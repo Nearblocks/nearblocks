@@ -1,0 +1,74 @@
+/*
+  Sample event job file (remove '.txt' from file name).
+  Only run jobs after the main indexer runs past startsAt block height.
+  Jobs will run forever if stopsAt isn't used.
+*/
+import { startStream, types } from 'near-lake-framework';
+
+import config from '#config';
+import knex from '#libs/knex';
+import logger from '#libs/log';
+import redis from '#libs/redis';
+import contract from '#services/contracts/mainnet/wrap.near';
+
+const service = 'wrap.near'; // Contract name
+const startsAt = 30181650; // Start from block height
+const stopsAt = 40181650; // Stops at block height (optional)
+
+const lakeConfig: types.LakeConfig = {
+  s3BucketName: config.s3BucketName,
+  s3RegionName: config.s3RegionName,
+  startBlockHeight: startsAt,
+  blocksPreloadPoolSize: config.preloadSize,
+};
+
+const onMessage = async (message: types.StreamerMessage) => {
+  await Promise.all(
+    message.shards.map(async (shard) => {
+      await Promise.all(
+        shard.receiptExecutionOutcomes.map(async (outcome) => {
+          if (outcome.receipt?.receiverId === service) {
+            await contract(knex, message.block.header, shard.shardId, outcome);
+          }
+        }),
+      );
+    }),
+  );
+};
+
+// No need make changes past this line
+const handleMessage = async (message: types.StreamerMessage) => {
+  try {
+    const block = message.block.header.height;
+
+    if (stopsAt && (stopsAt + 10) <= block) {
+      // Work around to end data streaming until there is a way to interrupt streaming programatically https://github.com/near/near-lake-framework-js/issues/2
+      process.exit();
+    }
+
+    logger.info(`${service}: syncing block: ${block}`);
+    await onMessage(message);
+    await redis.set(`job:${service}`, block + 1);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
+const job = async () => {
+  lakeConfig.startBlockHeight = startsAt;
+  const block = await redis.get(`job:${service}`);
+
+  if (stopsAt && block && stopsAt <= +block) return;
+
+  if (block && +block > startsAt) {
+    const next = +block - config.delta;
+    const start = next > startsAt ? next : startsAt;
+    lakeConfig.startBlockHeight = start;
+    logger.info(`${service}: last synced block: ${block}`);
+    logger.info(`${service}: syncing from block: ${start}`);
+  }
+
+  await startStream(lakeConfig, handleMessage);
+};
+
+export default job;

@@ -1,0 +1,25 @@
+version: "3.6"
+services:
+  indexer:
+    container_name: mainnet-indexer
+    build:
+      context: indexer
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file: mainnet.env
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "10m"
+  redis:
+    container_name: mainnet-redis
+    image: redis:6.2-alpine
+    command: redis-server --appendonly yes --appendfsync always
+    restart: always
+    volumes:
+      - redis-data:/mnt/redis
+
+volumes:
+  redis-data:
