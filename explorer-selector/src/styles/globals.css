@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+  -webkit-font-smoothing: antialiased;
+  color: var(--sand12);
+}
+
+.font-inherit {
+  font-family: inherit !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  text-decoration: none;
+}
