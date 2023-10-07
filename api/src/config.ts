@@ -36,7 +36,7 @@ const config: Config = {
     ? env.NETWORK === Network.MAINNET
       ? 'api.nearblocks.io'
       : 'api-testnet.nearblocks.io'
-    : 'localhost:3000'
+    : 'localhost:3000',
 };
 
 export default config;

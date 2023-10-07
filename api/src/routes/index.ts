@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import key from '#routes/key';
 import fts from '#routes/fts';
 import txns from '#routes/txns';
 import nfts from '#routes/nfts';
@@ -24,6 +25,7 @@ const routes = () => {
   stats(app);
   charts(app);
   search(app);
+  key(app);
 
   return app;
 };
