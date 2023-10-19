@@ -9,8 +9,8 @@ const config = {
       : "https://nearblocks.io",
   nearexplorer:
     props?.network === "testnet"
-      ? "https://explorer.testnet.near.org"
-      : "https://explorer.near.org",
+      ? "https://legacy.explorer.testnet.near.org"
+      : "https://legacy.explorer.near.org",
 };
 
 function getFirstPathSegment(url) {
