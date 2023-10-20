@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "#config": ["config.ts"],
+      "#libs/*": ["libs/*"],
+      "#services/*": ["services/*"],
+      "#jobs/*": ["jobs/*"],
+      "#ts/*": ["types/*"]
+    },
+    "target": "es2022",
+    "module": "node16",
+    "lib": ["esnext"],
+    "moduleResolution": "node16",
+    "rootDir": ".",
+    "outDir": "build",
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"]
+}
