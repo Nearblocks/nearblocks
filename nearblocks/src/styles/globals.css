@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+  -webkit-font-smoothing: antialiased;
+  color: var(--sand12);
+}
+
+.font-inherit {
+  font-family: inherit !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  text-decoration: none;
+}
+
+@keyframes loading-pulse-1 {
+  0% {
+    top: 36px;
+    height: 128px
+  }
+
+  50% {
+    top: 60px;
+    height: 80px
+  }
+
+  100% {
+    top: 60px;
+    height: 80px
+  }
+}
+
+@keyframes loading-pulse-2 {
+  0% {
+    top: 41.99999999999999px;
+    height: 116.00000000000001px
+  }
+
+  50% {
+    top: 60px;
+    height: 80px
+  }
+
+  100% {
+    top: 60px;
+    height: 80px
+  }
+}
+
+@keyframes loading-pulse-3 {
+  0% {
+    top: 48px;
+    height: 104px
+  }
+
+  50% {
+    top: 60px;
+    height: 80px
+  }
+
+  100% {
+    top: 60px;
+    height: 80px
+  }
+}
+
+.loading-pulse div {
+  position: absolute;
+  width: 30px
+}
+
+.loading-pulse div:nth-child(1) {
+  left: 35px;
+  background: #0D494A;
+  animation: loading-pulse-1 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: -0.2s
+}
+
+.loading-pulse div:nth-child(2) {
+  left: 85px;
+  background: #0D494A;
+  animation: loading-pulse-2 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: -0.1s
+}
+
+.loading-pulse div:nth-child(3) {
+  left: 135px;
+  background: #0D494A;
+  animation: loading-pulse-3 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: undefineds
+}
+
+.loading-spinner-pulse-container {
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  overflow: hidden;
+  background: #FFFF;
+}
+
+.loading-pulse {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: translateZ(0) scale(1);
+  backface-visibility: hidden;
+  transform-origin: 0 0;
+}
+
+.loading-pulse div {
+  box-sizing: content-box;
+}
