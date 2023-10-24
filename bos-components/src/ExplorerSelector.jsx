@@ -149,10 +149,10 @@ const H6 = styled.h6`
 const NearBlocksButton = styled.a`
   height: 191px;
   width: 264px;
-  border: ${props.selected === "nearblocks" ? "" : "2px solid #338E7B"};
+  border: ${state.selected === "nearblocks" ? "2px solid #338E7B" : ""};
   position: relative;
   border-radius: 10px;
-  box-shadow: ${props.selected === "nearblocks" ? "" : " 0 0 3px  #999"};
+  box-shadow: ${state.selected === "nearblocks" ? "" : " 0 0 3px  #999"};
   margin: 10px;
   display: flex;
   justify-content: center;
@@ -180,10 +180,10 @@ const Tag = styled.span`
 const NearExplorerButton = styled.a`
   height: 191px;
   width: 264px;
-  border: ${props.selected === "nearexplorer" ? "3px solid #338E7B" : ""};
+  border: ${state.selected === "nearexplorer" ? "3px solid #338E7B" : ""};
   position: relative;
   border-radius: 10px;
-  box-shadow: ${props.selected === "nearexplorer" ? "" : " 0 0 3px  #999"};
+  box-shadow: ${state.selected === "nearexplorer" ? "" : " 0 0 3px  #999"};
   margin: 10px;
   display: flex;
   justify-content: center;
@@ -217,7 +217,7 @@ const Badge = styled.span`
 return (
   <Main>
     <H3>NEAR Explorer Selector</H3>
-    {getFirstPathSegment(path) && (
+    {getFirstPathSegment(path) && !hasLinkNearblocks && !hasLinkNearblocks && (
       <H6>
         You are searching for{" "}
         {selectUrlAfterSecondSlash(path)
