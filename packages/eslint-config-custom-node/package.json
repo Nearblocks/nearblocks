@@ -1,0 +1,13 @@
+{
+  "name": "eslint-config-custom-node",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.js",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "~6.8",
+    "@typescript-eslint/parser": "~6.8",
+    "eslint": "~8.51",
+    "eslint-config-prettier": "~8.3",
+    "eslint-plugin-perfectionist": "~2.2"
+  }
+}

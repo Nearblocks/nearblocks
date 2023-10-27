@@ -1,19 +1,19 @@
 version: "3.6"
 services:
-  api:
-    container_name: mainnet-api
+  indexer-base:
+    container_name: mainnet-indexer-base
     build:
-      context: api
+      context: .
+      dockerfile: ./apps/indexer-base/Dockerfile
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - 3001:3001
     env_file: mainnet.env
-  indexer:
-    container_name: mainnet-indexer
+  indexer-balance:
+    container_name: mainnet-indexer-balance
     build:
-      context: indexer
+      context: .
+      dockerfile: ./apps/indexer-balance/Dockerfile
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"

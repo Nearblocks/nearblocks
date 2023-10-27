@@ -1,0 +1,28 @@
+{
+  "name": "nearblocks",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,ts,tsx,md,json}\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint-config-custom-nextjs": "*",
+    "eslint-config-custom-node": "*",
+    "prettier": "3.0.3",
+    "turbo": "1.10.16"
+  },
+  "packageManager": "yarn@1.22.19",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
+  }
+}

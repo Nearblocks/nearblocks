@@ -1,0 +1,41 @@
+{
+  "name": "indexer-balance",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src -e .ts",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "dependencies": {
+    "@sentry/node": "7.74.1",
+    "axios": "1.5.1",
+    "envalid": "8.0.0",
+    "lodash-es": "4.17.21",
+    "near-api-js": "2.1.4",
+    "near-lake-framework": "2.0.0",
+    "redis-lock": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "~4.17",
+    "@types/node": "~20.8",
+    "eslint-config-custom-node": "*",
+    "nodemon": "~3.0",
+    "rimraf": "~5.0",
+    "nb-knex": "*",
+    "nb-logger": "*",
+    "nb-redis": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "typescript": "~5.2"
+  }
+}
