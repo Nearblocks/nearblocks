@@ -1,6 +1,6 @@
-import { useVmStore } from "@/stores/vm";
+import { useVmStore } from '@/stores/vm';
 
-import { Spinner } from "../lib/Spinner";
+import { Spinner } from '../lib/Spinner';
 
 type Props = {
   className?: string;

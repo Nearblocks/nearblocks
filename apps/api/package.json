@@ -15,9 +15,7 @@
     "clean": "rimraf build",
     "build": "yarn clean && tsc -p tsconfig.json",
     "start": "node build/src/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
-    "lint": "eslint ./src --ext .ts",
-    "format": "prettier --config .prettierrc --write ./src"
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts"
   },
   "dependencies": {
     "@sentry/node": "7.18.0",

@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from 'react';
 
-import { useBosLoaderStore } from "@/stores/bos-loader";
+import { useBosLoaderStore } from '@/stores/bos-loader';
 
 export function useBosLoaderInitializer() {
   const loaderUrl = process.env.NEXT_PUBLIC_LOADER_URL;
@@ -15,14 +15,14 @@ export function useBosLoaderInitializer() {
 
       try {
         const res = await fetch(url, {
-          method: "GET",
+          method: 'GET',
           headers: {
-            Accept: "application/json",
+            Accept: 'application/json',
           },
         });
 
         if (!res.ok) {
-          throw new Error("Network response was not OK");
+          throw new Error('Network response was not OK');
         }
 
         const data = await res.json();
@@ -40,7 +40,7 @@ export function useBosLoaderInitializer() {
         });
       }
     },
-    [setStore]
+    [setStore],
   );
 
   useEffect(() => {

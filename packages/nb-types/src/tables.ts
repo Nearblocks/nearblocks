@@ -1,8 +1,12 @@
 import {
   AccessKeyPermissionKind,
   ActionKind,
+  EventCause,
+  EventStatus,
   ExecutionOutcomeStatus,
   ReceiptKind,
+  StateChangeCause,
+  StateChangeDirection,
 } from './enums.js';
 import { JsonObject, JsonValue } from './types.js';
 
@@ -16,6 +20,8 @@ export interface TTables {
   chunks: Chunk;
   execution_outcome_receipts: ExecutionOutcomeReceipt;
   execution_outcomes: ExecutionOutcome;
+  ft_events: FTEvent;
+  nft_events: NFTEvent;
   receipts: Receipt;
   settings: Setting;
   transactions: Transaction;
@@ -64,14 +70,14 @@ export type BalanceEvent = {
   affected_account_id: string;
   block_height: number;
   block_timestamp: string;
-  cause: string;
+  cause: StateChangeCause;
   delta_nonstaked_amount: string;
   delta_staked_amount: string;
-  direction: string;
+  direction: StateChangeDirection;
   event_index: string;
   involved_account_id: null | string;
   receipt_id: null | string;
-  status: string;
+  status: EventStatus;
   transaction_hash: null | string;
 };
 
@@ -112,6 +118,38 @@ export type ExecutionOutcome = {
   shard_id: number;
   status: ExecutionOutcomeStatus;
   tokens_burnt: string;
+};
+
+export type FTEvent = {
+  absolute_amount: string;
+  affected_account_id: string;
+  block_height: number;
+  block_timestamp: string;
+  cause: EventCause;
+  contract_account_id: string;
+  delta_amount: string;
+  event_index: string;
+  event_memo: null | string;
+  involved_account_id: null | string;
+  receipt_id: string;
+  standard: string;
+  status: EventStatus;
+};
+
+export type NFTEvent = {
+  authorized_account_id: null | string;
+  block_height: number;
+  block_timestamp: string;
+  cause: EventCause;
+  contract_account_id: string;
+  event_index: string;
+  event_memo: null | string;
+  new_owner_account_id: null | string;
+  old_owner_account_id: null | string;
+  receipt_id: string;
+  standard: string;
+  status: EventStatus;
+  token_id: string;
 };
 
 export type Receipt = {

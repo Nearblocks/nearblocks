@@ -9,7 +9,7 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing indexer...');
+    logger.info({ network: config.network }, 'initializing base indexer...');
     await redisClient.connect();
     logger.info('syncing genesis data...');
     await syncGenesis();
@@ -27,7 +27,7 @@ const onSignal = async (signal: number | string) => {
   try {
     await knex.destroy();
     await redisClient.quit();
-    await sentry.close(1000);
+    await sentry.close(1_000);
   } catch (error) {
     logger.error(error);
   }

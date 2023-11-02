@@ -1,7 +1,7 @@
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
-import { VmComponent } from "@/components/vm/VmComponent";
-import { useBosComponents } from "@/hooks/useBosComponents";
+import { VmComponent } from '@/components/vm/VmComponent';
+import { useBosComponents } from '@/hooks/useBosComponents';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 

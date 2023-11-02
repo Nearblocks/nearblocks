@@ -1,4 +1,4 @@
-import type { NetworkId } from "@/utils/types";
+import type { NetworkId } from '@/utils/types';
 
 type NetworkComponents = {
   home: string;

@@ -8,9 +8,9 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing indexer...');
+    logger.info({ network: config.network }, 'initializing balance indexer...');
     await redisClient.connect();
-    logger.info('syncing blockchain data...');
+    logger.info('syncing balance data...');
     await syncData();
   } catch (error) {
     logger.error('aborting...');
@@ -24,7 +24,7 @@ const onSignal = async (signal: number | string) => {
   try {
     await knex.destroy();
     await redisClient.quit();
-    await sentry.close(1000);
+    await sentry.close(1_000);
   } catch (error) {
     logger.error(error);
   }

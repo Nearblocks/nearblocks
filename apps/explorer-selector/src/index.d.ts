@@ -1,6 +1,6 @@
-declare module "near-social-vm";
+declare module 'near-social-vm';
 
-declare module "nanoid" {
+declare module 'nanoid' {
   export function nanoid(size?: number): string;
 }
 

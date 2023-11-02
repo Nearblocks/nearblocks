@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 type BosLoaderState = {
   failedToLoad: boolean;
@@ -14,7 +14,7 @@ type BosLoaderStore = BosLoaderState & {
 export const useBosLoaderStore = create<BosLoaderStore>((set) => ({
   failedToLoad: false,
   hasResolved: false,
-  loaderUrl: "",
+  loaderUrl: '',
   redirectMap: {},
   set: (state) => set((previousState) => ({ ...previousState, ...state })),
 }));

@@ -10,12 +10,10 @@ RUN turbo prune indexer-balance --docker
 
 FROM base AS installer
 WORKDIR /app
-
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn --immutable
-
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 RUN yarn turbo run build --filter=indexer-balance...
@@ -24,7 +22,6 @@ FROM base AS runner
 ENV NODE_ENV production
 USER node
 WORKDIR /app
-
 COPY --chown=node:node --from=installer /app .
 COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
 

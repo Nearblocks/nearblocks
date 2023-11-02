@@ -31,10 +31,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "neon"
+name = "nb-json"
 version = "0.1.0"
 dependencies = [
- "neon 0.10.1",
+ "neon",
  "neon-serde3",
  "serde_json",
 ]
@@ -86,7 +86,7 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82cc4314b64e35f90f2d817d17bee06a63d3eba36058e0dc73ad21f24cf5033c"
 dependencies = [
- "neon 0.10.1",
+ "neon",
  "num",
  "serde",
 ]

@@ -11,8 +11,6 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "dependencies": {
@@ -28,10 +26,9 @@
     "@types/lodash-es": "~4.17",
     "@types/node": "~20.8",
     "@types/stream-json": "~1.7",
-    "cpy-cli": "~5.0",
     "eslint-config-custom-node": "*",
-    "nodemon": "~3.0",
     "rimraf": "~5.0",
+    "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-redis": "*",

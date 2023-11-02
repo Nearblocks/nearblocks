@@ -1,10 +1,10 @@
 import { Knex } from 'knex';
-import { AccountView } from 'near-api-js/lib/providers/provider.js';
 import { types } from 'near-lake-framework';
 
+import { AccountView } from 'nb-near';
 import {
   BalanceEvent,
-  ExecutionOutcomeStatus,
+  EventStatus,
   StateChangeCause,
   StateChangeCauseView,
   StateChangeDirection,
@@ -13,7 +13,7 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isAccountDelete, isAccountUpdate } from '#libs/guards';
-import { viewAccount } from '#libs/near';
+import near from '#libs/near';
 import { redis, redisClient, redLock } from '#libs/redis';
 import { mapStateChangeStatus } from '#libs/utils';
 import {
@@ -79,11 +79,11 @@ export const storeChunkBalance = async (
   if (!changesLength) return;
 
   const startIndex =
-    BigInt(block.timestamp) * 100000000n * 100000000n +
-    BigInt(shard.shardId) * 10000000n;
+    BigInt(block.timestamp) * 100_000_000n * 100_000_000n +
+    BigInt(shard.shardId) * 10_000_000n;
 
   for (let index = 0; index < changesLength; index++) {
-    changes[index].event_index = (startIndex + BigInt(index)).toString();
+    changes[index].event_index = String(startIndex + BigInt(index));
   }
 
   await retry(async () => {
@@ -231,7 +231,7 @@ const storeValidatorChanges = async (
       event_index: '0',
       involved_account_id: null,
       receipt_id: null,
-      status: ExecutionOutcomeStatus.SUCCESS_VALUE,
+      status: EventStatus.SUCCESS,
       transaction_hash: null,
     });
   }
@@ -530,7 +530,7 @@ const getRPCBalance = async (
   accountId: string,
   blockHash: string,
 ): Promise<Balance> => {
-  const { data } = await viewAccount(accountId, blockHash);
+  const { data } = await near.viewAccount(accountId, blockHash);
 
   if (data.result) {
     const account = data.result as AccountView;
@@ -555,12 +555,13 @@ const getDeltas = (
   currentBalance: AccountBalance,
 ) => {
   return {
-    nonStaked: (
+    nonStaked: String(
       BigInt(currentBalance.balance.nonStaked) -
-      BigInt(prevBalance.balance.nonStaked)
-    ).toString(),
-    staked: (
-      BigInt(currentBalance.balance.staked) - BigInt(prevBalance.balance.staked)
-    ).toString(),
+        BigInt(prevBalance.balance.nonStaked),
+    ),
+    staked: String(
+      BigInt(currentBalance.balance.staked) -
+        BigInt(prevBalance.balance.staked),
+    ),
   };
 };

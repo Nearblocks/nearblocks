@@ -24,11 +24,14 @@ import {
 import { AccessKeyPermission, ReceiptAction } from '#types/types';
 
 const require = createRequire(import.meta.url);
-const neon = require('../../neon');
+const json = require('nb-json');
 
-export const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
+export const jsonParse = (args: string) => json.parse(args);
+
+export const jsonStringify = (args: unknown): string => json.stringify(args);
+
+export const decodeArgs = <T>(args: string): T =>
+  json.parse(Buffer.from(args, 'base64').toString());
 
 export const mapExecutionStatus = (
   status: types.ExecutionStatus,
@@ -165,13 +168,6 @@ export const publicKeyFromImplicitAccount = (account: string) => {
     return null;
   }
 };
-
-export const jsonParse = (args: string) => neon.parse(args);
-
-export const jsonStringify = (args: unknown): string => neon.stringify(args);
-
-export const decodeArgs = <T>(args: string): T =>
-  neon.parse(Buffer.from(args, 'base64').toString());
 
 export const isExecutionSuccess = (status: types.ExecutionStatus) => {
   if ('SuccessValue' in status || 'SuccessReceiptId' in status) {

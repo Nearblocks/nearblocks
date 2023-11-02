@@ -12,8 +12,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
-        destination: process.env.NEXT_PUBLIC_NETWORK_ID === "mainnet" ? "https://legacy.explorer.near.org/api/:path*" : "https://legacy.explorer.testnet.near.org/api/:path*",
+        source: '/api/:path*',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://legacy.explorer.near.org/api/:path*'
+            : 'https://legacy.explorer.testnet.near.org/api/:path*',
       },
     ];
   },

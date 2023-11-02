@@ -11,14 +11,16 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,ts,tsx,md,json}\""
+    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,ts,tsx,md,json}\"",
+    "prepare": "husky install"
   },
   "dependencies": {},
   "devDependencies": {
     "eslint-config-custom-nextjs": "*",
     "eslint-config-custom-node": "*",
     "prettier": "3.0.3",
-    "turbo": "1.10.16"
+    "turbo": "1.10.16",
+    "husky": "8.0.0"
   },
   "packageManager": "yarn@1.22.19",
   "engines": {

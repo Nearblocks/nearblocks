@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from 'envalid';
+import { cleanEnv, str } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -10,7 +10,6 @@ const env = cleanEnv(process.env, {
   REDIS_URL: str(),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
-  START_BLOCK_HEIGHT: num(),
 });
 
 const network: Network =
@@ -24,7 +23,7 @@ const config: Config = {
   cacheExpiry: 60 * 60 * 24, // cache expiry time in seconds (1 day)
   dbUrl: env.DATABASE_URL,
   delta: 100, // start from blocks earlier on sync interuption
-  insertLimit: 1000, // records to insert into the db at a time
+  insertLimit: 1_000, // records to insert into the db at a time
   network: network,
   preloadSize: 100, // blocks to preload in nearlake
   redisUrl: env.REDIS_URL,
@@ -32,7 +31,7 @@ const config: Config = {
   s3BucketName,
   s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: env.START_BLOCK_HEIGHT,
+  startBlockHeight: 0,
 };
 
 export default config;

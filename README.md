@@ -20,6 +20,6 @@ We welcome contribution to Near Blocks, please see CONTRIBUTING for more informa
 
 ## License
 
-Near Blocks is licensed under the terms of Business Source License 1.1. 
+Near Blocks is licensed under the terms of Business Source License 1.1.
 
 See LICENSE for details

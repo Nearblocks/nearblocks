@@ -13,7 +13,7 @@ const env = cleanEnv(process.env, {
 
 const network: Network =
   env.NETWORK === Network.TESTNET ? Network.TESTNET : Network.MAINNET;
-const genesisHeight = network === Network.MAINNET ? 9820210 : 42376888;
+const genesisHeight = network === Network.MAINNET ? 9_820_210 : 42_376_888;
 const genesisTimestamp =
   network === Network.MAINNET ? '1595350551591948000' : '1596166782911378000';
 const genesisFile = `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/${network}/genesis.json`;
@@ -25,11 +25,11 @@ const s3BucketName =
 const config: Config = {
   cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
   dbUrl: env.DATABASE_URL,
-  delta: 1000, // start from blocks earlier on sync interuption
+  delta: 1_000, // start from blocks earlier on sync interuption
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,
-  insertLimit: 1000, // records to insert into the db at a time
+  insertLimit: 1_000, // records to insert into the db at a time
   network: network,
   preloadSize: 100, // blocks to preload in nearlake
   redisUrl: env.REDIS_URL,

@@ -8,7 +8,7 @@
 
 ## Introduction
 
-The NearBlocks is built on BOS (Blockchain Operating System) and provides a convenient way to select and use our components. 
+The NearBlocks is built on BOS (Blockchain Operating System) and provides a convenient way to select and use our components.
 
 You can access all our deployed components here [https://near.social/mob.near/widget/LastWidgets?accountId=nearblocks.near](https://near.social/mob.near/widget/LastWidgets?accountId=nearblocks.near)
 
@@ -34,7 +34,7 @@ Or use it in app by adding: `account`/widget/`Near BOS Component` into the Widge
 
 ## Continuous Integration & Delivery
 
-We use the [BOS CLI](https://github.com/bos-cli-rs/bos-cli-rs "BOS CLI") (Command Line Interface) in conjunction with GitHub Actions to automate Continuous Integration (CI) and Continuous Delivery (CD). This streamlined process ensures smooth code deployment to both testnet and mainnet environments.
+We use the [BOS CLI](https://github.com/bos-cli-rs/bos-cli-rs 'BOS CLI') (Command Line Interface) in conjunction with GitHub Actions to automate Continuous Integration (CI) and Continuous Delivery (CD). This streamlined process ensures smooth code deployment to both testnet and mainnet environments.
 
 ### Configuration Requirements
 
@@ -44,7 +44,7 @@ Prepare access key that will be used for components deployment.
 
 It is recommended to use a dedicated function-call-only access key, so you need to:
 
-1.1. (Optional) Creating a new account. Here is [near CLI RS](https://github.com/near/near-cli-rs "near CLI RS") command to do that:
+1.1. (Optional) Creating a new account. Here is [near CLI RS](https://github.com/near/near-cli-rs 'near CLI RS') command to do that:
 
 > ```bash
 > # Create the key  (change account.near to NEAR Account)
@@ -68,7 +68,7 @@ It is recommended to use a dedicated function-call-only access key, so you need 
 > export ACCOUNT_ID_MAINNET=nearblocks.near
 > ```
 
-1.3. Add a new access key to account, explicitly adding permissions to call the set method. 
+1.3. Add a new access key to account, explicitly adding permissions to call the set method.
 
 > ```bash
 > # For testnet:

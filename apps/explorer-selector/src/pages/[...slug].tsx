@@ -1,4 +1,4 @@
-import ExplorerSelector from "@/components/ExplorerSelector";
+import ExplorerSelector from '@/components/ExplorerSelector';
 
 const ExplorerPage = () => {
   return <ExplorerSelector />;

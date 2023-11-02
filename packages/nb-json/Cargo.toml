@@ -1,5 +1,5 @@
 [package]
-name = "neon"
+name = "nb-json"
 version = "0.1.0"
 license = "ISC"
 edition = "2018"

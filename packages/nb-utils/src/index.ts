@@ -1,8 +1,8 @@
-type Options = {
+export type Options = {
   retries?: number;
 };
 
-type Context = {
+export type Context = {
   attempt: number;
 };
 
