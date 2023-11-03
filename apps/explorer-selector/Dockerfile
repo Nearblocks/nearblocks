@@ -1,53 +1,42 @@
-# Deps
-FROM node:18-alpine AS deps
+# https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
+FROM node:20-bookworm-slim as base
 
-ARG NEXT_PUBLIC_NETWORK_ID
-ARG NEXT_PUBLIC_BOS_NETWORK
-ARG NEXT_PUBLIC_ACCOUNT_ID
-
-RUN apk add --no-cache libc6-compat git
-WORKDIR /usr/src/app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-# Builder
-FROM node:18-alpine AS builder
-
-ARG NEXT_PUBLIC_NETWORK_ID
-ARG NEXT_PUBLIC_BOS_NETWORK
-ARG NEXT_PUBLIC_ACCOUNT_ID
-
-WORKDIR /usr/src/app
-COPY --from=deps /usr/src/app/node_modules ./node_modules
+FROM base AS builder
+RUN apt update && apt install -y dumb-init
+WORKDIR /app
+RUN yarn global add turbo
 COPY . .
-RUN yarn build
+RUN turbo prune explorer-selector --docker
 
-# Runner
-FROM node:18-alpine AS runner
-
+FROM base AS installer
+WORKDIR /app
 ARG NEXT_PUBLIC_NETWORK_ID
 ARG NEXT_PUBLIC_BOS_NETWORK
 ARG NEXT_PUBLIC_ACCOUNT_ID
-
-WORKDIR /usr/src/app
-
-ENV NODE_ENV production
-
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-COPY --from=builder /usr/src/app/next.config.js ./
-# COPY --from=builder /usr/src/app/public ./public
-COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /usr/src/app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV HOST 0.0.0.0
-ENV PORT 3000
 ENV NEXT_TELEMETRY_DISABLED 1
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/yarn.lock ./yarn.lock
+RUN yarn install
+COPY --from=builder /app/out/full/ .
+COPY turbo.json turbo.json
+RUN yarn turbo run build --filter=explorer-selector...
 
-CMD ["node", "server.js"]`
+FROM base AS runner
+WORKDIR /app
+ARG NEXT_PUBLIC_NETWORK_ID
+ARG NEXT_PUBLIC_BOS_NETWORK
+ARG NEXT_PUBLIC_ACCOUNT_ID
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
+COPY --from=installer /app/apps/web/next.config.js .
+COPY --from=installer /app/apps/web/package.json .
+COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+
+CMD ["dumb-init", "node", "apps/indexer-balance/dist/index.js"]

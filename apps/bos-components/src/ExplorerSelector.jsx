@@ -1,16 +1,16 @@
 State.init({
-  selected: "nearblocks",
+  selected: 'nearblocks',
 });
 
 const config = {
   nearblocks:
-    props?.network === "testnet"
-      ? "https://testnet.nearblocks.io"
-      : "https://nearblocks.io",
+    props?.network === 'testnet'
+      ? 'https://testnet.nearblocks.io'
+      : 'https://nearblocks.io',
   nearexplorer:
-    props?.network === "testnet"
-      ? "https://legacy.explorer.testnet.near.org"
-      : "https://legacy.explorer.near.org",
+    props?.network === 'testnet'
+      ? 'https://legacy.explorer.testnet.near.org'
+      : 'https://legacy.explorer.near.org',
 };
 
 function getFirstPathSegment(url) {
@@ -19,12 +19,12 @@ function getFirstPathSegment(url) {
   if (match && match[1]) {
     return match[1];
   } else {
-    return "";
+    return '';
   }
 }
 
 function removePlural(word) {
-  if (word.endsWith("s")) {
+  if (word.endsWith('s')) {
     return word.slice(0, -1);
   } else {
     return word;
@@ -32,27 +32,27 @@ function removePlural(word) {
 }
 
 function selectUrlAfterSecondSlash(url) {
-  const segments = url.split("/");
+  const segments = url.split('/');
 
   if (segments.length >= 3) {
-    const selectedUrl = segments.slice(2).join("/");
+    const selectedUrl = segments.slice(2).join('/');
     return selectedUrl;
   } else {
-    return "";
+    return '';
   }
 }
 
 function getHref(link) {
   if (link)
     switch (getFirstPathSegment(link)) {
-      case "accounts":
+      case 'accounts':
         return (
-          config.nearblocks + "/address/" + selectUrlAfterSecondSlash(link)
+          config.nearblocks + '/address/' + selectUrlAfterSecondSlash(link)
         );
-      case "transactions":
-        return config.nearblocks + "/txns/" + selectUrlAfterSecondSlash(link);
-      case "stats":
-        return config.nearblocks + "/charts";
+      case 'transactions':
+        return config.nearblocks + '/txns/' + selectUrlAfterSecondSlash(link);
+      case 'stats':
+        return config.nearblocks + '/charts';
 
       default:
         return config.nearblocks + link;
@@ -65,15 +65,15 @@ function getHref(link) {
 function linkNearblocks(link) {
   if (link)
     switch (getFirstPathSegment(link)) {
-      case "":
+      case '':
         return true;
-      case "accounts":
+      case 'accounts':
         return true;
-      case "transactions":
+      case 'transactions':
         return true;
-      case "blocks":
+      case 'blocks':
         return true;
-      case "stats":
+      case 'stats':
         return true;
       default:
         return false;
@@ -83,24 +83,24 @@ function linkNearblocks(link) {
 function linkNearExplorer(link) {
   if (link)
     switch (getFirstPathSegment(link)) {
-      case "":
+      case '':
         return true;
-      case "accounts":
+      case 'accounts':
         return true;
-      case "transactions":
+      case 'transactions':
         return true;
-      case "blocks":
+      case 'blocks':
         return true;
-      case "stats":
+      case 'stats':
         return true;
-      case "nodes":
+      case 'nodes':
         return true;
       default:
         return false;
     }
 }
 
-const path = props?.path || "";
+const path = props?.path || '';
 const href = getHref(path);
 const hasLinkNearblocks = props?.path ? !linkNearblocks(path) : false;
 const hasLinkNearExplorer = props?.path ? !linkNearExplorer(path) : false;
@@ -149,10 +149,10 @@ const H6 = styled.h6`
 const NearBlocksButton = styled.a`
   height: 191px;
   width: 264px;
-  border: ${state.selected === "nearblocks" ? "2px solid #338E7B" : ""};
+  border: ${state.selected === 'nearblocks' ? '2px solid #338E7B' : ''};
   position: relative;
   border-radius: 10px;
-  box-shadow: ${state.selected === "nearblocks" ? "" : " 0 0 3px  #999"};
+  box-shadow: ${state.selected === 'nearblocks' ? '' : ' 0 0 3px  #999'};
   margin: 10px;
   display: flex;
   justify-content: center;
@@ -180,10 +180,10 @@ const Tag = styled.span`
 const NearExplorerButton = styled.a`
   height: 191px;
   width: 264px;
-  border: ${state.selected === "nearexplorer" ? "3px solid #338E7B" : ""};
+  border: ${state.selected === 'nearexplorer' ? '3px solid #338E7B' : ''};
   position: relative;
   border-radius: 10px;
-  box-shadow: ${state.selected === "nearexplorer" ? "" : " 0 0 3px  #999"};
+  box-shadow: ${state.selected === 'nearexplorer' ? '' : ' 0 0 3px  #999'};
   margin: 10px;
   display: flex;
   justify-content: center;
@@ -219,7 +219,7 @@ return (
     <H3>NEAR Explorer Selector</H3>
     {getFirstPathSegment(path) && !hasLinkNearblocks && !hasLinkNearblocks && (
       <H6>
-        You are searching for{" "}
+        You are searching for{' '}
         {selectUrlAfterSecondSlash(path)
           ? removePlural(getFirstPathSegment(path))
           : getFirstPathSegment(path)}
@@ -238,12 +238,12 @@ return (
             : config.nearblocks
         }
         onClick={() => {
-          onSelect({ selected: "nearblocks" });
+          onSelect({ selected: 'nearblocks' });
         }}
       >
         <Tag>Recommended</Tag>
         <ImageTab
-          src={"https://nearblocks.io/images/nearblocksblack.svg"}
+          src={'https://nearblocks.io/images/nearblocksblack.svg'}
           alt="Nearblocks"
         ></ImageTab>
       </NearBlocksButton>
@@ -254,7 +254,7 @@ return (
             : config.nearexplorer
         }
         onClick={() => {
-          onSelect({ selected: "nearexplorer" });
+          onSelect({ selected: 'nearexplorer' });
         }}
       >
         <ImageTab

@@ -1,4 +1,8 @@
-## Config
+## 📚 Indexer Base
+
+Base indexer works with basic information about blocks 🧱, transactions 💸, receipts 🧾, account 👤 & access keys 🔑
+
+### Config
 
 ```
 DATABASE_URL=

@@ -11,7 +11,9 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,ts,tsx,md,json}\"",
+    "lint:check": "turbo run lint:check",
+    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,jsx,ts,tsx,md,json}\"",
+    "format:check": "prettier --config .prettierrc --check --cache \"**/*.{js,cjs,jsx,ts,tsx,md,json}\"",
     "prepare": "husky install"
   },
   "dependencies": {},

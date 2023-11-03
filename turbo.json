@@ -6,9 +6,17 @@
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_API_HOST"]
+      "env": [
+        "NEXT_PUBLIC_NETWORK_ID",
+        "NEXT_PUBLIC_ACCOUNT_ID",
+        "NEXT_PUBLIC_LOADER_URL",
+        "NEXT_PUBLIC_BOS_NETWORK"
+      ]
     },
     "lint": {
+      "dependsOn": ["^build"]
+    },
+    "lint:check": {
       "dependsOn": ["^build"]
     },
     "dev": {
