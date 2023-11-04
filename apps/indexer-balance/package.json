@@ -1,7 +1,8 @@
 {
   "name": "indexer-balance",
   "version": "0.1.0",
-  "private": true,
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
   "type": "module",
   "imports": {
     "#*": [

@@ -1,0 +1,11 @@
+version: "3.6"
+services:
+  api:
+    container_name: testnet-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file: testnet.env

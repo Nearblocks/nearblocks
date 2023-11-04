@@ -1,7 +1,7 @@
-import { Knex } from 'knex';
 import { difference, uniq } from 'lodash-es';
 import { types } from 'near-lake-framework';
 
+import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import {
   ActionReceiptAction,

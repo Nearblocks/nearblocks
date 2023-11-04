@@ -1,6 +1,6 @@
-import { Knex } from 'knex';
 import { types } from 'near-lake-framework';
 
+import { Knex } from 'nb-knex';
 import {
   EventCause,
   EventStandard,

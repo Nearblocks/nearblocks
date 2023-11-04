@@ -1,6 +1,6 @@
-import { Knex } from 'knex';
 import { types } from 'near-lake-framework';
 
+import { Knex } from 'nb-knex';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 

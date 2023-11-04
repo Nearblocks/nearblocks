@@ -1,7 +1,6 @@
-/* eslint-disable perfectionist/sort-enums */
-import { Knex } from 'knex';
 import { types } from 'near-lake-framework';
 
+import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { EventType, FTEvent, NFTEvent } from 'nb-types';
 

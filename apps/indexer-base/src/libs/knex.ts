@@ -1,5 +1,7 @@
-import { createKnex } from 'nb-knex';
+import { createKnex, Knex } from 'nb-knex';
 
 import config from '#config';
 
-export default createKnex(config.dbUrl);
+const knex: Knex = createKnex(config.dbUrl);
+
+export default knex;

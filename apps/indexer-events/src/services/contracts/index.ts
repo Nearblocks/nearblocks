@@ -1,7 +1,7 @@
 /* eslint-disable perfectionist/sort-objects */
-import { Knex } from 'knex';
 import { types } from 'near-lake-framework';
 
+import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 
