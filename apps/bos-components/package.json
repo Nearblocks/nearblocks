@@ -1,0 +1,10 @@
+{
+  "name": "bos-components",
+  "version": "1.0.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "scripts": {
+    "start:testnet": "BOS_URL=https://test.near.org/$ACCOUNT/widget/ExplorerSelector && open $BOS_URL && echo \"Preview at: $BOS_URL\"",
+    "dev": "yarn start:testnet && bos-loader $ACCOUNT --path src"
+  }
+}

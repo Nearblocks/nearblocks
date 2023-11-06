@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - "bos-components/**"
+      - "apps/bos-components/**"
   pull_request:
     branches: 
       - main
     types: [closed]
     paths:
-      - "bos-components/**"
+      - "apps/bos-components/**"
       
 jobs:
   deploy-mainnet:
@@ -34,5 +34,5 @@ jobs:
 
       - name: Deploy widgets
         run: |
-          cd bos-components &&
+          cd apps/bos-components &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
