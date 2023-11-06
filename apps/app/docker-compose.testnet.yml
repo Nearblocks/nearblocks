@@ -1,0 +1,17 @@
+name: nearblocks
+services:
+  testnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_NETWORK_ID: testnet
+        NEXT_PUBLIC_BOS_NETWORK: mainnet
+        NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
+    restart: always
+    ports:
+      - "127.0.0.1:3006:3000"
+    environment:
+      NEXT_PUBLIC_NETWORK_ID: testnet
+      NEXT_PUBLIC_BOS_NETWORK: mainnet
+      NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
