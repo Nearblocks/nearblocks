@@ -1,0 +1,23 @@
+name: Deploy NearBlocks Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/app/**"
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+    paths:
+      - "apps/app/**"
+
+jobs:
+  deploy-mainnet:
+    runs-on: ubuntu-latest
+    name: Deploy NearBlocks Gateway
+
+    steps:
+      - name: Deploy
+        run: echo
