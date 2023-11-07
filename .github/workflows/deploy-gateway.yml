@@ -1,4 +1,4 @@
-name: Deploy NearBlocks Gateway
+name: [NearBlocks Gateway] Release
 
 on:
   push:
@@ -16,7 +16,7 @@ on:
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
-    name: Deploy NearBlocks Gateway
+    name: Deploy
 
     steps:
       - name: Deploy
@@ -26,4 +26,4 @@ jobs:
           sync: true
           username: ${{ secrets.GATEWAY_SSH_USER }}
           key: ${{ secrets.GATEWAY_SSH_KEY }}
-          script: sh deploy.sh
+          script: ./deploy.sh

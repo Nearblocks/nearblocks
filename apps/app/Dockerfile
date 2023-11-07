@@ -14,7 +14,6 @@ ARG NEXT_PUBLIC_NETWORK_ID
 ARG NEXT_PUBLIC_BOS_NETWORK
 ARG NEXT_PUBLIC_ACCOUNT_ID
 ENV NEXT_TELEMETRY_DISABLED 1
-COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install
