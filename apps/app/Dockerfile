@@ -32,10 +32,9 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
 COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
-COPY --from=installer /app/apps/web/next.config.js .
-COPY --from=installer /app/apps/web/package.json .
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
-
-CMD ["dumb-init", "node", "apps/app/dist/index.js"]
+COPY --from=installer /app/apps/app/next.config.js .
+COPY --from=installer /app/apps/app/package.json .
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/static ./apps/app/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
+CMD ["dumb-init", "node", "apps/app/server.js"]
