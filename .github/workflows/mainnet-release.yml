@@ -1,4 +1,4 @@
-name: [BOS Components] Release
+name: BOS Components Release
 
 on:
   push:
