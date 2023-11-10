@@ -1,4 +1,4 @@
-name: [NearBlocks Gateway] Release
+name: NearBlocks Gateway Release
 
 on:
   push:

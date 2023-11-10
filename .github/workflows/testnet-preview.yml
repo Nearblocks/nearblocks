@@ -1,4 +1,4 @@
-name: [BOS Components] Preview
+name: BOS Components Preview
 
 on:
   pull_request:
