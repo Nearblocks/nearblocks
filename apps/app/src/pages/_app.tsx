@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
+import '../../public/common.css';
 
 import { MetaTags } from '@/components/MetaTags';
 import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
