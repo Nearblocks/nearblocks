@@ -28,11 +28,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+        
       - name: Install near-social CLI
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/FroVolod/bos-cli-rs/releases/download/v0.3.5/bos-cli-installer.sh | sh
 
       - name: Deploy widgets
         run: |
-          cd apps/bos-components &&
+          cd apps/bos-components/.bos/transpiled  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send

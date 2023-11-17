@@ -16,6 +16,7 @@ build
 
 # other
 dist/
+.bos
 
 # misc
 .DS_Store

@@ -9,6 +9,11 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap"
           rel="stylesheet"
         />
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://beta.nearblocks.io/common.css"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>

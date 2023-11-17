@@ -3,8 +3,33 @@
   "version": "1.0.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
+  "type": "module",
   "scripts": {
-    "start:testnet": "BOS_URL=https://test.near.org/$ACCOUNT/widget/ExplorerSelector && open $BOS_URL && echo \"Preview at: $BOS_URL\"",
-    "dev": "yarn start:testnet && bos-loader $ACCOUNT --path src"
+    "start:testnet": "BOS_URL=https://test.near.org/$ACCOUNT/widget/bos-components.components.ExplorerSelector && open $BOS_URL && echo \"Preview at: $BOS_URL\"",
+    "dev": "yarn start:testnet && bos-loader $ACCOUNT --path .bos/transpiled/src",
+    "build": "rimraf .bos/transpiled && mkdir -p .bos/transpiled/src && sucrase ./src -d .bos/transpiled/src/bos-components --transforms typescript,jsx --jsx-runtime preserve --disable-es-transforms --out-extension jsx && node ./build.js",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.2",
+    "@babel/preset-env": "^7.23.2",
+    "@csstools/postcss-extract": "^3.0.0",
+    "@fullhuman/postcss-purgecss": "^5.0.0",
+    "@types/react": "^18.2.27",
+    "autoprefixer": "^10.4.16",
+    "eslint-config-custom-nextjs": "*",
+    "cssnano": "^6.0.1",
+    "near-social-vm-types": "^1.0.0",
+    "path": "^0.12.7",
+    "postcss": "^8.4.31",
+    "purgecss": "^5.0.0",
+    "replace-in-files": "^3.0.0",
+    "rimraf": "^5.0.5",
+    "sucrase": "^3.34.0",
+    "nb-tsconfig": "*",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.2.2"
   }
 }

@@ -1,0 +1,39 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer utilities {
+    .flex-0 {
+        flex: 0;
+    }
+
+    .min-w-10 {
+        min-width: 10rem;
+    }
+}
+
+b,
+strong {
+    font-weight: 600;
+}
+
+pre[class*='language-'] {
+    margin: 0 !important;
+}
+
+pre[class*='language-']>code {
+    border-left: 4px solid #2d8f44 !important;
+    box-shadow: -1px 0px 0px 0px #2d8f44, 0px 0px 0px 1px #dfdfdf !important;
+}
+
+.soft-shadow {
+    box-shadow: 0 2.6px 6.3px rgba(0, 0, 0, 0.06),
+        0 6.3px 16px rgba(0, 0, 0, 0.04), 0 12px 32.6px rgba(0, 0, 0, 0.027),
+        0 21.4px 67.2px rgba(0, 0, 0, 0.018), 0 43px 184px rgba(0, 0, 0, 0.011);
+}
+
+.image-shadow {
+    box-shadow: 0 1.6px 5.4px rgba(0, 0, 0, 0.054),
+        0 4.4px 14.9px rgba(0, 0, 0, 0.069), 0 10.6px 35.9px rgba(0, 0, 0, 0.079),
+        0 35px 119px rgba(0, 0, 0, 0.11);
+}
