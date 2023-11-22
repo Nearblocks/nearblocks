@@ -117,12 +117,21 @@ export interface NFTTransferLog {
   token_ids: string[];
 }
 
-export type EventContract = (
-  knex: Knex,
-  block: types.BlockHeader,
-  shardId: number,
-  outcome: types.ExecutionOutcomeWithReceipt,
-) => Promise<void>;
+export type EventContract = (param: EventContractParam) => Promise<void>;
+
+export type EventContractParam = {
+  blockHeader: types.BlockHeader;
+  knex: Knex;
+  outcomes: types.ExecutionOutcomeWithReceipt[];
+  shardId: number;
+};
+
+export type FTContractMatchAction = (
+  action: types.FunctionCallAction,
+  predecessor: string,
+  logs: string[],
+  status?: types.ExecutionStatus,
+) => FTEventEntry[];
 
 export type FTEventEntry = {
   affected: string;
@@ -170,4 +179,10 @@ export type FTMeta = {
   reference_hash: string | undefined;
   spec: string;
   symbol: string;
+};
+
+export type AccountTokenBalance = {
+  accountId: string;
+  balance: string;
+  contractId: string;
 };

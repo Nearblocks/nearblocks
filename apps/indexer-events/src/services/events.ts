@@ -1,19 +1,20 @@
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
-import { logger } from 'nb-logger';
-import { EventType, FTEvent, NFTEvent } from 'nb-types';
+import { EventStandard, EventType, FTEvent, NFTEvent } from 'nb-types';
 
 import { isNep141, isNep171 } from '#libs/guards';
 import { isExecutionSuccess } from '#libs/utils';
 import { storeFTEvents } from '#services/ft';
 import { storeNFTEvents } from '#services/nft';
-import { EventDataEvent } from '#types/types';
+import { EventDataEvent, FTEventLogs, NFTEventLogs } from '#types/types';
 
-import { matchContractEvents } from './contracts/index.js';
+import { matchLegacyFTEvents } from './contracts/ft/index.js';
 
 export const EVENT_PATTERN = {
   ACCOUNT: /^Account @([\S]+) burned (\d+)/,
+  AURORA_FINISH_DEPOSIT: /^Mint (\d+) nETH tokens for: ([\S]+)/,
+  AURORA_REFUND: /^Refund amount (\d+) from ([\S]+) to ([\S]+)/,
   REFUND: /^Refund (\d+) from ([\S]+) to ([\S]+)/,
   TRANSFER: /^Transfer (\d+) from ([\S]+) to ([\S]+)/,
   WRAP_NEAR_DEPOSIT: /^Deposit (\d+) NEAR to ([\S]+)/,
@@ -25,13 +26,14 @@ export const storeEvents = async (
 ) => {
   await Promise.all([
     storeNEPEvents(knex, message),
-    matchContractEvents(knex, message),
+    matchLegacyFTEvents(knex, message),
   ]);
 };
 
-const storeNEPEvents = async (knex: Knex, message: types.StreamerMessage) => {
-  const prefix = 'EVENT_JSON:';
-
+export const storeNEPEvents = async (
+  knex: Knex,
+  message: types.StreamerMessage,
+) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       const ftEvents: EventDataEvent[] = [];
@@ -50,29 +52,17 @@ const storeNEPEvents = async (knex: Knex, message: types.StreamerMessage) => {
             receiptId: outcome.receipt.receiptId,
             shardId: shard.shardId,
           };
+          const events = extractEvents(outcome);
 
-          outcome.executionOutcome.outcome.logs.forEach((eventLog) => {
-            try {
-              const trimmed = eventLog.trim().startsWith(prefix)
-                ? eventLog.trim().replace(prefix, '')
-                : '';
-
-              if (!trimmed) return;
-
-              const event = JSON.parse(trimmed);
-
-              if (isNep141(event)) {
-                ftEvents.push({ data, event });
-              }
-
-              if (isNep171(event)) {
-                nftEvents.push({ data, event });
-              }
-            } catch (error) {
-              logger.warn({ logs: outcome.executionOutcome.outcome.logs });
-              logger.warn(error);
+          for (const event of events) {
+            if (isNep141(event)) {
+              ftEvents.push({ data, event });
             }
-          });
+
+            if (isNep171(event)) {
+              nftEvents.push({ data, event });
+            }
+          }
         }
       });
 
@@ -84,22 +74,46 @@ const storeNEPEvents = async (knex: Knex, message: types.StreamerMessage) => {
   );
 };
 
+export const extractEvents = (outcome: types.ExecutionOutcomeWithReceipt) => {
+  const prefix = 'EVENT_JSON:';
+  const events: FTEventLogs[] | NFTEventLogs[] = [];
+
+  for (const log of outcome.executionOutcome.outcome.logs) {
+    const trimmed = log.trim().startsWith(prefix)
+      ? log.trim().replace(prefix, '')
+      : '';
+
+    if (!trimmed) continue;
+
+    try {
+      events.push(JSON.parse(trimmed));
+    } catch (error) {
+      //
+    }
+  }
+
+  return events;
+};
+
 export function setEventIndex(
   shardId: number,
   blockTimestamp: number,
   eventType: EventType,
+  eventStandard: EventStandard,
   events: FTEvent[],
 ): FTEvent[];
 export function setEventIndex(
   shardId: number,
   blockTimestamp: number,
   eventType: EventType,
+  eventStandard: EventStandard,
   events: NFTEvent[],
 ): NFTEvent[];
 export function setEventIndex(
   shardId: number,
   blockTimestamp: number,
   eventType: EventType,
+  eventStandard: EventStandard,
   events: FTEvent[] | NFTEvent[],
 ): FTEvent[] | NFTEvent[] {
   const dataLength = events.length;
@@ -109,6 +123,7 @@ export function setEventIndex(
     BigInt(eventType) * 1_000_000n;
 
   for (let index = 0; index < dataLength; index++) {
+    events[index].standard = eventStandard;
     events[index].event_index = String(startIndex + BigInt(index));
   }
 

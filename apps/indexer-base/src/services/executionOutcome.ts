@@ -31,7 +31,7 @@ export const storeChunkExecutionOutcomes = async (
   const outcomes: ExecutionOutcome[] = [];
   const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
-  executionOutcomes.forEach(async (executionOutcome, indexInChunk) => {
+  executionOutcomes.forEach((executionOutcome, indexInChunk) => {
     outcomes.push(
       getExecutionOutcomeData(
         shardId,

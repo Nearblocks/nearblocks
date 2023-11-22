@@ -71,8 +71,8 @@ export type BalanceEvent = {
   block_height: number;
   block_timestamp: string;
   cause: StateChangeCause;
-  delta_nonstaked_amount: string;
-  delta_staked_amount: string;
+  delta_nonstaked_amount: null | string;
+  delta_staked_amount: null | string;
   direction: StateChangeDirection;
   event_index: string;
   involved_account_id: null | string;
@@ -121,7 +121,7 @@ export type ExecutionOutcome = {
 };
 
 export type FTEvent = {
-  absolute_amount: string;
+  absolute_amount: null | string;
   affected_account_id: string;
   block_height: number;
   block_timestamp: string;
@@ -137,15 +137,16 @@ export type FTEvent = {
 };
 
 export type NFTEvent = {
+  affected_account_id: string;
   authorized_account_id: null | string;
   block_height: number;
   block_timestamp: string;
   cause: EventCause;
   contract_account_id: string;
+  delta_amount: number;
   event_index: string;
   event_memo: null | string;
-  new_owner_account_id: null | string;
-  old_owner_account_id: null | string;
+  involved_account_id: null | string;
   receipt_id: string;
   standard: string;
   status: EventStatus;

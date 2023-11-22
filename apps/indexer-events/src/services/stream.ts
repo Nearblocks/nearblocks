@@ -19,8 +19,6 @@ export const syncData = async () => {
   const settings = await knex('settings').where({ key: eventsKey }).first();
   const latestBlock = settings?.value?.sync;
 
-  logger.warn({ latestBlock });
-
   if (latestBlock) {
     const next = +latestBlock - config.delta;
 
@@ -54,7 +52,9 @@ export const onMessage = async (message: types.StreamerMessage) => {
         .merge();
     }
   } catch (error) {
-    logger.error('aborting...');
+    logger.error(
+      `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
+    );
     logger.error(error);
     sentry.captureException(error);
     process.exit();

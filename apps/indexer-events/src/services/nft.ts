@@ -38,17 +38,18 @@ export const storeNFTEvents = async (
             .filter((token) => token)
             .forEach((token) => {
               eventData.push({
+                affected_account_id: eventItem.owner_id,
                 authorized_account_id: null,
                 block_height: blockHeader.height,
                 block_timestamp: blockHeader.timestampNanosec,
                 cause: EventCause.MINT,
                 contract_account_id: data.contractId,
+                delta_amount: 1,
                 event_index: '0',
                 event_memo: eventItem.memo ?? null,
-                new_owner_account_id: eventItem.owner_id,
-                old_owner_account_id: null,
+                involved_account_id: null,
                 receipt_id: data.receiptId,
-                standard: EventStandard.NFT,
+                standard: '',
                 status: EventStatus.SUCCESS,
                 token_id: token,
               });
@@ -68,17 +69,18 @@ export const storeNFTEvents = async (
             .filter((token) => token)
             .forEach((token) => {
               eventData.push({
+                affected_account_id: eventItem.owner_id,
                 authorized_account_id: eventItem.authorized_id ?? null,
                 block_height: blockHeader.height,
                 block_timestamp: blockHeader.timestampNanosec,
                 cause: EventCause.BURN,
                 contract_account_id: data.contractId,
+                delta_amount: -1,
                 event_index: '0',
                 event_memo: eventItem.memo ?? null,
-                new_owner_account_id: null,
-                old_owner_account_id: eventItem.owner_id,
+                involved_account_id: null,
                 receipt_id: data.receiptId,
-                standard: EventStandard.NFT,
+                standard: '',
                 status: EventStatus.SUCCESS,
                 token_id: token,
               });
@@ -98,17 +100,34 @@ export const storeNFTEvents = async (
             .filter((token) => token)
             .forEach((token) => {
               eventData.push({
+                affected_account_id: eventItem.old_owner_id,
                 authorized_account_id: eventItem.authorized_id ?? null,
                 block_height: blockHeader.height,
                 block_timestamp: blockHeader.timestampNanosec,
                 cause: EventCause.TRANSFER,
                 contract_account_id: data.contractId,
+                delta_amount: -1,
                 event_index: '0',
                 event_memo: eventItem.memo ?? null,
-                new_owner_account_id: eventItem.new_owner_id,
-                old_owner_account_id: eventItem.old_owner_id,
+                involved_account_id: eventItem.new_owner_id,
                 receipt_id: data.receiptId,
-                standard: EventStandard.NFT,
+                standard: '',
+                status: EventStatus.SUCCESS,
+                token_id: token,
+              });
+              eventData.push({
+                affected_account_id: eventItem.new_owner_id,
+                authorized_account_id: eventItem.authorized_id ?? null,
+                block_height: blockHeader.height,
+                block_timestamp: blockHeader.timestampNanosec,
+                cause: EventCause.TRANSFER,
+                contract_account_id: data.contractId,
+                delta_amount: 1,
+                event_index: '0',
+                event_memo: eventItem.memo ?? null,
+                involved_account_id: eventItem.old_owner_id,
+                receipt_id: data.receiptId,
+                standard: '',
                 status: EventStatus.SUCCESS,
                 token_id: token,
               });
@@ -123,6 +142,7 @@ export const storeNFTEvents = async (
       shardId,
       blockHeader.timestamp,
       EventType.NEP171,
+      EventStandard.NFT,
       eventData,
     );
     await saveNFTData(knex, data);
