@@ -104,6 +104,7 @@ export enum NFTLogKind {
   TRANSFER = 'nft_transfer',
 }
 
+// Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
   NEP171 = 2,
