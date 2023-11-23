@@ -31,7 +31,7 @@ const config: Config = {
   s3BucketName,
   s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: 30_181_670, // wrap.near mint
+  startBlockHeight: 30_181_500,
 };
 
 export default config;

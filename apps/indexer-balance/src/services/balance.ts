@@ -1,7 +1,6 @@
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
-import { AccountView } from 'nb-near';
 import {
   BalanceEvent,
   EventStatus,
@@ -11,15 +10,11 @@ import {
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import { isAccountDelete, isAccountUpdate } from '#libs/guards';
-import near from '#libs/near';
-import { redis, redisClient, redLock } from '#libs/redis';
 import { mapStateChangeStatus } from '#libs/utils';
 import {
   AccountBalance,
   ActionReceiptGasReward,
-  Balance,
   ReceiptProcessing,
   StateChange,
   TransactionProcessing,
@@ -53,16 +48,16 @@ export const storeChunkBalance = async (
     block.height,
   );
 
-  const validatorChanges = await storeValidatorChanges(
+  const validatorChanges = await getValidatorChanges(
     stateChanges.validators,
     block,
   );
-  const txnChanges = await storeTxnChanges(
+  const txnChanges = await getTxnChanges(
     shard.chunk?.transactions || [],
     stateChanges.transactions,
     block,
   );
-  const receiptRewardChanges = await storeReceiptRewardChanges(
+  const receiptRewardChanges = await getReceiptRewardChanges(
     shard.receiptExecutionOutcomes,
     stateChanges.receipts,
     stateChanges.rewards,
@@ -203,21 +198,13 @@ const getAccount = (
   return null;
 };
 
-const storeValidatorChanges = async (
+const getValidatorChanges = async (
   balanceChanges: AccountBalance[],
   block: types.BlockHeader,
 ) => {
   const result: BalanceEvent[] = [];
 
   for (const currentBalance of balanceChanges) {
-    const prevBalance = await getAccountBalance(
-      currentBalance.accountId,
-      block.prevHash,
-    );
-    const { nonStaked, staked } = getDeltas(prevBalance, currentBalance);
-
-    await saveAccountBalance(currentBalance);
-
     result.push({
       absolute_nonstaked_amount: currentBalance.balance.nonStaked,
       absolute_staked_amount: currentBalance.balance.staked,
@@ -225,8 +212,8 @@ const storeValidatorChanges = async (
       block_height: block.height,
       block_timestamp: block.timestampNanosec,
       cause: StateChangeCause.ValidatorsReward,
-      delta_nonstaked_amount: nonStaked,
-      delta_staked_amount: staked,
+      delta_nonstaked_amount: null,
+      delta_staked_amount: null,
       direction: StateChangeDirection.Inbound,
       event_index: '0',
       involved_account_id: null,
@@ -239,7 +226,7 @@ const storeValidatorChanges = async (
   return result;
 };
 
-const storeTxnChanges = async (
+const getTxnChanges = async (
   txns: types.IndexerTransactionWithOutcome[],
   balanceChanges: Map<string, AccountBalance>,
   block: types.BlockHeader,
@@ -265,14 +252,6 @@ const storeTxnChanges = async (
 
       balanceChanges.delete(txnHash);
 
-      const prevBalance = await getAccountBalance(
-        affectedAccount,
-        block.prevHash,
-      );
-      const { nonStaked, staked } = getDeltas(prevBalance, changesAfterTxn);
-
-      await saveAccountBalance(changesAfterTxn);
-
       result.push({
         absolute_nonstaked_amount: changesAfterTxn.balance.nonStaked,
         absolute_staked_amount: changesAfterTxn.balance.staked,
@@ -280,8 +259,8 @@ const storeTxnChanges = async (
         block_height: block.height,
         block_timestamp: block.timestampNanosec,
         cause: StateChangeCause.Transaction,
-        delta_nonstaked_amount: nonStaked,
-        delta_staked_amount: staked,
+        delta_nonstaked_amount: null,
+        delta_staked_amount: null,
         direction: StateChangeDirection.Outbound,
         event_index: '0',
         involved_account_id: involvedAccount,
@@ -291,33 +270,6 @@ const storeTxnChanges = async (
         ),
         transaction_hash: txnHash,
       });
-
-      if (involvedAccount && involvedAccount !== affectedAccount) {
-        const involvedAccountPrevBalance = await getAccountBalance(
-          involvedAccount,
-          block.prevHash,
-        );
-
-        result.push({
-          absolute_nonstaked_amount:
-            involvedAccountPrevBalance.balance.nonStaked,
-          absolute_staked_amount: involvedAccountPrevBalance.balance.staked,
-          affected_account_id: involvedAccount,
-          block_height: block.height,
-          block_timestamp: block.timestampNanosec,
-          cause: StateChangeCause.Transaction,
-          delta_nonstaked_amount: '0',
-          delta_staked_amount: '0',
-          direction: StateChangeDirection.Inbound,
-          event_index: '0',
-          involved_account_id: affectedAccount,
-          receipt_id: null,
-          status: mapStateChangeStatus(
-            txn.outcome.executionOutcome.outcome.status,
-          ),
-          transaction_hash: txnHash,
-        });
-      }
     }
   }
 
@@ -336,7 +288,7 @@ const storeTxnChanges = async (
   return result;
 };
 
-const storeReceiptRewardChanges = async (
+const getReceiptRewardChanges = async (
   outcomes: types.ExecutionOutcomeWithReceipt[],
   receipts: Map<string, AccountBalance>,
   rewards: Map<string, AccountBalance>,
@@ -365,14 +317,6 @@ const storeReceiptRewardChanges = async (
 
       receipts.delete(receiptId);
 
-      const prevBalance = await getAccountBalance(
-        affectedAccount,
-        block.prevHash,
-      );
-      const { nonStaked, staked } = getDeltas(prevBalance, changesAfterReceipt);
-
-      await saveAccountBalance(changesAfterReceipt);
-
       result.push({
         absolute_nonstaked_amount: changesAfterReceipt.balance.nonStaked,
         absolute_staked_amount: changesAfterReceipt.balance.staked,
@@ -380,8 +324,8 @@ const storeReceiptRewardChanges = async (
         block_height: block.height,
         block_timestamp: block.timestampNanosec,
         cause: StateChangeCause.Receipt,
-        delta_nonstaked_amount: nonStaked,
-        delta_staked_amount: staked,
+        delta_nonstaked_amount: null,
+        delta_staked_amount: null,
         direction: StateChangeDirection.Inbound,
         event_index: '0',
         involved_account_id: involvedAccount,
@@ -389,31 +333,6 @@ const storeReceiptRewardChanges = async (
         status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
         transaction_hash: null,
       });
-
-      if (involvedAccount && involvedAccount !== affectedAccount) {
-        const involvedAccountPrevBalance = await getAccountBalance(
-          involvedAccount,
-          block.prevHash,
-        );
-
-        result.push({
-          absolute_nonstaked_amount:
-            involvedAccountPrevBalance.balance.nonStaked,
-          absolute_staked_amount: involvedAccountPrevBalance.balance.staked,
-          affected_account_id: involvedAccount,
-          block_height: block.height,
-          block_timestamp: block.timestampNanosec,
-          cause: StateChangeCause.Receipt,
-          delta_nonstaked_amount: '0',
-          delta_staked_amount: '0',
-          direction: StateChangeDirection.Outbound,
-          event_index: '0',
-          involved_account_id: affectedAccount,
-          receipt_id: receiptId,
-          status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
-          transaction_hash: null,
-        });
-      }
     }
 
     const changesAfterReward = rewards.get(receiptId);
@@ -427,14 +346,6 @@ const storeReceiptRewardChanges = async (
 
       rewards.delete(receiptId);
 
-      const prevBalance = await getAccountBalance(
-        affectedAccount,
-        block.prevHash,
-      );
-      const { nonStaked, staked } = getDeltas(prevBalance, changesAfterReward);
-
-      await saveAccountBalance(changesAfterReward);
-
       result.push({
         absolute_nonstaked_amount: changesAfterReward.balance.nonStaked,
         absolute_staked_amount: changesAfterReward.balance.staked,
@@ -442,8 +353,8 @@ const storeReceiptRewardChanges = async (
         block_height: block.height,
         block_timestamp: block.timestampNanosec,
         cause: StateChangeCause.ContractReward,
-        delta_nonstaked_amount: nonStaked,
-        delta_staked_amount: staked,
+        delta_nonstaked_amount: null,
+        delta_staked_amount: null,
         direction: StateChangeDirection.Inbound,
         event_index: '0',
         involved_account_id: involvedAccount,
@@ -479,89 +390,4 @@ const storeReceiptRewardChanges = async (
   }
 
   return result;
-};
-
-const getAccountBalance = async (accountId: string, blockHash: string) => {
-  return await retry(async () => {
-    const unlock = await redLock('balance', 10);
-    const balance = await getBalance(accountId, blockHash);
-    await unlock();
-
-    return { accountId, balance };
-  });
-};
-
-const saveAccountBalance = async (currentBalance: AccountBalance) => {
-  return retry(async () => {
-    const unlock = await redLock('balance', 10);
-    await redisClient.set(
-      redis.getPrefixedKeys(currentBalance.accountId),
-      JSON.stringify(currentBalance.balance),
-      { EX: config.cacheExpiry },
-    );
-    await unlock();
-  });
-};
-
-const getBalance = async (
-  accountId: string,
-  blockHash: string,
-): Promise<Balance> => {
-  const cachedAccount = await redisClient.get(redis.getPrefixedKeys(accountId));
-
-  if (cachedAccount) return JSON.parse(cachedAccount);
-
-  const accountBalance = await getRPCBalance(accountId, blockHash);
-
-  if (accountBalance) {
-    await redisClient.set(
-      redis.getPrefixedKeys(accountId),
-      JSON.stringify(accountBalance),
-      {
-        EX: config.cacheExpiry,
-      },
-    );
-  }
-
-  return accountBalance;
-};
-
-const getRPCBalance = async (
-  accountId: string,
-  blockHash: string,
-): Promise<Balance> => {
-  const { data } = await near.viewAccount(accountId, blockHash);
-
-  if (data.result) {
-    const account = data.result as AccountView;
-    return {
-      nonStaked: account.amount,
-      staked: account.locked,
-    };
-  }
-
-  if (data?.error?.cause?.name === 'UNKNOWN_ACCOUNT') {
-    return {
-      nonStaked: '0',
-      staked: '0',
-    };
-  }
-
-  throw Error(data);
-};
-
-const getDeltas = (
-  prevBalance: AccountBalance,
-  currentBalance: AccountBalance,
-) => {
-  return {
-    nonStaked: String(
-      BigInt(currentBalance.balance.nonStaked) -
-        BigInt(prevBalance.balance.nonStaked),
-    ),
-    staked: String(
-      BigInt(currentBalance.balance.staked) -
-        BigInt(prevBalance.balance.staked),
-    ),
-  };
 };

@@ -54,7 +54,9 @@ export const onMessage = async (message: types.StreamerMessage) => {
       storeAccessKeys(knex, message),
     ]);
   } catch (error) {
-    logger.error('aborting...');
+    logger.error(
+      `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
+    );
     logger.error(error);
     sentry.captureException(error);
     process.exit();

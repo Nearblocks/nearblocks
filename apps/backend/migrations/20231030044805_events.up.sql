@@ -18,7 +18,7 @@ CREATE TABLE ft_events (
   status event_status,
   event_memo TEXT,
 	delta_amount NUMERIC(40) NOT NULL,
-	absolute_amount NUMERIC(40) NOT NULL,
+	absolute_amount NUMERIC(40),
   block_timestamp BIGINT NOT NULL,
   PRIMARY KEY (
     event_index,
@@ -33,12 +33,13 @@ CREATE TABLE nft_events (
   receipt_id TEXT NOT NULL,
   contract_account_id TEXT NOT NULL,
   token_id TEXT NOT NULL,
-  old_owner_account_id TEXT,
-  new_owner_account_id TEXT,
+  affected_account_id TEXT,
+  involved_account_id TEXT,
   authorized_account_id TEXT,
   cause event_cause,
   status event_status,
   event_memo TEXT,
+  delta_amount SMALLINT NOT NULL,
   block_timestamp BIGINT NOT NULL,
   PRIMARY KEY (
     event_index,
@@ -48,11 +49,15 @@ CREATE TABLE nft_events (
 
 
 
+CREATE INDEX fte_contract_account_id_idx ON ft_events USING btree (contract_account_id);
+
 CREATE INDEX fte_affected_account_id_idx ON ft_events USING btree (affected_account_id);
 
 
 
-CREATE INDEX nfte_contract_account_id_idx ON ft_events USING btree (contract_account_id);
+CREATE INDEX nfte_contract_account_id_idx ON nft_events USING btree (contract_account_id);
+
+CREATE INDEX nfte_affected_account_id_idx ON nft_events USING btree (affected_account_id);
 
 
 

@@ -71,17 +71,18 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
   }
 
   if (isFunctionCallAction(action)) {
-    let jsonArgs = {};
+    let jsonArgs = null;
+    let base64Args = null;
 
     try {
       jsonArgs = decodeArgs(action.FunctionCall.args);
     } catch (error) {
-      //
+      base64Args = action.FunctionCall.args;
     }
 
     kind = ActionKind.FUNCTION_CALL;
     args = {
-      args_base64: action.FunctionCall.args,
+      args_base64: base64Args,
       args_json: jsonArgs,
       deposit: action.FunctionCall.deposit,
       gas: action.FunctionCall.gas,

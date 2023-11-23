@@ -104,6 +104,7 @@ export enum NFTLogKind {
   TRANSFER = 'nft_transfer',
 }
 
+// Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
   NEP171 = 2,
@@ -118,4 +119,6 @@ export enum EventType {
   TOKEN_BURROW_NEAR = 11,
   TOKEN_REF_FINANCE_NEAR = 12,
   TOKEN_V2_REF_FINANCE_NEAR = 13,
+  L2E_NEAR = 14,
+  FUSOTAO_TOKEN = 15,
 }

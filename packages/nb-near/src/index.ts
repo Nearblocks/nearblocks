@@ -9,6 +9,34 @@ export class RPC {
     this.request = axios.create({ baseURL });
   }
 
+  async callFunction(
+    contractId: string,
+    methodName: string,
+    args: string,
+    blockHash?: string,
+  ) {
+    const params = {
+      account_id: contractId,
+      args_base64: args,
+      method_name: methodName,
+      request_type: 'call_function',
+    };
+
+    if (blockHash) {
+      return this.query({ ...params, block_id: blockHash });
+    }
+
+    return this.query({ ...params, finality: 'final' });
+  }
+
+  decodeResult<T>(result: string): T {
+    return JSON.parse(Buffer.from(result, 'base64').toString());
+  }
+
+  encodeArgs(args: unknown) {
+    return Buffer.from(JSON.stringify(args)).toString('base64');
+  }
+
   async query(params: unknown) {
     return this.request.post('', {
       id: 'near',
