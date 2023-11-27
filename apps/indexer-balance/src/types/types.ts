@@ -2,6 +2,9 @@ import { Network, StateChangeCauseView, StateChangeValueView } from 'nb-types';
 
 export type Config = {
   cacheExpiry: number;
+  dbCa: string;
+  dbCert: string;
+  dbKey: string;
   dbUrl: string;
   delta: number;
   insertLimit: number;

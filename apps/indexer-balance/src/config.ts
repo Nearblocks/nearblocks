@@ -5,6 +5,9 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  DATABASE_CA: str({ default: '' }),
+  DATABASE_CERT: str({ default: '' }),
+  DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   NETWORK: str(),
   REDIS_URL: str(),
@@ -20,7 +23,10 @@ const s3BucketName =
     : 'near-lake-data-testnet';
 
 const config: Config = {
-  cacheExpiry: 60 * 60 * 24, // cache expiry time in seconds (1 day)
+  cacheExpiry: 60 * 60, // cache expiry time in seconds (1 hour)
+  dbCa: env.DATABASE_CA,
+  dbCert: env.DATABASE_CERT,
+  dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 100, // start from blocks earlier on sync interuption
   insertLimit: 1_000, // records to insert into the db at a time

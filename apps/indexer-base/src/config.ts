@@ -5,6 +5,9 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  DATABASE_CA: str({ default: '' }),
+  DATABASE_CERT: str({ default: '' }),
+  DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   NETWORK: str(),
   REDIS_URL: str(),
@@ -24,6 +27,9 @@ const s3BucketName =
 
 const config: Config = {
   cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
+  dbCa: env.DATABASE_CA,
+  dbCert: env.DATABASE_CERT,
+  dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 1_000, // start from blocks earlier on sync interuption
   genesisFile: genesisFile, // url to download genesis data

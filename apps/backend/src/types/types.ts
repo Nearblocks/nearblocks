@@ -267,6 +267,9 @@ export type JsonValue =
 export interface Config {
   cmcApiKey: string;
   coingeckoApiKey?: string;
+  dbCa: string;
+  dbCert: string;
+  dbKey: string;
   dbUrl: string;
   genesisDate: string;
   genesisHeight: number;
