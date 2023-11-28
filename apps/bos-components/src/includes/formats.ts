@@ -88,3 +88,43 @@ export function convertToUTC(timestamp: number, hour: boolean) {
 
   return formattedDate;
 }
+
+export function getTimeAgoString(timestamp: number) {
+  const currentUTC = Date.now();
+  const date = new Date(timestamp);
+  const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
+
+  const intervals = {
+    year: seconds / (60 * 60 * 24 * 365),
+    month: seconds / (60 * 60 * 24 * 30),
+    week: seconds / (60 * 60 * 24 * 7),
+    day: seconds / (60 * 60 * 24),
+    hour: seconds / (60 * 60),
+    minute: seconds / 60,
+  };
+
+  if (intervals.year > 1) {
+    return Math.floor(intervals.year) + ' years ago';
+  } else if (intervals.month > 1) {
+    return Math.floor(intervals.month) + ' months ago';
+  } else if (intervals.week > 1) {
+    return Math.floor(intervals.week) + ' weeks ago';
+  } else if (intervals.day > 1) {
+    return Math.floor(intervals.day) + ' days ago';
+  } else if (intervals.hour > 1) {
+    return Math.floor(intervals.hour) + ' hours ago';
+  } else if (intervals.minute > 1) {
+    return Math.floor(intervals.minute) + ' minutes ago';
+  } else {
+    return 'a few seconds ago';
+  }
+}
+
+export function formatTimestampToString(timestamp: number) {
+  const date = new Date(timestamp);
+
+  // Format the date to 'YYYY-MM-DD HH:mm:ss' format
+  const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
+
+  return formattedDate;
+}
