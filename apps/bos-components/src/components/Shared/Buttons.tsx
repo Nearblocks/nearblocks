@@ -1,0 +1,95 @@
+import QRCodeIcon from '@/includes/icons/QRCodeIcon';
+import QrCode from '@/includes/Common/QrCode';
+import CopyIcon from '@/includes/icons/CopyIcon';
+import CloseCircle from '@/includes/icons/CloseCircle';
+
+/**
+ * @param {string} id - The account identifier passed as a string.
+ */
+
+interface Props {
+  id: string;
+}
+
+export default function (props: Props) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const onCopyClick = () => {
+    clipboard.writeText(props.id);
+    setShowTooltip((t: boolean) => !t);
+    setTimeout(() => {
+      setShowTooltip((t: boolean) => !t);
+    }, 5000);
+  };
+  return (
+    <>
+      <span className="inline-flex space-x-2 h-7">
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <button
+                type="button"
+                onClick={onCopyClick}
+                className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full  p-1.5 w-7 h-7"
+              >
+                <span className="inline-block align-middle items-center pb-2">
+                  <CopyIcon className="fill-current -z-50 text-green-500 group-hover:text-white h-4 w-4" />
+                </span>
+              </button>
+            </Tooltip.Trigger>
+            <Tooltip.Content
+              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+              sideOffset={5}
+            >
+              {showTooltip ? 'Copied!' : 'Copy account ID to clipboard'}
+              <Tooltip.Arrow className="fill-white" />
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+        <Dialog.Root>
+          <Dialog.Trigger asChild>
+            <button className="bg-green-500 items-center bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7">
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span className="inline-block align-middle items-center pb-2">
+                      <QRCodeIcon className="fill-current text-green-500 group-hover:text-white h-4 w-4" />
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    sideOffset={8}
+                    place="bottom"
+                  >
+                    Click to view QR Code
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            </button>
+          </Dialog.Trigger>
+          <Dialog.Overlay className="bg-green-500 bg-opacity-10 data-[state=open]:animate-overlayShow fixed inset-0" />
+          <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-20 max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] w-80 h-80">
+            <Dialog.Title>
+              <div className="flex items-center justify-between bg-gray-100 px-3 py-4">
+                <h4 className="flex items-center text-xs break-all">
+                  {' '}
+                  {props.id}
+                </h4>
+                <Dialog.Close asChild className="text-gray-500 fill-current">
+                  <button
+                    className="text-gray-500 fill-current"
+                    aria-label="Close"
+                  >
+                    <CloseCircle />
+                  </button>
+                </Dialog.Close>
+              </div>
+            </Dialog.Title>
+            <div className="flex items-center text-xs break-all">
+              <QrCode value={props.id} width={160} height={160} />
+            </div>
+          </Dialog.Content>
+        </Dialog.Root>
+      </span>
+    </>
+  );
+}

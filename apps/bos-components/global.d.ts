@@ -1,6 +1,6 @@
 declare const Widget: (params: {
   src: string;
-  props: object;
+  props?: object;
 }) => React.ReactNode;
 
 declare const useState: <T>(
@@ -13,3 +13,9 @@ declare const useEffect: (
 
 declare const styled;
 declare const asyncFetch;
+declare const Big;
+declare const Popover;
+declare const Tooltip;
+declare const Dialog;
+declare const Select;
+declare const ScrollArea;

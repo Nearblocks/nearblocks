@@ -32,7 +32,7 @@ async function build() {
       let updatedContent = content;
 
       // Regular expression to match the import statement
-      const importRegex = /import\s+(\w+)\s+from\s+"@\/includes\/([^"]*)";/;
+      const importRegex = /import\s+(\w+)\s+from\s+'@\/includes\/([^']*)';/;
 
       while (true) {
         const match = updatedContent.match(importRegex);
@@ -85,11 +85,11 @@ async function build() {
 
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],
-    from: /import\s+(\w+)\s+from\s+"@\/includes\/([^"]*)";/gm,
+    from: /import\s+(\w+)\s+from\s+'@\/includes\/([^']*)';/gm,
     to: (_match) => {
       // extract component name and path to the imported component
       const [component, componentName, componentPath] = _match.match(
-        /import\s+(\w+)\s+from\s+"@\/includes\/([^"]*)";/,
+        /import\s+(\w+)\s+from\s+'@\/includes\/([^']*)';/,
       );
       // read content of the component from the path
       const fileToPath = `${transpiledPathPrefix}/../includes/${componentPath}.jsx`;
@@ -129,7 +129,6 @@ async function build() {
                       'utf8',
                     )
                     .replace(/export /g, '');
-
                   extraNames.forEach(function (name) {
                     const functionName = `${name.trim()}`;
                     const regex = new RegExp(
@@ -147,6 +146,7 @@ async function build() {
           });
         }
       }
+
       return fileContent;
     } catch (error) {
       console.error('Error in processImports:', error);
@@ -156,7 +156,7 @@ async function build() {
 
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],
-    from: /import\s+{[^}]*}\s+from\s+"@\/includes\/([^"]*)";/gm,
+    from: /import\s+{[^}]*}\s+from\s+'@\/includes\/([^']*)';/gm,
     to: (_match, importPath) => {
       const extractedNames = _match
         .match(/\{([^}]*)\}/)[1] // Get the content inside curly braces
@@ -171,23 +171,24 @@ async function build() {
         )
         .replace(/export /g, '');
       let contentImport = '';
+      let fileImported = '';
       // loops through each function name to extract function content
-      extractedNames.forEach(function (name) {
+      extractedNames.forEach(function (name, index) {
         const functionName = `${name.trim()}`;
 
         const regex = new RegExp(
-          `function ${functionName}\\s*\\([^)]*\\)\\s*{((?:[^{}]*|{[^{}]*})*?)}`,
+          `function\\s+${functionName}\\s*\\([^)]*\\)\\s*{([^]*)}`,
+          's',
         );
-        // extract the function body that matches the name from the file content
-        const functionMatch = importedFileContent.match(regex);
-        if (functionMatch) {
-          contentImport += functionMatch[0] + '\n';
+
+        const match = importedFileContent.match(regex);
+        if (match) {
+          contentImport = match[0] + '\n';
         }
         // check if any imported functions used in the etracted content
-        contentImport = processFileImports(contentImport, importedFileContent);
+        fileImported += processFileImports(contentImport, importedFileContent);
       });
-
-      return `/* INCLUDE: "includes/${importPath}.jsx" */\n${contentImport}/* END_INCLUDE: "includes/${importPath}.jsx" */`;
+      return `/* INCLUDE: "includes/${importPath}.jsx" */\n${fileImported}/* END_INCLUDE: "includes/${importPath}.jsx" */`;
     },
   });
 
