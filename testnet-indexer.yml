@@ -19,14 +19,14 @@ services:
       - "host.docker.internal:host-gateway"
     env_file: testnet.env
   indexer-events:
-    container_name: mainnet-indexer-events
+    container_name: testnet-indexer-events
     build:
       context: .
       dockerfile: ./apps/indexer-events/Dockerfile
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file: mainnet.env
+    env_file: testnet.env
   redis:
     container_name: testnet-redis
     image: redis:7.2-alpine
