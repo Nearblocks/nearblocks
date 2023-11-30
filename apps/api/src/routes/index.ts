@@ -11,6 +11,7 @@ import charts from '#routes/charts';
 import search from '#routes/search';
 import account from '#routes/account';
 import exports from '#routes/exports';
+import validators from '#routes/validators';
 
 const routes = () => {
   const app = Router();
@@ -26,6 +27,7 @@ const routes = () => {
   charts(app);
   search(app);
   key(app);
+  validators(app);
 
   return app;
 };

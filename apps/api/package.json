@@ -1,5 +1,5 @@
 {
-  "name": "nearblocks-api",
+  "name": "api",
   "version": "0.1.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
@@ -15,7 +15,10 @@
   "scripts": {
     "clean": "rimraf build",
     "start": "node build/src/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts"
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "build": "yarn clean && tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
     "@sentry/node": "7.18.0",

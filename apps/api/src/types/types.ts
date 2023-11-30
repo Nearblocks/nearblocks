@@ -80,3 +80,142 @@ export type ValidationError = {
   message: string;
   path: string;
 };
+export type ExpProtocolConfig =  {
+  avg_hidden_validator_seats_per_shard: number[];
+  epoch_length: number;
+  num_block_producer_seats: number;
+  protocol_version: number; 
+}
+
+
+export type CurrentEpochValidatorInfo = {
+  account_id: string;
+  public_key: string;
+  is_slashed: boolean;
+  stake: string;
+  shards: number;
+  num_produced_blocks: number;
+  num_expected_blocks: number;
+  num_produced_chunks: number;
+  num_expected_chunks: number;
+};
+
+export type NextEpochValidatorInfo = {
+  account_id: string;
+  public_key: string;
+  stake: string;
+  shards: number;
+};
+
+export type ValidatorStakeViewV1 = {
+  account_id: string;
+  public_key: string;
+  stake: string;
+};
+
+
+export type ValidatorKickoutReason =
+  | "Slashed"
+  | {
+      NotEnoughBlocks: {
+        produced: number;
+        expected: number;
+      };
+    }
+  | {
+      NotEnoughChunks: {
+        produced: number;
+        expected: number;
+      };
+    }
+  | { Unstaked: {} }
+  | {
+      NotEnoughStake: {
+        stake: string;
+        threshold: string;
+      };
+    }
+  | { DidNotGetASeat: {} };
+
+
+export type ValidatorKickoutView = {
+  account_id: string;
+  reason: ValidatorKickoutReason;
+};
+
+export type EpochValidatorInfo = {
+  current_validators: Array<CurrentEpochValidatorInfo>;
+  next_validators: Array<NextEpochValidatorInfo>;
+  current_fishermen: ValidatorStakeViewV1;
+  next_fishermen: ValidatorStakeViewV1;
+  current_proposals: Array<ValidatorStakeViewV1>;
+  prev_epoch_kickout: ValidatorKickoutView;
+  epoch_start_height: number;
+  epoch_height: number;
+};
+
+export type ValidationProgress = {
+  chunks: {
+    produced: number;
+    total: number;
+  };
+  blocks: {
+    produced: number;
+    total: number;
+  };
+};
+
+export type ValidatorEpochData = {
+  accountId: string;
+  publicKey?: string;
+
+  currentEpoch?: {
+    stake: string;
+    progress: ValidationProgress;
+  };
+  nextEpoch?: {
+    stake: string;
+  };
+  afterNextEpoch?: {
+    stake: string;
+  };
+};
+
+
+export type ValidatorTelemetry = {
+  ipAddress: string;
+  nodeId: string;
+  lastSeen: number;
+  lastHeight: number;
+  agentName: string;
+  agentVersion: string;
+  agentBuild: string;
+  status: string;
+  latitude: string | null;
+  longitude: string | null;
+  city: string | null;
+};
+
+export type ValidatorPoolInfo = {
+  fee: { numerator: number; denominator: number } | null;
+  delegatorsCount: number | null;
+};
+
+export type ValidatorDescription = {
+  country?: string;
+  countryCode?: string;
+  description?: string;
+  discord?: string;
+  email?: string;
+  twitter?: string;
+  url?: string;
+};
+
+export type ValidatorSortFn = (a: ValidatorFullData, b: ValidatorFullData) => number;
+
+export type ValidatorFullData = ValidatorEpochData & {
+  telemetry?: ValidatorTelemetry;
+  poolInfo?: ValidatorPoolInfo;
+  description?: ValidatorDescription;
+  contractStake?: string;
+};
