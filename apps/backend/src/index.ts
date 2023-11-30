@@ -3,11 +3,13 @@ import { fileURLToPath } from 'url';
 
 import Bree from 'bree';
 
+import { logger as log } from 'nb-logger';
+
 import knex from '#libs/knex';
-import log from '#libs/log';
 import sentry from '#libs/sentry';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'jobs');
+
 const logger: Bree.BreeLogger = {
   error: () => {
     //
@@ -19,16 +21,9 @@ const logger: Bree.BreeLogger = {
     //
   },
 };
+
 const jobs: Bree.JobOptions[] = [
-  // { name: 'stats', cron: '*/15 * * * * *', hasSeconds: true }, // every 15 seconds
-  // { name: 'dailyStats', cron: '1 1 * * *' }, // every day at 01:01
-  // { name: 'ftMeta', cron: '* * * * *' }, // every minute
-  // { name: 'nftMeta', cron: '*/20 * * * * *', hasSeconds: true }, // every 20 seconds
-  // { name: 'marketData', cron: '* * * * *' }, // every minute
-  // { name: 'marketSearch', cron: '* * * * *' }, // every minute
-  // { name: 'ftTotalSupply', cron: '*/5 * * * * *', hasSeconds: true }, // every 5 seconds
-  // { name: 'refreshViews', cron: '*/15 * * * *' }, // every 15 minutes
-  { cron: '0 0 1 1 *', name: 'stats' },
+  { cron: '0 0 1 1 * *', hasSeconds: true, name: 'stats' },
 ];
 
 const bree = new Bree({ jobs, logger, root });

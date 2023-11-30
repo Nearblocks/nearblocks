@@ -1,14 +1,26 @@
-import knexPkg, { Knex } from 'knex';
+import { ConnectionOptions } from 'tls';
+
+import { createKnex, Knex } from 'nb-knex';
 
 import config from '#config';
 
-const { knex: createKnex } = knexPkg;
-const knexConfig: Knex.Config = {
-  client: 'pg',
-  connection: config.dbUrl,
-  pool: { max: 1, min: 0 },
+const ssl: ConnectionOptions = {
+  rejectUnauthorized: true,
 };
 
-const knex = createKnex(knexConfig);
+if (config.dbCa) {
+  ssl.ca = Buffer.from(config.dbCa, 'base64').toString('utf-8');
+  ssl.cert = Buffer.from(config.dbCert, 'base64').toString('utf-8');
+  ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
+}
+
+const knex: Knex = createKnex({
+  client: 'pg',
+  connection: {
+    connectionString: config.dbUrl,
+    ssl: ssl?.ca ? ssl : false,
+  },
+  pool: { max: 10, min: 1 },
+});
 
 export default knex;

@@ -4,6 +4,9 @@ import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
 export interface Config {
   cacheExpiry: number;
+  dbCa: string;
+  dbCert: string;
+  dbKey: string;
   dbUrl: string;
   delta: number;
   genesisFile: string;

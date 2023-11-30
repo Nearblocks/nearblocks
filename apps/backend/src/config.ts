@@ -1,26 +1,20 @@
-import log from '#libs/log';
+import { cleanEnv, str } from 'envalid';
+
 import { Network } from '#types/enums';
 import { Config } from '#types/types';
 
-const dbUrl = process.env.DATABASE_URL;
-const rpcUrl = process.env.RPC_URL;
-const cmcApiKey = process.env.COINMARKETCAP_API_KEY;
-const lcwApiKey = process.env.LIVECOINWATCH_API_KEY;
-const coingeckoApiKey = process.env.COINGECKO_API_KEY;
-
-if (!dbUrl || !rpcUrl || !cmcApiKey || !lcwApiKey || !coingeckoApiKey) {
-  log.error(
-    {
-      COINGECKO_API_KEY: coingeckoApiKey || null,
-      COINMARKETCAP_API_KEY: cmcApiKey || null,
-      DATABASE_URL: dbUrl || null,
-      LIVECOINWATCH_API_KEY: lcwApiKey || null,
-      RPC_NODE_URL: rpcUrl || null,
-    },
-    'missing config...',
-  );
-  process.exit();
-}
+const env = cleanEnv(process.env, {
+  COINGECKO_API_KEY: str(),
+  COINMARKETCAP_API_KEY: str(),
+  DATABASE_CA: str({ default: '' }),
+  DATABASE_CERT: str({ default: '' }),
+  DATABASE_KEY: str({ default: '' }),
+  DATABASE_URL: str(),
+  LIVECOINWATCH_API_KEY: str(),
+  NETWORK: str(),
+  RPC_URL: str(),
+  SENTRY_DSN: str({ default: '' }),
+});
 
 const network: Network =
   process.env.NETWORK === Network.TESTNET ? Network.TESTNET : Network.MAINNET;
@@ -29,14 +23,17 @@ const genesisDate = network === Network.MAINNET ? '2020-07-21' : '2021-04-01';
 const sentryDsn = process.env.SENTRY_DSN;
 
 const config: Config = {
-  cmcApiKey,
-  coingeckoApiKey,
-  dbUrl,
+  cmcApiKey: env.COINMARKETCAP_API_KEY,
+  coingeckoApiKey: env.COINGECKO_API_KEY,
+  dbCa: env.DATABASE_CA,
+  dbCert: env.DATABASE_CERT,
+  dbKey: env.DATABASE_KEY,
+  dbUrl: env.DATABASE_URL,
   genesisDate,
   genesisHeight,
-  lcwApiKey,
+  lcwApiKey: env.LIVECOINWATCH_API_KEY,
   network,
-  rpcUrl,
+  rpcUrl: env.RPC_URL,
   sentryDsn,
 };
 

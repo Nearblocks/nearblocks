@@ -1,15 +1,15 @@
 import { parentPort } from 'worker_threads';
 
-import log from '#libs/log';
+import { logger } from 'nb-logger';
+import { sleep } from 'nb-utils';
+
 import sentry from '#libs/sentry';
-import { sleep } from '#libs/utils';
-import { syncStats } from '#services/stats';
 
 (async () => {
   try {
-    await syncStats();
+    //
   } catch (error) {
-    log.error(error);
+    logger.error(error);
     sentry.captureException(error);
     await sleep(1000);
   }
