@@ -17,33 +17,7 @@
 import { truncateString } from '@/includes/libs';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { dollarFormat, localFormat } from '@/includes/formats';
-
-interface MetaInfo {
-  decimals: number;
-  icon: string;
-  name: string;
-  price: number;
-  reference: string;
-  symbol: string;
-}
-
-interface FtsInfo {
-  amount: number;
-  contract: string;
-  ft_meta: MetaInfo;
-}
-
-interface NftsInfo {
-  amount: number;
-  contract: string;
-  nft_meta: MetaInfo;
-  quantity: number;
-}
-
-interface InventoryInfo {
-  fts: FtsInfo[];
-  nfts: NftsInfo[];
-}
+import { InventoryInfo, TokenListInfo } from '@/includes/types';
 
 interface Props {
   id?: string;
@@ -51,13 +25,7 @@ interface Props {
   data: InventoryInfo;
   ft: {
     amount: number;
-    tokens: {
-      amount: number;
-      contract: string;
-      ft_meta: MetaInfo;
-      rpcAmount: number;
-      amountUsd: number;
-    }[];
+    tokens: TokenListInfo[];
   };
   appUrl?: string;
 }

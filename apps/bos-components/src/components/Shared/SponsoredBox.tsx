@@ -10,7 +10,7 @@ export default function () {
         return {
           ownerId: 'nearblocks.near',
           nodeUrl: 'https://rpc.mainnet.near.org',
-          requestUrl: 'https://api.nearblocks.io/v1/',
+          backendUrl: 'https://api.nearblocks.io/v1/',
           rpcUrl: 'https://archival-rpc.testnet.near.org',
           appUrl: 'https://nearblocks.io/',
         };
@@ -18,7 +18,7 @@ export default function () {
         return {
           ownerId: 'nearblocks.testnet',
           nodeUrl: 'https://rpc.testnet.near.org',
-          requestUrl: 'https://api-testnet.nearblocks.io/v1/',
+          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
           rpcUrl: 'https://archival-rpc.testnet.near.org',
           appUrl: 'https://testnet.nearblocks.io/',
         };
@@ -26,6 +26,7 @@ export default function () {
         return {};
     }
   }
+
   const config = getConfig(context.networkId);
 
   return (

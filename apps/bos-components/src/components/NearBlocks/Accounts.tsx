@@ -40,7 +40,7 @@ import {
   AccessKeyInfo,
   ContractInfo,
   FtInfo,
-  MetaInfo,
+  TokenListInfo,
 } from '@/includes/types';
 
 export default function (props: Props) {
@@ -119,8 +119,7 @@ export default function (props: Props) {
             setStatsData({ near_price: statsResp.near_price });
           },
         )
-        .catch()
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchAccountData() {
@@ -149,7 +148,7 @@ export default function (props: Props) {
             });
           },
         )
-        .catch();
+        .catch(() => {});
     }
 
     function fetchContractData() {
@@ -178,7 +177,7 @@ export default function (props: Props) {
             });
           },
         )
-        .catch();
+        .catch(() => {});
     }
 
     function fetchTokenData() {
@@ -205,8 +204,7 @@ export default function (props: Props) {
             });
           },
         )
-        .catch()
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchInventoryData() {
@@ -230,7 +228,7 @@ export default function (props: Props) {
             });
           },
         )
-        .catch();
+        .catch(() => {});
     }
 
     fetchStatsData();
@@ -276,14 +274,11 @@ export default function (props: Props) {
               result: { result: number[] };
             };
           }) => {
-            console.log('dff', data);
             const resp = data?.body?.result;
             return decodeArgs(resp.result);
           },
         )
-        .catch((error: any) => {
-          console.log(error);
-        });
+        .catch(() => {});
     }
 
     function loadBalances() {
@@ -295,21 +290,9 @@ export default function (props: Props) {
 
       let total = Big(0);
 
-      const tokens: {
-        amount: number;
-        contract: string;
-        ft_meta: MetaInfo;
-        rpcAmount: number;
-        amountUsd: number;
-      }[] = [];
+      const tokens: TokenListInfo[] = [];
 
-      const pricedTokens: {
-        amount: number;
-        contract: string;
-        ft_meta: MetaInfo;
-        rpcAmount: number;
-        amountUsd: number;
-      }[] = [];
+      const pricedTokens: TokenListInfo[] = [];
 
       Promise.all(
         fts.map((ft: FtsInfo) => {

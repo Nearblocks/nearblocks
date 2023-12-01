@@ -8,11 +8,7 @@ const Address = () => {
   const { id } = router.query;
   const components = useBosComponents();
 
-  return (
-    <>
-      <VmComponent src={components?.account} props={{ id: id }} />
-    </>
-  );
+  return <VmComponent src={components?.account} props={{ id: id }} />;
 };
 
 export default Address;

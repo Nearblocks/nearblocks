@@ -93,3 +93,11 @@ export type FtInfo = {
     amountUsd: number;
   }[];
 };
+
+export type TokenListInfo = {
+  amount: number;
+  contract: string;
+  ft_meta: MetaInfo;
+  rpcAmount: number;
+  amountUsd: number;
+};
