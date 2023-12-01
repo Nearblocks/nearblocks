@@ -22,6 +22,17 @@ mainnetRedis.on('error', errorHandler);
 
 const prefix = 'api';
 
+export const readCache = async (key: string) => {
+  const prefixedKey = `${prefix}:${key}`;
+  const redisData = await redis.get(prefixedKey);
+
+  if (redisData) {
+    return JSON.parse
+
+  }
+  return null
+}
+
 export const cache = async (key: string, callback: any, options: Options) => {
   const prefixedKey = `${prefix}:${key}`;
   const redisData = await redis.get(prefixedKey);
