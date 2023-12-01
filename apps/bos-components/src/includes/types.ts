@@ -65,16 +65,18 @@ export type ContractCodeInfo = {
   hash: string;
 };
 
+export type KeysInfo = {
+  access_key: {
+    nonce: number;
+    permission: string;
+  };
+  public_key: string;
+};
+
 export type AccessKeyInfo = {
   block_hash: string;
   block_height: number;
-  keys: {
-    access_key: {
-      nonce: number;
-      permission: string;
-    };
-    public_key: string;
-  }[];
+  keys: KeysInfo[];
   hash: string;
 };
 
@@ -83,21 +85,15 @@ export type ContractInfo = {
   hash: string;
 };
 
-export type FtInfo = {
-  amount: number;
-  tokens: {
-    amount: number;
-    contract: string;
-    ft_meta: MetaInfo;
-    rpcAmount: number;
-    amountUsd: number;
-  }[];
-};
-
 export type TokenListInfo = {
   amount: number;
   contract: string;
   ft_meta: MetaInfo;
   rpcAmount: number;
   amountUsd: number;
+};
+
+export type FtInfo = {
+  amount: number;
+  tokens: TokenListInfo[];
 };
