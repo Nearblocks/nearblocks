@@ -1,11 +1,15 @@
+import { getValidatorsTimeout } from './../libs/validator';
 import { Response } from 'express';
 
 import { cache } from '#libs/redis';
 import catchAsync from '#libs/async';
-import { EpochValidatorInfo, RequestValidator, ValidatorEpochData } from '#ts/types';
+import { RequestValidator } from '#ts/types';
 import { List } from '#libs/schema/blocks';
 import { getProtocolConfig, getValidators, callJsonRpc } from '#libs/near';
-import { mapValidators } from '#libs/validator';
+import { accumulatedStakes, getValidatorsTimeout, mapValidators, validatorsSortFns } from '#libs/validator';
+import Big from 'big.js';
+import { keyBinder } from '#libs/utils';
+import db from '#libs/db';
 
 const EXPIRY = 10; // 5 sec 
 const HOUR = 3600; // 1 hour
@@ -13,6 +17,35 @@ const YEAR = 31536000
  
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => { 
   console.log(req.headers)
+
+
+  const poolIdsCheck = await cache(
+    `validators:poolIdsCheck`,
+    async () => {
+      try {
+        const { query, values } = keyBinder(
+          `
+            SELECT
+              *
+            FROM
+              accounts
+            WHERE
+            account_id like '%.poolv1.near%'
+          `,
+          {  },
+        );
+    
+        const { rows } = await db.query(query, values);
+     
+        return  rows.map(({ accountId }) => accountId);
+      } catch (error) {
+        return null;
+      }
+    },
+    { EX: 600 }, // 10 minute
+  );
+
+
   const genesisConfig = await cache(
     `validators:genesis-config`,
     async () => {
@@ -55,14 +88,29 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         return null;
       }
     },
-    { EX: EXPIRY },
+    { EX: getValidatorsTimeout(cache) },
   );
-
+console.log({validators})
   if (validators) {
-    const nextValidators = cache(`validators:nextValidators`, validators?.next_validators, { EX: EXPIRY })
-    const currentValidators = cache(`validators:currentValidators`, validators?.current_validators, { EX: EXPIRY })
-    const epochStartHeight = cache(`validators:epochStartHeight`, validators?.epoch_start_height, { EX: EXPIRY })
-    const mappedValidators = cache(`validators:mappedValidators`, mapValidators(validators, []), { EX: EXPIRY })
+    const nextValidators = await cache(`validators:nextValidators`,   () => {
+      return validators?.next_validators
+    } , { EX: EXPIRY })
+    const currentValidators = await cache(`validators:currentValidators`, () => {
+      return validators?.current_validators
+    }, { EX: EXPIRY })
+    const epochStartHeight = await cache(`validators:epochStartHeight`, () => {
+      return validators?.epoch_start_height
+    } , { EX: EXPIRY })
+    const mappedValidators = await cache(`validators:mappedValidators`, () => {
+      return mapValidators(validators, poolIdsCheck)
+    } , { EX: EXPIRY })
+    const cumulativeStake = await cache(`validators:cumulativeStake`, () => {
+      return accumulatedStakes(validators)
+    } , { EX: EXPIRY })
+
+
+
+
   }
 
 

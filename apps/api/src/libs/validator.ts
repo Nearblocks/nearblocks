@@ -3,6 +3,8 @@ import { merge } from 'lodash-es';
 import { Response, NextFunction } from 'express';
 import Big from 'big.js';
 import { EpochValidatorInfo, RequestValidators, ValidatorEpochData, ValidatorSortFn } from '#ts/types';
+import { Redis as RedisType  } from 'redis';
+import { SECOND } from '#config';
 
 const validator = <T extends ZodTypeAny>(schema: T) => {
   return (
@@ -109,3 +111,46 @@ export const validatorsSortFns: ValidatorSortFn[] = [
     sortByBNComparison(a.afterNextEpoch?.stake, b.afterNextEpoch?.stake),
   (a, b) => sortByBNComparison(a.contractStake, b.contractStake),
 ];
+
+export const accumulatedStakes = (
+  mappedValidators: ValidatorEpochData[]
+) :Big[] => {
+
+  const sortedValidators = validatorsSortFns.reduceRight(
+    (acc, sortFn) => {
+      return acc.sort(sortFn);
+    },
+    [...mappedValidators]
+  );
+
+  const accumulatedStakes = sortedValidators.reduce(
+    (acc, validator) => {
+      const lastAmount = acc[acc.length - 1] || new Big(0);
+      const stake = validator.currentEpoch
+        ? new Big(validator.currentEpoch.stake)
+        : new Big(0);
+      acc.push(lastAmount.plus(stake));
+      return acc;
+    },
+    [new Big(0)]
+  );
+    return accumulatedStakes
+}
+
+
+
+export const getValidatorsTimeout = (cache: RedisType) => {
+  const latestBlock = cache.get('blocks:latest:1');
+  const epochStartBlock = cache.get('epochStartBlock');
+  const protocolConfig = cache.get('validators:protocolConfig');
+
+ 
+  if (!latestBlock || !epochStartBlock || !protocolConfig) {
+    return 3 * SECOND;
+  }
+  const epochProgress =
+    (latestBlock.height - epochStartBlock.height) / protocolConfig.epochLength;
+  const timeRemaining =
+    (latestBlock.timestamp - epochStartBlock.timestamp) * (1 - epochProgress);
+  return Math.max(SECOND, timeRemaining / 2);
+};

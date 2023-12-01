@@ -14,7 +14,7 @@ const rateLimiter = catchAsync(
     const id = (req.user as User)?.id;
     const realIp = req?.headers['x-real-ip'] || req.ip;
 
-    if (!id) {
+    if (!id && realIp) {
       return await useFreePlan(res, next, realIp.toString());
     }
 
