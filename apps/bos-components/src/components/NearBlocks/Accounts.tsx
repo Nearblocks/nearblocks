@@ -100,192 +100,192 @@ export default function (props: Props) {
 
   const config = getConfig(context.networkId);
 
-  function fetchStatsData() {
-    //@ts-ignore
-    asyncFetch(`${config?.backendUrl}stats`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (data: {
-          body: {
-            stats: SatsInfo[];
-          };
-        }) => {
-          const statsResp = data?.body?.stats?.[0];
-          setStatsData({ near_price: statsResp.near_price });
-        },
-      )
-      .catch()
-      .finally(() => {});
-  }
-
-  function fetchAccountData() {
-    //@ts-ignore
-    asyncFetch(`${config?.backendUrl}account/${props.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (data: {
-          body: {
-            account: AccountInfo[];
-          };
-        }) => {
-          const accountResp = data?.body?.account?.[0];
-          setAccountData({
-            account_id: accountResp.account_id,
-            amount: accountResp.amount,
-            code_hash: accountResp.code_hash,
-            created: accountResp.created,
-            deleted: accountResp.deleted,
-            locked: accountResp.locked,
-            storage_usage: accountResp.storage_usage,
-          });
-        },
-      )
-      .catch();
-  }
-
-  function fetchContractData() {
-    //@ts-ignore
-    asyncFetch(
-      `${config?.backendUrl}account/${props.id}/contract/deployments`,
-      {
+  useEffect(() => {
+    function fetchStatsData() {
+      //@ts-ignore
+      asyncFetch(`${config?.backendUrl}stats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      },
-    )
-      .then(
-        (data: {
-          body: {
-            deployments: DeploymentsInfo[];
-          };
-        }) => {
-          const depResp = data?.body?.deployments?.[0];
-          setDeploymentData({
-            block_timestamp: depResp.block_timestamp,
-            receipt_predecessor_account_id:
-              depResp.receipt_predecessor_account_id,
-            transaction_hash: depResp.transaction_hash,
-          });
+      })
+        .then(
+          (data: {
+            body: {
+              stats: SatsInfo[];
+            };
+          }) => {
+            const statsResp = data?.body?.stats?.[0];
+            setStatsData({ near_price: statsResp.near_price });
+          },
+        )
+        .catch()
+        .finally(() => {});
+    }
+
+    function fetchAccountData() {
+      //@ts-ignore
+      asyncFetch(`${config?.backendUrl}account/${props.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (data: {
+            body: {
+              account: AccountInfo[];
+            };
+          }) => {
+            const accountResp = data?.body?.account?.[0];
+            setAccountData({
+              account_id: accountResp.account_id,
+              amount: accountResp.amount,
+              code_hash: accountResp.code_hash,
+              created: accountResp.created,
+              deleted: accountResp.deleted,
+              locked: accountResp.locked,
+              storage_usage: accountResp.storage_usage,
+            });
+          },
+        )
+        .catch();
+    }
+
+    function fetchContractData() {
+      //@ts-ignore
+      asyncFetch(
+        `${config?.backendUrl}account/${props.id}/contract/deployments`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
       )
-      .catch();
-  }
+        .then(
+          (data: {
+            body: {
+              deployments: DeploymentsInfo[];
+            };
+          }) => {
+            const depResp = data?.body?.deployments?.[0];
+            setDeploymentData({
+              block_timestamp: depResp.block_timestamp,
+              receipt_predecessor_account_id:
+                depResp.receipt_predecessor_account_id,
+              transaction_hash: depResp.transaction_hash,
+            });
+          },
+        )
+        .catch();
+    }
 
-  function fetchTokenData() {
-    //@ts-ignore
-    asyncFetch(`${config?.backendUrl}fts/${props.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (data: {
-          body: {
-            contracts: TokenInfo[];
-          };
-        }) => {
-          const tokenResp = data?.body?.contracts?.[0];
-          setTokenData({
-            name: tokenResp.name,
-            icon: tokenResp.icon,
-            symbol: tokenResp.symbol,
-            price: tokenResp.price,
-            website: tokenResp.website,
-          });
+    function fetchTokenData() {
+      //@ts-ignore
+      asyncFetch(`${config?.backendUrl}fts/${props.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-      .catch()
-      .finally(() => {});
-  }
+      })
+        .then(
+          (data: {
+            body: {
+              contracts: TokenInfo[];
+            };
+          }) => {
+            const tokenResp = data?.body?.contracts?.[0];
+            setTokenData({
+              name: tokenResp.name,
+              icon: tokenResp.icon,
+              symbol: tokenResp.symbol,
+              price: tokenResp.price,
+              website: tokenResp.website,
+            });
+          },
+        )
+        .catch()
+        .finally(() => {});
+    }
 
-  function fetchInventoryData() {
-    //@ts-ignore
-    asyncFetch(`${config?.backendUrl}account/${props.id}/inventory`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (data: {
-          body: {
-            inventory: InventoryInfo;
-          };
-        }) => {
-          const response = data?.body?.inventory;
-          setInventoryData({
-            fts: response.fts,
-            nfts: response.nfts,
-          });
+    function fetchInventoryData() {
+      //@ts-ignore
+      asyncFetch(`${config?.backendUrl}account/${props.id}/inventory`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-      .catch();
-  }
+      })
+        .then(
+          (data: {
+            body: {
+              inventory: InventoryInfo;
+            };
+          }) => {
+            const response = data?.body?.inventory;
+            setInventoryData({
+              fts: response.fts,
+              nfts: response.nfts,
+            });
+          },
+        )
+        .catch();
+    }
 
-  useEffect(() => {
     fetchStatsData();
     fetchAccountData();
     fetchContractData();
     fetchTokenData();
     fetchInventoryData();
-  }, []);
-
-  function ftBalanceOf(contracts: string, account_id?: string) {
-    //@ts-ignore
-    return asyncFetch(`${config?.rpcUrl}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'dontcare',
-        method: 'query',
-        params: {
-          request_type: 'call_function',
-          finality: 'final',
-          account_id: contracts,
-          method_name: 'ft_balance_of',
-          args_base64: encodeArgs({ account_id }),
-        },
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (res: {
-          body: {
-            result: { result: number[] };
-          };
-        }) => {
-          return res;
-        },
-      )
-      .then(
-        (data: {
-          body: {
-            result: { result: number[] };
-          };
-        }) => {
-          console.log('dff', data);
-          const resp = data?.body?.result;
-          return decodeArgs(resp.result);
-        },
-      )
-      .catch((error: any) => {
-        console.log(error);
-      });
-  }
+  }, [config?.backendUrl, props.id]);
 
   useEffect(() => {
+    function ftBalanceOf(contracts: string, account_id?: string) {
+      //@ts-ignore
+      return asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'call_function',
+            finality: 'final',
+            account_id: contracts,
+            method_name: 'ft_balance_of',
+            args_base64: encodeArgs({ account_id }),
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: { result: number[] };
+            };
+          }) => {
+            return res;
+          },
+        )
+        .then(
+          (data: {
+            body: {
+              result: { result: number[] };
+            };
+          }) => {
+            console.log('dff', data);
+            const resp = data?.body?.result;
+            return decodeArgs(resp.result);
+          },
+        )
+        .catch((error: any) => {
+          console.log(error);
+        });
+    }
+
     function loadBalances() {
       const fts = inventoryData.fts;
       if (!fts?.length) {
@@ -379,97 +379,97 @@ export default function (props: Props) {
     }
 
     loadBalances();
-  }, [inventoryData?.fts, props.id]);
-
-  function contractCode(address: string) {
-    //@ts-ignore
-    asyncFetch(`${config?.rpcUrl}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'dontcare',
-        method: 'query',
-        params: {
-          request_type: 'view_code',
-          finality: 'final',
-          account_id: address,
-          prefix_base64: '',
-        },
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (res: {
-          body: {
-            result: ContractCodeInfo;
-          };
-        }) => {
-          const resp = res?.body?.result;
-          setCode({
-            block_hash: resp.block_hash,
-            block_height: resp.block_height,
-            code_base64: resp.code_base64,
-            hash: resp.hash,
-          });
-        },
-      )
-      .catch(() => {});
-  }
-
-  function viewAccessKeys(address: string) {
-    //@ts-ignore
-    asyncFetch(`${config?.rpcUrl}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'dontcare',
-        method: 'query',
-        params: {
-          request_type: 'view_access_key_list',
-          finality: 'final',
-          account_id: address,
-        },
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (res: {
-          body: {
-            result: AccessKeyInfo;
-          };
-        }) => {
-          const resp = res?.body?.result;
-          setKey({
-            block_hash: resp.block_hash,
-            block_height: resp.block_height,
-            keys: resp.keys,
-            hash: resp.hash,
-          });
-        },
-      )
-      .catch(() => {});
-  }
+  }, [inventoryData?.fts, props.id, config?.rpcUrl]);
 
   useEffect(() => {
     if (props?.useStyles) fetchStyle();
-  }, []);
+  }, [props?.useStyles]);
 
   const Theme = styled.div`
     ${css}
   `;
 
   useEffect(() => {
+    function contractCode(address: string) {
+      //@ts-ignore
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_code',
+            finality: 'final',
+            account_id: address,
+            prefix_base64: '',
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: ContractCodeInfo;
+            };
+          }) => {
+            const resp = res?.body?.result;
+            setCode({
+              block_hash: resp.block_hash,
+              block_height: resp.block_height,
+              code_base64: resp.code_base64,
+              hash: resp.hash,
+            });
+          },
+        )
+        .catch(() => {});
+    }
+
+    function viewAccessKeys(address: string) {
+      //@ts-ignore
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_access_key_list',
+            finality: 'final',
+            account_id: address,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: AccessKeyInfo;
+            };
+          }) => {
+            const resp = res?.body?.result;
+            setKey({
+              block_hash: resp.block_hash,
+              block_height: resp.block_height,
+              keys: resp.keys,
+              hash: resp.hash,
+            });
+          },
+        )
+        .catch(() => {});
+    }
+
     function loadSchema() {
       if (!props.id) return;
 
       Promise.all([contractCode(props.id), viewAccessKeys(props.id)]);
     }
     loadSchema();
-  }, [props.id]);
+  }, [props.id, config?.rpcUrl]);
 
   if (code?.code_base64) {
     const locked = (key.keys || []).every(
