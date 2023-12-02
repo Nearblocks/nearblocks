@@ -3,34 +3,13 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
-import { nanoToMilli } from '@/includes/libs';
+import { getConfig, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 export default function () {
   const [isLoading, setIsLoading] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
-  function getConfig(network: string) {
-    switch (network) {
-      case 'mainnet':
-        return {
-          ownerId: 'nearblocks.near',
-          nodeUrl: 'https://rpc.mainnet.near.org',
-          backendUrl: 'https://api.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://nearblocks.io/',
-        };
-      case 'testnet':
-        return {
-          ownerId: 'nearblocks.testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
-          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://testnet.nearblocks.io/',
-        };
-      default:
-        return {};
-    }
-  }
+
   const config = getConfig(context.networkId);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

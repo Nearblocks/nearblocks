@@ -196,3 +196,27 @@ export type ChartInfo = {
   near_price: string;
   txns: string;
 };
+
+export type TransactionInfo = {
+  actions: {
+    action: string;
+    method: string;
+  }[];
+  actions_agg: {
+    deposit: number;
+  };
+  block: {
+    block_height: number;
+  };
+  block_timestamp: string;
+  included_in_block_hash: string;
+  outcomes: {
+    status: boolean;
+  };
+  outcomes_agg: {
+    transaction_fee: number;
+  };
+  receiver_account_id: string;
+  signer_account_id: string;
+  transaction_hash: string;
+};

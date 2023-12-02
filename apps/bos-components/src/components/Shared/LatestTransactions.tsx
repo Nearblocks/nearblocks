@@ -1,5 +1,10 @@
 import { getTimeAgoString, shortenHex } from '@/includes/formats';
-import { nanoToMilli, shortenAddress, yoctoToNear } from '@/includes/libs';
+import {
+  getConfig,
+  nanoToMilli,
+  shortenAddress,
+  yoctoToNear,
+} from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
 export default function () {
@@ -14,28 +19,6 @@ export default function () {
     );
   };
 
-  function getConfig(network: string) {
-    switch (network) {
-      case 'mainnet':
-        return {
-          ownerId: 'nearblocks.near',
-          nodeUrl: 'https://rpc.mainnet.near.org',
-          backendUrl: 'https://api.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://nearblocks.io/',
-        };
-      case 'testnet':
-        return {
-          ownerId: 'nearblocks.testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
-          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://testnet.nearblocks.io/',
-        };
-      default:
-        return {};
-    }
-  }
   const config = getConfig(context.networkId);
 
   function fetchLatestTxns() {
