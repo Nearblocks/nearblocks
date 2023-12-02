@@ -13,6 +13,9 @@ export interface RequestValidators<T> extends Request {
 export type RequestValidator<T> = Required<RequestValidators<T>>;
 
 export type Config = {
+  dbCa: string;
+  dbCert: string;
+  dbKey: string;
   dbUrl: string;
   mainnetDbUrl: string;
   mainnetRedisUrl: string;

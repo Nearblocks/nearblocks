@@ -8,6 +8,8 @@ import QueryStream from 'pg-query-stream';
 import config from '#config';
 import { StreamTransformWrapper } from '#types/types';
 
+import { ssl } from './db.js';
+
 export const streamCsv = (
   res: Response,
   query: string,
@@ -18,6 +20,7 @@ export const streamCsv = (
   const pool = new pg.Pool({
     connectionString: config.dbUrl,
     max: 1,
+    ssl: ssl?.ca ? ssl : false,
   });
   const stringifier = stringify({
     columns,

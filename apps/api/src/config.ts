@@ -5,6 +5,9 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  DATABASE_CA: str({ default: '' }),
+  DATABASE_CERT: str({ default: '' }),
+  DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   MAINNET_DB_URL: str(),
   MAINNET_REDIS_URL: str(),
@@ -17,6 +20,9 @@ const env = cleanEnv(process.env, {
 });
 
 const config: Config = {
+  dbCa: env.DATABASE_CA,
+  dbCert: env.DATABASE_CERT,
+  dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   mainnetDbUrl: env.MAINNET_DB_URL,
   mainnetRedisUrl: env.MAINNET_REDIS_URL,
