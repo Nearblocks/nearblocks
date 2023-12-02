@@ -19,3 +19,4 @@ declare const Tooltip;
 declare const Dialog;
 declare const Select;
 declare const ScrollArea;
+declare const Buffer;
