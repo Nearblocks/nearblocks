@@ -1,11 +1,11 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import config from '#config';
 import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
-import { keyBinder, getPagination } from '#libs/utils';
-import { Item, FtTxns, FtTxnsCount, Holders } from '#libs/schema/fts';
+import db from '#libs/db';
+import { FtTxns, FtTxnsCount, Holders, Item } from '#libs/schema/fts';
+import { getPagination, keyBinder } from '#libs/utils';
+import { RawQueryParams, RequestValidator } from '#types/types';
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const contract = req.validator.data.contract;
@@ -207,7 +207,7 @@ const txns = catchAsync(
             order === 'desc' ? 'DESC' : 'ASC'
           }
       `,
-      { contract, account, from, to, limit, offset, event },
+      { account, contract, event, from, limit, offset, to },
     );
 
     const { rows } = await db.query(query, values);
@@ -225,8 +225,8 @@ const txnsCount = catchAsync(
     const event = req.validator.data.event;
 
     const useFormat = true;
-    const bindings = { contract, account, from, to, event };
-    const rawQuery = (options: any) => `
+    const bindings = { account, contract, event, from, to };
+    const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
@@ -348,4 +348,4 @@ const holdersCount = catchAsync(
   },
 );
 
-export default { item, txns, txnsCount, holders, holdersCount };
+export default { holders, holdersCount, item, txns, txnsCount };

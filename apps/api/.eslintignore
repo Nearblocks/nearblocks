@@ -1,3 +1,2 @@
-/**/*.js
-graphql
-prisma
+.turbo
+dist

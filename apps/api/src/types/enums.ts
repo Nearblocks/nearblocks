@@ -1,29 +1,24 @@
-export enum Network {
-  MAINNET = 'mainnet',
-  TESTNET = 'testnet',
-}
-
 export enum ActionKind {
+  ADD_KEY = 'ADD_KEY',
   CREATE_ACCOUNT = 'CREATE_ACCOUNT',
+  DELETE_ACCOUNT = 'DELETE_ACCOUNT',
+  DELETE_KEY = 'DELETE_KEY',
   DEPLOY_CONTRACT = 'DEPLOY_CONTRACT',
   FUNCTION_CALL = 'FUNCTION_CALL',
-  TRANSFER = 'TRANSFER',
   STAKE = 'STAKE',
-  ADD_KEY = 'ADD_KEY',
-  DELETE_KEY = 'DELETE_KEY',
-  DELETE_ACCOUNT = 'DELETE_ACCOUNT',
+  TRANSFER = 'TRANSFER',
 }
 
 export enum EventKind {
+  BURN = 'BURN',
   MINT = 'MINT',
   TRANSFER = 'TRANSFER',
-  BURN = 'BURN',
 }
 
 export enum VerificationKind {
-  VERIFY_EMAIL = 'VERIFY_EMAIL',
   RESET_PASSWORD = 'RESET_PASSWORD',
   UPDATE_EMAIL = 'UPDATE_EMAIL',
+  VERIFY_EMAIL = 'VERIFY_EMAIL',
 }
 
 export enum SubscriptionStatus {

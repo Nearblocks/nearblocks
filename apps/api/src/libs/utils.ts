@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Big from 'big.js';
 import { format } from 'numerable';
 
+import { mainnetDb } from '#libs/db';
 import logger from '#libs/logger';
 import Sentry from '#libs/sentry';
-import { mainnetDb } from '#libs/db';
-import { ValidationError } from '#ts/types';
+import { ValidationError } from '#types/types';
 
 Big.NE = -18;
 const MS_PER_NS = Big(10).pow(6);
@@ -53,10 +54,10 @@ export const keyBinder = (raw: string, bindings: any, format = false) => {
 export const yoctoToNear = (yocto: string) =>
   Big(yocto).div(YOCTO_PER_NEAR).toString();
 
-export const msToNsTime = (ms: string | number) =>
+export const msToNsTime = (ms: number | string) =>
   Big(ms).mul(MS_PER_NS).toString();
 
-export const nsToMsTime = (ns: string | number) =>
+export const nsToMsTime = (ns: number | string) =>
   Big(ns).div(Big(10).pow(6)).toString();
 
 export const tokenAmount = (amount: string, decimals: number) =>
@@ -68,8 +69,8 @@ export const localFormat = (string: string, decimals = 8) =>
 export const validationErrors = (errors: ValidationError[]) => {
   return {
     errors: errors.map((error) => ({
-      path: [error.path],
       message: error.message,
+      path: [error.path],
     })),
   };
 };

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
-import ft from '#services/fts/index';
 import schema from '#libs/schema/fts';
-import contract from '#services/fts/contract';
-import validator from '#middlewares/validator';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
+import contract from '#services/fts/contract';
+import ft from '#services/fts/index';
 
 const route = Router();
 

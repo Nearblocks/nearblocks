@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import txns from '#services/txns';
 import schema from '#libs/schema/txns';
-import validator from '#middlewares/validator';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
+import txns from '#services/txns';
 
 const route = Router();
 

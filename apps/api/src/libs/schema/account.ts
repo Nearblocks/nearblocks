@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import dayjs from '#libs/dayjs';
-import { ActionKind, EventKind } from '#ts/enums';
+import { ActionKind, EventKind } from '#types/enums';
 
 const item = z.object({
   account: z.string(),
@@ -30,9 +30,9 @@ const tokens = z.object({
 
 const keys = z.object({
   account: z.string(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
 });
 
 const keysCount = z.object({
@@ -41,83 +41,83 @@ const keysCount = z.object({
 
 const txns = z.object({
   account: z.string(),
-  from: z.string().optional(),
-  to: z.string().optional(),
   action: z.nativeEnum(ActionKind).optional(),
+  from: z.string().optional(),
   method: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const txnsCount = z.object({
   account: z.string(),
-  from: z.string().optional(),
-  to: z.string().optional(),
   action: z.nativeEnum(ActionKind).optional(),
+  from: z.string().optional(),
   method: z.string().optional(),
+  to: z.string().optional(),
 });
 
 const txnsExport = z.object({
   account: z.string(),
-  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
-  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
 });
 
 const ftTxns = z.object({
   account: z.string(),
-  from: z.string().optional(),
-  to: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const ftTxnsCount = z.object({
   account: z.string(),
+  event: z.nativeEnum(EventKind).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  event: z.nativeEnum(EventKind).optional(),
 });
 
 const ftTxnsExport = z.object({
   account: z.string(),
-  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
-  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
 });
 
 const nftTxns = z.object({
   account: z.string(),
-  from: z.string().optional(),
-  to: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const nftTxnsCount = z.object({
   account: z.string(),
+  event: z.nativeEnum(EventKind).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  event: z.nativeEnum(EventKind).optional(),
 });
 
 const nftTxnsExport = z.object({
   account: z.string(),
-  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
-  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
     message: 'Invalid date',
   }),
 });
@@ -141,21 +141,21 @@ export type NftTxnsCount = z.infer<typeof nftTxnsCount>;
 export type NftTxnsExport = z.infer<typeof nftTxnsExport>;
 
 export default {
-  item,
+  action,
   contract,
   deployments,
-  action,
-  inventory,
-  tokens,
-  keys,
-  keysCount,
-  txns,
-  txnsCount,
-  txnsExport,
   ftTxns,
   ftTxnsCount,
   ftTxnsExport,
+  inventory,
+  item,
+  keys,
+  keysCount,
   nftTxns,
   nftTxnsCount,
   nftTxnsExport,
+  tokens,
+  txns,
+  txnsCount,
+  txnsExport,
 };

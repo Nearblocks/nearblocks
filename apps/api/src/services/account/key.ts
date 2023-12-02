@@ -1,10 +1,10 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
-import { keyBinder, getPagination } from '#libs/utils';
+import db from '#libs/db';
 import { Keys, KeysCount } from '#libs/schema/account';
+import { getPagination, keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const keys = catchAsync(async (req: RequestValidator<Keys>, res: Response) => {
   const account = req.validator.data.account;

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import stats from '#services/stats';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import stats from '#services/stats';
 
 const route = Router();
 

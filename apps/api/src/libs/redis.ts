@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 
 import config from '#config';
 import { errorHandler } from '#libs/utils';
@@ -22,6 +22,7 @@ mainnetRedis.on('error', errorHandler);
 
 const prefix = 'api';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const cache = async (key: string, callback: any, options: Options) => {
   const prefixedKey = `${prefix}:${key}`;
   const redisData = await redis.get(prefixedKey);

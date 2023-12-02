@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
-import { List, Count, Txns } from '#libs/schema/fts';
-import { keyBinder, getPagination } from '#libs/utils';
+import db from '#libs/db';
+import { Count, List, Txns } from '#libs/schema/fts';
+import { getPagination, keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const orderBy = (sort: string) => {
   switch (sort) {
@@ -93,7 +93,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       ORDER BY
         ${orderBy(sort)} ${order === 'desc' ? 'DESC NULLS LAST' : 'ASC'}
     `,
-    { search: `%${search}%`, limit, offset },
+    { limit, offset, search: `%${search}%` },
   );
 
   const { rows } = await db.query(query, values);
@@ -288,4 +288,4 @@ const txnsCount = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json({ txns: rows });
 });
 
-export default { list, count, txns, txnsCount };
+export default { count, list, txns, txnsCount };

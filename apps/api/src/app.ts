@@ -2,15 +2,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import cors from 'cors';
-import helmet from 'helmet';
-import qs from 'query-string';
-import passport from 'passport';
 import express, { Request, Response } from 'express';
+import helmet from 'helmet';
+import passport from 'passport';
+import qs from 'query-string';
 
 import sentry from '#libs/sentry';
-import routes from '#routes/index';
 import swagger from '#libs/swagger';
-import { bearerStrategy, anonymousStrategy } from '#middlewares/passport';
+import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
+import routes from '#routes/index';
 
 const file = fileURLToPath(import.meta.url);
 const dir = path.dirname(file);
@@ -30,8 +30,8 @@ app.use(helmet());
 passport.use(bearerStrategy);
 passport.use(anonymousStrategy);
 
-app.set('trust proxy', 1);
-app.get('/ip', (req, res) => res.send(req.ip));
+app.set('trust proxy', 2);
+// app.get('/ip', (req, res) => res.send(req.ip));
 
 app.use('/v1', routes());
 

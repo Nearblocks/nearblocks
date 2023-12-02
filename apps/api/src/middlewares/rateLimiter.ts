@@ -1,21 +1,20 @@
+import { NextFunction, Request, Response } from 'express';
 import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 
+import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import { mainnetDb } from '#libs/db';
-import catchAsync from '#libs/async';
-import { Plan, User } from '#ts/types';
 import { mainnetRedis } from '#libs/redis';
-import { SubscriptionStatus } from '#ts/enums';
 import { getFreePlan, keyBinder } from '#libs/utils';
-import { NextFunction, Request, Response } from 'express';
+import { SubscriptionStatus } from '#types/enums';
+import { Plan, User } from '#types/types';
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as User)?.id;
-    const realIp = req?.headers['x-real-ip'] || req.ip;
 
     if (!id) {
-      return await useFreePlan(res, next, realIp.toString());
+      return await useFreePlan(res, next, req.ip!);
     }
 
     const date = dayjs.utc().toISOString();
@@ -34,7 +33,7 @@ const rateLimiter = catchAsync(
         LIMIT
           1
       `,
-      { user: id, date },
+      { date, user: id },
     );
 
     const { rows } = await mainnetDb.query(query, values);
@@ -58,7 +57,7 @@ const rateLimiter = catchAsync(
 const useFreePlan = async (
   res: Response,
   next: NextFunction,
-  key: string | number,
+  key: number | string,
 ) => {
   const freePlan = await getFreePlan();
 
@@ -82,22 +81,22 @@ const rateLimiterUnion = (plan: Plan) => {
   const pointsMonth = plan.limit_per_month;
 
   const minuteRateLimiter = new RateLimiterRedis({
-    storeClient: mainnetRedis,
+    duration: 60, // 1 min
     keyPrefix: `plan_${plan.id}_minute`,
     points: pointsMinute,
-    duration: 60, // 1 min
+    storeClient: mainnetRedis,
   });
   const dayRateLimiter = new RateLimiterRedis({
-    storeClient: mainnetRedis,
+    duration: 60 * 60 * 24, // 1 day
     keyPrefix: `plan_${plan.id}_day`,
     points: pointsDay,
-    duration: 60 * 60 * 24, // 1 day
+    storeClient: mainnetRedis,
   });
   const monthRateLimiter = new RateLimiterRedis({
-    storeClient: mainnetRedis,
+    duration: 60 * 60 * 24 * 30, // 30 days
     keyPrefix: `plan_${plan.id}_month`,
     points: pointsMonth,
-    duration: 60 * 60 * 24 * 30, // 30 days
+    storeClient: mainnetRedis,
   });
 
   return new RateLimiterUnion(

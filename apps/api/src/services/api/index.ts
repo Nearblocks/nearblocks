@@ -1,10 +1,10 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
+import db from '#libs/db';
 import { AccountTxns } from '#libs/schema/api/index';
-import { keyBinder, getPagination, yoctoToNear } from '#libs/utils';
+import { getPagination, keyBinder, yoctoToNear } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const accountTxns = catchAsync(
   async (req: RequestValidator<AccountTxns>, res: Response) => {
@@ -122,16 +122,16 @@ const accountTxns = catchAsync(
       const status = row.outcomes.status;
 
       return {
-        hash: row.transaction_hash,
         action: row.actions?.[0]?.action ?? null,
-        method: row.actions?.[0]?.method ?? null,
         block: row.block.block_height,
-        timestamp: row.block_timestamp,
-        from: row.signer_account_id,
-        to: row.receiver_account_id,
         deposit: yoctoToNear(row.actions_agg.deposit),
         fee: yoctoToNear(row.outcomes_agg.transaction_fee),
+        from: row.signer_account_id,
+        hash: row.transaction_hash,
+        method: row.actions?.[0]?.method ?? null,
         status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
+        timestamp: row.block_timestamp,
+        to: row.receiver_account_id,
       };
     });
 

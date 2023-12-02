@@ -1,19 +1,20 @@
 import { Response } from 'express';
+import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
 
-import db from '#libs/db';
-import { cache } from '#libs/redis';
 import catchAsync from '#libs/async';
-import { keyBinder } from '#libs/utils';
-import { RequestValidator } from '#ts/types';
-import { viewAccount, viewCode, viewAccessKeys } from '#libs/near';
+import db from '#libs/db';
+import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
+import { cache } from '#libs/redis';
 import {
-  Item,
   Action,
-  Tokens,
   Contract,
-  Inventory,
   Deployments,
+  Inventory,
+  Item,
+  Tokens,
 } from '#libs/schema/account';
+import { keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const EXPIRY = 60; // 1 mins
 
@@ -104,9 +105,9 @@ const contract = catchAsync(
     ]);
 
     const keys = key.keys || [];
-    const locked = keys.every(
-      (key: any) => key.access_key.permission !== 'FullAccess',
-    );
+    const locked = keys.every((key: AccessKeyInfoView) => {
+      key.access_key.permission !== 'FullAccess';
+    });
 
     return res
       .status(200)
@@ -369,10 +370,10 @@ const tokens = catchAsync(
 );
 
 export default {
-  item,
+  action,
   contract,
   deployments,
-  action,
   inventory,
+  item,
   tokens,
 };
