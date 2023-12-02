@@ -1,16 +1,16 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
-import { keyBinder, getPagination } from '#libs/utils';
+import db from '#libs/db';
 import {
-  Tokens,
   TokenItem,
-  TokenTxns,
+  Tokens,
   TokensCount,
+  TokenTxns,
   TokenTxnsCount,
 } from '#libs/schema/nfts';
+import { getPagination, keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const list = catchAsync(
   async (req: RequestValidator<Tokens>, res: Response) => {
@@ -287,7 +287,7 @@ const txns = catchAsync(
             order === 'desc' ? 'DESC' : 'ASC'
           }
       `,
-      { contract, token, from, to, limit, offset, event },
+      { contract, event, from, limit, offset, to, token },
     );
 
     const { rows } = await db.query(query, values);
@@ -325,7 +325,7 @@ const txnsCount = catchAsync(
               nft.contract = a.emitted_by_contract_account_id
           )
       `,
-      { contract, token, from, to, event },
+      { contract, event, from, to, token },
     );
 
     const { rows } = await db.query(query, values);
@@ -334,4 +334,4 @@ const txnsCount = catchAsync(
   },
 );
 
-export default { list, count, item, txns, txnsCount };
+export default { count, item, list, txns, txnsCount };

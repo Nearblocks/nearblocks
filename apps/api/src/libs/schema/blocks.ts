@@ -17,4 +17,4 @@ export type Item = z.infer<typeof item>;
 export type List = z.infer<typeof list>;
 export type Latest = z.infer<typeof latest>;
 
-export default { list, latest, item };
+export default { item, latest, list };

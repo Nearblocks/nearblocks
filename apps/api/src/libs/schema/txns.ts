@@ -1,24 +1,24 @@
 import { z } from 'zod';
 
-import { ActionKind } from '#ts/enums';
+import { ActionKind } from '#types/enums';
 
 const list = z.object({
+  action: z.nativeEnum(ActionKind).optional(),
   block: z.string().optional(),
   from: z.string().optional(),
-  to: z.string().optional(),
-  action: z.nativeEnum(ActionKind).optional(),
   method: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const count = z.object({
+  action: z.nativeEnum(ActionKind).optional(),
   block: z.string().optional(),
   from: z.string().optional(),
-  to: z.string().optional(),
-  action: z.nativeEnum(ActionKind).optional(),
   method: z.string().optional(),
+  to: z.string().optional(),
 });
 
 const latest = z.object({
@@ -34,4 +34,4 @@ export type Count = z.infer<typeof count>;
 export type Latest = z.infer<typeof latest>;
 export type Item = z.infer<typeof item>;
 
-export default { list, count, latest, item };
+export default { count, item, latest, list };

@@ -1,14 +1,14 @@
 import { Router } from 'express';
 
+import schema from '#libs/schema/account';
+import { bearerAuth } from '#middlewares/passport';
+import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
 import ft from '#services/account/ft';
+import account from '#services/account/index';
 import key from '#services/account/key';
 import nft from '#services/account/nft';
 import txn from '#services/account/txn';
-import schema from '#libs/schema/account';
-import account from '#services/account/index';
-import validator from '#middlewares/validator';
-import { bearerAuth } from '#middlewares/passport';
-import rateLimiter from '#middlewares/rateLimiter';
 
 const route = Router();
 

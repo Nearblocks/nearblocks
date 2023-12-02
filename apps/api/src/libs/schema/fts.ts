@@ -1,11 +1,12 @@
 import { z } from 'zod';
 
-import { EventKind } from '#ts/enums';
+import { EventKind } from '#types/enums';
 
 const list = z.object({
-  search: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(50).optional().default(50),
+  search: z.string().optional(),
   sort: z
     .enum([
       'name',
@@ -18,7 +19,6 @@ const list = z.object({
     ])
     .optional()
     .default('onchain_market_cap'),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
 });
 
 const count = z.object({
@@ -26,18 +26,18 @@ const count = z.object({
 });
 
 const txns = z.object({
-  from: z.string().optional(),
-  to: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const txnsCount = z.object({
+  event: z.nativeEnum(EventKind).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  event: z.nativeEnum(EventKind).optional(),
 });
 
 const item = z.object({
@@ -45,29 +45,29 @@ const item = z.object({
 });
 
 const ftTxns = z.object({
-  contract: z.string(),
   a: z.string().optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
+  contract: z.string(),
   event: z.nativeEnum(EventKind).optional(),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  to: z.string().optional(),
 });
 
 const ftTxnsCount = z.object({
-  contract: z.string(),
   a: z.string().optional(),
+  contract: z.string(),
+  event: z.nativeEnum(EventKind).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  event: z.nativeEnum(EventKind).optional(),
 });
 
 const holders = z.object({
   contract: z.string(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
 });
 
 const holdersCount = z.object({
@@ -85,13 +85,13 @@ export type Holders = z.infer<typeof holders>;
 export type HoldersCount = z.infer<typeof holdersCount>;
 
 export default {
-  list,
   count,
-  txns,
-  txnsCount,
-  item,
   ftTxns,
   ftTxnsCount,
   holders,
   holdersCount,
+  item,
+  list,
+  txns,
+  txnsCount,
 };

@@ -1,8 +1,8 @@
-import { ZodTypeAny } from 'zod';
+import { NextFunction, Response } from 'express';
 import { merge } from 'lodash-es';
-import { Response, NextFunction } from 'express';
+import { ZodTypeAny } from 'zod';
 
-import { RequestValidators } from '#ts/types';
+import { RequestValidators } from '#types/types';
 
 const validator = <T extends ZodTypeAny>(schema: T) => {
   return (

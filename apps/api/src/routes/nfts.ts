@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-import nft from '#services/nfts/index';
 import schema from '#libs/schema/nfts';
-import tokens from '#services/nfts/tokens';
-import validator from '#middlewares/validator';
-import contract from '#services/nfts/contract';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
+import contract from '#services/nfts/contract';
+import nft from '#services/nfts/index';
+import tokens from '#services/nfts/tokens';
 
 const route = Router();
 

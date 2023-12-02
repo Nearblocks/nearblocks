@@ -1,25 +1,25 @@
-import { Key, Plan, User } from '#ts/types';
+import { Key, Plan, User } from '#types/types';
 
 export const transformUser = ({
-  id,
   email,
-  username,
-  verified,
+  id,
+  keys = [],
   last_login_at,
   plan,
-  keys = [],
+  username,
+  verified,
 }: User) => {
   const transformedPlan = plan ? transformPlan(plan) : null;
   const transformedKeys = keys.map((key) => transformKey(key));
 
   return {
-    id,
     email,
-    username,
-    verified,
+    id,
+    keys: transformedKeys,
     last_login_at,
     plan: transformedPlan,
-    keys: transformedKeys,
+    username,
+    verified,
   };
 };
 
@@ -28,37 +28,37 @@ export const transformPlans = (plans: Plan[]) =>
 
 export const transformPlan = ({
   id,
-  title,
-  limit_per_second,
-  limit_per_minute,
   limit_per_day,
+  limit_per_minute,
   limit_per_month,
-  price_monthly,
+  limit_per_second,
   price_annually,
+  price_monthly,
+  title,
 }: Plan) => ({
   id,
-  title,
-  limit_per_second,
-  limit_per_minute,
   limit_per_day,
+  limit_per_minute,
   limit_per_month,
-  price_monthly,
+  limit_per_second,
   price_annually,
+  price_monthly,
+  title,
 });
 
 export const transformKeys = (keys: Key[]) =>
   keys.map((key) => transformKey(key));
 
 export const transformKey = ({
+  created_at,
   id,
   name,
   token,
-  created_at,
   updated_at,
 }: Key) => ({
+  created_at,
   id,
   name,
   token,
-  created_at,
   updated_at,
 });

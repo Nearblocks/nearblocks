@@ -1,13 +1,17 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import config from '#config';
-import dayjs from '#libs/dayjs';
 import catchAsync from '#libs/async';
-import { streamCsv } from '#libs/stream';
-import { RequestValidator, StreamTransformWrapper } from '#ts/types';
+import dayjs from '#libs/dayjs';
+import db from '#libs/db';
 import { NftTxns, NftTxnsCount, NftTxnsExport } from '#libs/schema/account';
-import { keyBinder, getPagination, msToNsTime, nsToMsTime } from '#libs/utils';
+import { streamCsv } from '#libs/stream';
+import { getPagination, keyBinder, msToNsTime, nsToMsTime } from '#libs/utils';
+import {
+  RawQueryParams,
+  RequestValidator,
+  StreamTransformWrapper,
+} from '#types/types';
 
 const txns = catchAsync(
   async (req: RequestValidator<NftTxns>, res: Response) => {
@@ -161,7 +165,7 @@ const txns = catchAsync(
             order === 'desc' ? 'DESC' : 'ASC'
           }
       `,
-      { account, from, to, limit, offset, event },
+      { account, event, from, limit, offset, to },
     );
 
     const { rows } = await db.query(query, values);
@@ -182,8 +186,8 @@ const txnsCount = catchAsync(
     }
 
     const useFormat = true;
-    const bindings = { account, from, to, event };
-    const rawQuery = (options: any) => `
+    const bindings = { account, event, from, to };
+    const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
@@ -379,38 +383,38 @@ const txnsExport = catchAsync(
           emitted_in_shard_id ASC,
           emitted_index_of_event_entry_in_shard ASC
       `,
-      { account, start, end },
+      { account, end, start },
     );
 
     const columns = [
-      { key: 'status', header: 'Status' },
-      { key: 'hash', header: 'Txn Hash' },
-      { key: 'method', header: 'Method' },
-      { key: 'from', header: 'From' },
-      { key: 'to', header: 'To' },
-      { key: 'id', header: 'Token ID' },
-      { key: 'token', header: 'Token' },
-      { key: 'contract', header: 'Contract' },
-      { key: 'block', header: 'Block' },
-      { key: 'timestamp', header: 'Time' },
+      { header: 'Status', key: 'status' },
+      { header: 'Txn Hash', key: 'hash' },
+      { header: 'Method', key: 'method' },
+      { header: 'From', key: 'from' },
+      { header: 'To', key: 'to' },
+      { header: 'Token ID', key: 'id' },
+      { header: 'Token', key: 'token' },
+      { header: 'Contract', key: 'contract' },
+      { header: 'Block', key: 'block' },
+      { header: 'Time', key: 'timestamp' },
     ];
     const transform: StreamTransformWrapper =
       (stringifier) => (row, _, callback) => {
         const status = row.outcomes.status;
 
         stringifier.write({
-          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
-          hash: row.transaction_hash,
-          method: row.event_kind,
-          from: row.token_old_owner_account_id || 'system',
-          to: row.token_new_owner_account_id || 'system',
-          id: row.token_id,
-          token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
-          contract: row.nft ? row.nft.contract : '',
           block: row.block.block_height,
+          contract: row.nft ? row.nft.contract : '',
+          from: row.token_old_owner_account_id || 'system',
+          hash: row.transaction_hash,
+          id: row.token_id,
+          method: row.event_kind,
+          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
+          to: row.token_new_owner_account_id || 'system',
+          token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
         });
         callback();
       };

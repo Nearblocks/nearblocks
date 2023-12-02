@@ -1,16 +1,16 @@
 import { Router } from 'express';
 
-import key from '#routes/key';
-import fts from '#routes/fts';
-import txns from '#routes/txns';
-import nfts from '#routes/nfts';
-import stats from '#routes/stats';
+import account from '#routes/account';
 import api from '#routes/api/index';
 import blocks from '#routes/blocks';
 import charts from '#routes/charts';
-import search from '#routes/search';
-import account from '#routes/account';
 import exports from '#routes/exports';
+import fts from '#routes/fts';
+import key from '#routes/key';
+import nfts from '#routes/nfts';
+import search from '#routes/search';
+import stats from '#routes/stats';
+import txns from '#routes/txns';
 
 const routes = () => {
   const app = Router();

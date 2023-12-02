@@ -1,10 +1,10 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { keyBinder } from '#libs/utils';
+import db from '#libs/db';
 import { Item } from '#libs/schema/search';
-import { RequestValidator } from '#ts/types';
+import { keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const txns = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const keyword = req.validator.data.keyword;
@@ -181,12 +181,12 @@ const search = catchAsync(
     ]);
 
     return res.status(200).json({
-      txns: txn.rows,
-      blocks: block.rows,
       accounts: account.rows,
+      blocks: block.rows,
       receipts: receipt.rows,
+      txns: txn.rows,
     });
   },
 );
 
-export default { txns, blocks, accounts, receipts, search };
+export default { accounts, blocks, receipts, search, txns };

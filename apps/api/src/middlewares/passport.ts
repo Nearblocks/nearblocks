@@ -1,6 +1,6 @@
 import passport from 'passport';
-import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import { Strategy as AnonymousStrategy } from 'passport-anonymous';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
 
 import { bearerVerify } from '#services/passport';
 

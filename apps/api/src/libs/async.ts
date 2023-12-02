@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextFunction, Request, Response } from 'express';
 
 const catchAsync =
   (fn: any) => (req: Request, res: Response, next: NextFunction) => {

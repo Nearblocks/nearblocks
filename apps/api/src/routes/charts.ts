@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import charts from '#services/charts';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import charts from '#services/charts';
 
 const route = Router();
 

@@ -1,10 +1,10 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
-import { keyBinder } from '#libs/utils';
-import { RequestValidator } from '#ts/types';
+import db from '#libs/db';
 import { Item } from '#libs/schema/key';
+import { keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const key = req.validator.data.key;

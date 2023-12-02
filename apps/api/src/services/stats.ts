@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
+import catchAsync from '#libs/async';
 import db from '#libs/db';
 import { cache } from '#libs/redis';
-import catchAsync from '#libs/async';
 
 const EXPIRY = 15; // 15 sec
 

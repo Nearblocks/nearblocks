@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import key from '#services/key';
 import schema from '#libs/schema/key';
-import validator from '#middlewares/validator';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
+import key from '#services/key';
 
 const route = Router();
 

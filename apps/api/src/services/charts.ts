@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import db from '#libs/db';
 import catchAsync from '#libs/async';
+import db from '#libs/db';
 
 const list = catchAsync(async (_req: Request, res: Response) => {
   const { rows } = await db.query(
@@ -51,4 +51,4 @@ const latest = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json({ charts: rows });
 });
 
-export default { list, latest };
+export default { latest, list };

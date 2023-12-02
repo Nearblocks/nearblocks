@@ -1,20 +1,24 @@
 import { Response } from 'express';
 
-import db from '#libs/db';
 import config from '#config';
-import dayjs from '#libs/dayjs';
 import catchAsync from '#libs/async';
-import { ActionKind } from '#ts/enums';
-import { streamCsv } from '#libs/stream';
+import dayjs from '#libs/dayjs';
+import db from '#libs/db';
 import { Txns, TxnsCount, TxnsExport } from '#libs/schema/account';
-import { RequestValidator, StreamTransformWrapper } from '#ts/types';
+import { streamCsv } from '#libs/stream';
 import {
+  getPagination,
   keyBinder,
   msToNsTime,
   nsToMsTime,
   yoctoToNear,
-  getPagination,
 } from '#libs/utils';
+import { ActionKind } from '#types/enums';
+import {
+  RawQueryParams,
+  RequestValidator,
+  StreamTransformWrapper,
+} from '#types/types';
 
 const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const account = req.validator.data.account;
@@ -179,7 +183,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         tr.block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
         tr.index_in_chunk ${order === 'desc' ? 'DESC' : 'ASC'}
     `,
-    { account, from, to, limit, offset, action, method },
+    { account, action, from, limit, method, offset, to },
   );
 
   const { rows } = await db.query(query, values);
@@ -200,8 +204,8 @@ const txnsCount = catchAsync(
     }
 
     const useFormat = true;
-    const bindings = { account, from, to, action, method };
-    const rawQuery = (options: any) => `
+    const bindings = { account, action, from, method, to };
+    const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
@@ -242,9 +246,9 @@ const txnsCount = catchAsync(
 
     const { query, values } = keyBinder(
       rawQuery({
-        select: 'r.receipt_id',
         action: `'ACTION'`,
         method: `'method_name'`,
+        select: 'r.receipt_id',
       }),
       bindings,
       useFormat,
@@ -264,9 +268,9 @@ const txnsCount = catchAsync(
 
     const { query: countQuery, values: countValues } = keyBinder(
       rawQuery({
-        select: 'COUNT(r.receipt_id)',
         action: 'ACTION',
         method: 'method_name',
+        select: 'COUNT(r.receipt_id)',
       }),
       bindings,
     );
@@ -405,19 +409,19 @@ const txnsExport = catchAsync(
           tr.block_timestamp ASC,
           tr.index_in_chunk ASC
       `,
-      { account, start, end },
+      { account, end, start },
     );
 
     const columns = [
-      { key: 'status', header: 'Status' },
-      { key: 'hash', header: 'Txn Hash' },
-      { key: 'method', header: 'Method' },
-      { key: 'deposit', header: 'Deposit Value' },
-      { key: 'fee', header: 'Txn Fee' },
-      { key: 'from', header: 'From' },
-      { key: 'to', header: 'To' },
-      { key: 'block', header: 'Block' },
-      { key: 'timestamp', header: 'Time' },
+      { header: 'Status', key: 'status' },
+      { header: 'Txn Hash', key: 'hash' },
+      { header: 'Method', key: 'method' },
+      { header: 'Deposit Value', key: 'deposit' },
+      { header: 'Txn Fee', key: 'fee' },
+      { header: 'From', key: 'from' },
+      { header: 'To', key: 'to' },
+      { header: 'Block', key: 'block' },
+      { header: 'Time', key: 'timestamp' },
     ];
     const transform: StreamTransformWrapper =
       (stringifier) => (row, _, callback) => {
@@ -426,18 +430,18 @@ const txnsExport = catchAsync(
         const method = row.actions?.[0]?.method ?? 'Unknown';
 
         stringifier.write({
-          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
-          hash: row.transaction_hash,
-          method:
-            !action || action === ActionKind.FUNCTION_CALL ? method : action,
+          block: row.block.block_height,
           deposit: yoctoToNear(row.actions_agg.deposit),
           fee: yoctoToNear(row.outcomes_agg.transaction_fee),
           from: row.predecessor_account_id || 'system',
-          to: row.receiver_account_id || 'system',
-          block: row.block.block_height,
+          hash: row.transaction_hash,
+          method:
+            !action || action === ActionKind.FUNCTION_CALL ? method : action,
+          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
+          to: row.receiver_account_id || 'system',
         });
         callback();
       };

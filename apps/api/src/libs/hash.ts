@@ -10,8 +10,8 @@ const make = (password: string, salt: Buffer = crypto.randomBytes(32)) => {
   );
 
   return {
-    salt: salt.toString('hex'),
     hashedPassword: hashedPassword.toString('hex'),
+    salt: salt.toString('hex'),
   };
 };
 

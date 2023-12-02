@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 
+import catchAsync from '#libs/async';
 import db from '#libs/db';
 import { cache } from '#libs/redis';
-import catchAsync from '#libs/async';
-import { RequestValidator } from '#ts/types';
-import { keyBinder, getPagination } from '#libs/utils';
-import { List, Latest, Item } from '#libs/schema/blocks';
+import { Item, Latest, List } from '#libs/schema/blocks';
+import { getPagination, keyBinder } from '#libs/utils';
+import { RequestValidator } from '#types/types';
 
 const EXPIRY = 5; // 5 sec
 
@@ -218,4 +218,4 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   return res.status(200).json({ blocks: rows });
 });
 
-export default { list, count, latest, item };
+export default { count, item, latest, list };
