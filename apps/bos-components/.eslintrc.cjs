@@ -15,5 +15,6 @@ module.exports = {
     'react/display-name': 'off',
     '@next/next/no-img-element': 'off',
     'import/no-anonymous-default-export': 'off',
+    'react/jsx-no-undef': 'off',
   },
 };
