@@ -1,3 +1,6 @@
+import { localFormat } from '@/includes/formats';
+import { yoctoToNear } from '@/includes/libs';
+
 export function encodeArgs(args: object) {
   if (!args || typeof args === 'undefined') return '';
 
@@ -23,4 +26,10 @@ export function txnMethod(actions: { action: string; method: string }[]) {
   }
 
   return action.action;
+}
+
+export function gasPrice(yacto: number) {
+  const near = Big(yoctoToNear(yacto, false)).mul(Big(10).pow(12)).toString();
+
+  return `${localFormat(near)} Ⓝ / Tgas`;
 }

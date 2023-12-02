@@ -1,3 +1,5 @@
+import { yoctoToNear } from '@/includes/libs';
+
 export function localFormat(number: number) {
   const formattedNumber = Number(number).toLocaleString('en', {
     minimumFractionDigits: 0,
@@ -120,6 +122,10 @@ export function getTimeAgoString(timestamp: number) {
   }
 }
 
+export function formatWithCommas(number: string) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
 export function formatTimestampToString(timestamp: number) {
   const date = new Date(timestamp);
 
@@ -127,4 +133,107 @@ export function formatTimestampToString(timestamp: number) {
   const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
 
   return formattedDate;
+}
+
+export function convertToMetricPrefix(number: number) {
+  const prefixes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']; // Metric prefixes
+
+  let count = 0;
+  while (Math.abs(number) >= 1000 && count < prefixes.length - 1) {
+    number /= 1000;
+    count++;
+  }
+
+  return number.toFixed(2) + prefixes[count];
+}
+
+export function gasFee(gas: number, price: number) {
+  const near = yoctoToNear(Big(gas).mul(Big(price)).toString(), true);
+
+  return `${near} Ⓝ`;
+}
+
+export function currency(number: number): string {
+  let absNumber = Math.abs(number);
+
+  const suffixes = ['', 'K', 'M', 'B', 'T', 'Q'];
+  let suffixIndex = 0;
+
+  while (absNumber >= 1000 && suffixIndex < suffixes.length - 1) {
+    absNumber /= 1000;
+    suffixIndex++;
+  }
+
+  let shortNumber = parseFloat(absNumber.toFixed(2));
+
+  return (number < 0 ? '-' : '') + shortNumber + ' ' + suffixes[suffixIndex];
+}
+
+export function formatDate(dateString: string) {
+  const inputDate = new Date(dateString);
+
+  const days = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const dayOfWeek = days[inputDate.getDay()];
+  const month = months[inputDate.getMonth()];
+  const day = inputDate.getDate();
+  const year = inputDate.getFullYear();
+
+  const formattedDate = dayOfWeek + ', ' + month + ' ' + day + ', ' + year;
+  return formattedDate;
+}
+
+export function formatCustomDate(inputDate: string) {
+  var date = new Date(inputDate);
+
+  // Array of month names
+  var monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  // Get month and day
+  var month = monthNames[date.getMonth()];
+  var day = date.getDate();
+
+  // Create formatted date string in "MMM DD" format
+  var formattedDate = month + ' ' + (day < 10 ? '0' + day : day);
+
+  return formattedDate;
+}
+
+export function shortenHex(address: string) {
+  return `${address && address.substr(0, 6)}...${address.substr(-4)}`;
 }

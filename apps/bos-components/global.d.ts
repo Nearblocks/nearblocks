@@ -1,5 +1,5 @@
 declare const Widget: (params: {
-  src: string;
+  src?: string;
   props?: object;
 }) => React.ReactNode;
 

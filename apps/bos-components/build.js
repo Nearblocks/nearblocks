@@ -1,25 +1,9 @@
 import fs from 'fs';
 import replaceInFiles from 'replace-in-files';
-import postcss from 'postcss';
-import postcssPurgecss from '@fullhuman/postcss-purgecss';
-import cssnano from 'cssnano';
-import tailwindcss from 'tailwindcss';
 
 const transpiledPathPrefix = '.bos/transpiled/src/bos-components';
-const css = fs.readFileSync('./src/public/styles.css', 'utf8');
-const outputFilePathApp = '../app/public/common.css';
 
 async function build() {
-  // Process the CSS
-  let stylesByFile = {};
-
-  const postcssPlugins = [
-    tailwindcss(),
-    postcssPurgecss({
-      content: ['src/**/*.tsx'], // Files to search for used classes
-    }),
-    cssnano(),
-  ];
   const processComponentImports = (filePath, processedFiles = new Set()) => {
     if (processedFiles.has(filePath)) {
       // Prevent infinite recursion due to cyclic dependencies or repetitive file reads
@@ -56,14 +40,6 @@ async function build() {
       return '';
     }
   };
-
-  await postcss(postcssPlugins)
-    .process(css, { from: 'style.css' })
-    .then((result) => {
-      stylesByFile = result.css;
-      fs.writeFileSync(outputFilePathApp, stylesByFile);
-    })
-    .catch(() => {});
 
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],

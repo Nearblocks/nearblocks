@@ -4,7 +4,7 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 const HomePage = () => {
   const components = useBosComponents();
 
-  return <VmComponent src={components?.nodeExplorer} />;
+  return <VmComponent src={components?.homePage} />;
 };
 
 export default HomePage;

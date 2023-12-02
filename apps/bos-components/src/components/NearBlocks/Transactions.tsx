@@ -16,7 +16,12 @@ import {
   formatTimestampToString,
 } from '@/includes/formats';
 import { txnMethod } from '@/includes/near';
-import { nanoToMilli, truncateString, yoctoToNear } from '@/includes/libs';
+import {
+  getConfig,
+  nanoToMilli,
+  truncateString,
+  yoctoToNear,
+} from '@/includes/libs';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
@@ -36,26 +41,6 @@ export default function (props: Props) {
   );
   const [sorting, setSorting] = useState('desc');
 
-  function getConfig(network: string) {
-    switch (network) {
-      case 'mainnet':
-        return {
-          ownerId: 'nearblocks.near',
-          nodeUrl: 'https://rpc.mainnet.near.org',
-          requestUrl: 'https://api.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-        };
-      case 'testnet':
-        return {
-          ownerId: 'nearblocks.testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
-          requestUrl: 'https://api-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-        };
-      default:
-        return {};
-    }
-  }
   const config = getConfig(context.networkId);
 
   function fetchStyle() {
@@ -81,7 +66,7 @@ export default function (props: Props) {
   function fetchTotalTxns(qs?: string) {
     setIsLoading(true);
     const queryParams = qs ? '?' + qs : '';
-    asyncFetch(`${config?.requestUrl}txns/count${queryParams}`, {
+    asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +91,7 @@ export default function (props: Props) {
   function fetchTxns(qs?: string, sqs?: string) {
     const queryParams = qs ? qs + '&' : '';
     asyncFetch(
-      `${config?.requestUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
+      `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
       {
         method: 'GET',
         headers: {
