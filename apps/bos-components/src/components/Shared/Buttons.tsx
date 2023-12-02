@@ -4,7 +4,8 @@ import CopyIcon from '@/includes/icons/CopyIcon';
 import CloseCircle from '@/includes/icons/CloseCircle';
 
 /**
- * @param {string} id - The account identifier passed as a string.
+ * @interface Props
+ * @param {string} [id] - The account identifier passed as a string.
  */
 
 interface Props {

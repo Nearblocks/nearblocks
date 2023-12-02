@@ -19,6 +19,7 @@ import {
   fiatValue,
   nanoToMilli,
   shortenAddress,
+  getConfig,
 } from '@/includes/libs';
 import {
   dollarFormat,
@@ -62,29 +63,6 @@ export default function (props: Props) {
   const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
   const [css, setCss] = useState({});
 
-  function getConfig(network: string) {
-    switch (network) {
-      case 'mainnet':
-        return {
-          ownerId: 'nearblocks.near',
-          nodeUrl: 'https://rpc.mainnet.near.org',
-          backendUrl: 'https://api.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://nearblocks.io/',
-        };
-      case 'testnet':
-        return {
-          ownerId: 'nearblocks.testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
-          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://testnet.nearblocks.io/',
-        };
-      default:
-        return {};
-    }
-  }
-
   /**
    * Fetches styles asynchronously from a nearblocks gateway.
    */
@@ -102,7 +80,6 @@ export default function (props: Props) {
 
   useEffect(() => {
     function fetchStatsData() {
-      //@ts-ignore
       asyncFetch(`${config?.backendUrl}stats`, {
         method: 'GET',
         headers: {
@@ -123,7 +100,6 @@ export default function (props: Props) {
     }
 
     function fetchAccountData() {
-      //@ts-ignore
       asyncFetch(`${config?.backendUrl}account/${props.id}`, {
         method: 'GET',
         headers: {
@@ -152,7 +128,6 @@ export default function (props: Props) {
     }
 
     function fetchContractData() {
-      //@ts-ignore
       asyncFetch(
         `${config?.backendUrl}account/${props.id}/contract/deployments`,
         {
@@ -181,7 +156,6 @@ export default function (props: Props) {
     }
 
     function fetchTokenData() {
-      //@ts-ignore
       asyncFetch(`${config?.backendUrl}fts/${props.id}`, {
         method: 'GET',
         headers: {
@@ -208,7 +182,6 @@ export default function (props: Props) {
     }
 
     function fetchInventoryData() {
-      //@ts-ignore
       asyncFetch(`${config?.backendUrl}account/${props.id}/inventory`, {
         method: 'GET',
         headers: {
@@ -240,7 +213,6 @@ export default function (props: Props) {
 
   useEffect(() => {
     function ftBalanceOf(contracts: string, account_id?: string) {
-      //@ts-ignore
       return asyncFetch(`${config?.rpcUrl}`, {
         method: 'POST',
         body: JSON.stringify({
@@ -374,7 +346,6 @@ export default function (props: Props) {
 
   useEffect(() => {
     function contractCode(address: string) {
-      //@ts-ignore
       asyncFetch(`${config?.rpcUrl}`, {
         method: 'POST',
         body: JSON.stringify({
@@ -411,7 +382,6 @@ export default function (props: Props) {
     }
 
     function viewAccessKeys(address: string) {
-      //@ts-ignore
       asyncFetch(`${config?.rpcUrl}`, {
         method: 'POST',
         body: JSON.stringify({
@@ -504,7 +474,7 @@ export default function (props: Props) {
             <Widget
               src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredText`}
               props={{
-                fromHome: false,
+                textColor: false,
               }}
             />
           }

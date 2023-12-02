@@ -1,6 +1,6 @@
 /**
  * @interface Props
- * @param {string} appUrl - The URL of the application.
+ * @param {string} [appUrl] - The URL of the application.
  */
 
 interface Props {

@@ -1,4 +1,13 @@
-const QRCodeIcon = (props: { className: string }) => {
+/**
+ * @interface Props
+ * @param {string} [className] - The CSS class name(s) for styling purposes.
+ */
+
+interface Props {
+  className: string;
+}
+
+const QRCodeIcon = (props: Props) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

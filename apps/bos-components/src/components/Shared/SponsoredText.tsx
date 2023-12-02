@@ -1,10 +1,12 @@
 /**
- * @param {boolean} fromHome - Indicates if the component is rendered from the home.
+ * @interface Props
+ * @param {boolean} [textColour] - Indicates the optional text color property for the component.
  */
 
 interface Props {
-  fromHome?: boolean;
+  textColour?: boolean;
 }
+
 export default function (props: Props) {
   interface Sponsored {
     title: string;
@@ -12,6 +14,7 @@ export default function (props: Props) {
     btnText: string;
     url: string;
   }
+
   const [sponsored, setSponsored] = useState<Sponsored>({} as Sponsored);
 
   useEffect(() => {
@@ -40,7 +43,7 @@ export default function (props: Props) {
     <div className="pt-3 text-sm flex">
       <p
         className={`pr-2  ${
-          props.fromHome ? 'text-white' : 'text-black'
+          props.textColour ? 'text-white' : 'text-black'
         }  font-thin`}
       >
         Sponsored:

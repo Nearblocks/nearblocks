@@ -35,3 +35,26 @@ export function truncateString(str: string, maxLength: number, suffix: string) {
   }
   return str.substring(0, maxLength - suffix.length) + suffix;
 }
+
+export function getConfig(network: string) {
+  switch (network) {
+    case 'mainnet':
+      return {
+        ownerId: 'nearblocks.near',
+        nodeUrl: 'https://rpc.mainnet.near.org',
+        backendUrl: 'https://api.nearblocks.io/v1/',
+        rpcUrl: 'https://archival-rpc.testnet.near.org',
+        appUrl: 'https://nearblocks.io/',
+      };
+    case 'testnet':
+      return {
+        ownerId: 'nearblocks.testnet',
+        nodeUrl: 'https://rpc.testnet.near.org',
+        backendUrl: 'https://api-testnet.nearblocks.io/v1/',
+        rpcUrl: 'https://archival-rpc.testnet.near.org',
+        appUrl: 'https://testnet.nearblocks.io/',
+      };
+    default:
+      return {};
+  }
+}

@@ -2,31 +2,9 @@ import Trade from '@/includes/Banners/Trade';
 import Earn from '@/includes/Banners/Earn';
 import Store from '@/includes/Banners/Store';
 import ArrowDown from '@/includes/icons/ArrowDown';
+import { getConfig } from '@/includes/libs';
 
 export default function () {
-  function getConfig(network: string) {
-    switch (network) {
-      case 'mainnet':
-        return {
-          ownerId: 'nearblocks.near',
-          nodeUrl: 'https://rpc.mainnet.near.org',
-          backendUrl: 'https://api.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://nearblocks.io/',
-        };
-      case 'testnet':
-        return {
-          ownerId: 'nearblocks.testnet',
-          nodeUrl: 'https://rpc.testnet.near.org',
-          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://archival-rpc.testnet.near.org',
-          appUrl: 'https://testnet.nearblocks.io/',
-        };
-      default:
-        return {};
-    }
-  }
-
   const config = getConfig(context.networkId);
 
   return (

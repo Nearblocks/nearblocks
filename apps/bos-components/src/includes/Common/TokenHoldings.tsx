@@ -1,17 +1,12 @@
 /**
+ * @interface Props
  * @param {string} [id] - Optional identifier for the account, passed as a string.
  * @param {boolean} [loading] - Flag indicating whether data is currently loading.
- * @param {InventoryInfo} data - Information related to the inventory.
- * @param {Object} ft - Object containing details about the tokens.
- * @param {number} ft.amount -  amount in USD of tokens.
- * @param {Object[]} ft.tokens - Array containing individual token details.
- * @param {number} ft.tokens[].amount - Amount of a specific token.
- * @param {string} ft.tokens[].contract - Contract address of the token.
- * @param {MetaInfo} ft.tokens[].ft_meta - Additional metadata related to the token.
- * @param {number} ft.tokens[].rpcAmount - Amount in RPC.
- * @param {number} ft.tokens[].amountUsd - Amount in USD.
- * @param {number} ft.tokens[].amountUsd - Amount in USD.
- * @param {string} appUrl - The URL of the application.
+ * @param {InventoryInfo} [data] - Information related to the inventory.
+ * @param {Object} [ft] - Object containing details about the tokens.
+ * @param {number} [ft.amount] -  amount in USD of tokens.
+ * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
+ * @param {string} [appUrl] - The URL of the application.
  */
 
 import { truncateString } from '@/includes/libs';
