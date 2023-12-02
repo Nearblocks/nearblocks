@@ -9,3 +9,13 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file: mainnet.env
+  redis:
+    container_name: mainnet-redis
+    image: redis:7.2-alpine
+    command: redis-server --appendonly yes --appendfsync always
+    restart: always
+    volumes:
+      - redis-data:/mnt/redis
+
+volumes:
+  redis-data:
