@@ -43,20 +43,20 @@ export default config;
 
 export const SECOND = 1;
 export const MINUTE = 60;
-export const EXPIRY = 5; // 5 sec 
+export const EXPIRY = 5; // 5 sec
 export const HOUR = 3600; // 1 hour
-export const YEAR = 31536000
+export const YEAR = 31536000;
 export const DAY = 24 * HOUR;
 
 export const validator = {
   accountIdSuffix: {
-    lockup: "lockup.near",
+    lockup: 'lockup.near',
     stakingPool: {
-      mainnet: ".poolv1.near",
+      mainnet: '.poolv1.near',
       testnet: undefined,
       shardnet: undefined,
       guildnet: undefined,
       localnet: undefined,
     },
-  }
-}
+  },
+};

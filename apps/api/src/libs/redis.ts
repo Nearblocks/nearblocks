@@ -27,11 +27,10 @@ export const readCache = async (key: string) => {
   const redisData = await redis.get(prefixedKey);
 
   if (redisData) {
-    return JSON.parse
-
+    return JSON.parse(redisData);
   }
-  return null
-}
+  return null;
+};
 
 export const cache = async (key: string, callback: any, options: Options) => {
   const prefixedKey = `${prefix}:${key}`;
@@ -42,7 +41,6 @@ export const cache = async (key: string, callback: any, options: Options) => {
   }
 
   const data = await callback();
-
   if (data) {
     await redis.setex(prefixedKey, options.EX, JSON.stringify(data));
   }

@@ -4,7 +4,7 @@ import validators from '#services/validators';
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/validators',route);
+  app.use('/validators', route);
 
   /**
    * GET /v1/validators
@@ -12,8 +12,7 @@ const routes = (app: Router) => {
    * @tags validators
    * @return 200 - success response
    */
-  route.get('/',  validators.list);
-
+  route.get('/', validators.list);
 };
 
 export default routes;

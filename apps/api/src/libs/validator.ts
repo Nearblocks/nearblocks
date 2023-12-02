@@ -2,9 +2,14 @@ import { ZodTypeAny } from 'zod';
 import { merge } from 'lodash-es';
 import { Response, NextFunction } from 'express';
 import Big from 'big.js';
-import { EpochValidatorInfo, RequestValidators, ValidatorEpochData, ValidatorSortFn } from '#ts/types';
-import { Redis as RedisType  } from 'redis';
+import {
+  EpochValidatorInfo,
+  RequestValidators,
+  ValidatorEpochData,
+  ValidatorSortFn,
+} from '#ts/types';
 import { SECOND } from '#config';
+import { readCache } from '#libs/redis';
 
 const validator = <T extends ZodTypeAny>(schema: T) => {
   return (
@@ -28,10 +33,9 @@ const validator = <T extends ZodTypeAny>(schema: T) => {
 
 export default validator;
 
-
 export const mapValidators = (
   epochStatus: EpochValidatorInfo,
-  poolIds: string[]
+  poolIds: string[],
 ): ValidatorEpochData[] => {
   // @ts-ignore
   const validatorsMap: Map<string, ValidatorEpochData> = new Map();
@@ -113,14 +117,13 @@ export const validatorsSortFns: ValidatorSortFn[] = [
 ];
 
 export const accumulatedStakes = (
-  mappedValidators: ValidatorEpochData[]
-) :Big[] => {
-
+  mappedValidators: ValidatorEpochData[],
+): Big[] => {
   const sortedValidators = validatorsSortFns.reduceRight(
     (acc, sortFn) => {
       return acc.sort(sortFn);
     },
-    [...mappedValidators]
+    [...mappedValidators],
   );
 
   const accumulatedStakes = sortedValidators.reduce(
@@ -132,19 +135,16 @@ export const accumulatedStakes = (
       acc.push(lastAmount.plus(stake));
       return acc;
     },
-    [new Big(0)]
+    [new Big(0)],
   );
-    return accumulatedStakes
-}
+  return accumulatedStakes;
+};
 
+export const getValidatorsTimeout = async () => {
+  const latestBlock: any = await readCache('validators:latestBlock');
+  const epochStartBlock: any = await readCache('validators:epochStartBlock');
+  const protocolConfig: any = await readCache('validators:protocolConfig');
 
-
-export const getValidatorsTimeout = (cache: RedisType) => {
-  const latestBlock = cache.get('blocks:latest:1');
-  const epochStartBlock = cache.get('epochStartBlock');
-  const protocolConfig = cache.get('validators:protocolConfig');
-
- 
   if (!latestBlock || !epochStartBlock || !protocolConfig) {
     return 3 * SECOND;
   }
@@ -152,5 +152,6 @@ export const getValidatorsTimeout = (cache: RedisType) => {
     (latestBlock.height - epochStartBlock.height) / protocolConfig.epochLength;
   const timeRemaining =
     (latestBlock.timestamp - epochStartBlock.timestamp) * (1 - epochProgress);
+
   return Math.max(SECOND, timeRemaining / 2);
 };

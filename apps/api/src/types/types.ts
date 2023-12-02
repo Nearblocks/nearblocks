@@ -80,13 +80,12 @@ export type ValidationError = {
   message: string;
   path: string;
 };
-export type ExpProtocolConfig =  {
+export type ExpProtocolConfig = {
   avg_hidden_validator_seats_per_shard: number[];
   epoch_length: number;
   num_block_producer_seats: number;
-  protocol_version: number; 
-}
-
+  protocol_version: number;
+};
 
 export type CurrentEpochValidatorInfo = {
   account_id: string;
@@ -113,9 +112,8 @@ export type ValidatorStakeViewV1 = {
   stake: string;
 };
 
-
 export type ValidatorKickoutReason =
-  | "Slashed"
+  | 'Slashed'
   | {
       NotEnoughBlocks: {
         produced: number;
@@ -136,7 +134,6 @@ export type ValidatorKickoutReason =
       };
     }
   | { DidNotGetASeat: {} };
-
 
 export type ValidatorKickoutView = {
   account_id: string;
@@ -181,7 +178,6 @@ export type ValidatorEpochData = {
   };
 };
 
-
 export type ValidatorTelemetry = {
   ipAddress: string;
   nodeId: string;
@@ -211,7 +207,10 @@ export type ValidatorDescription = {
   url?: string;
 };
 
-export type ValidatorSortFn = (a: ValidatorFullData, b: ValidatorFullData) => number;
+export type ValidatorSortFn = (
+  a: ValidatorFullData,
+  b: ValidatorFullData,
+) => number;
 
 export type ValidatorFullData = ValidatorEpochData & {
   telemetry?: ValidatorTelemetry;

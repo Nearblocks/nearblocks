@@ -44,10 +44,11 @@ export const callFunction = async (
     args_base64: bytesStringify(args),
   });
 
-  export const getValidators = async () =>
-  provider.sendJsonRpc('validators', [null])
+export const getValidators = async () =>
+  provider.sendJsonRpc('validators', [null]);
 
-  export const getProtocolConfig = async () =>
-  provider.sendJsonRpc('EXPERIMENTAL_protocol_config', { finality: "final" })
+export const getProtocolConfig = async () =>
+  provider.sendJsonRpc('EXPERIMENTAL_protocol_config', { finality: 'final' });
 
-  export const callJsonRpc = async (fn:string, params:object) => provider.sendJsonRpc(fn, params)
+export const callJsonRpc = async (fn: string, params: object) =>
+  provider.sendJsonRpc(fn, params);
