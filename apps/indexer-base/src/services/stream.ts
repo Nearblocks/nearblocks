@@ -21,6 +21,10 @@ const lakeConfig: types.LakeConfig = {
   startBlockHeight: config.genesisHeight,
 };
 
+if (config.s3Endpoint) {
+  lakeConfig.s3Endpoint = config.s3Endpoint;
+}
+
 export const syncData = async () => {
   const block = await knex('blocks').orderBy('block_height', 'desc').first();
 

@@ -16,6 +16,7 @@ export type Config = {
   redisUrl: string;
   rpcUrl: string;
   s3BucketName: string;
+  s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;
   sentryDsn?: string;
   startBlockHeight: number;

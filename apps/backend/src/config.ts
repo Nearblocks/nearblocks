@@ -11,15 +11,16 @@ const env = cleanEnv(process.env, {
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   LIVECOINWATCH_API_KEY: str(),
-  NETWORK: str(),
+  NETWORK: str({
+    choices: [Network.MAINNET, Network.TESTNET],
+  }),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
 });
 
-const network: Network =
-  process.env.NETWORK === Network.TESTNET ? Network.TESTNET : Network.MAINNET;
-const genesisHeight = network === Network.MAINNET ? 9820210 : 42376888;
-const genesisDate = network === Network.MAINNET ? '2020-07-21' : '2021-04-01';
+const genesisHeight = env.NETWORK === Network.MAINNET ? 9820210 : 42376888;
+const genesisDate =
+  env.NETWORK === Network.MAINNET ? '2020-07-21' : '2021-04-01';
 const sentryDsn = process.env.SENTRY_DSN;
 
 const config: Config = {
@@ -32,7 +33,7 @@ const config: Config = {
   genesisDate,
   genesisHeight,
   lcwApiKey: env.LIVECOINWATCH_API_KEY,
-  network,
+  network: env.NETWORK,
   rpcUrl: env.RPC_URL,
   sentryDsn,
 };

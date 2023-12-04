@@ -1,4 +1,5 @@
-import { cleanEnv, str } from 'envalid';
+import { cleanEnv, str, url } from 'envalid';
+import { types } from 'near-lake-framework';
 
 import { Network } from 'nb-types';
 
@@ -9,18 +10,30 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  NETWORK: str(),
+  NETWORK: str({
+    choices: [Network.MAINNET, Network.TESTNET],
+  }),
   REDIS_URL: str(),
   RPC_URL: str(),
+  S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 
-const network: Network =
-  env.NETWORK === Network.TESTNET ? Network.TESTNET : Network.MAINNET;
+let s3Endpoint: null | types.EndpointConfig = null;
 const s3BucketName =
-  network === Network.MAINNET
+  env.NETWORK === Network.MAINNET
     ? 'near-lake-data-mainnet'
     : 'near-lake-data-testnet';
+
+if (env.S3_ENDPOINT) {
+  const endpoint = new URL(env.S3_ENDPOINT);
+  s3Endpoint = {
+    hostname: endpoint.hostname,
+    path: endpoint.pathname,
+    port: +endpoint.port || 80,
+    protocol: endpoint.protocol,
+  };
+}
 
 const config: Config = {
   cacheExpiry: 60 * 60, // cache expiry time in seconds (1 hour)
@@ -30,11 +43,12 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   delta: 100, // start from blocks earlier on sync interuption
   insertLimit: 1_000, // records to insert into the db at a time
-  network: network,
+  network: env.NETWORK,
   preloadSize: 100, // blocks to preload in nearlake
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   s3BucketName,
+  s3Endpoint,
   s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: 0,
