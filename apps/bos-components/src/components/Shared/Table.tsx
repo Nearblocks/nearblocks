@@ -83,18 +83,19 @@ export default function (props: Props) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {props.data.map((row, rowIndex: number) => (
-              <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
-                {props.columns.map((column: column, colIndex: number) => (
-                  <td
-                    key={colIndex}
-                    className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
-                  >
-                    {column.cell ? column.cell(row) : row[column.key]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {props.data &&
+              props.data.map((row, rowIndex: number) => (
+                <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
+                  {props.columns.map((column: column, colIndex: number) => (
+                    <td
+                      key={colIndex}
+                      className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
+                    >
+                      {column.cell ? column.cell(row) : row[column.key]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

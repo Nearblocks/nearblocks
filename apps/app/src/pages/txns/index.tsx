@@ -4,11 +4,7 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 const TransactionList = () => {
   const components = useBosComponents();
 
-  return (
-    <>
-      <VmComponent src={components?.transaction} />
-    </>
-  );
+  return <VmComponent src={components?.transaction} />;
 };
 
 export default TransactionList;

@@ -1,13 +1,14 @@
 /**
- * Component : Transaction
+ * Author: Nearblocks Pte Ltd
+ * Component : Transactions
  * License : Business Source License 1.1
- * Description: Provides a complete catalog of all transactions.
+ * Description: Table of Transactions on Near Protocol.
  * @interface Props
- * @param {boolean} [useStyles] - Flag indicating whether to apply default gateway styles; when set to `true`, the component uses default styles, otherwise, it allows for custom styling.
+ * @param {boolean} [fetchStyles] - Use Nearblock styles.
  */
 
 interface Props {
-  useStyles?: boolean;
+  fetchStyles?: boolean;
 }
 
 import {
@@ -43,19 +44,22 @@ export default function (props: Props) {
 
   const config = getConfig(context.networkId);
 
-  function fetchStyle() {
-    asyncFetch(
-      'https://nearblocks.io/_next/static/css/4acfc667ed910a4e.css',
-    ).then((res: any) => {
-      if (res?.body) {
-        setCss(res.body);
-      }
-    });
+  /**
+   * Fetches styles asynchronously from a nearblocks gateway.
+   */
+  function fetchStyles() {
+    asyncFetch('https://beta.nearblocks.io/common.css').then(
+      (res: { body: string }) => {
+        if (res?.body) {
+          setCss(res.body);
+        }
+      },
+    );
   }
 
   useEffect(() => {
-    if (props?.useStyles) fetchStyle();
-  }, []);
+    if (props?.fetchStyles) fetchStyles();
+  }, [props?.fetchStyles]);
 
   const Theme = styled.div`
     ${css}
@@ -63,74 +67,75 @@ export default function (props: Props) {
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
-  function fetchTotalTxns(qs?: string) {
-    setIsLoading(true);
-    const queryParams = qs ? '?' + qs : '';
-    asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(
-        (data: {
-          body: {
-            txns: { count: number }[];
-          };
-        }) => {
-          const resp = data?.body?.txns?.[0];
-          setTotalCount(resp?.count);
-        },
-      )
-      .catch()
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
-  function fetchTxns(qs?: string, sqs?: string) {
-    const queryParams = qs ? qs + '&' : '';
-    asyncFetch(
-      `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
-      {
+  useEffect(() => {
+    function fetchTotalTxns(qs?: string) {
+      setIsLoading(true);
+      const queryParams = qs ? '?' + qs : '';
+      asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      },
-    )
-      .then(
-        (data: {
-          body: {
-            txns: TransactionInfo[];
-          };
-        }) => {
-          const resp = data?.body?.txns;
-          setTxns(resp);
+      })
+        .then(
+          (data: {
+            body: {
+              txns: { count: number }[];
+            };
+          }) => {
+            const resp = data?.body?.txns?.[0];
+            setTotalCount(resp?.count);
+          },
+        )
+        .catch(() => {})
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+
+    function fetchTxns(qs?: string, sqs?: string) {
+      const queryParams = qs ? qs + '&' : '';
+      asyncFetch(
+        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
       )
-      .catch()
-      .finally(() => {});
-  }
+        .then(
+          (data: {
+            body: {
+              txns: TransactionInfo[];
+            };
+          }) => {
+            const resp = data?.body?.txns;
+            setTxns(resp);
+          },
+        )
+        .catch(() => {});
+    }
 
-  useEffect(() => {
     fetchTotalTxns();
     fetchTxns();
-  }, []);
 
-  const setPage = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  useEffect(() => {
     const QueryString = Object.keys(filters)
       .map(
         (key) =>
           `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`,
       )
       .join('&');
-    fetchTxns(QueryString, sorting);
-  }, [currentPage]);
+
+    if (QueryString || sorting) {
+      fetchTotalTxns(QueryString);
+      fetchTxns(QueryString, sorting);
+    }
+  }, [config?.backendUrl, currentPage, filters, sorting]);
+
+  const setPage = (page: number) => {
+    setCurrentPage(page);
+  };
 
   let filterValue: string;
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -147,17 +152,6 @@ export default function (props: Props) {
     setFilters((prev) => ({ ...prev, [name]: filterValue }));
   };
 
-  useEffect(() => {
-    const QueryString = Object.keys(filters)
-      .map(
-        (key) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`,
-      )
-      .join('&');
-    fetchTotalTxns(QueryString);
-    fetchTxns(QueryString, sorting);
-  }, [filters, sorting]);
-
   const onClear = (name: string) => {
     const updatedFilters = { ...filters };
 
@@ -171,6 +165,7 @@ export default function (props: Props) {
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
   };
+
   const columns = [
     {
       header: '',
@@ -533,52 +528,46 @@ export default function (props: Props) {
 
   return (
     <Theme>
-      <div className="container mx-auto px-3">
-        <div>
-          <div className="flex gap-4 mb-2 md:mb-2 mt-10">
+      <div>
+        <div className="bg-hero-pattern h-72">
+          <div className="container mx-auto px-3">
+            <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-black">
+              Latest Near Protocol transactions
+            </h1>
+          </div>
+        </div>
+        <div className="container mx-auto px-3 -mt-48">
+          <div className="block lg:flex lg:space-x-2">
             <div className="w-full">
-              <div className="bg-hero-pattern h-72">
-                <div className="container mx-auto px-3">
-                  <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-black">
-                    Latest Near Protocol transactions
-                  </h1>
-                </div>
-              </div>
-              <div className="container mx-auto px-3 -mt-48">
-                <div className="block lg:flex lg:space-x-2">
-                  <div className="w-full">
-                    <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-                      {isLoading ? (
-                        <Skelton />
-                      ) : (
-                        <div className={`flex flex-col lg:flex-row pt-4`}>
-                          <div className="flex flex-col">
-                            <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
-                              {`More than > ${totalCount} transactions found`}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {
-                        // @ts-ignore
-                        <Widget
-                          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-                          props={{
-                            columns: columns,
-                            data: txns,
-                            isLoading: isLoading,
-                            isPagination: true,
-                            count: totalCount,
-                            page: currentPage,
-                            limit: 25,
-                            pageLimit: 200,
-                            setPage: setPage,
-                          }}
-                        />
-                      }
+              <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+                {isLoading ? (
+                  <Skelton />
+                ) : (
+                  <div className={`flex flex-col lg:flex-row pt-4`}>
+                    <div className="flex flex-col">
+                      <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
+                        {`More than > ${totalCount} transactions found`}
+                      </p>
                     </div>
                   </div>
-                </div>
+                )}
+                {
+                  // @ts-ignore
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+                    props={{
+                      columns: columns,
+                      data: txns,
+                      isLoading: isLoading,
+                      isPagination: true,
+                      count: totalCount,
+                      page: currentPage,
+                      limit: 25,
+                      pageLimit: 200,
+                      setPage: setPage,
+                    }}
+                  />
+                }
               </div>
             </div>
           </div>

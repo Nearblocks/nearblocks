@@ -1,15 +1,16 @@
 /**
+ * Author: Nearblocks Pte Ltd
  * Component : Accounts
  * License : Business Source License 1.1
  * Description: Accounts component enable users to view information related to their accounts.
  * @interface Props
  * @param {string} [id] - The account identifier passed as a string.
- * @param {boolean} [useStyles] - Flag indicating whether to apply default gateway styles; when set to `true`, the component uses default styles, otherwise, it allows for custom styling.
+ * @param {boolean} [fetchStyles] - Use Nearblock styles.
  */
 
 interface Props {
   id?: string;
-  useStyles?: boolean;
+  fetchStyles?: boolean;
 }
 
 import Skelton from '@/includes/Common/Skelton';
@@ -66,7 +67,7 @@ export default function (props: Props) {
   /**
    * Fetches styles asynchronously from a nearblocks gateway.
    */
-  function fetchStyle() {
+  function fetchStyles() {
     asyncFetch('https://beta.nearblocks.io/common.css').then(
       (res: { body: string }) => {
         if (res?.body) {
@@ -337,8 +338,8 @@ export default function (props: Props) {
   }, [inventoryData?.fts, props.id, config?.rpcUrl]);
 
   useEffect(() => {
-    if (props?.useStyles) fetchStyle();
-  }, [props?.useStyles]);
+    if (props?.fetchStyles) fetchStyles();
+  }, [props?.fetchStyles]);
 
   const Theme = styled.div`
     ${css}

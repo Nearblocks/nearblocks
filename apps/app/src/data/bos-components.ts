@@ -5,26 +5,26 @@ type NetworkComponents = {
   account: string;
   transaction: string;
   blocks: string;
-  homePage: string;
+  latestBlocks: string;
+  latestTransactions: string;
+  transactionOverview: string;
+};
+
+const ComponentUrl = {
+  nodeExplorer: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NodeExplorer`,
+  account: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Accounts`,
+  transaction: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions`,
+  blocks: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Blocks`,
+  latestBlocks: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.LatestBlocks`,
+  latestTransactions: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.LatestTransactions`,
+  transactionOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.TransactionOverview`,
 };
 
 export const componentsByNetworkId: Record<
   NetworkId,
   NetworkComponents | undefined
 > = {
-  testnet: {
-    nodeExplorer: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.NodeExplorer`,
-    account: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Accounts`,
-    transaction: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Transactions`,
-    blocks: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Blocks`,
-    homePage: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.HomePage`,
-  },
+  testnet: ComponentUrl,
 
-  mainnet: {
-    nodeExplorer: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.NodeExplorer`,
-    account: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Accounts`,
-    transaction: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Transactions`,
-    blocks: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.Blocks`,
-    homePage: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NearBlocks.HomePage`,
-  },
+  mainnet: ComponentUrl,
 };

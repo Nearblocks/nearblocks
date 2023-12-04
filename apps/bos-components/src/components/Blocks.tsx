@@ -1,9 +1,10 @@
 /**
+ * Author: Nearblocks Pte Ltd
  * Component : Blocks
  * License : Business Source License 1.1
- * Description: Provides a complete catalog of latest near protocol blocks.
+ * Description: Table of blocks on Near Protocol.
  * @interface Props
- * @param {boolean} [useStyles] - Flag indicating whether to apply default gateway styles; when set to `true`, the component uses default styles, otherwise, it allows for custom styling.
+ * @param {boolean} [fetchStyles] - Use Nearblock styles.
  */
 
 import Skelton from '@/includes/Common/Skelton';
@@ -18,7 +19,7 @@ import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
-  useStyles?: boolean;
+  fetchStyles?: boolean;
 }
 
 export default function (props: Props) {
@@ -31,19 +32,22 @@ export default function (props: Props) {
 
   const config = getConfig(context.networkId);
 
-  function fetchStyle() {
-    asyncFetch(
-      'https://testnet.nearblocks.io/_next/static/css/4ae91f0f745a03f5.css',
-    ).then((res: { body: string }) => {
-      if (res?.body) {
-        setCss(res.body);
-      }
-    });
+  /**
+   * Fetches styles asynchronously from a nearblocks gateway.
+   */
+  function fetchStyles() {
+    asyncFetch('https://beta.nearblocks.io/common.css').then(
+      (res: { body: string }) => {
+        if (res?.body) {
+          setCss(res.body);
+        }
+      },
+    );
   }
 
   useEffect(() => {
-    if (props?.useStyles) fetchStyle();
-  }, [props?.useStyles]);
+    if (props?.fetchStyles) fetchStyles();
+  }, [props?.fetchStyles]);
 
   const Theme = styled.div`
     ${css}
@@ -99,7 +103,7 @@ export default function (props: Props) {
 
     fetchTotalBlocks();
     fetchBlocks();
-  }, [config?.backendUrl]);
+  }, [config?.backendUrl, currentPage]);
 
   const start = blocks?.[0];
   const end = blocks?.[blocks?.length - 1];
@@ -260,49 +264,45 @@ export default function (props: Props) {
 
   return (
     <Theme>
-      <div className="container mx-auto px-3">
-        <div>
-          <div className="flex gap-4 mb-2 md:mb-2 mt-10">
-            <div className="w-full">
-              <div className="bg-hero-pattern h-72">
-                <div className="container mx-auto px-3">
-                  <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-black">
-                    Latest Near Protocol Blocks
-                  </h1>
-                </div>
-              </div>
-              <div className="container mx-auto px-3 -mt-48">
-                <div className="block lg:flex lg:space-x-2">
-                  <div className="w-full ">
-                    <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-                      {isLoading ? (
-                        <Skelton className="leading-7" />
-                      ) : (
-                        <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
-                          Block # {localFormat(start?.block_height)} to #
-                          {localFormat(end?.block_height)} (Total of{' '}
-                          {localFormat(totalCount)} blocks)
-                        </p>
-                      )}
-                      {
-                        // @ts-ignore
-                        <Widget
-                          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-                          props={{
-                            columns: columns,
-                            data: blocks,
-                            isLoading: isLoading,
-                            isPagination: true,
-                            count: totalCount,
-                            page: currentPage,
-                            limit: 25,
-                            pageLimit: 200,
-                            setPage: setPage,
-                          }}
-                        />
-                      }
-                    </div>
-                  </div>
+      <div className="flex gap-4 mb-2 md:mb-2 mt-10">
+        <div className="w-full">
+          <div className="bg-hero-pattern h-72">
+            <div className="container mx-auto px-3">
+              <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-black">
+                Latest Near Protocol Blocks
+              </h1>
+            </div>
+          </div>
+          <div className="container mx-auto px-3 -mt-48">
+            <div className="block lg:flex lg:space-x-2">
+              <div className="w-full ">
+                <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+                  {isLoading ? (
+                    <Skelton className="leading-7" />
+                  ) : (
+                    <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
+                      Block #{localFormat(start?.block_height)} to
+                      {'#' + localFormat(end?.block_height)} (Total of{' '}
+                      {localFormat(totalCount)} blocks)
+                    </p>
+                  )}
+                  {
+                    // @ts-ignore
+                    <Widget
+                      src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+                      props={{
+                        columns: columns,
+                        data: blocks,
+                        isLoading: isLoading,
+                        isPagination: true,
+                        count: totalCount,
+                        page: currentPage,
+                        limit: 25,
+                        pageLimit: 200,
+                        setPage: setPage,
+                      }}
+                    />
+                  }
                 </div>
               </div>
             </div>

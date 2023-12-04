@@ -1,15 +1,23 @@
-import { getTimeAgoString, shortenHex } from '@/includes/formats';
+/**
+ * Author: Nearblocks Pte Ltd
+ * Component : LatestBlocks
+ * License : Business Source License 1.1
+ * Description: Latest Blocks on Near Protocol.
+ */
+
 import {
-  getConfig,
-  nanoToMilli,
-  shortenAddress,
-  yoctoToNear,
-} from '@/includes/libs';
-import { TransactionInfo } from '@/includes/types';
+  convertToMetricPrefix,
+  getTimeAgoString,
+  localFormat,
+} from '@/includes/formats';
+import { getConfig, nanoToMilli } from '@/includes/libs';
+import { BlocksInfo } from '@/includes/types';
 
 export default function () {
   const [isLoading, setIsLoading] = useState(false);
-  const [txns, setTxns] = useState<TransactionInfo[]>([]);
+  const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
+
+  const config = getConfig(context.networkId);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -19,55 +27,50 @@ export default function () {
     );
   };
 
-  const config = getConfig(context.networkId);
-
-  function fetchLatestTxns() {
-    setIsLoading(true);
-    asyncFetch(`${config.backendUrl}txns/latest`, {
-      refreshInterval: 5000,
-      revalidateOnReconnect: true,
-    }).then(
-      (data: {
-        body: {
-          txns: TransactionInfo[];
-        };
-      }) => {
-        const resp = data?.body?.txns;
-        setTxns(resp);
-      },
-    );
-    setIsLoading(false);
-  }
-
   useEffect(() => {
-    fetchLatestTxns();
-  }, []);
+    function fetchLatestBlocks() {
+      setIsLoading(true);
+      asyncFetch(`${config.backendUrl}blocks/latest`).then(
+        (data: {
+          body: {
+            blocks: BlocksInfo[];
+          };
+        }) => {
+          const resp = data?.body?.blocks;
+          setBlocks(resp);
+        },
+      );
+      setIsLoading(false);
+    }
+
+    fetchLatestBlocks();
+  }, [config.backendUrl]);
 
   return (
     <>
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!txns && (
+            {!blocks && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 Error!
               </div>
             )}
-            {!isLoading && txns.length === 0 && (
+            {!isLoading && blocks.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                No transactions!
+                No blocks found
               </div>
             )}
             {isLoading && (
               <div className="px-3 divide-y h-80">
                 {[...Array(10)].map((_, i) => (
                   <div
-                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3 h-16"
+                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
                     key={i}
                   >
-                    <div className="flex items-center ">
-                      <div className="flex-shrink-0 rounded-full h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
-                        TX
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 rounded-lg h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
+                        BK
                       </div>
                       <div className="px-2">
                         <div className="text-green-500 text-sm">
@@ -91,69 +94,62 @@ export default function () {
                 ))}
               </div>
             )}
-            {txns.length > 0 && (
+            {blocks.length > 0 && (
               <div className="px-3 divide-y h-80">
-                {txns.map((txn) => {
+                {blocks.map((block) => {
                   return (
                     <div
-                      className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-3 items-center py-3"
-                      key={txn.transaction_hash}
+                      className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
+                      key={block.block_hash}
                     >
                       <div className=" flex items-center">
-                        <div className="flex-shrink-0 rounded-full h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
-                          TX
+                        <div className="flex-shrink-0 rounded-lg h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
+                          BK
                         </div>
                         <div className="overflow-hidden pl-2">
-                          <div className="text-green-500 text-sm  ">
-                            <a href={`/txns/${txn.transaction_hash}`}>
-                              <a className="text-green-500 font-medium">
-                                {shortenHex(txn.transaction_hash)}
+                          <div className="text-green-500 text-sm font-medium ">
+                            <a href={`/blocks/${block.block_hash}`}>
+                              <a className="text-green-500">
+                                {localFormat(block.block_height)}
                               </a>
                             </a>
                           </div>
                           <div className="text-gray-400 text-xs truncate">
                             {getTimeAgoString(
-                              nanoToMilli(Number(txn.block_timestamp)),
+                              nanoToMilli(block.block_timestamp),
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
-                        <div className="whitespace-nowrap truncate">
-                          From{' '}
-                          <a href={`/address/${txn.signer_account_id}`}>
-                            <a className="text-green-500  font-medium">
-                              {shortenAddress(txn.signer_account_id)}
-                            </a>
+                      <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
+                        Author{' '}
+                        <a href={`/address/${block.author_account_id}`}>
+                          <a className="text-green-500  font-medium">
+                            {block.author_account_id}
                           </a>
-                        </div>
-                        <div className="whitespace-nowrap truncate">
-                          To{' '}
-                          <a href={`/address/${txn.receiver_account_id}`}>
-                            <a className="text-green-500 font-medium">
-                              {shortenAddress(txn.receiver_account_id)}
-                            </a>
-                          </a>
+                        </a>
+                        <div className="text-gray-400 text-sm ">
+                          {localFormat(block?.transactions_agg.count || 0)} txns{' '}
                         </div>
                       </div>
                       <div className="text-right order-1 md:order-2 overflow-hidden">
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <span className="u-label--badge-in  text-gray-400 truncate">
-                                {yoctoToNear(
-                                  txn.actions_agg?.deposit || 0,
-                                  true,
-                                )}{' '}
-                                Ⓝ
+                              <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 text-gray-400 truncate">
+                                {block.chunks_agg.gas_used
+                                  ? convertToMetricPrefix(
+                                      block.chunks_agg.gas_used,
+                                    )
+                                  : '0 '}
+                                gas
                               </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content
-                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
                               sideOffset={5}
                             >
-                              Deposit value
-                              <Tooltip.Arrow className="fill-white" />
+                              Gas used
                             </Tooltip.Content>
                           </Tooltip.Root>
                         </Tooltip.Provider>
@@ -184,11 +180,11 @@ export default function () {
           <Loader className="h-10" />
         </div>
       )}
-      {txns && txns.length > 0 && (
+      {blocks && blocks.length > 0 && (
         <div className="border-t px-2 py-3 text-gray-700">
-          <a href="/txns">
-            <a className="block text-center  border border-green-900/10 font-thin bg-green-500 hover:bg-green-400 text-white text-xs py-3 rounded w-full focus:outline-none">
-              View all transactions
+          <a href="/blocks">
+            <a className="block text-center border border-green-900/10 bg-green-500 hover:bg-green-400 font-thin text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
+              View all blocks
             </a>
           </a>
         </div>
