@@ -15,6 +15,10 @@ const lakeConfig: types.LakeConfig = {
   startBlockHeight: config.startBlockHeight,
 };
 
+if (config.s3Endpoint) {
+  lakeConfig.s3Endpoint = config.s3Endpoint;
+}
+
 export const syncData = async () => {
   const settings = await knex('settings').where({ key: balanceKey }).first();
   const latestBlock = settings?.value?.sync;

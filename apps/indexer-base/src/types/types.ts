@@ -17,6 +17,7 @@ export interface Config {
   preloadSize: number;
   redisUrl: string;
   s3BucketName: string;
+  s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;
   sentryDsn?: string;
 }
