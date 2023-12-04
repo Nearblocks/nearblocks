@@ -1,3 +1,5 @@
+import { types } from 'near-lake-framework';
+
 import { Network, StateChangeCauseView, StateChangeValueView } from 'nb-types';
 
 export type Config = {
@@ -13,6 +15,7 @@ export type Config = {
   redisUrl: string;
   rpcUrl: string;
   s3BucketName: string;
+  s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;
   sentryDsn?: string;
   startBlockHeight: number;
