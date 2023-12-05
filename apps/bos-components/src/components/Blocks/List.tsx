@@ -264,46 +264,44 @@ export default function (props: Props) {
 
   return (
     <Theme>
-      <div className="flex gap-4 mb-2 md:mb-2 mt-10">
-        <div className="w-full">
-          <div className="bg-hero-pattern h-72">
-            <div className="container mx-auto px-3">
-              <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-black">
-                Latest Near Protocol Blocks
-              </h1>
-            </div>
+      <div>
+        <div className="bg-hero-pattern h-72">
+          <div className="container mx-auto px-3">
+            <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+              Latest Near Protocol Blocks
+            </h1>
           </div>
-          <div className="container mx-auto px-3 -mt-48">
-            <div className="block lg:flex lg:space-x-2">
-              <div className="w-full ">
-                <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-                  {isLoading ? (
-                    <Skelton className="leading-7" />
-                  ) : (
-                    <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
-                      Block #{localFormat(start?.block_height)} to
-                      {'#' + localFormat(end?.block_height)} (Total of{' '}
-                      {localFormat(totalCount)} blocks)
-                    </p>
-                  )}
-                  {
-                    // @ts-ignore
-                    <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-                      props={{
-                        columns: columns,
-                        data: blocks,
-                        isLoading: isLoading,
-                        isPagination: true,
-                        count: totalCount,
-                        page: currentPage,
-                        limit: 25,
-                        pageLimit: 200,
-                        setPage: setPage,
-                      }}
-                    />
-                  }
-                </div>
+        </div>
+        <div className="container mx-auto px-3 -mt-48">
+          <div className="block lg:flex lg:space-x-2">
+            <div className="w-full ">
+              <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+                {isLoading ? (
+                  <Skelton className="leading-7" />
+                ) : (
+                  <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
+                    Block #{localFormat(start?.block_height)} to
+                    {'#' + localFormat(end?.block_height)} (Total of{' '}
+                    {localFormat(totalCount)} blocks)
+                  </p>
+                )}
+                {
+                  // @ts-ignore
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+                    props={{
+                      columns: columns,
+                      data: blocks,
+                      isLoading: isLoading,
+                      isPagination: true,
+                      count: totalCount,
+                      page: currentPage,
+                      limit: 25,
+                      pageLimit: 200,
+                      setPage: setPage,
+                    }}
+                  />
+                }
               </div>
             </div>
           </div>

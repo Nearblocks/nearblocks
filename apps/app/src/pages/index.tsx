@@ -7,7 +7,7 @@ const HomePage = () => {
   return (
     <>
       <VmComponent src={components?.transactionOverview} />
-      <div className="py-8 relative">{/* <Banner1 /> */}</div>
+      <div className="py-8 relative"></div>
       <section>
         <div className="container mx-auto px-3  z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
