@@ -1,6 +1,6 @@
 /**
- * Author: Nearblocks Pte Ltd
  * Component : Accounts
+ * Author: Nearblocks Pte Ltd
  * License : Business Source License 1.1
  * Description: Accounts component enable users to view information related to their accounts.
  * @interface Props

@@ -1041,6 +1041,9 @@ video {
 .bg-opacity-90 {
   --tw-bg-opacity: 0.9;
 }
+.bg-hero-pattern {
+  background-image: url('/images/wavey-fingerprint.png');
+}
 .fill-current {
   fill: currentColor;
 }

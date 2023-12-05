@@ -1,6 +1,6 @@
 /**
- * Author: Nearblocks Pte Ltd
  * Component : Transactions
+ * Author: Nearblocks Pte Ltd
  * License : Business Source License 1.1
  * Description: Table of Transactions on Near Protocol.
  * @interface Props
