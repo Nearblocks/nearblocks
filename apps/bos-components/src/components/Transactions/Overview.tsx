@@ -1,8 +1,8 @@
 /**
- * Component : Transaction Overview
+ * Component: Transaction Overview
  * Author: Nearblocks Pte Ltd
- * License : Business Source License 1.1
- * Description:  Providing a comprehensive overview of nearblocks transactions.
+ * License: Business Source License 1.1
+ * Description: Providing a comprehensive overview of nearblocks transactions.
  * @interface Props
  * @param {boolean} [fetchStyles] - Use Nearblock styles.
  */

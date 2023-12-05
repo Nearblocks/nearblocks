@@ -1,7 +1,7 @@
 /**
- * Component : Blocks
+ * Component: Blocks
  * Author: Nearblocks Pte Ltd
- * License : Business Source License 1.1
+ * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
  * @interface Props
  * @param {boolean} [fetchStyles] - Use Nearblock styles.

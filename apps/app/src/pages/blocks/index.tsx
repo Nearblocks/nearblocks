@@ -8,7 +8,6 @@ const Blocks = () => {
     <>
       <div className="container mx-auto px-3">
         <section>
-          {' '}
           <VmComponent src={components?.blocks} />
         </section>
       </div>

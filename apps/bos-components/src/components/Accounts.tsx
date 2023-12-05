@@ -1,7 +1,7 @@
 /**
- * Component : Accounts
+ * Component: Accounts
  * Author: Nearblocks Pte Ltd
- * License : Business Source License 1.1
+ * License: Business Source License 1.1
  * Description: Accounts component enable users to view information related to their accounts.
  * @interface Props
  * @param {string} [id] - The account identifier passed as a string.

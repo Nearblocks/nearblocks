@@ -1,7 +1,7 @@
 /**
- * Component : LatestTransactions
+ * Component: LatestTransactions
  * Author: Nearblocks Pte Ltd
- * License : Business Source License 1.1
+ * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  */
 
