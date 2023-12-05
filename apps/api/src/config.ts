@@ -42,9 +42,9 @@ const config: Config = {
 export default config;
 
 export const SECOND = 1;
-export const MINUTE = 60;
-export const EXPIRY = 5; // 5 sec
-export const HOUR = 3600; // 1 hour
+export const MINUTE = 60;  
+export const EXPIRY = 5;  
+export const HOUR = 3600;  
 export const YEAR = 31536000;
 export const DAY = 24 * HOUR;
 

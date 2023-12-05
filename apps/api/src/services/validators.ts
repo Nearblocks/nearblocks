@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { cache, readCache } from '#libs/redis';
 import catchAsync from '#libs/async';
+import Big from 'big.js'
 import { RequestValidator } from '#ts/types';
 import { List } from '#libs/schema/blocks';
 import {
@@ -16,18 +17,15 @@ import {
   mapValidators,
 } from '#libs/validator';
 import { keyBinder, nsToMsTime } from '#libs/utils';
-import db from '#libs/db';
-
-const EXPIRY = 5; // 5 sec
-const HOUR = 3600; // 1 hour
-const YEAR = 31536000;
+import db from '#libs/db'; 
+import { EXPIRY, HOUR, YEAR, MINUTE, SECOND } from '#config';
+ 
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
-  const page = Number(req.query.page);
-  const perPage = Number(req.query.per_page);
-
-  console.log({ page, perPage });
+  const page = Number(req.query.page) ?? 0;
+  const perPage = Number(req.query.per_page) ?? 10; 
+  
   const latestBlock = await cache(
     `validators:latestBlock`,
     async () => {
@@ -103,7 +101,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         return null;
       }
     },
-    { EX: 600 }, // 10 minute
+    { EX: MINUTE * 10 }, // 10 minute
   );
 
   const genesisConfig = await cache(
@@ -186,21 +184,21 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     () => {
       return validators?.next_validators;
     },
-    { EX: EXPIRY },
+    { EX: expiry },
   );
   const currentValidators = await cache(
     `validators:currentValidators`,
     () => {
       return validators?.current_validators;
     },
-    { EX: EXPIRY },
+    { EX: expiry },
   );
   const epochStartHeight = await cache(
     `validators:epochStartHeight`,
     () => {
       return validators?.epoch_start_height;
     },
-    { EX: EXPIRY },
+    { EX: expiry },
   );
 
   const mappedValidators = mapValidators(validators, poolIdsCheck);
@@ -209,7 +207,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     () => {
       return accumulatedStakes(mappedValidators);
     },
-    { EX: EXPIRY },
+    { EX: expiry },
   );
 
   const validatorList = mappedValidators.slice(
@@ -251,7 +249,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         return [];
       }
     },
-    { EX: 300 }, // 15 se
+    { EX: SECOND * 15 },
   );
 
   const stakingPoolStakeProposalsFromContract = await cache(
@@ -279,10 +277,15 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         return null;
       }
     },
-    { EX: 300 }, // 15 se
+    { EX: SECOND * 15 },
   );
 
-  combinedData = mappedValidators.map((validator: any) => {
+  const totalStake = mappedValidators.map((validator) => validator.currentEpoch?.stake)
+      .filter((stake) => typeof stake === "string" && stake !== "") 
+      .reduce((acc, stake) => new Big(Number(stake)).plus(acc), new Big(0)) 
+   
+
+  combinedData = mappedValidators.map((validator: any, index:number) => {
     const matchingPoolInfo = poolinfo.find(
       (info: any) => info.accountId === validator.accountId,
     );
@@ -299,6 +302,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           }
         : {},
       contractStake: stakingPool ? stakingPool.contractStake : null,
+      index: index
     };
 
     return validatorInfo;
@@ -316,6 +320,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       currentValidators,
       nextValidators,
       cumulativeStake,
+      totalStake
     });
 });
 

@@ -81,12 +81,13 @@ export const mapValidators = (
     };
     validatorsMap.set(nextProposal.account_id, validator);
   }
-
-  for (const accountId of poolIds) {
-    const validator = validatorsMap.get(accountId) || {
-      accountId,
-    };
-    validatorsMap.set(accountId, validator);
+  if (poolIds) {
+    for (const accountId of poolIds) {
+      const validator = validatorsMap.get(accountId) || {
+        accountId,
+      };
+      validatorsMap.set(accountId, validator);
+    }
   }
 
   return [...validatorsMap.values()];
