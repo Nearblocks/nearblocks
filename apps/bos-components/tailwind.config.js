@@ -78,7 +78,6 @@ module.exports = {
       },
       backgroundImage: (theme) => ({
         'hero-pattern': "url('/images/wavey-fingerprint.png')",
-        'error-pattern': "url('/images/leaf_nearscan.jpg')",
       }),
     },
   },

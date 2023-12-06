@@ -1,5 +1,5 @@
 /**
- * Component: Transactions
+ * Component: TransactionsList
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Table of Transactions on Near Protocol.

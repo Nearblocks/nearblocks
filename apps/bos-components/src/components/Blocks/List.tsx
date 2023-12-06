@@ -1,5 +1,5 @@
 /**
- * Component: Blocks
+ * Component: BlocksList
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
