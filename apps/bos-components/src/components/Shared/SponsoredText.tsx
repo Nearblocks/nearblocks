@@ -1,10 +1,10 @@
 /**
  * @interface Props
- * @param {boolean} [textColour] - Indicates the optional text color property for the component.
+ * @param {boolean} [textColor] - Indicates the optional text color property for the component.
  */
 
 interface Props {
-  textColour?: boolean;
+  textColor?: boolean;
 }
 
 export default function (props: Props) {
@@ -43,7 +43,7 @@ export default function (props: Props) {
     <div className="pt-3 text-sm flex">
       <p
         className={`pr-2  ${
-          props.textColour ? 'text-white' : 'text-black'
+          props.textColor ? 'text-white' : 'text-black'
         }  font-thin`}
       >
         Sponsored:

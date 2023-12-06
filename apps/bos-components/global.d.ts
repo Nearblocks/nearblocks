@@ -1,5 +1,5 @@
 declare const Widget: (params: {
-  src: string;
+  src?: string;
   props?: object;
 }) => React.ReactNode;
 
@@ -20,3 +20,4 @@ declare const Dialog;
 declare const Select;
 declare const ScrollArea;
 declare const Buffer;
+declare const useMemo;

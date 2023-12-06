@@ -76,6 +76,10 @@ module.exports = {
       borderRadius: {
         '4xl': '30px',
       },
+      backgroundImage: (theme) => ({
+        'hero-pattern': "url('/images/wavey-fingerprint.png')",
+        'error-pattern': "url('/images/leaf_nearscan.jpg')",
+      }),
     },
   },
   plugins: [],
