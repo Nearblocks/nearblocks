@@ -22,6 +22,7 @@ const lakeConfig: types.LakeConfig = {
 };
 
 if (config.s3Endpoint) {
+  lakeConfig.s3ForcePathStyle = true;
   lakeConfig.s3Endpoint = config.s3Endpoint;
 }
 
