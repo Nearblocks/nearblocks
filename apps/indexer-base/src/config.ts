@@ -14,7 +14,7 @@ const env = cleanEnv(process.env, {
     choices: [Network.MAINNET, Network.TESTNET],
   }),
   REDIS_URL: str(),
-  S3_ENDPOINT: url(),
+  S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 

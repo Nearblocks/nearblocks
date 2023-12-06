@@ -23,8 +23,6 @@ export const syncData = async () => {
   const settings = await knex('settings').where({ key: balanceKey }).first();
   const latestBlock = settings?.value?.sync;
 
-  logger.warn({ latestBlock });
-
   if (latestBlock) {
     const next = +latestBlock - config.delta;
 

@@ -117,7 +117,7 @@ const getStateChanges = (
           throw new Error(
             `Duplicated balance changes for transaction ${txHash} at block_height ${blockHeight}.One of them may be missed ${JSON.stringify(
               account,
-            )} ${JSON.stringify(result.transactions.get(txHash))}.`,
+            )} ${result.transactions.get(txHash)}.`,
           );
         }
 
@@ -131,7 +131,7 @@ const getStateChanges = (
           throw new Error(
             `Duplicated balance changes for receipt ${receiptHash} at block_height ${blockHeight}. ${JSON.stringify(
               account,
-            )} ${JSON.stringify(result.receipts.get(receiptHash))}.`,
+            )} ${result.receipts.get(receiptHash)}.`,
           );
         }
 
@@ -145,7 +145,7 @@ const getStateChanges = (
           throw new Error(
             `Duplicated balance changes for receipt ${receiptHash} (reward) at block_height ${blockHeight}. ${JSON.stringify(
               account,
-            )} ${JSON.stringify(result.receipts.get(receiptHash))}.`,
+            )} ${result.receipts.get(receiptHash)}.`,
           );
         }
 
@@ -279,9 +279,9 @@ const getTxnChanges = async (
         balanceChanges.size
       } changes for transactions were not applied, block_height ${
         block.height
-      }, keys: ${JSON.stringify(
-        balanceChanges.keys(),
-      )}, values: ${JSON.stringify(balanceChanges.values())}`,
+      }, keys: ${[...balanceChanges.keys()]}, values: ${JSON.stringify([
+        ...balanceChanges.values(),
+      ])}`,
     );
   }
 
@@ -371,9 +371,9 @@ const getReceiptRewardChanges = async (
         receipts.size
       } changes for transactions were not applied, block_height ${
         block.height
-      }, keys: ${JSON.stringify(receipts.keys())}, values: ${JSON.stringify(
-        receipts.values(),
-      )}`,
+      }, keys: ${[...receipts.keys()]}, values: ${JSON.stringify([
+        ...receipts.values(),
+      ])}`,
     );
   }
 
@@ -383,9 +383,9 @@ const getReceiptRewardChanges = async (
         rewards.size
       } changes for transactions were not applied, block_height ${
         block.height
-      }, keys: ${JSON.stringify(rewards.keys())}, values: ${JSON.stringify(
-        rewards.values(),
-      )}`,
+      }, keys: ${[...rewards.keys()]}, values: ${JSON.stringify([
+        ...rewards.values(),
+      ])}`,
     );
   }
 
