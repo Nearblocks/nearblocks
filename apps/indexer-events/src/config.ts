@@ -15,7 +15,7 @@ const env = cleanEnv(process.env, {
   }),
   REDIS_URL: str(),
   RPC_URL: str(),
-  S3_ENDPOINT: url(),
+  S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 

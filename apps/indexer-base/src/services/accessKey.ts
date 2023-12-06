@@ -97,11 +97,13 @@ export const storeChunkAccessKeys = async (
             receiptId,
           });
           accessKeys.forEach((value, key) => {
-            accessKeys.set(key, {
-              ...value,
-              deleted_by_block_height: block.height,
-              deleted_by_receipt_id: receiptId,
-            });
+            if (value.account_id === accountId) {
+              accessKeys.set(key, {
+                ...value,
+                deleted_by_block_height: block.height,
+                deleted_by_receipt_id: receiptId,
+              });
+            }
           });
           continue;
         }
@@ -178,7 +180,7 @@ export const storeChunkAccessKeys = async (
             .update('deleted_by_receipt_id', key.receiptId)
             .update('deleted_by_block_height', block.height)
             .where('account_id', key.accountId)
-            .where('created_by_block_height', '>', block.height)
+            .where('created_by_block_height', '<', block.height)
             .whereNull('deleted_by_block_height');
         });
       }),

@@ -51,7 +51,7 @@ const config: Config = {
   s3Endpoint,
   s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: 0,
+  startBlockHeight: 22633809,
 };
 
 export default config;
