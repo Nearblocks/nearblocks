@@ -44,6 +44,11 @@ export default function () {
     }
 
     fetchLatestBlocks();
+    const interval = setInterval(() => {
+      fetchLatestBlocks();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [config.backendUrl]);
 
   return (

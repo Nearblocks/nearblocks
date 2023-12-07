@@ -134,6 +134,7 @@ export type StatusInfo = {
   total_txns: number;
   volume: number;
 };
+
 export type ChartSeriesInfo = {
   type: string;
   data: number[];
@@ -219,4 +220,41 @@ export type TransactionInfo = {
   receiver_account_id: string;
   signer_account_id: string;
   transaction_hash: string;
+};
+
+export type ChartStat = {
+  date: string;
+  near_price: string;
+  market_cap: string;
+  total_supply: string;
+  blocks: string;
+  gas_fee: string;
+  gas_used: string;
+  avg_gas_price: string;
+  avg_gas_limit: string;
+  txns: string;
+  txn_volume: string;
+  txn_volume_usd: string;
+  txn_fee: string;
+  txn_fee_usd: string;
+  total_addresses: string;
+  addresses: string;
+};
+
+export type ChartTypeInfo = {
+  title: string;
+  description: string;
+};
+
+export type ChartConfig = {
+  chart: {
+    height: number;
+    zoomType: string;
+  };
+  title: {
+    text: string;
+  };
+  subtitle: {
+    text: string;
+  };
 };

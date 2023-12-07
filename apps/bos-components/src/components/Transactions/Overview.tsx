@@ -245,28 +245,6 @@ export default function (props: Props) {
 
   return (
     <Theme>
-      <div className="flex items-center justify-center bg-hero-pattern">
-        <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
-          <div className="flex flex-col lg:flex-row pb-5">
-            <div className="lg:w-3/5 w-full flex-col">
-              <h1 className="text-white text-2xl pb-3 flex flex-col">
-                Near Protocol Explorer
-              </h1>
-              <div className="flex flex-grow"></div>
-              <div className="text-white">
-                {
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredText`}
-                    props={{
-                      textColor: true,
-                    }}
-                  />
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="relative -mt-14">
         <div className="container mx-auto px-3">
           <div className="bg-white soft-shadow rounded-lg overflow-hidden px-5 md:py lg:px-0">

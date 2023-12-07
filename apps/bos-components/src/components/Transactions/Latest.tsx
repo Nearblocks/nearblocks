@@ -31,10 +31,7 @@ export default function () {
   useEffect(() => {
     function fetchLatestTxns() {
       setIsLoading(true);
-      asyncFetch(`${config.backendUrl}txns/latest`, {
-        refreshInterval: 5000,
-        revalidateOnReconnect: true,
-      }).then(
+      asyncFetch(`${config.backendUrl}txns/latest`).then(
         (data: {
           body: {
             txns: TransactionInfo[];
@@ -47,6 +44,11 @@ export default function () {
       setIsLoading(false);
     }
     fetchLatestTxns();
+    const interval = setInterval(() => {
+      fetchLatestTxns();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [config.backendUrl]);
 
   return (
