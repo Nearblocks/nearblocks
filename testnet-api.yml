@@ -8,7 +8,9 @@ services:
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file: testnet.web.env
+    env_file: testnet.api.env
+    ports:
+      - "127.0.0.1:3008:3001"
   redis:
     container_name: testnet-redis
     image: redis:7.2-alpine
