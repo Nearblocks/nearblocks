@@ -1,4 +1,35 @@
-import { localFormat } from '@/includes/formats';
+import { localFormat, formatWithCommas } from '@/includes/formats';
+
+export function convertAmountToReadableString(amount: number, type: string) {
+  if (!amount) return null;
+
+  let value;
+  let suffix;
+
+  const nearNomination = Math.pow(10, 24);
+
+  const amountInNear = Number(amount) / nearNomination;
+
+  if (type === 'totalSupply' || type === 'totalStakeAmount') {
+    value = formatWithCommas((amountInNear / 1e6).toFixed(1));
+    suffix = 'M';
+  } else if (type === 'seatPriceAmount') {
+    value = formatWithCommas(Math.round(amountInNear).toString());
+  } else {
+    value = amount.toString();
+  }
+  return `${value}${suffix}`;
+}
+
+export function convertTimestampToTime(timestamp: number) {
+  const hours = Math.floor(timestamp / 3600);
+  const minutes = Math.floor((timestamp % 3600) / 60);
+  const seconds = Math.floor(timestamp % 60);
+
+  return `${hours.toString().padStart(2, '0')}H ${minutes
+    .toString()
+    .padStart(2, '0')}M ${seconds.toString().padStart(2, '0')}S`;
+}
 
 export function yoctoToNear(yocto: number, format: boolean) {
   const YOCTO_PER_NEAR = Big(10).pow(24).toString();
@@ -42,7 +73,7 @@ export function getConfig(network: string) {
       return {
         ownerId: 'nearblocks.near',
         nodeUrl: 'https://rpc.mainnet.near.org',
-        backendUrl: 'https://api.nearblocks.io/v1/',
+        backendUrl: 'https://api-beta.nearblocks.io/v1/',
         rpcUrl: 'https://archival-rpc.testnet.near.org',
         appUrl: 'https://nearblocks.io/',
       };
@@ -50,7 +81,7 @@ export function getConfig(network: string) {
       return {
         ownerId: 'nearblocks.testnet',
         nodeUrl: 'https://rpc.testnet.near.org',
-        backendUrl: 'https://api-testnet.nearblocks.io/v1/',
+        backendUrl: 'https://api-testnet-beta.nearblocks.io/v1/',
         rpcUrl: 'https://archival-rpc.testnet.near.org',
         appUrl: 'https://testnet.nearblocks.io/',
       };
