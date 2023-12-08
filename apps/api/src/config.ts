@@ -9,14 +9,14 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  MAINNET_DB_URL: str(),
-  MAINNET_REDIS_URL: str(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
   REDIS_URL: str(),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
+  USER_DB_URL: str(),
+  USER_REDIS_URL: str(),
 });
 
 const config: Config = {
@@ -24,8 +24,6 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  mainnetDbUrl: env.MAINNET_DB_URL,
-  mainnetRedisUrl: env.MAINNET_REDIS_URL,
   maxQueryCost: 200000,
   maxQueryRows: 5000,
   network: env.NETWORK,
@@ -33,6 +31,8 @@ const config: Config = {
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
+  userDbUrl: env.USER_DB_URL,
+  userRedisUrl: env.USER_REDIS_URL,
 };
 
 export default config;
