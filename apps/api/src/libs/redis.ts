@@ -12,7 +12,7 @@ const redis = new Redis(config.redisUrl, {
   maxRetriesPerRequest: null,
 });
 
-export const mainnetRedis = new Redis(config.mainnetRedisUrl, {
+export const mainnetRedis = new Redis(config.userRedisUrl, {
   enableOfflineQueue: false,
   maxRetriesPerRequest: null,
 });

@@ -23,7 +23,7 @@ const db = new Pool({
 });
 
 export const mainnetDb = new Pool({
-  connectionString: config.mainnetDbUrl,
+  connectionString: config.userDbUrl,
   max: 60,
   ssl: ssl?.ca ? ssl : false,
 });
