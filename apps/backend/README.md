@@ -1,6 +1,6 @@
-## 💡 Backend
+## Backend
 
-Backend contains database migrations 📦 and cron jobs 🕒 to fetch and analyze statistics 📊
+Backend contains database migrations, seed files and cron jobs to fetch and analyze statistics
 
 ### Config
 
@@ -21,8 +21,16 @@ SENTRY_DSN=
 
 ### Migrations
 
-Migrations 📦 can be applied by accessing the Docker container 🐳 and executing the following command
+Migrations can be applied by accessing the Docker container and executing the following command:
 
 ```
 cd apps/backend && yarn migrate
+```
+
+### Seed
+
+To run all seed files, enter the Docker container and execute the following command:
+
+```
+cd apps/backend && yarn seed
 ```
