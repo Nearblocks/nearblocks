@@ -23,7 +23,7 @@ const logger: Bree.BreeLogger = {
 };
 
 const jobs: Bree.JobOptions[] = [
-  { cron: '0 0 1 1 * *', hasSeconds: true, name: 'stats' },
+  { cron: '* * * * * *', hasSeconds: true, name: 'events' },
 ];
 
 const bree = new Bree({ jobs, logger, root });

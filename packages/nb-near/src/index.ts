@@ -13,7 +13,7 @@ export class RPC {
     contractId: string,
     methodName: string,
     args: string,
-    blockHash?: string,
+    blockId?: number | string,
   ) {
     const params = {
       account_id: contractId,
@@ -22,8 +22,8 @@ export class RPC {
       request_type: 'call_function',
     };
 
-    if (blockHash) {
-      return this.query({ ...params, block_id: blockHash });
+    if (blockId) {
+      return this.query({ ...params, block_id: blockId });
     }
 
     return this.query({ ...params, finality: 'final' });
@@ -46,10 +46,10 @@ export class RPC {
     });
   }
 
-  async viewAccount(accountId: string, blockHash: string) {
+  async viewAccount(accountId: string, blockId: number | string) {
     return this.query({
       account_id: accountId,
-      block_id: blockHash,
+      block_id: blockId,
       request_type: 'view_account',
     });
   }

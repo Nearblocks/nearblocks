@@ -20,9 +20,9 @@
   "devDependencies": {
     "eslint-config-custom-nextjs": "*",
     "eslint-config-custom-node": "*",
+    "husky": "8.0.0",
     "prettier": "3.0.3",
-    "turbo": "1.10.16",
-    "husky": "8.0.0"
+    "turbo": "1.11.0"
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
