@@ -1,6 +1,7 @@
 import { cleanEnv, str } from 'envalid';
 
-import { Network } from '#types/enums';
+import { Network } from 'nb-types';
+
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
@@ -15,6 +16,7 @@ const env = cleanEnv(process.env, {
     choices: [Network.MAINNET, Network.TESTNET],
   }),
   RPC_URL: str(),
+  RPC_URL2: str(),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -35,6 +37,7 @@ const config: Config = {
   lcwApiKey: env.LIVECOINWATCH_API_KEY,
   network: env.NETWORK,
   rpcUrl: env.RPC_URL,
+  rpcUrl2: env.RPC_URL2,
   sentryDsn,
 };
 

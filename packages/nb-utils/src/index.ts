@@ -6,6 +6,8 @@ export type Context = {
   attempt: number;
 };
 
+const NS_IN_A_MS = 10n ** 6n;
+
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -33,3 +35,7 @@ export const retry = async <A>(
 
   throw new Error(`failed retrying ${retries} times...`);
 };
+
+export const msToNsTime = (ms: number) => String(BigInt(ms) * NS_IN_A_MS);
+
+export const nsToMsTime = (ns: string) => +String(BigInt(ns) / NS_IN_A_MS);
