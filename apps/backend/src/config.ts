@@ -15,6 +15,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  REDIS_URL: str(),
   RPC_URL: str(),
   RPC_URL2: str(),
   SENTRY_DSN: str({ default: '' }),
@@ -36,9 +37,28 @@ const config: Config = {
   genesisHeight,
   lcwApiKey: env.LIVECOINWATCH_API_KEY,
   network: env.NETWORK,
+  redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   rpcUrl2: env.RPC_URL2,
   sentryDsn,
 };
 
 export default config;
+
+export const SECOND = 1;
+export const MINUTE = 60;
+export const HOUR = 60 * MINUTE;
+export const DAY = 24 * HOUR;
+
+export const validator = {
+  accountIdSuffix: {
+    lockup: 'lockup.near',
+    stakingPool: {
+      guildnet: undefined,
+      localnet: undefined,
+      mainnet: '.poolv1.near',
+      shardnet: undefined,
+      testnet: undefined,
+    },
+  },
+};

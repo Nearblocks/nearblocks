@@ -258,3 +258,100 @@ export type ChartConfig = {
     text: string;
   };
 };
+
+export interface ProtocolConfig {
+  version: number;
+  epochLength: number;
+  maxNumberOfSeats: number;
+}
+export type CurrentEpochValidatorInfo = {
+  account_id: string;
+  public_key: string;
+  is_slashed: boolean;
+  stake: string;
+  shards: number;
+  num_produced_blocks: number;
+  num_expected_blocks: number;
+  num_produced_chunks: number;
+  num_expected_chunks: number;
+};
+export type EpochStartBlock = {
+  height: number;
+  timestamp: number;
+  totalSupply: string;
+};
+
+export interface GenesisConfig {
+  height: number;
+  timestamp: number;
+  protocolVersion: number;
+  totalSupply: string;
+  minStakeRatio: number[];
+}
+export type LatestBlock = {
+  height: number;
+  timestamp: number;
+};
+
+export type ValidationProgress = {
+  chunks: {
+    produced: number;
+    total: number;
+  };
+  blocks: {
+    produced: number;
+    total: number;
+  };
+};
+
+export type ValidatorEpochData = {
+  accountId: string;
+  publicKey?: string;
+
+  currentEpoch?: {
+    stake: string;
+    progress: ValidationProgress;
+  };
+  nextEpoch?: {
+    stake: string;
+  };
+  afterNextEpoch?: {
+    stake: string;
+  };
+  index?: number;
+};
+
+export type ValidatorTelemetry = {
+  ipAddress: string;
+  nodeId: string;
+  lastSeen: number;
+  lastHeight: number;
+  agentName: string;
+  agentVersion: string;
+  agentBuild: string;
+  status: string;
+  latitude: string | null;
+  longitude: string | null;
+  city: string | null;
+};
+export type ValidatorPoolInfo = {
+  fee: { numerator: number; denominator: number } | null;
+  delegatorsCount: number | null;
+};
+
+export type ValidatorDescription = {
+  country?: string;
+  countryCode?: string;
+  description?: string;
+  discord?: string;
+  email?: string;
+  twitter?: string;
+  url?: string;
+};
+
+export type ValidatorFullData = ValidatorEpochData & {
+  telemetry?: ValidatorTelemetry;
+  poolInfo?: ValidatorPoolInfo;
+  description?: ValidatorDescription;
+  contractStake?: string;
+};

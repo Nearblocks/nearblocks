@@ -22,6 +22,16 @@ mainnetRedis.on('error', errorHandler);
 
 const prefix = 'api';
 
+export const readCache = async (key: string) => {
+  const prefixedKey = `${prefix}:${key}`;
+  const redisData = await redis.get(prefixedKey);
+
+  if (redisData) {
+    return JSON.parse(redisData);
+  }
+  return null;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const cache = async (key: string, callback: any, options: Options) => {
   const prefixedKey = `${prefix}:${key}`;
