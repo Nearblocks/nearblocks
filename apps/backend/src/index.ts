@@ -15,7 +15,9 @@ const logger: Bree.BreeLogger = {
   error: () => {
     //
   },
-  info: () => {},
+  info: () => {
+    //
+  },
   warn: () => {
     //
   },
@@ -27,24 +29,24 @@ const jobs: Bree.JobOptions[] = [
     closeWorkerAfterMs: 10000,
     cron: '*/10 * * * * *',
     hasSeconds: true,
-    name: 'main',
+    name: 'node-validator',
   }, // every 10s
   {
     closeWorkerAfterMs: 15000,
     cron: '*/10 * * * * *',
     hasSeconds: true,
-    name: 'updatepoolinfo',
+    name: 'update-pool-info',
   }, // every 10s
   {
     closeWorkerAfterMs: 10000,
     cron: '*/10 * * * * *',
     hasSeconds: true,
-    name: 'updatestakingpool',
+    name: 'update-staking-pool',
   }, // every 10s
-  { cron: '0 0 * * *', name: 'genesisconfig' }, // every day
-  { cron: '0 * * * *', name: 'protocolconfig' }, // every hour
-  { cron: '*/5 * * * * *', hasSeconds: true, name: 'latestblock' }, // every 5s
-  { cron: '*/10 * * * *', name: 'poolid' }, // every 10 minute
+  { cron: '0 0 * * *', name: 'genesis-config', timeout: '5s' }, // every day
+  { cron: '0 * * * *', name: 'protocol-config', timeout: '5s' }, // every hour
+  { cron: '*/5 * * * * *', hasSeconds: true, name: 'latest-block' }, // every 5s
+  { cron: '*/10 * * * *', name: 'pool-id', timeout: '5s' }, // every 10 minute
 ];
 
 const bree = new Bree({ jobs, logger, root });
@@ -69,7 +71,6 @@ const onSignal = async (signal: number | string) => {
     await bree.stop();
     await sentry.close(1000);
   } catch (error) {
-    log.info('error ');
     log.error(error);
   }
 

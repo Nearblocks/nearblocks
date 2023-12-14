@@ -8,11 +8,14 @@ import { PublishTopic } from '#types/types';
     const publish: PublishTopic = (topic) => {
       void topic;
     };
+
     await tasks.redisConnect();
-    await tasks.updatePoolInfoMap.fn(publish);
+    await tasks.genesisProtocolInfoFetch.fn(publish);
   } catch (error: unknown) {
     //
   }
+
+  await tasks.redisDisConnect();
 
   if (parentPort) {
     return parentPort.postMessage('done');

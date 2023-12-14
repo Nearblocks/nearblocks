@@ -5,11 +5,11 @@ import {
   validatorApi,
 } from 'nb-near';
 
-import { DAY, HOUR } from '#config';
-import config, { validator } from '#config';
+import config from '#config';
 import db from '#libs/knex';
 import RPC from '#libs/near';
 import { readCache, redis, redisClient } from '#libs/redis';
+import { DAY, HOUR, validator } from '#libs/utils';
 import {
   AccountRow,
   CachedTimestampMap,
@@ -24,6 +24,10 @@ export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
 export const redisConnect = async () => {
   await redisClient.connect();
+};
+
+export const redisDisConnect = async () => {
+  await redisClient.disconnect();
 };
 
 export const latestBlockCheck: RegularCheckFn = {

@@ -9,11 +9,11 @@ import { PublishTopic } from '#types/types';
       void topic;
     };
     await tasks.redisConnect();
-    await tasks.validatorsCheck.fn(publish);
+    await tasks.poolIdsCheck.fn(publish);
   } catch (error: unknown) {
     //
   }
-
+  await tasks.redisDisConnect();
   if (parentPort) {
     return parentPort.postMessage('done');
   }

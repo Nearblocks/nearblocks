@@ -9,11 +9,11 @@ import { PublishTopic } from '#types/types';
       void topic;
     };
     await tasks.redisConnect();
-    await tasks.protocolConfigCheck.fn(publish);
+    await tasks.updateStakingPoolStakeProposalsFromContractMap.fn(publish);
   } catch (error: unknown) {
     //
   }
-
+  await tasks.redisDisConnect();
   if (parentPort) {
     return parentPort.postMessage('done');
   }

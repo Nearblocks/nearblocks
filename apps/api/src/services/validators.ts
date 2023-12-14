@@ -6,14 +6,26 @@ import { List } from '#libs/schema/blocks.js';
 import { RequestValidator } from '#types/types';
 
 const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
-  const combinedData = await readCache('validatorLists');
-  const currentValidators = await readCache('currentValidators');
-  const nextValidators = await readCache('nextValidators');
-  const protocolConfig = await readCache('protocolConfig');
-  const genesisConfig = await readCache('genesisConfig');
-  const epochStatsCheck = await readCache('epochStatsCheck');
-  const epochStartBlock = await readCache('epochStartBlock');
-  const latestBlock = await readCache('latestBlock');
+  const [
+    combinedData,
+    currentValidators,
+    nextValidators,
+    protocolConfig,
+    genesisConfig,
+    epochStatsCheck,
+    epochStartBlock,
+    latestBlock,
+  ] = await Promise.all([
+    readCache('validatorLists'),
+    readCache('currentValidators'),
+    readCache('nextValidators'),
+    readCache('protocolConfig'),
+    readCache('genesisConfig'),
+    readCache('epochStatsCheck'),
+    readCache('epochStartBlock'),
+    readCache('latestBlock'),
+  ]);
+
   return res.status(200).json({
     combinedData,
     currentValidators,
