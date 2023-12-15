@@ -11,13 +11,6 @@ services:
     env_file: mainnet.api.env
     ports:
       - "127.0.0.1:3007:3001"
-  redis:
-    container_name: mainnet-redis
-    image: redis:7.2-alpine
-    command: redis-server --appendonly yes --appendfsync always
-    restart: always
-    volumes:
-      - redis-data:/mnt/redis
 
 volumes:
   redis-data:

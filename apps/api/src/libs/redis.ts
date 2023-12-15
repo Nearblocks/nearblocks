@@ -20,7 +20,7 @@ export const mainnetRedis = new Redis(config.userRedisUrl, {
 redis.on('error', errorHandler);
 mainnetRedis.on('error', errorHandler);
 
-const prefix = 'api';
+const prefix = `api:${config.network}`;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const cache = async (key: string, callback: any, options: Options) => {
