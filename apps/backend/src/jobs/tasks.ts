@@ -4,31 +4,21 @@ import {
   EpochValidatorInfo,
   validatorApi,
 } from 'nb-near';
+import { ValidatorEpochData, ValidatorPoolInfo } from 'nb-types';
 
 import config from '#config';
 import db from '#libs/knex';
 import RPC from '#libs/near';
-import { readCache, redis, redisClient } from '#libs/redis';
+import { cache, readCache, redis } from '#libs/redis';
 import { DAY, HOUR, validator } from '#libs/utils';
 import {
-  AccountRow,
   CachedTimestampMap,
   ExpGenesisConfig,
   ExpProtocolConfig,
   RegularCheckFn,
-  ValidatorEpochData,
-  ValidatorPoolInfo,
 } from '#types/types';
 
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
-
-export const redisConnect = async () => {
-  await redisClient.connect();
-};
-
-export const redisDisConnect = async () => {
-  await redisClient.disconnect();
-};
 
 export const latestBlockCheck: RegularCheckFn = {
   fn: async () => {
@@ -40,12 +30,12 @@ export const latestBlockCheck: RegularCheckFn = {
     );
     if (data.result) {
       const latestBlock = data.result as BlockResult;
-      await redisClient.set(
-        redis.getPrefixedKeys(`latestBlock`),
-        JSON.stringify({
+      await cache(
+        `latestBlock`,
+        {
           height: latestBlock?.header?.height,
           timestamp: latestBlock?.header?.timestamp,
-        }),
+        },
         { EX: HOUR },
       );
     }
@@ -63,9 +53,9 @@ export const protocolConfigCheck: RegularCheckFn = {
     if (data.result) {
       const protocolConfig = data.result as ExpProtocolConfig;
       if (protocolConfig) {
-        await redisClient.set(
-          redis.getPrefixedKeys('protocolConfig'),
-          JSON.stringify({
+        await cache(
+          'protocolConfig',
+          {
             epochLength: protocolConfig.epoch_length,
             maxNumberOfSeats:
               protocolConfig.num_block_producer_seats +
@@ -74,7 +64,7 @@ export const protocolConfigCheck: RegularCheckFn = {
                 0,
               ),
             version: protocolConfig.protocol_version,
-          }),
+          },
           { EX: HOUR },
         );
       }
@@ -84,35 +74,29 @@ export const protocolConfigCheck: RegularCheckFn = {
 
 export const genesisProtocolInfoFetch: RegularCheckFn = {
   fn: async () => {
-    const [{ data }, { rows }] = await Promise.all([
+    const [{ data }, genesisAccount] = await Promise.all([
       RPC.query(
         {
           finality: 'final',
         },
         'EXPERIMENTAL_genesis_config',
       ),
-      db.raw(`
-            SELECT
-              count(account_id) as count 
-            FROM
-               accounts
-            WHERE  created_by_receipt_id IS NULL
-            LIMIT 1
-          `),
+      db('accounts').count('account_id').whereNull('created_by_receipt_id'),
     ]);
-    if (data.result) {
+
+    if (data.result && genesisAccount) {
+      const genesisAccountCount = genesisAccount[0].count;
       const genesisProtocolConfig = data.result as ExpGenesisConfig;
-      const genesisAccountCount = rows;
-      await redisClient.set(
-        redis.getPrefixedKeys('genesisConfig'),
-        JSON.stringify({
-          accountCount: Number(genesisAccountCount[0]?.count),
+      await cache(
+        'genesisConfig',
+        {
+          accountCount: genesisAccountCount,
           height: genesisProtocolConfig.genesis_height,
           minStakeRatio: genesisProtocolConfig.minimum_stake_ratio,
           protocolVersion: genesisProtocolConfig.protocol_version,
           timestamp: new Date(genesisProtocolConfig.genesis_time).valueOf(),
           totalSupply: genesisProtocolConfig.total_supply,
-        }),
+        },
         { EX: DAY },
       );
     }
@@ -126,21 +110,14 @@ export const poolIdsCheck: RegularCheckFn = {
       network === 'mainnet'
         ? `${validator.accountIdSuffix.stakingPool.mainnet}`
         : `${validator.accountIdSuffix.stakingPool.testnet}`;
-    const { rows } = await db.raw(`
-            SELECT
-                account_id as accountId 
-            FROM
-               accounts
-            WHERE  account_id like '%${address}' `);
+    const rows = await db('accounts')
+      .select('account_id')
+      .whereLike('account_id', `%${address}`);
 
-    const accounts = rows.map((data: AccountRow) => {
-      return data.accountid;
+    const accounts = rows.map((data) => {
+      return data.account_id;
     });
-    await redisClient.set(
-      redis.getPrefixedKeys('poolIds'),
-      JSON.stringify(accounts),
-      { EX: DAY },
-    );
+    await cache('poolIds', accounts, { EX: DAY });
   },
 };
 
@@ -165,11 +142,7 @@ const getValidators = async () => {
   const { data } = await RPC.query([null], 'validators');
   if (data.result) {
     const validator = data.result as EpochValidatorInfo;
-    await redisClient.set(
-      redis.getPrefixedKeys('validatorsPromise'),
-      JSON.stringify({ validator }),
-      { EX: DAY },
-    );
+    await cache('validatorsPromise', validator, { EX: DAY });
     return validator;
   }
   return null;
@@ -277,9 +250,9 @@ const fetchStakingPoolInfo = async () => {
       const mappingsnew = {
         valueMap: new Map([...mappings.valueMap]),
       };
-      await redisClient.set(
-        redis.getPrefixedKeys('stakingPoolStakeProposalsFromContract'),
-        JSON.stringify(Array.from(mappingsnew.valueMap.entries())),
+      await cache(
+        'stakingPoolStakeProposalsFromContract',
+        Array.from(mappingsnew.valueMap.entries()),
         { EX: DAY },
       );
       await saveValidatorLists();
@@ -365,9 +338,9 @@ const fetchPoolInfo = async () => {
       const mappingsnew = {
         valueMap: new Map([...mappings.valueMap]),
       };
-      await redisClient.set(
-        redis.getPrefixedKeys('stakingPoolInfos'),
-        JSON.stringify(Array.from(mappingsnew.valueMap.entries())),
+      await cache(
+        'stakingPoolInfos',
+        Array.from(mappingsnew.valueMap.entries()),
         { EX: DAY },
       );
       await saveValidatorLists();
@@ -426,11 +399,7 @@ const saveValidatorLists = async () => {
         : null,
     }));
 
-    await redisClient.set(
-      redis.getPrefixedKeys('validatorLists'),
-      JSON.stringify(combined),
-      { EX: DAY },
-    );
+    await cache('validatorLists', combined, { EX: DAY });
   }
 };
 
@@ -449,23 +418,13 @@ export const validatorsCheck: RegularCheckFn = {
 
       const mappedValidators = mapValidators(validators, poolIds ?? []);
 
-      await redisClient.set(
-        redis.getPrefixedKeys('mappedValidators'),
-        JSON.stringify(mappedValidators),
-        { EX: DAY },
-      );
+      await cache('mappedValidators', mappedValidators, { EX: DAY });
 
-      await redisClient.set(
-        redis.getPrefixedKeys('currentValidators'),
-        JSON.stringify(validators.current_validators),
-        { EX: DAY },
-      );
+      await cache('currentValidators', validators.current_validators, {
+        EX: DAY,
+      });
 
-      await redisClient.set(
-        redis.getPrefixedKeys('nextValidators'),
-        JSON.stringify(validators.next_validators),
-        { EX: DAY },
-      );
+      await cache('nextValidators', validators.next_validators, { EX: DAY });
 
       if (genesisConfig && protocolConfig) {
         const seatPrice = await validatorApi.findSeatPrice(
@@ -474,11 +433,7 @@ export const validatorsCheck: RegularCheckFn = {
           genesisConfig.minStakeRatio,
           protocolConfig.version,
         );
-        await redisClient.set(
-          redis.getPrefixedKeys('epochStatsCheck'),
-          JSON.stringify(seatPrice.toString()),
-          { EX: DAY },
-        );
+        await cache('epochStatsCheck', seatPrice.toString(), { EX: DAY });
       }
       const { data } = await RPC.query(
         {
@@ -490,13 +445,13 @@ export const validatorsCheck: RegularCheckFn = {
       const epochStartBlocks = data.result as BlockResult;
 
       if (epochStartBlocks) {
-        await redisClient.set(
-          redis.getPrefixedKeys('epochStartBlock'),
-          JSON.stringify({
+        await cache(
+          'epochStartBlock',
+          {
             height: epochStartBlocks.header.height,
             timestamp: epochStartBlocks.header.timestamp,
             total_supply: epochStartBlocks.header.total_supply,
-          }),
+          },
           { EX: DAY },
         );
       }

@@ -1,7 +1,15 @@
 import { Dayjs } from 'dayjs';
 
 import { BlockHeader, EpochValidatorInfo } from 'nb-near';
-import { FTEvent, Network } from 'nb-types';
+import {
+  FTEvent,
+  LatestBlock,
+  Network,
+  ProtocolConfig,
+  ValidatorEpochData,
+  ValidatorFullData,
+  ValidatorPoolInfo,
+} from 'nb-types';
 
 export interface Config {
   cmcApiKey: string;
@@ -35,18 +43,6 @@ export type ExpProtocolConfig = {
   epoch_length: number;
   num_block_producer_seats: number;
   protocol_version: number;
-};
-
-export type CurrentEpochValidatorInfo = {
-  account_id: string;
-  is_slashed: boolean;
-  num_expected_blocks: number;
-  num_expected_chunks: number;
-  num_produced_blocks: number;
-  num_produced_chunks: number;
-  public_key: string;
-  shards: number;
-  stake: string;
 };
 
 export type NextEpochValidatorInfo = {
@@ -90,85 +86,10 @@ export type ValidatorKickoutView = {
   reason: ValidatorKickoutReason;
 };
 
-export type ValidationProgress = {
-  blocks: {
-    produced: number;
-    total: number;
-  };
-  chunks: {
-    produced: number;
-    total: number;
-  };
-};
-
-export type PoolInfo = {
-  accountId?: string;
-  delegatorsCount?: number;
-  fee?: {
-    denominator: number;
-    numerator: number;
-  };
-};
-
-export type ValidatorEpochData = {
-  accountId: string;
-  afterNextEpoch?: {
-    stake: string;
-  };
-
-  contractStake?: string;
-  currentEpoch?: {
-    progress: ValidationProgress;
-    stake: string;
-  };
-  index?: number;
-  nextEpoch?: {
-    stake: string;
-  };
-  poolInfo?: ValidatorPoolInfo;
-  publicKey?: string;
-};
-
-export type ValidatorTelemetry = {
-  agentBuild: string;
-  agentName: string;
-  agentVersion: string;
-  city: null | string;
-  ipAddress: string;
-  lastHeight: number;
-  lastSeen: number;
-  latitude: null | string;
-  longitude: null | string;
-  nodeId: string;
-  status: string;
-};
-
-export type ValidatorPoolInfo = {
-  delegatorsCount: null | number;
-  fee: { denominator: number; numerator: number } | null;
-};
-
-export type ValidatorDescription = {
-  country?: string;
-  countryCode?: string;
-  description?: string;
-  discord?: string;
-  email?: string;
-  twitter?: string;
-  url?: string;
-};
-
 export type ValidatorSortFn = (
   a: ValidatorFullData,
   b: ValidatorFullData,
 ) => number;
-
-export type ValidatorFullData = ValidatorEpochData & {
-  contractStake?: string;
-  description?: ValidatorDescription;
-  poolInfo?: ValidatorPoolInfo;
-  telemetry?: ValidatorTelemetry;
-};
 
 export type EpochBlock = {
   header: {
@@ -201,19 +122,6 @@ export interface AccountResponse {
   locked: string;
   storage_usage: number;
 }
-export interface AccountRow {
-  accountid: string;
-}
-export interface LatestBlock {
-  height: number;
-  timestamp: number;
-}
-
-export interface GenesisConfig {
-  epochLength: number;
-  maxNumberOfSeats: number;
-  version: number;
-}
 
 export type CachedTimestampMap<T> = {
   promisesMap: Map<string, Promise<void>>;
@@ -225,7 +133,7 @@ export type CronTaskTypes = {
   epochStartBlock: BlockHeader;
   EpochValidatorInfo: EpochValidatorInfo;
   latestBlock: LatestBlock;
-  protocolConfig: GenesisConfig;
+  protocolConfig: ProtocolConfig;
   stakingPoolInfos: CachedTimestampMap<ValidatorPoolInfo>;
   stakingPoolStakeProposalsFromContract: CachedTimestampMap<string>;
   validators: ValidatorEpochData[];

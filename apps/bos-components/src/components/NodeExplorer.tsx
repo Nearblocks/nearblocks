@@ -6,14 +6,15 @@ import {
   getConfig,
   nanoToMilli,
 } from '@/includes/libs';
+import { EpochStartBlock } from '@/includes/types';
+
 import {
   CurrentEpochValidatorInfo,
-  EpochStartBlock,
   LatestBlock,
   ProtocolConfig,
   ValidatorEpochData,
   ValidatorFullData,
-} from '@/includes/types';
+} from 'nb-types';
 
 export default function () {
   const FRACTION_DIGITS = 2;
@@ -22,8 +23,7 @@ export default function () {
   const [validatorFullData, setValidatorFullData] = useState<
     ValidatorEpochData[]
   >([]);
-  // const [cumulativeStake, setCumulativeStake] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [currentValidators, setCurrentValidators] = useState<
     CurrentEpochValidatorInfo[]
@@ -42,6 +42,28 @@ export default function () {
   );
   const config = getConfig(context.networkId);
 
+  const validatorInfo = useCache(
+    () =>
+      asyncFetch(`${config?.backendUrl}validators`).then((res: any) => {
+        const data = res.body;
+        setCurrentValidators(data?.currentValidators);
+
+        const mappedValidators = data?.combinedData;
+        setValidatorFullData(mappedValidators);
+        setProtocolConfig(data?.protocolConfig);
+        setSeatPrice(data?.epochStatsCheck);
+        setEpochStartBlock(data?.epochStartBlock);
+        setLatestBlockSub(data?.latestBlock);
+        setValidatorData(mappedValidators);
+        return data;
+      }),
+    `${context.networkId}:validatorInfo`,
+    { subscribe: true },
+  );
+  if (validatorInfo) {
+    setIsLoading(false);
+  }
+
   const sortByBNComparison = (aValue?: string, bValue?: string) => {
     const a = aValue ? new Big(aValue) : null;
     const b = bValue ? new Big(bValue) : null;
@@ -57,53 +79,6 @@ export default function () {
     }
     return 0;
   };
-
-  useEffect(() => {
-    // Fetch validator info
-    function fetchData(flag: boolean) {
-      setIsLoading(flag);
-      asyncFetch(`${config?.backendUrl}validators`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((res: any) => {
-          const resp = res?.body;
-          if (resp) {
-            setIsLoading(false);
-            setCurrentValidators(resp?.currentValidators);
-
-            const mappedValidators = resp?.combinedData;
-            setValidatorFullData(mappedValidators);
-            setProtocolConfig(resp?.protocolConfig);
-            setSeatPrice(resp?.epochStatsCheck);
-            setEpochStartBlock(resp?.epochStartBlock);
-            setLatestBlockSub(resp?.latestBlock);
-          }
-        })
-        .catch(() => {});
-    }
-
-    const interval = setInterval(() => {
-      fetchData(false);
-    }, 30000); // poll for every 30 second
-
-    fetchData(true);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [config.backendUrl]);
-
-  useEffect(() => {
-    const onValidatorDataSlice = () => {
-      setValidatorData(validatorFullData);
-    };
-    if (validatorFullData.length > 0) {
-      onValidatorDataSlice();
-    }
-  }, [validatorFullData]);
 
   const getTotalStake = (validators: ValidatorFullData[]) =>
     validators.length > 0 &&
@@ -161,7 +136,7 @@ export default function () {
       !epochStartBlock?.height ||
       !protocolConfig?.epochLength
     ) {
-      return 0; // Or any default value you prefer
+      return 0;
     }
 
     return (

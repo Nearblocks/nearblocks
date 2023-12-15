@@ -13,6 +13,7 @@ declare const useEffect: (
 
 declare const styled;
 declare const asyncFetch;
+declare const useCache;
 declare const Big;
 declare const Popover;
 declare const Tooltip;
