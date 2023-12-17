@@ -258,3 +258,9 @@ export type ChartConfig = {
     text: string;
   };
 };
+
+export type EpochStartBlock = {
+  height: number;
+  timestamp: number;
+  totalSupply: string;
+};

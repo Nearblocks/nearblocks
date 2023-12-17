@@ -1,6 +1,14 @@
 import axios, { AxiosInstance } from 'axios';
+import { validators } from 'near-api-js';
+export type {
+  AccountView,
+  BlockHeader,
+  BlockResult,
+  EpochValidatorInfo,
+  Provider,
+} from 'near-api-js/lib/providers/provider.js';
 
-export type { AccountView } from 'near-api-js/lib/providers/provider.js';
+export const validatorApi = validators;
 
 export class RPC {
   request: AxiosInstance;
@@ -37,11 +45,11 @@ export class RPC {
     return Buffer.from(JSON.stringify(args)).toString('base64');
   }
 
-  async query(params: unknown) {
+  async query(params: unknown, method = 'query') {
     return this.request.post('', {
       id: 'near',
       jsonrpc: '2.0',
-      method: 'query',
+      method,
       params,
     });
   }

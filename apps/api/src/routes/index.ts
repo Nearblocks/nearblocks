@@ -11,6 +11,7 @@ import nfts from '#routes/nfts';
 import search from '#routes/search';
 import stats from '#routes/stats';
 import txns from '#routes/txns';
+import validators from '#routes/validators';
 
 const routes = () => {
   const app = Router();
@@ -26,6 +27,7 @@ const routes = () => {
   charts(app);
   search(app);
   key(app);
+  validators(app);
 
   return app;
 };

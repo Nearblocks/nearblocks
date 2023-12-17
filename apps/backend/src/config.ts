@@ -15,6 +15,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  REDIS_URL: str(),
   RPC_URL: str(),
   RPC_URL2: str(),
   SENTRY_DSN: str({ default: '' }),
@@ -36,6 +37,7 @@ const config: Config = {
   genesisHeight,
   lcwApiKey: env.LIVECOINWATCH_API_KEY,
   network: env.NETWORK,
+  redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   rpcUrl2: env.RPC_URL2,
   sentryDsn,
