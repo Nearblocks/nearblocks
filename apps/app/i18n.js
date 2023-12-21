@@ -32,5 +32,5 @@ module.exports = {
     'rgx:^/kb': ['kb'],
   },
   loadLocaleFrom: (lang, ns) =>
-    import(`nearblock-translate/${lang}/${ns}.json`).then((m) => m.default),
+    import(`nearblock-translations/${lang}/${ns}.json`).then((m) => m.default),
 };

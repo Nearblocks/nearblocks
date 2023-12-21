@@ -2,6 +2,7 @@
  * @interface Props
  *  @property {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
  *  @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
+ *  @param {string}  [network] - The network data to show, either mainnet or testnet.
  */
 import SearchIcon from '@/includes/icons/SearchIcon';
 import ArrowDown from '@/includes/icons/ArrowDown';
@@ -11,14 +12,15 @@ import { debounce, getConfig, shortenAddress } from '@/includes/libs';
 import { SearchResult } from '@/includes/types';
 interface Props {
   isHeader?: boolean;
+  network: string;
   t: (key: string) => string | undefined;
 }
 
-export default function SearchBar({ isHeader, t }: Props) {
+export default function SearchBar({ isHeader, t, network }: Props) {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
-  const config = getConfig(context.networkId);
+  const config = getConfig(network);
 
   // Determine whether to show search results
   const showResults =

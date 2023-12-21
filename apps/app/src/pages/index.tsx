@@ -1,7 +1,7 @@
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
+import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-
 const HomePage = () => {
   const components = useBosComponents();
   const { t } = useTranslation();
@@ -21,6 +21,7 @@ const HomePage = () => {
                   props={{
                     isHeader: false,
                     t: t,
+                    network: networkId,
                   }}
                 />
               </div>
@@ -42,7 +43,7 @@ const HomePage = () => {
             <div className="w-full">
               <div className="bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
-                  Latest Blocks
+                  {t('home:latestBlocks')}
                 </h2>
                 <VmComponent src={components?.latestBlocks} />
               </div>
@@ -50,7 +51,7 @@ const HomePage = () => {
             <div className="w-full">
               <div className="bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
-                  Latest Transactions
+                  {t('home:latestTxns')}
                 </h2>
                 <VmComponent src={components?.latestTransactions} />
               </div>
