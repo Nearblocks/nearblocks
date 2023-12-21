@@ -16,18 +16,21 @@
     "near-api-js": "2.1.3",
     "near-social-vm": "github:NearSocial/VM#2.5.1",
     "next": "13.3.4",
+    "next-translate": "^2.6.2",
+    "nearblock-translate": "https://github.com/Nearblocks/translations#117b31e8091b1c8e4de9c2075676fa792cf6031c",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.46.1",
     "zustand": "4.3.7"
   },
   "devDependencies": {
+    "@types/node": "~20.8",
     "@types/react": "~18.2",
     "@types/react-dom": "~18.2",
-    "@types/node": "~20.8",
     "autoprefixer": "~10.4",
     "eslint-config-custom-nextjs": "*",
     "nb-tsconfig": "*",
+    "next-translate-plugin": "^2.6.2",
     "postcss": "~8.4",
     "tailwindcss": "~3.3",
     "typescript": "~5.2"

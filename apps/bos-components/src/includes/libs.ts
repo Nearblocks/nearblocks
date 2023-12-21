@@ -1,4 +1,5 @@
 import { localFormat, formatWithCommas } from '@/includes/formats';
+import { Debounce } from './types';
 
 export function convertAmountToReadableString(amount: number, type: string) {
   if (!amount) return null;
@@ -88,4 +89,35 @@ export function getConfig(network: string) {
     default:
       return {};
   }
+}
+export function debounce<TArgs extends any[]>(
+  delay: any,
+  func: any,
+): Debounce<TArgs> {
+  let timer: number | undefined;
+  let active = true;
+  console.log('hgjhgh');
+  const debounced: Debounce<TArgs> = (arg) => {
+    if (active) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        active && func(arg);
+        timer = undefined;
+      }, delay);
+    } else {
+      func(arg);
+    }
+  };
+
+  debounced.isPending = () => {
+    return timer !== undefined;
+  };
+
+  debounced.cancel = () => {
+    active = false;
+  };
+
+  debounced.flush = (arg) => func(arg);
+
+  return debounced;
 }

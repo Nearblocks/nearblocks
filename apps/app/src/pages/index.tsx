@@ -1,19 +1,29 @@
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
+import useTranslation from 'next-translate/useTranslation';
 
 const HomePage = () => {
   const components = useBosComponents();
+  const { t } = useTranslation();
 
   return (
     <>
       <div className="flex items-center justify-center bg-hero-pattern">
         <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
           <div className="flex flex-col lg:flex-row pb-5">
-            <div className="lg:w-3/5 w-full flex-col">
+            <div className="lg:w-3/5  flex-col">
               <h1 className="text-white text-2xl pb-3 flex flex-col">
-                Near Protocol Explorer
+                {t('home:heroTitle')}
               </h1>
-              <div className="flex flex-grow"></div>
+              <div className="flex flex-grow">
+                <VmComponent
+                  src={components?.search}
+                  props={{
+                    isHeader: false,
+                    t: t,
+                  }}
+                />
+              </div>
               <div className="text-white">
                 <VmComponent
                   src={components?.sponsoredText}

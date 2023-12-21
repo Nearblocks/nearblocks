@@ -9,6 +9,7 @@ type NetworkComponents = {
   latestTransactions: string;
   transactionOverview: string;
   sponsoredText: string;
+  search: string;
 };
 
 const ComponentUrl = {
@@ -20,6 +21,7 @@ const ComponentUrl = {
   latestTransactions: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Latest`,
   transactionOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Overview`,
   sponsoredText: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.SponsoredText`,
+  search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
 };
 
 export const componentsByNetworkId: Record<
