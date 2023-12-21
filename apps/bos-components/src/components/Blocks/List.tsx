@@ -4,8 +4,7 @@
  * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
  * @interface Props
- * @param {string} [network] - Identifies the network by specifying its identifier.
- *                             Example: network=testnet, which identifies the currently used testnet.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)

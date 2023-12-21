@@ -5,8 +5,7 @@
  * Description: Transactions Overview.
  * @interface Props
  * @param {boolean} [fetchStyles] - Use Nearblock styles.
- * @param {string} [network] - Identifies the network by specifying its identifier.
- *                             Example: network=testnet, which identifies the currently used testnet.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {

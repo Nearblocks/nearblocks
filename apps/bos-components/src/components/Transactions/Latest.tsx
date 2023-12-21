@@ -4,8 +4,7 @@
  * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  * @interface Props
- * @param {string} [network] - Identifies the network by specifying its identifier.
- *                             Example: network=testnet, which identifies the currently used testnet.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {
