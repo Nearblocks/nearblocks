@@ -1,5 +1,6 @@
 import { localFormat } from '@/includes/formats';
 import { yoctoToNear } from '@/includes/libs';
+import { TransactionStatusInfo } from '@/includes/types';
 
 export function encodeArgs(args: object) {
   if (!args || typeof args === 'undefined') return '';
@@ -32,4 +33,17 @@ export function gasPrice(yacto: number) {
   const near = Big(yoctoToNear(yacto, false)).mul(Big(10).pow(12)).toString();
 
   return `${localFormat(near)} Ⓝ / Tgas`;
+}
+
+export function tokenAmount(amount: number, decimal: number, format: boolean) {
+  if (amount === undefined || amount === null) return 'N/A';
+
+  const near = Big(amount).div(Big(10).pow(+decimal));
+
+  return format
+    ? near.toString().toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 8,
+      })
+    : near;
 }

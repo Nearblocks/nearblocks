@@ -3,7 +3,14 @@
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Latest Blocks on Near Protocol.
+ * @interface Props
+ * @param {string} [network] - Identifies the network by specifying its identifier.
+ *                             Example: network=testnet, which identifies the currently used testnet.
  */
+
+interface Props {
+  network: string;
+}
 
 import {
   convertToMetricPrefix,
@@ -13,12 +20,11 @@ import {
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
-export default function () {
+export default function (props: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
-  const config = getConfig(context.networkId);
-
+  const config = getConfig(props.network);
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
@@ -28,25 +34,28 @@ export default function () {
   };
 
   useEffect(() => {
+    let delay = 5000;
+    let retries = 0;
+
     function fetchLatestBlocks() {
       setIsLoading(true);
-      asyncFetch(`${config.backendUrl}blocks/latest`).then(
-        (data: {
-          body: {
-            blocks: BlocksInfo[];
-          };
-        }) => {
+      asyncFetch(`${config.backendUrl}blocks/latest`)
+        .then((data: { body: { blocks: BlocksInfo[] } }) => {
           const resp = data?.body?.blocks;
           setBlocks(resp);
-        },
-      );
+        })
+        .catch((error: any) => {
+          if (error.response && error.response.status === 429) {
+            delay = Math.min(2 ** retries * 1000, 60000);
+            retries++;
+          }
+        });
       setIsLoading(false);
     }
 
     fetchLatestBlocks();
-    const interval = setInterval(() => {
-      fetchLatestBlocks();
-    }, 5000);
+
+    const interval = setInterval(fetchLatestBlocks, delay);
 
     return () => clearInterval(interval);
   }, [config.backendUrl]);
@@ -113,8 +122,11 @@ export default function () {
                         </div>
                         <div className="overflow-hidden pl-2">
                           <div className="text-green-500 text-sm font-medium ">
-                            <a href={`/blocks/${block.block_hash}`}>
-                              <a className="text-green-500">
+                            <a
+                              href={`/blocks/${block.block_hash}`}
+                              className="hover:no-underline"
+                            >
+                              <a className="text-green-500 hover:no-underline">
                                 {localFormat(block.block_height)}
                               </a>
                             </a>
@@ -128,8 +140,11 @@ export default function () {
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
                         Author{' '}
-                        <a href={`/address/${block.author_account_id}`}>
-                          <a className="text-green-500  font-medium">
+                        <a
+                          href={`/address/${block.author_account_id}`}
+                          className="hover:no-underline"
+                        >
+                          <a className="text-green-500 font-medium hover:no-underline">
                             {block.author_account_id}
                           </a>
                         </a>
@@ -141,13 +156,12 @@ export default function () {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 text-gray-400 truncate">
+                              <span className="u-label--badge-in text-gray-400 truncate">
                                 {block.chunks_agg.gas_used
                                   ? convertToMetricPrefix(
                                       block.chunks_agg.gas_used,
-                                    )
-                                  : '0 '}
-                                gas
+                                    ) + 'gas'
+                                  : '0 gas'}
                               </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content

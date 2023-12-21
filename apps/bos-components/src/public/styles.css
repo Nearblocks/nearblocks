@@ -37,3 +37,26 @@ pre[class*='language-']>code {
         0 4.4px 14.9px rgba(0, 0, 0, 0.069), 0 10.6px 35.9px rgba(0, 0, 0, 0.079),
         0 35px 119px rgba(0, 0, 0, 0.11);
 }
+
+.u-label--badge-in {
+    position: relative;
+    letter-spacing: .8px;
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background-color: rgba(76,189,187,.1);
+    font-size: .65625rem;
+    line-height: 1.7;
+    padding: .2rem .8rem
+}
+
+.u-label--badge-in:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: "";
+    border-top: .7rem solid transparent;
+    border-bottom: .7rem solid transparent;
+    border-left: .7rem solid #fff
+}
