@@ -1,19 +1,30 @@
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-
+import { networkId } from '@/utils/config';
+import useTranslation from 'next-translate/useTranslation';
 const HomePage = () => {
   const components = useBosComponents();
+  const { t } = useTranslation();
 
   return (
     <>
       <div className="flex items-center justify-center bg-hero-pattern">
         <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
           <div className="flex flex-col lg:flex-row pb-5">
-            <div className="lg:w-3/5 w-full flex-col">
+            <div className="lg:w-3/5  flex-col">
               <h1 className="text-white text-2xl pb-3 flex flex-col">
-                Near Protocol Explorer
+                {t('home:heroTitle')}
               </h1>
-              <div className="flex flex-grow"></div>
+              <div className="flex flex-grow">
+                <VmComponent
+                  src={components?.search}
+                  props={{
+                    isHeader: false,
+                    t: t,
+                    network: networkId,
+                  }}
+                />
+              </div>
               <div className="text-white">
                 <VmComponent
                   src={components?.sponsoredText}
@@ -32,7 +43,7 @@ const HomePage = () => {
             <div className="w-full">
               <div className="bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
-                  Latest Blocks
+                  {t('home:latestBlocks')}
                 </h2>
                 <VmComponent src={components?.latestBlocks} />
               </div>
@@ -40,7 +51,7 @@ const HomePage = () => {
             <div className="w-full">
               <div className="bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
-                  Latest Transactions
+                  {t('home:latestTxns')}
                 </h2>
                 <VmComponent src={components?.latestTransactions} />
               </div>

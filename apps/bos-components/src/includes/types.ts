@@ -264,3 +264,22 @@ export type EpochStartBlock = {
   timestamp: number;
   totalSupply: string;
 };
+export type SearchResult = {
+  accounts?: Array<{ account_id: string }>;
+  txns?: Array<{ transaction_hash: string }>;
+  receipts?: Array<{
+    receipt_id: string;
+    originated_from_transaction_hash: string;
+  }>;
+  blocks?: Array<{ block_hash: string; block_height: number }>;
+};
+export type SearchRoute = {
+  type?: string;
+  path?: string;
+};
+export type Debounce<TArgs extends any[]> = {
+  (args: TArgs): void;
+  cancel(): void;
+  isPending(): boolean;
+  flush(args: TArgs): void;
+};

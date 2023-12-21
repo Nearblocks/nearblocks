@@ -1,7 +1,8 @@
 const path = require('path');
+const nextTranslate = require('next-translate-plugin');
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = nextTranslate({
   reactStrictMode: true,
   poweredByHeader: false,
   optimizeFonts: false,
@@ -14,6 +15,6 @@ const nextConfig = {
 
     return config;
   },
-};
+});
 
 module.exports = nextConfig;
