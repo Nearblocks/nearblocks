@@ -1,6 +1,5 @@
 import { localFormat } from '@/includes/formats';
 import { yoctoToNear } from '@/includes/libs';
-import { TransactionStatusInfo } from '@/includes/types';
 
 export function encodeArgs(args: object) {
   if (!args || typeof args === 'undefined') return '';
