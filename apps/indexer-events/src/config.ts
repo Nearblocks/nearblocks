@@ -1,4 +1,4 @@
-import { cleanEnv, str, url } from 'envalid';
+import { cleanEnv, num, str, url } from 'envalid';
 import { types } from 'near-lake-framework';
 
 import { Network } from 'nb-types';
@@ -10,6 +10,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  EVENTS_START_BLOCK: num({ default: 0 }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -51,7 +52,7 @@ const config: Config = {
   s3Endpoint,
   s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: 30_181_500,
+  startBlockHeight: env.EVENTS_START_BLOCK,
 };
 
 export default config;
