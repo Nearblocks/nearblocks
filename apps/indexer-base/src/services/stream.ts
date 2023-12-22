@@ -18,7 +18,7 @@ const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
   s3BucketName: config.s3BucketName,
   s3RegionName: config.s3RegionName,
-  startBlockHeight: config.genesisHeight,
+  startBlockHeight: config.startBlockHeight,
 };
 
 if (config.s3Endpoint) {
@@ -29,14 +29,12 @@ if (config.s3Endpoint) {
 export const syncData = async () => {
   const block = await knex('blocks').orderBy('block_height', 'desc').first();
 
-  if (block) {
+  if (!lakeConfig.startBlockHeight && block) {
     const next = +block.block_height - config.delta;
 
-    if (next > lakeConfig.startBlockHeight) {
-      logger.info(`last synced block: ${block.block_height}`);
-      logger.info(`syncing from block: ${next}`);
-      lakeConfig.startBlockHeight = next;
-    }
+    logger.info(`last synced block: ${block.block_height}`);
+    logger.info(`syncing from block: ${next}`);
+    lakeConfig.startBlockHeight = next;
   }
 
   for await (const message of stream(lakeConfig)) {
@@ -48,6 +46,7 @@ export const onMessage = async (message: types.StreamerMessage) => {
   try {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
+
     await prepareCache(message);
     await storeBlock(knex, message.block);
     await storeChunks(knex, message);

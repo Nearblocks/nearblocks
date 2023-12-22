@@ -20,6 +20,7 @@ export interface Config {
   s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;
   sentryDsn?: string;
+  startBlockHeight: number;
 }
 
 export type ActionReceipt = {
