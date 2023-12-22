@@ -1,6 +1,6 @@
 name: nearblocks
 services:
-  mainnet:
+  app:
     build:
       context: .
       dockerfile: ./apps/app/Dockerfile

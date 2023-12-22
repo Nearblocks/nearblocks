@@ -9,6 +9,7 @@ COPY . .
 RUN turbo prune app --docker
 
 FROM base AS installer
+RUN apt update && apt install -y git
 WORKDIR /app
 ARG NEXT_PUBLIC_NETWORK_ID
 ARG NEXT_PUBLIC_BOS_NETWORK
@@ -16,7 +17,7 @@ ARG NEXT_PUBLIC_ACCOUNT_ID
 ENV NEXT_TELEMETRY_DISABLED 1
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
-RUN yarn install
+RUN yarn --immutable
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 RUN yarn turbo run build --filter=app...
