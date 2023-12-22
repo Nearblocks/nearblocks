@@ -9455,7 +9455,7 @@ near-social-vm-types@^1.0.0:
     styled-components "^5.3.6"
     tweetnacl "^1.0.3"
 
-"nearblock-translate@https://github.com/Nearblocks/translations#117b31e8091b1c8e4de9c2075676fa792cf6031c":
+"nearblock-translations@https://github.com/Nearblocks/translations#117b31e8091b1c8e4de9c2075676fa792cf6031c":
   version "0.1.2"
   resolved "https://github.com/Nearblocks/translations#117b31e8091b1c8e4de9c2075676fa792cf6031c"
 
@@ -9464,14 +9464,14 @@ negotiator@0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
-next-translate-plugin@^2.6.2:
+next-translate-plugin@~2.6:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/next-translate-plugin/-/next-translate-plugin-2.6.2.tgz#b08044699ff1a66fc028b818ba300b6308d2d057"
   integrity sha512-qfvYG//QfP7b+A/xXGP9K+bdswkAFCabguemuEqjxu+j8pRNoF+jWKmepRXRaAcn1PqFLBj6PBvYkqD1r5k5Zw==
   dependencies:
     typescript "4.5.2"
 
-next-translate@^2.6.2:
+next-translate@2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/next-translate/-/next-translate-2.6.2.tgz#f9a1bc7dd3d635a36828f5a7a4d5bb8defb77d61"
   integrity sha512-Dcfo2Vyw+Ds06+8BJM0RcV/lfN7R59kTY/NP+XJgSpcrFKZV6QJuKfS+K4+OHkKBdQnF3ZOT3wk1np9eZx/PEA==
