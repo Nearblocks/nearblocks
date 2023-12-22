@@ -286,11 +286,13 @@ export type SearchRoute = {
   type?: string;
   path?: string;
 };
+
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
   cancel(): void;
   isPending(): boolean;
   flush(args: TArgs): void;
+};
 
 export type FunctionCallInfo = {
   args: string;
@@ -386,4 +388,41 @@ export type TransactionStatusInfo = {
   status: InfoStatus;
   transaction: TransInfo;
   transaction_outcome: OutcomeInfo;
+};
+
+export type TransactionLog = {
+  contract: string | undefined;
+  logs: string;
+};
+
+export type ActionType = {
+  [key: string]: any;
+};
+
+export type Obj = {
+  [key: string]: string | Obj;
+};
+
+export type AccountContractInfo = {
+  amount: string;
+  block_hash: string;
+  block_height: number;
+  code_hash: string;
+  locked: string;
+  storage_paid_at: number;
+  storage_usage: number;
+  account_id: string;
+  created: {
+    transaction_hash: string;
+    block_timestamp: string;
+  };
+  deleted: {
+    transaction_hash: string;
+    block_timestamp: string;
+  };
+};
+
+export type EventPropsInfo = {
+  event: TransactionLog;
+  network: string;
 };
