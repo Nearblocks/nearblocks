@@ -4,17 +4,33 @@
  * License: Business Source License 1.1
  * Description: Table of Transactions on Near Protocol.
  * @interface Props
- * @param {boolean} [fetchStyles] - Use Nearblock styles.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {number} [currentPage] - The current page number being displayed. (Optional)
+ *                                 Example: If provided, currentPage=3 will display the third page of blocks.
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
+ * @param {function} [setPage] - A function used to set the current page. (Optional)
+ *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {function} [handleFilter] - Function to handle filter changes. (Optional)
+ *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
+ * @param {function} onFilterClear - Function to clear a specific or all filters. (Optional)
+ *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
-  fetchStyles?: boolean;
+  network: string;
+  currentPage: number;
+  filters: { [key: string]: string };
+  setPage: (page: number) => void;
+  handleFilter: (name: string, value: string) => void;
+  onFilterClear: (name: string) => void;
 }
 
 import {
   localFormat,
   getTimeAgoString,
   formatTimestampToString,
+  capitalizeFirstLetter,
 } from '@/includes/formats';
 import { txnMethod } from '@/includes/near';
 import {
@@ -29,41 +45,17 @@ import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
 import SortIcon from '@/includes/icons/SortIcon';
 import Skelton from '@/includes/Common/Skelton';
+import CloseCircle from '@/includes/icons/CloseCircle';
 
 export default function (props: Props) {
-  const [css, setCss] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(1);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
   const [showAge, setShowAge] = useState(true);
-  const [filters, setFilters] = useState<{ [key: string]: string }>(
-    {} as { [key: string]: string },
-  );
+
   const [sorting, setSorting] = useState('desc');
 
-  const config = getConfig(context.networkId);
-
-  /**
-   * Fetches styles asynchronously from a nearblocks gateway.
-   */
-  function fetchStyles() {
-    asyncFetch('https://beta.nearblocks.io/common.css').then(
-      (res: { body: string }) => {
-        if (res?.body) {
-          setCss(res.body);
-        }
-      },
-    );
-  }
-
-  useEffect(() => {
-    if (props?.fetchStyles) fetchStyles();
-  }, [props?.fetchStyles]);
-
-  const Theme = styled.div`
-    ${css}
-  `;
+  const config = getConfig(props.network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -84,6 +76,7 @@ export default function (props: Props) {
             };
           }) => {
             const resp = data?.body?.txns?.[0];
+            setTotalCount(0);
             setTotalCount(resp?.count);
           },
         )
@@ -93,10 +86,11 @@ export default function (props: Props) {
         });
     }
 
-    function fetchTxns(qs?: string, sqs?: string) {
+    function fetchTxnsData(qs?: string, sqs?: string) {
+      setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${props.currentPage}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -104,38 +98,41 @@ export default function (props: Props) {
           },
         },
       )
-        .then(
-          (data: {
-            body: {
-              txns: TransactionInfo[];
-            };
-          }) => {
-            const resp = data?.body?.txns;
+        .then((data: { body: { txns: TransactionInfo[] } }) => {
+          const resp = data?.body?.txns;
+          if (Array.isArray(resp) && resp.length > 0) {
             setTxns(resp);
-          },
-        )
+          }
+        })
         .catch(() => {});
+      setIsLoading(false);
+    }
+    let urlString = '';
+    if (props?.filters && Object.keys(props.filters).length > 0) {
+      urlString = Object.keys(props.filters)
+        .map(
+          (key) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(
+              props?.filters[key],
+            )}`,
+        )
+        .join('&');
     }
 
-    fetchTotalTxns();
-    fetchTxns();
-
-    const QueryString = Object.keys(filters)
-      .map(
-        (key) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`,
-      )
-      .join('&');
-
-    if (QueryString || sorting) {
-      fetchTotalTxns(QueryString);
-      fetchTxns(QueryString, sorting);
+    if (urlString && sorting) {
+      fetchTotalTxns(urlString);
+      fetchTxnsData(urlString, sorting);
+    } else if (urlString) {
+      fetchTotalTxns(urlString);
+      fetchTxnsData(urlString);
+    } else if (
+      sorting &&
+      (!props.filters || Object.keys(props.filters).length === 0)
+    ) {
+      fetchTotalTxns();
+      fetchTxnsData('', sorting);
     }
-  }, [config?.backendUrl, currentPage, filters, sorting]);
-
-  const setPage = (page: number) => {
-    setCurrentPage(page);
-  };
+  }, [config?.backendUrl, props.currentPage, props?.filters, sorting]);
 
   let filterValue: string;
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -149,16 +146,12 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    setFilters((prev) => ({ ...prev, [name]: filterValue }));
+    props.handleFilter(name, filterValue);
   };
 
   const onClear = (name: string) => {
-    const updatedFilters = { ...filters };
-
-    if (updatedFilters.hasOwnProperty(name)) {
-      delete updatedFilters[name];
-
-      setFilters(updatedFilters);
+    if (props.onFilterClear && props.filters) {
+      props.onFilterClear(name);
     }
   };
 
@@ -189,7 +182,10 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                  <a href={`/txns/${row.transaction_hash}`}>
+                  <a
+                    href={`/txns/${row.transaction_hash}`}
+                    className="hover:no-underline"
+                  >
                     <a className="text-green-500 font-medium">
                       {truncateString(row.transaction_hash, 15, '...')}
                     </a>
@@ -227,7 +223,7 @@ export default function (props: Props) {
             <div>
               <input
                 name="type"
-                value={filters.method}
+                value={props?.filters ? props?.filters?.method : ''}
                 onChange={onInputChange}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
@@ -264,7 +260,7 @@ export default function (props: Props) {
               >
                 <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">
-                    {truncateString(txnMethod(row.actions), 18, '...')}
+                    {truncateString(txnMethod(row.actions).trim(), 15, '...')}
                   </span>
                 </span>
               </Tooltip.Trigger>
@@ -325,7 +321,7 @@ export default function (props: Props) {
           >
             <input
               name="from"
-              value={filters.from}
+              value={props?.filters ? props?.filters?.from : ''}
               onChange={onInputChange}
               placeholder={'Search by address e.g. Ⓝ..'}
               className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
@@ -357,7 +353,10 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                  <a href={`/address/${row.signer_account_id}`}>
+                  <a
+                    href={`/address/${row.signer_account_id}`}
+                    className="hover:no-underline"
+                  >
                     <a className="text-green-500">
                       {truncateString(row.signer_account_id, 18, '...')}
                     </a>
@@ -403,7 +402,7 @@ export default function (props: Props) {
           >
             <input
               name="to"
-              value={filters.to}
+              value={props?.filters ? props?.filters?.to : ''}
               onChange={onInputChange}
               placeholder={'Search by address e.g. Ⓝ..'}
               className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
@@ -435,7 +434,10 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                  <a href={`/address/${row.receiver_account_id}`}>
+                  <a
+                    href={`/address/${row.receiver_account_id}`}
+                    className="hover:no-underline"
+                  >
                     <a className="text-green-500">
                       {truncateString(row.receiver_account_id, 17, '...')}
                     </a>
@@ -463,7 +465,10 @@ export default function (props: Props) {
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          <a href={`/blocks/${row.included_in_block_hash}`}>
+          <a
+            href={`/blocks/${row.included_in_block_hash}`}
+            className="hover:no-underline"
+          >
             <a className="text-green-500">
               {localFormat(row.block?.block_height)}
             </a>
@@ -527,52 +532,71 @@ export default function (props: Props) {
   ];
 
   return (
-    <Theme>
-      <div>
-        <div className="bg-hero-pattern h-72">
-          <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
-              Latest Near Protocol transactions
-            </h1>
-          </div>
+    <div>
+      <div className="bg-hero-pattern h-72">
+        <div className="container mx-auto px-3">
+          <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+            Latest Near Protocol transactions
+          </h1>
         </div>
-        <div className="container mx-auto px-3 -mt-48">
-          <div className="block lg:flex lg:space-x-2">
-            <div className="w-full">
-              <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-                {isLoading ? (
-                  <Skelton />
-                ) : (
-                  <div className={`flex flex-col lg:flex-row pt-4`}>
-                    <div className="flex flex-col">
-                      <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
-                        {`More than > ${totalCount} transactions found`}
-                      </p>
-                    </div>
+      </div>
+      <div className="container mx-auto px-3 -mt-48">
+        <div className="block lg:flex lg:space-x-2">
+          <div className="w-full">
+            <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+              {isLoading ? (
+                <Skelton />
+              ) : (
+                <div className={`flex flex-col lg:flex-row pt-4`}>
+                  <div className="flex flex-col">
+                    <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
+                      {`More than > ${totalCount} transactions found`}
+                    </p>
                   </div>
-                )}
-                {
-                  // @ts-ignore
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-                    props={{
-                      columns: columns,
-                      data: txns,
-                      isLoading: isLoading,
-                      isPagination: true,
-                      count: totalCount,
-                      page: currentPage,
-                      limit: 25,
-                      pageLimit: 200,
-                      setPage: setPage,
-                    }}
-                  />
-                }
-              </div>
+                  {props?.filters && Object.keys(props?.filters).length > 0 && (
+                    <div className="flex items-center px-2 text-sm mb-4 text-gray-500 lg:ml-auto">
+                      Filtered By:
+                      <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
+                        {props?.filters &&
+                          Object.keys(props?.filters).map((key) => (
+                            <span className="flex" key={key}>
+                              {capitalizeFirstLetter(key)}:{' '}
+                              <span className="inline-block truncate max-w-[120px]">
+                                <span className="font-semibold">
+                                  {props?.filters[key]}
+                                </span>
+                              </span>
+                            </span>
+                          ))}
+                        <CloseCircle
+                          className="w-4 h-4 fill-current cursor-pointer"
+                          onClick={onClear}
+                        />
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+              {
+                <Widget
+                  src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+                  props={{
+                    columns: columns,
+                    data: txns,
+                    isLoading: isLoading,
+                    isPagination: true,
+                    count: totalCount,
+                    page: props.currentPage,
+                    limit: 25,
+                    pageLimit: 200,
+                    setPage: props.setPage,
+                  }}
+                />
+              }
             </div>
           </div>
         </div>
       </div>
-    </Theme>
+    </div>
   );
 }

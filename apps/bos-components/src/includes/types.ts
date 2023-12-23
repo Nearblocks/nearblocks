@@ -108,6 +108,7 @@ export type BlocksInfo = {
     gas_used: number;
   };
   gas_price: number;
+  prev_block_hash: string;
   receipts_agg: {
     count: number;
   };
@@ -205,6 +206,7 @@ export type TransactionInfo = {
   }[];
   actions_agg: {
     deposit: number;
+    gas_attached: string;
   };
   block: {
     block_height: number;
@@ -216,10 +218,17 @@ export type TransactionInfo = {
   };
   outcomes_agg: {
     transaction_fee: number;
+    gas_used: string;
   };
+  receipt_conversion_gas_burnt: string;
+  receipt_conversion_tokens_burnt: string;
   receiver_account_id: string;
   signer_account_id: string;
   transaction_hash: string;
+  receipts: {
+    fts: [];
+    nfts: [];
+  }[];
 };
 
 export type ChartStat = {
@@ -277,9 +286,143 @@ export type SearchRoute = {
   type?: string;
   path?: string;
 };
+
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
   cancel(): void;
   isPending(): boolean;
   flush(args: TArgs): void;
+};
+
+export type FunctionCallInfo = {
+  args: string;
+  deposit: string;
+  gas: number;
+  method_name: string;
+};
+
+export type GasProfileInfo = {
+  cost: string;
+  cost_category: string;
+  gas_used: string;
+};
+
+export type OutcomeInfo = {
+  block_hash: string;
+  id: string;
+  outcome: {
+    executor_id: string;
+    gas_burnt: number;
+    logs: [];
+    metadata: {
+      gas_profile: GasProfileInfo[];
+      version: number;
+    };
+    receipt_ids: string[];
+    status: {
+      Failure: {
+        ActionError: {
+          index: number;
+          kind: {
+            FunctionCallError: {
+              ExecutionError: string;
+            };
+          };
+        };
+      };
+    };
+    tokens_burnt: string;
+  };
+  proof: {
+    direction: string;
+    hash: string;
+  }[];
+};
+
+export type ReceiptsInfo = {
+  predecessor_id: string;
+  receipt: {
+    Action: {
+      actions: {
+        FunctionCall: FunctionCallInfo;
+      }[];
+      gas_price: string;
+      input_data_ids: [];
+      output_data_receivers: [];
+      signer_id: string;
+      signer_public_key: string;
+    };
+  };
+  receipt_id: string;
+  receiver_id: string;
+};
+
+export type InfoStatus = {
+  Failure: {
+    ActionError: {
+      index: number;
+      kind: {
+        FunctionCallError: {
+          ExecutionError: string;
+        };
+      };
+    };
+  };
+};
+
+export type TransInfo = {
+  actions: {
+    FunctionCall: FunctionCallInfo[];
+  };
+  hash: string;
+  nonce: number;
+  public_key: string;
+  receiver_id: string;
+  signature: string;
+  signer_id: string;
+};
+
+export type TransactionStatusInfo = {
+  receipts: ReceiptsInfo[];
+  receipts_outcome: OutcomeInfo[];
+  status: InfoStatus;
+  transaction: TransInfo;
+  transaction_outcome: OutcomeInfo;
+};
+
+export type TransactionLog = {
+  contract: string | undefined;
+  logs: string;
+};
+
+export type ActionType = {
+  [key: string]: any;
+};
+
+export type Obj = {
+  [key: string]: string | Obj;
+};
+
+export type AccountContractInfo = {
+  amount: string;
+  block_hash: string;
+  block_height: number;
+  code_hash: string;
+  locked: string;
+  storage_paid_at: number;
+  storage_usage: number;
+  account_id: string;
+  created: {
+    transaction_hash: string;
+    block_timestamp: string;
+  };
+  deleted: {
+    transaction_hash: string;
+    block_timestamp: string;
+  };
+};
+
+export type EventPropsInfo = {
+  event: TransactionLog;
+  network: string;
 };

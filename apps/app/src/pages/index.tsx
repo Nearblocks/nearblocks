@@ -35,7 +35,10 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <VmComponent src={components?.transactionOverview} />
+      <VmComponent
+        src={components?.transactionOverview}
+        props={{ network: networkId }}
+      />
       <div className="py-8 relative"></div>
       <section>
         <div className="container mx-auto px-3  z-10">
@@ -45,7 +48,10 @@ const HomePage = () => {
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
                   {t('home:latestBlocks')}
                 </h2>
-                <VmComponent src={components?.latestBlocks} />
+                <VmComponent
+                  src={components?.latestBlocks}
+                  props={{ network: networkId }}
+                />
               </div>
             </div>
             <div className="w-full">
@@ -53,7 +59,10 @@ const HomePage = () => {
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
                   {t('home:latestTxns')}
                 </h2>
-                <VmComponent src={components?.latestTransactions} />
+                <VmComponent
+                  src={components?.latestTransactions}
+                  props={{ network: networkId }}
+                />
               </div>
             </div>
           </div>

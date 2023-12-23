@@ -1,14 +1,16 @@
 /**
- * Component: Transaction Overview
+ * Component: Transactions Overview
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
- * Description: Providing a comprehensive overview of nearblocks transactions.
+ * Description: Transactions Overview.
  * @interface Props
  * @param {boolean} [fetchStyles] - Use Nearblock styles.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {
   fetchStyles?: boolean;
+  network: string;
 }
 
 import Skelton from '@/includes/Common/Skelton';
@@ -36,7 +38,7 @@ export default function (props: Props) {
     {} as ChartConfigType,
   );
 
-  const config = getConfig(context.networkId);
+  const config = getConfig(props.network);
 
   /**
    * Fetches styles asynchronously from a nearblocks gateway.
@@ -56,46 +58,45 @@ export default function (props: Props) {
   `;
 
   useEffect(() => {
+    let delay = 15000;
+    let retries = 0;
+
     function fetchStats() {
       setIsLoading(true);
       asyncFetch(`${config?.backendUrl}stats`)
-        .then(
-          (data: {
-            body: {
-              stats: StatusInfo[];
-            };
-          }) => {
-            const resp = data?.body?.stats?.[0];
-            setStats({
-              avg_block_time: resp.avg_block_time,
-              block: resp.block,
-              change_24: resp.change_24,
-              gas_price: resp.gas_price,
-              high_24h: resp.high_24h,
-              high_all: resp.high_all,
-              low_24h: resp.low_24h,
-              low_all: resp.low_all,
-              market_cap: resp.market_cap,
-              near_btc_price: resp.near_btc_price,
-              near_price: resp.near_price,
-              nodes: resp.nodes,
-              nodes_online: resp.nodes_online,
-              total_supply: resp.total_supply,
-              total_txns: resp.total_txns,
-              volume: resp.volume,
-            });
-          },
-        )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
+        .then((data: { body: { stats: StatusInfo[] } }) => {
+          const resp = data?.body?.stats?.[0];
+          setStats({
+            avg_block_time: resp.avg_block_time,
+            block: resp.block,
+            change_24: resp.change_24,
+            gas_price: resp.gas_price,
+            high_24h: resp.high_24h,
+            high_all: resp.high_all,
+            low_24h: resp.low_24h,
+            low_all: resp.low_all,
+            market_cap: resp.market_cap,
+            near_btc_price: resp.near_btc_price,
+            near_price: resp.near_price,
+            nodes: resp.nodes,
+            nodes_online: resp.nodes_online,
+            total_supply: resp.total_supply,
+            total_txns: resp.total_txns,
+            volume: resp.volume,
+          });
+        })
+        .catch((error: any) => {
+          if (error.response && error.response.status === 429) {
+            delay = Math.min(2 ** retries * 15000, 60000);
+            retries++;
+          }
         });
+      setIsLoading(false);
     }
 
     fetchStats();
-    const interval = setInterval(() => {
-      fetchStats();
-    }, 15000);
+
+    const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
   }, [config?.backendUrl]);
@@ -250,12 +251,12 @@ export default function (props: Props) {
           <div className="bg-white soft-shadow rounded-lg overflow-hidden px-5 md:py lg:px-0">
             <div
               className={`grid grid-flow-col grid-cols-1 ${
-                context.networkId === 'mainnet'
+                props.network === 'mainnet'
                   ? 'grid-rows-3 lg:grid-cols-3'
                   : 'grid-rows-2 lg:grid-cols-2'
               } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3`}
             >
-              {context.networkId === 'mainnet' && (
+              {props.network === 'mainnet' && (
                 <>
                   <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:pb-0 md:px-5">
                     <div className="flex flex-row py-5 lg:pb-5 lg:px-0">

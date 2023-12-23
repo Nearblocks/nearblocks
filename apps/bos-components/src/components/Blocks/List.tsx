@@ -4,7 +4,11 @@
  * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
  * @interface Props
- * @param {boolean} [fetchStyles] - Use Nearblock styles.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {number} [currentPage] - The current page number being displayed. (Optional)
+ *                                 Example: If provided, currentPage=3 will display the third page of blocks.
+ * @param {function} [setPage] - A function used to set the current page. (Optional)
+ *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 
 import Skelton from '@/includes/Common/Skelton';
@@ -19,39 +23,17 @@ import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
-  fetchStyles?: boolean;
+  currentPage: number;
+  setPage: (page: number) => void;
 }
 
 export default function (props: Props) {
-  const [css, setCss] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(1);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
   const [showAge, setShowAge] = useState(true);
 
   const config = getConfig(context.networkId);
-
-  /**
-   * Fetches styles asynchronously from a nearblocks gateway.
-   */
-  function fetchStyles() {
-    asyncFetch('https://beta.nearblocks.io/common.css').then(
-      (res: { body: string }) => {
-        if (res?.body) {
-          setCss(res.body);
-        }
-      },
-    );
-  }
-
-  useEffect(() => {
-    if (props?.fetchStyles) fetchStyles();
-  }, [props?.fetchStyles]);
-
-  const Theme = styled.div`
-    ${css}
-  `;
 
   useEffect(() => {
     function fetchTotalBlocks() {
@@ -79,8 +61,9 @@ export default function (props: Props) {
     }
 
     function fetchBlocks() {
+      setIsLoading(true);
       asyncFetch(
-        `${config?.backendUrl}blocks?page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}blocks?page=${props.currentPage}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -99,18 +82,15 @@ export default function (props: Props) {
           },
         )
         .catch(() => {});
+      setIsLoading(false);
     }
 
     fetchTotalBlocks();
     fetchBlocks();
-  }, [config?.backendUrl, currentPage]);
+  }, [config?.backendUrl, props.currentPage]);
 
   const start = blocks?.[0];
   const end = blocks?.[blocks?.length - 1];
-
-  const setPage = (page: number) => {
-    setCurrentPage(page);
-  };
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -124,8 +104,10 @@ export default function (props: Props) {
       key: 'block_hash',
       cell: (row: BlocksInfo) => (
         <span className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          <a href={`/blocks/${row.block_hash}`}>
-            <a className="text-green-500">{localFormat(row.block_height)}</a>
+          <a href={`/blocks/${row.block_hash}`} className="hover:no-underline">
+            <a className="text-green-500 hover:no-underline">
+              {localFormat(row.block_height)}
+            </a>
           </a>
         </span>
       ),
@@ -207,8 +189,11 @@ export default function (props: Props) {
       key: 'author_account_id',
       cell: (row: BlocksInfo) => (
         <span className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          <a href={`/address/${row.author_account_id}`}>
-            <a className="text-green-500">
+          <a
+            href={`/address/${row.author_account_id}`}
+            className="hover:no-underline"
+          >
+            <a className="text-green-500 hover:no-underline">
               {shortenAddress(row.author_account_id)}
             </a>
           </a>
@@ -263,50 +248,47 @@ export default function (props: Props) {
   ];
 
   return (
-    <Theme>
-      <div>
-        <div className="bg-hero-pattern h-72">
-          <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
-              Latest Near Protocol Blocks
-            </h1>
-          </div>
+    <div>
+      <div className="bg-hero-pattern h-72">
+        <div className="container mx-auto px-3">
+          <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+            Latest Near Protocol Blocks
+          </h1>
         </div>
-        <div className="container mx-auto px-3 -mt-48">
-          <div className="block lg:flex lg:space-x-2">
-            <div className="w-full ">
-              <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-                {isLoading ? (
-                  <Skelton className="leading-7" />
-                ) : (
-                  <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
-                    Block #{localFormat(start?.block_height)} to
-                    {'#' + localFormat(end?.block_height)} (Total of{' '}
-                    {localFormat(totalCount)} blocks)
-                  </p>
-                )}
-                {
-                  // @ts-ignore
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-                    props={{
-                      columns: columns,
-                      data: blocks,
-                      isLoading: isLoading,
-                      isPagination: true,
-                      count: totalCount,
-                      page: currentPage,
-                      limit: 25,
-                      pageLimit: 200,
-                      setPage: setPage,
-                    }}
-                  />
-                }
-              </div>
+      </div>
+      <div className="container mx-auto px-3 -mt-48">
+        <div className="block lg:flex lg:space-x-2">
+          <div className="w-full ">
+            <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+              {isLoading ? (
+                <Skelton className="leading-7" />
+              ) : (
+                <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
+                  Block #{localFormat(start?.block_height)} to
+                  {'#' + localFormat(end?.block_height)} (Total of{' '}
+                  {localFormat(totalCount)} blocks)
+                </p>
+              )}
+              {
+                <Widget
+                  src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+                  props={{
+                    columns: columns,
+                    data: blocks,
+                    isLoading: isLoading,
+                    isPagination: true,
+                    count: totalCount,
+                    page: props.currentPage,
+                    limit: 25,
+                    pageLimit: 200,
+                    setPage: props.setPage,
+                  }}
+                />
+              }
             </div>
           </div>
         </div>
       </div>
-    </Theme>
+    </div>
   );
 }

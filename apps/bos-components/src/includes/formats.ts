@@ -1,4 +1,4 @@
-import { yoctoToNear } from '@/includes/libs';
+import { truncateString, yoctoToNear } from '@/includes/libs';
 
 export function localFormat(number: number) {
   const formattedNumber = Number(number).toLocaleString('en', {
@@ -56,7 +56,7 @@ export function convertToUTC(timestamp: number, hour: boolean) {
   ];
   const monthIndex = Number(utcMonth) - 1;
   // Format the date as required (Jul-25-2022 16:25:37)
-  const formattedDate =
+  let formattedDate =
     monthAbbreviations[monthIndex] +
     '-' +
     utcDay +
@@ -70,22 +70,26 @@ export function convertToUTC(timestamp: number, hour: boolean) {
     utcSeconds;
 
   if (hour) {
-    const currentDate = new Date();
-    const differenceInSeconds = Math.floor(
-      (currentDate.getTime() - date.getTime()) / 1000,
-    );
+    // Convert hours to 12-hour format
+    let hour12 = parseInt(utcHours);
+    const ampm = hour12 >= 12 ? 'PM' : 'AM';
+    hour12 = hour12 % 12 || 12;
 
-    if (differenceInSeconds < 60) {
-      return 'a few seconds ago';
-    } else if (differenceInSeconds < 3600) {
-      const minutes = Math.floor(differenceInSeconds / 60);
-      return minutes + ' minute' + (minutes !== 1 ? 's' : '') + ' ago';
-    } else if (differenceInSeconds < 86400) {
-      const hours = Math.floor(differenceInSeconds / 3600);
-      return hours + ' hour' + (hours !== 1 ? 's' : '') + ' ago';
-    }
-
-    return formattedDate;
+    // Add AM/PM to the formatted date (Jul-25-2022 4:25:37 PM)
+    formattedDate =
+      monthAbbreviations[monthIndex] +
+      '-' +
+      utcDay +
+      '-' +
+      utcYear +
+      ' ' +
+      hour12 +
+      ':' +
+      utcMinutes +
+      ':' +
+      utcSeconds +
+      ' ' +
+      ampm;
   }
 
   return formattedDate;
@@ -105,18 +109,20 @@ export function getTimeAgoString(timestamp: number) {
     minute: seconds / 60,
   };
 
-  if (intervals.year > 1) {
-    return Math.floor(intervals.year) + ' years ago';
+  if (intervals.year == 1) {
+    return Math.ceil(intervals.year) + ' year ago';
+  } else if (intervals.year > 1) {
+    return Math.ceil(intervals.year) + ' years ago';
   } else if (intervals.month > 1) {
-    return Math.floor(intervals.month) + ' months ago';
+    return Math.ceil(intervals.month) + ' months ago';
   } else if (intervals.week > 1) {
-    return Math.floor(intervals.week) + ' weeks ago';
+    return Math.ceil(intervals.week) + ' weeks ago';
   } else if (intervals.day > 1) {
-    return Math.floor(intervals.day) + ' days ago';
+    return Math.ceil(intervals.day) + ' days ago';
   } else if (intervals.hour > 1) {
-    return Math.floor(intervals.hour) + ' hours ago';
+    return Math.ceil(intervals.hour) + ' hours ago';
   } else if (intervals.minute > 1) {
-    return Math.floor(intervals.minute) + ' minutes ago';
+    return Math.ceil(intervals.minute) + ' minutes ago';
   } else {
     return 'a few seconds ago';
   }
@@ -144,7 +150,7 @@ export function convertToMetricPrefix(number: number) {
     count++;
   }
 
-  return number.toFixed(2) + prefixes[count];
+  return number.toFixed(2) + ' ' + prefixes[count];
 }
 
 export function gasFee(gas: number, price: number) {
@@ -236,4 +242,23 @@ export function formatCustomDate(inputDate: string) {
 
 export function shortenHex(address: string) {
   return `${address && address.substr(0, 6)}...${address.substr(-4)}`;
+}
+
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function shortenToken(token: string) {
+  return truncateString(token, 14, '');
+}
+
+export function shortenTokenSymbol(token: string) {
+  return truncateString(token, 5, '');
+}
+
+export function gasPercentage(gasUsed: string, gasAttached: string) {
+  if (!gasAttached) return 'N/A';
+
+  const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed();
+  return `${formattedNumber}%`;
 }
