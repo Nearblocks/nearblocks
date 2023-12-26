@@ -198,9 +198,10 @@ export const ftTransfer = (
   predecessor: string,
 ): FTEventEntry[] => {
   const decodedArgs = decodeArgs<FTTransferArgs>(args);
-  const amount = BigInt(decodedArgs.amount);
 
-  if (decodedArgs.receiver_id && amount) {
+  if (decodedArgs?.receiver_id && +decodedArgs?.amount) {
+    const amount = BigInt(decodedArgs.amount);
+
     return [
       {
         affected: predecessor,
