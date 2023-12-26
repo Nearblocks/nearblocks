@@ -17,6 +17,13 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: '/api/telemetry',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api-beta.nearblocks.io/v1/node/telemetry'
+            : 'https://api-testnet-beta.nearblocks.io/v1/node/telemetry',
+      },
+      {
         source: '/api/:path*',
         destination:
           process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'

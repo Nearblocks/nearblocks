@@ -8,6 +8,7 @@ import exports from '#routes/exports';
 import fts from '#routes/fts';
 import key from '#routes/key';
 import nfts from '#routes/nfts';
+import node from '#routes/node';
 import search from '#routes/search';
 import stats from '#routes/stats';
 import txns from '#routes/txns';
@@ -28,6 +29,7 @@ const routes = () => {
   search(app);
   key(app);
   validators(app);
+  node(app);
 
   return app;
 };
