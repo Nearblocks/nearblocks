@@ -23,7 +23,6 @@ app.set('query parser', (str: string) =>
 );
 
 app.use(sentry.Handlers.requestHandler());
-
 swagger(app, dir);
 app.use(cors());
 app.use(helmet());
