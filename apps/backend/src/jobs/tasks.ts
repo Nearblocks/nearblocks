@@ -4,7 +4,11 @@ import {
   EpochValidatorInfo,
   validatorApi,
 } from 'nb-near';
-import { ValidatorEpochData, ValidatorPoolInfo } from 'nb-types';
+import {
+  ValidatorEpochData,
+  ValidatorPoolInfo,
+  ValidatorTelemetry,
+} from 'nb-types';
 
 import config from '#config';
 import db from '#libs/knex';
@@ -470,6 +474,68 @@ export const validatorsCheck: RegularCheckFn = {
           ),
         ]),
       ]);
+
+      await saveValidatorLists();
+    }
+  },
+};
+
+export const validatorsTelemetryCheck: RegularCheckFn = {
+  fn: async () => {
+    const validators = (await readCache(
+      redis.getPrefixedKeys('validatorsPromise'),
+    )) as EpochValidatorInfo;
+
+    if (validators) {
+      const poolIds = await readCache(redis.getPrefixedKeys('poolIds'));
+
+      const accountIds = [
+        ...validators.current_validators.map(({ account_id }) => account_id),
+        ...validators.next_validators.map(({ account_id }) => account_id),
+        ...validators.current_proposals.map(({ account_id }) => account_id),
+        ...poolIds,
+      ];
+
+      const nodesInfo = await db('node')
+        .select(
+          'ip_address',
+          'account_id',
+          'node_id',
+          'last_seen',
+          'last_height',
+          'status',
+          'agent_name',
+          'agent_version',
+          'agent_build',
+          'latitude',
+          'longitude',
+          'city',
+        )
+        .whereIn('account_id', accountIds)
+        .orderBy('last_seen');
+
+      const nodes = nodesInfo.reduce<
+        Partial<Record<string, ValidatorTelemetry>>
+      >((acc, nodeInfo) => {
+        acc[nodeInfo.account_id] = {
+          agentBuild: nodeInfo.agent_build,
+          agentName: nodeInfo.agent_name,
+          agentVersion: nodeInfo.agent_version,
+          city: nodeInfo.city,
+          ipAddress: nodeInfo.ip_address,
+          lastHeight: parseInt(nodeInfo.last_height, 10),
+          lastSeen: nodeInfo.last_seen.valueOf(),
+          latitude: nodeInfo.latitude,
+          longitude: nodeInfo.longitude,
+          nodeId: nodeInfo.node_id,
+          status: nodeInfo.status,
+        };
+        return acc;
+      }, {});
+
+      await cache('validatorTelemetry', nodes, {
+        EX: DAY,
+      });
 
       await saveValidatorLists();
     }

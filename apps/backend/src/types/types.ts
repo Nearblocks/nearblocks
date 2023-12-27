@@ -161,3 +161,17 @@ export type RegularCheckFn = {
 export interface StakingPoolStakeProposals {
   valueMap: Map<string, number>;
 }
+
+export type ValidatorTelemetry = {
+  agentBuild: string;
+  agentName: string;
+  agentVersion: string;
+  city: null | string;
+  ipAddress: string;
+  lastHeight: number;
+  lastSeen: number;
+  latitude: null | string;
+  longitude: null | string;
+  nodeId: string;
+  status: string;
+};

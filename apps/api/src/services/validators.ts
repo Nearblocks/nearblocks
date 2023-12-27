@@ -2,7 +2,7 @@ import { Response } from 'express';
 
 import catchAsync from '#libs/async';
 import { readCache } from '#libs/redis';
-import { List } from '#libs/schema/blocks.js';
+import { List, Telemetry } from '#libs/schema/validator';
 import { RequestValidator } from '#types/types';
 
 const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
@@ -38,4 +38,12 @@ const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
   });
 });
 
-export default { list };
+const telemetry = catchAsync(
+  async (req: RequestValidator<Telemetry>, res: Response) => {
+    const validator = req.validator.data.validator;
+
+    return res.status(200).json({ validator });
+  },
+);
+
+export default { list, telemetry };

@@ -18,6 +18,14 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get('/', validator(schema.list), validators.list);
+
+  /**
+   * GET /v1/validators/telemetry
+   * @summary Get validators telemetry
+   * @tags Validators
+   * @return 200 - success response
+   */
+  route.get('/telemetry', validator(schema.list), validators.list);
 };
 
 export default routes;
