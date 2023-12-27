@@ -15,6 +15,13 @@ export function dollarFormat(number: number) {
   });
   return formattedNumber;
 }
+export function dollarNonCentFormat(number: number) {
+  const formattedNumber = Number(number).toLocaleString('en', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  return formattedNumber;
+}
 
 export function weight(number: number) {
   const suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -261,4 +268,7 @@ export function gasPercentage(gasUsed: string, gasAttached: string) {
 
   const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed();
   return `${formattedNumber}%`;
+}
+export function serialNumber(index: number, page: number, perPage: number) {
+  return index + 1 + (page - 1) * perPage;
 }

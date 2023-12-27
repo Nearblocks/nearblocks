@@ -286,7 +286,6 @@ export type SearchRoute = {
   type?: string;
   path?: string;
 };
-
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
   cancel(): void;
@@ -425,4 +424,20 @@ export type AccountContractInfo = {
 export type EventPropsInfo = {
   event: TransactionLog;
   network: string;
+};
+export type Sorting = {
+  sort: string;
+  order: 'asc' | 'desc';
+};
+export type Token = {
+  name: string;
+  contract: string;
+  icon: string;
+  symbol: string;
+  price: number | null;
+  change_24: number | null;
+  volume_24h: number | null;
+  market_cap: number | null;
+  onchain_market_cap: number | null;
+  holders: number;
 };
