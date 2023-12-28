@@ -10,7 +10,7 @@ type NetworkComponents = {
   transactionOverview: string;
   sponsoredText: string;
   search: string;
-  tokens: string;
+  ftList: string;
 };
 
 const ComponentUrl = {
@@ -23,7 +23,7 @@ const ComponentUrl = {
   transactionOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Overview`,
   sponsoredText: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.SponsoredText`,
   search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
-  tokens: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Tokens.FTList`,
+  ftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Tokens.FTList`,
 };
 
 export const componentsByNetworkId: Record<

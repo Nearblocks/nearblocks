@@ -38,7 +38,7 @@ const TopFTTokens = () => {
             <div className="w-full">
               <div className="bg-white border soft-shadow rounded-lg pb-1">
                 <VmComponent
-                  src={components?.tokens}
+                  src={components?.ftList}
                   props={{
                     t: t,
                     currentPage: currentPage,
