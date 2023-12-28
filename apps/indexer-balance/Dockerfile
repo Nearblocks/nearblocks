@@ -25,4 +25,4 @@ WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
 
-CMD ["dumb-init", "node", "apps/indexer-balance/dist/index.js"]
+CMD ["dumb-init", "node", "--max-old-space-size=8192", "apps/indexer-balance/dist/index.js"]
