@@ -440,7 +440,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
   };
   return (
     <>
-      <div className="flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
+      <div className="flex items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
         {isLoading ? (
           <Skelton className="leading-7" />
         ) : (
@@ -450,9 +450,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
               : `A total of ${totalCount} Token Contracts found`}
           </p>
         )}
-        <div className={`flex w-full h-10 sm:w-80 mr-2`}>
+        <div className="flex w-full h-10 sm:w-80 mr-2">
           <div className="flex-grow">
-            <label id="token-search">
+            <label htmlFor="token-search" className="relative">
               <input
                 name="search"
                 autoComplete="off"
@@ -460,10 +460,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                 className="search ml-2 pl-8 token-search bg-white w-full h-full text-sm py-2 outline-none border rounded-lg"
                 onChange={onChange}
               />
+              <span className="bg-token-search absolute left-[18px] top-0 bottom-0 w-[14px] bg-no-repeat bg-center bg-contain "></span>
             </label>
             {searchResults?.length > 0 && (
               <div className="z-50 relative">
-                <div className="text-xs rounded-b-md  -mt-1 bg-white py-2 shadow">
+                <div className="text-xs rounded-b-md -mt-1 bg-white py-2 shadow">
                   {searchResults.map((token) => (
                     <div
                       key={token.contract}
@@ -495,23 +496,20 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           </div>
         </div>
       </div>
-      {
-        // @ts-ignore
-        <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
-          props={{
-            columns: columns,
-            data: tokens,
-            isLoading: isLoading,
-            isPagination: true,
-            count: totalCount,
-            page: currentPage,
-            limit: 25,
-            pageLimit: 200,
-            setPage: setPage,
-          }}
-        />
-      }
+      <Widget
+        src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+        props={{
+          columns: columns,
+          data: tokens,
+          isLoading: isLoading,
+          isPagination: true,
+          count: totalCount,
+          page: currentPage,
+          limit: 25,
+          pageLimit: 200,
+          setPage: setPage,
+        }}
+      />
     </>
   );
 }
