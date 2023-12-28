@@ -40,6 +40,10 @@ export default function () {
   const [latestBlockSub, setLatestBlockSub] = useState<LatestBlock>(
     {} as LatestBlock,
   );
+  const [validatorTelemetry, setValidatorTelemetry] = useState<any>([]);
+
+  const [expanded, setExpanded] = useState<number[]>([]);
+
   const config = getConfig(context.networkId);
 
   const validatorInfo = useCache(
@@ -55,6 +59,7 @@ export default function () {
         setEpochStartBlock(data?.epochStartBlock);
         setLatestBlockSub(data?.latestBlock);
         setValidatorData(mappedValidators);
+        setValidatorTelemetry(data?.validatorTelemetry);
         return data;
       }),
     `${context.networkId}:validatorInfo`,
@@ -63,6 +68,7 @@ export default function () {
   if (validatorInfo) {
     setIsLoading(false);
   }
+  console.log(validatorInfo);
 
   const sortByBNComparison = (aValue?: string, bValue?: string) => {
     const a = aValue ? new Big(aValue) : null;
@@ -176,7 +182,32 @@ export default function () {
     return (Date.now() - epochTimestamp) / 1000;
   }, [epochStartBlock]);
 
+  const handleRowClick = (rowIndex: number) => {
+    const isRowExpanded = expanded.includes(rowIndex);
+
+    if (isRowExpanded) {
+      setExpanded((prevExpanded) =>
+        prevExpanded.filter((index) => index !== rowIndex),
+      );
+    } else {
+      setExpanded((prevExpanded) => [...prevExpanded, rowIndex]);
+    }
+  };
+
   const columns = [
+    {
+      header: 'Action',
+      key: 'View',
+      cell: (row: ValidatorEpochData) => {
+        return (
+          <div className="flex">
+            <a href="#" onClick={() => handleRowClick(row.index || 0)}>
+              Click
+            </a>
+          </div>
+        );
+      },
+    },
     { header: 'VALIDATOR', key: 'accountId' },
     {
       header: 'FEE',
@@ -293,6 +324,35 @@ export default function () {
       },
     },
   ];
+
+  const ExpandedRow = (row: ValidatorFullData) => {
+    const telemetry = validatorTelemetry?.[row.accountId];
+    return (
+      <tr className="h-[57px] hover:bg-blue-900/5">
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentBuild}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentName}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentVersion}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentVersion}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentVersion}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentVersion}
+        </td>
+        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+          {telemetry?.agentVersion}
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div>
@@ -437,6 +497,8 @@ export default function () {
                       isPagination: false,
                       count: validatorFullData.length,
                       isLoading: isLoading,
+                      renderRowSubComponent: ExpandedRow,
+                      expanded,
                     }}
                   />
                 </div>

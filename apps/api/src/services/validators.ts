@@ -2,7 +2,7 @@ import { Response } from 'express';
 
 import catchAsync from '#libs/async';
 import { readCache } from '#libs/redis';
-import { List, Telemetry } from '#libs/schema/validator';
+import { List } from '#libs/schema/validator';
 import { RequestValidator } from '#types/types';
 
 const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
@@ -15,6 +15,7 @@ const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
     epochStatsCheck,
     epochStartBlock,
     latestBlock,
+    validatorTelemetry,
   ] = await Promise.all([
     readCache('validatorLists'),
     readCache('currentValidators'),
@@ -24,6 +25,7 @@ const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
     readCache('epochStatsCheck'),
     readCache('epochStartBlock'),
     readCache('latestBlock'),
+    readCache('validatorTelemetry'),
   ]);
 
   return res.status(200).json({
@@ -35,15 +37,8 @@ const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
     latestBlock,
     nextValidators,
     protocolConfig,
+    validatorTelemetry,
   });
 });
 
-const telemetry = catchAsync(
-  async (req: RequestValidator<Telemetry>, res: Response) => {
-    const validator = req.validator.data.validator;
-
-    return res.status(200).json({ validator });
-  },
-);
-
-export default { list, telemetry };
+export default { list };

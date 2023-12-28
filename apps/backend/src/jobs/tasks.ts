@@ -495,8 +495,7 @@ export const validatorsTelemetryCheck: RegularCheckFn = {
         ...validators.current_proposals.map(({ account_id }) => account_id),
         ...poolIds,
       ];
-
-      const nodesInfo = await db('node')
+      const nodesInfo = await db('nodes')
         .select(
           'ip_address',
           'account_id',
@@ -536,8 +535,6 @@ export const validatorsTelemetryCheck: RegularCheckFn = {
       await cache('validatorTelemetry', nodes, {
         EX: DAY,
       });
-
-      await saveValidatorLists();
     }
   },
 };

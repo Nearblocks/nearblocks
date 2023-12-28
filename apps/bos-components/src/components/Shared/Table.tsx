@@ -1,5 +1,6 @@
 import Skelton from '@/includes/Common/Skelton';
 import Paginator from '@/includes/Common/Paginator';
+
 /**
  * @param {boolean} isLoading - Represents the loading state of the data.
  * @param {Array} columns - An array of objects defining the columns for the table.
@@ -27,6 +28,8 @@ interface Props {
   limit: number;
   pageLimit: number;
   setPage: (page: number) => void;
+  renderRowSubComponent: (row: any, rowIndex?: number) => React.ReactNode;
+  expanded: number[];
 }
 
 export default function (props: Props) {
@@ -85,16 +88,23 @@ export default function (props: Props) {
           <tbody className="bg-white divide-y divide-gray-200">
             {props.data &&
               props.data.map((row, rowIndex: number) => (
-                <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
-                  {props.columns.map((column: column, colIndex: number) => (
-                    <td
-                      key={colIndex}
-                      className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
-                    >
-                      {column.cell ? column.cell(row) : row[column.key]}
-                    </td>
-                  ))}
-                </tr>
+                <>
+                  <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
+                    {props.columns.map((column: column, colIndex: number) => (
+                      <td
+                        key={colIndex}
+                        className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
+                      >
+                        {column.cell ? column.cell(row) : row[column.key]}
+                      </td>
+                    ))}
+                  </tr>
+                  {row.isExpanded ||
+                  (props.expanded.length > 0 &&
+                    props.expanded.includes(rowIndex))
+                    ? props.renderRowSubComponent(row)
+                    : null}
+                </>
               ))}
           </tbody>
         </table>
