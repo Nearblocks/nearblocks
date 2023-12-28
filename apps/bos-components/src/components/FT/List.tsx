@@ -1,5 +1,5 @@
 /**
- * Component: TokensFT
+ * Component: FTList
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Top Tokens on Near Protocol.
