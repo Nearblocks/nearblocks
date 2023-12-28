@@ -1,5 +1,5 @@
 /**
- * Component: Top Tokens
+ * Component: TokensFT
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Top Tokens on Near Protocol.
@@ -408,41 +408,36 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
     },
   ];
-  function fetchSearch(value?: string) {
-    if (!value || value.trim() === '') {
-      setSearchResults([]);
-      return;
-    }
-    asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((data: { body: { tokens: Token[] } }) => {
-        const resp = data?.body?.tokens;
-        setSearchResults(resp);
+
+  const debouncedSearch = useMemo(() => {
+    return debounce(500, (value: string) => {
+      if (!value || value.trim() === '') {
+        setSearchResults([]);
+        return;
+      }
+      asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch(() => {});
-  }
-  const debouncedSearch = useMemo(
-    () => debounce(500, (value: string) => fetchSearch(value)),
-    [],
-  );
-  useEffect(() => {
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [debouncedSearch]);
+        .then((data: { body: { tokens: Token[] } }) => {
+          const resp = data?.body?.tokens;
+          setSearchResults(resp);
+        })
+        .catch(() => {});
+    });
+  }, [config?.backendUrl]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     debouncedSearch(value);
   };
   return (
     <>
-      <div className="flex items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
+      <div className="flex flex-row items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
         {isLoading ? (
-          <Skelton className="leading-7" />
+          <Skelton className="max-w-lg pl-3" />
         ) : (
           <p className="pl-3">
             {t
@@ -450,7 +445,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
               : `A total of ${totalCount} Token Contracts found`}
           </p>
         )}
-        <div className="flex w-full h-10 sm:w-80 mr-2">
+        <div className={`flex w-full h-10 sm:w-80 mr-2`}>
           <div className="flex-grow">
             <label htmlFor="token-search" className="relative">
               <input
@@ -464,7 +459,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             </label>
             {searchResults?.length > 0 && (
               <div className="z-50 relative">
-                <div className="text-xs rounded-b-md -mt-1 bg-white py-2 shadow">
+                <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
                   {searchResults.map((token) => (
                     <div
                       key={token.contract}
@@ -477,7 +472,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                               src={token?.icon}
                               alt={token?.name}
                               appUrl={config.appUrl}
-                              className="w-5 h-5 mr-2"
+                              className="w-5 h-5"
                             />
                           </div>
                           <p className="font-semibold text-sm truncate">
