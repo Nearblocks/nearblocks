@@ -1,3 +1,7 @@
+import { logger } from 'nb-logger';
+
+import Sentry from '#libs/sentry';
+
 export const splitArray = <T>(array: T[]): [T[], T[]] => {
   if (!array || !array.length) return [[], []];
 
@@ -10,7 +14,7 @@ export const splitArray = <T>(array: T[]): [T[], T[]] => {
 };
 
 export const SECOND = 1;
-export const MINUTE = 60;
+export const MINUTE = 60 * SECOND;
 export const HOUR = 60 * MINUTE;
 export const DAY = 24 * HOUR;
 
@@ -18,11 +22,13 @@ export const validator = {
   accountIdSuffix: {
     lockup: 'lockup.near',
     stakingPool: {
-      guildnet: undefined,
-      localnet: undefined,
       mainnet: '.poolv1.near',
-      shardnet: undefined,
       testnet: undefined,
     },
   },
+};
+
+export const errorHandler = (error: Error) => {
+  logger.error(error);
+  Sentry.captureException(error);
 };

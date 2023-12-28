@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 
 import catchAsync from '#libs/async';
 import db from '#libs/db';
-import { cache } from '#libs/redis';
+import redis from '#libs/redis';
 
 const EXPIRY = 15; // 15 sec
 
 const latest = catchAsync(async (_req: Request, res: Response) => {
-  const stats = await cache(
+  const stats = await redis.cache(
     'stats:latest',
     async () => {
       try {
@@ -41,7 +41,7 @@ const latest = catchAsync(async (_req: Request, res: Response) => {
         return null;
       }
     },
-    { EX: EXPIRY },
+    EXPIRY,
   );
 
   return res.status(200).json({ stats });

@@ -1,21 +1,27 @@
 import { parentPort } from 'worker_threads';
 
-import * as tasks from '#jobs/tasks';
-import { redisClient } from '#libs/redis';
-import { PublishTopic } from '#types/types';
+import { logger } from 'nb-logger';
+import { sleep } from 'nb-utils';
+
+import { createApiRedis } from '#libs/redis';
+import sentry from '#libs/sentry';
+import { validatorsCheck } from '#services/tasks';
 
 (async () => {
+  const redis = createApiRedis();
+  const redisClient = redis.client();
+
   try {
-    const publish: PublishTopic = (topic) => {
-      void topic;
-    };
     await redisClient.connect();
-    await tasks.validatorsCheck.fn(publish);
-  } catch (error: unknown) {
-    //
+    await validatorsCheck(redis);
+  } catch (error) {
+    sentry.captureException(error);
+    logger.error(error);
+    await sleep(1000);
   }
 
-  await redisClient.disconnect();
+  redisClient.disconnect();
+
   if (parentPort) {
     return parentPort.postMessage('done');
   }

@@ -1,53 +1,39 @@
-import { Redis } from 'ioredis';
+import { Redis, RedisOptions } from 'nb-redis';
 
 import config from '#config';
 import { errorHandler } from '#libs/utils';
 
-type Options = {
-  EX: number;
-};
+let options: RedisOptions = {};
 
-const redis = new Redis(config.redisUrl, {
-  enableOfflineQueue: false,
-  maxRetriesPerRequest: null,
-});
+if (config.redisUrl) {
+  const url = new URL(config.redisUrl);
+  options = {
+    host: url.hostname,
+    port: +url.port,
+  };
+}
 
-export const mainnetRedis = new Redis(config.userRedisUrl, {
-  enableOfflineQueue: false,
-  maxRetriesPerRequest: null,
-});
+if (config.redisSentinel) {
+  const urls = config.redisSentinel.split('|').filter((u) => u);
 
-redis.on('error', errorHandler);
-mainnetRedis.on('error', errorHandler);
+  if (urls.length) {
+    options = {
+      sentinels: urls.map((u) => {
+        const url = new URL(u);
 
-const prefix = `api:${config.network}`;
-
-export const readCache = async (key: string) => {
-  const prefixedKey = `${prefix}:${key}`;
-  const redisData = await redis.get(prefixedKey);
-
-  if (redisData) {
-    return JSON.parse(redisData);
+        return { host: url.hostname, port: +url.port };
+      }),
+    };
   }
-  return null;
-};
+}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const cache = async (key: string, callback: any, options: Options) => {
-  const prefixedKey = `${prefix}:${key}`;
-  const redisData = await redis.get(prefixedKey);
+const redis = new Redis(`api:${config.network}`, options);
+const userRedis = new Redis(`user-api:${config.network}`, options);
 
-  if (redisData) {
-    return JSON.parse(redisData);
-  }
+export const redisClient = redis.client();
+export const userRedisClient = userRedis.client();
 
-  const data = await callback();
-
-  if (data) {
-    await redis.setex(prefixedKey, options.EX, JSON.stringify(data));
-  }
-
-  return data;
-};
+redisClient.on('error', errorHandler);
+userRedisClient.on('error', errorHandler);
 
 export default redis;

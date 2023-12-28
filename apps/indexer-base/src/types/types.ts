@@ -15,6 +15,7 @@ export interface Config {
   insertLimit: number;
   network: Network;
   preloadSize: number;
+  redisSentinel: string;
   redisUrl: string;
   s3BucketName: string;
   s3Endpoint: null | types.EndpointConfig;

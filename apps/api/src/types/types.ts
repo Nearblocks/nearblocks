@@ -21,11 +21,11 @@ export type Config = {
   maxQueryRows: number;
   network: string;
   port: number;
+  redisSentinel: string;
   redisUrl: string;
   rpcUrl: string;
   sentryDsn?: string;
   userDbUrl: string;
-  userRedisUrl: string;
 };
 
 export type StreamTransformWrapper = (

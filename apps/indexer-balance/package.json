@@ -19,8 +19,7 @@
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
     "lodash-es": "4.17.21",
-    "near-lake-framework": "2.0.0",
-    "redis-lock": "1.0.0"
+    "near-lake-framework": "2.0.0"
   },
   "devDependencies": {
     "@types/lodash-es": "~4.17",
@@ -30,7 +29,6 @@
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-near": "*",
-    "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",

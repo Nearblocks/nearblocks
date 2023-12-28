@@ -6,7 +6,6 @@ Balance indexer collects the info about native NEAR token balance changes 📊 (
 
 ```
 DATABASE_URL=
-REDIS_URL=
 RPC_URL=
 NETWORK=mainnet
 AWS_ACCESS_KEY_ID=

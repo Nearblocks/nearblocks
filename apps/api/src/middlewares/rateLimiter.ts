@@ -4,7 +4,7 @@ import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import { mainnetDb } from '#libs/db';
-import { mainnetRedis } from '#libs/redis';
+import { userRedisClient } from '#libs/redis';
 import { getFreePlan, keyBinder } from '#libs/utils';
 import { SubscriptionStatus } from '#types/enums';
 import { Plan, User } from '#types/types';
@@ -84,19 +84,19 @@ const rateLimiterUnion = (plan: Plan) => {
     duration: 60, // 1 min
     keyPrefix: `plan_${plan.id}_minute`,
     points: pointsMinute,
-    storeClient: mainnetRedis,
+    storeClient: userRedisClient,
   });
   const dayRateLimiter = new RateLimiterRedis({
     duration: 60 * 60 * 24, // 1 day
     keyPrefix: `plan_${plan.id}_day`,
     points: pointsDay,
-    storeClient: mainnetRedis,
+    storeClient: userRedisClient,
   });
   const monthRateLimiter = new RateLimiterRedis({
     duration: 60 * 60 * 24 * 30, // 30 days
     keyPrefix: `plan_${plan.id}_month`,
     points: pointsMonth,
-    storeClient: mainnetRedis,
+    storeClient: userRedisClient,
   });
 
   return new RateLimiterUnion(

@@ -10,7 +10,7 @@ import {
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import { redis, redisClient } from '#libs/redis';
+import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
 export const storeReceipts = async (
@@ -158,9 +158,7 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
 
 const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
   const txnHashes: Map<string, string> = new Map();
-  const hashes = await redisClient.mGet(
-    redis.getPrefixedKeys(receiptOrDataIds),
-  );
+  const hashes = await redisClient.mget(redis.prefixedKeys(receiptOrDataIds));
 
   hashes.forEach((hash, i) => {
     if (hash) txnHashes.set(receiptOrDataIds[i], hash);

@@ -1,29 +1,39 @@
-import { Redis } from 'nb-redis';
+import { Redis, RedisOptions } from 'nb-redis';
 
 import config from '#config';
+import { errorHandler } from '#libs/utils';
 
-type Options = {
-  EX: number;
-};
+let options: RedisOptions = {};
 
-export const redis = new Redis(`api:${config.network}`, {
-  url: config.redisUrl,
-});
-export const redisClient = redis.getClient();
+if (config.redisUrl) {
+  const url = new URL(config.redisUrl);
+  options = {
+    host: url.hostname,
+    port: +url.port,
+  };
+}
 
-export const readCache = async (key: string) => {
-  const redisData = await redisClient.get(key);
+if (config.redisSentinel) {
+  const urls = config.redisSentinel.split('|').filter((u) => u);
 
-  if (redisData) {
-    return JSON.parse(redisData);
+  if (urls.length) {
+    options = {
+      sentinels: urls.map((u) => {
+        const url = new URL(u);
+
+        return { host: url.hostname, port: +url.port };
+      }),
+    };
   }
-  return null;
+}
+
+const redis = new Redis(`backend:${config.network}`, options);
+export const redisClient = redis.client();
+
+redisClient.on('error', errorHandler);
+
+export const createApiRedis = () => {
+  return new Redis(`api:${config.network}`, { ...options, lazyConnect: true });
 };
 
-export const cache = async (key: string, data: unknown, option: Options) => {
-  await redisClient.set(
-    redis.getPrefixedKeys(key),
-    JSON.stringify(data),
-    option,
-  );
-};
+export default redis;

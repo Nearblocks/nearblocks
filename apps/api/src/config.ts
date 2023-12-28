@@ -1,4 +1,4 @@
-import { cleanEnv, str } from 'envalid';
+import { cleanEnv, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -12,11 +12,11 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  REDIS_URL: str(),
+  REDIS_SENTINEL: str({ default: '' }),
+  REDIS_URL: url({ default: '' }),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
   USER_DB_URL: str(),
-  USER_REDIS_URL: str(),
 });
 
 const config: Config = {
@@ -28,11 +28,11 @@ const config: Config = {
   maxQueryRows: 5000,
   network: env.NETWORK,
   port: 3001,
+  redisSentinel: env.REDIS_SENTINEL,
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
   userDbUrl: env.USER_DB_URL,
-  userRedisUrl: env.USER_REDIS_URL,
 };
 
 export default config;

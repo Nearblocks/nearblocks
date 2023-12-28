@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
-import { readCache } from '#libs/redis';
+import redis from '#libs/redis';
 import { List } from '#libs/schema/blocks.js';
 import { RequestValidator } from '#types/types';
 
@@ -16,14 +16,14 @@ const list = catchAsync(async (_req: RequestValidator<List>, res: Response) => {
     epochStartBlock,
     latestBlock,
   ] = await Promise.all([
-    readCache('validatorLists'),
-    readCache('currentValidators'),
-    readCache('nextValidators'),
-    readCache('protocolConfig'),
-    readCache('genesisConfig'),
-    readCache('epochStatsCheck'),
-    readCache('epochStartBlock'),
-    readCache('latestBlock'),
+    redis.parse('validatorLists'),
+    redis.parse('currentValidators'),
+    redis.parse('nextValidators'),
+    redis.parse('protocolConfig'),
+    redis.parse('genesisConfig'),
+    redis.parse('epochStatsCheck'),
+    redis.parse('epochStartBlock'),
+    redis.parse('latestBlock'),
   ]);
 
   return res.status(200).json({

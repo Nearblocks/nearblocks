@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import catchAsync from '#libs/async';
 import db from '#libs/db';
-import { cache } from '#libs/redis';
+import redis from '#libs/redis';
 import { Item, Latest, List } from '#libs/schema/blocks';
 import { getPagination, keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
@@ -139,7 +139,7 @@ const latest = catchAsync(
       { limit },
     );
 
-    const blocks = await cache(
+    const blocks = await redis.cache(
       `blocks:latest:${limit}`,
       async () => {
         try {
@@ -150,7 +150,7 @@ const latest = catchAsync(
           return null;
         }
       },
-      { EX: EXPIRY },
+      EXPIRY,
     );
 
     return res.status(200).json({ blocks });
