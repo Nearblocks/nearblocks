@@ -6,10 +6,16 @@
  * @interface Props
  *  @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  *  @param {string}  [network] - The network data to show, either mainnet or testnet.
+ *  @param {number} [currentPage] - The current page number being displayed. (Optional)
+ *                                 Example: If provided, currentPage=3 will display the third page of blocks.
+ *  @param {function} [setPage] - A function used to set the current page. (Optional)
+ *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 interface Props {
   network: string;
   t: (key: string, options?: { count?: number }) => string | undefined;
+  currentPage: number;
+  setPage: (page: number) => void;
 }
 
 import {
@@ -33,10 +39,9 @@ const initialSorting: Sorting = {
 const initialPagination = {
   per_page: 50,
 };
-export default function ({ t, network }: Props) {
+export default function ({ t, network, currentPage, setPage }: Props) {
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<Token[]>([]);
 
@@ -116,9 +121,6 @@ export default function ({ t, network }: Props) {
     }
   }, [config?.backendUrl, currentPage, sorting]);
 
-  const setPage = (page: number) => {
-    setCurrentPage(page);
-  };
   const onOrder = (sortKey: string) => {
     setSorting((state) => ({
       ...state,

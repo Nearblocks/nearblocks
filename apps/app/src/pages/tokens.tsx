@@ -2,8 +2,24 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
+import { useEffect, useState } from 'react';
+import Router, { useRouter } from 'next/router';
 const TopFTTokens = () => {
+  const router = useRouter();
   const components = useBosComponents();
+  const { page } = router.query;
+
+  const initialPage = page ? Number(page) : 1;
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  const setPage = (pageNumber: number) => {
+    Router.push(`/tokens?page=${pageNumber}`);
+    setCurrentPage(pageNumber);
+  };
+
+  useEffect(() => {
+    setCurrentPage(page ? Number(page) : 1);
+  }, [page]);
   const { t } = useTranslation();
 
   return (
@@ -25,6 +41,8 @@ const TopFTTokens = () => {
                   src={components?.tokens}
                   props={{
                     t: t,
+                    currentPage: currentPage,
+                    setPage: setPage,
                     network: networkId,
                   }}
                 />
