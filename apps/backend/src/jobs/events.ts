@@ -1,5 +1,6 @@
 import { parentPort } from 'worker_threads';
 
+import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
 import knex from '#libs/knex';
@@ -13,6 +14,7 @@ import { snapshotFTBalance } from '#services/events';
     });
   } catch (error) {
     sentry.captureException(error);
+    logger.error(error);
     await sleep(1000);
   }
 

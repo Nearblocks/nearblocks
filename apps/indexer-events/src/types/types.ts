@@ -13,7 +13,6 @@ export type Config = {
   insertLimit: number;
   network: Network;
   preloadSize: number;
-  redisUrl: string;
   rpcUrl: string;
   s3BucketName: string;
   s3Endpoint: null | types.EndpointConfig;

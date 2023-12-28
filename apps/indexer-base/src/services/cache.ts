@@ -3,7 +3,7 @@ import { types } from 'near-lake-framework';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { redis, redisClient } from '#libs/redis';
+import redis from '#libs/redis';
 
 export const prepareCache = async (message: types.StreamerMessage) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
@@ -18,9 +18,7 @@ export const prepareCache = async (message: types.StreamerMessage) => {
       const transactionHash = txn.transaction.hash;
       const receiptId = txn.outcome.executionOutcome.outcome.receiptIds[0];
 
-      await redisClient.set(redis.getPrefixedKeys(receiptId), transactionHash, {
-        EX: config.cacheExpiry,
-      });
+      await redis.set(receiptId, transactionHash, config.cacheExpiry);
     }),
     receipts.map(async (receipt) => {
       const receiptOrDataId: string =
@@ -29,7 +27,7 @@ export const prepareCache = async (message: types.StreamerMessage) => {
           : receipt.receiptId;
 
       const parentHash = await retry(async () => {
-        return await redisClient.get(redis.getPrefixedKeys(receiptOrDataId));
+        return await redis.get(receiptOrDataId);
       });
 
       if (parentHash && 'Action' in receipt.receipt) {
@@ -39,30 +37,20 @@ export const prepareCache = async (message: types.StreamerMessage) => {
 
         await Promise.all(
           dataIds.map(async (dataId) => {
-            await redisClient.set(redis.getPrefixedKeys(dataId), parentHash, {
-              EX: config.cacheExpiry,
-            });
+            await redis.set(dataId, parentHash, config.cacheExpiry);
           }),
         );
       }
     }),
     outcomes.map(async (outcome) => {
       const parentHash = await retry(async () => {
-        return await redisClient.get(
-          redis.getPrefixedKeys(outcome.executionOutcome.id),
-        );
+        return await redis.get(outcome.executionOutcome.id);
       });
 
       if (parentHash) {
         await Promise.all(
           outcome.executionOutcome.outcome.receiptIds.map(async (receiptId) => {
-            await redisClient.set(
-              redis.getPrefixedKeys(receiptId),
-              parentHash,
-              {
-                EX: config.cacheExpiry,
-              },
-            );
+            await redis.set(receiptId, parentHash, config.cacheExpiry);
           }),
         );
       }

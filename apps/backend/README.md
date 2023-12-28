@@ -8,6 +8,7 @@ Update environment variables in `*.backend.env`
 
 ```
 DATABASE_URL=
+REDIS_SENTINEL=
 RPC_URL=
 RPC_URL2=
 NETWORK=
@@ -19,6 +20,7 @@ LIVECOINWATCH_API_KEY=
 DATABASE_CA=
 DATABASE_CERT=
 DATABASE_KEY=
+REDIS_URL=
 SENTRY_DSN=
 ```
 

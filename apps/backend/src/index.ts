@@ -6,21 +6,15 @@ import Bree from 'bree';
 import { logger as log } from 'nb-logger';
 
 import knex from '#libs/knex';
-import { redisClient } from '#libs/redis';
+import redis from '#libs/redis';
 import sentry from '#libs/sentry';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'jobs');
 
 const logger: Bree.BreeLogger = {
-  error: () => {
-    //
-  },
-  info: () => {
-    //
-  },
-  warn: () => {
-    //
-  },
+  error: () => {},
+  info: () => {},
+  warn: () => {},
 };
 
 const jobs: Bree.JobOptions[] = [
@@ -54,7 +48,6 @@ const bree = new Bree({ jobs, logger, root });
 (async () => {
   try {
     log.info('Job started');
-    await redisClient.connect();
     await bree.start();
   } catch (error) {
     log.error('aborting...');
@@ -66,10 +59,12 @@ const bree = new Bree({ jobs, logger, root });
 
 const onSignal = async (signal: number | string) => {
   try {
-    await knex.destroy();
-    await redisClient.quit();
-    await bree.stop();
-    await sentry.close(1000);
+    await Promise.all([
+      await knex.destroy(),
+      await redis.quit(),
+      await bree.stop(),
+      await sentry.close(1000),
+    ]);
   } catch (error) {
     log.error(error);
   }

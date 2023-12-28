@@ -4,7 +4,7 @@ import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
 import catchAsync from '#libs/async';
 import db from '#libs/db';
 import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
-import { cache } from '#libs/redis';
+import redis from '#libs/redis';
 import {
   Action,
   Contract,
@@ -50,7 +50,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   );
 
   const [actions, info] = await Promise.all([
-    cache(
+    redis.cache(
       `account:${account}:action`,
       async () => {
         try {
@@ -61,9 +61,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           return null;
         }
       },
-      { EX: EXPIRY * 1 }, // 1 mins
+      EXPIRY * 1, // 1 mins
     ),
-    cache(
+    redis.cache(
       `account:${account}`,
       async () => {
         try {
@@ -72,7 +72,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           return null;
         }
       },
-      { EX: EXPIRY * 1 }, // 1 mins
+      EXPIRY * 1, // 1 mins
     ),
   ]);
 
@@ -86,7 +86,7 @@ const contract = catchAsync(
     const account = req.validator.data.account;
 
     const [contract, key] = await Promise.all([
-      cache(
+      redis.cache(
         `contract:${account}`,
         async () => {
           try {
@@ -95,12 +95,12 @@ const contract = catchAsync(
             return null;
           }
         },
-        { EX: EXPIRY * 5 }, // 5 mins
+        EXPIRY * 5, // 5 mins
       ),
-      cache(
+      redis.cache(
         `contract:${account}:keys`,
         async () => viewAccessKeys(account),
-        { EX: EXPIRY * 5 }, // 5 mins
+        EXPIRY * 5, // 5 mins
       ),
     ]);
 
@@ -279,7 +279,7 @@ const inventory = catchAsync(
       { account },
     );
 
-    const inventory = await cache(
+    const inventory = await redis.cache(
       `account:${account}:inventory`,
       async () => {
         const [{ rows: fts }, { rows: nfts }] = await Promise.all([
@@ -289,7 +289,7 @@ const inventory = catchAsync(
 
         return { fts, nfts };
       },
-      { EX: EXPIRY * 15 }, // 15 mins
+      EXPIRY * 15, // 15 mins
     );
 
     return res.status(200).json({ inventory });
@@ -346,7 +346,7 @@ const tokens = catchAsync(
       { account },
     );
 
-    const tokens = await cache(
+    const tokens = await redis.cache(
       `account:${account}:tokens`,
       async () => {
         const [{ rows: fts }, { rows: nfts }] = await Promise.all([
@@ -362,7 +362,7 @@ const tokens = catchAsync(
 
         return { fts: ftList, nfts: nftList };
       },
-      { EX: EXPIRY * 1 }, // 1 mins
+      EXPIRY * 1, // 1 mins
     );
 
     return res.status(200).json({ tokens });

@@ -22,6 +22,7 @@ export interface Config {
   genesisHeight: number;
   lcwApiKey: string;
   network: Network;
+  redisSentinel: string;
   redisUrl: string;
   rpcUrl: string;
   rpcUrl2: string;
@@ -147,15 +148,6 @@ export type CronTaskMap = {
     nextOutput: CronTaskTypes[S],
     prevOutput?: CronTaskTypes[S],
   ) => void;
-};
-
-export type PublishTopic = <S extends keyof CronTaskMap>(
-  event: S,
-  arg: CronTaskTypes[S],
-) => void;
-
-export type RegularCheckFn = {
-  fn: (publish: PublishTopic) => Promise<void>;
 };
 
 export interface StakingPoolStakeProposals {

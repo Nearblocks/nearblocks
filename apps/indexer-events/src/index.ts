@@ -2,14 +2,12 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import knex from '#libs/knex';
-import { redisClient } from '#libs/redis';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing events indexer...');
-    await redisClient.connect();
     logger.info('syncing events data...');
     await syncData();
   } catch (error) {
@@ -22,9 +20,7 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await knex.destroy();
-    await redisClient.quit();
-    await sentry.close(1_000);
+    await Promise.all([knex.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

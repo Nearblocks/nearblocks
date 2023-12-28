@@ -14,7 +14,6 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  REDIS_URL: str(),
   RPC_URL: str(),
   S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
@@ -46,7 +45,6 @@ const config: Config = {
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,
   preloadSize: 100, // blocks to preload in nearlake
-  redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   s3BucketName,
   s3Endpoint,

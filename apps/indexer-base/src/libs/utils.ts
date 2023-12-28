@@ -4,6 +4,7 @@ import { base58 } from '@scure/base';
 import { snakeCase, toUpper } from 'lodash-es';
 import { types } from 'near-lake-framework';
 
+import { logger } from 'nb-logger';
 import {
   AccessKeyPermissionKind,
   ActionKind,
@@ -21,6 +22,7 @@ import {
   isStakeAction,
   isTransferAction,
 } from '#libs/guards';
+import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction } from '#types/types';
 
 const require = createRequire(import.meta.url);
@@ -176,4 +178,9 @@ export const isExecutionSuccess = (status: types.ExecutionStatus) => {
   }
 
   return false;
+};
+
+export const errorHandler = (error: Error) => {
+  logger.error(error);
+  sentry.captureException(error);
 };

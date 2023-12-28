@@ -8,7 +8,6 @@ You can find the code for legacy token implementations in the `src/services/cont
 
 ```
 DATABASE_URL=
-REDIS_URL=
 RPC_URL=
 NETWORK=mainnet
 AWS_ACCESS_KEY_ID=
