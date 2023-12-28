@@ -15,6 +15,8 @@ interface column {
   header: string;
   key: string;
   cell?: (row: any, rowIndex?: number) => React.ReactNode;
+  tdClassName: string;
+  thClassName?: string;
 }
 
 interface Props {
@@ -34,14 +36,10 @@ export default function (props: Props) {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 h-[51px]">
             <tr>
               {props.columns.map((column, index) => (
-                <th
-                  key={index}
-                  scope="col"
-                  className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
+                <th key={index} scope="col" className={column.thClassName}>
                   {column.header}
                 </th>
               ))}
@@ -49,12 +47,9 @@ export default function (props: Props) {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {[...Array(10)].map((_, index) => (
-              <tr key={index}>
+              <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
                 {props.columns.map((_, colIndex) => (
-                  <td
-                    key={colIndex}
-                    className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
-                  >
+                  <td key={colIndex} className={_.tdClassName}>
                     <Skelton />
                   </td>
                 ))}
@@ -69,14 +64,10 @@ export default function (props: Props) {
     <>
       <div className="overflow-x-auto ">
         <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 h-[51px]">
             <tr>
               {props?.columns.map((column: column, index: number) => (
-                <th
-                  key={index}
-                  scope="col"
-                  className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
+                <th key={index} scope="col" className={column.thClassName}>
                   {column.header}
                 </th>
               ))}
@@ -85,13 +76,12 @@ export default function (props: Props) {
           <tbody className="bg-white divide-y divide-gray-200">
             {props.data &&
               props.data.map((row, rowIndex: number) => (
-                <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
+                <tr key={rowIndex} className=" hover:bg-blue-900/5 h-[53px]">
                   {props.columns.map((column: column, colIndex: number) => (
-                    <td
-                      key={colIndex}
-                      className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
-                    >
-                      {column.cell ? column.cell(row) : row[column.key]}
+                    <td key={colIndex} className={column.tdClassName}>
+                      {column.cell
+                        ? column.cell(row, rowIndex)
+                        : row[column.key]}
                     </td>
                   ))}
                 </tr>
