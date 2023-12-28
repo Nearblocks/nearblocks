@@ -33,4 +33,4 @@ COPY --chown=node:node --from=installer /app .
 COPY --from=neon-builder /usr/bin/dumb-init /usr/bin/dumb-init
 COPY --from=neon-builder /app/index.node ./node_modules/nb-json/index.node
 
-CMD ["dumb-init", "node", "apps/indexer-base/dist/index.js"]
+CMD ["dumb-init", "node", "--max-old-space-size=8192", "apps/indexer-base/dist/index.js"]
