@@ -1,5 +1,5 @@
 import Skelton from '@/includes/Common/Skelton';
-import { formatWithCommas } from '@/includes/formats';
+import { formatWithCommas, getTimeAgoString } from '@/includes/formats';
 import {
   convertAmountToReadableString,
   convertTimestampToTime,
@@ -15,6 +15,8 @@ import {
   ValidatorEpochData,
   ValidatorFullData,
 } from 'nb-types';
+
+const pageLimit = 10;
 
 export default function () {
   const FRACTION_DIGITS = 2;
@@ -43,6 +45,7 @@ export default function () {
   const [validatorTelemetry, setValidatorTelemetry] = useState<any>([]);
 
   const [expanded, setExpanded] = useState<number[]>([]);
+  const [page, setPage] = useState<number>(1);
 
   const config = getConfig(context.networkId);
 
@@ -50,16 +53,16 @@ export default function () {
     () =>
       asyncFetch(`${config?.backendUrl}validators`).then((res: any) => {
         const data = res.body;
-        setCurrentValidators(data?.currentValidators);
+        setCurrentValidators(data?.currentValidators ?? []);
 
         const mappedValidators = data?.combinedData;
-        setValidatorFullData(mappedValidators);
-        setProtocolConfig(data?.protocolConfig);
-        setSeatPrice(data?.epochStatsCheck);
-        setEpochStartBlock(data?.epochStartBlock);
-        setLatestBlockSub(data?.latestBlock);
-        setValidatorData(mappedValidators);
-        setValidatorTelemetry(data?.validatorTelemetry);
+        setValidatorFullData(mappedValidators ?? []);
+        setProtocolConfig(data?.protocolConfig ?? []);
+        setSeatPrice(data?.epochStatsCheck ?? []);
+        setEpochStartBlock(data?.epochStartBlock ?? []);
+        setLatestBlockSub(data?.latestBlock ?? []);
+        // setValidatorData(mappedValidators ?? []);
+        setValidatorTelemetry(data?.validatorTelemetry ?? []);
         return data;
       }),
     `${context.networkId}:validatorInfo`,
@@ -68,7 +71,12 @@ export default function () {
   if (validatorInfo) {
     setIsLoading(false);
   }
-  console.log(validatorInfo);
+
+  useEffect(() => {
+    setValidatorData(
+      validatorFullData?.slice(page * pageLimit - pageLimit, page * pageLimit),
+    );
+  }, [validatorFullData, page]);
 
   const sortByBNComparison = (aValue?: string, bValue?: string) => {
     const a = aValue ? new Big(aValue) : null;
@@ -199,6 +207,7 @@ export default function () {
       header: 'Action',
       key: 'View',
       cell: (row: ValidatorEpochData) => {
+        console.log({ row });
         return (
           <div className="flex">
             <a href="#" onClick={() => handleRowClick(row.index || 0)}>
@@ -328,29 +337,27 @@ export default function () {
   const ExpandedRow = (row: ValidatorFullData) => {
     const telemetry = validatorTelemetry?.[row.accountId];
     return (
-      <tr className="h-[57px] hover:bg-blue-900/5">
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentBuild}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentName}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentVersion}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentVersion}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentVersion}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentVersion}
-        </td>
-        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-          {telemetry?.agentVersion}
-        </td>
-      </tr>
+      <>
+        <tr>
+          <td colSpan={8}>
+            <div className="grid grid-cols-5 gap-4">
+              <div className="col-span-1 p-4">Uptime</div>
+              <div className="col-span-1 p-4">Latest block</div>
+              <div className="col-span-1 p-4">Latest Telemetry Update</div>
+              <div className="col-span-1 p-4">Node Agent Name</div>
+              <div className="col-span-1 p-4">Node Agent Version / Build</div>
+
+              <div className="col-span-1 p-4">98%</div>
+              <div className="col-span-1 p-4"> {telemetry?.lastHeight}</div>
+              <div className="col-span-1 p-4">
+                {getTimeAgoString(nanoToMilli(telemetry?.lastSeen))}
+              </div>
+              <div className="col-span-1 p-4">{telemetry?.agentName}</div>
+              <div className="col-span-1 p-4">{`${telemetry?.agentVersion}/${telemetry?.agentBuild}`}</div>
+            </div>
+          </td>
+        </tr>
+      </>
     );
   };
 
@@ -494,11 +501,15 @@ export default function () {
                     props={{
                       columns: columns,
                       data: validatorData || [],
-                      isPagination: false,
                       count: validatorFullData.length,
                       isLoading: isLoading,
                       renderRowSubComponent: ExpandedRow,
                       expanded,
+                      isPagination: true,
+                      page: page,
+                      limit: pageLimit,
+                      pageLimit: 999,
+                      setPage: setPage,
                     }}
                   />
                 </div>
