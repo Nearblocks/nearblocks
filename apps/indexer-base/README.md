@@ -6,7 +6,9 @@ Base indexer works with basic information about blocks 🧱, transactions 💸, 
 
 ```
 DATABASE_URL=
-REDIS_SENTINEL=
+REDIS_SENTINEL_NAME=
+REDIS_SENTINEL_URLS=
+REDIS_SENTINEL_PASSWORD=
 NETWORK=mainnet
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=

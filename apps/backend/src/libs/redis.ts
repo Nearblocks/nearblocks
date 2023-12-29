@@ -13,11 +13,14 @@ if (config.redisUrl) {
   };
 }
 
-if (config.redisSentinel) {
-  const urls = config.redisSentinel.split('|').filter((u) => u);
+if (config.redisSentinelName) {
+  const urls = config.redisSentinelUrls.split('|').filter((u) => u);
 
   if (urls.length) {
     options = {
+      name: config.redisSentinelName,
+      password: config.redisSentinelPassword,
+      sentinelPassword: config.redisSentinelPassword,
       sentinels: urls.map((u) => {
         const url = new URL(u);
 
