@@ -6,13 +6,6 @@ on:
       - main
     paths:
       - "apps/bos-components/**"
-  pull_request:
-    branches: 
-      - main
-    types: [closed]
-    paths:
-      - "apps/bos-components/**"
-      
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
