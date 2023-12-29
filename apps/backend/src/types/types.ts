@@ -22,7 +22,9 @@ export interface Config {
   genesisHeight: number;
   lcwApiKey: string;
   network: Network;
-  redisSentinel: string;
+  redisSentinelName: string;
+  redisSentinelPassword: string;
+  redisSentinelUrls: string;
   redisUrl: string;
   rpcUrl: string;
   rpcUrl2: string;
