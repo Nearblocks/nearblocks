@@ -49,6 +49,10 @@ const jobs: Bree.JobOptions[] = [
     hasSeconds: true,
     name: 'validator-telemetry',
   }, // every 5s
+  {
+    cron: '*/10 * * * *', 
+    name: 'staking-pool-metadata',
+  }, // every 5s
 ];
 
 const bree = new Bree({ jobs, logger, root });

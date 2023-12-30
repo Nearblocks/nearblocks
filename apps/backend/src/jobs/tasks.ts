@@ -19,6 +19,7 @@ import {
   CachedTimestampMap,
   ExpGenesisConfig,
   ExpProtocolConfig,
+  PoolMetadataAccountInfo,
   RegularCheckFn,
 } from '#types/types';
 
@@ -373,6 +374,10 @@ const saveValidatorLists = async () => {
       redis.getPrefixedKeys('stakingPoolStakeProposalsFromContract'),
     )) as CachedTimestampMap<string>;
 
+    const stakingPoolMetadataInfo = (await readCache(
+      redis.getPrefixedKeys('stakingPoolMetadataInfo'),
+    ))
+
     let stakingPoolStakeProposals = new Map();
     if (
       stakingPoolStakeProposalsFromContract &&
@@ -392,18 +397,26 @@ const saveValidatorLists = async () => {
       stakingPoolInfosData = new Map(stakingPoolInfos);
     }
 
-    const combined = mappedValidators.map((validator, index: number) => ({
-      ...validator,
-      contractStake: stakingPoolStakeProposals.has(validator.accountId)
-        ? stakingPoolStakeProposals?.get(validator.accountId)
-        : null,
-      index,
-      poolInfo: stakingPoolInfosData.has(validator.accountId)
-        ? stakingPoolInfosData.get(validator.accountId)
-        : null,
-    }));
+
+    const combined = mappedValidators.map((validator, index: number) => {
+      const metaInfo =  stakingPoolMetadataInfo.find((item: { [key: string]: PoolMetadataAccountInfo }) => validator.accountId in item)
+      return {
+        ...validator,
+        contractStake: stakingPoolStakeProposals.has(validator.accountId)
+          ? stakingPoolStakeProposals?.get(validator.accountId)
+          : null,
+        description: metaInfo ? Object.values(metaInfo)[0] : null,
+        index,
+
+        poolInfo: stakingPoolInfosData.has(validator.accountId)
+          ? stakingPoolInfosData.get(validator.accountId)
+          : null,
+
+      }
+    });
 
     await cache('validatorLists', combined, { EX: DAY });
+
   }
 };
 
@@ -538,3 +551,42 @@ export const validatorsTelemetryCheck: RegularCheckFn = {
     }
   },
 };
+
+
+
+export const stakingPoolMetadataInfoCheck: RegularCheckFn = {
+  fn: async () => {
+    const VALIDATOR_DESCRIPTION_QUERY_AMOUNT = 100;
+    let currentIndex = 0;
+
+    const { data } = await RPC.callFunction(
+      'pool-details.near',
+      'get_all_fields',
+      RPC.encodeArgs({
+        from_index: currentIndex,
+        limit: VALIDATOR_DESCRIPTION_QUERY_AMOUNT,
+      }),
+    );
+    const stakingPoolsDescriptions = []
+    if (data.result) {
+      const metadataInfo = JSON.parse(Buffer.from(data.result.result).toString());
+      const entries: [string, PoolMetadataAccountInfo][] = Object.entries(metadataInfo);
+
+      if (entries.length > 0) {
+
+
+        for (const [accountId, poolMetadataInfo] of entries) {
+          const entryObject: { [accountId: string]: PoolMetadataAccountInfo } = {
+            [accountId]: poolMetadataInfo,
+          };
+          stakingPoolsDescriptions.push(entryObject);
+        }
+        currentIndex += VALIDATOR_DESCRIPTION_QUERY_AMOUNT;
+      }
+    }
+    await cache('stakingPoolMetadataInfo', stakingPoolsDescriptions, {
+      EX: DAY,
+    });
+
+  },
+}; 

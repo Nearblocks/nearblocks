@@ -175,3 +175,18 @@ export type ValidatorTelemetry = {
   nodeId: string;
   status: string;
 };
+
+export type PoolMetadataAccountInfo = {
+  city?: string;
+  country?: string;
+  country_code: string;
+  description?: string;
+  discord?: string;
+  email?: string;
+  github?: string;
+  logo?: string;
+  name?: string;
+  telegram?: string;
+  twitter?: string;
+  url?: string;
+};
