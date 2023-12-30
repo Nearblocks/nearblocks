@@ -95,19 +95,32 @@ export const errorHandler = (error: Error) => {
   Sentry.captureException(error);
 };
 
-
-export const sortByBNComparison = (aValue?: string, bValue?: string) => {
-  const a = aValue ? new Big(aValue) : null;
-  const b = bValue ? new Big(bValue) : null;
-
-  if (a && b) {
-    return a.cmp(b);
+export const cmp = (a: Big, b: Big) => {
+  if (a.eq(b)) {
+    return 0;
   }
-  if (a) {
-    return -1;
-  }
-  if (b) {
+  if (a.gt(b)) {
     return 1;
   }
+  return -1;
+};
+
+export const sortByBNComparison = (aValue?: string, bValue?: string) => {
+  if (aValue !== undefined && bValue !== undefined) {
+    // Ensure both values are valid numbers before comparing
+    const aNumeric = Big(aValue ?? 0);
+    const bNumeric = Big(bValue ?? 0);
+
+    return cmp(bNumeric, aNumeric);
+  }
+
+  if (aValue) {
+    return -1;
+  }
+
+  if (bValue) {
+    return 1;
+  }
+
   return 0;
 };

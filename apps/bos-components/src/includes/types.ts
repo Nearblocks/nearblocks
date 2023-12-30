@@ -1,3 +1,5 @@
+import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
+
 export type SatsInfo = {
   near_price: number;
 };
@@ -425,4 +427,18 @@ export type AccountContractInfo = {
 export type EventPropsInfo = {
   event: TransactionLog;
   network: string;
+};
+
+export type ValidatorFullData = {
+  validatorEpochData: ValidatorEpochData[];
+  currentValidators: number;
+  totalStake: number;
+  seatPrice: number;
+  elapsedTime: number;
+  totalSeconds: number;
+  epochProgress: number;
+  validatorTelemetry: {
+    [accountId: string]: ValidatorTelemetry;
+  };
+  total: number;
 };

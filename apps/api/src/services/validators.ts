@@ -1,41 +1,32 @@
 import Big from 'big.js';
 import { Response } from 'express';
 
+import { BlockHeader } from 'nb-near';
+import { LatestBlock, ProtocolConfig, ValidatorFullData } from 'nb-types';
+
 import catchAsync from '#libs/async';
 import { readCache } from '#libs/redis';
 import { List } from '#libs/schema/validator';
-import { sortByBNComparison, nsToMsTime } from '#libs/utils';
+import { nsToMsTime, sortByBNComparison } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type ValidatorSortFn = (
-  a: any,
-  b: any,
-) => number;
+type ValidatorSortFn = (a: ValidatorFullData, b: ValidatorFullData) => number;
 
-const sortedValidators = (combinedData: any) => {
+const validatorsSortFns: ValidatorSortFn[] = [
+  (a, b) => sortByBNComparison(a.currentEpoch?.stake, b.currentEpoch?.stake),
+  (a, b) => sortByBNComparison(a.nextEpoch?.stake, b.nextEpoch?.stake),
+  (a, b) =>
+    sortByBNComparison(a.afterNextEpoch?.stake, b.afterNextEpoch?.stake),
+  (a, b) => sortByBNComparison(a.contractStake, b.contractStake),
+];
 
-
-  const validatorsSortFns: ValidatorSortFn[] = [
-    (a, b) =>
-      sortByBNComparison(a.currentEpoch?.stake, b.currentEpoch?.stake),
-    (a, b) => sortByBNComparison(a.nextEpoch?.stake, b.nextEpoch?.stake),
-    (a, b) =>
-      sortByBNComparison(a.afterNextEpoch?.stake, b.afterNextEpoch?.stake),
-    (a, b) => sortByBNComparison(a.contractStake, b.contractStake),
-  ];
-
-  return validatorsSortFns.reduceRight(
-    (acc, sortFn) => {
-      return acc.sort(sortFn);
-    },
-    [...combinedData],
-  );
-}
-
-
-const epochProgress = (latestBlockSub: any, epochStartBlock: any, protocolConfig: any) => {
+const epochProgress = (
+  latestBlockSub: LatestBlock,
+  epochStartBlock: BlockHeader,
+  protocolConfig: ProtocolConfig,
+) => {
   if (
     !latestBlockSub?.height ||
     !epochStartBlock?.height ||
@@ -49,9 +40,13 @@ const epochProgress = (latestBlockSub: any, epochStartBlock: any, protocolConfig
       protocolConfig.epochLength) *
     100
   );
-}
+};
 
-const timeRemaining = (latestBlockSub: any, epochStartBlock: any, epochProgress: any) => {
+const timeRemaining = (
+  latestBlockSub: LatestBlock,
+  epochStartBlock: BlockHeader,
+  epochProgress: number,
+) => {
   if (
     !latestBlockSub?.timestamp ||
     !epochStartBlock?.timestamp ||
@@ -60,36 +55,85 @@ const timeRemaining = (latestBlockSub: any, epochStartBlock: any, epochProgress:
     return 0;
   }
   const epochTimestamp = Number(nsToMsTime(epochStartBlock?.timestamp || 0));
-  const latestBlockTimestamp = Number(nsToMsTime(latestBlockSub?.timestamp || 0));
+  const latestBlockTimestamp = Number(
+    nsToMsTime(latestBlockSub?.timestamp || 0),
+  );
 
   return (
     ((latestBlockTimestamp - epochTimestamp) / epochProgress) *
     (100 - epochProgress)
   );
-}
+};
 
-const elapsedTime = (epochStartBlock: any) => {
+const elapsedTime = (epochStartBlock: BlockHeader) => {
   if (!epochStartBlock?.timestamp) {
     return 0;
   }
   const epochTimestamp = Number(nsToMsTime(epochStartBlock?.timestamp || 0));
   return (Date.now() - epochTimestamp) / 1000;
-}
+};
 
 const FRACTION_DIGITS = 2;
 const EXTRA_PRECISION_MULTIPLIER = 10000;
+
+const stakePercents = (
+  validator: ValidatorFullData,
+  currentStake: any,
+  totalStake: number,
+  cumulativeStake: any,
+) => {
+  if (!validator.currentEpoch) {
+    return null;
+  }
+
+  const extra = Big(EXTRA_PRECISION_MULTIPLIER);
+  const stake = currentStake ? Big(currentStake) : Big(0);
+  const ownPercent = Big(totalStake).eq(Big(0))
+    ? Big(0)
+    : stake.times(extra).div(Big(totalStake));
+
+  const cumulativeStakePercent = Big(totalStake).eq(Big(0))
+    ? Big(0)
+    : Big(cumulativeStake).times(extra).div(Big(totalStake));
+  console.log({ cumulativeStakePercent });
+
+  const percents = {
+    cumulativePercent: cumulativeStakePercent.div(extra),
+    ownPercent: ownPercent.div(extra),
+  };
+
+  const accumulatedPercent = percents.cumulativePercent
+    .minus(percents.ownPercent)
+    .times(Big(100))
+    .toFixed(FRACTION_DIGITS);
+  const ownPercentage = percents.ownPercent
+    .times(Big(100))
+    .toFixed(FRACTION_DIGITS);
+  const cumulativePercent = percents.cumulativePercent
+    .times(Big(100))
+    .toFixed(FRACTION_DIGITS);
+
+  return {
+    accumulatedPercent,
+    cumulativePercent,
+    ownPercentage,
+  };
+};
+
+const calculateTotalStake = (validators: ValidatorFullData[]) =>
+  validators
+    .map((validator) => validator.currentEpoch?.stake)
+    .filter((stake: any) => typeof stake === 'string' && stake !== '')
+    .reduce((acc, stake: any) => Big(acc).plus(Big(stake)), Big(0));
 
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const page = req.validator.data.page;
   const perPage = req.validator.data.per_page;
 
-
   const [
     combinedData,
     currentValidators,
-    nextValidators,
     protocolConfig,
-    genesisConfig,
     epochStatsCheck,
     epochStartBlock,
     latestBlock,
@@ -97,71 +141,91 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   ] = await Promise.all([
     readCache('validatorLists'),
     readCache('currentValidators'),
-    readCache('nextValidators'),
     readCache('protocolConfig'),
-    readCache('genesisConfig'),
     readCache('epochStatsCheck'),
     readCache('epochStartBlock'),
     readCache('latestBlock'),
     readCache('validatorTelemetry'),
   ]);
 
-  const validatorPaginatedData = combinedData?.slice(page * perPage - perPage, page * perPage)
+  const validatorPaginatedData = combinedData?.slice(
+    page * perPage - perPage,
+    page * perPage,
+  );
 
-  const totalStake = combinedData.length > 0 &&
-    combinedData
-      .map((validator: any) => validator?.currentEpoch?.stake || 0)
-      .filter((stake: any) => typeof stake === 'string' && stake !== '')
-      .reduce((acc: any, stake: any) => new Big(acc).plus(stake).toString(), '0');
-      
-  const sortedValidatorsData = sortedValidators(combinedData)
+  const totalStake = calculateTotalStake(combinedData);
 
-  const cumulativeAmounts = sortedValidatorsData.reduce(
-    (acc: any, validator: any) => {
-      const lastAmount = new Big(acc[acc.length - 1]);
+  const sortedValidatorsData = validatorsSortFns.reduceRight(
+    (acc, sortFn) => acc.sort(sortFn),
+    [...combinedData],
+  );
+  const cumulativeAmounts = sortedValidatorsData.reduce<Big[]>(
+    (acc: Big[], validator: any) => {
+      const lastAmount = acc[acc.length - 1] ?? Big(0);
       return [
         ...acc,
         validator.currentEpoch
-          ? lastAmount.add(validator?.currentEpoch?.stake).toString()
-          : lastAmount.toString(),
+          ? lastAmount.plus(Big(validator.currentEpoch.stake))
+          : lastAmount,
       ];
     },
-    ['0'],
+    [],
   );
 
+  const epochProgressData = epochProgress(
+    latestBlock,
+    epochStartBlock,
+    protocolConfig,
+  );
+  const timeRemainingData = timeRemaining(
+    latestBlock,
+    epochStartBlock,
+    epochProgressData,
+  );
+  const totalSeconds = timeRemainingData
+    ? Math.floor(+timeRemainingData / 1000)
+    : 0;
+  const elapsedTimeData = elapsedTime(epochStartBlock);
 
-  const epochProgressData = epochProgress(latestBlock, epochStartBlock, protocolConfig)
-  const timeRemainingData: any = timeRemaining(latestBlock, epochStartBlock, epochProgress)
+  const validatorFullData = validatorPaginatedData.map(
+    (validator: any, index: number) => {
+      const currentStake = validator.currentEpoch?.stake;
+      const stake = currentStake ? Big(currentStake) : Big(0);
+      const extra = Big(EXTRA_PRECISION_MULTIPLIER);
 
+      const ownPercent: Big.BigSource = stake
+        .times(extra)
+        .div(Big(+totalStake));
+      const percent = ownPercent
+        .div(extra)
+        .times(Big(100))
+        .toFixed(FRACTION_DIGITS);
+      const pagedIndex = (page - 1) * perPage + index;
 
-  const totalSeconds = (timeRemainingData ? Math.floor(+timeRemainingData / 1000) : 0)
+      const cumilativeStake = stakePercents(
+        validator,
+        currentStake,
+        +totalStake,
+        cumulativeAmounts[pagedIndex],
+      );
 
-  const elapsedTimeData = elapsedTime(epochStartBlock)
-
-  const validatorFullData = validatorPaginatedData.map((validator:any) => {
-    const currentStake = validator.currentEpoch?.stake;
-    const stake = currentStake ? Big(currentStake) : Big(0);
-    const extra =  Big(EXTRA_PRECISION_MULTIPLIER);
-    const ownPercent = stake.times(extra).div(totalStake)
-    const percent = (ownPercent.div(extra) * Big(100));
-    
-    return {
-      ...validator,
-      percent,
-    }
-  })
-
-
+      return {
+        ...validator,
+        cumilativeStake,
+        percent,
+      };
+    },
+  );
 
   return res.status(200).json({
-    combinedData,
-    currentValidators,
-    epochStartBlock,
+    currentValidators: currentValidators.length,
+    elapsedTimeData,
+    epochProgressData,
     epochStatsCheck,
-    genesisConfig,
-    latestBlock,
-    nextValidators,
-    protocolConfig,
+    total: combinedData.length,
+    totalSeconds,
+    totalStake,
+    validatorFullData,
     validatorTelemetry,
   });
 });

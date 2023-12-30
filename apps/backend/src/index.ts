@@ -50,7 +50,7 @@ const jobs: Bree.JobOptions[] = [
     name: 'validator-telemetry',
   }, // every 5s
   {
-    cron: '*/10 * * * *', 
+    cron: '*/10 * * * *',
     name: 'staking-pool-metadata',
   }, // every 5s
 ];
