@@ -36,9 +36,9 @@ export const storeFTEvents = async (
   for (const { data, event } of events) {
     if (isFTMintEventLog(event) && Array.isArray(event.data)) {
       for (const eventItem of event.data) {
-        const deltaAmount = BigInt(eventItem.amount);
+        if (eventItem.owner_id && +eventItem.amount) {
+          const deltaAmount = BigInt(eventItem.amount);
 
-        if (eventItem.owner_id && deltaAmount) {
           eventData.push({
             absolute_amount: null,
             affected_account_id: eventItem.owner_id,
@@ -60,9 +60,9 @@ export const storeFTEvents = async (
 
     if (isFTBurnEventLog(event) && Array.isArray(event.data)) {
       for (const eventItem of event.data) {
-        const deltaAmount = BigInt(eventItem.amount) * -1n;
+        if (eventItem.owner_id && +eventItem.amount) {
+          const deltaAmount = BigInt(eventItem.amount) * -1n;
 
-        if (eventItem.owner_id && deltaAmount) {
           eventData.push({
             absolute_amount: null,
             affected_account_id: eventItem.owner_id,
@@ -84,10 +84,14 @@ export const storeFTEvents = async (
 
     if (isFTTransferEventLog(event) && Array.isArray(event.data)) {
       for (const eventItem of event.data) {
-        const deltaAmount = BigInt(eventItem.amount);
-        const negativeDeltaAmount = deltaAmount * -1n;
+        if (
+          eventItem.old_owner_id &&
+          eventItem.new_owner_id &&
+          +eventItem.amount
+        ) {
+          const deltaAmount = BigInt(eventItem.amount);
+          const negativeDeltaAmount = deltaAmount * -1n;
 
-        if (eventItem.old_owner_id && eventItem.new_owner_id && deltaAmount) {
           eventData.push({
             absolute_amount: null,
             affected_account_id: eventItem.old_owner_id,
