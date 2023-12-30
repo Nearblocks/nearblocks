@@ -12,8 +12,8 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:check": "turbo run lint:check",
-    "format": "prettier --config .prettierrc --write --cache \"**/*.{js,cjs,jsx,ts,tsx,md,json}\"",
-    "format:check": "prettier --config .prettierrc --check --cache \"**/*.{js,cjs,jsx,ts,tsx,md,json}\"",
+    "format": "prettier --config .prettierrc --write --cache .",
+    "format:check": "prettier --config .prettierrc --check --cache .",
     "prepare": "husky install"
   },
   "dependencies": {},
@@ -22,6 +22,8 @@
     "eslint-config-custom-node": "*",
     "husky": "8.0.0",
     "prettier": "3.0.3",
+    "prettier-plugin-embed": "0.3.2",
+    "prettier-plugin-sql": "0.18.0",
     "turbo": "1.11.0"
   },
   "packageManager": "yarn@1.22.19",

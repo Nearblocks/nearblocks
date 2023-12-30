@@ -1,4 +1,4 @@
-version: "3.6"
+version: '3.6'
 services:
   indexer-base:
     container_name: mainnet-indexer-base
@@ -7,7 +7,7 @@ services:
       dockerfile: ./apps/indexer-base/Dockerfile
     restart: always
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env
   indexer-balance:
     container_name: mainnet-indexer-balance
@@ -16,7 +16,7 @@ services:
       dockerfile: ./apps/indexer-balance/Dockerfile
     restart: always
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env
   indexer-events:
     container_name: mainnet-indexer-events
@@ -25,7 +25,7 @@ services:
       dockerfile: ./apps/indexer-events/Dockerfile
     restart: always
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env
 
 volumes:

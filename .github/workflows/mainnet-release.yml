@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "apps/bos-components/**"
+      - 'apps/bos-components/**'
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
 
       - name: Build project
         run: cd apps/bos-components &&  yarn build
-        
+
       - name: Install near-social CLI
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/FroVolod/bos-cli-rs/releases/download/v0.3.5/bos-cli-installer.sh | sh

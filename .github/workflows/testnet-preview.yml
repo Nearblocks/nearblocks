@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "apps/bos-components/**"
+      - 'apps/bos-components/**'
 
 jobs:
   deploy-testnet:
