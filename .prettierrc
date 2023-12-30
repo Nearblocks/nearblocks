@@ -8,5 +8,7 @@
         "parser": "typescript"
       }
     }
-  ]
+  ],
+  "plugins": ["prettier-plugin-sql"],
+  "language": "postgresql"
 }

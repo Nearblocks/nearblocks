@@ -10,7 +10,7 @@ services:
         NEXT_PUBLIC_ACCOUNT_ID: nearblocks.near
     restart: always
     ports:
-      - "127.0.0.1:3004:3000"
+      - '127.0.0.1:3004:3000'
     environment:
       NEXT_PUBLIC_NETWORK_ID: mainnet
       NEXT_PUBLIC_BOS_NETWORK: mainnet

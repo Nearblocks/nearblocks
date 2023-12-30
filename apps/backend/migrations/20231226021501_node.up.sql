@@ -25,8 +25,5 @@ CREATE TABLE nodes (
   min_block_production_delay integer,
   max_block_production_delay integer,
   max_block_wait_delay integer,
-   PRIMARY KEY (
-    node_id
-  )
-);   
-   
+  PRIMARY KEY (node_id)
+);

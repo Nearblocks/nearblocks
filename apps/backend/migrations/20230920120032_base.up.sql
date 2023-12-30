@@ -1,9 +1,6 @@
-CREATE TYPE access_key_permission_kind AS ENUM (
-  'FULL_ACCESS',
-  'FUNCTION_CALL'
-);
+CREATE TYPE access_key_permission_kind AS ENUM('FULL_ACCESS', 'FUNCTION_CALL');
 
-CREATE TYPE action_kind AS ENUM (
+CREATE TYPE action_kind AS ENUM(
   'CREATE_ACCOUNT',
   'DEPLOY_CONTRACT',
   'FUNCTION_CALL',
@@ -15,19 +12,16 @@ CREATE TYPE action_kind AS ENUM (
   'UNKNOWN'
 );
 
-CREATE TYPE execution_outcome_status AS ENUM (
+CREATE TYPE execution_outcome_status AS ENUM(
   'UNKNOWN',
   'FAILURE',
   'SUCCESS_VALUE',
   'SUCCESS_RECEIPT_ID'
 );
 
-CREATE TYPE receipt_kind AS ENUM (
-  'ACTION',
-  'DATA'
-);
+CREATE TYPE receipt_kind AS ENUM('ACTION', 'DATA');
 
-CREATE TYPE state_change_reason_kind AS ENUM (
+CREATE TYPE state_change_reason_kind AS ENUM(
   'TRANSACTION_PROCESSING',
   'ACTION_RECEIPT_PROCESSING_STARTED',
   'ACTION_RECEIPT_GAS_REWARD',
@@ -39,7 +33,7 @@ CREATE TYPE state_change_reason_kind AS ENUM (
   'RESHARDING'
 );
 
-CREATE TYPE app__stripe_status AS ENUM (
+CREATE TYPE app__stripe_status AS ENUM(
   'trialing',
   'active',
   'canceled',
@@ -49,16 +43,9 @@ CREATE TYPE app__stripe_status AS ENUM (
   'unpaid'
 );
 
-CREATE TYPE app__verifications_type AS ENUM (
-  'VERIFY_EMAIL',
-  'RESET_PASSWORD',
-  'UPDATE_EMAIL'
-);
+CREATE TYPE app__verifications_type AS ENUM('VERIFY_EMAIL', 'RESET_PASSWORD', 'UPDATE_EMAIL');
 
-
-
-CREATE FUNCTION count_cost_estimate (query text)
-RETURNS TABLE (rows NUMERIC, cost NUMERIC) AS $$
+CREATE FUNCTION count_cost_estimate (query text) RETURNS TABLE (rows NUMERIC, cost NUMERIC) AS $$
   DECLARE
     rec JSON;
   BEGIN
@@ -69,8 +56,7 @@ RETURNS TABLE (rows NUMERIC, cost NUMERIC) AS $$
   END;
 $$ LANGUAGE PLPGSQL STRICT;
 
-CREATE FUNCTION count_estimate (query TEXT)
-RETURNS NUMERIC AS $$
+CREATE FUNCTION count_estimate (query TEXT) RETURNS NUMERIC AS $$
   DECLARE
     rec RECORD;
     rows NUMERIC;
@@ -83,12 +69,9 @@ RETURNS NUMERIC AS $$
   END;
 $$ LANGUAGE PLPGSQL STRICT;
 
-CREATE FUNCTION epoch_nano_seconds()
-RETURNS BIGINT AS $$
+CREATE FUNCTION epoch_nano_seconds () RETURNS BIGINT AS $$
   SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT * 1000 * 1000 * 1000;
 $$ LANGUAGE SQL STABLE;
-
-
 
 CREATE TABLE access_keys (
   public_key TEXT NOT NULL,
@@ -113,10 +96,7 @@ CREATE TABLE accounts (
   created_by_block_height NUMERIC(20, 0) NOT NULL,
   deleted_by_block_height NUMERIC(20, 0),
   created_by_block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    account_id,
-    created_by_block_timestamp
-  )
+  PRIMARY KEY (account_id, created_by_block_timestamp)
 );
 
 CREATE TABLE action_receipt_actions (
@@ -154,10 +134,7 @@ CREATE TABLE blocks (
   gas_price NUMERIC(45, 0) NOT NULL,
   author_account_id TEXT NOT NULL,
   block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    block_hash,
-    block_timestamp
-  )
+  PRIMARY KEY (block_hash, block_timestamp)
 );
 
 CREATE TABLE chunks (
@@ -168,10 +145,7 @@ CREATE TABLE chunks (
   gas_used NUMERIC(20, 0) NOT NULL,
   author_account_id TEXT NOT NULL,
   included_in_block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    chunk_hash,
-    included_in_block_timestamp
-  )
+  PRIMARY KEY (chunk_hash, included_in_block_timestamp)
 );
 
 CREATE TABLE execution_outcomes (
@@ -184,10 +158,7 @@ CREATE TABLE execution_outcomes (
   executor_account_id TEXT NOT NULL,
   status execution_outcome_status NOT NULL,
   executed_in_block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    receipt_id,
-    executed_in_block_timestamp
-  )
+  PRIMARY KEY (receipt_id, executed_in_block_timestamp)
 );
 
 CREATE TABLE execution_outcome_receipts (
@@ -213,10 +184,7 @@ CREATE TABLE receipts (
   receipt_kind receipt_kind NOT NULL,
   originated_from_transaction_hash TEXT NOT NULL,
   included_in_block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    receipt_id,
-    included_in_block_timestamp
-  )
+  PRIMARY KEY (receipt_id, included_in_block_timestamp)
 );
 
 CREATE TABLE transactions (
@@ -231,10 +199,7 @@ CREATE TABLE transactions (
   receipt_conversion_gas_burnt NUMERIC(20, 0),
   receipt_conversion_tokens_burnt NUMERIC(45, 0),
   block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (
-    transaction_hash,
-    block_timestamp
-  )
+  PRIMARY KEY (transaction_hash, block_timestamp)
 );
 
 CREATE TABLE settings (
@@ -254,7 +219,6 @@ CREATE TABLE api__users (
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP,
   last_login_at TIMESTAMP,
-
   PRIMARY KEY (id),
   UNIQUE (stripe_cid),
   UNIQUE (email),
@@ -269,7 +233,6 @@ CREATE TABLE api__verifications (
   code TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   expires_at TIMESTAMP NOT NULL,
-
   PRIMARY KEY (id),
   UNIQUE (user_id, type),
   UNIQUE (code)
@@ -289,7 +252,6 @@ CREATE TABLE api__plans (
   price_annually INTEGER,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP,
-
   PRIMARY KEY (id),
   UNIQUE (stripe_pid),
   UNIQUE (stripe_mpid),
@@ -305,11 +267,9 @@ CREATE TABLE api__subscriptions (
   end_date DATE NOT NULL,
   status app__stripe_status NOT NULL,
   created_at TIMESTAMP NOT NULL,
-
   PRIMARY KEY (id),
   UNIQUE (stripe_sid)
 );
-
 
 CREATE TABLE api__keys (
   id BIGSERIAL NOT NULL,
@@ -318,12 +278,9 @@ CREATE TABLE api__keys (
   token TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP,
-
   PRIMARY KEY (id),
   UNIQUE (token)
 );
-
-
 
 CREATE INDEX ak_account_id_deleted_by_receipt_created_by_block_timestamp_idx ON access_keys USING btree (account_id, created_by_block_timestamp DESC);
 
@@ -331,28 +288,51 @@ CREATE INDEX ak_account_id_idx ON access_keys USING btree (account_id);
 
 CREATE INDEX ak_public_key_idx ON access_keys USING btree (public_key);
 
-CREATE INDEX ak_account_id_created_by_block_height_block_timestamp_idx ON access_keys USING btree (account_id, created_by_block_height DESC, deleted_by_block_height DESC);
-
+CREATE INDEX ak_account_id_created_by_block_height_block_timestamp_idx ON access_keys USING btree (
+  account_id,
+  created_by_block_height DESC,
+  deleted_by_block_height DESC
+);
 
 CREATE INDEX a_created_by_block_timestamp_idx ON accounts USING btree (created_by_block_timestamp DESC);
 
-CREATE INDEX a_account_id_created_by_block_height_block_timestamp_idx ON accounts USING btree (account_id, created_by_block_height DESC, deleted_by_block_height DESC);
-
+CREATE INDEX a_account_id_created_by_block_height_block_timestamp_idx ON accounts USING btree (
+  account_id,
+  created_by_block_height DESC,
+  deleted_by_block_height DESC
+);
 
 CREATE INDEX ara_action_kind_idx ON action_receipt_actions USING btree (action_kind);
 
 CREATE INDEX ara_args_method_name_idx ON action_receipt_actions USING btree ((args ->> 'method_name'::text))
-WHERE (action_kind = 'FUNCTION_CALL'::action_kind);
+WHERE
+  (action_kind = 'FUNCTION_CALL'::action_kind);
 
-CREATE INDEX ara_args_function_call_receipt_receiver_account_id_idx ON action_receipt_actions USING btree ((args ->> 'method_name'::text), receipt_receiver_account_id)
-WHERE (action_kind = 'FUNCTION_CALL'::action_kind);
+CREATE INDEX ara_args_function_call_receipt_receiver_account_id_idx ON action_receipt_actions USING btree (
+  (args ->> 'method_name'::text),
+  receipt_receiver_account_id
+)
+WHERE
+  (action_kind = 'FUNCTION_CALL'::action_kind);
 
-CREATE INDEX ara_args_method_name_receipt_receiver_account_id_idx ON action_receipt_actions USING btree ((args ->> 'method_name'::text), receipt_receiver_account_id);
+CREATE INDEX ara_args_method_name_receipt_receiver_account_id_idx ON action_receipt_actions USING btree (
+  (args ->> 'method_name'::text),
+  receipt_receiver_account_id
+);
 
-CREATE INDEX ara_args_receiver_id_idx ON action_receipt_actions USING btree ((((args -> 'args_json'::text) ->> 'receiver_id'::text)))
-WHERE ((action_kind = 'FUNCTION_CALL'::action_kind) AND ((args ->> 'args_json'::text) IS NOT NULL));
+CREATE INDEX ara_args_receiver_id_idx ON action_receipt_actions USING btree (
+  (
+    (args -> 'args_json'::text) ->> 'receiver_id'::text
+  )
+)
+WHERE
+  (action_kind = 'FUNCTION_CALL'::action_kind)
+  AND (args ->> 'args_json'::text) IS NOT NULL;
 
-CREATE INDEX ara_receipt_included_in_block_timestamp_action_receipt_idx ON action_receipt_actions USING btree (receipt_included_in_block_timestamp DESC, index_in_action_receipt DESC);
+CREATE INDEX ara_receipt_included_in_block_timestamp_action_receipt_idx ON action_receipt_actions USING btree (
+  receipt_included_in_block_timestamp DESC,
+  index_in_action_receipt DESC
+);
 
 CREATE INDEX ara_receipt_id_idx ON action_receipt_actions USING btree (receipt_id);
 
@@ -362,8 +342,10 @@ CREATE INDEX ara_receipt_predecessor_account_id_idx ON action_receipt_actions US
 
 CREATE INDEX ara_receipt_receiver_account_id_idx ON action_receipt_actions USING btree (receipt_receiver_account_id);
 
-CREATE INDEX ara_receiver_account_id_receipt_included_in_block_timestamp_idx ON action_receipt_actions USING btree (receipt_receiver_account_id, receipt_included_in_block_timestamp DESC);
-
+CREATE INDEX ara_receiver_account_id_receipt_included_in_block_timestamp_idx ON action_receipt_actions USING btree (
+  receipt_receiver_account_id,
+  receipt_included_in_block_timestamp DESC
+);
 
 CREATE INDEX arod_output_data_id_idx ON action_receipt_output_data USING btree (output_data_id);
 
@@ -371,14 +353,11 @@ CREATE INDEX arod_output_from_receipt_id_idx ON action_receipt_output_data USING
 
 CREATE INDEX arod_receiver_account_id_idx ON action_receipt_output_data USING btree (receiver_account_id);
 
-
 CREATE INDEX b_height_idx ON blocks USING btree (block_height DESC);
 
 CREATE INDEX b_timestamp_idx ON blocks USING btree (block_timestamp DESC);
 
-
 CREATE INDEX c_included_in_block_hash_idx ON chunks USING btree (included_in_block_hash);
-
 
 CREATE INDEX eo_executed_in_block_timestamp_idx ON execution_outcomes USING btree (executed_in_block_timestamp DESC);
 
@@ -388,9 +367,7 @@ CREATE INDEX eo_receipt_id_status_idx ON execution_outcomes USING btree (receipt
 
 CREATE INDEX eo_status_idx ON execution_outcomes USING btree (status);
 
-
 CREATE INDEX eor_produced_receipt_id ON execution_outcome_receipts USING btree (produced_receipt_id);
-
 
 CREATE INDEX r_included_in_block_hash_idx ON receipts USING btree (included_in_block_hash);
 
@@ -403,7 +380,6 @@ CREATE INDEX r_predecessor_account_id_idx ON receipts USING btree (predecessor_a
 CREATE INDEX r_receiver_account_id_idx ON receipts USING btree (receiver_account_id);
 
 CREATE INDEX r_included_in_block_timestamp_idx ON receipts USING btree (included_in_block_timestamp DESC);
-
 
 CREATE INDEX t_converted_into_receipt_id_dx ON transactions USING btree (converted_into_receipt_id);
 
@@ -419,38 +395,82 @@ CREATE INDEX t_signer_account_id_idx ON transactions USING btree (signer_account
 
 CREATE INDEX t_block_timestamp_index_in_chunk_idx ON transactions USING btree (block_timestamp DESC, index_in_chunk DESC);
 
+SELECT
+  create_hypertable (
+    'access_keys',
+    'created_by_block_timestamp',
+    chunk_time_interval => 3024000000000000
+  );
 
+SELECT
+  create_hypertable (
+    'accounts',
+    'created_by_block_timestamp',
+    chunk_time_interval => 3628800000000000
+  );
 
-SELECT create_hypertable ('access_keys', 'created_by_block_timestamp', chunk_time_interval => 3024000000000000);
+SELECT
+  create_hypertable (
+    'action_receipt_actions',
+    'receipt_included_in_block_timestamp',
+    chunk_time_interval => 259200000000000
+  );
 
-SELECT create_hypertable ('accounts', 'created_by_block_timestamp', chunk_time_interval => 3628800000000000);
+SELECT
+  create_hypertable (
+    'blocks',
+    'block_timestamp',
+    chunk_time_interval => 3628800000000000
+  );
 
-SELECT create_hypertable ('action_receipt_actions', 'receipt_included_in_block_timestamp', chunk_time_interval => 259200000000000);
+SELECT
+  create_hypertable (
+    'chunks',
+    'included_in_block_timestamp',
+    chunk_time_interval => 1209600000000000
+  );
 
-SELECT create_hypertable ('blocks', 'block_timestamp', chunk_time_interval => 3628800000000000);
+SELECT
+  create_hypertable (
+    'execution_outcomes',
+    'executed_in_block_timestamp',
+    chunk_time_interval => 604800000000000
+  );
 
-SELECT create_hypertable ('chunks', 'included_in_block_timestamp', chunk_time_interval => 1209600000000000);
+SELECT
+  create_hypertable (
+    'receipts',
+    'included_in_block_timestamp',
+    chunk_time_interval => 432000000000000
+  );
 
-SELECT create_hypertable ('execution_outcomes', 'executed_in_block_timestamp', chunk_time_interval => 604800000000000);
+SELECT
+  create_hypertable (
+    'transactions',
+    'block_timestamp',
+    chunk_time_interval => 604800000000000
+  );
 
-SELECT create_hypertable ('receipts', 'included_in_block_timestamp', chunk_time_interval => 432000000000000);
+SELECT
+  set_integer_now_func ('access_keys', 'epoch_nano_seconds');
 
-SELECT create_hypertable ('transactions', 'block_timestamp', chunk_time_interval => 604800000000000);
+SELECT
+  set_integer_now_func ('accounts', 'epoch_nano_seconds');
 
+SELECT
+  set_integer_now_func ('action_receipt_actions', 'epoch_nano_seconds');
 
+SELECT
+  set_integer_now_func ('blocks', 'epoch_nano_seconds');
 
-SELECT set_integer_now_func('access_keys', 'epoch_nano_seconds');
+SELECT
+  set_integer_now_func ('chunks', 'epoch_nano_seconds');
 
-SELECT set_integer_now_func('accounts', 'epoch_nano_seconds');
+SELECT
+  set_integer_now_func ('execution_outcomes', 'epoch_nano_seconds');
 
-SELECT set_integer_now_func('action_receipt_actions', 'epoch_nano_seconds');
+SELECT
+  set_integer_now_func ('receipts', 'epoch_nano_seconds');
 
-SELECT set_integer_now_func('blocks', 'epoch_nano_seconds');
-
-SELECT set_integer_now_func('chunks', 'epoch_nano_seconds');
-
-SELECT set_integer_now_func('execution_outcomes', 'epoch_nano_seconds');
-
-SELECT set_integer_now_func('receipts', 'epoch_nano_seconds');
-
-SELECT set_integer_now_func('transactions', 'epoch_nano_seconds');
+SELECT
+  set_integer_now_func ('transactions', 'epoch_nano_seconds');
