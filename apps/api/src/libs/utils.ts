@@ -94,3 +94,20 @@ export const errorHandler = (error: Error) => {
   logger.error(error);
   Sentry.captureException(error);
 };
+
+
+export const sortByBNComparison = (aValue?: string, bValue?: string) => {
+  const a = aValue ? new Big(aValue) : null;
+  const b = bValue ? new Big(bValue) : null;
+
+  if (a && b) {
+    return a.cmp(b);
+  }
+  if (a) {
+    return -1;
+  }
+  if (b) {
+    return 1;
+  }
+  return 0;
+};
