@@ -103,7 +103,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                     {result.accounts.map((address) => (
                       <a
                         href={`/address/${address.account_id}`}
-                        className="no-underline"
+                        className="hover:no-underline"
                         key={address.account_id}
                       >
                         <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
@@ -120,6 +120,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                     </h3>
                     {result.txns.map((txn) => (
                       <a
+                        className="hover:no-underline"
                         href={`/txns/${txn.transaction_hash}`}
                         key={txn.transaction_hash}
                       >
@@ -138,6 +139,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                     {result.receipts.map((receipt) => (
                       <a
                         href={`/receipt/${receipt.originated_from_transaction_hash}`}
+                        className="hover:no-underline"
                         key={receipt.receipt_id}
                       >
                         <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
@@ -155,6 +157,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                     {result.blocks.map((block) => (
                       <a
                         href={`/block/${block.block_hash}`}
+                        className="hover:no-underline"
                         key={block.block_hash}
                       >
                         <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">

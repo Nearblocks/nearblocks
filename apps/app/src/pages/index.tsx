@@ -1,11 +1,14 @@
+import LatestSkelton from '@/components/lib/Spinner/LatestSkelton';
+import Loader from '@/components/lib/Spinner/Loader';
+import OverviewSkelton from '@/components/lib/Spinner/OverviewSkelton';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 const HomePage = () => {
   const components = useBosComponents();
-  const { t } = useTranslation();
 
+  const { t } = useTranslation();
   return (
     <>
       <div className="flex items-center justify-center bg-hero-pattern">
@@ -18,6 +21,11 @@ const HomePage = () => {
               <div className="flex flex-grow">
                 <VmComponent
                   src={components?.search}
+                  spinner={
+                    <div className="max-w-lg w-full pl-3">
+                      <Loader />
+                    </div>
+                  }
                   props={{
                     isHeader: false,
                     t: t,
@@ -25,20 +33,18 @@ const HomePage = () => {
                   }}
                 />
               </div>
-              <div className="text-white">
-                <VmComponent
-                  src={components?.sponsoredText}
-                  props={{ textColor: true }}
-                />
-              </div>
+              <div className="text-white"></div>
             </div>
           </div>
         </div>
       </div>
-      <VmComponent
-        src={components?.transactionsOverview}
-        props={{ network: networkId }}
-      />
+      <div>
+        <VmComponent
+          src={components?.transactionOverview}
+          spinner={<OverviewSkelton />}
+          props={{ t: t, network: networkId }}
+        />
+      </div>
       <div className="py-8 relative"></div>
       <section>
         <div className="container mx-auto px-3  z-10">
@@ -49,8 +55,9 @@ const HomePage = () => {
                   {t('home:latestBlocks')}
                 </h2>
                 <VmComponent
-                  src={components?.blocksLatest}
-                  props={{ network: networkId }}
+                  src={components?.latestBlocks}
+                  spinner={<LatestSkelton />}
+                  props={{ t: t, network: networkId }}
                 />
               </div>
             </div>
@@ -60,8 +67,13 @@ const HomePage = () => {
                   {t('home:latestTxns')}
                 </h2>
                 <VmComponent
-                  src={components?.transactionsLatest}
-                  props={{ network: networkId }}
+                  spinner={
+                    <div className="max-w-lg w-full pl-3">
+                      <LatestSkelton />
+                    </div>
+                  }
+                  src={components?.latestTransactions}
+                  props={{ t: t, network: networkId }}
                 />
               </div>
             </div>

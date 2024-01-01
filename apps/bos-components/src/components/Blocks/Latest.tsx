@@ -1,14 +1,16 @@
 /**
- * Component: LatestBlocks
+ * Component: BlocksLatest
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Latest Blocks on Near Protocol.
  * @interface Props
+ * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {
   network: string;
+  t: (key: string) => string | undefined;
 }
 
 import {
@@ -19,11 +21,11 @@ import {
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
-export default function (props: Props) {
+export default function ({ network, t }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
-  const config = getConfig(props.network);
+  const config = getConfig(network);
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
@@ -66,12 +68,12 @@ export default function (props: Props) {
           <ScrollArea.Viewport>
             {!blocks && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                Error!
+                {t ? t('home:error') : 'Error!'}
               </div>
             )}
             {!isLoading && blocks.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                No blocks found
+                {t ? t('home:noBlocks') : 'No blocks found'}
               </div>
             )}
             {isLoading && (
@@ -138,7 +140,7 @@ export default function (props: Props) {
                         </div>
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
-                        Author{' '}
+                        {t ? t('home:blockMiner') : 'Author'}{' '}
                         <a
                           href={`/address/${block.author_account_id}`}
                           className="hover:no-underline"

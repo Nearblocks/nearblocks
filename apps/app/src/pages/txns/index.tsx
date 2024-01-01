@@ -1,11 +1,13 @@
 import Router from 'next/router';
-
+import useTranslation from 'next-translate/useTranslation';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { useEffect, useState } from 'react';
 import { networkId } from '@/utils/config';
+import TableSkelton from '@/components/lib/Spinner/TableSkelton';
 
 const TransactionList = () => {
+  const { t } = useTranslation();
   const components = useBosComponents();
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -74,17 +76,36 @@ const TransactionList = () => {
   const filtersObject = filters ? filters : {};
 
   return (
-    <VmComponent
-      src={components?.transactionsList}
-      props={{
-        currentPage: currentPage,
-        setPage: setPage,
-        filters: filtersObject,
-        handleFilter: handleFilter,
-        onFilterClear: onFilterClear,
-        network: networkId,
-      }}
-    />
+    <>
+      <div className="bg-hero-pattern h-72">
+        <div className="container mx-auto px-3">
+          <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+            {t ? t('txns:heading') : 'Latest Near Protocol transactions'}
+          </h1>
+        </div>
+      </div>
+      <div className="container mx-auto px-3 -mt-48">
+        <div className="block lg:flex lg:space-x-2">
+          <div className="w-full">
+            <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
+              <VmComponent
+                spinner={<TableSkelton />}
+                src={components?.transaction}
+                props={{
+                  currentPage: currentPage,
+                  t: t,
+                  setPage: setPage,
+                  filters: filtersObject,
+                  handleFilter: handleFilter,
+                  onFilterClear: onFilterClear,
+                  network: networkId,
+                }}
+              />{' '}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

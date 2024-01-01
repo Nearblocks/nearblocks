@@ -44,9 +44,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<Token[]>([]);
-
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
-
+  const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
   const config = getConfig(network);
   const ArrowUp = () => {
     return (
@@ -80,7 +79,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             };
           }) => {
             const resp = data?.body?.tokens?.[0];
-            setTotalCount(resp?.count);
+            setTotalCount(resp?.count | 0);
           },
         )
         .catch(() => {})
@@ -90,6 +89,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
     }
 
     function fetchTokens(qs?: string, sqs?: Sorting) {
+      setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
         `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=25`,
@@ -107,10 +107,13 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             };
           }) => {
             const resp = data?.body?.tokens;
-            setTokens(resp);
+            setTokens(resp || []);
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
 
     fetchTotalTokens();
@@ -133,6 +136,30 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           : 'desc',
     }));
   };
+  const debouncedSearch = useMemo(() => {
+    return debounce(500, (value: string) => {
+      if (!value || value.trim() === '') {
+        setSearchResults([]);
+        return;
+      }
+      asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((data: { body: { tokens: Token[] } }) => {
+          const resp = data?.body?.tokens;
+          setSearchResults(resp);
+        })
+        .catch(() => {});
+    });
+  }, [config?.backendUrl]);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    debouncedSearch(value);
+  };
   const columns = [
     {
       header: <span>#</span>,
@@ -143,7 +170,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-gray-400 align-top',
+        'pl-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
     },
@@ -174,8 +201,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
               appUrl={config.appUrl}
               className="w-5 h-5 mr-2"
             />
-            <a href={`/token/${row.contract}`}>
-              <a className=" text-green-500 ">
+            <a href={`/token/${row.contract}`} className="hover:no-underline">
+              <a className=" text-green-500 hover:no-underline">
                 <span className="inline-block truncate max-w-[200px] mr-1">
                   {row.name}
                 </span>
@@ -188,7 +215,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-80  align-top',
     },
     {
       header: (
@@ -294,14 +321,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           <button
             type="button"
             onClick={() => onOrder('market_cap')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
+            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'market_cap' && (
               <div className="text-gray-500 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
-            Circulating MC
+            <span className="uppercase">Circulating MC</span>
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
@@ -310,9 +337,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  sideOffset={8}
-                  place="bottom"
+                  className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
+                  align="start"
+                  side="bottom"
                 >
                   {
                     ' Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
@@ -343,14 +370,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           <button
             type="button"
             onClick={() => onOrder('onchain_market_cap')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
+            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'onchain_market_cap' && (
               <div className="text-gray-500 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
-            On-Chain MC
+            <span className="uppercase">On-Chain MC</span>
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
@@ -360,8 +387,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {
                     "Calculated by multiplying the token's Total Supply on Near with the current market price per token"
@@ -409,35 +436,13 @@ export default function ({ t, network, currentPage, setPage }: Props) {
     },
   ];
 
-  const debouncedSearch = useMemo(() => {
-    return debounce(500, (value: string) => {
-      if (!value || value.trim() === '') {
-        setSearchResults([]);
-        return;
-      }
-      asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((data: { body: { tokens: Token[] } }) => {
-          const resp = data?.body?.tokens;
-          setSearchResults(resp);
-        })
-        .catch(() => {});
-    });
-  }, [config?.backendUrl]);
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    debouncedSearch(value);
-  };
   return (
     <>
       <div className="flex flex-row items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
         {isLoading ? (
-          <Skelton className="max-w-lg pl-3" />
+          <div className="max-w-lg w-full pl-3">
+            <Skelton />
+          </div>
         ) : (
           <p className="pl-3">
             {t
@@ -465,8 +470,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                       key={token.contract}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                     >
-                      <a href={`/token/${token.contract}`}>
-                        <a className="flex items-center my-1 whitespace-nowrap ">
+                      <a
+                        href={`/token/${token.contract}`}
+                        className="hover:no-underline"
+                      >
+                        <a className="hover:no-underline flex items-center my-1 whitespace-nowrap ">
                           <div className="flex-shrink-0 h-5 w-5 mr-2">
                             <TokenImage
                               src={token?.icon}
@@ -503,6 +511,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
+          Error: errorMessage,
         }}
       />
     </>

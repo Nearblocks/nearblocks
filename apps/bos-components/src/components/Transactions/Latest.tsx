@@ -1,13 +1,15 @@
 /**
- * Component: LatestTransactions
+ * Component: TransactionsLatest
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  * @interface Props
+ * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {
+  t: (key: string) => string | undefined;
   network: string;
 }
 
@@ -20,7 +22,7 @@ import {
 } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
-export default function (props: Props) {
+export default function ({ t, network }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
@@ -32,7 +34,7 @@ export default function (props: Props) {
     );
   };
 
-  const config = getConfig(props.network);
+  const config = getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -77,12 +79,12 @@ export default function (props: Props) {
           <ScrollArea.Viewport>
             {!txns && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                Error!
+                {t ? t('home:error') : ' Error!'}
               </div>
             )}
             {!isLoading && txns.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                No transactions found!
+                {t ? t('home:noTxns') : ' No transactions found!'}
               </div>
             )}
             {isLoading && (
@@ -150,7 +152,7 @@ export default function (props: Props) {
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                         <div className="whitespace-nowrap truncate">
-                          From{' '}
+                          {t ? t('home:txnFrom') : 'From'}{' '}
                           <a
                             href={`/address/${txn.signer_account_id}`}
                             className="hover:no-underline"
@@ -161,7 +163,7 @@ export default function (props: Props) {
                           </a>
                         </div>
                         <div className="whitespace-nowrap truncate">
-                          To{' '}
+                          {t ? t('home:txnTo') : 'To'}{' '}
                           <a
                             href={`/address/${txn.receiver_account_id}`}
                             className="hover:no-underline"
