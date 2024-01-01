@@ -30,6 +30,7 @@ interface Props {
   setPage: (page: number) => void;
   renderRowSubComponent: (row: any, rowIndex?: number) => React.ReactNode;
   expanded: number[];
+  tiny: false;
 }
 
 export default function (props: Props) {
@@ -70,45 +71,105 @@ export default function (props: Props) {
   }
   return (
     <>
-      <div className="overflow-x-auto ">
-        <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100">
-            <tr>
-              {props?.columns.map((column: column, index: number) => (
-                <th
-                  key={index}
-                  scope="col"
-                  className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {props.data &&
-              props.data.map((row, rowIndex: number) => (
-                <>
-                  <tr key={rowIndex} className="h-[57px] hover:bg-blue-900/5">
-                    {props.columns.map((column: column, colIndex: number) => (
-                      <td
-                        key={colIndex}
-                        className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
-                      >
-                        {column.cell ? column.cell(row) : row[column.key]}
-                      </td>
-                    ))}
-                  </tr>
-                  {row.isExpanded ||
-                  (props.expanded.length > 0 &&
-                    props.expanded.includes(rowIndex))
-                    ? props.renderRowSubComponent(row)
-                    : null}
-                </>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      {props.tiny ? (
+        <div className={`bg-gray-50 overflow-x-auto`}>
+          <table className={'min-w-full divide-y border-separate '}>
+            <thead>
+              <tr>
+                {props?.columns.map((column: column, index: number) => (
+                  <th
+                    key={index}
+                    scope="col"
+                    className="px-5 pt-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    {column.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {props.data &&
+                props.data.map((row, rowIndex: number) => (
+                  // @ts-ignore
+                  <Fragment key={rowIndex}>
+                    <tr className="hover:bg-blue-900/5">
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td
+                          key={colIndex}
+                          className="px-5 whitespace-nowrap text-sm text-gray-500 font-medium"
+                        >
+                          {column.cell ? column.cell(row) : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
+                    {row?.showWarning && (
+                      <tr className="h-[25px] hover:bg-blue-900/5">
+                        <td
+                          colSpan={props.columns.length}
+                          className="px-5 py-2 whitespace-nowrap text-sm text-yellow-500 font-medium"
+                        >
+                          {row?.warning}
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className={'overflow-x-auto'}>
+          <table className={`min-w-full divide-y border-t`}>
+            <thead className={'bg-gray-100'}>
+              <tr>
+                {props?.columns.map((column: column, index: number) => (
+                  <th
+                    key={index}
+                    scope="col"
+                    className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                  >
+                    {column.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className={'bg-white divide-y divide-gray-200'}>
+              {props.data &&
+                props.data.map((row, rowIndex: number) => (
+                  // @ts-ignore
+                  <Fragment key={rowIndex}>
+                    <tr className="h-[57px] hover:bg-blue-900/5">
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td
+                          key={colIndex}
+                          className="px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium"
+                        >
+                          {column.cell ? column.cell(row) : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
+                    {row?.showWarning && (
+                      <tr className="h-[57px] hover:bg-blue-900/5">
+                        <td
+                          colSpan={props.columns.length}
+                          className="px-5 py-4 whitespace-nowrap text-sm text-yellow-500 font-medium"
+                        >
+                          {row?.warning}
+                        </td>
+                      </tr>
+                    )}
+
+                    {row.isExpanded ||
+                    (props.expanded.length > 0 &&
+                      props.expanded.includes(rowIndex))
+                      ? props.renderRowSubComponent(row)
+                      : null}
+                  </Fragment>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       {props.isPagination ? (
         <Paginator
           loading={props?.isLoading}

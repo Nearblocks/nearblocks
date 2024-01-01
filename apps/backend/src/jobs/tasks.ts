@@ -27,102 +27,118 @@ export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
 export const latestBlockCheck: RegularCheckFn = {
   fn: async () => {
-    const { data } = await RPC.query(
-      {
-        finality: 'final',
-      },
-      'block',
-    );
-    if (data.result) {
-      const latestBlock = data.result as BlockResult;
-      await cache(
-        `latestBlock`,
+    try {
+      const { data } = await RPC.query(
         {
-          height: latestBlock?.header?.height,
-          timestamp: latestBlock?.header?.timestamp,
+          finality: 'final',
         },
-        { EX: HOUR },
+        'block',
       );
+      if (data.result) {
+        const latestBlock = data.result as BlockResult;
+        await cache(
+          `latestBlock`,
+          {
+            height: latestBlock?.header?.height,
+            timestamp: latestBlock?.header?.timestamp,
+          },
+          { EX: HOUR },
+        );
+      }
+    } catch (err) {
+      //
     }
   },
 };
 
 export const protocolConfigCheck: RegularCheckFn = {
   fn: async () => {
-    const { data } = await RPC.query(
-      {
-        finality: 'final',
-      },
-      'EXPERIMENTAL_protocol_config',
-    );
-    if (data.result) {
-      const protocolConfig = data.result as ExpProtocolConfig;
-      if (protocolConfig) {
-        await cache(
-          'protocolConfig',
-          {
-            epochLength: protocolConfig.epoch_length,
-            maxNumberOfSeats:
-              protocolConfig.num_block_producer_seats +
-              protocolConfig.avg_hidden_validator_seats_per_shard.reduce(
-                (seats, seat) => seats + seat,
-                0,
-              ),
-            version: protocolConfig.protocol_version,
-          },
-          { EX: HOUR },
-        );
+    try {
+      const { data } = await RPC.query(
+        {
+          finality: 'final',
+        },
+        'EXPERIMENTAL_protocol_config',
+      );
+      if (data.result) {
+        const protocolConfig = data.result as ExpProtocolConfig;
+        if (protocolConfig) {
+          await cache(
+            'protocolConfig',
+            {
+              epochLength: protocolConfig.epoch_length,
+              maxNumberOfSeats:
+                protocolConfig.num_block_producer_seats +
+                protocolConfig.avg_hidden_validator_seats_per_shard.reduce(
+                  (seats, seat) => seats + seat,
+                  0,
+                ),
+              version: protocolConfig.protocol_version,
+            },
+            { EX: HOUR },
+          );
+        }
       }
+    } catch (err) {
+      //
     }
   },
 };
 
 export const genesisProtocolInfoFetch: RegularCheckFn = {
   fn: async () => {
-    const [{ data }, genesisAccount] = await Promise.all([
-      RPC.query(
-        {
-          finality: 'final',
-        },
-        'EXPERIMENTAL_genesis_config',
-      ),
-      db('accounts').count('account_id').whereNull('created_by_receipt_id'),
-    ]);
+    try {
+      const [{ data }, genesisAccount] = await Promise.all([
+        RPC.query(
+          {
+            finality: 'final',
+          },
+          'EXPERIMENTAL_genesis_config',
+        ),
+        db('accounts').count('account_id').whereNull('created_by_receipt_id'),
+      ]);
 
-    if (data.result && genesisAccount) {
-      const genesisAccountCount = genesisAccount[0].count;
-      const genesisProtocolConfig = data.result as ExpGenesisConfig;
-      await cache(
-        'genesisConfig',
-        {
-          accountCount: genesisAccountCount,
-          height: genesisProtocolConfig.genesis_height,
-          minStakeRatio: genesisProtocolConfig.minimum_stake_ratio,
-          protocolVersion: genesisProtocolConfig.protocol_version,
-          timestamp: new Date(genesisProtocolConfig.genesis_time).valueOf(),
-          totalSupply: genesisProtocolConfig.total_supply,
-        },
-        { EX: DAY },
-      );
+      if (data.result && genesisAccount) {
+        const genesisAccountCount = genesisAccount[0].count;
+        const genesisProtocolConfig = data.result as ExpGenesisConfig;
+        await cache(
+          'genesisConfig',
+          {
+            accountCount: genesisAccountCount,
+            height: genesisProtocolConfig.genesis_height,
+            minStakeRatio: genesisProtocolConfig.minimum_stake_ratio,
+            protocolVersion: genesisProtocolConfig.protocol_version,
+            timestamp: new Date(genesisProtocolConfig.genesis_time).valueOf(),
+            totalSupply: genesisProtocolConfig.total_supply,
+          },
+          { EX: DAY },
+        );
+      }
+    } catch (err) {
+      //
     }
   },
 };
 
 export const poolIdsCheck: RegularCheckFn = {
   fn: async () => {
-    const network = config.network;
-    const address =
-      network === 'mainnet'
-        ? `${validator.accountIdSuffix.stakingPool.mainnet}`
-        : `${validator.accountIdSuffix.stakingPool.testnet}`;
-    const rows = await db('accounts')
-      .select('account_id')
-      .whereLike('account_id', `%${address}`);
+    try {
+      const network = config.network;
+      const address =
+        network === 'mainnet'
+          ? `${validator.accountIdSuffix.stakingPool.mainnet}`
+          : `${validator.accountIdSuffix.stakingPool.testnet}`;
+      const rows = await db('accounts')
+        .select('account_id')
+        .whereLike('account_id', `%${address}`);
 
-    const accounts = rows.map((data) => {
-      return data.account_id;
-    });
-    await cache('poolIds', accounts, { EX: DAY });
+      const accounts = rows.map((data) => {
+        return data.account_id;
+      });
+      await cache('poolIds', accounts, { EX: DAY });
+    } catch (err) {
+      //
+    }
   },
 };
 
@@ -144,13 +160,17 @@ export const poolIdsCheck: RegularCheckFn = {
 // };
 
 const getValidators = async () => {
-  const { data } = await RPC.query([null], 'validators');
-  if (data.result) {
-    const validator = data.result as EpochValidatorInfo;
-    await cache('validatorsPromise', validator, { EX: DAY });
-    return validator;
+  try {
+    const { data } = await RPC.query([null], 'validators');
+    if (data.result) {
+      const validator = data.result as EpochValidatorInfo;
+      await cache('validatorsPromise', validator, { EX: DAY });
+      return validator;
+    }
+    return null;
+  } catch (err) {
+    return null;
   }
-  return null;
 };
 
 const mapValidators = (
@@ -365,58 +385,64 @@ export const updatePoolInfoMap: RegularCheckFn = {
 };
 
 const saveValidatorLists = async () => {
-  const mappedValidators = (await readCache(
-    redis.getPrefixedKeys('mappedValidators'),
-  )) as ValidatorEpochData[];
+  try {
+    const mappedValidators = (await readCache(
+      redis.getPrefixedKeys('mappedValidators'),
+    )) as ValidatorEpochData[];
 
-  if (mappedValidators.length > 0) {
-    const stakingPoolStakeProposalsFromContract = (await readCache(
-      redis.getPrefixedKeys('stakingPoolStakeProposalsFromContract'),
-    )) as CachedTimestampMap<string>;
+    if (mappedValidators.length > 0) {
+      const stakingPoolStakeProposalsFromContract = (await readCache(
+        redis.getPrefixedKeys('stakingPoolStakeProposalsFromContract'),
+      )) as CachedTimestampMap<string>;
 
-    const stakingPoolMetadataInfo = await readCache(
-      redis.getPrefixedKeys('stakingPoolMetadataInfo'),
-    );
-
-    let stakingPoolStakeProposals = new Map();
-    if (
-      stakingPoolStakeProposalsFromContract &&
-      Array.isArray(stakingPoolStakeProposalsFromContract)
-    ) {
-      stakingPoolStakeProposals = new Map(
-        stakingPoolStakeProposalsFromContract,
+      const stakingPoolMetadataInfo = await readCache(
+        redis.getPrefixedKeys('stakingPoolMetadataInfo'),
       );
+
+      let stakingPoolStakeProposals = new Map();
+      if (
+        stakingPoolStakeProposalsFromContract &&
+        Array.isArray(stakingPoolStakeProposalsFromContract)
+      ) {
+        stakingPoolStakeProposals = new Map(
+          stakingPoolStakeProposalsFromContract,
+        );
+      }
+
+      const stakingPoolInfos = (await readCache(
+        redis.getPrefixedKeys('stakingPoolInfos'),
+      )) as CachedTimestampMap<ValidatorPoolInfo>;
+
+      let stakingPoolInfosData = new Map();
+      if (stakingPoolInfos && Array.isArray(stakingPoolInfos)) {
+        stakingPoolInfosData = new Map(stakingPoolInfos);
+      }
+
+      const combined = mappedValidators.map((validator, index: number) => {
+        const metaInfo = stakingPoolMetadataInfo
+          ? stakingPoolMetadataInfo.find(
+              (item: { [key: string]: PoolMetadataAccountInfo }) =>
+                validator.accountId in item,
+            )
+          : null;
+        return {
+          ...validator,
+          contractStake: stakingPoolStakeProposals.has(validator.accountId)
+            ? stakingPoolStakeProposals?.get(validator.accountId)
+            : null,
+          description: metaInfo ? Object.values(metaInfo)[0] : null,
+          index,
+
+          poolInfo: stakingPoolInfosData.has(validator.accountId)
+            ? stakingPoolInfosData.get(validator.accountId)
+            : null,
+        };
+      });
+
+      await cache('validatorLists', combined, { EX: DAY });
     }
-
-    const stakingPoolInfos = (await readCache(
-      redis.getPrefixedKeys('stakingPoolInfos'),
-    )) as CachedTimestampMap<ValidatorPoolInfo>;
-
-    let stakingPoolInfosData = new Map();
-    if (stakingPoolInfos && Array.isArray(stakingPoolInfos)) {
-      stakingPoolInfosData = new Map(stakingPoolInfos);
-    }
-
-    const combined = mappedValidators.map((validator, index: number) => {
-      const metaInfo = stakingPoolMetadataInfo.find(
-        (item: { [key: string]: PoolMetadataAccountInfo }) =>
-          validator.accountId in item,
-      );
-      return {
-        ...validator,
-        contractStake: stakingPoolStakeProposals.has(validator.accountId)
-          ? stakingPoolStakeProposals?.get(validator.accountId)
-          : null,
-        description: metaInfo ? Object.values(metaInfo)[0] : null,
-        index,
-
-        poolInfo: stakingPoolInfosData.has(validator.accountId)
-          ? stakingPoolInfosData.get(validator.accountId)
-          : null,
-      };
-    });
-
-    await cache('validatorLists', combined, { EX: DAY });
+  } catch (err) {
+    console.log({ err });
   }
 };
 

@@ -1,16 +1,16 @@
 import Skelton from '@/includes/Common/Skelton';
-import { formatWithCommas, getTimeAgoString } from '@/includes/formats';
+import { formatWithCommas } from '@/includes/formats';
 import {
   convertAmountToReadableString,
   convertTimestampToTime,
   getConfig,
-  nanoToMilli,
+  timeAgo,
 } from '@/includes/libs';
 import { ValidatorFullData } from '@/includes/types';
-
+import ArrowDown from '@/includes/icons/ArrowDown';
 import { ValidatorEpochData } from 'nb-types';
 
-const pageLimit = 10;
+const pageLimit = 25;
 
 const initialValidatorFullData = {
   validatorEpochData: [],
@@ -28,7 +28,6 @@ export default function () {
   const [validatorFullData, setValidatorFullData] = useState<ValidatorFullData>(
     initialValidatorFullData,
   );
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [expanded, setExpanded] = useState<number[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -74,16 +73,40 @@ export default function () {
     }
   };
 
+  const stakingStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Active';
+      case 'joining':
+        return 'Joining';
+
+      case 'leaving':
+        return 'Kickout';
+      case 'proposal':
+        return 'Proposal';
+      case 'idle':
+        return 'idle';
+
+      case 'newcomer':
+        return 'Newcomer';
+      case 'onHold':
+        return 'On hold';
+      default:
+        return 'Active';
+    }
+  };
+
   const columns = [
     {
-      header: 'Action',
+      header: 'Status',
       key: 'View',
       cell: (row: ValidatorEpochData) => {
         return (
           <div className="flex">
-            <a href="#" onClick={() => handleRowClick(row.index || 0)}>
-              Click
-            </a>
+            <button onClick={() => handleRowClick(row.index || 0)}>
+              <ArrowDown />
+            </button>
+            <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
           </div>
         );
       },
@@ -146,65 +169,230 @@ export default function () {
       header: 'CUMULATIVE STAKE',
       key: 'cumulative_stake',
       cell: (row: ValidatorEpochData) => {
-        return <div>{row?.cumilativeStake?.cumulativePercent}%</div>;
+        return (
+          <div>
+            {row?.cumilativeStake?.cumulativePercent
+              ? `${row?.cumilativeStake?.cumulativePercent}%`
+              : 'N/A'}
+          </div>
+        );
       },
     },
     {
       header: 'STAKE CHANGE (24H)',
       key: '24_change',
       cell: (row: ValidatorEpochData) => {
-        const nextVisibleStake =
-          parseFloat(row.nextEpoch?.stake || '0') ??
-          parseFloat(row.afterNextEpoch?.stake || '0');
-
-        const currentStake = parseFloat(row.currentEpoch?.stake || '0');
-
-        if (!isNaN(currentStake) && !isNaN(nextVisibleStake)) {
-          const stakeDelta = nextVisibleStake - currentStake;
-
-          if (stakeDelta !== 0) {
-            return (
-              <div className="flex">
-                {stakeDelta >= 0 ? '+' : '-'}{' '}
-                <p>
-                  {convertAmountToReadableString(
-                    Math.abs(stakeDelta),
-                    'seatPriceAmount',
-                  )}{' '}
-                  Ⓝ
-                </p>
-              </div>
-            );
+        if (!row?.stakeChange?.value) {
+          const visibleStake =
+            row?.currentEpoch?.stake ??
+            row?.nextEpoch?.stake ??
+            row?.afterNextEpoch?.stake ??
+            row?.contractStake;
+          if (visibleStake) {
+            return `${convertAmountToReadableString(
+              Math.abs(Number(visibleStake)),
+              'seatPriceAmount',
+            )} Ⓝ`;
           }
+          return null;
         }
-
-        return null;
+        return (
+          <div className="flex">
+            {row?.stakeChange?.symbol}
+            <p>{row?.stakeChange?.value}Ⓝ</p>
+          </div>
+        );
       },
     },
   ];
 
   const ExpandedRow = (row: ValidatorEpochData) => {
     const telemetry = validatorFullData?.validatorTelemetry[row.accountId];
+
     if (!telemetry) return;
+
+    const progress = row?.currentEpoch?.progress;
+
+    const productivityRatio = progress
+      ? (progress.blocks.produced + progress.chunks.produced) /
+        (progress.blocks.total + progress.chunks.total)
+      : 0;
+
     return (
       <>
         <tr>
-          <td colSpan={8}>
-            <div className="grid grid-cols-5 gap-4">
-              <div className="col-span-1 p-4">Uptime</div>
-              <div className="col-span-1 p-4">Latest block</div>
-              <div className="col-span-1 p-4">Latest Telemetry Update</div>
-              <div className="col-span-1 p-4">Node Agent Name</div>
-              <div className="col-span-1 p-4">Node Agent Version / Build</div>
-
-              <div className="col-span-1 p-4">98%</div>
-              <div className="col-span-1 p-4"> {telemetry?.lastHeight}</div>
-              <div className="col-span-1 p-4">
-                {getTimeAgoString(nanoToMilli(telemetry?.lastSeen))}
+          <td colSpan={8} className="bg-gray-50">
+            <Widget
+              src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+              props={{
+                columns: [
+                  {
+                    header: 'Uptime',
+                    key: 'uptime',
+                    cell: () => {
+                      return (
+                        <div className="text-black">
+                          {(productivityRatio * 100).toFixed(3)}%
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Latest block',
+                    key: 'latest_block',
+                    cell: () => {
+                      return (
+                        <div className="text-black">
+                          {telemetry?.lastHeight}
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Latest Telemetry Update',
+                    key: 'telemetry',
+                    cell: () => {
+                      return (
+                        <div className="text-black">
+                          {telemetry?.lastSeen && timeAgo(telemetry?.lastSeen)}
+                        </div>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Node Agent Name',
+                    key: 'agent_name',
+                    cell: () => {
+                      return (
+                        <span className="text-black rounded bg-gray-300 px-1">
+                          {telemetry?.agentName}{' '}
+                        </span>
+                      );
+                    },
+                  },
+                  {
+                    header: 'Node Agent Version / Build',
+                    key: 'agent_version',
+                    cell: () => {
+                      return (
+                        <span className="text-black rounded bg-gray-300 px-1">{`${telemetry?.agentVersion}/${telemetry?.agentBuild}`}</span>
+                      );
+                    },
+                  },
+                ],
+                data: [telemetry] || [],
+                isLoading: false,
+                isPagination: false,
+                tiny: true,
+              }}
+            />
+            {row?.description ? (
+              <Widget
+                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                props={{
+                  columns: [
+                    {
+                      header: 'Web',
+                      key: 'web',
+                      cell: (row: ValidatorEpochData) => {
+                        return (
+                          <div className="text-sky-500">
+                            <a
+                              href={
+                                row?.description?.url?.startsWith('http')
+                                  ? row?.description?.url
+                                  : `http://${row?.description?.url}`
+                              }
+                              rel="noreferrer noopener"
+                              target="_blank"
+                            >
+                              {' '}
+                              {row?.description?.url}
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      header: 'Email',
+                      key: 'email',
+                      cell: (row: ValidatorEpochData) => {
+                        return (
+                          <div className="text-sky-500">
+                            <a href={`mailto:${row?.description?.email}`}>
+                              {row?.description?.email}{' '}
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    row?.description?.twitter && {
+                      header: 'Twitter',
+                      key: 'twitter',
+                      cell: (row: ValidatorEpochData) => {
+                        return (
+                          <div className="text-sky-500">
+                            <a
+                              href={`https://twitter.com/${row?.description?.twitter}`}
+                              rel="noreferrer noopener"
+                              target="_blank"
+                            >
+                              {row?.description?.twitter}
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    row?.description?.discord && {
+                      header: 'Discord',
+                      key: 'discord',
+                      cell: (row: ValidatorEpochData) => {
+                        return (
+                          <div className="text-sky-500">
+                            <a
+                              href={row?.description?.discord}
+                              rel="noreferrer noopener"
+                              target="_blank"
+                            >
+                              {row?.description?.discord}
+                            </a>
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      header: 'Description',
+                      key: 'description',
+                      cell: (row: ValidatorEpochData) => {
+                        return (
+                          <div className="text-gray-400">
+                            <small>{row?.description?.description}</small>
+                          </div>
+                        );
+                      },
+                    },
+                  ],
+                  data: [row] || [],
+                  isLoading: false,
+                  isPagination: false,
+                  tiny: true,
+                }}
+              />
+            ) : (
+              <div className="flex justify-center text-sm text-gray-500 font-medium py-4 ">
+                If you are node owner feel free to fill all &nbsp;
+                <a
+                  href="https://github.com/zavodil/near-pool-details#description"
+                  className="text-sky-500"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  {' '}
+                  data{' '}
+                </a>
+                &nbsp;to promote your own node!
               </div>
-              <div className="col-span-1 p-4">{telemetry?.agentName}</div>
-              <div className="col-span-1 p-4">{`${telemetry?.agentVersion}/${telemetry?.agentBuild}`}</div>
-            </div>
+            )}
           </td>
         </tr>
       </>
@@ -268,8 +456,8 @@ export default function () {
                           {convertAmountToReadableString(
                             Number(validatorFullData?.seatPrice),
                             'seatPriceAmount',
-                          )}{' '}
-                          Ⓝ{' '}
+                          )}
+                          Ⓝ
                         </>
                       )}
                     </div>
@@ -339,14 +527,14 @@ export default function () {
               <div className="flex flex-col pt-4">
                 <div className="flex flex-col">
                   {isLoading ? (
-                    <p className="leading-7 px-3 text-sm mb-4 text-gray-500">
+                    <div className="leading-7 px-3 text-sm mb-4 text-gray-500">
                       <Skelton className="w-25 break-words" />
-                    </p>
+                    </div>
                   ) : (
-                    <p className="leading-7 px-3 text-sm mb-4 text-gray-500">
+                    <div className="leading-7 px-3 text-sm mb-4 text-gray-500">
                       {validatorFullData?.total}
                       Validators found
-                    </p>
+                    </div>
                   )}
                 </div>
                 <div className="flex flex-col">
@@ -355,7 +543,7 @@ export default function () {
                     props={{
                       columns: columns,
                       data: validatorFullData?.validatorEpochData || [],
-                      count: validatorFullData?.validatorEpochData.length,
+                      count: validatorFullData?.total,
                       isLoading: isLoading,
                       renderRowSubComponent: ExpandedRow,
                       expanded,
