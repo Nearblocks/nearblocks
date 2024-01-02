@@ -4,7 +4,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { useEffect, useState } from 'react';
 import { networkId } from '@/utils/config';
-import TableSkelton from '@/components/lib/Spinner/TableSkelton';
+import List from '@/components/skeleton/common/List';
 
 const TransactionList = () => {
   const { t } = useTranslation();
@@ -89,7 +89,7 @@ const TransactionList = () => {
           <div className="w-full">
             <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
               <VmComponent
-                spinner={<TableSkelton />}
+                skeleton={<List />}
                 src={components?.transaction}
                 props={{
                   currentPage: currentPage,

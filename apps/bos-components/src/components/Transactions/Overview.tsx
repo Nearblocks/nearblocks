@@ -13,7 +13,7 @@ interface Props {
   t: (key: string, options?: { days?: number }) => string | undefined;
 }
 
-import Skelton from '@/includes/Common/Skelton';
+import Skeleton from '@/includes/Common/Skeleton';
 import {
   currency,
   dollarFormat,
@@ -251,7 +251,7 @@ export default function ({ network, t }: Props) {
                         {t ? t('home:nearPrice') : 'NEAR PRICE'}
                       </p>
                       {isLoading ? (
-                        <Skelton />
+                        <Skeleton className="h-4" />
                       ) : (
                         <a href="/charts/near-price">
                           <a className="leading-6 text-gray-500">
@@ -288,7 +288,7 @@ export default function ({ network, t }: Props) {
                         {t ? t('home:marketCap') : ' MARKET CAP'}
                       </p>
                       {isLoading ? (
-                        <Skelton />
+                        <Skeleton className="h-4" />
                       ) : (
                         <a href="/charts/market-cap">
                           <a className="leading-6 text-gray-400">
@@ -318,7 +318,7 @@ export default function ({ network, t }: Props) {
                       {t ? t('home:transactions') : 'TRANSACTIONS'}
                     </p>
                     {isLoading ? (
-                      <Skelton />
+                      <Skeleton className="h-4" />
                     ) : (
                       <p className="leading-6 text-gray-400">
                         {currency(Number(stats?.total_txns ?? 0))}
@@ -332,7 +332,7 @@ export default function ({ network, t }: Props) {
                     {t ? t('home:gasPrice') : 'GAS PRICE'}
                   </p>
                   {isLoading ? (
-                    <Skelton />
+                    <Skeleton className="h-4" />
                   ) : (
                     <p className="leading-6 text-gray-400">
                       {gasPrice(Number(stats?.gas_price ?? 0))}
@@ -356,7 +356,7 @@ export default function ({ network, t }: Props) {
                       {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}
                     </p>
                     {isLoading ? (
-                      <Skelton />
+                      <Skeleton className="h-4" />
                     ) : (
                       <a href="/charts/blocks">
                         <a className="leading-6 text-gray-400">
@@ -371,7 +371,7 @@ export default function ({ network, t }: Props) {
                     {t ? t('home:avgBlockTime') : 'AVG. BLOCK TIME'}
                   </p>
                   {isLoading ? (
-                    <Skelton />
+                    <Skeleton className="h-4" />
                   ) : (
                     <a className="leading-6 text-gray-400">
                       {stats?.avg_block_time ?? 0} s
@@ -399,7 +399,7 @@ export default function ({ network, t }: Props) {
                       }}
                     />
                   ) : (
-                    <Skelton className="h-full w-full" />
+                    <Skeleton className="h-full w-full" />
                   )}
                 </div>
               </div>

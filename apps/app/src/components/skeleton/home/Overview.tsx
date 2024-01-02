@@ -1,7 +1,7 @@
 import { networkId } from '@/utils/config';
-import Loader from './Loader';
+import Skeleton from '../common/Skeleton';
 import React from 'react';
-const OverviewSkelton = () => {
+const Overview = () => {
   return (
     <div className="relative -mt-14">
       <div className="container mx-auto px-3">
@@ -19,24 +19,24 @@ const OverviewSkelton = () => {
                   <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                     <div className="items-center flex justify-left mr-3 ">
                       <div className="max-w-lg w-40 pl-3  h-full">
-                        <Loader />
+                        <Skeleton className="h-4" />
                       </div>
                     </div>
                     <div className="ml-2">
                       <div className="max-w-lg w-96 pl-3  h-full">
-                        <Loader />
+                        <Skeleton className="h-4" />
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                     <div className="items-center flex justify-left mr-3 ">
                       <div className="max-w-lg w-96 pl-3  h-full">
-                        <Loader />
+                        <Skeleton className="h-4" />
                       </div>
                     </div>
                     <div className="ml-2">
                       <div className="max-w-lg w-96 pl-3  h-full">
-                        <Loader />
+                        <Skeleton className="h-4" />
                       </div>
                     </div>
                   </div>
@@ -48,21 +48,21 @@ const OverviewSkelton = () => {
                 <div className="flex flex-row ">
                   <div className="items-center flex justify-left mr-3 ">
                     <div className="max-w-lg w-96 pl-3  h-full">
-                      <Loader />
+                      <Skeleton className="h-4" />
                     </div>
                   </div>
                   <div className="ml-2">
                     <div className="max-w-lg w-60 pl-3  h-full">
-                      <Loader />
+                      <Skeleton className="h-4" />
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col text-right">
                   <div className="max-w-lg pl-3  h-full">
-                    <Loader />
+                    <Skeleton className="h-4" />
                   </div>
                   <div className="max-w-lg  pl-3  h-full">
-                    <Loader />
+                    <Skeleton className="h-4" />
                   </div>
                 </div>
               </div>
@@ -70,21 +70,21 @@ const OverviewSkelton = () => {
                 <div className="flex flex-row ">
                   <div className="items-center flex justify-left mr-3 ">
                     <div className="max-w-lg w-96 pl-3  h-full">
-                      <Loader />
+                      <Skeleton className="h-4" />
                     </div>
                   </div>
                   <div className="ml-2">
                     <div className="max-w-lg w-60 pl-3  h-full">
-                      <Loader />
+                      <Skeleton className="h-4" />
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col text-right">
                   <div className="max-w-lg  pl-3  h-full">
-                    <Loader />
+                    <Skeleton className="h-4" />
                   </div>
                   <div className="max-w-lg  pl-3  h-full">
-                    <Loader />
+                    <Skeleton className="h-4" />
                   </div>
                 </div>
               </div>
@@ -92,10 +92,10 @@ const OverviewSkelton = () => {
             <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:px-5">
               <div className="flex-1 lg:px-0">
                 <div className="max-w-lg w-96 pl-3 pt-5  h-20">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </div>
                 <div className="max-w-lg w-96 pl-3  pt-5 h-full">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </div>
               </div>
             </div>
@@ -107,4 +107,4 @@ const OverviewSkelton = () => {
   );
 };
 
-export default OverviewSkelton;
+export default Overview;

@@ -27,10 +27,10 @@ import {
 import { debounce, getConfig } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
-import Skelton from '@/includes/Common/Skelton';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import SortIcon from '@/includes/icons/SortIcon';
 import Question from '@/includes/icons/Question';
+import Skeleton from '@/includes/Common/Skeleton';
 
 const initialSorting: Sorting = {
   sort: 'onchain_market_cap',
@@ -441,7 +441,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       <div className="flex flex-row items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
         {isLoading ? (
           <div className="max-w-lg w-full pl-3">
-            <Skelton />
+            <Skeleton className="h-5" />
           </div>
         ) : (
           <p className="pl-3">

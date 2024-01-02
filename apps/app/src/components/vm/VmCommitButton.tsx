@@ -7,6 +7,7 @@ type Props = {
   data: Record<string, unknown>;
   handleCommit?: () => void;
   onCommit?: () => void;
+  skeleton?: JSX.Element;
 };
 
 export function VmCommitButton(props: Props) {

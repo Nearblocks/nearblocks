@@ -1,7 +1,7 @@
 import React from 'react';
-import Loader from './Loader';
+import Skeleton from '../common/Skeleton';
 
-const LatestSkelton = () => {
+const Latest = () => {
   return (
     <>
       <div className="relative">
@@ -13,35 +13,43 @@ const LatestSkelton = () => {
             >
               <div className="flex items-center ">
                 <div className="flex-shrink-0 rounded-full h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
-                  <Loader className="h-4" />
+                  <Skeleton className="h-4" />
                 </div>
                 <div className="px-2">
                   <div className="text-green-500 text-sm">
-                    <Loader className="h-4" />
+                    <div className="h-5 w-14">
+                      <Skeleton className="h-4" />
+                    </div>
                   </div>
                   <div className="text-gray-400 text-xs">
-                    <Loader className="h-3" />
+                    <div className="h-4 w-24">
+                      <Skeleton className="h-3" />
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
-                <Loader className="h-4" />
+                <div className="h-5 w-36">
+                  <Skeleton className="h-4" />
+                </div>
                 <div className="text-gray-400 text-sm">
-                  <Loader className="h-4" />
+                  <div className="h-5 w-14">
+                    <Skeleton className="h-4" />
+                  </div>
                 </div>
               </div>
               <div className="text-right order-1 md:order-2">
-                <Loader />
+                <Skeleton className="h-4" />
               </div>
             </div>
           ))}
         </div>
       </div>
       <div className="border-t px-2 py-3 text-gray-700">
-        <Loader className="h-10" />
+        <Skeleton className="h-10" />
       </div>
     </>
   );
 };
 
-export default LatestSkelton;
+export default Latest;

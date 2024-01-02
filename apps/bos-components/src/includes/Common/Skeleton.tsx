@@ -7,7 +7,7 @@ interface Props {
   className?: string;
 }
 
-const Skelton = (props: Props) => {
+const Skeleton = (props: Props) => {
   return (
     <div
       className={`bg-gray-200 h-4 rounded shadow-sm animate-pulse ${props.className}`}
@@ -15,4 +15,4 @@ const Skelton = (props: Props) => {
   );
 };
 
-export default Skelton;
+export default Skeleton;

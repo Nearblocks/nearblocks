@@ -13,6 +13,7 @@ interface Props {
   t: (key: string) => string | undefined;
 }
 
+import Skeleton from '@/includes/Common/Skeleton';
 import {
   convertToMetricPrefix,
   getTimeAgoString,
@@ -23,16 +24,10 @@ import { BlocksInfo } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
   const config = getConfig(network);
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
-      ></div>
-    );
-  };
 
   useEffect(() => {
     let delay = 5000;
@@ -44,14 +39,17 @@ export default function ({ network, t }: Props) {
         .then((data: { body: { blocks: BlocksInfo[] } }) => {
           const resp = data?.body?.blocks;
           setBlocks(resp);
+          setError(false);
+          setIsLoading(false);
         })
         .catch((error: any) => {
           if (error.response && error.response.status === 429) {
             delay = Math.min(2 ** retries * 1000, 60000);
             retries++;
           }
+          setError(false);
+          setIsLoading(false);
         });
-      setIsLoading(false);
     }
 
     fetchLatestBlocks();
@@ -66,19 +64,19 @@ export default function ({ network, t }: Props) {
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!blocks && (
+            {!blocks && error && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 {t ? t('home:error') : 'Error!'}
               </div>
             )}
-            {!isLoading && blocks.length === 0 && (
+            {!error && !isLoading && blocks.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 {t ? t('home:noBlocks') : 'No blocks found'}
               </div>
             )}
-            {isLoading && (
+            {blocks.length === 0 && (
               <div className="px-3 divide-y h-80">
-                {[...Array(10)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
                     key={i}
@@ -89,21 +87,31 @@ export default function ({ network, t }: Props) {
                       </div>
                       <div className="px-2">
                         <div className="text-green-500 text-sm">
-                          <Loader className="h-4" wrapperClassName="h-5 w-14" />
+                          <div className="h-5 w-14">
+                            <Skeleton className="h-4" />
+                          </div>
                         </div>
                         <div className="text-gray-400 text-xs">
-                          <Loader className="h-3" wrapperClassName="h-4 w-24" />
+                          <div className="h-4 w-24">
+                            <Skeleton className="h-3" />
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
-                      <Loader className="h-4" wrapperClassName="h-5 w-36" />
+                      <div className="h-5 w-36">
+                        <Skeleton className="h-4" />
+                      </div>
                       <div className="text-gray-400 text-sm">
-                        <Loader className="h-4" wrapperClassName="h-5 w-14" />
+                        <div className="h-5 w-14">
+                          <Skeleton className="h-4" />
+                        </div>
                       </div>
                     </div>
                     <div className="text-right order-1 md:order-2">
-                      <Loader wrapperClassName="ml-auto w-32" />
+                      <div className="ml-auto w-32">
+                        <Skeleton className="h-4" />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -195,9 +203,9 @@ export default function ({ network, t }: Props) {
           <ScrollArea.Corner className="bg-black-500" />
         </ScrollArea.Root>
       </div>
-      {isLoading && (
+      {blocks.length === 0 && (
         <div className="border-t px-2 py-3 text-gray-700">
-          <Loader className="h-10" />
+          <Skeleton className="h-10" />
         </div>
       )}
       {blocks && blocks.length > 0 && (

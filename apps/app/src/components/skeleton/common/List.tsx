@@ -1,12 +1,12 @@
 import React from 'react';
-import Loader from './Loader';
+import Skeleton from './Skeleton';
 
-const TableSkelton = () => {
+const List = () => {
   return (
     <>
       <div className="flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
         <div className="max-w-lg pl-3 w-full h-10 ">
-          <Loader className="mt-2" />
+          <Skeleton className="mt-2 h-4" />
         </div>
       </div>
       <div className="overflow-x-auto ">
@@ -17,49 +17,49 @@ const TableSkelton = () => {
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
               <th
                 scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
               >
-                <Loader />
+                <Skeleton className="h-4" />
               </th>
             </tr>
           </thead>
@@ -67,28 +67,28 @@ const TableSkelton = () => {
             {[...Array(25)].map((_, i) => (
               <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500  align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-tiny align-top ">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
-                  <Loader />
+                  <Skeleton className="h-4" />
                 </td>
               </tr>
             ))}
@@ -98,11 +98,11 @@ const TableSkelton = () => {
       <div className="bg-white px-2 py-3 flex items-center justify-between border-t md:px-4">
         <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div></div>
-          <Loader className="w-64" />
+          <Skeleton className="w-64 h-4" />
         </div>
       </div>
     </>
   );
 };
 
-export default TableSkelton;
+export default List;

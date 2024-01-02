@@ -1,6 +1,6 @@
-import LatestSkelton from '@/components/lib/Spinner/LatestSkelton';
-import Loader from '@/components/lib/Spinner/Loader';
-import OverviewSkelton from '@/components/lib/Spinner/OverviewSkelton';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import Latest from '@/components/skeleton/home/Latest';
+import Overview from '@/components/skeleton/home/Overview';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
@@ -21,9 +21,9 @@ const HomePage = () => {
               <div className="flex flex-grow">
                 <VmComponent
                   src={components?.search}
-                  spinner={
+                  skeleton={
                     <div className="max-w-lg w-full pl-3">
-                      <Loader />
+                      <Skeleton className="h-5" />
                     </div>
                   }
                   props={{
@@ -41,7 +41,7 @@ const HomePage = () => {
       <div>
         <VmComponent
           src={components?.transactionOverview}
-          spinner={<OverviewSkelton />}
+          skeleton={<Overview />}
           props={{ t: t, network: networkId }}
         />
       </div>
@@ -56,7 +56,7 @@ const HomePage = () => {
                 </h2>
                 <VmComponent
                   src={components?.latestBlocks}
-                  spinner={<LatestSkelton />}
+                  skeleton={<Latest />}
                   props={{ t: t, network: networkId }}
                 />
               </div>
@@ -67,11 +67,7 @@ const HomePage = () => {
                   {t('home:latestTxns')}
                 </h2>
                 <VmComponent
-                  spinner={
-                    <div className="max-w-lg w-full pl-3">
-                      <LatestSkelton />
-                    </div>
-                  }
+                  skeleton={<Latest />}
                   src={components?.latestTransactions}
                   props={{ t: t, network: networkId }}
                 />

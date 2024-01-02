@@ -46,8 +46,8 @@ import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
 import SortIcon from '@/includes/icons/SortIcon';
-import Skelton from '@/includes/Common/Skelton';
 import CloseCircle from '@/includes/icons/CloseCircle';
+import Skeleton from '@/includes/Common/Skeleton';
 
 export default function (props: Props) {
   const {
@@ -557,7 +557,7 @@ export default function (props: Props) {
     <>
       {isLoading ? (
         <div className="pl-6 max-w-sm py-4 h-[60px]">
-          <Skelton />
+          <Skeleton className="h-4" />
         </div>
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>

@@ -12,7 +12,7 @@
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 
-import Skelton from '@/includes/Common/Skelton';
+import Skeleton from '@/includes/Common/Skeleton';
 import {
   convertToMetricPrefix,
   formatTimestampToString,
@@ -252,15 +252,15 @@ export default function ({ currentPage, setPage, t, network }: Props) {
     <>
       {isLoading ? (
         <div className="pl-6 max-w-sm py-4 h-[60px]">
-          <Skelton />
+          <Skeleton />
         </div>
       ) : (
         <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
           {t
             ? t('blocks:listing', {
-                from: localFormat(start?.block_height),
-                to: localFormat(end?.block_height),
-                count: localFormat(totalCount),
+                from: localFormat(start?.block_height | 0),
+                to: localFormat(end?.block_height | 0),
+                count: localFormat(totalCount | 0),
               })
             : `Block #${localFormat(start?.block_height)} to ${
                 '#' + localFormat(end?.block_height)

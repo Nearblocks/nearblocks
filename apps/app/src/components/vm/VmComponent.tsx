@@ -4,7 +4,7 @@ import { useVmStore } from '@/stores/vm';
 type Props = {
   src: string;
   props?: Record<string, unknown>;
-  spinner?: JSX.Element;
+  skeleton?: JSX.Element;
 };
 
 export function VmComponent(props: Props) {
@@ -12,7 +12,7 @@ export function VmComponent(props: Props) {
   const redirectMapStore = useBosLoaderStore();
 
   if (!EthersProvider || !redirectMapStore.hasResolved) {
-    return props.spinner;
+    return props.skeleton || null;
   }
 
   return (

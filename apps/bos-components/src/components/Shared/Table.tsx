@@ -1,5 +1,5 @@
-import Skelton from '@/includes/Common/Skelton';
 import Paginator from '@/includes/Common/Paginator';
+import Skeleton from '@/includes/Common/Skeleton';
 /**
  * @param {boolean} isLoading - Represents the loading state of the data.
  * @param {Array} columns - An array of objects defining the columns for the table.
@@ -52,7 +52,7 @@ export default function (props: Props) {
               <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
                 {props.columns.map((column, colIndex) => (
                   <td key={colIndex} className={column.tdClassName}>
-                    <Skelton />
+                    <Skeleton className="h-4" />
                   </td>
                 ))}
               </tr>

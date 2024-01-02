@@ -4,8 +4,7 @@ import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { useEffect, useState } from 'react';
 import Router, { useRouter } from 'next/router';
-
-import TableSkelton from '@/components/lib/Spinner/TableSkelton';
+import List from '@/components/skeleton/common/List';
 
 const TopFTTokens = () => {
   const router = useRouter();
@@ -40,7 +39,7 @@ const TopFTTokens = () => {
             <div className=" bg-white border soft-shadow rounded-lg pb-1 ">
               <VmComponent
                 src={components?.ftList}
-                spinner={<TableSkelton />}
+                skeleton={<List />}
                 props={{
                   t: t,
                   currentPage: currentPage,

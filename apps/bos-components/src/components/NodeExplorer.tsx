@@ -1,4 +1,4 @@
-import Skelton from '@/includes/Common/Skelton';
+import Skeleton from '@/includes/Common/Skeleton';
 import { formatWithCommas } from '@/includes/formats';
 import {
   convertAmountToReadableString,
@@ -318,7 +318,7 @@ export default function () {
                     </div>
                     <div className="w-full md:w-3/4 break-words">
                       {isLoading ? (
-                        <Skelton className="w-16 break-words" />
+                        <Skeleton className="h-4 w-16 break-words" />
                       ) : (
                         currentValidators?.length
                       )}
@@ -330,7 +330,7 @@ export default function () {
                     </div>
                     <div className="w-full md:w-3/4 break-words">
                       {isLoading ? (
-                        <Skelton className="w-16 break-words" />
+                        <Skeleton className="h-4 w-16 break-words" />
                       ) : (
                         convertAmountToReadableString(
                           totalStake,
@@ -345,7 +345,7 @@ export default function () {
                     </div>
                     <div className="w-full md:w-3/4 break-words">
                       {isLoading ? (
-                        <Skelton className="w-16 break-words" />
+                        <Skeleton className="h-4 w-16 break-words" />
                       ) : (
                         <>
                           {convertAmountToReadableString(
@@ -372,7 +372,7 @@ export default function () {
                     </div>
                     <div className="w-full text-green-500 md:w-3/4 break-words">
                       {!elapsedTime ? (
-                        <Skelton className="h-3 w-32" />
+                        <Skeleton className="h-3 w-32" />
                       ) : (
                         convertTimestampToTime(elapsedTime)
                       )}
@@ -382,7 +382,7 @@ export default function () {
                     <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA:</div>
                     <div className="w-full md:w-3/4 text-green-500 break-words">
                       {!totalSeconds ? (
-                        <Skelton className="h-3 w-32" />
+                        <Skeleton className="h-3 w-32" />
                       ) : (
                         convertTimestampToTime(totalSeconds)
                       )}
@@ -394,7 +394,7 @@ export default function () {
                     </div>
                     <div className="w-full md:w-3/4 break-words">
                       {!epochProgress ? (
-                        <Skelton className="h-3 w-full" />
+                        <Skeleton className="h-3 w-full" />
                       ) : (
                         <div className="flex space-x-4 gap-2 items-center ">
                           <div className="bg-blue-50 h-2 w-full rounded-full">
@@ -419,7 +419,7 @@ export default function () {
                 <div className="flex flex-col">
                   {isLoading ? (
                     <p className="leading-7 px-3 text-sm mb-4 text-gray-500">
-                      <Skelton className="w-25 break-words" />
+                      <Skeleton className=" h-4 w-25 break-words" />
                     </p>
                   ) : (
                     <p className="leading-7 px-3 text-sm mb-4 text-gray-500">
