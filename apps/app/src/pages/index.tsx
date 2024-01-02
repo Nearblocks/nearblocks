@@ -40,7 +40,7 @@ const HomePage = () => {
       </div>
       <div>
         <VmComponent
-          src={components?.transactionOverview}
+          src={components?.transactionsOverview}
           skeleton={<Overview />}
           props={{ t: t, network: networkId }}
         />
@@ -55,7 +55,7 @@ const HomePage = () => {
                   {t('home:latestBlocks')}
                 </h2>
                 <VmComponent
-                  src={components?.latestBlocks}
+                  src={components?.blocksLatest}
                   skeleton={<Latest />}
                   props={{ t: t, network: networkId }}
                 />
@@ -68,7 +68,7 @@ const HomePage = () => {
                 </h2>
                 <VmComponent
                   skeleton={<Latest />}
-                  src={components?.latestTransactions}
+                  src={components?.transactionsLatest}
                   props={{ t: t, network: networkId }}
                 />
               </div>

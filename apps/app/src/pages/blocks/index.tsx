@@ -39,7 +39,7 @@ const Blocks = () => {
             <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
               <VmComponent
                 skeleton={<List />}
-                src={components?.blocks}
+                src={components?.blocksList}
                 props={{
                   currentPage: currentPage,
                   setPage: setPage,

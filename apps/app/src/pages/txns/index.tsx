@@ -90,7 +90,7 @@ const TransactionList = () => {
             <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
               <VmComponent
                 skeleton={<List />}
-                src={components?.transaction}
+                src={components?.transactionsList}
                 props={{
                   currentPage: currentPage,
                   t: t,
