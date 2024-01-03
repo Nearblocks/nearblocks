@@ -51,6 +51,7 @@ export type NftsInfo = {
   contract: string;
   nft_meta: MetaInfo;
   quantity: number;
+  nft_token_meta: string;
 };
 
 export type InventoryInfo = {
@@ -225,10 +226,7 @@ export type TransactionInfo = {
   receiver_account_id: string;
   signer_account_id: string;
   transaction_hash: string;
-  receipts: {
-    fts: [];
-    nfts: [];
-  }[];
+  receipts: InventoryInfo[];
 };
 
 export type ChartStat = {
@@ -306,32 +304,44 @@ export type GasProfileInfo = {
   gas_used: string;
 };
 
-export type OutcomeInfo = {
-  block_hash: string;
-  id: string;
-  outcome: {
-    executor_id: string;
-    gas_burnt: number;
-    logs: [];
-    metadata: {
-      gas_profile: GasProfileInfo[];
-      version: number;
-    };
-    receipt_ids: string[];
-    status: {
-      Failure: {
-        ActionError: {
-          index: number;
-          kind: {
-            FunctionCallError: {
-              ExecutionError: string;
-            };
+export type outcomePropsInfo = {
+  executor_id: string;
+  gas_burnt: number;
+  logs: [];
+  metadata: {
+    gas_profile: GasProfileInfo[];
+    version: number;
+  };
+  outgoing_receipts: {
+    actions: {
+      action_kind: string;
+      args: {
+        stake: number;
+        deposit: number;
+      };
+    }[];
+    outcome: outcomePropsInfo;
+  };
+  receipt_ids: string[];
+  status: {
+    Failure: {
+      ActionError: {
+        index: number;
+        kind: {
+          FunctionCallError: {
+            ExecutionError: string;
           };
         };
       };
     };
-    tokens_burnt: string;
   };
+  tokens_burnt: string;
+};
+
+export type OutcomeInfo = {
+  block_hash: string;
+  id: string;
+  outcome: outcomePropsInfo;
   proof: {
     direction: string;
     hash: string;
@@ -372,7 +382,7 @@ export type InfoStatus = {
 export type TransInfo = {
   actions: {
     FunctionCall: FunctionCallInfo[];
-  };
+  }[];
   hash: string;
   nonce: number;
   public_key: string;
@@ -381,7 +391,7 @@ export type TransInfo = {
   signer_id: string;
 };
 
-export type TransactionStatusInfo = {
+export type RPCTransactionInfo = {
   receipts: ReceiptsInfo[];
   receipts_outcome: OutcomeInfo[];
   status: InfoStatus;
@@ -425,10 +435,168 @@ export type EventPropsInfo = {
   event: TransactionLog;
   network: string;
 };
+
+export type DepositPropsInfo = {
+  event: {
+    token_id: string;
+    account_id: string;
+    amount: string;
+  }[];
+  network: string;
+};
+
+export type ActionPropsInfo = {
+  action: {
+    from: string;
+    to: string;
+    action_kind: string;
+    args: {
+      stake: number;
+      deposit: number;
+    };
+  };
+};
+export type ArgsPropsInfo = {
+  access_key: {
+    permission: {
+      permission_kind: string;
+      FunctionCall: {
+        method_names: [];
+        receiver_id: string;
+      };
+    };
+  };
+  public_key: string;
+  beneficiary_id: string;
+  method_name: string;
+  args_base64: string;
+  args: string;
+  stake: number;
+  deposit: number;
+};
+
+export type TransactionActionInfo = {
+  args: ArgsPropsInfo;
+  receiver: string;
+  t: (key: string) => string | undefined;
+};
+
+export type ReceiptsPropsInfo = {
+  actions: {
+    action_kind: string;
+    args: {
+      deposit: string;
+      access_key: {
+        nonce: number;
+        permission: string;
+      };
+      public_key: string;
+    };
+  }[];
+  block_hash: string;
+  id: string;
+  outcome: {
+    executor_id: string;
+    gas_burnt: number;
+    logs: [];
+    metadata: {
+      gas_profile: [];
+      version: number;
+    };
+    receipt_ids: string[];
+    status: {
+      SuccessValue: string;
+    };
+    tokens_burnt: number;
+    outgoing_receipts: {
+      predecessor_id: string;
+      receipt: {
+        Action: {
+          actions: [
+            {
+              Transfer: {
+                deposit: string;
+              };
+            },
+          ];
+          gas_price: string;
+          input_data_ids: [];
+          output_data_receivers: [];
+          signer_id: string;
+          signer_public_key: string;
+        };
+      };
+      receipt_id: string;
+      receiver_id: string;
+      actions: {
+        action_kind: string;
+        args: {
+          deposit: string;
+        };
+      }[];
+      block_hash: string;
+      id: string;
+      outcome: {
+        executor_id: string;
+        gas_burnt: number;
+        logs: [];
+        metadata: {
+          gas_profile: [];
+          version: number;
+        };
+        receipt_ids: [];
+        status: {
+          SuccessValue: string;
+        };
+        tokens_burnt: number;
+        outgoing_receipts: [];
+      };
+      proof: {
+        direction: string;
+        hash: string;
+      }[];
+    }[];
+  };
+  predecessor_id: string;
+  proof: {
+    direction: string;
+    hash: string;
+  }[];
+  receipt: {
+    Action: {
+      actions: [
+        string,
+        {
+          Transfer: {
+            deposit: string;
+          };
+        },
+        {
+          AddKey: {
+            access_key: {
+              nonce: 0;
+              permission: string;
+            };
+            public_key: string;
+          };
+        },
+      ];
+      gas_price: string;
+      input_data_ids: [];
+      output_data_receivers: [];
+      signer_id: string;
+      signer_public_key: string;
+    };
+  };
+  receipt_id: string;
+  receiver_id: string;
+};
+
 export type Sorting = {
   sort: string;
   order: 'asc' | 'desc';
 };
+
 export type Token = {
   name: string;
   contract: string;
@@ -440,4 +608,33 @@ export type Token = {
   market_cap: number | null;
   onchain_market_cap: number | null;
   holders: number;
+};
+
+export type TransActionProps = {
+  key: number;
+  action: {
+    action_kind: string;
+    args: ArgsPropsInfo;
+  };
+  receiver: any;
+  t: (key: string) => string | undefined;
+};
+
+export type TokenInfoProps = {
+  contract: string;
+  amount: number;
+  decimals: number;
+  network: string;
+};
+
+export type ReceiptStatsProps = {
+  receipt: {
+    outcome: {
+      status: {
+        SuccessValue?: any;
+        Failure?: any;
+        SuccessReceiptId?: any;
+      };
+    };
+  };
 };

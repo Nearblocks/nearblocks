@@ -36,7 +36,7 @@ const HomePage = () => {
         </div>
       </div>
       <VmComponent
-        src={components?.transactionOverview}
+        src={components?.transactionsOverview}
         props={{ network: networkId }}
       />
       <div className="py-8 relative"></div>
@@ -49,7 +49,7 @@ const HomePage = () => {
                   {t('home:latestBlocks')}
                 </h2>
                 <VmComponent
-                  src={components?.latestBlocks}
+                  src={components?.blocksLatest}
                   props={{ network: networkId }}
                 />
               </div>
@@ -60,7 +60,7 @@ const HomePage = () => {
                   {t('home:latestTxns')}
                 </h2>
                 <VmComponent
-                  src={components?.latestTransactions}
+                  src={components?.transactionsLatest}
                   props={{ network: networkId }}
                 />
               </div>

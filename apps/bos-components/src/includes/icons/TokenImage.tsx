@@ -8,21 +8,20 @@
 
 interface Props {
   src: string;
-  alt: string;
-  className: string;
+  alt?: string;
+  className?: string;
   appUrl?: string;
+  onLoad?: () => void;
 }
 
-const TokenImage = (props: Props) => {
-  const placeholder = `${props.appUrl}images/tokenplaceholder.svg`;
+const TokenImage = ({ appUrl, src, alt, ...rest }: Props) => {
+  const placeholder = `${appUrl}images/tokenplaceholder.svg`;
+  const onError = (e: any) => {
+    e.target.onError = null;
+    e.target.src = placeholder;
+  };
 
-  return (
-    <img
-      src={props.src || placeholder}
-      alt={props.alt}
-      className={props.className}
-    />
-  );
+  return <img src={src || placeholder} alt={alt} {...rest} onError={onError} />;
 };
 
 export default TokenImage;
