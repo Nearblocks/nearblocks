@@ -75,7 +75,7 @@ const TransactionList = () => {
 
   return (
     <VmComponent
-      src={components?.transaction}
+      src={components?.transactionsList}
       props={{
         currentPage: currentPage,
         setPage: setPage,
