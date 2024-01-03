@@ -22,3 +22,5 @@ declare const Select;
 declare const ScrollArea;
 declare const Buffer;
 declare const useMemo;
+declare const Tabs;
+declare const Accordion;

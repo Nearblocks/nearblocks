@@ -157,7 +157,15 @@ export function convertToMetricPrefix(number: number) {
     count++;
   }
 
-  return number.toFixed(2) + ' ' + prefixes[count];
+  // Check if the number is close to an integer value
+  if (Math.abs(number) >= 10) {
+    number = Math.round(number); // Round the number to the nearest whole number
+    return number + ' ' + prefixes[count];
+  }
+
+  return (
+    Number(Math.floor(number * 100) / 100).toFixed(2) + ' ' + prefixes[count]
+  );
 }
 
 export function gasFee(gas: number, price: number) {
@@ -266,7 +274,7 @@ export function shortenTokenSymbol(token: string) {
 export function gasPercentage(gasUsed: string, gasAttached: string) {
   if (!gasAttached) return 'N/A';
 
-  const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed();
+  const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed(2);
   return `${formattedNumber}%`;
 }
 export function serialNumber(index: number, page: number, perPage: number) {

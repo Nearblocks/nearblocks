@@ -24,7 +24,7 @@ const Blocks = () => {
 
   return (
     <VmComponent
-      src={components?.blocks}
+      src={components?.blocksList}
       props={{
         currentPage: currentPage,
         setPage: setPage,
