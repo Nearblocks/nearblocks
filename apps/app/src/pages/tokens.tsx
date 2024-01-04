@@ -34,20 +34,18 @@ const TopFTTokens = () => {
       </div>
 
       <div className="container mx-auto px-3 -mt-48 ">
-        <div className="block lg:flex lg:space-x-2">
+        <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
-            <div className=" bg-white border soft-shadow rounded-lg pb-1 ">
-              <VmComponent
-                src={components?.ftList}
-                skeleton={<List />}
-                props={{
-                  t: t,
-                  currentPage: currentPage,
-                  setPage: setPage,
-                  network: networkId,
-                }}
-              />
-            </div>
+            <VmComponent
+              src={components?.ftList}
+              skeleton={<List />}
+              props={{
+                t: t,
+                currentPage: currentPage,
+                setPage: setPage,
+                network: networkId,
+              }}
+            />
           </div>
         </div>
       </div>

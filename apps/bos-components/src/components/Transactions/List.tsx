@@ -72,7 +72,6 @@ export default function (props: Props) {
 
   useEffect(() => {
     function fetchTotalTxns(qs?: string) {
-      setIsLoading(true);
       const queryParams = qs ? '?' + qs : '';
       asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
         method: 'GET',
@@ -92,9 +91,7 @@ export default function (props: Props) {
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     function fetchTxnsData(qs?: string, sqs?: string) {
@@ -554,9 +551,9 @@ export default function (props: Props) {
   ];
 
   return (
-    <>
+    <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
       {isLoading ? (
-        <div className="pl-6 max-w-sm py-4 h-[60px]">
+        <div className="pl-6 max-w-lg w-full py-4 h-[60px]">
           <Skeleton className="h-4" />
         </div>
       ) : (
@@ -609,6 +606,6 @@ export default function (props: Props) {
           }}
         />
       }
-    </>
+    </div>
   );
 }

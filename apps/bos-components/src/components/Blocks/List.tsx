@@ -44,7 +44,6 @@ export default function ({ currentPage, setPage, t, network }: Props) {
 
   useEffect(() => {
     function fetchTotalBlocks() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}blocks/count`, {
         method: 'GET',
         headers: {
@@ -62,9 +61,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     function fetchBlocks() {
@@ -249,10 +246,10 @@ export default function ({ currentPage, setPage, t, network }: Props) {
   ];
 
   return (
-    <>
+    <div className=" bg-white border soft-shadow rounded-lg pb-1 ">
       {isLoading ? (
-        <div className="pl-6 max-w-sm py-4 h-[60px]">
-          <Skeleton />
+        <div className="pl-6 max-w-lg w-full py-4 h-[60px]">
+          <Skeleton className="h-4" />
         </div>
       ) : (
         <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
@@ -284,6 +281,6 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           }}
         />
       }
-    </>
+    </div>
   );
 }

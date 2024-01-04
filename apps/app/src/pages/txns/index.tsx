@@ -85,23 +85,21 @@ const TransactionList = () => {
         </div>
       </div>
       <div className="container mx-auto px-3 -mt-48">
-        <div className="block lg:flex lg:space-x-2">
-          <div className="w-full">
-            <div className="bg-white border soft-shadow rounded-lg overflow-hidden">
-              <VmComponent
-                skeleton={<List />}
-                src={components?.transactionsList}
-                props={{
-                  currentPage: currentPage,
-                  t: t,
-                  setPage: setPage,
-                  filters: filtersObject,
-                  handleFilter: handleFilter,
-                  onFilterClear: onFilterClear,
-                  network: networkId,
-                }}
-              />{' '}
-            </div>
+        <div className=" relative block lg:flex lg:space-x-2">
+          <div className=" w-full">
+            <VmComponent
+              skeleton={<List />}
+              src={components?.transactionsList}
+              props={{
+                currentPage: currentPage,
+                t: t,
+                setPage: setPage,
+                filters: filtersObject,
+                handleFilter: handleFilter,
+                onFilterClear: onFilterClear,
+                network: networkId,
+              }}
+            />{' '}
           </div>
         </div>
       </div>

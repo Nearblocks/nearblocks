@@ -64,7 +64,6 @@ export default function ({ t, network, currentPage, setPage }: Props) {
 
   useEffect(() => {
     function fetchTotalTokens(qs?: string) {
-      setIsLoading(true);
       const queryParams = qs ? '?' + qs : '';
       asyncFetch(`${config?.backendUrl}fts/count${queryParams}`, {
         method: 'GET',
@@ -83,9 +82,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     function fetchTokens(qs?: string, sqs?: Sorting) {
@@ -437,11 +434,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
   ];
 
   return (
-    <>
+    <div className=" bg-white border soft-shadow rounded-lg pb-1 ">
       <div className="flex flex-row items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
         {isLoading ? (
           <div className="max-w-lg w-full pl-3">
-            <Skeleton className="h-5" />
+            <Skeleton className="h-4" />
           </div>
         ) : (
           <p className="pl-3">
@@ -514,6 +511,6 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           Error: errorMessage,
         }}
       />
-    </>
+    </div>
   );
 }

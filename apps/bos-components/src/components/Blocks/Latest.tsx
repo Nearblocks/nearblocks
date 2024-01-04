@@ -64,7 +64,7 @@ export default function ({ network, t }: Props) {
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!blocks && error && (
+            {!blocks && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 {t ? t('home:error') : 'Error!'}
               </div>
