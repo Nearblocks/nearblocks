@@ -132,7 +132,7 @@ export function timeAgo(unixTimestamp: number): string {
     const daysAgo: number = Math.floor(secondsAgo / 86400);
     return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
   }
-  }
+}
 export function shortenAddress(address: string) {
   const string = String(address);
 
