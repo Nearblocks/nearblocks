@@ -13,7 +13,6 @@ interface Props {
   fetchStyles?: boolean;
 }
 
-import Skelton from '@/includes/Common/Skelton';
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
 import {
   yoctoToNear,
@@ -44,6 +43,7 @@ import {
   FtInfo,
   TokenListInfo,
 } from '@/includes/types';
+import Skeleton from '@/includes/Common/Skeleton';
 
 export default function (props: Props) {
   const [loading, setLoading] = useState(false);
@@ -443,7 +443,7 @@ export default function (props: Props) {
       <div className="container mx-auto px-3">
         <div className="flex items-center justify-between flex-wrap pt-4">
           {!props.id ? (
-            <Skelton />
+            <Skeleton className="h-4" />
           ) : (
             <h1 className="flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
               Near Account: @&nbsp;{' '}
@@ -509,7 +509,7 @@ export default function (props: Props) {
                 <div className="flex py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0">Balance:</div>
                   {loading ? (
-                    <Skelton />
+                    <Skeleton className="h-4" />
                   ) : (
                     <div className="w-full md:w-3/4">
                       {yoctoToNear(accountData?.amount || 0, true)} Ⓝ
@@ -520,7 +520,7 @@ export default function (props: Props) {
                   <div className="flex py-4 text-sm text-gray-600">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">Value</div>
                     {loading ? (
-                      <Skelton />
+                      <Skeleton className="h-4" />
                     ) : (
                       <div className="w-full md:w-3/4 break-words">
                         $
@@ -562,7 +562,7 @@ export default function (props: Props) {
                     <div className="w-full mb-2 md:mb-0">Staked Balance:</div>
                     {loading ? (
                       <div className="w-full mb-2 break-words">
-                        <Skelton className="" />
+                        <Skeleton className="h-4" />
                       </div>
                     ) : (
                       <div className="w-full mb-2 break-words">
@@ -574,7 +574,7 @@ export default function (props: Props) {
                     <div className="w-full mb-2 md:mb-0">Storage Used:</div>
                     {loading ? (
                       <div className="w-full mb-2 break-words">
-                        <Skelton className="" />
+                        <Skeleton className="h-4" />
                       </div>
                     ) : (
                       <div className="w-full break-words xl:mt-0 mb-2">
@@ -587,7 +587,7 @@ export default function (props: Props) {
                   <div className="flex xl:flex-nowrap items-center justify-between py-4 w-full">
                     {loading ? (
                       <div className="w-full mb-2 md:mb-0">
-                        <Skelton className="" />
+                        <Skeleton className="h-4" />
                       </div>
                     ) : (
                       <div className="w-full mb-2 md:mb-0">
@@ -598,7 +598,7 @@ export default function (props: Props) {
                     )}
                     {loading ? (
                       <div className="w-full mb-2 break-words">
-                        <Skelton className="" />
+                        <Skeleton className="h-4" />
                       </div>
                     ) : (
                       <div className="w-full mb-2 break-words">

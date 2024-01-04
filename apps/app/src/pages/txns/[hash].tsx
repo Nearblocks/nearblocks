@@ -17,7 +17,7 @@ const Txn = () => {
       <VmComponent
         src={components?.transactionsHash}
         props={{ hash: hash, network: networkId, t: t }}
-        spinner={<Detail />}
+        skeleton={<Detail />}
       />
       <div className="py-8"></div>
     </div>

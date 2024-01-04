@@ -1,16 +1,19 @@
 /**
- * Component: LatestTransactions
+ * Component: TransactionsLatest
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  * @interface Props
+ * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
  */
 
 interface Props {
+  t: (key: string) => string | undefined;
   network: string;
 }
 
+import Skeleton from '@/includes/Common/Skeleton';
 import { getTimeAgoString, shortenHex } from '@/includes/formats';
 import {
   getConfig,
@@ -20,19 +23,12 @@ import {
 } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
-export default function (props: Props) {
+export default function ({ t, network }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
-      ></div>
-    );
-  };
-
-  const config = getConfig(props.network);
+  const config = getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -49,6 +45,8 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns;
             setTxns(resp);
+            setError(false);
+            setIsLoading(false);
 
             delay = 5000;
             retries = 0;
@@ -59,8 +57,9 @@ export default function (props: Props) {
             delay = Math.min(2 ** retries * 1000, 60000);
             retries++;
           }
+          setIsLoading(false);
+          setError(true);
         });
-      setIsLoading(false);
     }
 
     fetchLatestTxns();
@@ -77,17 +76,17 @@ export default function (props: Props) {
           <ScrollArea.Viewport>
             {!txns && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                Error!
+                {t ? t('home:error') : ' Error!'}
               </div>
             )}
-            {!isLoading && txns.length === 0 && (
+            {!error && !isLoading && txns.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
-                No transactions found!
+                {t ? t('home:noTxns') : ' No transactions found!'}
               </div>
             )}
-            {isLoading && (
+            {txns.length === 0 && (
               <div className="px-3 divide-y h-80">
-                {[...Array(10)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3 h-16"
                     key={i}
@@ -98,21 +97,31 @@ export default function (props: Props) {
                       </div>
                       <div className="px-2">
                         <div className="text-green-500 text-sm">
-                          <Loader className="h-4" wrapperClassName="h-5 w-14" />
+                          <div className="h-5 w-14">
+                            <Skeleton className="h-4" />
+                          </div>
                         </div>
                         <div className="text-gray-400 text-xs">
-                          <Loader className="h-3" wrapperClassName="h-4 w-24" />
+                          <div className="h-4 w-24">
+                            <Skeleton className="h-3" />
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
-                      <Loader className="h-4" wrapperClassName="h-5 w-36" />
+                      <div className="h-5 w-36">
+                        <Skeleton className="h-4" />
+                      </div>
                       <div className="text-gray-400 text-sm">
-                        <Loader className="h-4" wrapperClassName="h-5 w-14" />
+                        <div className="h-5 w-14">
+                          <Skeleton className="h-4" />
+                        </div>
                       </div>
                     </div>
                     <div className="text-right order-1 md:order-2">
-                      <Loader wrapperClassName="ml-auto w-32" />
+                      <div className="ml-auto w-32">
+                        <Skeleton className="h-4" />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -150,7 +159,7 @@ export default function (props: Props) {
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                         <div className="whitespace-nowrap truncate">
-                          From{' '}
+                          {t ? t('home:txnFrom') : 'From'}{' '}
                           <a
                             href={`/address/${txn.signer_account_id}`}
                             className="hover:no-underline"
@@ -161,7 +170,7 @@ export default function (props: Props) {
                           </a>
                         </div>
                         <div className="whitespace-nowrap truncate">
-                          To{' '}
+                          {t ? t('home:txnTo') : 'To'}{' '}
                           <a
                             href={`/address/${txn.receiver_account_id}`}
                             className="hover:no-underline"
@@ -214,9 +223,9 @@ export default function (props: Props) {
           <ScrollArea.Corner className="bg-black-500" />
         </ScrollArea.Root>
       </div>
-      {isLoading && (
+      {txns.length === 0 && (
         <div className="border-t px-2 py-3 text-gray-700">
-          <Loader className="h-10" />
+          <Skeleton className="h-10" />
         </div>
       )}
       {txns && txns.length > 0 && (

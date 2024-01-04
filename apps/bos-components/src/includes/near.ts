@@ -20,11 +20,14 @@ export function decodeArgs(args: number[]) {
   return JSON.parse(Buffer.from(encodedString, 'base64').toString());
 }
 
-export function txnMethod(actions: { action: string; method: string }[]) {
+export function txnMethod(
+  actions: { action: string; method: string }[],
+  t: (key: string, options?: { count?: string | undefined }) => string,
+) {
   const count = actions?.length || 0;
 
-  if (!count) return 'Unknown';
-  if (count > 1) return 'Batch Transaction';
+  if (!count) return t ? t('txns:unknownType') : 'Unknown';
+  if (count > 1) return t ? t('txns:batchTxns') : 'Batch Transaction';
 
   const action = actions[0];
 

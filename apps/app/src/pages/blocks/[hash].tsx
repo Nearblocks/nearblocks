@@ -21,7 +21,7 @@ const Block = () => {
           network: networkId,
           t: t,
         }}
-        spinner={<Detail />}
+        skeleton={<Detail />}
       />
     </div>
   );

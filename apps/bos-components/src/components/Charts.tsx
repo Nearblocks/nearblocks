@@ -17,7 +17,7 @@ interface Props {
   network: string;
 }
 
-import Skelton from '@/includes/Common/Skelton';
+import Skeleton from '@/includes/Common/Skeleton';
 import { getConfig, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
@@ -456,7 +456,7 @@ export default function (props: Props) {
                     }}
                   />
                 ) : (
-                  <Skelton className="h-[93%] w-full" />
+                  <Skeleton className="h-[93%] w-full" />
                 )}
               </div>
             </div>
