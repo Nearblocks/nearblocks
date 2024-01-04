@@ -44,7 +44,7 @@ export function fiatValue(big: number, price: number) {
   const value = Big(big).mul(Big(price)).toString();
   const formattedNumber = Number(value).toLocaleString('en', {
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 6,
   });
   return formattedNumber;
 }
@@ -53,19 +53,11 @@ export function nanoToMilli(nano: number) {
   return new Big(nano).div(new Big(10).pow(6)).round().toNumber();
 }
 
-export function shortenAddress(address: string) {
-  const string = String(address);
-
-  if (string.length <= 20) return string;
-
-  return `${string.substr(0, 10)}...${string.substr(-7)}`;
-}
-
 export function truncateString(str: string, maxLength: number, suffix: string) {
   if (str.length <= maxLength) {
     return str;
   }
-  return str.substring(0, maxLength - suffix.length) + suffix;
+  return str.substring(0, maxLength) + suffix;
 }
 
 export function getConfig(network: string) {
@@ -120,4 +112,12 @@ export function debounce<TArgs extends any[]>(
   debounced.flush = (arg) => func(arg);
 
   return debounced;
+}
+
+export function shortenAddress(address: string) {
+  const string = String(address);
+
+  if (string.length <= 20) return string;
+
+  return `${string.substr(0, 10)}...${string.substr(-7)}`;
 }

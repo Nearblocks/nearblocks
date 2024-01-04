@@ -27,7 +27,7 @@ const ComponentUrl = {
   transactionsHash: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Hash`,
   search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
   ftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.List`,
-  charts: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.charts`,
+  charts: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Charts`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,
