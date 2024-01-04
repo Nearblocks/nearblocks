@@ -6,13 +6,6 @@ on:
       - main
     paths:
       - 'apps/app/**'
-  pull_request:
-    branches:
-      - main
-    types: [closed]
-    paths:
-      - 'apps/app/**'
-
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
