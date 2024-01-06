@@ -1,7 +1,5 @@
 import { useVmStore } from '@/stores/vm';
 
-import { Spinner } from '../lib/Spinner';
-
 type Props = {
   className?: string;
   data: Record<string, unknown>;
@@ -14,7 +12,7 @@ export function VmCommitButton(props: Props) {
   const { near, CommitButton } = useVmStore();
 
   if (!near || !CommitButton) {
-    return <Spinner />;
+    return;
   }
 
   return <CommitButton near={near} {...props} />;
