@@ -4,11 +4,11 @@
  * License: Business Source License 1.1
  * Description: Top Tokens on Near Protocol.
  * @interface Props
- *  @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
- *  @param {string}  [network] - The network data to show, either mainnet or testnet.
- *  @param {number} [currentPage] - The current page number being displayed. (Optional)
+ * @param {Function} t - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- *  @param {function} [setPage] - A function used to set the current page. (Optional)
+ * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 interface Props {
@@ -89,7 +89,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=${initialPagination.per_page}`,
         {
           method: 'GET',
           headers: {
@@ -505,7 +505,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           isPagination: true,
           count: totalCount,
           page: currentPage,
-          limit: 25,
+          limit: initialPagination.per_page,
           pageLimit: 200,
           setPage: setPage,
           Error: errorMessage,

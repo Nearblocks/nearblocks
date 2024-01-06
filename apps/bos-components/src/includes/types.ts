@@ -608,6 +608,12 @@ export type Token = {
   market_cap: number | null;
   onchain_market_cap: number | null;
   holders: number;
+  base_uri: string;
+  reference: string;
+  tokens: number;
+  transfers: number;
+  transfers_3days: number;
+  transfers_day: number;
 };
 
 export type TransActionProps = {
