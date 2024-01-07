@@ -47,7 +47,22 @@ export default function (props: Props) {
             };
           }) => {
             const resp = data?.body?.txns?.[0];
-            setTxn(resp);
+            setTxn({
+              actions: resp.actions,
+              actions_agg: resp.actions_agg,
+              block: resp.block,
+              block_timestamp: resp.block_timestamp,
+              included_in_block_hash: resp.included_in_block_hash,
+              outcomes: resp.outcomes,
+              outcomes_agg: resp.outcomes_agg,
+              receipt_conversion_gas_burnt: resp.receipt_conversion_gas_burnt,
+              receipt_conversion_tokens_burnt:
+                resp.receipt_conversion_tokens_burnt,
+              receiver_account_id: resp.receiver_account_id,
+              signer_account_id: resp.signer_account_id,
+              transaction_hash: resp.transaction_hash,
+              receipts: resp.receipts,
+            });
             setIsLoading(false);
           },
         )

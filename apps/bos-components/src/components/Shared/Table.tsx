@@ -11,6 +11,9 @@ import Skeleton from '@/includes/Common/Skeleton';
  * @param {string} Error - Error message if there is no data.
  * @param {number} pageLimit - The maximum number of pages to display in pagination.
  * @param {function} setPage - A function used to set the current page of the table.
+ * @param {function} renderRowSubComponent - A function is used to render a sub-component for each row in the table.
+ * @param {Array} expanded - An array of numbers representing the indices of rows that are expanded.
+ * @param {boolean} isExpanded -  Flag for compact table display.
  */
 interface column {
   header: string;
@@ -30,6 +33,9 @@ interface Props {
   limit: number;
   pageLimit: number;
   setPage: (page: number) => void;
+  renderRowSubComponent: (row: any, rowIndex?: number) => React.ReactNode;
+  expanded: number[];
+  isExpanded: false;
   Error: string;
 }
 
@@ -64,40 +70,110 @@ export default function (props: Props) {
   }
   return (
     <>
-      <div className="overflow-x-auto ">
-        <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100 h-[51px]">
-            <tr>
-              {props?.columns.map((column: column, index: number) => (
-                <th key={index} scope="col" className={column.thClassName}>
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {!props.isLoading && props.data.length === 0 && (
-              <tr className="h-[53px]">
-                <td className="px-6 py-4 text-gray-400 text-xs">
-                  {props.Error}
-                </td>
+      {props.isExpanded ? (
+        <div className={`bg-gray-50 overflow-x-auto`}>
+          <table className={'min-w-full divide-y border-separate '}>
+            <thead>
+              <tr>
+                {props?.columns.map((column: column, index: number) => (
+                  <th key={index} scope="col" className={column.thClassName}>
+                    {column.header}
+                  </th>
+                ))}
               </tr>
-            )}
-            {props.data &&
-              props.data.map((row, rowIndex: number) => (
-                <tr key={rowIndex} className=" hover:bg-blue-900/5 h-[53px]">
-                  {props.columns.map((column: column, colIndex: number) => (
-                    <td key={colIndex} className={column.tdClassName}>
-                      {column.cell
-                        ? column.cell(row, rowIndex)
-                        : row[column.key]}
-                    </td>
-                  ))}
+            </thead>
+            <tbody>
+              {!props.isLoading && props.data.length === 0 && (
+                <tr className="h-[53px]">
+                  <td className="px-6 py-4 text-gray-400 text-xs">
+                    {props.Error}
+                  </td>
                 </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+              )}
+              {props.data &&
+                props.data.map((row, rowIndex: number) => (
+                  <>
+                    <tr key={rowIndex} className=" hover:bg-blue-900/5">
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td key={colIndex} className={column.tdClassName}>
+                          {column.cell
+                            ? column.cell(row, rowIndex)
+                            : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
+                    {row?.showWarning && (
+                      <tr className="h-[25px] hover:bg-blue-900/5">
+                        <td
+                          colSpan={props.columns.length}
+                          className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
+                        >
+                          {row?.warning}
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="overflow-x-auto ">
+          <table className="min-w-full divide-y border-t">
+            <thead className="bg-gray-100 h-[51px]">
+              <tr>
+                {props?.columns.map((column: column, index: number) => (
+                  <th key={index} scope="col" className={column.thClassName}>
+                    {column.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {!props.isLoading && props.data.length === 0 && (
+                <tr className="h-[53px]">
+                  <td className="px-6 py-4 text-gray-400 text-xs">
+                    {props.Error}
+                  </td>
+                </tr>
+              )}
+              {props.data &&
+                props.data.map((row, rowIndex: number) => (
+                  <>
+                    <tr
+                      key={rowIndex}
+                      className=" hover:bg-blue-900/5 h-[53px]"
+                    >
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td key={colIndex} className={column.tdClassName}>
+                          {column.cell
+                            ? column.cell(row, rowIndex)
+                            : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
+                    {row?.showWarning && (
+                      <tr className="h-[57px] hover:bg-blue-900/5">
+                        <td
+                          colSpan={props.columns.length}
+                          className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
+                        >
+                          {row?.warning}
+                        </td>
+                      </tr>
+                    )}
+
+                    {row.isExpanded ||
+                    (props.expanded.length > 0 &&
+                      props.expanded.includes(rowIndex))
+                      ? props.renderRowSubComponent(row)
+                      : null}
+                  </>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       {props.isPagination ? (
         <Paginator
           loading={props?.isLoading}

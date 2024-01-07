@@ -14,22 +14,14 @@ interface Props {
   onLoad?: () => void;
 }
 
-const TokenImage = ({ appUrl, src, alt, className, onLoad }: Props) => {
+const TokenImage = ({ appUrl, src, alt, ...rest }: Props) => {
   const placeholder = `${appUrl}images/tokenplaceholder.svg`;
   const onError = (e: any) => {
     e.target.onError = null;
     e.target.src = placeholder;
   };
 
-  return (
-    <img
-      src={src || placeholder}
-      alt={alt}
-      className={className}
-      onLoad={onLoad}
-      onError={onError}
-    />
-  );
+  return <img src={src || placeholder} alt={alt} {...rest} onError={onError} />;
 };
 
 export default TokenImage;

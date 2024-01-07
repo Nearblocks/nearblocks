@@ -1,3 +1,5 @@
+import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
+
 export type SatsInfo = {
   near_price: number;
 };
@@ -304,7 +306,7 @@ export type GasProfileInfo = {
   gas_used: string;
 };
 
-export type outcomePropsInfo = {
+export type OutcomePropsInfo = {
   executor_id: string;
   gas_burnt: number;
   logs: [];
@@ -320,7 +322,7 @@ export type outcomePropsInfo = {
         deposit: number;
       };
     }[];
-    outcome: outcomePropsInfo;
+    outcome: OutcomePropsInfo;
   };
   receipt_ids: string[];
   status: {
@@ -341,7 +343,7 @@ export type outcomePropsInfo = {
 export type OutcomeInfo = {
   block_hash: string;
   id: string;
-  outcome: outcomePropsInfo;
+  outcome: OutcomePropsInfo;
   proof: {
     direction: string;
     hash: string;
@@ -614,6 +616,13 @@ export type Token = {
   transfers: number;
   transfers_3days: number;
   transfers_day: number;
+  website: string;
+  meta: {
+    twitter: string;
+    facebook: string;
+    telegram: string;
+    coingecko_id: string;
+  };
 };
 
 export type TransActionProps = {
@@ -631,6 +640,20 @@ export type TokenInfoProps = {
   amount: number;
   decimals: number;
   network: string;
+};
+
+export type ValidatorFullData = {
+  validatorEpochData: ValidatorEpochData[];
+  currentValidators: number;
+  totalStake: number;
+  seatPrice: number;
+  elapsedTime: number;
+  totalSeconds: number;
+  epochProgress: number;
+  validatorTelemetry: {
+    [accountId: string]: ValidatorTelemetry;
+  };
+  total: number;
 };
 
 export type ReceiptStatsProps = {

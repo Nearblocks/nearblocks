@@ -167,7 +167,18 @@ export function convertToMetricPrefix(number: number) {
     Number(Math.floor(number * 100) / 100).toFixed(2) + ' ' + prefixes[count]
   );
 }
+export function formatNumber(value: number): string {
+  const suffixes = ['', 'K', 'M', 'B', 'T'];
+  let suffixIndex = 0;
 
+  while (value >= 10000 && suffixIndex < suffixes.length - 1) {
+    value /= 1000;
+    suffixIndex++;
+  }
+
+  const formattedValue = value.toFixed(1).replace(/\.0+$/, '');
+  return `${formattedValue} ${suffixes[suffixIndex]}`;
+}
 export function gasFee(gas: number, price: number) {
   const near = yoctoToNear(Big(gas).mul(Big(price)).toString(), true);
 

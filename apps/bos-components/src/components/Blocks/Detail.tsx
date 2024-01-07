@@ -147,9 +147,9 @@ export default function (props: Props) {
             <h1 className="text-xl text-gray-700 px-2 py-4">
               {t ? (
                 <>
-                  {t('blocks:block.heading.0')}
+                  {t('blocks:blockHeading.text')}
                   <span key={1} className="font-semibold">
-                    {t('blocks:block.heading.1', {
+                    {t('blocks:blockHeading.content', {
                       block: localFormat(block.block_height | 0),
                     })}
                   </span>
@@ -242,12 +242,12 @@ export default function (props: Props) {
               {t ? (
                 <>
                   <LinkWrapper href={`/txns?block=${block.block_hash}`}>
-                    {t('blocks:block.transactions.1', {
+                    {t('blocks:blockTransactions.0', {
                       txns: localFormat(block.transactions_agg.count || 0),
                     })}
                   </LinkWrapper>
                   &nbsp;
-                  {t('blocks:block.transactions.2', {
+                  {t('blocks:blockTransactions.1', {
                     receipts: localFormat(block.receipts_agg.count || 0),
                   })}
                 </>

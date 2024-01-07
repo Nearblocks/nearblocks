@@ -11,9 +11,7 @@ type Props = {
 export function VmComponent(props: Props) {
   const { EthersProvider, Widget } = useVmStore();
   const redirectMapStore = useBosLoaderStore();
-  const [showLoader, setShowLoader] = useState(
-    !EthersProvider || !redirectMapStore.hasResolved,
-  );
+  const [showLoader, setShowLoader] = useState(true);
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(!EthersProvider || !redirectMapStore.hasResolved);
