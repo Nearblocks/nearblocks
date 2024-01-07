@@ -49,6 +49,17 @@ export type ValidatorPoolInfo = {
   fee: { denominator: number; numerator: number } | null;
 };
 
+type cumilativeStakeInfo = {
+  accumulatedPercent: number;
+  cumulativePercent: number;
+  ownPercentage: number;
+};
+
+type stakeChange = {
+  symbol: string;
+  value: string;
+};
+
 export type ValidatorEpochData = {
   accountId: string;
   afterNextEpoch?: {
@@ -56,16 +67,24 @@ export type ValidatorEpochData = {
   };
 
   contractStake?: string;
+  cumilativeStake?: cumilativeStakeInfo;
   currentEpoch?: {
     progress: ValidationProgress;
     stake: string;
   };
+  description?: ValidatorDescription;
   index?: number;
+  isExpanded?: string;
   nextEpoch?: {
     stake: string;
   };
+  percent?: number;
   poolInfo?: ValidatorPoolInfo;
   publicKey?: string;
+  showWarning?: boolean;
+  stakeChange?: stakeChange;
+  stakingStatus?: string;
+  warning?: string;
 };
 
 export type ValidatorTelemetry = {
@@ -79,7 +98,9 @@ export type ValidatorTelemetry = {
   latitude: null | string;
   longitude: null | string;
   nodeId: string;
+  showWarning?: boolean;
   status: string;
+  warning?: string;
 };
 
 export type ValidatorDescription = {

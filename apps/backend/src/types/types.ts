@@ -155,3 +155,32 @@ export type CronTaskMap = {
 export interface StakingPoolStakeProposals {
   valueMap: Map<string, number>;
 }
+
+export type ValidatorTelemetry = {
+  agentBuild: string;
+  agentName: string;
+  agentVersion: string;
+  city: null | string;
+  ipAddress: string;
+  lastHeight: number;
+  lastSeen: number;
+  latitude: null | string;
+  longitude: null | string;
+  nodeId: string;
+  status: string;
+};
+
+export type PoolMetadataAccountInfo = {
+  city?: string;
+  country?: string;
+  country_code: string;
+  description?: string;
+  discord?: string;
+  email?: string;
+  github?: string;
+  logo?: string;
+  name?: string;
+  telegram?: string;
+  twitter?: string;
+  url?: string;
+};

@@ -41,6 +41,17 @@ const jobs: Bree.JobOptions[] = [
   { cron: '0 * * * *', name: 'protocol-config', timeout: '5s' }, // every hour
   { cron: '*/5 * * * * *', hasSeconds: true, name: 'latest-block' }, // every 5s
   { cron: '*/10 * * * *', name: 'pool-id', timeout: '5s' }, // every 10 minute
+  {
+    cron: '*/5 * * * * *',
+    hasSeconds: true,
+    name: 'validator-telemetry',
+    timeout: '10s',
+  }, // every 5s
+  {
+    cron: '*/10 * * * *',
+    name: 'staking-pool-metadata',
+    timeout: '10s',
+  }, // every 10 minute
 ];
 
 const bree = new Bree({ jobs, logger, root });
