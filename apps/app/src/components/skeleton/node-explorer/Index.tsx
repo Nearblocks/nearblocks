@@ -6,7 +6,7 @@ const Index = () => {
   return (
     <div className="container mx-auto px-3 -mt-48">
       <div>
-        <div className="flex gap-4  mt-10">
+        <div className="relative flex gap-4  mt-10">
           <div className="w-full">
             <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
               <div>
@@ -78,11 +78,7 @@ const Index = () => {
         </div>
         <div className="py-5"></div>
         <div className="relative w-full mb-10">
-          {/* <div className="bg-white soft-shadow rounded-lg pb-1">
-              <div className="flex flex-col pt-4"> */}
           <List />
-          {/* </div>
-            </div> */}
         </div>
       </div>
     </div>

@@ -264,12 +264,12 @@ export default function ({ network, currentPage, setPage }: Props) {
               <div
                 className="absolute top-0 left-0 right-0 bottom-0 h-full bg-green-500 text-center flex items-center justify-center"
                 style={{
-                  width: `${row?.cumilativeStake?.cumulativePercent || 0}%`,
+                  width: `${row?.cumulativeStake?.cumulativePercent || 0}%`,
                 }}
               ></div>
               <span className="absolute  text-white inset-0 flex items-center justify-center">
-                {row?.cumilativeStake?.cumulativePercent
-                  ? `${row?.cumilativeStake?.cumulativePercent}%`
+                {row?.cumulativeStake?.cumulativePercent
+                  ? `${row?.cumulativeStake?.cumulativePercent}%`
                   : 'N/A'}
               </span>
             </div>

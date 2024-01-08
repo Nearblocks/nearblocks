@@ -553,7 +553,7 @@ export default function (props: Props) {
   return (
     <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
       {isLoading ? (
-        <div className="pl-6 max-w-lg w-full py-4 h-[60px]">
+        <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
         </div>
       ) : (

@@ -15,7 +15,7 @@ export function VmComponent(props: Props) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(!EthersProvider || !redirectMapStore.hasResolved);
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [EthersProvider, redirectMapStore.hasResolved]);
