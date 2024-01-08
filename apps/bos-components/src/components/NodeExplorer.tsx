@@ -46,12 +46,12 @@ export default function ({ network, currentPage, setPage }: Props) {
     initialValidatorFullData,
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [totalSuppy, setTotalSupplay] = useState('');
+  const [totalSuppy, setTotalSupplay] = useState(0);
   const [expanded, setExpanded] = useState<number[]>([]);
   const errorMessage = 'No validator data!';
   const config = getConfig(network);
 
-  const TotalSupply = yoctoToNear(Number(totalSuppy), false);
+  const TotalSupply = yoctoToNear(Number(totalSuppy || 0), false);
 
   useEffect(() => {
     function fetchValidatorData() {
@@ -90,7 +90,7 @@ export default function ({ network, currentPage, setPage }: Props) {
         .then((res: any) => {
           const data = res.body;
 
-          setTotalSupplay(data.stats[0].total_supply);
+          setTotalSupplay(data.stats[0].total_supply || 0);
         })
         .catch(() => {})
         .finally(() => {
