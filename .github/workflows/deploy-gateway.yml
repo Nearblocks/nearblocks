@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'apps/app/**'
+      - 'apps/api/**'
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
