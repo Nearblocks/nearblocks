@@ -44,7 +44,7 @@ const jobs: Bree.JobOptions[] = [
   {
     cron: '*/5 * * * * *',
     hasSeconds: true,
-    name: 'validator-telemetry',
+    name: 'nodevalidator-telemetry',
     timeout: '10s',
   }, // every 5s
   {
