@@ -6,8 +6,8 @@ const List = () => {
     <div className="absolute w-full h-full z-10">
       <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
         <div className=" flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
-          <div className="max-w-lg pl-3 w-full h-10 ">
-            <Skeleton className="mt-2 h-4" />
+          <div className="max-w-lg pl-3 w-full py-3 h-10 ">
+            <Skeleton className=" h-4" />
           </div>
         </div>
         <div className="overflow-x-auto ">

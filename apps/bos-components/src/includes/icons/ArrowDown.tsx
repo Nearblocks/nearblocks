@@ -4,7 +4,7 @@
  */
 
 interface Props {
-  className: string;
+  className?: string;
 }
 const ArrowDown = (props: Props) => {
   return (
