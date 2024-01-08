@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import schema from '#libs/schema/blocks';
+import schema from '#libs/schema/nodevalidator';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
-import validators from '#services/validators';
+import nodevalidator from '#services/nodevalidator';
 
 const route = Router();
 
@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    * @tags Validators
    * @return 200 - success response
    */
-  route.get('/', validator(schema.list), validators.list);
+  route.get('/', validator(schema.list), nodevalidator.list);
 };
 
 export default routes;

@@ -5,7 +5,11 @@ import {
   validatorApi,
 } from 'nb-near';
 import { Redis } from 'nb-redis';
-import { ValidatorEpochData, ValidatorPoolInfo } from 'nb-types';
+import {
+  ValidatorEpochData,
+  ValidatorPoolInfo,
+  ValidatorTelemetry,
+} from 'nb-types';
 
 import config from '#config';
 import db from '#libs/knex';
@@ -15,6 +19,7 @@ import {
   CachedTimestampMap,
   ExpGenesisConfig,
   ExpProtocolConfig,
+  PoolMetadataAccountInfo,
 } from '#types/types';
 
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
@@ -339,6 +344,10 @@ const saveValidatorLists = async (redis: Redis) => {
       'stakingPoolStakeProposalsFromContract',
     )) as CachedTimestampMap<string>;
 
+    const stakingPoolMetadataInfo = await redis.parse(
+      'stakingPoolMetadataInfo',
+    );
+
     let stakingPoolStakeProposals = new Map();
 
     if (
@@ -360,16 +369,26 @@ const saveValidatorLists = async (redis: Redis) => {
       stakingPoolInfosData = new Map(stakingPoolInfos);
     }
 
-    const combined = mappedValidators.map((validator, index: number) => ({
-      ...validator,
-      contractStake: stakingPoolStakeProposals.has(validator.accountId)
-        ? stakingPoolStakeProposals?.get(validator.accountId)
-        : null,
-      index,
-      poolInfo: stakingPoolInfosData.has(validator.accountId)
-        ? stakingPoolInfosData.get(validator.accountId)
-        : null,
-    }));
+    const combined = mappedValidators.map((validator, index: number) => {
+      const metaInfo = stakingPoolMetadataInfo
+        ? stakingPoolMetadataInfo.find(
+            (item: { [key: string]: PoolMetadataAccountInfo }) =>
+              validator.accountId in item,
+          )
+        : null;
+      return {
+        ...validator,
+        contractStake: stakingPoolStakeProposals.has(validator.accountId)
+          ? stakingPoolStakeProposals?.get(validator.accountId)
+          : null,
+        description: metaInfo ? Object.values(metaInfo)[0] : null,
+        index,
+
+        poolInfo: stakingPoolInfosData.has(validator.accountId)
+          ? stakingPoolInfosData.get(validator.accountId)
+          : null,
+      };
+    });
 
     await redis.stringify('validatorLists', combined, DAY);
   }
@@ -440,5 +459,94 @@ export const validatorsCheck = async (redis: Redis) => {
     ]);
 
     await saveValidatorLists(redis);
+  }
+};
+
+export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
+  const VALIDATOR_DESCRIPTION_QUERY_AMOUNT = 100;
+  let currentIndex = 0;
+
+  const { data } = await RPC.callFunction(
+    'pool-details.near',
+    'get_all_fields',
+    RPC.encodeArgs({
+      from_index: currentIndex,
+      limit: VALIDATOR_DESCRIPTION_QUERY_AMOUNT,
+    }),
+  );
+  const stakingPoolsDescriptions = [];
+  if (data.result) {
+    const metadataInfo = JSON.parse(Buffer.from(data.result.result).toString());
+    const entries: [string, PoolMetadataAccountInfo][] =
+      Object.entries(metadataInfo);
+
+    if (entries.length > 0) {
+      for (const [accountId, poolMetadataInfo] of entries) {
+        const entryObject: { [accountId: string]: PoolMetadataAccountInfo } = {
+          [accountId]: poolMetadataInfo,
+        };
+        stakingPoolsDescriptions.push(entryObject);
+      }
+      currentIndex += VALIDATOR_DESCRIPTION_QUERY_AMOUNT;
+    }
+  }
+  await redis.stringify(
+    'stakingPoolMetadataInfo',
+    stakingPoolsDescriptions,
+    DAY,
+  );
+};
+
+export const validatorsTelemetryCheck = async (redis: Redis) => {
+  const validators = (await redis.parse(
+    'validatorsPromise',
+  )) as EpochValidatorInfo;
+  if (validators) {
+    const poolIds = await redis.parse('poolIds');
+
+    const accountIds = [
+      ...validators.current_validators.map(({ account_id }) => account_id),
+      ...validators.next_validators.map(({ account_id }) => account_id),
+      ...validators.current_proposals.map(({ account_id }) => account_id),
+      ...poolIds,
+    ];
+    const nodesInfo = await db('nodes')
+      .select(
+        'ip_address',
+        'account_id',
+        'node_id',
+        'last_seen',
+        'last_height',
+        'status',
+        'agent_name',
+        'agent_version',
+        'agent_build',
+        'latitude',
+        'longitude',
+        'city',
+      )
+      .whereIn('account_id', accountIds)
+      .orderBy('last_seen');
+
+    const nodes = nodesInfo.reduce<Partial<Record<string, ValidatorTelemetry>>>(
+      (acc, nodeInfo) => {
+        acc[nodeInfo.account_id] = {
+          agentBuild: nodeInfo.agent_build,
+          agentName: nodeInfo.agent_name,
+          agentVersion: nodeInfo.agent_version,
+          city: nodeInfo.city,
+          ipAddress: nodeInfo.ip_address,
+          lastHeight: parseInt(nodeInfo.last_height, 10),
+          lastSeen: nodeInfo.last_seen.valueOf(),
+          latitude: nodeInfo.latitude,
+          longitude: nodeInfo.longitude,
+          nodeId: nodeInfo.node_id,
+          status: nodeInfo.status,
+        };
+        return acc;
+      },
+      {},
+    );
+    await redis.stringify('validatorTelemetry', nodes, DAY);
   }
 };

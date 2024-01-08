@@ -9,10 +9,10 @@ import fts from '#routes/fts';
 import key from '#routes/key';
 import nfts from '#routes/nfts';
 import node from '#routes/node';
+import nodevalidator from '#routes/nodevalidator';
 import search from '#routes/search';
 import stats from '#routes/stats';
 import txns from '#routes/txns';
-import validators from '#routes/validators';
 
 const routes = () => {
   const app = Router();
@@ -28,7 +28,7 @@ const routes = () => {
   charts(app);
   search(app);
   key(app);
-  validators(app);
+  nodevalidator(app);
   node(app);
 
   return app;
