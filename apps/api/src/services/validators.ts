@@ -16,7 +16,7 @@ import {
   validatorsSortFns,
 } from '#libs/nodevalidator';
 import redis from '#libs/redis';
-import { List } from '#libs/schema/validator';
+import { List } from '#libs/schema/nodevalidator';
 import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -94,7 +94,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           .toFixed(FRACTION_DIGITS);
         const pagedIndex = (page - 1) * perPage + index;
 
-        const cumilativeStake = stakePercents(
+        const cumulativeStake = stakePercents(
           validator,
           currentStake,
           +totalStake,
@@ -119,7 +119,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
 
         return {
           ...validator,
-          cumilativeStake,
+          cumulativeStake,
           percent,
           showWarning: isNetworkHolder === pagedIndex,
           stakeChange,

@@ -49,7 +49,7 @@ export type ValidatorPoolInfo = {
   fee: { denominator: number; numerator: number } | null;
 };
 
-type cumilativeStakeInfo = {
+type cumulativeStakeInfo = {
   accumulatedPercent: number;
   cumulativePercent: number;
   ownPercentage: number;
@@ -67,7 +67,7 @@ export type ValidatorEpochData = {
   };
 
   contractStake?: string;
-  cumilativeStake?: cumilativeStakeInfo;
+  cumulativeStake?: cumulativeStakeInfo;
   currentEpoch?: {
     progress: ValidationProgress;
     stake: string;

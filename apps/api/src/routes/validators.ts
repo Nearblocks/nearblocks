@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import schema from '#libs/schema/validator';
+import schema from '#libs/schema/nodevalidator';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
