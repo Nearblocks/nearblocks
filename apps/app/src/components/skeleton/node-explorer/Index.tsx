@@ -4,10 +4,10 @@ import Skeleton from '../common/Skeleton';
 
 const Index = () => {
   return (
-    <div className="container mx-auto px-3 -mt-48">
+    <div className="relative container mx-auto px-3 -mt-48">
       <div>
-        <div className="relative flex gap-4  mt-10">
-          <div className="w-full">
+        <div className="flex flex-col md:flex-row gap-4 mt-10">
+          <div className="w-full md:w-1/2">
             <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
               <div>
                 <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
@@ -46,7 +46,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-          <div className="w-full">
+          <div className="w-full md:w-1/2">
             <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
               <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
                 Epoch information

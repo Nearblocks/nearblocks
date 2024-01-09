@@ -88,7 +88,6 @@ export function debounce<TArgs extends any[]>(
 ): Debounce<TArgs> {
   let timer: number | undefined;
   let active = true;
-  console.log('hgjhgh');
   const debounced: Debounce<TArgs> = (arg) => {
     if (active) {
       clearTimeout(timer);
