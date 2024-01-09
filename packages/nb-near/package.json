@@ -1,0 +1,22 @@
+{
+  "name": "nb-near",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "dependencies": {
+    "axios": "1.6.2",
+    "near-api-js": "2.1.4"
+  },
+  "devDependencies": {
+    "eslint-config-custom-node": "*",
+    "nb-tsconfig": "*",
+    "typescript": "~5.2"
+  }
+}

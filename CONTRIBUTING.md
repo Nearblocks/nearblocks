@@ -8,7 +8,7 @@ To request feature requests please request through our Github issues here https:
 
 Please provide as much information as possible so we can properly understand your request. We will try our best to accomodate features which are high in demand.
 
-Bug reports can also be made through Github issues, again please provide as much information as possible including steps to replicate. 
+Bug reports can also be made through Github issues, again please provide as much information as possible including steps to replicate.
 
 If you believe reporting your bug publicly represents a security risk, please send us
 [a message via GitHub Security tab](https://github.com/nearblocks/nearblocks/security/advisories).

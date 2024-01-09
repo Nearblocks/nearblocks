@@ -1,0 +1,16 @@
+version: '3.6'
+services:
+  api:
+    container_name: testnet-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: testnet.api.env
+    ports:
+      - '127.0.0.1:3008:3001'
+
+volumes:
+  redis-data:

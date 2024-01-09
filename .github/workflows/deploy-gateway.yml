@@ -1,0 +1,23 @@
+name: NearBlocks Gateway Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/app/**'
+      - 'apps/api/**'
+jobs:
+  deploy-mainnet:
+    runs-on: ubuntu-latest
+    name: Deploy
+
+    steps:
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.GATEWAY_SSH_HOSTS }}
+          sync: true
+          username: ${{ secrets.GATEWAY_SSH_USER }}
+          key: ${{ secrets.GATEWAY_SSH_KEY }}
+          script: ./deploy.sh

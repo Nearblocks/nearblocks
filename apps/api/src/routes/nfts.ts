@@ -1,0 +1,200 @@
+import { Router } from 'express';
+
+import schema from '#libs/schema/nfts';
+import { bearerAuth } from '#middlewares/passport';
+import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
+import contract from '#services/nfts/contract';
+import nft from '#services/nfts/index';
+import tokens from '#services/nfts/tokens';
+
+const route = Router();
+
+const routes = (app: Router) => {
+  app.use('/nfts', bearerAuth, rateLimiter, route);
+
+  /**
+   * GET /v1/nfts
+   * @summary Get top nfts by pagination
+   * @tags NFTs
+   * @param {string} search.query - search keyword
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
+   * @param {string} sort.query - json:{"enum": ["name", "tokens", "txns_day", "txns_3days", "txns", "holders"], "default": "txns_day"}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/', validator(schema.list), nft.list);
+
+  /**
+   * GET /v1/nfts/count
+   * @summary Get top nfts count
+   * @tags NFTs
+   * @param {string} search.query - search keyword
+   * @return 200 - success response
+   */
+  route.get('/count', validator(schema.count), nft.count);
+
+  /**
+   * GET /v1/nfts/txns
+   * @summary Get nft txns by pagination
+   * @tags NFTs
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @return 200 - success response
+   */
+  route.get('/txns', validator(schema.txns), nft.txns);
+
+  /**
+   * GET /v1/nfts/txns/count
+   * @summary Get nft txns count
+   * @tags NFTs
+   * @return 200 - success response
+   */
+  route.get('/txns/count', validator(schema.txnsCount), nft.txnsCount);
+
+  /**
+   * GET /v1/nfts/{contract}
+   * @summary Get nft info
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @return 200 - success response
+   */
+  route.get('/:contract', validator(schema.item), contract.item);
+
+  /**
+   * GET /v1/nfts/{contract}/txns
+   * @summary Get nft txns by pagination
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} event.query - event kind
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
+
+  /**
+   * GET /v1/nfts/{contract}/txns/count
+   * @summary Get nft txns count
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} event.query - event kind
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/txns/count',
+    validator(schema.nftTxnsCount),
+    contract.txnsCount,
+  );
+
+  /**
+   * GET /v1/nfts/{contract}/holders
+   * @summary Get nft holders by pagination
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:contract/holders', validator(schema.holders), contract.holders);
+
+  /**
+   * GET /v1/nfts/{contract}/holders/count
+   * @summary Get nft holders count
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/holders/count',
+    validator(schema.holdersCount),
+    contract.holdersCount,
+  );
+
+  /**
+   * GET /v1/nfts/{contract}/tokens
+   * @summary Get nft tokens list by pagination
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} token.query - token id
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
+
+  /**
+   * GET /v1/nfts/{contract}/tokens/count
+   * @summary Get nft tokens count
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} token.query - token id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/tokens/count',
+    validator(schema.tokensCount),
+    tokens.count,
+  );
+
+  /**
+   * GET /v1/nfts/{contract}/tokens/{token}
+   * @summary Get nft token info
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} token.query - token id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/tokens/:token',
+    validator(schema.tokenItem),
+    tokens.item,
+  );
+
+  /**
+   * GET /v1/nfts/{contract}/tokens/{token}/txns
+   * @summary Get nft token txns by pagination
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} token.query - token id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} event.query - event kind
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/tokens/:token/txns',
+    validator(schema.tokenTxns),
+    tokens.txns,
+  );
+
+  /**
+   * GET /v1/nfts/{contract}/tokens/{token}/txns/count
+   * @summary Get nft token txns count
+   * @tags NFTs
+   * @param {string} contract.path.required - contract id
+   * @param {string} token.query - token id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} event.query - event kind
+   * @return 200 - success response
+   */
+  route.get(
+    '/:contract/tokens/:token/txns/count',
+    validator(schema.tokenTxnsCount),
+    tokens.txnsCount,
+  );
+};
+
+export default routes;

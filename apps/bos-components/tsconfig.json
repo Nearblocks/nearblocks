@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "baseUrl": "./src/",
+    "paths": {
+      "@/includes/*": ["./includes/*"]
+    },
+    "types": [
+      "@types/react",
+      "near-social-vm-types",
+      "@near-js/types",
+      "./global.d.ts"
+    ]
+  },
+  "extends": "nb-tsconfig/nextjs.json",
+  "include": ["**/*.ts", "**/*.tsx"]
+}

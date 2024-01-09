@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+  -webkit-font-smoothing: antialiased;
+  color: var(--sand12);
+}
+
+.font-inherit {
+  font-family: inherit !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.btn {
+  text-decoration: none;
+}
+
+.bg-blue {
+  background-color: #21325B !important;
+}
+
+.b,
+.strong {
+  font-weight: 600;
+}
+
+@keyframes loading-pulse-1 {
+  0% {
+    top: 18px;
+    height: 64px
+  }
+
+  50% {
+    top: 30px;
+    height: 40px
+  }
+
+  100% {
+    top: 30px;
+    height: 40px
+  }
+}
+
+@keyframes loading-pulse-2 {
+  0% {
+    top: 20.99999999999999px;
+    height: 58.00000000000001px
+  }
+
+  50% {
+    top: 30px;
+    height: 40px
+  }
+
+  100% {
+    top: 30px;
+    height: 40px
+  }
+}
+
+@keyframes loading-pulse-3 {
+  0% {
+    top: 24px;
+    height: 52px
+  }
+
+  50% {
+    top: 30px;
+    height: 40px
+  }
+
+  100% {
+    top: 30px;
+    height: 40px
+  }
+}
+
+.loading-pulse div {
+  position: absolute;
+  width: 14px
+}
+
+.loading-pulse div:nth-child(1) {
+  left: 17.5px;
+  background: #0D494A;
+  animation: loading-pulse-1 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: -0.2s
+}
+
+.loading-pulse div:nth-child(2) {
+  left: 42.5px;
+  background: #0D494A;
+  animation: loading-pulse-2 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: -0.1s
+}
+
+.loading-pulse div:nth-child(3) {
+  left: 67.5px;
+  background: #0D494A;
+  animation: loading-pulse-3 0.5s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+  animation-delay: undefineds
+}
+
+.loading-spinner-pulse-container {
+  width: 100px;
+  height: 100px;
+  display: inline-block;
+  overflow: hidden;
+  background: #FFFF;
+}
+
+.loading-pulse {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform: translateZ(0) scale(1);
+  backface-visibility: hidden;
+  transform-origin: 0 0;
+}
+
+.loading-pulse div {
+  box-sizing: content-box;
+}

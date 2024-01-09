@@ -3,22 +3,22 @@ Business Source License 1.1
 License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
 "Business Source License" is a trademark of MariaDB Corporation Ab.
 
------------------------------------------------------------------------------
+---
 
 Parameters
 
-Licensor:             Nearblocks Pte Ltd
+Licensor: Nearblocks Pte Ltd
 
-Licensed Work:        Nearblocks
-                      The Licensed Work is (c) 2023 Nearblocks Pte Ltd
+Licensed Work: Nearblocks
+The Licensed Work is (c) 2023 Nearblocks Pte Ltd
 
 Additional Use Grant: N/A
 
-Change Date:          Four years from the date the Licensed Work is published
+Change Date: Four years from the date the Licensed Work is published
 
-Change License:       MPL 2.0
+Change License: MPL 2.0
 
------------------------------------------------------------------------------
+---
 
 Terms
 

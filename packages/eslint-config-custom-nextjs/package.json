@@ -1,0 +1,14 @@
+{
+  "name": "eslint-config-custom-nextjs",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "main": "src/index.js",
+  "dependencies": {
+    "eslint": "~8.51",
+    "eslint-config-next": "~13.4",
+    "eslint-config-prettier": "~8.3",
+    "eslint-plugin-react": "~7.28",
+    "eslint-config-turbo": "~1.9"
+  }
+}

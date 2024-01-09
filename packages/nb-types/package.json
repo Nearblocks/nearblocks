@@ -1,0 +1,18 @@
+{
+  "name": "nb-types",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "devDependencies": {
+    "eslint-config-custom-node": "*",
+    "nb-tsconfig": "*",
+    "typescript": "~5.2"
+  }
+}
