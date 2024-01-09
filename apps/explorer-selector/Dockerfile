@@ -4,7 +4,7 @@ FROM node:20-bookworm-slim as base
 FROM base AS builder
 RUN apt update && apt install -y dumb-init
 WORKDIR /app
-RUN yarn global add turbo && npx @turbo/codemod add-package-manage
+RUN yarn global add turbo && npx @turbo/codemod add-package-manager
 COPY . .
 RUN turbo prune explorer-selector --docker
 
