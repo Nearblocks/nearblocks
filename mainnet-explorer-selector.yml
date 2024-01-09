@@ -1,4 +1,4 @@
-name: explorer-selector
+#name: explorer-selector
 services:
   mainnet:
     build:
