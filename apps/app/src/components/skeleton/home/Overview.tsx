@@ -26,7 +26,6 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                       <Image
                         src="https://nearblocks.io/images/near price.svg"
                         alt={t('nearPrice')}
-                        className="h-9 w-9"
                         width="24"
                         height="24"
                       />
@@ -45,7 +44,6 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                       <Image
                         src="https://nearblocks.io/images/market.svg"
                         alt={t('marketCap')}
-                        className="h-9 w-9"
                         width="24"
                         height="24"
                       />
@@ -69,7 +67,6 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                     <Image
                       src="https://nearblocks.io/images/transactions.svg"
                       alt={t('transactions')}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />
@@ -100,7 +97,6 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                     <Image
                       src="https://nearblocks.io/images/pickaxe.svg"
                       alt={t('activeValidator')}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />

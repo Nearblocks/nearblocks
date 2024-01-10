@@ -54,7 +54,7 @@ export default function (props: Props) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {[...Array(50)].map((_, index) => (
+            {[...Array(props.limit)].map((_, index) => (
               <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
                 {props.columns.map((column, colIndex) => (
                   <td key={colIndex} className={column.tdClassName}>
@@ -85,7 +85,7 @@ export default function (props: Props) {
             <tbody>
               {!props.isLoading && props.data.length === 0 && (
                 <tr className="h-[53px]">
-                  <td className="px-6 py-4 text-gray-400 text-xs">
+                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
                 </tr>
@@ -132,7 +132,7 @@ export default function (props: Props) {
             <tbody className="bg-white divide-y divide-gray-200">
               {!props.isLoading && props.data.length === 0 && (
                 <tr className="h-[53px]">
-                  <td className="px-6 py-4 text-gray-400 text-xs">
+                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
                 </tr>

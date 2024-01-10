@@ -208,7 +208,7 @@ export default function (props: Props) {
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -302,7 +302,7 @@ export default function (props: Props) {
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -546,7 +546,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName: 'inline-flex',
+      thClassName: 'inline-flex whitespace-nowrap',
     },
   ];
 
