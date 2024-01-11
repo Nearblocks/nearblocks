@@ -22,7 +22,7 @@ export function decodeArgs(args: number[]) {
 
 export function txnMethod(
   actions: { action: string; method: string }[],
-  t: (key: string, options?: { count?: string | undefined }) => string,
+  t?: (key: string, options?: { count?: string | undefined }) => string,
 ) {
   const count = actions?.length || 0;
 
@@ -47,14 +47,9 @@ export function gasPrice(yacto: number) {
 export function tokenAmount(amount: number, decimal: number, format: boolean) {
   if (amount === undefined || amount === null) return 'N/A';
 
-  const near = Big(amount).div(Big(10).pow(+decimal));
+  const near = Big(amount).div(Big(10).pow(decimal));
 
-  return format
-    ? near.toString().toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 8,
-      })
-    : near;
+  return format ? near.toFixed(8) : near.toFixed(decimal);
 }
 
 export function mapRpcActionToAction(action: string | ActionType) {
@@ -77,7 +72,7 @@ export function mapRpcActionToAction(action: string | ActionType) {
   return null;
 }
 
-const valueFromObj = (obj: Obj): string | undefined => {
+function valueFromObj(obj: Obj): string | undefined {
   const keys = Object.keys(obj);
 
   for (let i = 0; i < keys.length; i++) {
@@ -97,7 +92,7 @@ const valueFromObj = (obj: Obj): string | undefined => {
   }
 
   return undefined;
-};
+}
 
 export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
   let txLogs: TransactionLog[] = [];
