@@ -83,7 +83,7 @@ export default function (props: Props) {
               </tr>
             </thead>
             <tbody>
-              {!props.isLoading && props.data.length === 0 && (
+              {!props.isLoading && props.data === undefined && (
                 <tr className="h-[53px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
@@ -137,7 +137,7 @@ export default function (props: Props) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {!props.isLoading && props.data.length === 0 && (
+              {!props.isLoading && props.data === undefined && (
                 <tr className="h-[53px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}

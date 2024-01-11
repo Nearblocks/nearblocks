@@ -38,15 +38,13 @@ export default function ({ network, currentPage, setPage, t }: Props) {
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [tokens, setTokens] = useState<Token[]>([]);
-
+  const [tokens, setTokens] = useState<{ [key: number]: Token[] }>({});
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
   const config = getConfig(network);
 
   useEffect(() => {
     function fetchTotalTokens(qs?: string) {
-      setIsLoading(true);
       const queryParams = qs ? '?' + qs : '';
       asyncFetch(`${config?.backendUrl}nfts/count${queryParams}`, {
         method: 'GET',
@@ -59,18 +57,19 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             body: {
               tokens: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens?.[0];
-            setTotalCount(resp?.count);
+            if (data.status === 200) {
+              setTotalCount(resp?.count);
+            }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
-
-    function fetchTokens(qs?: string, sqs?: Sorting) {
+    function fetchTokens(qs: string, sqs: Sorting, page: number) {
+      setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
         `${config?.backendUrl}nfts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=${initialPagination.per_page}`,
@@ -86,19 +85,25 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             body: {
               tokens: Token[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens;
-            setTokens(resp);
+            if (data.status === 200) {
+              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
 
     fetchTotalTokens();
-    fetchTokens('', sorting);
+    fetchTokens('', sorting, currentPage);
     if (sorting) {
       fetchTotalTokens();
-      fetchTokens('', sorting);
+      fetchTokens('', sorting, currentPage);
     }
   }, [config?.backendUrl, currentPage, sorting]);
 
@@ -172,9 +177,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
-      thClassName:
-        'text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-4 whitespace-nowrap text-sm  w-80 text-gray-500 align-top',
     },
     {
       header: (
@@ -377,7 +380,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
           src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: tokens,
+            data: tokens[currentPage],
             isLoading: isLoading,
             isPagination: true,
             count: totalCount,

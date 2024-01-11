@@ -30,7 +30,7 @@ import {
 } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [charts, setCharts] = useState<ChartInfo[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(
@@ -41,39 +41,36 @@ export default function ({ network, t }: Props) {
 
   useEffect(() => {
     let delay = 15000;
-    let retries = 0;
 
     function fetchStats() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}stats`)
-        .then((data: { body: { stats: StatusInfo[] } }) => {
+        .then((data: { body: { stats: StatusInfo[] }; status: number }) => {
           const resp = data?.body?.stats?.[0];
-          setStats({
-            avg_block_time: resp.avg_block_time,
-            block: resp.block,
-            change_24: resp.change_24,
-            gas_price: resp.gas_price,
-            high_24h: resp.high_24h,
-            high_all: resp.high_all,
-            low_24h: resp.low_24h,
-            low_all: resp.low_all,
-            market_cap: resp.market_cap,
-            near_btc_price: resp.near_btc_price,
-            near_price: resp.near_price,
-            nodes: resp.nodes,
-            nodes_online: resp.nodes_online,
-            total_supply: resp.total_supply,
-            total_txns: resp.total_txns,
-            volume: resp.volume,
-          });
-        })
-        .catch((error: any) => {
-          if (error.response && error.response.status === 429) {
-            delay = Math.min(2 ** retries * 15000, 60000);
-            retries++;
+          if (data.status === 200) {
+            setStats({
+              avg_block_time: resp.avg_block_time,
+              block: resp.block,
+              change_24: resp.change_24,
+              gas_price: resp.gas_price,
+              high_24h: resp.high_24h,
+              high_all: resp.high_all,
+              low_24h: resp.low_24h,
+              low_all: resp.low_all,
+              market_cap: resp.market_cap,
+              near_btc_price: resp.near_btc_price,
+              near_price: resp.near_price,
+              nodes: resp.nodes,
+              nodes_online: resp.nodes_online,
+              total_supply: resp.total_supply,
+              total_txns: resp.total_txns,
+              volume: resp.volume,
+            });
           }
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (isLoading) setIsLoading(false);
         });
-      setIsLoading(false);
     }
 
     fetchStats();
@@ -81,7 +78,7 @@ export default function ({ network, t }: Props) {
     const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
-  }, [config?.backendUrl]);
+  }, [config?.backendUrl, isLoading]);
 
   useEffect(() => {
     function fetchChartData() {

@@ -85,7 +85,6 @@ export default function (props: Props) {
   useEffect(() => {
     if (rpcTxn) {
       const receipt = transactionReceipts(rpcTxn);
-      console.log('efewf', receipt);
       setReceipt(receipt);
     }
   }, [rpcTxn]);

@@ -36,8 +36,8 @@ interface Props {
 export default function ({ currentPage, setPage, t, network }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
   const [showAge, setShowAge] = useState(true);
+  const [blocks, setBlocks] = useState<{ [key: number]: BlocksInfo[] }>({});
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
 
   const config = getConfig(network);
@@ -55,34 +55,37 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             body: {
               blocks: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.blocks?.[0];
-            setTotalCount(resp?.count);
+            if (data.status === 200) {
+              setTotalCount(resp?.count);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchBlocks() {
+    function fetchBlocks(page: number) {
       setIsLoading(true);
-      asyncFetch(
-        `${config?.backendUrl}blocks?page=${currentPage}&per_page=25`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${config?.backendUrl}blocks?page=${page}&per_page=25`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+      })
         .then(
           (data: {
             body: {
               blocks: BlocksInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.blocks;
-            setBlocks(resp || []);
+            if (data.status === 200) {
+              setBlocks((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           },
         )
         .catch(() => {})
@@ -92,12 +95,11 @@ export default function ({ currentPage, setPage, t, network }: Props) {
     }
 
     fetchTotalBlocks();
-    fetchBlocks();
+    fetchBlocks(currentPage);
   }, [config?.backendUrl, currentPage]);
 
-  const start = blocks?.[0];
-  const end = blocks?.[blocks?.length - 1];
-
+  const start = blocks[currentPage]?.[0];
+  const end = blocks[currentPage]?.[blocks[currentPage]?.length - 1];
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const columns = [
@@ -269,7 +271,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: blocks,
+            data: blocks[currentPage],
             isLoading: isLoading,
             isPagination: true,
             count: totalCount,
