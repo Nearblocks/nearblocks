@@ -19,8 +19,7 @@ if (config.redisSentinelName) {
   if (urls.length) {
     options = {
       name: config.redisSentinelName,
-      password: config.redisSentinelPassword,
-      sentinelPassword: config.redisSentinelPassword,
+      password: config.redisPassword,
       sentinels: urls.map((u) => {
         const url = new URL(u);
 

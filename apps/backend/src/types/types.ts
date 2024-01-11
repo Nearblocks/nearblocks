@@ -22,8 +22,8 @@ export interface Config {
   genesisHeight: number;
   lcwApiKey: string;
   network: Network;
+  redisPassword: string;
   redisSentinelName: string;
-  redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
   rpcUrl: string;
