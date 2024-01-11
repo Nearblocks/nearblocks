@@ -23,7 +23,7 @@ import { getConfig, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
@@ -31,24 +31,21 @@ export default function ({ network, t }: Props) {
 
   useEffect(() => {
     let delay = 5000;
-    let retries = 0;
 
     function fetchLatestBlocks() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}blocks/latest`)
-        .then((data: { body: { blocks: BlocksInfo[] } }) => {
+        .then((data: { body: { blocks: BlocksInfo[] }; status: number }) => {
           const resp = data?.body?.blocks;
-          setBlocks(resp);
-          setError(false);
-          setIsLoading(false);
-        })
-        .catch((error: any) => {
-          if (error.response && error.response.status === 429) {
-            delay = Math.min(2 ** retries * 1000, 60000);
-            retries++;
+          if (data.status === 200) {
+            setBlocks(resp);
+            setError(false);
           }
-          setError(false);
-          setIsLoading(false);
+        })
+        .catch(() => {
+          setError(true);
+        })
+        .finally(() => {
+          if (isLoading) setIsLoading(false);
         });
     }
 
@@ -57,14 +54,14 @@ export default function ({ network, t }: Props) {
     const interval = setInterval(fetchLatestBlocks, delay);
 
     return () => clearInterval(interval);
-  }, [config.backendUrl]);
+  }, [config.backendUrl, isLoading]);
 
   return (
     <>
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!blocks && (
+            {!blocks && error && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 {t ? t('home:error') : 'Error!'}
               </div>
@@ -74,7 +71,7 @@ export default function ({ network, t }: Props) {
                 {t ? t('home:noBlocks') : 'No blocks found'}
               </div>
             )}
-            {blocks.length === 0 && (
+            {isLoading && blocks.length === 0 && (
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -203,7 +200,7 @@ export default function ({ network, t }: Props) {
           <ScrollArea.Corner className="bg-black-500" />
         </ScrollArea.Root>
       </div>
-      {blocks.length === 0 && (
+      {isLoading && blocks.length === 0 && (
         <div className="border-t px-2 py-3 text-gray-700">
           <Skeleton className="h-10" />
         </div>

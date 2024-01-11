@@ -124,9 +124,12 @@ export default function (props: Props) {
               body: {
                 stats: StatusInfo;
               };
+              status: number;
             }) => {
               const resp = res?.body?.stats;
-              setStatsData(resp);
+              if (res.status === 200) {
+                setStatsData(resp);
+              }
             },
           )
           .catch(() => {});
@@ -151,9 +154,12 @@ export default function (props: Props) {
           body: {
             market_data: { current_price: { usd: number } };
           };
+          status: number;
         }) => {
           const resp = data?.body?.market_data?.current_price?.usd;
-          setPrice(resp);
+          if (data.status === 200) {
+            setPrice(resp);
+          }
         },
       );
     }

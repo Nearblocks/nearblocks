@@ -60,8 +60,8 @@ export default function (props: Props) {
     t,
   } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(1);
-  const [txns, setTxns] = useState<TransactionInfo[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
@@ -84,21 +84,23 @@ export default function (props: Props) {
             body: {
               txns: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.txns?.[0];
-            setTotalCount(0);
-            setTotalCount(resp?.count);
+            if (data.status === 200) {
+              setTotalCount(resp?.count);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchTxnsData(qs?: string, sqs?: string) {
+    function fetchTxnsData(qs: string, sqs: string, page: number) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -106,10 +108,12 @@ export default function (props: Props) {
           },
         },
       )
-        .then((data: { body: { txns: TransactionInfo[] } }) => {
+        .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
           const resp = data?.body?.txns;
-          if (Array.isArray(resp) && resp.length > 0) {
-            setTxns(resp);
+          if (data.status === 200) {
+            if (Array.isArray(resp) && resp.length > 0) {
+              setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           }
         })
         .catch(() => {})
@@ -129,13 +133,10 @@ export default function (props: Props) {
 
     if (urlString && sorting) {
       fetchTotalTxns(urlString);
-      fetchTxnsData(urlString, sorting);
-    } else if (urlString) {
-      fetchTotalTxns(urlString);
-      fetchTxnsData(urlString);
+      fetchTxnsData(urlString, sorting, currentPage);
     } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
       fetchTotalTxns();
-      fetchTxnsData('', sorting);
+      fetchTxnsData('', sorting, currentPage);
     }
   }, [config?.backendUrl, currentPage, filters, sorting]);
 
@@ -594,7 +595,7 @@ export default function (props: Props) {
           src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: txns,
+            data: txns[currentPage],
             isLoading: isLoading,
             isPagination: true,
             count: totalCount,

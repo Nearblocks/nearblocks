@@ -46,19 +46,22 @@ export default function (props: Props) {
               body: {
                 blocks: BlocksInfo[];
               };
+              status: number;
             }) => {
               const resp = res?.body?.blocks?.[0];
-              setBlock({
-                author_account_id: resp.author_account_id,
-                block_hash: resp.author_account_id,
-                block_height: resp.block_height,
-                block_timestamp: resp.block_timestamp,
-                chunks_agg: resp.chunks_agg,
-                gas_price: resp.gas_price,
-                prev_block_hash: resp.author_account_id,
-                receipts_agg: resp.receipts_agg,
-                transactions_agg: resp.transactions_agg,
-              });
+              if (res.status === 200) {
+                setBlock({
+                  author_account_id: resp.author_account_id,
+                  block_hash: resp.author_account_id,
+                  block_height: resp.block_height,
+                  block_timestamp: resp.block_timestamp,
+                  chunks_agg: resp.chunks_agg,
+                  gas_price: resp.gas_price,
+                  prev_block_hash: resp.author_account_id,
+                  receipts_agg: resp.receipts_agg,
+                  transactions_agg: resp.transactions_agg,
+                });
+              }
             },
           )
           .catch(() => {});

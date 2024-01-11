@@ -43,7 +43,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [tokens, setTokens] = useState<Token[]>([]);
+  const [tokens, setTokens] = useState<{ [key: number]: Token[] }>({});
+
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
   const config = getConfig(network);
@@ -76,20 +77,23 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             body: {
               tokens: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens?.[0];
-            setTotalCount(resp?.count | 0);
+            if (data.status === 200) {
+              setTotalCount(resp?.count | 0);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchTokens(qs?: string, sqs?: Sorting) {
+    function fetchTokens(qs: string, sqs: Sorting, page: number) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -102,9 +106,12 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             body: {
               tokens: Token[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens;
-            setTokens(resp || []);
+            if (data.status === 200) {
+              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           },
         )
         .catch(() => {})
@@ -114,10 +121,10 @@ export default function ({ t, network, currentPage, setPage }: Props) {
     }
 
     fetchTotalTokens();
-    fetchTokens('', sorting);
+    fetchTokens('', sorting, currentPage);
     if (sorting) {
       fetchTotalTokens();
-      fetchTokens('', sorting);
+      fetchTokens('', sorting, currentPage);
     }
   }, [config?.backendUrl, currentPage, sorting]);
 
@@ -500,7 +507,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
-          data: tokens,
+          data: tokens[currentPage],
           isLoading: isLoading,
           isPagination: true,
           count: totalCount,

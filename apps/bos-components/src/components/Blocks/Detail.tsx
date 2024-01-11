@@ -68,19 +68,22 @@ export default function (props: Props) {
             body: {
               blocks: BlocksInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.blocks?.[0];
-            setBlock({
-              author_account_id: resp.author_account_id,
-              block_hash: resp.block_hash,
-              block_height: resp.block_height,
-              block_timestamp: resp.block_timestamp,
-              chunks_agg: resp.chunks_agg,
-              gas_price: resp.gas_price,
-              prev_block_hash: resp.prev_block_hash,
-              receipts_agg: resp.receipts_agg,
-              transactions_agg: resp.transactions_agg,
-            });
+            if (data.status === 200) {
+              setBlock({
+                author_account_id: resp.author_account_id,
+                block_hash: resp.block_hash,
+                block_height: resp.block_height,
+                block_timestamp: resp.block_timestamp,
+                chunks_agg: resp.chunks_agg,
+                gas_price: resp.gas_price,
+                prev_block_hash: resp.prev_block_hash,
+                receipts_agg: resp.receipts_agg,
+                transactions_agg: resp.transactions_agg,
+              });
+            }
             setIsLoading(false);
           },
         )
@@ -107,9 +110,12 @@ export default function (props: Props) {
           body: {
             market_data: { current_price: { usd: number } };
           };
+          status: number;
         }) => {
           const resp = data?.body?.market_data?.current_price?.usd;
-          setPrice(resp);
+          if (data.status === 200) {
+            setPrice(resp);
+          }
         },
       );
       setIsLoading(false);

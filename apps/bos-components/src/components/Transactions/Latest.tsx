@@ -24,7 +24,7 @@ import {
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({ t, network }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
@@ -32,49 +32,43 @@ export default function ({ t, network }: Props) {
 
   useEffect(() => {
     let delay = 5000;
-    let retries = 0;
 
     function fetchLatestTxns() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}txns/latest`)
         .then(
           (data: {
             body: {
               txns: TransactionInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.txns;
-            setTxns(resp);
-            setError(false);
-            setIsLoading(false);
-
-            delay = 5000;
-            retries = 0;
+            if (data.status === 200) {
+              setTxns(resp);
+              setError(false);
+            }
           },
         )
-        .catch((error: any) => {
-          if (error.response && error.response.status === 429) {
-            delay = Math.min(2 ** retries * 1000, 60000);
-            retries++;
-          }
-          setIsLoading(false);
+        .catch(() => {
           setError(true);
+        })
+        .finally(() => {
+          if (isLoading) setIsLoading(false);
         });
     }
-
     fetchLatestTxns();
 
     const interval = setInterval(fetchLatestTxns, delay);
 
     return () => clearInterval(interval);
-  }, [config.backendUrl]);
+  }, [config.backendUrl, isLoading]);
 
   return (
     <>
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!txns && (
+            {!txns && error && (
               <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
                 {t ? t('home:error') : ' Error!'}
               </div>
@@ -84,7 +78,7 @@ export default function ({ t, network }: Props) {
                 {t ? t('home:noTxns') : ' No transactions found!'}
               </div>
             )}
-            {txns.length === 0 && (
+            {isLoading && txns.length === 0 && (
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -223,7 +217,7 @@ export default function ({ t, network }: Props) {
           <ScrollArea.Corner className="bg-black-500" />
         </ScrollArea.Root>
       </div>
-      {txns.length === 0 && (
+      {isLoading && txns.length === 0 && (
         <div className="border-t px-2 py-3 text-gray-700">
           <Skeleton className="h-10" />
         </div>
