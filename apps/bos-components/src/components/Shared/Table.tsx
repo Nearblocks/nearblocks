@@ -92,10 +92,16 @@ export default function (props: Props) {
               )}
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
-                  <>
-                    <tr key={rowIndex} className=" hover:bg-blue-900/5">
+                  <Fragment key={rowIndex}>
+                    <tr
+                      key={`expandRow-${rowIndex}`}
+                      className=" hover:bg-blue-900/5"
+                    >
                       {props.columns.map((column: column, colIndex: number) => (
-                        <td key={colIndex} className={column.tdClassName}>
+                        <td
+                          key={`expandCol-${colIndex}`}
+                          className={column.tdClassName}
+                        >
                           {column.cell
                             ? column.cell(row, rowIndex)
                             : row[column.key]}
@@ -105,6 +111,7 @@ export default function (props: Props) {
                     {row?.showWarning && (
                       <tr className="h-[25px] hover:bg-blue-900/5">
                         <td
+                          key={`expandWarning-${rowIndex}`}
                           colSpan={props.columns.length}
                           className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
                         >
@@ -112,7 +119,7 @@ export default function (props: Props) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
             </tbody>
           </table>
@@ -139,13 +146,16 @@ export default function (props: Props) {
               )}
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
-                  <>
+                  <Fragment key={rowIndex}>
                     <tr
-                      key={rowIndex}
+                      key={`row-${rowIndex}`}
                       className=" hover:bg-blue-900/5 h-[53px]"
                     >
                       {props.columns.map((column: column, colIndex: number) => (
-                        <td key={colIndex} className={column.tdClassName}>
+                        <td
+                          key={`col-${colIndex}`}
+                          className={column.tdClassName}
+                        >
                           {column.cell
                             ? column.cell(row, rowIndex)
                             : row[column.key]}
@@ -153,7 +163,10 @@ export default function (props: Props) {
                       ))}
                     </tr>
                     {row?.showWarning && (
-                      <tr className="h-[57px] hover:bg-blue-900/5">
+                      <tr
+                        key={`warning-${rowIndex}`}
+                        className="h-[57px] hover:bg-blue-900/5"
+                      >
                         <td
                           colSpan={props.columns.length}
                           className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
@@ -168,7 +181,7 @@ export default function (props: Props) {
                       props.expanded.includes(rowIndex))
                       ? props.renderRowSubComponent(row)
                       : null}
-                  </>
+                  </Fragment>
                 ))}
             </tbody>
           </table>

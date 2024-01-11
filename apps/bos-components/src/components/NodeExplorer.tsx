@@ -163,7 +163,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       case 'onHold':
         return 'On hold';
       default:
-        return 'Active';
+        return;
     }
   };
   const getStatusColorClass = (status: string) => {
@@ -204,10 +204,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           bgColor: 'bg-blue-500 text-white',
         };
       default:
-        return {
-          textColor: 'text-emerald-500',
-          bgColor: 'bg-emerald-50 text-emerald-500',
-        };
+        return {};
     }
   };
   const columns = [
