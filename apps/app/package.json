@@ -17,7 +17,7 @@
     "near-social-vm": "github:NearSocial/VM#2.5.1",
     "next": "13.3.4",
     "next-translate": "2.6.2",
-    "nearblock-translations": "https://github.com/Nearblocks/translations#117b31e8091b1c8e4de9c2075676fa792cf6031c",
+    "nearblock-translations": "https://github.com/Nearblocks/translations.git#c1b8897a68f09d57ba75c53dd86334c48ad8c8ac",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.46.1",
