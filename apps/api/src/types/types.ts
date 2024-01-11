@@ -21,8 +21,8 @@ export type Config = {
   maxQueryRows: number;
   network: string;
   port: number;
+  redisPassword: string;
   redisSentinelName: string;
-  redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
   rpcUrl: string;
