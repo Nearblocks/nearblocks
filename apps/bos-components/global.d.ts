@@ -24,3 +24,4 @@ declare const Buffer;
 declare const useMemo;
 declare const Tabs;
 declare const Accordion;
+declare const Fragment;

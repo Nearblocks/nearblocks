@@ -58,6 +58,8 @@ export default function ({ network, currentPage, setPage }: Props) {
 
   useEffect(() => {
     function fetchValidatorData() {
+      setIsLoading(true);
+
       asyncFetch(`${config?.backendUrl}validators?page=${currentPage}`, {
         method: 'GET',
         headers: {
@@ -79,12 +81,15 @@ export default function ({ network, currentPage, setPage }: Props) {
             total: data?.total,
           };
           setValidatorFullData(validators);
+          setExpanded([]);
         })
         .catch(() => {})
-        .finally(() => {});
+
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
     function fetchTotalSuppy() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}stats`, {
         method: 'GET',
         headers: {
@@ -97,12 +102,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           setTotalSupplay(data.stats[0].total_supply || 0);
         })
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     function fetchLatestBlock() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}blocks/latests?limit=1`, {
         method: 'GET',
         headers: {
@@ -115,9 +117,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           setLatestBlock(data.blocks[0].block_height || 0);
         })
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     fetchLatestBlock();
     fetchTotalSuppy();
@@ -163,7 +163,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       case 'onHold':
         return 'On hold';
       default:
-        return 'Active';
+        return;
     }
   };
   const getStatusColorClass = (status: string) => {
@@ -181,7 +181,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       case 'leaving':
         return {
           textColor: 'text-red-500',
-          bgColor: 'bg-red-50]text-red-500',
+          bgColor: 'bg-red-50 text-red-500',
         };
       case 'proposal':
         return {
@@ -204,10 +204,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           bgColor: 'bg-blue-500 text-white',
         };
       default:
-        return {
-          textColor: 'text-emerald-500',
-          bgColor: 'bg-emerald-50 text-emerald-500',
-        };
+        return {};
     }
   };
   const columns = [
@@ -297,7 +294,7 @@ export default function ({ network, currentPage, setPage }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
     },
     {
-      header: <span className="flex w-max">TOTAL STAKE</span>,
+      header: <span>TOTAL STAKE</span>,
       key: 'stake',
       cell: (row: ValidatorEpochData) => (
         <span>
@@ -312,20 +309,20 @@ export default function ({ network, currentPage, setPage }: Props) {
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="flex w-max">STAKE %</span>,
+      header: <span>STAKE %</span>,
       key: 'percentage',
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="flex w-max">CUMULATIVE STAKE</span>,
+      header: <span>CUMULATIVE STAKE</span>,
       key: 'cumulative_stake',
       cell: (row: ValidatorEpochData) => {
         return (
@@ -348,10 +345,10 @@ export default function ({ network, currentPage, setPage }: Props) {
       },
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="flex w-max">STAKE CHANGE (24H)</span>,
+      header: <span>STAKE CHANGE (24H)</span>,
       key: '24_change',
       cell: (row: ValidatorEpochData) => {
         if (!row?.stakeChange?.value) {
@@ -369,23 +366,21 @@ export default function ({ network, currentPage, setPage }: Props) {
           return null;
         }
         return (
-          <div className="flex">
-            <div
-              className={
-                row?.stakeChange.symbol === '+'
-                  ? 'text-green-500'
-                  : 'text-red-500'
-              }
-            >
-              {row?.stakeChange?.symbol}
-            </div>
-            <p> {row?.stakeChange?.value} Ⓝ</p>
+          <div
+            className={`flex ${
+              row?.stakeChange.symbol === '+'
+                ? 'text-neargreen'
+                : 'text-red-500'
+            }`}
+          >
+            <div>{row?.stakeChange?.symbol}</div>
+            <p>{row?.stakeChange?.value} Ⓝ</p>
           </div>
         );
       },
       tdClassName: 'px-6 py-4  whitespace-nowrap text-sm text-gray-500 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
@@ -412,10 +407,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div
-                                className="d-flex "
-                                style={{ display: 'flex' }}
-                              >
+                              <div className="flex">
                                 <div>Uptime</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -455,10 +447,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div
-                                className="d-flex "
-                                style={{ display: 'flex' }}
-                              >
+                              <div className="flex">
                                 <div>Latest block</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -505,10 +494,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div
-                                className="d-flex "
-                                style={{ display: 'flex' }}
-                              >
+                              <div className="flex">
                                 <div>Latest Telemetry Update</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -546,10 +532,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div
-                                className="d-flex "
-                                style={{ display: 'flex' }}
-                              >
+                              <div className="flex">
                                 <div>Node Agent Name</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -749,72 +732,47 @@ export default function ({ network, currentPage, setPage }: Props) {
   };
 
   return (
-    <div className="container mx-auto px-3 -mt-48">
-      <div>
-        <div className="flex flex-col md:flex-row gap-4 mt-10">
-          <div className="w-full md:w-1/2">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <div>
-                <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
-                  <span>Staking overview</span>
-                  <div className="flex">
-                    <span>Total Supply: </span>{' '}
-                    {isLoading ? (
-                      <Skeleton className="h-4 w-12 break-words" />
-                    ) : (
-                      <span>
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <span>{formatNumber(Number(TotalSupply))}</span>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="center"
-                              side="top"
-                            >
-                              {totalSuppy + ' yoctoⓃ'}
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>{' '}
-                      </span>
-                    )}
-                  </div>
-                </h2>
+    <div>
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/2">
+          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+            <div>
+              <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
+                <span>Staking Overview</span>
+              </h2>
+            </div>
+            <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Current Validators
+                </div>
+                <div className="w-full md:w-3/4 break-words">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  ) : (
+                    validatorFullData?.currentValidators
+                  )}
+                </div>
               </div>
-              <div className="px-3 divide-y text-sm text-gray-600">
-                <div className="flex  py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                    Current Validators
-                  </div>
-                  <div className="w-full md:w-3/4 break-words">
-                    {isLoading ? (
-                      <Skeleton className="h-4 w-16 break-words" />
-                    ) : (
-                      validatorFullData?.currentValidators
-                    )}
-                  </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Total Staked
                 </div>
-                <div className="flex  py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                    Total Staked
-                  </div>
-                  <div className="w-full md:w-3/4 break-words">
-                    {isLoading ? (
-                      <Skeleton className="h-4 w-16 break-words" />
-                    ) : (
-                      convertAmountToReadableString(
-                        validatorFullData?.totalStake,
-                        'totalStakeAmount',
-                      )
-                    )}
-                  </div>
+                <div className="w-full md:w-3/4 break-words">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  ) : (
+                    convertAmountToReadableString(
+                      validatorFullData?.totalStake,
+                      'totalStakeAmount',
+                    )
+                  )}
                 </div>
-                <div className="flex  py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                    Current seat price
-                  </div>
-                  <div className="w-full md:w-3/4 break-words">
+              </div>
+              <div className="flex max-md:divide-y flex-col md:flex-row ">
+                <div className="flex items-center justify-between md:w-1/2 py-4">
+                  <div className="w-full mb-2 md:mb-0">Current Seat Price</div>
+                  <div className="w-full break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
                     ) : (
@@ -828,56 +786,28 @@ export default function ({ network, currentPage, setPage }: Props) {
                     )}
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="w-full md:w-1/2">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
-                Epoch information
-              </h2>
-              <div className="px-3 divide-y text-sm text-gray-600">
-                <div className="flex items-center justify-between py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                    Epoch elapsed time:
-                  </div>
-                  <div className="w-full text-green-500 md:w-3/4 break-words">
-                    {!validatorFullData?.elapsedTime ? (
-                      <Skeleton className="h-3 w-32" />
+                <div className="flex items-center justify-between md:w-1/2 py-4">
+                  <div className="w-full mb-2 md:mb-0">Total Supply</div>
+                  <div className="w-full break-words">
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-16 break-words" />
                     ) : (
-                      convertTimestampToTime(validatorFullData?.elapsedTime)
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA:</div>
-                  <div className="w-full md:w-3/4 text-green-500 break-words">
-                    {!validatorFullData?.totalSeconds ? (
-                      <Skeleton className="h-3 w-32" />
-                    ) : (
-                      convertTimestampToTime(timeRemaining)
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Progress</div>
-                  <div className="w-full md:w-3/4 break-words">
-                    {!validatorFullData?.epochProgress ? (
-                      <Skeleton className="h-3 w-full" />
-                    ) : (
-                      <div className="flex space-x-4 gap-2 items-center ">
-                        <div className="bg-blue-50 h-2 w-full rounded-full">
-                          <div
-                            className="bg-green-500 h-2 rounded-full"
-                            style={{
-                              width: `${validatorFullData?.epochProgress.toFixed(
-                                1,
-                              )}%`,
-                            }}
-                          ></div>
-                        </div>
-                        {validatorFullData?.epochProgress.toFixed(0)}%
-                      </div>
+                      <>
+                        <Tooltip.Provider>
+                          <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                              <span>{formatNumber(Number(TotalSupply))}</span>
+                            </Tooltip.Trigger>
+                            <Tooltip.Content
+                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                              align="center"
+                              side="top"
+                            >
+                              {totalSuppy + ' yoctoⓃ'}
+                            </Tooltip.Content>
+                          </Tooltip.Root>
+                        </Tooltip.Provider>{' '}
+                      </>
                     )}
                   </div>
                 </div>
@@ -885,41 +815,94 @@ export default function ({ network, currentPage, setPage }: Props) {
             </div>
           </div>
         </div>
-        <div className="py-5"></div>
-        <div className="w-full mb-10">
-          <div className="bg-white soft-shadow rounded-lg pb-1">
-            <div className="flex flex-col pt-4">
-              <div className="flex flex-col">
-                {isLoading ? (
-                  <p className="leading-7 pl-3 px-3 text-sm mb-4 text-gray-500">
-                    <Skeleton className=" h-4 w-25 break-words" />
-                  </p>
-                ) : (
-                  <div className="leading-7 pl-3 px-3 text-sm mb-4 text-gray-500">
-                    {validatorFullData?.total}
-                    Validators found
-                  </div>
-                )}
+        <div className="w-full md:w-1/2">
+          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+            <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+              Epoch Information
+            </h2>
+            <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Epoch Elapsed Time:
+                </div>
+                <div className="w-full text-green-500 md:w-3/4 break-words">
+                  {!validatorFullData?.elapsedTime ? (
+                    <Skeleton className="h-3 w-32" />
+                  ) : (
+                    convertTimestampToTime(validatorFullData?.elapsedTime)
+                  )}
+                </div>
               </div>
-              <div className="flex flex-col">
-                <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
-                  props={{
-                    columns: columns,
-                    data: validatorFullData?.validatorEpochData || [],
-                    count: validatorFullData?.total,
-                    isLoading: isLoading,
-                    renderRowSubComponent: ExpandedRow,
-                    expanded,
-                    isPagination: true,
-                    page: currentPage,
-                    limit: 25,
-                    pageLimit: 999,
-                    setPage: setPage,
-                    Error: errorMessage,
-                  }}
-                />
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA:</div>
+                <div className="w-full md:w-3/4 text-green-500 break-words">
+                  {!validatorFullData?.totalSeconds ? (
+                    <Skeleton className="h-3 w-32" />
+                  ) : (
+                    convertTimestampToTime(timeRemaining)
+                  )}
+                </div>
               </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Progress</div>
+                <div className="w-full md:w-3/4 break-words">
+                  {!validatorFullData?.epochProgress ? (
+                    <Skeleton className="h-3 w-full" />
+                  ) : (
+                    <div className="flex space-x-4 gap-2 items-center ">
+                      <div className="bg-blue-50 h-2 w-full rounded-full">
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{
+                            width: `${validatorFullData?.epochProgress.toFixed(
+                              1,
+                            )}%`,
+                          }}
+                        ></div>
+                      </div>
+                      {validatorFullData?.epochProgress.toFixed(0)}%
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="py-5"></div>
+      <div className="w-full mb-10">
+        <div className="bg-white soft-shadow rounded-lg pb-1">
+          <div className="flex flex-col pt-4">
+            <div className="flex flex-col">
+              {isLoading ? (
+                <div className="leading-7 max-w-lg w-full pl-3 py-1.5 text-sm mb-4 text-gray-500">
+                  <Skeleton className=" h-4 break-words" />
+                </div>
+              ) : (
+                <div className="leading-7 pl-3 px-3 text-sm mb-4 text-gray-500">
+                  {validatorFullData?.total}
+                  Validators found
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <Widget
+                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                props={{
+                  columns: columns,
+                  data: validatorFullData?.validatorEpochData || [],
+                  count: validatorFullData?.total,
+                  isLoading: isLoading,
+                  renderRowSubComponent: ExpandedRow,
+                  expanded,
+                  isPagination: true,
+                  page: currentPage,
+                  limit: 25,
+                  pageLimit: 999,
+                  setPage: setPage,
+                  Error: errorMessage,
+                }}
+              />
             </div>
           </div>
         </div>

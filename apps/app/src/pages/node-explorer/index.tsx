@@ -30,15 +30,19 @@ const NodeExplorer = () => {
           </h1>
         </div>
       </div>
-      <VmComponent
-        src={components?.nodeExplorer}
-        skeleton={<Index />}
-        props={{
-          currentPage: currentPage,
-          setPage: setPage,
-          network: networkId,
-        }}
-      />
+      <div className="container mx-auto px-3 -mt-48">
+        <div className="relative mt-10">
+          <VmComponent
+            src={components?.nodeExplorer}
+            skeleton={<Index />}
+            props={{
+              currentPage: currentPage,
+              setPage: setPage,
+              network: networkId,
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 };

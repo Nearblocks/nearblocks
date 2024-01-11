@@ -230,7 +230,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('block.gasFee') : 'GAS FEE'}</span>,
+      header: <span>{t ? t('blocks:block.gasFee') : 'GAS FEE'}</span>,
       key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>

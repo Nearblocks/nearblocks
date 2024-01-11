@@ -240,7 +240,6 @@ export default function ({ network, t }: Props) {
                     <img
                       src={`${config.appUrl}images/near price.svg`}
                       alt={t ? t('home:nearPrice') : 'nearPrice'}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />
@@ -277,7 +276,6 @@ export default function ({ network, t }: Props) {
                     <img
                       src={`${config.appUrl}images/market.svg`}
                       alt={t ? t('home:marketCap') : 'marketCap'}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />
@@ -307,7 +305,6 @@ export default function ({ network, t }: Props) {
                   <img
                     src={`${config.appUrl}images/transactions.svg`}
                     alt={t ? t('home:transactions') : 'transactions'}
-                    className="h-9 w-9"
                     width="24"
                     height="24"
                   />
@@ -345,7 +342,6 @@ export default function ({ network, t }: Props) {
                   <img
                     src={`${config.appUrl}images/pickaxe.svg`}
                     alt={t ? t('home:activeValidator') : 'activeValidator'}
-                    className="h-9 w-9"
                     width="24"
                     height="24"
                   />
