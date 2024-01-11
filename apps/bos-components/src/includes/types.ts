@@ -45,7 +45,7 @@ export type MetaInfo = {
 export type FtsInfo = {
   amount: number;
   contract: string;
-  ft_meta: MetaInfo;
+  ft_metas: MetaInfo;
 };
 
 export type NftsInfo = {
@@ -91,7 +91,7 @@ export type ContractInfo = {
 export type TokenListInfo = {
   amount: number;
   contract: string;
-  ft_meta: MetaInfo;
+  ft_metas: MetaInfo;
   rpcAmount: number;
   amountUsd: number;
 };
@@ -229,6 +229,13 @@ export type TransactionInfo = {
   signer_account_id: string;
   transaction_hash: string;
   receipts: InventoryInfo[];
+  event_kind: string;
+  token_old_owner_account_id: string;
+  token_new_owner_account_id: string;
+  token_id: string;
+  nft: Token;
+  amount: string;
+  ft: Token;
 };
 
 export type ChartStat = {
@@ -623,6 +630,12 @@ export type Token = {
     telegram: string;
     coingecko_id: string;
   };
+  token: string;
+  media: string;
+  asset: {
+    owner: string;
+  };
+  decimals: number;
 };
 
 export type TransActionProps = {
@@ -666,4 +679,18 @@ export type ReceiptStatsProps = {
       };
     };
   };
+};
+
+export type HoldersPropsInfo = {
+  account: string;
+  quantity: number;
+};
+
+export type NFTImageProps = {
+  base?: string;
+  media?: string;
+  alt?: string;
+  reference?: string;
+  className?: string;
+  network: string;
 };

@@ -1,10 +1,16 @@
 import React from 'react';
 import Skeleton from './Skeleton';
-
-const List = () => {
+interface Props {
+  showRounded?: boolean;
+}
+const List = ({ showRounded }: Props) => {
   return (
     <div className="absolute w-full h-full z-10">
-      <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
+      <div
+        className={`bg-white border soft-shadow ${
+          !showRounded ? 'rounded-lg' : ''
+        } overflow-hidden`}
+      >
         <div className=" flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
           <div className="max-w-lg pl-3 w-full py-3.5 ">
             <Skeleton className=" h-4" />

@@ -30,16 +30,15 @@ export default function (props: Props) {
               <button
                 type="button"
                 onClick={onCopyClick}
-                className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full  p-1.5 w-7 h-7"
+                className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
               >
-                <span className="inline-block align-middle items-center pb-2">
-                  <CopyIcon className="fill-current -z-50 text-green-500 group-hover:text-white h-4 w-4" />
-                </span>
+                <CopyIcon className="fill-current -z-50 text-green-500 group-hover:text-white h-4 w-4" />
               </button>
             </Tooltip.Trigger>
             <Tooltip.Content
               className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
               sideOffset={5}
+              side="bottom"
             >
               {showTooltip ? 'Copied!' : 'Copy account ID to clipboard'}
               <Tooltip.Arrow className="fill-white" />
@@ -52,14 +51,12 @@ export default function (props: Props) {
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <span className="inline-block align-middle items-center pb-2">
-                      <QRCodeIcon className="fill-current text-green-500 group-hover:text-white h-4 w-4" />
-                    </span>
+                    <QRCodeIcon className="fill-current text-green-500 group-hover:text-white h-4 w-4" />
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                     sideOffset={8}
-                    place="bottom"
+                    side="bottom"
                   >
                     Click to view QR Code
                   </Tooltip.Content>
@@ -68,11 +65,10 @@ export default function (props: Props) {
             </button>
           </Dialog.Trigger>
           <Dialog.Overlay className="bg-green-500 bg-opacity-10 data-[state=open]:animate-overlayShow fixed inset-0" />
-          <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-20 max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] w-80 h-80">
+          <Dialog.Content className="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] w-96 h-96 ">
             <Dialog.Title>
               <div className="flex items-center justify-between bg-gray-100 px-3 py-4">
                 <h4 className="flex items-center text-xs break-all">
-                  {' '}
                   {props.id}
                 </h4>
                 <Dialog.Close asChild className="text-gray-500 fill-current">
@@ -85,7 +81,7 @@ export default function (props: Props) {
                 </Dialog.Close>
               </div>
             </Dialog.Title>
-            <div className="flex items-center text-xs break-all">
+            <div className="p-4">
               <QrCode value={props.id} width={160} height={160} />
             </div>
           </Dialog.Content>

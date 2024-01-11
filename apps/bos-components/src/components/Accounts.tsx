@@ -5,12 +5,14 @@
  * Description: Accounts component enable users to view information related to their accounts.
  * @interface Props
  * @param {string} [id] - The account identifier passed as a string.
- * @param {boolean} [fetchStyles] - Use Nearblock styles.
+ * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
   id?: string;
-  fetchStyles?: boolean;
+  network: string;
+  t: (key: string) => string | undefined;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -44,10 +46,21 @@ import {
   TokenListInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
+import Download from '@/includes/icons/Download';
 
-export default function (props: Props) {
+const tabs = [
+  'Transactions',
+  'Token Txns',
+  'NFT Token Txns',
+  'Access Keys',
+  'Contract',
+  'Comments',
+];
+
+export default function ({ t, network, id }: Props) {
   const [loading, setLoading] = useState(false);
   const [statsData, setStatsData] = useState<SatsInfo>({} as SatsInfo);
+  const [pageTab, setPageTab] = useState('Transactions');
   const [accountData, setAccountData] = useState<AccountInfo>(
     {} as AccountInfo,
   );
@@ -62,22 +75,12 @@ export default function (props: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [code, setCode] = useState<ContractCodeInfo>({} as ContractCodeInfo);
   const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
-  const [css, setCss] = useState({});
 
-  /**
-   * Fetches styles asynchronously from a nearblocks gateway.
-   */
-  function fetchStyles() {
-    asyncFetch('https://beta.nearblocks.io/common.css').then(
-      (res: { body: string }) => {
-        if (res?.body) {
-          setCss(res.body);
-        }
-      },
-    );
-  }
+  const config = getConfig(network);
 
-  const config = getConfig(context.networkId);
+  const onTab = (index: number) => {
+    setPageTab(tabs[index]);
+  };
 
   useEffect(() => {
     function fetchStatsData() {
@@ -101,7 +104,7 @@ export default function (props: Props) {
     }
 
     function fetchAccountData() {
-      asyncFetch(`${config?.backendUrl}account/${props.id}`, {
+      asyncFetch(`${config?.backendUrl}account/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -129,15 +132,12 @@ export default function (props: Props) {
     }
 
     function fetchContractData() {
-      asyncFetch(
-        `${config?.backendUrl}account/${props.id}/contract/deployments`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${config?.backendUrl}account/${id}/contract/deployments`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+      })
         .then(
           (data: {
             body: {
@@ -157,7 +157,7 @@ export default function (props: Props) {
     }
 
     function fetchTokenData() {
-      asyncFetch(`${config?.backendUrl}fts/${props.id}`, {
+      asyncFetch(`${config?.backendUrl}fts/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ export default function (props: Props) {
     }
 
     function fetchInventoryData() {
-      asyncFetch(`${config?.backendUrl}account/${props.id}/inventory`, {
+      asyncFetch(`${config?.backendUrl}account/${id}/inventory`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ export default function (props: Props) {
     fetchContractData();
     fetchTokenData();
     fetchInventoryData();
-  }, [config?.backendUrl, props.id]);
+  }, [config?.backendUrl, id]);
 
   useEffect(() => {
     function ftBalanceOf(contracts: string, account_id?: string) {
@@ -269,7 +269,7 @@ export default function (props: Props) {
 
       Promise.all(
         fts.map((ft: FtsInfo) => {
-          return ftBalanceOf(ft.contract, props.id).then((rslt: string) => {
+          return ftBalanceOf(ft.contract, id).then((rslt: string) => {
             return { ...ft, amount: rslt };
           });
         }),
@@ -283,11 +283,13 @@ export default function (props: Props) {
           let rpcAmount = Big(0);
 
           if (amount) {
-            rpcAmount = Big(amount).div(Big(10).pow(ftrslt.ft_meta?.decimals));
+            rpcAmount = ftrslt.ft_metas?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt.ft_metas?.decimals))
+              : 0;
           }
 
-          if (ftrslt.ft_meta?.price) {
-            sum = rpcAmount.mul(Big(ftrslt.ft_meta?.price));
+          if (ftrslt.ft_metas?.price) {
+            sum = rpcAmount.mul(Big(ftrslt.ft_metas?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -335,15 +337,7 @@ export default function (props: Props) {
     }
 
     loadBalances();
-  }, [inventoryData?.fts, props.id, config?.rpcUrl]);
-
-  useEffect(() => {
-    if (props?.fetchStyles) fetchStyles();
-  }, [props?.fetchStyles]);
-
-  const Theme = styled.div`
-    ${css}
-  `;
+  }, [inventoryData?.fts, id, config?.rpcUrl]);
 
   useEffect(() => {
     function contractCode(address: string) {
@@ -418,12 +412,12 @@ export default function (props: Props) {
     }
 
     function loadSchema() {
-      if (!props.id) return;
+      if (!id) return;
 
-      Promise.all([contractCode(props.id), viewAccessKeys(props.id)]);
+      Promise.all([contractCode(id), viewAccessKeys(id)]);
     }
     loadSchema();
-  }, [props.id, config?.rpcUrl]);
+  }, [id, config?.rpcUrl]);
 
   if (code?.code_base64) {
     const locked = (key.keys || []).every(
@@ -439,259 +433,327 @@ export default function (props: Props) {
     setContract({ ...code, locked });
   }
   return (
-    <Theme>
-      <div className="container mx-auto px-3">
-        <div className="flex items-center justify-between flex-wrap pt-4">
-          {!props.id ? (
-            <Skeleton className="h-4" />
-          ) : (
-            <h1 className="flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
-              Near Account: @&nbsp;{' '}
-              {props?.id && (
-                <span className="font-semibold text-green-500 ">
-                  {' '}
-                  {'  ' + props.id}
-                </span>
+    <div className="container mx-auto px-3">
+      <div className="flex items-center justify-between flex-wrap pt-4">
+        {!id ? (
+          <Skeleton className="h-4" />
+        ) : (
+          <h1 className="flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+            Near Account: @&nbsp;{' '}
+            {id && (
+              <span className="font-semibold text-green-500 ">{'  ' + id}</span>
+            )}
+            {
+              <Widget
+                src={`${config.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                props={{
+                  id: id,
+                  config: config,
+                }}
+              />
+            }
+          </h1>
+        )}
+        {
+          <Widget
+            src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredBox`}
+          />
+        }
+      </div>
+      <div className="text-gray-500 px-2 pb-5 pt-1 border-t"></div>
+      <div className="flex items-center flex-shrink-0 max-w-full px-2 space-x-2 pt-4"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="w-full">
+          <div className="h-full bg-white soft-shadow rounded-lg">
+            <div className="flex justify-between border-b p-3 text-gray-600">
+              <h2 className="leading-6 text-sm font-semibold">
+                {t ? t('address:overview') : 'Overview'}
+              </h2>
+              {tokenData?.name && (
+                <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
+                  <div className="truncate max-w-[110px]">{tokenData.name}</div>
+                  {tokenData.website && (
+                    <a
+                      href={tokenData.website}
+                      className="ml-1"
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                    >
+                      <FaExternalLinkAlt />
+                    </a>
+                  )}
+                </div>
               )}
-              {
-                <Widget
-                  src={`${config.ownerId}/widget/bos-components.components.Shared.Buttons`}
-                  props={{
-                    id: props.id,
-                    config: config,
-                  }}
-                />
-              }
-            </h1>
-          )}
-          {
-            <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredBox`}
-            />
-          }
-        </div>
-        <div className="text-gray-500 px-2 pt-1 border-t">
-          {
-            <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredText`}
-              props={{
-                textColor: false,
-              }}
-            />
-          }
-        </div>
-
-        <div className="flex gap-2 mb-2 md:mb-2 mt-10">
-          <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg">
-              <div className="flex justify-between border-b p-3 text-gray-600">
-                <h2 className="leading-6 text-sm font-semibold">Overview</h2>
-                {tokenData?.name && (
-                  <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
-                    <div className="truncate max-w-[110px]">
-                      {tokenData.name}
-                    </div>
-                    {tokenData.website && (
-                      <a
-                        href={tokenData.website}
-                        className="ml-1"
-                        target="_blank"
-                        rel="noopener noreferrer nofollow"
-                      >
-                        <FaExternalLinkAlt />
-                      </a>
-                    )}
+            </div>
+            <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="flex flex-wrap py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                  {t ? t('address:balance') : 'Balance'}:
+                </div>
+                {loading ? (
+                  <Skeleton className="h-4 w-32" />
+                ) : (
+                  <div className="w-full md:w-3/4 break-words">
+                    {yoctoToNear(accountData?.amount || 0, true)} Ⓝ
                   </div>
                 )}
               </div>
-
-              <div className="px-3 divide-y text-sm text-gray-600">
-                <div className="flex py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0">Balance:</div>
+              {context.networkId === 'mainnet' && statsData?.near_price && (
+                <div className="flex flex-wrap py-4 text-sm text-gray-600">
+                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                    {t ? t('address:value') : 'Value'}:
+                  </div>
                   {loading ? (
-                    <Skeleton className="h-4" />
+                    <Skeleton className="h-4 w-32" />
                   ) : (
-                    <div className="w-full md:w-3/4">
-                      {yoctoToNear(accountData?.amount || 0, true)} Ⓝ
+                    <div className="w-full md:w-3/4 break-words">
+                      $
+                      {fiatValue(
+                        yoctoToNear(accountData.amount || 0, false),
+                        statsData.near_price,
+                      )}{' '}
+                      <span className="text-xs">
+                        (@ ${dollarFormat(statsData.near_price)} / Ⓝ)
+                      </span>
                     </div>
                   )}
                 </div>
-                {context.networkId === 'mainnet' && statsData?.near_price && (
-                  <div className="flex py-4 text-sm text-gray-600">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">Value</div>
-                    {loading ? (
-                      <Skeleton className="h-4" />
-                    ) : (
-                      <div className="w-full md:w-3/4 break-words">
-                        $
-                        {fiatValue(
-                          yoctoToNear(accountData.amount || 0, false),
-                          statsData.near_price,
-                        )}{' '}
-                        <span className="text-xs">
-                          (@ ${dollarFormat(statsData.near_price)} / Ⓝ)
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="flex py-4 text-sm text-gray-600">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0">Tokens:</div>
-                  <div className="w-full md:w-3/4 break-words -my-1">
-                    <TokenHoldings
-                      data={inventoryData}
-                      loading={loading}
-                      ft={ft}
-                      id={props.id}
-                      appUrl={config.appUrl}
-                    />
-                  </div>
+              )}
+              <div className="flex flex-wrap py-4 text-sm text-gray-600">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                  {t ? t('address:tokens') : 'Tokens'}:
+                </div>
+                <div className="w-full md:w-3/4 break-words -my-1">
+                  <TokenHoldings
+                    data={inventoryData}
+                    loading={loading}
+                    ft={ft}
+                    id={id}
+                    appUrl={config.appUrl}
+                  />
                 </div>
               </div>
             </div>
           </div>
-          <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="leading-6 border-b p-3 text-gray-600 text-sm font-semibold">
-                Account information
-              </h2>
-
-              <div className="px-3 divide-y text-sm text-gray-600">
-                <div className="flex justify-between">
-                  <div className="flex xl:flex-nowrap items-center justify-between py-4 w-full">
-                    <div className="w-full mb-2 md:mb-0">Staked Balance:</div>
-                    {loading ? (
-                      <div className="w-full mb-2 break-words">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      <div className="w-full mb-2 break-words">
-                        {yoctoToNear(Number(accountData?.locked || 0), true)} Ⓝ
-                      </div>
-                    )}
+        </div>
+        <div className="w-full">
+          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+            <h2 className="leading-6 border-b p-3 text-gray-600 text-sm font-semibold">
+              {t ? t('address:moreInfo') : 'Account information'}
+            </h2>
+            <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="flex justify-between">
+                <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                  <div className="w-full mb-2 md:mb-0">
+                    Staked {t ? t('address:balance') : 'Balance'}:
                   </div>
-                  <div className="flex ml-4 xl:flex-nowrap items-center justify-between py-4 w-full">
-                    <div className="w-full mb-2 md:mb-0">Storage Used:</div>
-                    {loading ? (
-                      <div className="w-full mb-2 break-words">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      <div className="w-full break-words xl:mt-0 mb-2">
-                        {weight(Number(accountData?.storage_usage) || 0)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <div className="flex xl:flex-nowrap items-center justify-between py-4 w-full">
-                    {loading ? (
-                      <div className="w-full mb-2 md:mb-0">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      <div className="w-full mb-2 md:mb-0">
-                        {accountData?.deleted?.transaction_hash
-                          ? 'Deleted At:'
-                          : 'Created At:'}
-                      </div>
-                    )}
-                    {loading ? (
-                      <div className="w-full mb-2 break-words">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      <div className="w-full mb-2 break-words">
-                        {accountData?.deleted?.transaction_hash
-                          ? convertToUTC(
-                              nanoToMilli(accountData.deleted.block_timestamp),
-                              false,
-                            )
-                          : accountData?.created?.transaction_hash
-                          ? convertToUTC(
-                              nanoToMilli(accountData.created.block_timestamp),
-                              false,
-                            )
-                          : accountData?.code_hash
-                          ? 'Genesis'
-                          : 'N/A'}
-                      </div>
-                    )}
-                  </div>
-                  {contract?.hash ? (
-                    <div className="flex ml-4 xl:flex-nowrap items-center justify-between py-4 w-full">
-                      <div className="w-full mb-2">Contract Locked:</div>
-                      <div className="w-full mb-2 break-words">
-                        {contract?.locked ? 'Yes' : 'No'}
-                      </div>
+                  {loading ? (
+                    <div className="w-full break-words">
+                      <Skeleton className="h-4 w-32" />
                     </div>
                   ) : (
-                    <div className="flex ml-4 xl:flex-nowrap items-center justify-between py-4 w-full" />
+                    <div className="w-full break-words xl:mt-0 mt-2">
+                      {yoctoToNear(Number(accountData?.locked || 0), true)} Ⓝ
+                    </div>
                   )}
                 </div>
-                {deploymentData?.receipt_predecessor_account_id && (
-                  <div className="flex items-center py-4">
-                    <div className="md:w-1/4 mb-2 md:mb-0 ">
-                      Contract Creator:
+                <div className="flex ml-4  xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                  <div className="w-full mb-2 md:mb-0">Storage Used:</div>
+                  {loading ? (
+                    <div className="w-full break-words">
+                      <Skeleton className="h-4 w-28" />
                     </div>
-                    <div className="ml-10 mb-2 md:w-3/4">
-                      <a
-                        href={`/address/${deploymentData.receipt_predecessor_account_id}`}
-                      >
-                        <a className="text-green-500">
-                          {shortenAddress(
-                            deploymentData.receipt_predecessor_account_id,
-                          )}
-                        </a>
-                      </a>
-                      {' at txn  '}
-                      <a href={`/txns/${deploymentData.transaction_hash}`}>
-                        <a className="text-green-500">
-                          {shortenAddress(deploymentData.transaction_hash)}
-                        </a>
-                      </a>
+                  ) : (
+                    <div className="w-full break-words xl:mt-0 mt-2">
+                      {weight(Number(accountData?.storage_usage) || 0)}
                     </div>
-                  </div>
-                )}
-                {tokenData?.name && (
-                  <div className="flex flex-wrap items-center justify-between py-4">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                      Token Tracker:
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                  {loading ? (
+                    <div className="w-full mb-2 md:mb-0">
+                      <Skeleton className="h-4 w-28" />
                     </div>
-                    <div className="w-full md:w-3/4 mb-2 break-words">
-                      <div className="flex items-center">
-                        <TokenImage
-                          src={tokenData?.icon}
-                          alt={tokenData?.name}
-                          appUrl={config.appUrl}
-                          className="w-4 h-4 mr-2"
-                        />
-                        <a href={`/token/${props.id}`}>
-                          <a className="flex text-green-500">
-                            <span className="inline-block truncate max-w-[110px] mr-1">
-                              {tokenData.name}
-                            </span>
-                            (
-                            <span className="inline-block truncate max-w-[80px]">
-                              {tokenData.symbol}
-                            </span>
-                            )
-                          </a>
-                        </a>
-                        {tokenData.price && (
-                          <div className="text-gray-500 ml-1">
-                            (@ ${localFormat(tokenData.price)})
-                          </div>
-                        )}
-                      </div>
+                  ) : (
+                    <div className="w-full mb-2 md:mb-0">
+                      {accountData?.deleted?.transaction_hash
+                        ? 'Deleted At:'
+                        : 'Created At:'}
+                    </div>
+                  )}
+                  {loading ? (
+                    <div className="w-full break-words">
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+                  ) : (
+                    <div className="w-full break-words xl:mt-0 mt-2">
+                      {accountData?.deleted?.transaction_hash
+                        ? convertToUTC(
+                            nanoToMilli(accountData.deleted.block_timestamp),
+                            false,
+                          )
+                        : accountData?.created?.transaction_hash
+                        ? convertToUTC(
+                            nanoToMilli(accountData.created.block_timestamp),
+                            false,
+                          )
+                        : accountData?.code_hash
+                        ? 'Genesis'
+                        : 'N/A'}
+                    </div>
+                  )}
+                </div>
+                {contract?.hash ? (
+                  <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                    <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
+                    <div className="w-full break-words xl:mt-0 mt-2">
+                      {contract?.locked ? 'Yes' : 'No'}
                     </div>
                   </div>
+                ) : (
+                  <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full" />
                 )}
               </div>
+              {deploymentData?.receipt_predecessor_account_id && (
+                <div className="flex flex-wrap items-center justify-between py-4">
+                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                    Contract Creator:
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    <a
+                      href={`/address/${deploymentData.receipt_predecessor_account_id}`}
+                      className="hover:no-underline"
+                    >
+                      <a className="text-green-500 hover:no-underline">
+                        {shortenAddress(
+                          deploymentData.receipt_predecessor_account_id,
+                        )}
+                      </a>
+                    </a>
+                    {' at txn  '}
+                    <a
+                      href={`/txns/${deploymentData.transaction_hash}`}
+                      className="hover:no-underline"
+                    >
+                      <a className="text-green-500 hover:no-underline">
+                        {shortenAddress(deploymentData.transaction_hash)}
+                      </a>
+                    </a>
+                  </div>
+                </div>
+              )}
+              {tokenData?.name && (
+                <div className="flex flex-wrap items-center justify-between py-4">
+                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                    Token Tracker:
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    <div className="flex items-center">
+                      <TokenImage
+                        src={tokenData?.icon}
+                        alt={tokenData?.name}
+                        appUrl={config.appUrl}
+                        className="w-4 h-4 mr-2"
+                      />
+                      <a href={`/token/${id}`} className="hover:no-underline">
+                        <a className="flex text-green-500 hover:no-underline">
+                          <span className="inline-block truncate max-w-[110px] mr-1">
+                            {tokenData.name}
+                          </span>
+                          (
+                          <span className="inline-block truncate max-w-[80px]">
+                            {tokenData.symbol}
+                          </span>
+                          )
+                        </a>
+                      </a>
+                      {tokenData.price && (
+                        <div className="text-gray-500 ml-1">
+                          (@ ${localFormat(tokenData.price)})
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </Theme>
+      <div className="py-6"></div>
+      <div className="block lg:flex lg:space-x-2 mb-10">
+        <div className="w-full ">
+          <div className="bg-white soft-shadow rounded-lg pb-1">
+            <Tabs.Root defaultValue={pageTab}>
+              <Tabs.List>
+                {tabs &&
+                  tabs.map((tab, index) => (
+                    <Tabs.Trigger
+                      key={index}
+                      onClick={() => onTab(index)}
+                      className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 ${
+                        pageTab === tab
+                          ? 'border-b-4 border-green-500 text-green-500'
+                          : ''
+                      }`}
+                      value={tab}
+                    >
+                      {tab === 'Transactions' ? (
+                        <h2>{t ? t('address:txns') : tab}</h2>
+                      ) : tab === 'Token Txns' ? (
+                        <h2>{t ? t('address:tokenTxns') : tab}</h2>
+                      ) : tab === 'Contract' ? (
+                        <div className=" flex h-full">
+                          <h2>{tab}</h2>
+                          <div className="text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-1 -mt-2 px-1 ">
+                            NEW
+                          </div>
+                        </div>
+                      ) : tab === 'Comments' ? (
+                        <h2>{t ? t('address:comments') : tab}</h2>
+                      ) : (
+                        <h2>{tab}</h2>
+                      )}
+                    </Tabs.Trigger>
+                  ))}
+              </Tabs.List>
+              <Tabs.Content value={tabs[0]}>
+                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
+                  <span className="text-xs sm:-mt-12  text-gray-700">
+                    <a
+                      href="/nft-token/exportdata/address/id"
+                      className="hover:no-underline"
+                    >
+                      <a
+                        target="_blank"
+                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
+                      >
+                        <p>CSV Export </p>
+                        <span className="ml-2">
+                          <Download />
+                        </span>
+                      </a>
+                    </a>
+                  </span>
+                </div>
+              </Tabs.Content>
+              <Tabs.Content value={tabs[1]}>
+                {' '}
+                <div className="px-4 sm:px-6 py-3"></div>
+              </Tabs.Content>
+              <Tabs.Content value={tabs[2]}>
+                {' '}
+                <div className="px-4 sm:px-6 py-3"></div>
+              </Tabs.Content>
+              <Tabs.Content value={tabs[3]}>
+                <div className="px-4 sm:px-6 py-3"></div>
+              </Tabs.Content>
+            </Tabs.Root>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

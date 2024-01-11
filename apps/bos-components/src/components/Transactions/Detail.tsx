@@ -83,7 +83,7 @@ export default function (props: Props) {
       receipts.forEach(
         (receipt) =>
           receipt?.fts?.forEach((ft) => {
-            if (ft.ft_meta) fts.push(ft);
+            if (ft.ft_metas) fts.push(ft);
           }),
       );
       receipts.forEach(
