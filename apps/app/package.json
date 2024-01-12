@@ -14,7 +14,7 @@
     "@near-wallet-selector/core": "8.1.1",
     "@web3-onboard/walletconnect": "2.3.9",
     "near-api-js": "2.1.3",
-    "near-social-vm": "github:NearSocial/VM#2.5.1",
+    "near-social-vm": "github:NearSocial/VM#2.5.5",
     "next": "13.3.4",
     "next-translate": "2.6.2",
     "nearblock-translations": "https://github.com/Nearblocks/translations.git#c1b8897a68f09d57ba75c53dd86334c48ad8c8ac",
