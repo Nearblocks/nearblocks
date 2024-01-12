@@ -13,7 +13,7 @@
   "dependencies": {
     "@near-wallet-selector/core": "8.1.1",
     "near-api-js": "2.1.3",
-    "near-social-vm": "github:NearSocial/VM#2.5.1",
+    "near-social-vm": "github:NearSocial/VM#2.5.5",
     "next": "13.3.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
