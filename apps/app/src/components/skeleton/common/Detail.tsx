@@ -1,98 +1,178 @@
 import React from 'react';
 import Skeleton from './Skeleton';
 
-const Detail = () => {
+const Detail = ({ network }: any) => {
   return (
-    <>
-      <div className="text-gray-400 text-xs px-2 mb-4"></div>
-      <div>
-        <div className="md:flex items-center justify-between">
+    <div className="absolute w-full z-50">
+      <div className="md:flex items-center justify-between bg-white">
+        <div className="w-80 max-w-xs px-3 py-5">
           <Skeleton className="h-7" />
-          <div className="flex items-center flex-shrink-0 max-w-full px-2 space-x-2 pt-4"></div>
+        </div>{' '}
+        <div className="w-80 max-w-xs px-3 py-5">
+          <Skeleton className="h-7" />
         </div>
-        <div className="text-gray-500 px-2 pb-5 pt-1"></div>
       </div>
+
       <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y soft-shadow rounded-lg">
-        <div className="flex flex-wrap p-4 text-red-500"></div>
+        {network === 'testnet' && (
+          <div className="flex flex-wrap p-4 text-red-500">
+            <div className="max-w-lg w-44 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        )}
         <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            {/* {t ? t('blocks:block.height') : 'Block Height'} */}
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
 
           <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-20" />
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-xl" />
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+            {/* {t ? t('blocks:block.hash') : 'Hash'} */}
           </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
 
           <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-sm" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-xs" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
-          </div>
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
-
-          <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
           </div>
         </div>
 
         <div className="flex flex-wrap p-4">
-          <div className="w-full md:w-1/4 mb-2 md:mb-0"></div>
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+            {/* {t ? t('blocks:block.timestamp') : 'Timestamp'} */}
+          </div>
+
           <div className="w-full md:w-3/4">
-            <Skeleton className="flex w-full max-w-lg" />
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
           </div>
         </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+            {/* {t ? t('blocks:block.transactions.0') : 'Transactions'} */}
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="max-w-lg w-36 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <div className="w-1/2 py-0.5">
+              <Skeleton className="h-4" />
+            </div>
+          </div>
+        </div>
+        {network === 'mainnet' && (
+          <div className="flex flex-wrap p-4">
+            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+              <div className="max-w-lg w-36 py-0.5">
+                <Skeleton className="h-4" />
+              </div>
+            </div>
+
+            <div className="w-full md:w-3/4">
+              <div className="w-1/2 py-0.5">
+                <Skeleton className="h-4" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

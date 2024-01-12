@@ -219,13 +219,11 @@ export default function ({ network, currentPage, setPage }: Props) {
       header: <span></span>,
       key: '',
       cell: (row: ValidatorEpochData) => (
-        <div className="">
-          <button onClick={() => handleRowClick(row.index || 0)}>
-            <ArrowDown
-              className={`${row.isExpanded ? 'rotate-180' : 'rotate-0'}`}
-            />
-          </button>
-        </div>
+        <button onClick={() => handleRowClick(row.index || 0)}>
+          <ArrowDown
+            className={`${row.isExpanded ? 'rotate-180' : 'rotate-0'}`}
+          />
+        </button>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 ',
       thClassName:

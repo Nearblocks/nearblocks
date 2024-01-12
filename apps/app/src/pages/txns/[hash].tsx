@@ -13,11 +13,11 @@ const Txn = () => {
   const components = useBosComponents();
 
   return (
-    <div className="container mx-auto px-3">
+    <div className="relative container mx-auto">
       <VmComponent
         src={components?.transactionsHash}
         props={{ hash: hash, network: networkId, t: t }}
-        skeleton={<Detail />}
+        skeleton={<Detail network={networkId} />}
       />
       <div className="py-8"></div>
     </div>

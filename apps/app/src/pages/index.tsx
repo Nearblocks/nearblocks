@@ -37,7 +37,7 @@ const HomePage = () => {
 
   const { t } = useTranslation();
   return (
-    <div className="">
+    <div>
       <div className="flex items-center justify-center bg-hero-pattern">
         <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
           <div className="flex flex-col lg:flex-row pb-5">
