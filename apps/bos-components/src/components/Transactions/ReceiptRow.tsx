@@ -96,8 +96,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.receipts.receipt.tooltip')
@@ -113,7 +113,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
-              {receipt.receipt_id}
+              {receipt.receipt_id ? receipt.receipt_id : ''}
             </div>
           )}
         </div>
@@ -128,8 +128,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   Block height
                 </Tooltip.Content>
@@ -141,7 +141,7 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
-          ) : (
+          ) : block?.block_height ? (
             <div className="w-full md:w-3/4 word-break">
               <a
                 href={`/blocks/${receipt.block_hash}`}
@@ -152,6 +152,8 @@ export default function (props: Props) {
                 </a>
               </a>
             </div>
+          ) : (
+            ''
           )}
         </div>
         <div>
@@ -166,8 +168,8 @@ export default function (props: Props) {
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    sideOffset={8}
-                    place="bottom"
+                    align="start"
+                    side="bottom"
                   >
                     {t
                       ? t('txns:txn.receipts.from.tooltip')
@@ -181,7 +183,7 @@ export default function (props: Props) {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-sm" />
               </div>
-            ) : (
+            ) : receipt.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <a
                   href={`/address/${receipt.predecessor_id}`}
@@ -192,6 +194,8 @@ export default function (props: Props) {
                   </a>
                 </a>
               </div>
+            ) : (
+              ''
             )}
           </div>
           <div className="flex flex-wrap p-4">
@@ -205,8 +209,8 @@ export default function (props: Props) {
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    sideOffset={8}
-                    place="bottom"
+                    align="start"
+                    side="bottom"
                   >
                     {t
                       ? t('txns:txn.receipts.to.tooltip')
@@ -220,7 +224,7 @@ export default function (props: Props) {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-xs" />
               </div>
-            ) : (
+            ) : receipt.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <a
                   href={`/address/${receipt.receiver_id}`}
@@ -231,6 +235,8 @@ export default function (props: Props) {
                   </a>
                 </a>
               </div>
+            ) : (
+              ''
             )}
           </div>
         </div>
@@ -245,8 +251,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.receipts.burnt.tooltip')
@@ -262,7 +268,7 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
-          ) : (
+          ) : receipt.outcome.gas_burnt ? (
             <div className="w-full items-center text-xs flex md:w-3/4 break-words">
               <div className="bg-orange-50 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
@@ -271,6 +277,8 @@ export default function (props: Props) {
                 {yoctoToNear(receipt.outcome.tokens_burnt, true)} Ⓝ
               </div>
             </div>
+          ) : (
+            ''
           )}
         </div>
         <div className="flex items-start flex-wrap p-4">
@@ -284,8 +292,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.receipts.actions.tooltip')
@@ -302,7 +310,7 @@ export default function (props: Props) {
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
             </div>
-          ) : (
+          ) : receipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
               {receipt?.actions?.map((action: any, i: number) => (
                 <TransactionActions
@@ -313,6 +321,8 @@ export default function (props: Props) {
                 />
               ))}
             </div>
+          ) : (
+            ''
           )}
         </div>
         <div className="flex items-start flex-wrap p-4">
@@ -326,8 +336,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.receipts.result.tooltip')
@@ -345,7 +355,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              <ReceiptStatus receipt={receipt} />
+              {receipt ? <ReceiptStatus receipt={receipt} /> : ''}
             </div>
           )}
         </div>
@@ -360,8 +370,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.receipts.logs.tooltip')
