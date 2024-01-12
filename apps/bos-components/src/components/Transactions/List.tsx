@@ -48,6 +48,7 @@ import { TransactionInfo } from '@/includes/types';
 import SortIcon from '@/includes/icons/SortIcon';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Skeleton from '@/includes/Common/Skeleton';
+import Clock from '@/includes/icons/Clock';
 
 export default function (props: Props) {
   const {
@@ -490,28 +491,42 @@ export default function (props: Props) {
     },
     {
       header: (
-        <span>
-          <div className="w-full inline-flex px-5 py-4">
-            <button
-              type="button"
-              onClick={toggleShowAge}
-              className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 focus:outline-none whitespace-nowrap"
-            >
-              {showAge
-                ? t
-                  ? t('txns:age')
-                  : 'AGE'
-                : t
-                ? t('txns:ageDT')
-                : 'DATE TIME (UTC)'}
-            </button>
-            <button type="button" onClick={onOrder} className="px-2">
-              <div className="text-gray-500 font-semibold">
-                <SortIcon order={sorting} />
-              </div>
-            </button>
-          </div>
-        </span>
+        <div className="w-full inline-flex px-5 py-4">
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleShowAge}
+                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 focus:outline-none whitespace-nowrap"
+                >
+                  {showAge
+                    ? t
+                      ? t('txns:age')
+                      : 'AGE'
+                    : t
+                    ? t('txns:ageDT')
+                    : 'DATE TIME (UTC)'}
+                  {showAge && <Clock className="text-green-500 ml-2" />}
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="top"
+              >
+                {showAge
+                  ? 'Click to show Datetime Format'
+                  : 'Click to show Age Format'}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+          <button type="button" onClick={onOrder} className="px-2">
+            <div className="text-gray-500 font-semibold">
+              <SortIcon order={sorting} />
+            </div>
+          </button>
+        </div>
       ),
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (

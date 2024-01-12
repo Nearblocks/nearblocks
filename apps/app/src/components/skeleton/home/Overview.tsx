@@ -34,7 +34,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                       <p className="uppercase font-semibold text-gray-600 text-sm ">
                         {t('nearPrice')}
                       </p>
-                      <div className="pt-1">
+                      <div className="py-1">
                         <Skeleton className="h-4" />
                       </div>
                     </div>
@@ -52,7 +52,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                       <p className="uppercase font-semibold text-gray-500 text-sm">
                         {t('marketCap')}{' '}
                       </p>
-                      <div className="pt-1 ">
+                      <div className="py-1 ">
                         <Skeleton className="h-4" />
                       </div>
                     </div>
@@ -75,7 +75,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                     <p className="uppercase font-semibold text-gray-500 text-sm">
                       {t('transactions')}
                     </p>
-                    <div className="pt-1">
+                    <div className="py-1">
                       <Skeleton className="h-4" />
                     </div>
                   </div>
@@ -86,7 +86,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                     {t('gasPrice')}
                   </p>
 
-                  <div className="pt-1">
+                  <div className="py-1">
                     <Skeleton className="h-4" />
                   </div>
                 </div>
@@ -105,7 +105,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                     <p className="uppercase font-semibold text-gray-500 text-sm">
                       {t('activeValidator')}
                     </p>
-                    <div className="pt-1">
+                    <div className="py-1">
                       <Skeleton className="h-4" />
                     </div>
                   </div>
@@ -114,20 +114,20 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                   <p className="uppercase font-semibold text-gray-500 text-sm">
                     {t('avgBlockTime')}
                   </p>
-                  <div className="pt-1">
+                  <div className="py-1">
                     <Skeleton className="h-4" />
                   </div>
                 </div>
               </div>
             </div>
             <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:px-5">
-              <div className="flex-1 lg:px-0">
+              <div className="flex-1 py-5 lg:px-0">
                 <p className="uppercase font-semibold text-gray-500 text-sm">
                   {' '}
                   {t('transactionHistory', { days: 14 })}
                 </p>
-                <div className="pt-1 mt-0.5">
-                  <Skeleton className="h-36 " />
+                <div className="mt-1">
+                  <Skeleton className="h-28 " />
                 </div>
               </div>
             </div>

@@ -20,6 +20,7 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
+import Clock from '@/includes/icons/Clock';
 import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
@@ -123,13 +124,35 @@ export default function ({ currentPage, setPage, t, network }: Props) {
     {
       header: (
         <div>
-          <button
-            type="button"
-            onClick={toggleShowAge}
-            className="px-6 py-2 text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-500 focus:outline-none whitespace-nowrap"
-          >
-            {showAge ? (t ? t('blocks:age') : 'AGE') : 'DATE TIME (UTC)'}
-          </button>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleShowAge}
+                  className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row"
+                >
+                  {showAge ? (
+                    <>
+                      {t ? t('blocks:age') : 'AGE'}
+                      <Clock className="text-green-500 ml-2" />
+                    </>
+                  ) : (
+                    'DATE TIME (UTC)'
+                  )}
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="top"
+              >
+                {showAge
+                  ? 'Click to show Datetime Format'
+                  : 'Click to show Age Format'}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </div>
       ),
       key: 'block_timestamp',
@@ -138,7 +161,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span>
                   {!showAge
                     ? formatTimestampToString(
                         nanoToMilli(row.block_timestamp || 0),
