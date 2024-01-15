@@ -1,20 +1,22 @@
 /**
  * @interface Props
- *  @property {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
- *  @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
- *  @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
  */
+
+interface Props {
+  network: string;
+  t: (key: string) => string | undefined;
+  isHeader?: boolean;
+}
+
 import SearchIcon from '@/includes/icons/SearchIcon';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
 import { localFormat, shortenHex } from '@/includes/formats';
 import { debounce, getConfig, shortenAddress } from '@/includes/libs';
 import { SearchResult } from '@/includes/types';
-interface Props {
-  isHeader?: boolean;
-  network: string;
-  t: (key: string) => string | undefined;
-}
 
 export default function SearchBar({ isHeader, t, network }: Props) {
   const [keyword, setKeyword] = useState('');

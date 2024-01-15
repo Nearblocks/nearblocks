@@ -4,10 +4,11 @@
  * License: Business Source License 1.1
  * Description: Charts component for Near Charts & Statistics
  * @interface Props
+ * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
  * @param {boolean} [fetchStyles] - Use Nearblocks styles in the component
  * @param {boolean} [poweredBy] - Powered by attribution
- * @param {string} [network] - The network data to show, either mainnet or testnet
+
  */
 
 interface Props {

@@ -4,8 +4,8 @@
  * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
@@ -25,13 +25,13 @@ import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
-  currentPage: number;
-  setPage: (page: number) => void;
   network: string;
   t: (
     key: string,
     options?: { from: string; to: string; count: string },
   ) => string | undefined;
+  currentPage: number;
+  setPage: (page: number) => void;
 }
 
 export default function ({ currentPage, setPage, t, network }: Props) {

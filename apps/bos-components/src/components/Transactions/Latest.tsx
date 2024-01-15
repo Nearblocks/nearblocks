@@ -4,13 +4,13 @@
  * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
-  t: (key: string) => string | undefined;
   network: string;
+  t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
