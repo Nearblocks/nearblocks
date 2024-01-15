@@ -5,16 +5,16 @@
  * Description: Details of Transaction Receipt on Near Protocol.
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
-  txn: TransactionInfo;
-  rpcTxn: RPCTransactionInfo;
   network: string;
   t: (key: string) => string | undefined;
+  txn: TransactionInfo;
+  rpcTxn: RPCTransactionInfo;
 }
 
 import { getConfig } from '@/includes/libs';

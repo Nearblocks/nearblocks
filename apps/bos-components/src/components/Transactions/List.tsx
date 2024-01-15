@@ -4,28 +4,28 @@
  * License: Business Source License 1.1
  * Description: Table of Transactions on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
- *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [handleFilter] - Function to handle filter changes. (Optional)
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
- * @param {function} onFilterClear - Function to clear a specific or all filters. (Optional)
+ * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
   network: string;
+  t: (key: string, options?: { count?: string }) => string;
   currentPage: number;
-  filters: { [key: string]: string };
   setPage: (page: number) => void;
+  filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
-  t: (key: string, options?: { count?: string }) => string;
 }
 
 import {

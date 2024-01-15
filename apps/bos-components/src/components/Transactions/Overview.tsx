@@ -4,8 +4,8 @@
  * License: Business Source License 1.1
  * Description: Transactions Overview.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {

@@ -5,8 +5,8 @@
  * Description: Details of specified blocks on Near Protocol.
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
- * @param {string} [hash] -  The block identifier passed as a string.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} [hash] -  The block identifier passed as a string.
  */
 
 interface Props {
