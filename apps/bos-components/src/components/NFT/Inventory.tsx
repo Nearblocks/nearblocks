@@ -110,7 +110,7 @@ export default function ({ network, id, token }: Props) {
     }
     fetchTotalToken();
     fetchTokenData();
-  }, [config?.backendUrl, currentPage, id]);
+  }, [config?.backendUrl, currentPage, id, token]);
 
   useEffect(() => {
     if (token) {
