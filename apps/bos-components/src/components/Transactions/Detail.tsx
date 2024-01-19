@@ -4,19 +4,19 @@
  * License: Business Source License 1.1
  * Description: Details of specific Transaction on Near Protocol.
  * @interface Props
- * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
+  network: string;
+  t: (key: string) => string | undefined;
   loading: boolean;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
-  network: string;
-  t: (key: string) => string | undefined;
 }
 
 import EventLogs from '@/includes/Common/Action/index';
@@ -36,7 +36,6 @@ import {
 import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import FaCaretRight from '@/includes/icons/FaCaretRight';
-import { NFTImage } from '@/includes/icons/NFTImage';
 import TokenImage from '@/includes/icons/TokenImage';
 import {
   fiatValue,
@@ -701,16 +700,21 @@ export default function (props: Props) {
                               className="hover:no-underline"
                             >
                               <a>
-                                <NFTImage
-                                  base={nft.nft_meta.base_uri}
-                                  media={nft.nft_token_meta.media}
-                                  reference={
-                                    nft.nft_meta.reference ||
-                                    nft.nft_token_meta.reference
-                                  }
-                                  alt={nft.nft_token_meta.title}
-                                  className="max-h-full rounded"
-                                />
+                                {
+                                  <Widget
+                                    src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                                    props={{
+                                      base: nft.nft_meta.base_uri,
+                                      media: nft.nft_token_meta.media,
+                                      reference:
+                                        nft.nft_meta.reference ||
+                                        nft.nft_token_meta.reference,
+                                      alt: nft.nft_token_meta.title,
+                                      className: 'max-h-full rounded',
+                                      network: network,
+                                    }}
+                                  />
+                                }
                               </a>
                             </a>
                           </div>

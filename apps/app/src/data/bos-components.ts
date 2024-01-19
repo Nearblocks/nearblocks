@@ -12,7 +12,10 @@ type NetworkComponents = {
   transactionsHash: string;
   search: string;
   ftList: string;
+  ftTransfersList: string;
   nftList: string;
+  nftOverview: string;
+  nftTransfersList: string;
   charts: string;
 };
 const ComponentUrl = {
@@ -28,7 +31,10 @@ const ComponentUrl = {
   transactionsHash: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Hash`,
   search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
   ftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.List`,
+  ftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.TransfersList`,
   nftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.List`,
+  nftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.Overview`,
+  nftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.TransfersList`,
   charts: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Charts`,
 };
 export const componentsByNetworkId: Record<
