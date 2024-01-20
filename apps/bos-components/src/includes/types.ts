@@ -611,11 +611,17 @@ export type Token = {
   contract: string;
   icon: string;
   symbol: string;
-  price: number | null;
+  price: number;
   change_24: number | null;
   volume_24h: number | null;
   market_cap: number | null;
   onchain_market_cap: number | null;
+  fully_diluted_market_cap: number | null;
+  total_supply: number | null;
+  circulating_supply: number | null;
+  description: string;
+  coingecko_id: string;
+  coinmarketcap_id: string;
   holders: number;
   base_uri: string;
   reference: string;
@@ -684,6 +690,7 @@ export type ReceiptStatsProps = {
 export type HoldersPropsInfo = {
   account: string;
   quantity: number;
+  amount: number;
 };
 
 export type NFTImageProps = {

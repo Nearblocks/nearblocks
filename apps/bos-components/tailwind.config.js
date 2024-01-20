@@ -76,6 +76,9 @@ module.exports = {
       borderRadius: {
         '4xl': '30px',
       },
+      backgroundColor: {
+        'blue-900-15': 'rgba(76 ,189 ,187  ,0.15)',
+      },
       backgroundImage: (theme) => ({
         'hero-pattern': "url('/images/wavey-fingerprint.png')",
       }),

@@ -55,11 +55,9 @@ export default function ({ network, currentPage, setPage }: Props) {
   const config = getConfig(network);
 
   const TotalSupply = yoctoToNear(Number(totalSuppy || 0), false);
-
   useEffect(() => {
     function fetchValidatorData(page: number) {
       setIsLoading(true);
-
       asyncFetch(`${config?.backendUrl}validators?page=${page}`, {
         method: 'GET',
         headers: {
@@ -398,7 +396,6 @@ export default function ({ network, currentPage, setPage }: Props) {
       ? (progress.blocks.produced + progress.chunks.produced) /
         (progress.blocks.total + progress.chunks.total)
       : 0;
-
     return (
       <>
         <tr>
@@ -829,7 +826,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             <div className="px-3 divide-y text-sm text-gray-600">
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                  Epoch Elapsed Time:
+                  Epoch Elapsed Time
                 </div>
                 <div className="w-full text-green-500 md:w-3/4 break-words">
                   {!validatorFullData[currentPage]?.elapsedTime ? (
@@ -842,7 +839,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA:</div>
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA</div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
                   {!validatorFullData[currentPage]?.totalSeconds ? (
                     <Skeleton className="h-3 w-32" />
@@ -858,7 +855,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                     <Skeleton className="h-3 w-full" />
                   ) : (
                     <div className="flex space-x-4 gap-2 items-center ">
-                      <div className="bg-blue-50 h-2 w-full rounded-full">
+                      <div className="bg-blue-900-15  h-2 w-full rounded-full">
                         <div
                           className="bg-green-500 h-2 rounded-full"
                           style={{
@@ -868,8 +865,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                           }}
                         ></div>
                       </div>
-                      {validatorFullData[currentPage]?.epochProgress.toFixed(0)}
-                      %
+                      {`${validatorFullData[currentPage]?.epochProgress.toFixed(
+                        0,
+                      )}%`}
                     </div>
                   )}
                 </div>
