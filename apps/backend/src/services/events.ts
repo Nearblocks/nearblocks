@@ -5,6 +5,7 @@ import { msToNsTime, nsToMsTime, retry } from 'nb-utils';
 
 import config from '#config';
 import dayjs from '#libs/dayjs';
+import { ftBalance } from '#libs/near';
 import { splitArray } from '#libs/utils';
 import { Snapshot } from '#types/enums';
 import { SnapshotEvent, SnapshotStartParams } from '#types/types';
@@ -121,25 +122,14 @@ const getRPCBalance = async (
   blockId: number | string,
 ) => {
   const near = new RPC(rpcUrl);
-
-  const { data } = await retry(
-    async () => {
-      return near.callFunction(
-        contractId,
-        'ft_balance_of',
-        near.encodeArgs({ account_id: accountId }),
-        blockId,
-      );
-    },
+  const balance = await retry(
+    async () => ftBalance(near, contractId, accountId, blockId),
     { retries: 1 },
   );
 
-  if (data.result && data.result.result) {
-    return near.decodeResult<string>(data.result.result);
-  }
+  if (balance) return balance;
 
   logger.error({
-    data,
     job: 'events',
     params: { accountId, blockId, contractId },
   });

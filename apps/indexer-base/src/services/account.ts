@@ -30,7 +30,7 @@ export const getGenesisAccountData = (
   created_by_block_height: blockHeight,
   created_by_block_timestamp: blockTimestamp,
   created_by_receipt_id: null,
-  deleted_by_block_height: blockHeight,
+  deleted_by_block_height: null,
   deleted_by_receipt_id: null,
 });
 

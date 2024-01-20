@@ -10,7 +10,7 @@
     ]
   },
   "scripts": {
-    "clean": "rimraf build",
+    "clean": "rimraf dist",
     "build": "yarn clean && tsc",
     "start": "node dist/index.js",
     "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
@@ -22,6 +22,8 @@
   "dependencies": {
     "@sentry/node": "7.74.1",
     "axios": "1.6.2",
+    "big.js": "6.2.1",
+    "borsh": "2.0.0",
     "bree": "9.1.2",
     "dayjs": "1.11.10",
     "envalid": "8.0.0",
@@ -29,6 +31,7 @@
     "p-map": "5.5.0"
   },
   "devDependencies": {
+    "@types/big.js": "~6.2.2",
     "@types/lodash-es": "~4.17",
     "@types/node": "~20.8",
     "eslint-config-custom-node": "*",
@@ -36,12 +39,12 @@
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-near": "*",
+    "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
     "nodemon": "~2.0",
     "rimraf": "~5.0",
-    "typescript": "~5.2",
-    "nb-redis": "*"
+    "typescript": "~5.2"
   }
 }

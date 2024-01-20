@@ -7,8 +7,17 @@
       "options": {
         "parser": "typescript"
       }
+    },
+    {
+      "files": ["*.sql"],
+      "options": {
+        "formatter": "sql-formatter"
+      }
     }
   ],
-  "plugins": ["prettier-plugin-sql"],
-  "language": "postgresql"
+  "plugins": ["prettier-plugin-embed", "prettier-plugin-sql"],
+  "language": "postgresql",
+  "dataTypeCase": "upper",
+  "functionCase": "upper",
+  "embeddedSqlIdentifiers": ["sql", "userSql"]
 }

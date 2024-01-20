@@ -14,7 +14,7 @@ import {
 import config from '#config';
 import db from '#libs/knex';
 import RPC from '#libs/near';
-import { DAY, HOUR, validator } from '#libs/utils';
+import { DAY, HOUR, SECOND, validator } from '#libs/utils';
 import {
   CachedTimestampMap,
   ExpGenesisConfig,
@@ -35,7 +35,7 @@ export const latestBlockCheck = async (redis: Redis) => {
         height: latestBlock?.header?.height,
         timestamp: latestBlock?.header?.timestamp,
       },
-      HOUR,
+      SECOND,
     );
   }
 };
@@ -329,6 +329,7 @@ const fetchPoolInfo = async (redis: Redis) => {
 
 export const updatePoolInfoMap = async (redis: Redis) => {
   const stakingPoolInfos = await redis.parse('stakingPoolInfos');
+
   if (!stakingPoolInfos) {
     await fetchPoolInfo(redis);
   }
@@ -376,6 +377,7 @@ const saveValidatorLists = async (redis: Redis) => {
               validator.accountId in item,
           )
         : null;
+
       return {
         ...validator,
         contractStake: stakingPoolStakeProposals.has(validator.accountId)
@@ -465,6 +467,7 @@ export const validatorsCheck = async (redis: Redis) => {
 export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
   const VALIDATOR_DESCRIPTION_QUERY_AMOUNT = 100;
   let currentIndex = 0;
+  const stakingPoolsDescriptions = [];
 
   const { data } = await RPC.callFunction(
     'pool-details.near',
@@ -474,7 +477,7 @@ export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
       limit: VALIDATOR_DESCRIPTION_QUERY_AMOUNT,
     }),
   );
-  const stakingPoolsDescriptions = [];
+
   if (data.result) {
     const metadataInfo = JSON.parse(Buffer.from(data.result.result).toString());
     const entries: [string, PoolMetadataAccountInfo][] =
@@ -487,9 +490,11 @@ export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
         };
         stakingPoolsDescriptions.push(entryObject);
       }
+
       currentIndex += VALIDATOR_DESCRIPTION_QUERY_AMOUNT;
     }
   }
+
   await redis.stringify(
     'stakingPoolMetadataInfo',
     stakingPoolsDescriptions,
@@ -501,6 +506,7 @@ export const validatorsTelemetryCheck = async (redis: Redis) => {
   const validators = (await redis.parse(
     'validatorsPromise',
   )) as EpochValidatorInfo;
+
   if (validators) {
     const poolIds = await redis.parse('poolIds');
 
@@ -508,7 +514,7 @@ export const validatorsTelemetryCheck = async (redis: Redis) => {
       ...validators.current_validators.map(({ account_id }) => account_id),
       ...validators.next_validators.map(({ account_id }) => account_id),
       ...validators.current_proposals.map(({ account_id }) => account_id),
-      ...poolIds,
+      ...(poolIds ?? []),
     ];
     const nodesInfo = await db('nodes')
       .select(
@@ -547,6 +553,7 @@ export const validatorsTelemetryCheck = async (redis: Redis) => {
       },
       {},
     );
+
     await redis.stringify('validatorTelemetry', nodes, DAY);
   }
 };

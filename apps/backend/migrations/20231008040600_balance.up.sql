@@ -33,7 +33,7 @@ SELECT
   create_hypertable (
     'balance_events',
     'block_timestamp',
-    chunk_time_interval = > 604800000000000
+    chunk_time_interval => 604800000000000
   );
 
 SELECT
