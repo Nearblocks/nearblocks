@@ -13,6 +13,7 @@ type NetworkComponents = {
   search: string;
   ftList: string;
   ftTransfersList: string;
+  ftOverview: string;
   nftList: string;
   nftOverview: string;
   nftTransfersList: string;
@@ -32,6 +33,7 @@ const ComponentUrl = {
   search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
   ftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.List`,
   ftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.TransfersList`,
+  ftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.Overview`,
   nftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.List`,
   nftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.Overview`,
   nftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.TransfersList`,
