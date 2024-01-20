@@ -9,7 +9,6 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
-import { circulatingSupply } from '#libs/supply';
 
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
@@ -33,7 +32,7 @@ const marketData = async (date: Dayjs) => {
 };
 
 const blockData = async (start: string, end: string) => {
-  const [blocks, latestBlock, gasUsed, gasFee, lastBlock] = await Promise.all([
+  const [blocks, latestBlock, gasUsed, gasFee] = await Promise.all([
     knex('blocks')
       .where('block_timestamp', '>=', start)
       .where('block_timestamp', '<', end)
@@ -58,16 +57,7 @@ const blockData = async (start: string, end: string) => {
       .where('blocks.block_timestamp', '<', end)
       .sum({ sum: knex.raw('chunks.gas_used * blocks.gas_price') })
       .first(),
-    knex('blocks')
-      .where('block_timestamp', '<', end)
-      .orderBy('block_timestamp', 'desc')
-      .limit(1)
-      .first(),
   ]);
-
-  if (lastBlock) {
-    await circulatingSupply(lastBlock);
-  }
 
   return {
     blocks: blocks?.count?.toString(),
