@@ -47,14 +47,14 @@ SELECT
   create_hypertable (
     'ft_events',
     'block_timestamp',
-    chunk_time_interval = > 604800000000000
+    chunk_time_interval => 604800000000000
   );
 
 SELECT
   create_hypertable (
     'nft_events',
     'block_timestamp',
-    chunk_time_interval = > 3628800000000000
+    chunk_time_interval => 3628800000000000
   );
 
 SELECT

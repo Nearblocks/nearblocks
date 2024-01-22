@@ -156,6 +156,39 @@ export interface StakingPoolStakeProposals {
   valueMap: Map<string, number>;
 }
 
+export type FTCoin = {
+  contract: string;
+  id: string;
+};
+
+export type CGCoin = {
+  id: string;
+  platforms: {
+    [key: string]: string;
+  };
+};
+
+export type FTMarketData = {
+  change_24: null | string;
+  circulating_supply: null | string;
+  description: null | string;
+  facebook: null | string;
+  fully_diluted_market_cap: null | string;
+  high_24h?: null | string;
+  high_all?: null | string;
+  low_24h?: null | string;
+  low_all?: null | string;
+  market_cap: null | string;
+  price: null | string;
+  price_btc: null | string;
+  price_eth: null | string;
+  reddit: null | string;
+  telegram: null | string;
+  twitter: null | string;
+  volume_24h: null | string;
+  website: null | string;
+};
+
 export type ValidatorTelemetry = {
   agentBuild: string;
   agentName: string;
@@ -183,4 +216,45 @@ export type PoolMetadataAccountInfo = {
   telegram?: string;
   twitter?: string;
   url?: string;
+};
+
+export type FTMetadata = {
+  decimals: number;
+  icon: null | string;
+  name: string;
+  reference: null | string;
+  reference_hash: null | string;
+  spec: string;
+  symbol: string;
+};
+
+export type NFTMetadata = {
+  base_uri: null | string;
+  icon: null | string;
+  name: string;
+  reference: null | string;
+  reference_hash: null | string;
+  spec: string;
+  symbol: string;
+};
+
+export type NFTTokenInfo = {
+  metadata: NFTTokenMetadata;
+  owner_id: string;
+  token_id: string;
+};
+
+export type NFTTokenMetadata = {
+  copies: null | number;
+  description: null | string;
+  expires_at: null | number;
+  extra: null | string;
+  issued_at: null | number;
+  media: null | string;
+  media_hash: null | string;
+  reference: null | string;
+  reference_hash: null | string;
+  starts_at: null | number;
+  title: null | string;
+  updated_at: null | number;
 };

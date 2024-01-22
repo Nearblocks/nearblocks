@@ -18,12 +18,19 @@ export interface TTables {
   balance_events: BalanceEvent;
   blocks: Block;
   chunks: Chunk;
+  daily_stats: DailyStats;
+  deployed_contracts: DeployedContracts;
+  errored_contracts: ErroredContracts;
   execution_outcome_receipts: ExecutionOutcomeReceipt;
   execution_outcomes: ExecutionOutcome;
   ft_events: FTEvent;
+  ft_meta: FTMeta;
   nft_events: NFTEvent;
+  nft_meta: NFTMeta;
+  nft_token_meta: NFTTokenMeta;
   receipts: Receipt;
   settings: Setting;
+  stats: Stats;
   transactions: Transaction;
 }
 
@@ -101,6 +108,45 @@ export type Chunk = {
   shard_id: number;
 };
 
+export type DailyStats = {
+  active_accounts: null | string;
+  active_contracts: null | string;
+  blocks: null | string;
+  circulating_supply: null | string;
+  date: null | string;
+  deleted_accounts: null | string;
+  gas_fee: null | string;
+  gas_used: null | string;
+  market_cap: null | string;
+  near_price: null | string;
+  new_accounts: null | string;
+  new_contracts: null | string;
+  total_supply: null | string;
+  txn_fee: null | string;
+  txn_fee_usd: null | string;
+  txn_volume: null | string;
+  txn_volume_usd: null | string;
+  txns: null | string;
+  unique_contracts: null | string;
+};
+
+export type DeployedContracts = {
+  block_hash: string;
+  block_timestamp: string;
+  code_sha256: string;
+  contract: string;
+  id: number;
+  receipt_id: string;
+};
+
+export type ErroredContracts = {
+  attempts: number;
+  contract: string;
+  id: number;
+  token: null | string;
+  type: string;
+};
+
 export type ExecutionOutcomeReceipt = {
   executed_in_block_timestamp: string;
   executed_receipt_id: string;
@@ -136,6 +182,40 @@ export type FTEvent = {
   status: EventStatus;
 };
 
+export type FTMeta = {
+  change_24: null | string;
+  circulating_supply: null | string;
+  coingecko_id: null | string;
+  coinmarketcap_id: null | string;
+  contract: string;
+  created_at: null | string;
+  decimals: number;
+  description: null | string;
+  facebook: null | string;
+  fully_diluted_market_cap: null | string;
+  icon: null | string;
+  livecoinwatch_id: null | string;
+  market_cap: null | string;
+  name: string;
+  price: null | string;
+  price_btc: null | string;
+  price_eth: null | string;
+  reddit: null | string;
+  reference: null | string;
+  reference_hash: null | string;
+  refreshed_at: null | string;
+  searched_at: null | string;
+  spec: null | string;
+  symbol: string;
+  synced_at: null | string;
+  telegram: null | string;
+  total_supply: null | string;
+  twitter: null | string;
+  updated_at: null | string;
+  volume_24h: null | string;
+  website: null | string;
+};
+
 export type NFTEvent = {
   affected_account_id: string;
   authorized_account_id: null | string;
@@ -153,6 +233,42 @@ export type NFTEvent = {
   token_id: string;
 };
 
+export type NFTMeta = {
+  base_uri: null | string;
+  contract: string;
+  created_at: null | string;
+  description: null | string;
+  facebook: null | string;
+  icon: null | string;
+  name: string;
+  reddit: null | string;
+  reference: null | string;
+  reference_hash: null | string;
+  spec: null | string;
+  symbol: string;
+  telegram: null | string;
+  twitter: null | string;
+  updated_at: null | string;
+  website: null | string;
+};
+
+export type NFTTokenMeta = {
+  contract: string;
+  copies: null | number;
+  description: null | string;
+  expires_at: null | string;
+  extra: null | string;
+  issued_at: null | string;
+  media: null | string;
+  media_hash: null | string;
+  reference: null | string;
+  reference_hash: null | string;
+  starts_at: null | string;
+  title: null | string;
+  token: string;
+  updated_at: null | string;
+};
+
 export type Receipt = {
   included_in_block_hash: string;
   included_in_block_timestamp: string;
@@ -168,6 +284,25 @@ export type Receipt = {
 export type Setting = {
   key: string;
   value: JsonObject;
+};
+
+export type Stats = {
+  avg_block_time: null | string;
+  change_24: null | string;
+  circulating_supply: null | string;
+  gas_price: null | string;
+  high_24h: null | string;
+  high_all: null | string;
+  id: number;
+  low_24h: null | string;
+  low_all: null | string;
+  market_cap: null | string;
+  near_btc_price: null | string;
+  near_price: null | string;
+  nodes_online: null | number;
+  total_supply: null | string;
+  total_txns: null | string;
+  volume: null | string;
 };
 
 export type Transaction = {
