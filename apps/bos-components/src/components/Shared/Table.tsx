@@ -42,30 +42,41 @@ interface Props {
 export default function (props: Props) {
   if (props.isLoading) {
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100 h-[51px]">
-            <tr>
-              {props.columns.map((column, index) => (
-                <th key={index} scope="col" className={column.thClassName}>
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {[...Array(props.limit)].map((_, index) => (
-              <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
-                {props.columns.map((column, colIndex) => (
-                  <td key={colIndex} className={column.tdClassName}>
-                    <Skeleton className="h-4" />
-                  </td>
+      <>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y border-t">
+            <thead className="bg-gray-100 h-[51px]">
+              <tr>
+                {props.columns.map((column, index) => (
+                  <th key={index} scope="col" className={column.thClassName}>
+                    {column.header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {[...Array(props.limit)].map((_, index) => (
+                <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
+                  {props.columns.map((column, colIndex) => (
+                    <td key={colIndex} className={column.tdClassName}>
+                      <Skeleton className="h-4" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {props.isPagination ? (
+          <Paginator
+            count={props.count}
+            page={props.page}
+            limit={props.limit}
+            pageLimit={props.pageLimit}
+            setPage={props.setPage}
+          />
+        ) : null}
+      </>
     );
   }
   return (
@@ -188,7 +199,6 @@ export default function (props: Props) {
       )}
       {props.isPagination ? (
         <Paginator
-          loading={props?.isLoading}
           count={props.count}
           page={props.page}
           limit={props.limit}

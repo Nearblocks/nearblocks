@@ -18,6 +18,7 @@ type NetworkComponents = {
   nftOverview: string;
   nftTransfersList: string;
   charts: string;
+  exportData: string;
 };
 const ComponentUrl = {
   nodeExplorer: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NodeExplorer`,
@@ -38,6 +39,7 @@ const ComponentUrl = {
   nftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.Overview`,
   nftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.TransfersList`,
   charts: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Charts`,
+  exportData: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.ExportData`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,

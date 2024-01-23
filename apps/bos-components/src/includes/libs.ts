@@ -49,7 +49,7 @@ export function fiatValue(big: number, price: number) {
   return formattedNumber;
 }
 
-export function nanoToMilli(nano: number) {
+export function nanoToMilli(nano: string) {
   return new Big(nano).div(new Big(10).pow(6)).round().toNumber();
 }
 
@@ -152,4 +152,17 @@ export function urlHostName(url: string) {
 
 export function holderPercentage(supply: number, quantity: number) {
   return Math.min(Big(quantity).div(Big(supply)).mul(Big(100)).toFixed(2), 100);
+}
+
+export function isAction(type: string) {
+  const actions = [
+    'DEPLOY_CONTRACT',
+    'TRANSFER',
+    'STAKE',
+    'ADD_KEY',
+    'DELETE_KEY',
+    'DELETE_ACCOUNT',
+  ];
+
+  return actions.includes(type.toUpperCase());
 }

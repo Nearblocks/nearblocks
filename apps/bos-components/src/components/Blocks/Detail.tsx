@@ -97,9 +97,7 @@ export default function (props: Props) {
   }, [config.backendUrl, hash]);
 
   const date = useMemo(() => {
-    const timestamp = new Date(
-      nanoToMilli(Number(block?.block_timestamp || 0)),
-    );
+    const timestamp = new Date(nanoToMilli(block?.block_timestamp));
 
     function fetchPriceAtDate(date: string) {
       asyncFetch(
@@ -217,15 +215,8 @@ export default function (props: Props) {
               </div>
             ) : (
               <div className="w-full md:w-3/4 break-words">
-                {getTimeAgoString(
-                  nanoToMilli(Number(block?.block_timestamp || 0)),
-                )}{' '}
-                (
-                {convertToUTC(
-                  nanoToMilli(Number(block?.block_timestamp || 0)),
-                  true,
-                )}
-                ) +UTC
+                {getTimeAgoString(nanoToMilli(block?.block_timestamp))} (
+                {convertToUTC(nanoToMilli(block?.block_timestamp), true)}) +UTC
               </div>
             )}
           </div>

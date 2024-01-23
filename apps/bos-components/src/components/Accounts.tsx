@@ -57,10 +57,11 @@ const tabs = [
   'Comments',
 ];
 
-export default function ({ t, network, id }: Props) {
+export default function ({ network, t, id }: Props) {
   const [loading, setLoading] = useState(false);
   const [statsData, setStatsData] = useState<SatsInfo>({} as SatsInfo);
   const [pageTab, setPageTab] = useState('Transactions');
+  const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [accountData, setAccountData] = useState<AccountInfo>(
     {} as AccountInfo,
   );
@@ -432,8 +433,25 @@ export default function ({ t, network, id }: Props) {
 
     setContract({ ...code, locked });
   }
+
+  const handleFilter = (name: string, value: string) => {
+    const updatedFilters = { ...filters, [name]: value };
+    setFilters(updatedFilters);
+  };
+
+  const onFilterClear = (name: string) => {
+    let updatedFilters = { ...filters };
+    if (updatedFilters.hasOwnProperty(name)) {
+      delete updatedFilters[name];
+      setFilters(updatedFilters);
+    } else {
+      updatedFilters = {};
+      setFilters(updatedFilters);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-3">
+    <>
       <div className="flex items-center justify-between flex-wrap pt-4">
         {!id ? (
           <Skeleton className="h-4" />
@@ -687,7 +705,7 @@ export default function ({ t, network, id }: Props) {
         <div className="w-full ">
           <div className="bg-white soft-shadow rounded-lg pb-1">
             <Tabs.Root defaultValue={pageTab}>
-              <Tabs.List>
+              <Tabs.List className="border-b flex">
                 {tabs &&
                   tabs.map((tab, index) => (
                     <Tabs.Trigger
@@ -723,6 +741,40 @@ export default function ({ t, network, id }: Props) {
                 <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
                   <span className="text-xs sm:-mt-12  text-gray-700">
                     <a
+                      href={`/exportdata?address=${id}`}
+                      className="hover:no-underline"
+                      target="_blank"
+                    >
+                      <a
+                        target="_blank"
+                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
+                      >
+                        <p>CSV Export </p>
+                        <span className="ml-2">
+                          <Download />
+                        </span>
+                      </a>
+                    </a>
+                  </span>
+                </div>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.Transactions`}
+                    props={{
+                      network: network,
+                      t: t,
+                      id: id,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                    }}
+                  />
+                }
+              </Tabs.Content>
+              <Tabs.Content value={tabs[1]}>
+                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
+                  <span className="text-xs sm:-mt-12  text-gray-700">
+                    <a
                       href="/nft-token/exportdata/address/id"
                       className="hover:no-underline"
                     >
@@ -738,22 +790,93 @@ export default function ({ t, network, id }: Props) {
                     </a>
                   </span>
                 </div>
-              </Tabs.Content>
-              <Tabs.Content value={tabs[1]}>
-                {' '}
-                <div className="px-4 sm:px-6 py-3"></div>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                    }}
+                  />
+                }
               </Tabs.Content>
               <Tabs.Content value={tabs[2]}>
-                {' '}
-                <div className="px-4 sm:px-6 py-3"></div>
+                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
+                  <span className="text-xs sm:-mt-12  text-gray-700">
+                    <a
+                      href="/nft-token/exportdata/address/id"
+                      className="hover:no-underline"
+                    >
+                      <a
+                        target="_blank"
+                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
+                      >
+                        <p>CSV Export </p>
+                        <span className="ml-2">
+                          <Download />
+                        </span>
+                      </a>
+                    </a>
+                  </span>
+                </div>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                    }}
+                  />
+                }
               </Tabs.Content>
               <Tabs.Content value={tabs[3]}>
-                <div className="px-4 sm:px-6 py-3"></div>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                    }}
+                  />
+                }
+              </Tabs.Content>
+              <Tabs.Content value={tabs[3]}>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                    }}
+                  />
+                }
+              </Tabs.Content>
+              <Tabs.Content value={tabs[3]}>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                    }}
+                  />
+                }
               </Tabs.Content>
             </Tabs.Root>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

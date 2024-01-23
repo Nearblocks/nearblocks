@@ -1,70 +1,59 @@
 /**
- * Component: TransactionsList
+ * Component: AddressTransactions
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
- * Description: Table of Transactions on Near Protocol.
+ * Description: Transactions of address on Near Protocol.
  * @interface Props
- * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {string}  [network] - The network data to show, either mainnet or testnet.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {number} [currentPage] - The current page number being displayed. (Optional)
- *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- * @param {function} [setPage] - A function used to set the current page. (Optional)
- *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} [id] - The account identifier passed as a string.
  * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [handleFilter] - Function to handle filter changes. (Optional)
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
- *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
   network: string;
-  t: (key: string, options?: { count?: string }) => string;
-  currentPage: number;
-  setPage: (page: number) => void;
+  t: (key: string, options?: { count?: string | undefined }) => string;
+  id: string;
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
 }
 
-import {
-  localFormat,
-  getTimeAgoString,
-  formatTimestampToString,
-  capitalizeFirstLetter,
-} from '@/includes/formats';
-import { txnMethod } from '@/includes/near';
-import {
-  getConfig,
-  nanoToMilli,
-  truncateString,
-  yoctoToNear,
-} from '@/includes/libs';
-import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
-import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
-import { TransactionInfo } from '@/includes/types';
-import SortIcon from '@/includes/icons/SortIcon';
-import CloseCircle from '@/includes/icons/CloseCircle';
 import Skeleton from '@/includes/Common/Skeleton';
+import TxnStatus from '@/includes/Common/Status';
+import {
+  capitalizeFirstLetter,
+  formatTimestampToString,
+  getTimeAgoString,
+  localFormat,
+} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
+import CloseCircle from '@/includes/icons/CloseCircle';
+import SortIcon from '@/includes/icons/SortIcon';
+import { getConfig, isAction, nanoToMilli, yoctoToNear } from '@/includes/libs';
+import { txnMethod } from '@/includes/near';
+import { TransactionInfo } from '@/includes/types';
 
-export default function (props: Props) {
-  const {
-    network,
-    currentPage,
-    filters,
-    setPage,
-    handleFilter,
-    onFilterClear,
-    t,
-  } = props;
+export default function ({
+  network,
+  t,
+  id,
+  filters,
+  handleFilter,
+  onFilterClear,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
   const config = getConfig(network);
@@ -74,12 +63,15 @@ export default function (props: Props) {
   useEffect(() => {
     function fetchTotalTxns(qs?: string) {
       const queryParams = qs ? '?' + qs : '';
-      asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+      asyncFetch(
+        `${config?.backendUrl}account/${id}/txns/count${queryParams}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
         .then(
           (data: {
             body: {
@@ -101,7 +93,7 @@ export default function (props: Props) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
+        `${config?.backendUrl}account/${id}/txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -114,6 +106,8 @@ export default function (props: Props) {
           if (data.status === 200) {
             if (Array.isArray(resp) && resp.length > 0) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            } else if (resp.length === 0) {
+              setTxns({});
             }
           }
         })
@@ -139,7 +133,7 @@ export default function (props: Props) {
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
-  }, [config?.backendUrl, currentPage, filters, sorting]);
+  }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
   let filterValue: string;
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -153,7 +147,15 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    handleFilter(name, filterValue);
+    if (name === 'type') {
+      if (isAction(filterValue)) {
+        handleFilter('action', filterValue);
+      } else {
+        handleFilter('method', filterValue);
+      }
+    } else {
+      handleFilter(name, filterValue);
+    }
   };
 
   const onClear = (name: string) => {
@@ -164,6 +166,10 @@ export default function (props: Props) {
 
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const setPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
   };
 
   const columns = [
@@ -231,7 +237,7 @@ export default function (props: Props) {
             <div className="flex flex-col">
               <input
                 name="type"
-                value={filters ? filters?.method : ''}
+                value={filters ? filters?.action || filters?.method : ''}
                 onChange={onInputChange}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
@@ -239,7 +245,7 @@ export default function (props: Props) {
               <div className="flex">
                 <button
                   type="submit"
-                  onClick={(e) => onFilter(e, 'method')}
+                  onClick={(e) => onFilter(e, 'type')}
                   className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
@@ -248,7 +254,7 @@ export default function (props: Props) {
                 <button
                   name="type"
                   type="button"
-                  onClick={() => onClear('method')}
+                  onClick={() => onClear('type')}
                   className="flex-1 rounded bg-gray-300 text-xs h-7"
                 >
                   {t ? t('txns:filter.clear') : 'Clear'}
@@ -352,7 +358,7 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'signer_account_id',
+      key: 'predecessor_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip.Provider>
@@ -360,11 +366,11 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                   <a
-                    href={`/address/${row.signer_account_id}`}
+                    href={`/address/${row.predecessor_account_id}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 hover:no-underline">
-                      {row.signer_account_id}
+                      {row.predecessor_account_id}
                     </a>
                   </a>
                 </span>
@@ -374,7 +380,7 @@ export default function (props: Props) {
                 align="start"
                 side="bottom"
               >
-                {truncateString(row.signer_account_id, 18, '...')}
+                {row.predecessor_account_id}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -386,11 +392,21 @@ export default function (props: Props) {
     {
       header: <span></span>,
       key: '',
-      cell: () => (
-        <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
-          <FaLongArrowAltRight />
-        </div>
-      ),
+      cell: (row: TransactionInfo) => {
+        return row.predecessor_account_id === row.receiver_account_id ? (
+          <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
+            {t ? t('txns:txnSelf') : 'SELF'}
+          </span>
+        ) : id === row.predecessor_account_id ? (
+          <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
+            {t ? t('txns:txnOut') : 'OUT'}
+          </span>
+        ) : (
+          <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
+            {t ? t('txns:txnIn') : 'IN'}
+          </span>
+        );
+      },
     },
     {
       header: (
@@ -444,13 +460,13 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span>
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                   <a
                     href={`/address/${row.receiver_account_id}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 hover:no-underline">
-                      {truncateString(row.receiver_account_id, 17, '...')}
+                      {row.receiver_account_id}
                     </a>
                   </a>
                 </span>
@@ -498,7 +514,7 @@ export default function (props: Props) {
                 <button
                   type="button"
                   onClick={toggleShowAge}
-                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 focus:outline-none whitespace-nowrap"
+                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider text-green-500 focus:outline-none whitespace-nowrap"
                 >
                   {showAge
                     ? t
@@ -554,12 +570,12 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName: 'inline-flex whitespace-nowrap',
+      thClassName: 'whitespace-nowrap',
     },
   ];
 
   return (
-    <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
+    <>
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
@@ -567,12 +583,8 @@ export default function (props: Props) {
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
-              {t
-                ? t('txns:listing', {
-                    count: localFormat(totalCount),
-                  })
-                : `More than > ${totalCount} transactions found`}
+            <p className="leading-7 px-3 text-sm mb-4 text-gray-500">
+              A total of {localFormat(totalCount)} transactions found
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
@@ -614,6 +626,6 @@ export default function (props: Props) {
           }}
         />
       }
-    </div>
+    </>
   );
 }

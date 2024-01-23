@@ -5,7 +5,7 @@ export type SatsInfo = {
 };
 
 export type AccountTimestampInfo = {
-  block_timestamp: number;
+  block_timestamp: string;
   transaction_hash: string;
 };
 
@@ -105,7 +105,7 @@ export type BlocksInfo = {
   author_account_id: string;
   block_hash: string;
   block_height: number;
-  block_timestamp: number;
+  block_timestamp: string;
   chunks_agg: {
     gas_limit: number;
     gas_used: number;
@@ -236,6 +236,7 @@ export type TransactionInfo = {
   nft: Token;
   amount: string;
   ft: Token;
+  predecessor_account_id: string;
 };
 
 export type ChartStat = {
@@ -430,6 +431,8 @@ export type AccountContractInfo = {
   storage_paid_at: number;
   storage_usage: number;
   account_id: string;
+  public_key: string;
+  permission_kind: string;
   created: {
     transaction_hash: string;
     block_timestamp: string;
@@ -700,4 +703,20 @@ export type NFTImageProps = {
   reference?: string;
   className?: string;
   network: string;
+};
+
+export type AccessInfo = {
+  block_hash: string;
+  block_height: number;
+  keys: KeysInfo[];
+  hash: string;
+  nonce: number;
+  permission: {
+    FunctionCall: {
+      allowance: number;
+      method_names: [];
+      receiver_id: string;
+    };
+  };
+  error: string;
 };

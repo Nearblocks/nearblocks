@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router';
-
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/common/Overview';
@@ -13,9 +12,9 @@ const Address = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="container mx-auto px-3">
+    <div className="relative container mx-auto px-3">
       <VmComponent
-        skeleton={<Overview />}
+        skeleton={<Overview border={true} />}
         src={components?.account}
         props={{
           id: id,

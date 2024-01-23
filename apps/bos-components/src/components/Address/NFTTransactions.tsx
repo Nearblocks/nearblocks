@@ -1,15 +1,12 @@
 /**
- * Component: TransactionsList
+ * Component: AddressNFTTransactions
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
- * Description: Table of Transactions on Near Protocol.
+ * Description: NFT Transactions of address on Near Protocol.
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {number} [currentPage] - The current page number being displayed. (Optional)
- *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- * @param {function} [setPage] - A function used to set the current page. (Optional)
- *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} [id] - The account identifier passed as a string
  * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [handleFilter] - Function to handle filter changes. (Optional)
@@ -21,8 +18,7 @@
 interface Props {
   network: string;
   t: (key: string, options?: { count?: string }) => string;
-  currentPage: number;
-  setPage: (page: number) => void;
+  id: string;
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
@@ -34,14 +30,7 @@ import {
   formatTimestampToString,
   capitalizeFirstLetter,
 } from '@/includes/formats';
-import { txnMethod } from '@/includes/near';
-import {
-  getConfig,
-  nanoToMilli,
-  truncateString,
-  yoctoToNear,
-} from '@/includes/libs';
-import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
+import { getConfig, nanoToMilli } from '@/includes/libs';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
@@ -49,37 +38,38 @@ import SortIcon from '@/includes/icons/SortIcon';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
+import TokenImage from '@/includes/icons/TokenImage';
 
 export default function (props: Props) {
-  const {
-    network,
-    currentPage,
-    filters,
-    setPage,
-    handleFilter,
-    onFilterClear,
-    t,
-  } = props;
+  const { network, t, id, filters, handleFilter, onFilterClear } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
   const config = getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
+  const setPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   useEffect(() => {
     function fetchTotalTxns(qs?: string) {
       const queryParams = qs ? '?' + qs : '';
-      asyncFetch(`${config?.backendUrl}txns/count${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+      asyncFetch(
+        `${config?.backendUrl}account/${id}/nft-txns/count?${queryParams}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
         .then(
           (data: {
             body: {
@@ -101,7 +91,7 @@ export default function (props: Props) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
+        `${config?.backendUrl}account/${id}/nft-txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -114,6 +104,8 @@ export default function (props: Props) {
           if (data.status === 200) {
             if (Array.isArray(resp) && resp.length > 0) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            } else if (resp.length === 0) {
+              setTxns({});
             }
           }
         })
@@ -139,12 +131,11 @@ export default function (props: Props) {
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
-  }, [config?.backendUrl, currentPage, filters, sorting]);
+  }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
   let filterValue: string;
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     filterValue = event.target.value;
-    // Do something with the value if needed
   };
 
   const onFilter = (
@@ -168,7 +159,7 @@ export default function (props: Props) {
 
   const columns = [
     {
-      header: <span></span>,
+      header: '',
       key: '',
       cell: (row: TransactionInfo) => (
         <>
@@ -176,10 +167,10 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500  flex justify-end ',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500  flex justify-end',
     },
     {
-      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
+      header: <>{t ? t('txns:hash') : 'TXN HASH'}</>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
@@ -210,7 +201,7 @@ export default function (props: Props) {
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
@@ -230,8 +221,8 @@ export default function (props: Props) {
           >
             <div className="flex flex-col">
               <input
-                name="type"
-                value={filters ? filters?.method : ''}
+                name="event"
+                value={filters ? filters?.event : ''}
                 onChange={onInputChange}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
@@ -239,7 +230,7 @@ export default function (props: Props) {
               <div className="flex">
                 <button
                   type="submit"
-                  onClick={(e) => onFilter(e, 'method')}
+                  onClick={(e) => onFilter(e, 'event')}
                   className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
@@ -258,16 +249,14 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'actions',
+      key: 'event_kind',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                  <span className="block truncate">
-                    {txnMethod(row.actions, t)}
-                  </span>
+                  <span className="block truncate">{row.event_kind}</span>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -275,36 +264,13 @@ export default function (props: Props) {
                 align="center"
                 side="bottom"
               >
-                {txnMethod(row.actions, t)}
+                {row.event_kind}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-    },
-    {
-      header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
-      key: 'deposit',
-      cell: (row: TransactionInfo) => (
-        <span>{yoctoToNear(row.actions_agg?.deposit || 0, true)} Ⓝ</span>
-      ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
-    },
-    {
-      header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
-      key: 'transaction_fee',
-      cell: (row: TransactionInfo) => (
-        <span>
-          {' '}
-          {yoctoToNear(row.outcomes_agg?.transaction_fee || 0, true)} Ⓝ
-        </span>
-      ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName:
-        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -352,45 +318,62 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'signer_account_id',
+      key: 'token_old_owner_account_id',
       cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                  <a
-                    href={`/address/${row.signer_account_id}`}
-                    className="hover:no-underline"
-                  >
-                    <a className="text-green-500 hover:no-underline">
-                      {row.signer_account_id}
+        <>
+          {row.token_old_owner_account_id ? (
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                    <a
+                      href={`/address/${row.token_old_owner_account_id}`}
+                      className="hover:no-underline"
+                    >
+                      <a className="text-green-500 hover:no-underline">
+                        {row.token_old_owner_account_id}
+                      </a>
                     </a>
-                  </a>
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
-                {truncateString(row.signer_account_id, 18, '...')}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        </span>
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                  align="start"
+                  side="bottom"
+                >
+                  {row.token_old_owner_account_id}
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          ) : (
+            'system'
+          )}
+        </>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
     },
     {
-      header: <span></span>,
-      key: '',
-      cell: () => (
-        <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
-          <FaLongArrowAltRight />
-        </div>
+      header: '',
+      key: 'token_old_owner_account_id',
+      cell: (row: TransactionInfo) => (
+        <>
+          {row.token_old_owner_account_id === row.token_new_owner_account_id ? (
+            <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
+              {t ? t('txns:txnSelf') : 'Self'}
+            </span>
+          ) : id === row.token_old_owner_account_id ? (
+            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
+              {t ? t('txns:txnOut') : 'OUT'}
+            </span>
+          ) : (
+            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
+              {t ? t('txns:txnIn') : 'IN'}
+            </span>
+          )}
+        </>
       ),
+      tdClassName: 'text-center',
     },
     {
       header: (
@@ -438,56 +421,137 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'receiver_account_id',
+      key: 'token_new_owner_account_id',
       cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span>
-                  <a
-                    href={`/address/${row.receiver_account_id}`}
-                    className="hover:no-underline"
-                  >
-                    <a className="text-green-500 hover:no-underline">
-                      {truncateString(row.receiver_account_id, 17, '...')}
+        <>
+          {row.token_new_owner_account_id ? (
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <span>
+                    <a
+                      href={`/address/${row.token_new_owner_account_id}`}
+                      className="hover:no-underline"
+                    >
+                      <a className="text-green-500 hover:no-underline">
+                        {row.token_new_owner_account_id}
+                      </a>
                     </a>
-                  </a>
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
-                {row.receiver_account_id}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        </span>
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                  align="start"
+                  side="bottom"
+                >
+                  {row.token_new_owner_account_id}
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          ) : (
+            'system'
+          )}
+        </>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
     },
     {
-      header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
-      key: 'block_height',
+      header: <>Token ID</>,
+      key: 'token_id',
       cell: (row: TransactionInfo) => (
-        <span>
-          <a
-            href={`/blocks/${row.included_in_block_hash}`}
-            className="hover:no-underline"
-          >
-            <a className="text-green-500 hover:no-underline">
-              {localFormat(row.block?.block_height)}
-            </a>
-          </a>
-        </span>
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <span>
+                <a
+                  href={`/nft-token/${row.nft?.contract}/${row.token_id}`}
+                  className="hover:no-underline"
+                >
+                  <a className="text-green-500 font-medium hover:no-underline">
+                    {row.token_id}
+                  </a>
+                </a>
+              </span>
+            </Tooltip.Trigger>
+            <Tooltip.Content
+              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+              align="start"
+              side="bottom"
+            >
+              {row.token_id}
+            </Tooltip.Content>
+          </Tooltip.Root>
+        </Tooltip.Provider>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 max-w-[110px] inline-block truncate',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+    },
+    {
+      header: <>Token</>,
+      key: 'block_height',
+      cell: (row: TransactionInfo) => {
+        return (
+          row.nft && (
+            <div className="flex flex-row items-center">
+              <span className="inline-flex mr-1">
+                <TokenImage
+                  src={row.nft?.icon}
+                  alt={row.nft?.name}
+                  className="w-4 h-4"
+                  appUrl={config.appUrl}
+                />
+              </span>
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <div className="text-sm text-gray-500 max-w-[110px] inline-block truncate">
+                      <a
+                        href={`/nft-token/${row.nft?.contract}`}
+                        className="hover:no-underline"
+                      >
+                        <a className="text-green-500 font-medium hover:no-underline">
+                          {row.nft?.name}
+                        </a>
+                      </a>
+                    </div>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="start"
+                    side="bottom"
+                  >
+                    {row.nft?.name}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+              {row.nft?.symbol && (
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div className="text-sm text-gray-400 max-w-[80px] inline-block truncate">
+                        &nbsp; {row.nft.symbol}
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content
+                      className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                      align="start"
+                      side="bottom"
+                    >
+                      {row.nft.symbol}
+                    </Tooltip.Content>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              )}
+            </div>
+          )
+        );
+      },
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
     },
     {
       header: (
@@ -554,12 +618,12 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName: 'inline-flex whitespace-nowrap',
+      thClassName: 'whitespace-nowrap',
     },
   ];
 
   return (
-    <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
+    <>
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
@@ -568,11 +632,7 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
-              {t
-                ? t('txns:listing', {
-                    count: localFormat(totalCount),
-                  })
-                : `More than > ${totalCount} transactions found`}
+              A total of {localFormat(totalCount)} transactions found
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
@@ -614,6 +674,6 @@ export default function (props: Props) {
           }}
         />
       }
-    </div>
+    </>
   );
 }

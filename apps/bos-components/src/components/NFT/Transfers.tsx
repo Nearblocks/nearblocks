@@ -19,18 +19,19 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
+import Clock from '@/includes/icons/Clock';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({ network, id }: Props) {
-  const [showAge, setShowAge] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
   const config = getConfig(network);
+  const [showAge, setShowAge] = useState(true);
   const errorMessage = 'No token transfers found!';
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -299,17 +300,37 @@ export default function ({ network, id }: Props) {
     },
     {
       header: (
-        <span>
-          <div className="w-full inline-flex px-5 py-4">
-            <button
-              type="button"
-              onClick={toggleShowAge}
-              className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 focus:outline-none whitespace-nowrap"
-            >
-              {showAge ? 'AGE' : 'DATE TIME (UTC)'}
-            </button>
-          </div>
-        </span>
+        <>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleShowAge}
+                  className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row whitespace-nowrap"
+                >
+                  {showAge ? (
+                    <>
+                      {'AGE'}
+                      <Clock className="text-green-500 ml-2" />
+                    </>
+                  ) : (
+                    <> {'DATE TIME (UTC)'}</>
+                  )}
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="top"
+              >
+                {showAge
+                  ? 'Click to show Datetime Format'
+                  : 'Click to show Age Format'}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        </>
       ),
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
@@ -319,12 +340,8 @@ export default function ({ network, id }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )
-                    : getTimeAgoString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )}
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -333,12 +350,8 @@ export default function ({ network, id }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )
-                  : getTimeAgoString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )}
+                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
