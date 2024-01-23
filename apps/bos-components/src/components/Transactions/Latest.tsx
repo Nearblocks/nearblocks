@@ -145,9 +145,7 @@ export default function ({ t, network }: Props) {
                             </a>
                           </div>
                           <div className="text-gray-400 text-xs truncate">
-                            {getTimeAgoString(
-                              nanoToMilli(Number(txn.block_timestamp)),
-                            )}
+                            {getTimeAgoString(nanoToMilli(txn.block_timestamp))}
                           </div>
                         </div>
                       </div>

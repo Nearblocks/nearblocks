@@ -346,12 +346,8 @@ export default function ({ network, id, t }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )
-                    : getTimeAgoString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )}
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -360,12 +356,8 @@ export default function ({ network, id, t }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )
-                  : getTimeAgoString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )}
+                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>

@@ -130,7 +130,7 @@ export default function ({ network, id, t }: Props) {
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
   };
-  console.log(token);
+
   const onToggle = () => setShowMarketCap((o) => !o);
   return (
     <>

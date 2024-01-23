@@ -213,7 +213,6 @@ export default function ({ network, id, token }: Props) {
       </div>
       <Paginator
         count={totalCount}
-        loading={isLoading}
         page={currentPage}
         setPage={setPage}
         limit={24}

@@ -144,7 +144,7 @@ export default function (props: Props) {
   const currentPrice = statsData?.near_price || 0;
 
   const date = useMemo(() => {
-    const timestamp = new Date(nanoToMilli(Number(txn?.block_timestamp || 0)));
+    const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
     function fetchPriceAtDate(date: string) {
       asyncFetch(
         `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
@@ -372,13 +372,8 @@ export default function (props: Props) {
             </div>
           ) : txn?.block_timestamp ? (
             <div className="w-full md:w-3/4 break-words">
-              {getTimeAgoString(nanoToMilli(Number(txn?.block_timestamp || 0)))}{' '}
-              (
-              {convertToUTC(
-                nanoToMilli(Number(txn?.block_timestamp || 0)),
-                true,
-              )}{' '}
-              +UTC)
+              {getTimeAgoString(nanoToMilli(txn?.block_timestamp))} (
+              {convertToUTC(nanoToMilli(txn?.block_timestamp), true)} +UTC)
             </div>
           ) : (
             ''
