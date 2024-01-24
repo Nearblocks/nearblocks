@@ -8,7 +8,7 @@ const List = ({ showRounded }: Props) => {
     <div className="absolute w-full h-full z-10">
       <div
         className={`bg-white border soft-shadow ${
-          !showRounded ? 'rounded-lg' : ''
+          !showRounded ? 'rounded-xl' : ''
         } overflow-hidden`}
       >
         <div className=" flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">

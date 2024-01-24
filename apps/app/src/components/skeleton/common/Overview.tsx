@@ -27,7 +27,7 @@ const Overview = ({ border }: OverviewProps) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg">
+            <div className="h-full bg-white soft-shadow rounded-xl">
               <div className="flex justify-between border-b p-3 text-gray-600">
                 <h2 className="leading-6 text-sm font-semibold">
                   <Skeleton className="h-4 w-28" />
@@ -62,7 +62,7 @@ const Overview = ({ border }: OverviewProps) => {
             </div>
           </div>
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
               <h2 className="leading-6 border-b p-3 text-gray-600 text-sm font-semibold">
                 <Skeleton className="h-4 w-28" />
               </h2>
@@ -108,11 +108,11 @@ const Overview = ({ border }: OverviewProps) => {
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <div className="bg-white soft-shadow rounded-lg pb-1">
+            <div className="bg-white soft-shadow rounded-xl pb-1">
               <div>
                 <div className=" flex">
                   <div
-                    className={` border-green-500 text-green-500 text-sm font-semibol overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
+                    className={`border-b-4 border-green-500 text-green-500 text-sm font-semibol overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
                   >
                     <Skeleton className="h-4 w-20" />
                   </div>{' '}

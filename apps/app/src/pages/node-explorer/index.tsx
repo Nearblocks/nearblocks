@@ -1,9 +1,10 @@
+import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/node-explorer/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 const NodeExplorer = () => {
   const router = useRouter();
@@ -46,5 +47,7 @@ const NodeExplorer = () => {
     </>
   );
 };
+
+NodeExplorer.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default NodeExplorer;

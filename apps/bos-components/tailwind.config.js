@@ -80,7 +80,7 @@ module.exports = {
         'blue-900-15': 'rgba(76 ,189 ,187  ,0.15)',
       },
       backgroundImage: (theme) => ({
-        'hero-pattern': "url('/images/wavey-fingerprint.png')",
+        'hero-pattern': "url('/images/wavey_fingerprint.png')",
       }),
     },
   },

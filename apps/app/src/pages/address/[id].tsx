@@ -4,6 +4,8 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/common/Overview';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
+import { ReactElement } from 'react';
+import Layout from '@/components/Layouts';
 
 const Address = () => {
   const router = useRouter();
@@ -25,5 +27,7 @@ const Address = () => {
     </div>
   );
 };
+
+Address.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default Address;

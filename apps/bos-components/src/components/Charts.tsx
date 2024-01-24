@@ -430,7 +430,7 @@ export default function (props: Props) {
   return (
     <Theme>
       <div>
-        <div className="bg-hero-pattern h-56">
+        <div className="bg-hero-pattern h-72">
           <div className="container mx-auto px-3">
             <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
               {props.chartTypes ? chartInfo.title : 'Near Charts & Statistics'}
@@ -491,6 +491,7 @@ export default function (props: Props) {
             )}
           </div>
         </div>
+        <div className="py-8"></div>
       </div>
     </Theme>
   );

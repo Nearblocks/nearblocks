@@ -1,3 +1,4 @@
+import Layout from '@/components/Layouts';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import Latest from '@/components/skeleton/home/Latest';
 import Overview from '@/components/skeleton/home/Overview';
@@ -5,7 +6,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 
 const HomePage = () => {
   const components = useBosComponents();
@@ -79,7 +80,7 @@ const HomePage = () => {
         <div className="container mx-auto px-3  z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="h-full relative w-full">
-              <div className=" bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
+              <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
                   {t('home:latestBlocks')}
                 </h2>
@@ -94,7 +95,7 @@ const HomePage = () => {
               </div>
             </div>
             <div className="h-full relative w-full">
-              <div className=" bg-white soft-shadow rounded-lg overflow-hidden mb-6 md:mb-10">
+              <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
                   {t('home:latestTxns')}
                 </h2>
@@ -113,5 +114,7 @@ const HomePage = () => {
     </div>
   );
 };
+
+HomePage.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default HomePage;
