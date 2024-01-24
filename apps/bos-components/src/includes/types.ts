@@ -645,6 +645,8 @@ export type Token = {
     owner: string;
   };
   decimals: number;
+  title: string;
+  nft: Token;
 };
 
 export type TransActionProps = {
