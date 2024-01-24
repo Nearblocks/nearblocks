@@ -3,6 +3,8 @@ import { networkId } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/common/Overview';
+import { ReactElement } from 'react';
+import Layout from '@/components/Layouts';
 
 const NFToken = () => {
   const router = useRouter();
@@ -21,4 +23,7 @@ const NFToken = () => {
     </div>
   );
 };
+
+NFToken.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+
 export default NFToken;

@@ -1,6 +1,8 @@
+import Layout from '@/components/Layouts';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
+import { ReactElement } from 'react';
 
 const MarketCapChart = () => {
   const components = useBosComponents();
@@ -12,5 +14,7 @@ const MarketCapChart = () => {
     />
   );
 };
+
+MarketCapChart.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default MarketCapChart;

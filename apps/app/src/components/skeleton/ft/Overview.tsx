@@ -16,12 +16,12 @@ const Overview = () => {
       <div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                 Overview
               </h2>
 
-              <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="px-3 divide-y text-sm text-nearblue-600">
                 <div className="flex divide-x my-2">
                   <div className="flex-col flex-1 flex-wrap py-1">
                     <div className="w-full text-gray-400 text-xs uppercase mb-1  text-[80%]">
@@ -83,11 +83,11 @@ const Overview = () => {
             </div>
           </div>
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                 Profile Summary
               </h2>
-              <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="px-3 divide-y text-sm text-nearblue-600">
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
 
@@ -132,39 +132,36 @@ const Overview = () => {
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <div className="bg-white soft-shadow rounded-lg pb-1">
-              <div>
-                <div className="border-b flex">
-                  <div
-                    className={`border-b-4 border-green-500 text-green-500 text-sm font-semibol overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
-                  >
-                    Transfers
-                  </div>{' '}
-                  <div
-                    className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
-                  >
-                    Holders
-                  </div>{' '}
-                  <div
-                    className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
-                  >
-                    Info
-                  </div>{' '}
-                  <div
-                    className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
-                  >
-                    FAQ
-                  </div>{' '}
-                  <div
-                    className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 `}
-                  >
-                    Comments
-                  </div>
-                </div>
-                <div className="relative">
-                  <List showRounded={true} />
-                </div>
+            <div className="flex">
+              <div
+                className={`rounded-lg bg-green-600 text-white text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+              >
+                Transfers
+              </div>{' '}
+              <div
+                className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+              >
+                Holders
+              </div>{' '}
+              <div
+                className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+              >
+                Info
+              </div>{' '}
+              <div
+                className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+              >
+                FAQ
+              </div>{' '}
+              <div
+                className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+              >
+                Comments
               </div>
+            </div>
+
+            <div className="relative">
+              <List />
             </div>
           </div>
         </div>

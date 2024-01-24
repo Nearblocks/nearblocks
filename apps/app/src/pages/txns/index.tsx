@@ -2,9 +2,10 @@ import Router from 'next/router';
 import useTranslation from 'next-translate/useTranslation';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { networkId } from '@/utils/config';
 import List from '@/components/skeleton/common/List';
+import Layout from '@/components/Layouts';
 
 const TransactionList = () => {
   const { t } = useTranslation();
@@ -106,5 +107,7 @@ const TransactionList = () => {
     </>
   );
 };
+
+TransactionList.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default TransactionList;

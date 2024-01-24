@@ -1,10 +1,11 @@
+import Layout from '@/components/Layouts';
 import List from '@/components/skeleton/common/List';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Router, { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 
 const TopNFTTokens = () => {
   const router = useRouter();
@@ -54,5 +55,7 @@ const TopNFTTokens = () => {
     </>
   );
 };
+
+TopNFTTokens.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default TopNFTTokens;

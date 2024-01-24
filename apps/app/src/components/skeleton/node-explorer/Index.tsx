@@ -7,7 +7,7 @@ const Index = () => {
     <div className="absolute w-full">
       <div className="flex flex-col md:flex-row gap-4 ">
         <div className=" w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
             <div>
               <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
                 <span>Staking Overview</span>
@@ -48,7 +48,7 @@ const Index = () => {
           </div>
         </div>
         <div className=" w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
             <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
               Epoch Information
             </h2>

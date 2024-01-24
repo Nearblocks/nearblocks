@@ -10,7 +10,7 @@ const Overview = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
   return (
     <div ref={ref} className="absolute w-full z-10">
       <div className="container mx-auto px-3">
-        <div className="bg-white soft-shadow rounded-lg overflow-hidden px-5 md:py lg:px-0">
+        <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
           <div
             className={`grid grid-flow-col grid-cols-1 ${
               networkId === 'mainnet'

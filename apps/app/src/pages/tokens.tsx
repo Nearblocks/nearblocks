@@ -2,9 +2,10 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
+import Layout from '@/components/Layouts';
 
 const TopFTTokens = () => {
   const router = useRouter();
@@ -53,5 +54,7 @@ const TopFTTokens = () => {
     </section>
   );
 };
+
+TopFTTokens.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default TopFTTokens;

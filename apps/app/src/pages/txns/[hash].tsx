@@ -5,6 +5,8 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Detail from '@/components/skeleton/common/Detail';
+import { ReactElement } from 'react';
+import Layout from '@/components/Layouts';
 
 const Txn = () => {
   const router = useRouter();
@@ -23,5 +25,7 @@ const Txn = () => {
     </div>
   );
 };
+
+Txn.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default Txn;

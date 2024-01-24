@@ -5,6 +5,8 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
 import Detail from '@/components/skeleton/common/Detail';
+import { ReactElement } from 'react';
+import Layout from '@/components/Layouts';
 
 const Block = () => {
   const router = useRouter();
@@ -27,5 +29,7 @@ const Block = () => {
     </div>
   );
 };
+
+Block.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default Block;

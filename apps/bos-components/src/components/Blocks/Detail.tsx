@@ -97,38 +97,40 @@ export default function (props: Props) {
   }, [config.backendUrl, hash]);
 
   const date = useMemo(() => {
-    const timestamp = new Date(nanoToMilli(block?.block_timestamp));
+    if (block?.block_timestamp) {
+      const timestamp = new Date(nanoToMilli(block?.block_timestamp));
 
-    function fetchPriceAtDate(date: string) {
-      asyncFetch(
-        `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
-      ).then(
-        (data: {
-          body: {
-            market_data: { current_price: { usd: number } };
-          };
-          status: number;
-        }) => {
-          const resp = data?.body?.market_data?.current_price?.usd;
-          if (data.status === 200) {
-            setPrice(resp);
-          }
-        },
-      );
-    }
+      function fetchPriceAtDate(date: string) {
+        asyncFetch(
+          `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
+        ).then(
+          (data: {
+            body: {
+              market_data: { current_price: { usd: number } };
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.market_data?.current_price?.usd;
+            if (data.status === 200) {
+              setPrice(resp);
+            }
+          },
+        );
+      }
 
-    let dt;
-    const currentDate = new Date();
-    if (currentDate > timestamp) {
-      const day = timestamp.getUTCDate();
-      const month = timestamp.getUTCMonth() + 1;
-      const year = timestamp.getUTCFullYear();
+      let dt;
+      const currentDate = new Date();
+      if (currentDate > timestamp) {
+        const day = timestamp.getUTCDate();
+        const month = timestamp.getUTCMonth() + 1;
+        const year = timestamp.getUTCFullYear();
 
-      dt = `${day < 10 ? '0' : ''}${day}-${
-        month < 10 ? '0' : ''
-      }${month}-${year}`;
+        dt = `${day < 10 ? '0' : ''}${day}-${
+          month < 10 ? '0' : ''
+        }${month}-${year}`;
 
-      fetchPriceAtDate(dt);
+        fetchPriceAtDate(dt);
+      }
     }
   }, [block?.block_timestamp]);
   return (
@@ -215,8 +217,12 @@ export default function (props: Props) {
               </div>
             ) : (
               <div className="w-full md:w-3/4 break-words">
-                {getTimeAgoString(nanoToMilli(block?.block_timestamp))} (
-                {convertToUTC(nanoToMilli(block?.block_timestamp), true)}) +UTC
+                {block?.block_timestamp &&
+                  `${getTimeAgoString(nanoToMilli(block?.block_timestamp))} (
+                ${convertToUTC(
+                  nanoToMilli(block?.block_timestamp),
+                  true,
+                )}) +UTC`}
               </div>
             )}
           </div>

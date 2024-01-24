@@ -6,7 +6,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
     <>
       <div
         ref={ref}
-        className="bg-white soft-shadow rounded-lg overflow-hidden absolute w-full z-10"
+        className="bg-white soft-shadow rounded-xl overflow-hidden absolute w-full z-10"
       >
         <div className="relative">
           <div className="px-3 divide-y h-80">
