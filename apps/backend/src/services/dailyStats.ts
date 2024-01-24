@@ -1,6 +1,5 @@
 import Big from 'big.js';
 import { Dayjs } from 'dayjs';
-import PMap from 'p-map';
 
 import { Network } from 'nb-types';
 import { msToNsTime, nsToMsTime, sleep, yoctoToNear } from 'nb-utils';
@@ -9,6 +8,7 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
+import { circulatingSupply } from '#libs/supply';
 
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
@@ -44,7 +44,7 @@ const blockData = async (start: string, end: string) => {
       .where('block_timestamp', '<', end)
       .orderBy('block_timestamp', 'desc')
       .limit(1)
-      .first('total_supply'),
+      .first(),
     knex('blocks')
       .join('chunks', 'chunks.included_in_block_hash', 'blocks.block_hash')
       .where('blocks.block_timestamp', '>=', start)
@@ -59,9 +59,15 @@ const blockData = async (start: string, end: string) => {
       .first(),
   ]);
 
+  let supply: null | string = null;
+
+  if (config.network === Network.MAINNET && latestBlock) {
+    supply = await circulatingSupply(latestBlock);
+  }
+
   return {
     blocks: blocks?.count?.toString(),
-    circulating_supply: null,
+    circulating_supply: supply,
     gas_fee: gasFee?.sum?.toString(),
     gas_used: gasUsed?.sum?.toString(),
     total_supply: latestBlock?.total_supply,
@@ -261,14 +267,12 @@ export const syncStats = async () => {
 
   if (diff < 1) return;
 
-  await PMap(
-    [...Array(diff)],
-    async (_, i) => {
-      const date = start.clone().add(i, 'day');
+  const days = Array.from({ length: diff }, (_, index) => index);
 
-      await dayStats(date.format('YYYY-MM-DD'));
-      await sleep(1000);
-    },
-    { concurrency: 1 },
-  );
+  for (const day of days) {
+    const date = start.clone().add(day, 'day');
+
+    await dayStats(date.format('YYYY-MM-DD'));
+    await sleep(1000);
+  }
 };
