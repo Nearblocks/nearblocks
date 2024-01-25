@@ -3,9 +3,9 @@ import { Big } from 'big.js';
 import { logger } from 'nb-logger';
 import { msToNsTime } from 'nb-utils';
 
-import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
+import lcw from '#libs/lcw';
 import near from '#libs/near';
 
 const blockTime = async (timestamp: string) => {
@@ -46,7 +46,7 @@ const blockData = async () => {
 };
 
 const marketData = async () => {
-  const price = await cg.marketData('near', true);
+  const price = await lcw.marketData('NEAR', true);
 
   if (!price) return {};
 
