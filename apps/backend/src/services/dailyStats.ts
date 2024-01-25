@@ -5,21 +5,21 @@ import { Network } from 'nb-types';
 import { msToNsTime, nsToMsTime, sleep, yoctoToNear } from 'nb-utils';
 
 import config from '#config';
-import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
+import lcw from '#libs/lcw';
 import { circulatingSupply } from '#libs/supply';
 
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
     return {
-      market_cap: undefined,
-      near_price: undefined,
+      market_cap: null,
+      near_price: null,
     };
   }
 
-  const start = date.format('DD-MM-YYYY');
-  const history = await cg.marketHistory(start);
+  const start = date.valueOf();
+  const history = await lcw.marketHistory(start);
 
   if (!history) {
     throw Error('market request failed');

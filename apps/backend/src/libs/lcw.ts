@@ -50,6 +50,37 @@ const marketData = async (id: string, full = false) => {
   }
 };
 
+const marketHistory = async (
+  timestamp: number,
+): Promise<null | Pick<FTMarketData, 'market_cap' | 'price'>> => {
+  try {
+    const price = await axios.post(
+      'https://api.livecoinwatch.com/coins/single/history',
+      {
+        code: 'NEAR',
+        currency: 'USD',
+        end: timestamp,
+        meta: false,
+        start: timestamp,
+      },
+      {
+        headers: { 'x-api-key': config.lcwApiKey },
+        timeout: 10000,
+      },
+    );
+
+    return {
+      market_cap: price?.data?.history?.[0]?.cap ?? null,
+      price: price?.data?.history?.[0]?.rate ?? null,
+    };
+  } catch (error) {
+    logger.error(error);
+    sentry.captureException(error);
+
+    return null;
+  }
+};
+
 const marketSearch = async (contract: string): Promise<null | string> => {
   let platform = 'NEAR';
   let address = contract;
@@ -77,4 +108,4 @@ const marketSearch = async (contract: string): Promise<null | string> => {
   }
 };
 
-export default { marketData, marketSearch };
+export default { marketData, marketHistory, marketSearch };
