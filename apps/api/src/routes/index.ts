@@ -7,6 +7,7 @@ import charts from '#routes/charts';
 import exports from '#routes/exports';
 import fts from '#routes/fts';
 import key from '#routes/key';
+import legacy from '#routes/legacy';
 import nfts from '#routes/nfts';
 import node from '#routes/node';
 import nodevalidator from '#routes/nodevalidator';
@@ -28,6 +29,7 @@ const routes = () => {
   charts(app);
   search(app);
   key(app);
+  legacy(app);
   nodevalidator(app);
   node(app);
 
