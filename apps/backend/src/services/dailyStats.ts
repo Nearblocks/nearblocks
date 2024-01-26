@@ -1,6 +1,7 @@
 import Big from 'big.js';
 import { Dayjs } from 'dayjs';
 
+import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { msToNsTime, nsToMsTime, sleep, yoctoToNear } from 'nb-utils';
 
@@ -20,6 +21,8 @@ const marketData = async (date: Dayjs) => {
 
   const start = date.valueOf();
   const history = await lcw.marketHistory(start);
+
+  logger.warn({ history, start });
 
   if (!history) {
     throw Error('market request failed');
@@ -235,6 +238,8 @@ const dayStats = async (date: string) => {
     ...txn,
     ...address,
   };
+
+  logger.warn({ data });
 
   await knex('daily_stats').insert(data);
 };

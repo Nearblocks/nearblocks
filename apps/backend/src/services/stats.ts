@@ -1,12 +1,15 @@
 import { Big } from 'big.js';
 
 import { logger } from 'nb-logger';
+import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
+import config from '#config';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import lcw from '#libs/lcw';
 import near from '#libs/near';
+import { circulatingSupply } from '#libs/supply.js';
 
 const blockTime = async (timestamp: string) => {
   const start = Big(timestamp)
@@ -24,22 +27,23 @@ const blockTime = async (timestamp: string) => {
 };
 
 const blockData = async () => {
-  const block = await knex('blocks')
-    .orderBy('block_height', 'desc')
-    .first('block_height', 'total_supply', 'gas_price', 'block_timestamp');
+  const block = await knex('blocks').orderBy('block_height', 'desc').first();
 
   if (!block) {
     return {};
   }
 
-  const [avgTime, stats] = await Promise.all([
-    blockTime(block.block_timestamp),
-    knex('daily_stats').orderBy('date', 'desc').first(),
-  ]);
+  let supply: null | string = null;
+
+  if (config.network === Network.MAINNET && block) {
+    supply = await circulatingSupply(block);
+  }
+
+  const avgTime = await blockTime(block.block_timestamp);
 
   return {
     avg_block_time: avgTime,
-    circulating_supply: stats?.circulating_supply ?? '0',
+    circulating_supply: supply,
     gas_price: block.gas_price,
     total_supply: block.total_supply,
   };
@@ -105,6 +109,8 @@ export const syncStats = async () => {
   ]);
 
   const data = { ...block, ...price, ...network, ...txn };
+
+  logger.warn({ data, job: 'stats' });
 
   if (stats) {
     return await knex('stats').update(data);
