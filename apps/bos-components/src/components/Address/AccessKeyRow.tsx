@@ -31,8 +31,12 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
 
   const config = getConfig(network);
 
-  const createdTime = nanoToMilli(accessKey.created?.block_timestamp);
-  const deletedTime = nanoToMilli(accessKey.deleted?.block_timestamp);
+  const createdTime = accessKey.created?.block_timestamp
+    ? nanoToMilli(accessKey.created?.block_timestamp)
+    : 0;
+  const deletedTime = accessKey.deleted?.block_timestamp
+    ? nanoToMilli(accessKey.deleted?.block_timestamp)
+    : 0;
 
   const txn = createdTime > deletedTime ? accessKey.created : accessKey.deleted;
 
@@ -137,7 +141,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
   return (
     <>
       <tr key={accessKey.public_key} className="hover:bg-blue-900/5">
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
           {txn?.transaction_hash ? (
             <Tooltip.Provider>
               <Tooltip.Root>
@@ -162,7 +166,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             'Genesis'
           )}
         </td>
-        <td className="pl-6 pr-2 py-4 whitespace-nowrap text-sm text-gray-500 ">
+        <td className="pl-6 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  ">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -179,7 +183,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             </Tooltip.Root>
           </Tooltip.Provider>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-start">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-start">
           {accessKey.permission_kind === 'FUNCTION_CALL' ? (
             <div className="bg-blue-900/10 rounded px-4 h-6 flex items-center justify-center text-center text-xs">
               Limited
@@ -190,12 +194,12 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-start ">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-start ">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
               {keyInfo?.permission?.FunctionCall?.method_names.length > 0
@@ -210,7 +214,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
           {Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
             'Ⓝ ' +
@@ -219,10 +223,10 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
                 true,
               )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
           {action}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
           {txn?.block_timestamp ? (
             <Tooltip.Provider>
               <Tooltip.Root>

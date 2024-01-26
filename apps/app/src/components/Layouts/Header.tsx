@@ -289,20 +289,24 @@ const Header = () => {
           </div>
           <div className="flex flex-col flex-grow w-full md:!w-auto">
             {showSearch && (
-              <div className="w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 pb-2 md:!pt-2 md:!pb-0 order-2 md:!order-1">
-                <VmComponent
-                  src={components?.search}
-                  skeleton={
-                    <div className="w-full">
-                      <Skeleton className="h-12" />
-                    </div>
-                  }
-                  props={{
-                    isHeader: true,
-                    t: t,
-                    network: networkId,
-                  }}
-                />
+              <div className="relative h-full w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 md:!pt-2 md:!pb-0 order-2 md:!order-1">
+                <div className="h-11">
+                  <VmComponent
+                    src={components?.search}
+                    skeleton={
+                      <>
+                        <div className="absolute top-0 left-0 w-full md:mt-2 mt-0 pb-4 h-11 pr-0 md:pr-8 px-3 md:px-0">
+                          <Skeleton className="h-11" />
+                        </div>
+                      </>
+                    }
+                    props={{
+                      isHeader: true,
+                      t: t,
+                      network: networkId,
+                    }}
+                  />
+                </div>
               </div>
             )}
             <nav

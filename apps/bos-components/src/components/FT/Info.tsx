@@ -54,16 +54,18 @@ export default function ({ token, id, network }: Props) {
     <div className="px-3 pt-2 pb-5 text-sm text-gray">
       {tokens?.description && (
         <>
-          <h3 className="text-gray-600 text-sm font-semibold py-2 underline">
+          <h3 className="text-nearblue-600 text-sm font-semibold py-2 underline">
             Overview
           </h3>
-          <p className="text-sm py-2 text-gray-600">{tokens?.description}</p>
+          <p className="text-sm py-2 text-nearblue-600">
+            {tokens?.description}
+          </p>
         </>
       )}
-      <h3 className="text-gray-600 text-sm font-semibold py-2 underline">
+      <h3 className="text-nearblue-600 text-sm font-semibold py-2 underline">
         Market
       </h3>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-gray-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Volume (24H):</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.volume_24h !== null ? (
@@ -73,7 +75,7 @@ export default function ({ token, id, network }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-gray-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating MC:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.market_cap !== null ? (
@@ -83,7 +85,7 @@ export default function ({ token, id, network }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-gray-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">On-chain MC:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.onchain_market_cap !== null ? (
@@ -93,7 +95,7 @@ export default function ({ token, id, network }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-gray-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating Supply:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.circulating_supply !== null ? (

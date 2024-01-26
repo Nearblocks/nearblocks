@@ -5,7 +5,7 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Router, { useRouter } from 'next/router';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 
 const TopNFTTokens = () => {
   const router = useRouter();
@@ -14,7 +14,8 @@ const TopNFTTokens = () => {
   const { t } = useTranslation();
   const initialPage = page ? Number(page) : 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-
+  const heightRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
     Router.push(`/nft-tokens?page=${pageNumber}`);
     setCurrentPage(pageNumber);
@@ -23,7 +24,25 @@ const TopNFTTokens = () => {
   useEffect(() => {
     setCurrentPage(page ? Number(page) : 1);
   }, [page]);
+  const updateOuterDivHeight = () => {
+    if (heightRef.current) {
+      const Height = heightRef.current.offsetHeight;
+      setHeight({ height: Height });
+    } else {
+      setHeight({});
+    }
+  };
+  useEffect(() => {
+    updateOuterDivHeight();
+    window.addEventListener('resize', updateOuterDivHeight);
 
+    return () => {
+      window.removeEventListener('resize', updateOuterDivHeight);
+    };
+  }, []);
+  const onChangeHeight = () => {
+    setHeight({});
+  };
   return (
     <>
       <section>
@@ -35,11 +54,12 @@ const TopNFTTokens = () => {
           </div>
         </div>
         <div className="container mx-auto px-3 -mt-48 ">
-          <div className="relative block lg:flex lg:space-x-2">
+          <div style={height} className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">
               <VmComponent
                 src={components?.nftList}
-                skeleton={<List />}
+                skeleton={<List ref={heightRef} />}
+                onChangeHeight={onChangeHeight}
                 props={{
                   currentPage: currentPage,
                   setPage: setPage,

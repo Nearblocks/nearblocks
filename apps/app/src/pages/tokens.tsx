@@ -2,7 +2,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
@@ -11,9 +11,11 @@ const TopFTTokens = () => {
   const router = useRouter();
   const components = useBosComponents();
   const { page } = router.query;
+  const { t } = useTranslation();
   const initialPage = page ? Number(page) : 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-
+  const heightRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
     Router.push(`/tokens?page=${pageNumber}`);
     setCurrentPage(pageNumber);
@@ -22,7 +24,25 @@ const TopFTTokens = () => {
   useEffect(() => {
     setCurrentPage(page ? Number(page) : 1);
   }, [page]);
-  const { t } = useTranslation();
+  const updateOuterDivHeight = () => {
+    if (heightRef.current) {
+      const Height = heightRef.current.offsetHeight;
+      setHeight({ height: Height });
+    } else {
+      setHeight({});
+    }
+  };
+  useEffect(() => {
+    updateOuterDivHeight();
+    window.addEventListener('resize', updateOuterDivHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateOuterDivHeight);
+    };
+  }, []);
+  const onChangeHeight = () => {
+    setHeight({});
+  };
 
   return (
     <section>
@@ -35,11 +55,12 @@ const TopFTTokens = () => {
       </div>
 
       <div className="container mx-auto px-3 -mt-48 ">
-        <div className="relative block lg:flex lg:space-x-2">
+        <div style={height} className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
             <VmComponent
               src={components?.ftList}
-              skeleton={<List />}
+              skeleton={<List ref={heightRef} />}
+              onChangeHeight={onChangeHeight}
               props={{
                 t: t,
                 currentPage: currentPage,

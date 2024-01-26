@@ -221,7 +221,7 @@ export default function ({ network, t }: Props) {
 
   return (
     <div className="container mx-auto px-3">
-      <div className="bg-white soft-shadow rounded-lg overflow-hidden px-5 md:py lg:px-0">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             network === 'mainnet'
@@ -242,16 +242,19 @@ export default function ({ network, t }: Props) {
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-gray-600 text-sm ">
+                    <p className="uppercase font-semibold text-nearblue-600 text-sm ">
                       {t ? t('home:nearPrice') : 'NEAR PRICE'}
                     </p>
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a href="/charts/near-price">
-                        <a className="leading-6 text-gray-500">
+                      <a
+                        href="/charts/near-price"
+                        className="hover:no-underline"
+                      >
+                        <a className="leading-6 text-nearblue-600 hover:no-underline">
                           ${dollarFormat(stats?.near_price ?? 0)}{' '}
-                          <span className="text-gray-400">
+                          <span className="text-nearblue-700">
                             @{localFormat(stats?.near_btc_price ?? 0)} BTC
                           </span>{' '}
                           {stats?.change_24 > 0 ? (
@@ -278,14 +281,17 @@ export default function ({ network, t }: Props) {
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-gray-500 text-sm">
+                    <p className="uppercase font-semibold text-nearblue-600 text-sm">
                       {t ? t('home:marketCap') : ' MARKET CAP'}
                     </p>
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a href="/charts/market-cap">
-                        <a className="leading-6 text-gray-400">
+                      <a
+                        href="/charts/market-cap"
+                        className="hover:no-underline"
+                      >
+                        <a className="leading-6 text-nearblue-700 hover:no-underline">
                           ${dollarFormat(stats?.market_cap ?? 0)}
                         </a>
                       </a>
@@ -307,27 +313,27 @@ export default function ({ network, t }: Props) {
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-gray-500 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
                     {t ? t('home:transactions') : 'TRANSACTIONS'}
                   </p>
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />
                   ) : (
-                    <p className="leading-6 text-gray-400">
+                    <p className="leading-6 text-nearblue-700">
                       {currency(Number(stats?.total_txns ?? 0))}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-gray-500 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 text-sm">
                   {' '}
                   {t ? t('home:gasPrice') : 'GAS PRICE'}
                 </p>
                 {isLoading ? (
                   <Skeleton className="my-1 h-4" />
                 ) : (
-                  <p className="leading-6 text-gray-400">
+                  <p className="leading-6 text-nearblue-700">
                     {gasPrice(Number(stats?.gas_price ?? 0))}
                   </p>
                 )}
@@ -344,14 +350,14 @@ export default function ({ network, t }: Props) {
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-gray-500 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
                     {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}
                   </p>
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />
                   ) : (
-                    <a href="/node-explorer">
-                      <a className="leading-6 text-gray-400">
+                    <a href="/node-explorer" className="hover:no-underline">
+                      <a className="leading-6 text-nearblue-700 hover:no-underline">
                         {localFormat(stats?.nodes_online ?? 0)}
                       </a>
                     </a>
@@ -359,14 +365,14 @@ export default function ({ network, t }: Props) {
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-gray-500 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 text-sm">
                   {t ? t('home:avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
                 {isLoading ? (
                   <Skeleton className="my-1 h-4" />
                 ) : (
-                  <a href="/charts/blocks">
-                    <a className="leading-6 text-gray-400">
+                  <a href="/charts/blocks" className="hover:no-underline">
+                    <a className="leading-6 text-nearblue-700 hover:no-underline">
                       {stats?.avg_block_time ?? 0} s
                     </a>
                   </a>
@@ -376,7 +382,7 @@ export default function ({ network, t }: Props) {
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:px-5">
             <div className="flex-1 py-5 lg:px-0">
-              <p className="uppercase font-semibold text-gray-500 text-sm">
+              <p className="uppercase font-semibold text-nearblue-600 text-sm">
                 {' '}
                 {t
                   ? t('home:transactionHistory', { days: 14 })

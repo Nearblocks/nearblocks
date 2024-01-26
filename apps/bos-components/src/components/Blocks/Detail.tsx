@@ -18,6 +18,7 @@ interface Props {
   ) => string | undefined;
 }
 
+import Skeleton from '@/includes/Common/Skeleton';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -53,7 +54,7 @@ export default function (props: Props) {
 
   const LinkWrapper = (props: Props) => (
     <a href={props.href} className="hover:no-underline">
-      <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 hover:text-white text-xs px-2 py-1 rounded-lg hover:no-underline">
+      <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
         {props.children}
       </a>
     </a>
@@ -137,9 +138,11 @@ export default function (props: Props) {
     <>
       <div className="md:flex items-center justify-between">
         {isLoading ? (
-          <Loader className="flex w-80 max-w-xs px-3 py-4" />
+          <div className="w-80 max-w-xs px-3 py-5">
+            <Skeleton className="h-7" />
+          </div>
         ) : (
-          <h1 className="text-xl text-gray-700 px-2 py-4">
+          <h1 className="text-xl text-nearblue-600 px-2 py-4">
             {t ? (
               <>
                 {t('blocks:block.heading.0')}
@@ -159,18 +162,13 @@ export default function (props: Props) {
             )}
           </h1>
         )}
-        {
-          <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredBox`}
-          />
-        }
       </div>
       {error || (!isLoading && Object.keys(block).length === 0) ? (
-        <div className="text-gray-400 text-xs px-2 mb-4">
+        <div className="text-nearblue-700 text-xs px-2 mb-4">
           {t ? t('blocks:blockError') : 'Block Error'}
         </div>
       ) : (
-        <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y soft-shadow rounded-lg">
+        <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
           {network === 'testnet' && (
             <div className="flex flex-wrap p-4 text-red-500">
               {t

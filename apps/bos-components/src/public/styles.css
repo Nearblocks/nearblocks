@@ -27,15 +27,26 @@ pre[class*='language-']>code {
 }
 
 .soft-shadow {
-    box-shadow: 0 2.6px 6.3px rgba(0, 0, 0, 0.06),
-        0 6.3px 16px rgba(0, 0, 0, 0.04), 0 12px 32.6px rgba(0, 0, 0, 0.027),
-        0 21.4px 67.2px rgba(0, 0, 0, 0.018), 0 43px 184px rgba(0, 0, 0, 0.011);
+    box-shadow: 0px 8px 19.200000762939453px 0px rgba(189, 197, 209, 0.2);
+    border: 1px solid rgba(233, 236, 239, 1)
 }
 
 .image-shadow {
     box-shadow: 0 1.6px 5.4px rgba(0, 0, 0, 0.054),
         0 4.4px 14.9px rgba(0, 0, 0, 0.069), 0 10.6px 35.9px rgba(0, 0, 0, 0.079),
         0 35px 119px rgba(0, 0, 0, 0.11);
+}
+
+.bg-blue {
+    background-color: #21325b !important;
+}
+
+.footer {
+    background: #fff;
+}
+
+.footer-links a:hover {
+    color: #003536;
 }
 
 .u-label--badge-in {
@@ -61,6 +72,20 @@ pre[class*='language-']>code {
     border-left: .7rem solid #fff
 }
 
-.bg-token-search {
+#token-search {
+    position: relative;
+}
+
+#token-search:before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 0;
+    bottom: 0;
+    width: 14px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' fill='gray' height='25' viewBox='0 0 25 25' fill-rule='evenodd'%3E%3Cpath d='M16.036 18.455l2.404-2.405 5.586 5.587-2.404 2.404zM8.5 2C12.1 2 15 4.9 15 8.5S12.1 15 8.5 15 2 12.1 2 8.5 4.9 2 8.5 2zm0-2C3.8 0 0 3.8 0 8.5S3.8 17 8.5 17 17 13.2 17 8.5 13.2 0 8.5 0zM15 16a1 1 0 1 1 2 0 1 1 0 1 1-2 0'%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.word-break {
+    word-break: break-word;
 }

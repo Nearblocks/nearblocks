@@ -99,43 +99,43 @@ export default function ({ network, t, id }: Props) {
             <tr>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Txn Hash
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Public key
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Access
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Contract
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Method
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Allowance
               </th>
               <th
                 scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
               >
                 Action
               </th>
@@ -149,7 +149,7 @@ export default function ({ network, t, id }: Props) {
                     {showWhen ? 'When' : 'Date Time (UTC)'}
                   </button>
                   <button type="button" onClick={onOrder} className="px-2">
-                    <div className="text-gray-500 font-semibold">
+                    <div className="text-nearblue-600  font-semibold">
                       <SortIcon order={sorting} />
                     </div>
                   </button>
@@ -161,32 +161,35 @@ export default function ({ network, t, id }: Props) {
             {isLoading &&
               [...Array(25)].map((_, i) => (
                 <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-tiny ">
                     <Skeleton />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
                     <Skeleton />
                   </td>
                 </tr>
               ))}
             {!isLoading && keys.length === 0 && (
               <tr className="h-[57px]">
-                <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
+                <td
+                  colSpan={100}
+                  className="px-6 py-4 text-nearblue-700 text-xs"
+                >
                   No access keys
                 </td>
               </tr>

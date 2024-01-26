@@ -14,6 +14,7 @@
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 
+import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
 import {
   formatTimestampToString,
@@ -113,7 +114,7 @@ export default function ({ network, t, id, tid }: Props) {
         </span>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-end',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
     },
     {
       header: <span>Txn Hash</span>,
@@ -145,9 +146,9 @@ export default function ({ network, t, id, tid }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>METHOD</span>,
@@ -157,7 +158,7 @@ export default function ({ network, t, id, tid }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">{row.event_kind}</span>
                 </span>
               </Tooltip.Trigger>
@@ -172,9 +173,9 @@ export default function ({ network, t, id, tid }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>{t ? t('from') : 'FROM'}</span>,
@@ -210,9 +211,9 @@ export default function ({ network, t, id, tid }: Props) {
           )}
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
 
     {
@@ -233,7 +234,7 @@ export default function ({ network, t, id, tid }: Props) {
       ),
       tdClassName: 'text-center',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
 
     {
@@ -271,9 +272,9 @@ export default function ({ network, t, id, tid }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>BLOCK</span>,
@@ -291,9 +292,9 @@ export default function ({ network, t, id, tid }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider h-[57px]',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider h-[57px]',
     },
     {
       header: (
@@ -354,17 +355,9 @@ export default function ({ network, t, id, tid }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
   ];
-
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
 
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -374,19 +367,16 @@ export default function ({ network, t, id, tid }: Props) {
     setCurrentPage(currentPage);
   }, [currentPage]);
 
-  console.log();
-
   return (
     <>
       {isLoading ? (
-        <Loader
-          className="leading-7"
-          wrapperClassName="pl-3 max-w-sm py-4 h-[60px]"
-        />
+        <div className="max-w-lg w-full pl-3 py-5">
+          <Skeleton className="h-4" />
+        </div>
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
               A total of {localFormat(totalCount)} transactions found
             </p>
           </div>

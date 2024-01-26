@@ -114,7 +114,7 @@ export default function ({ network, id, t }: Props) {
         </>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500  flex justify-end',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end',
     },
     {
       header: <span>{t ? t('hash') : 'HASH'}</span>,
@@ -146,9 +146,9 @@ export default function ({ network, id, t }: Props) {
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>BLOCK</span>,
@@ -166,9 +166,9 @@ export default function ({ network, id, t }: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('type') : 'TYPE'}</span>,
@@ -179,7 +179,7 @@ export default function ({ network, id, t }: Props) {
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                  <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                     <span className="block truncate">{row.event_kind}</span>
                   </span>
                 </Tooltip.Trigger>
@@ -197,9 +197,9 @@ export default function ({ network, id, t }: Props) {
           )}
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('token:fts.from') : 'FROM'}</span>,
@@ -236,9 +236,9 @@ export default function ({ network, id, t }: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -290,9 +290,9 @@ export default function ({ network, id, t }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>Quantity</span>,
@@ -300,9 +300,9 @@ export default function ({ network, id, t }: Props) {
       cell: (row: TransactionInfo) => (
         <>{tokenAmount(Number(row.amount), row.ft?.decimals, true)}</>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
@@ -363,7 +363,7 @@ export default function ({ network, id, t }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
   ];
 
@@ -376,7 +376,7 @@ export default function ({ network, id, t }: Props) {
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
               A total of {localFormat(totalCount)} transactions found
             </p>
           </div>

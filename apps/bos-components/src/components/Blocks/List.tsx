@@ -117,7 +117,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -180,7 +180,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,
@@ -188,7 +188,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       cell: (row: BlocksInfo) => (
         <span>{localFormat(row.transactions_agg.count)}</span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -198,7 +198,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       cell: (row: BlocksInfo) => (
         <span>{localFormat(row.receipts_agg.count)}</span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -218,7 +218,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -232,7 +232,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 gas'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -246,7 +246,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 gas'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -260,20 +260,20 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 Ⓝ'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
   return (
-    <div className="bg-white border soft-shadow rounded-lg pb-1 ">
+    <div className="bg-white border soft-shadow rounded-xl pb-1 ">
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
+        <p className="leading-7 pl-6 text-sm py-4 text-nearblue-600">
           {t
             ? t('blocks:listing', {
                 from: localFormat(start?.block_height | 0),

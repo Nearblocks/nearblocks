@@ -34,6 +34,7 @@ import {
 } from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
+import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
 import TokenImage from '@/includes/icons/TokenImage';
 import { getConfig, nanoToMilli } from '@/includes/libs';
@@ -176,7 +177,7 @@ export default function ({
         </>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-end',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end',
     },
     {
       header: <>{t ? t('txns:hash') : 'TXN HASH'}</>,
@@ -208,9 +209,9 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
@@ -236,7 +237,7 @@ export default function ({
                   value={filters ? filters?.event : ''}
                   onChange={onInputChange}
                   placeholder="Search by method"
-                  className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+                  className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
                 />
                 <div className="flex">
                   <button
@@ -267,7 +268,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600  rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">{row.event_kind}</span>
                 </span>
               </Tooltip.Trigger>
@@ -282,7 +283,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
       header: (
@@ -307,7 +308,7 @@ export default function ({
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
-              className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+              className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
             />
             <div className="flex">
               <button
@@ -363,7 +364,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
     },
     {
       header: '',
@@ -410,7 +411,7 @@ export default function ({
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
-              className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+              className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
             />
             <div className="flex">
               <button
@@ -466,7 +467,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
     },
     {
       header: <>Quantity</>,
@@ -475,9 +476,9 @@ export default function ({
         <span>{tokenAmount(Number(row.amount), row.ft?.decimals, true)}</span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <>Token</>,
@@ -497,7 +498,7 @@ export default function ({
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <div className="text-sm text-gray-500 max-w-[110px] inline-block truncate">
+                    <div className="text-sm text-nearblue-600  max-w-[110px] inline-block truncate">
                       <a
                         href={`/token/${row.ft?.contract}`}
                         className="hover:no-underline"
@@ -521,7 +522,7 @@ export default function ({
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
-                      <div className="text-sm text-gray-400 max-w-[80px] inline-block truncate">
+                      <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate">
                         &nbsp; {row.ft.symbol}
                       </div>
                     </Tooltip.Trigger>
@@ -540,9 +541,9 @@ export default function ({
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: (
@@ -577,7 +578,7 @@ export default function ({
             </Tooltip.Root>
           </Tooltip.Provider>
           <button type="button" onClick={onOrder} className="px-2">
-            <div className="text-gray-500 font-semibold">
+            <div className="text-nearblue-600  font-semibold">
               <SortIcon order={sorting} />
             </div>
           </button>
@@ -608,13 +609,13 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName: 'whitespace-nowrap',
     },
   ];
 
   return (
-    <>
+    <div className="bg-white soft-shadow rounded-xl pb-1">
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
@@ -622,30 +623,49 @@ export default function ({
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
               A total of {localFormat(totalCount)} transactions found
             </p>
           </div>
-          {filters && Object.keys(filters).length > 0 && (
-            <div className="flex items-center px-2 text-sm mb-4 text-gray-500 lg:ml-auto">
-              Filtered By:
-              <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                {filters &&
-                  Object.keys(filters).map((key) => (
-                    <span className="flex" key={key}>
-                      {capitalizeFirstLetter(key)}:{' '}
-                      <span className="inline-block truncate max-w-[120px]">
-                        <span className="font-semibold">{filters[key]}</span>
+          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+            {filters && Object.keys(filters).length > 0 && (
+              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
+                Filtered By:
+                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
+                  {filters &&
+                    Object.keys(filters).map((key) => (
+                      <span className="flex" key={key}>
+                        {capitalizeFirstLetter(key)}:{' '}
+                        <span className="inline-block truncate max-w-[120px]">
+                          <span className="font-semibold">{filters[key]}</span>
+                        </span>
                       </span>
-                    </span>
-                  ))}
-                <CloseCircle
-                  className="w-4 h-4 fill-current cursor-pointer"
-                  onClick={onClear}
-                />
-              </span>
-            </div>
-          )}
+                    ))}
+                  <CloseCircle
+                    className="w-4 h-4 fill-current cursor-pointer"
+                    onClick={onClear}
+                  />
+                </span>
+              </div>
+            )}
+
+            <span className="text-xs text-nearblue-600">
+              <a
+                href="/nft-token/exportdata/address/id"
+                className="hover:no-underline"
+              >
+                <a
+                  target="_blank"
+                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-2  border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800 hover:no-underline"
+                >
+                  <p>CSV Export </p>
+                  <span className="ml-2">
+                    <Download />
+                  </span>
+                </a>
+              </a>
+            </span>
+          </div>
         </div>
       )}
       <Widget
@@ -663,6 +683,6 @@ export default function ({
           Error: errorMessage,
         }}
       />
-    </>
+    </div>
   );
 }
