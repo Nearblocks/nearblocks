@@ -23,7 +23,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '* * * * *', name: 'ft-meta' }, // every minute
   { cron: '* * * * *', name: 'ft-market-data' }, // every minute
   { cron: '* * * * *', name: 'ft-market-search' }, // every minute
-  { cron: '*/5 * * * * *', hasSeconds: true, name: 'ft-total-supply' }, // every 5s
+  // { cron: '*/5 * * * * *', hasSeconds: true, name: 'ft-total-supply' }, // every 5s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nft-meta' }, // every 10s
   { cron: '* * * * * *', hasSeconds: true, name: 'events' }, // every second
   { cron: '*/10 * * * *', name: 'pool-id' }, // every 10 minute
