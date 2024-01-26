@@ -46,7 +46,7 @@ const HomePage = () => {
               <h1 className="text-white text-2xl pb-3 flex flex-col">
                 {t('home:heroTitle')}
               </h1>
-              <div className=" h-12">
+              <div className="h-12">
                 <VmComponent
                   src={components?.search}
                   skeleton={

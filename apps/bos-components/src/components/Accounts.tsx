@@ -46,7 +46,6 @@ import {
   TokenListInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
-import Download from '@/includes/icons/Download';
 
 const tabs = [
   'Transactions',
@@ -81,6 +80,7 @@ export default function ({ network, t, id }: Props) {
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
+    onFilterClear('');
   };
 
   useEffect(() => {
@@ -452,11 +452,13 @@ export default function ({ network, t, id }: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap pt-4">
+      <div className="flex items-center justify-between flex-wrap pt-4 ">
         {!id ? (
-          <Skeleton className="h-4" />
+          <div className="w-80 max-w-xs px-3 py-5">
+            <Skeleton className="h-7" />
+          </div>
         ) : (
-          <h1 className="flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+          <h1 className="py-4 flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
             Near Account: @&nbsp;{' '}
             {id && (
               <span className="font-semibold text-green-500 ">{'  ' + id}</span>
@@ -472,18 +474,11 @@ export default function ({ network, t, id }: Props) {
             }
           </h1>
         )}
-        {
-          <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredBox`}
-          />
-        }
       </div>
-      <div className="text-gray-500 px-2 pb-5 pt-1 border-t"></div>
-      <div className="flex items-center flex-shrink-0 max-w-full px-2 space-x-2 pt-4"></div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-lg">
-            <div className="flex justify-between border-b p-3 text-gray-600">
+          <div className="h-full bg-white soft-shadow rounded-xl">
+            <div className="flex justify-between border-b p-3 text-nearblue-600">
               <h2 className="leading-6 text-sm font-semibold">
                 {t ? t('address:overview') : 'Overview'}
               </h2>
@@ -503,7 +498,7 @@ export default function ({ network, t, id }: Props) {
                 </div>
               )}
             </div>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y text-sm text-nearblue-600">
               <div className="flex flex-wrap py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:balance') : 'Balance'}:
@@ -517,7 +512,7 @@ export default function ({ network, t, id }: Props) {
                 )}
               </div>
               {context.networkId === 'mainnet' && statsData?.near_price && (
-                <div className="flex flex-wrap py-4 text-sm text-gray-600">
+                <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0">
                     {t ? t('address:value') : 'Value'}:
                   </div>
@@ -537,7 +532,7 @@ export default function ({ network, t, id }: Props) {
                   )}
                 </div>
               )}
-              <div className="flex flex-wrap py-4 text-sm text-gray-600">
+              <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens'}:
                 </div>
@@ -555,11 +550,11 @@ export default function ({ network, t, id }: Props) {
           </div>
         </div>
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-            <h2 className="leading-6 border-b p-3 text-gray-600 text-sm font-semibold">
+          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+            <h2 className="leading-6 border-b p-3 text-nearblue-600 text-sm font-semibold">
               {t ? t('address:moreInfo') : 'Account information'}
             </h2>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y text-sm text-nearblue-600">
               <div className="flex justify-between">
                 <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
@@ -688,7 +683,7 @@ export default function ({ network, t, id }: Props) {
                         </a>
                       </a>
                       {tokenData.price && (
-                        <div className="text-gray-500 ml-1">
+                        <div className="text-nearblue-600 ml-1">
                           (@ ${localFormat(tokenData.price)})
                         </div>
                       )}
@@ -703,60 +698,43 @@ export default function ({ network, t, id }: Props) {
       <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
-          <div className="bg-white soft-shadow rounded-lg pb-1">
-            <Tabs.Root defaultValue={pageTab}>
-              <Tabs.List className="border-b flex">
-                {tabs &&
-                  tabs.map((tab, index) => (
-                    <Tabs.Trigger
-                      key={index}
-                      onClick={() => onTab(index)}
-                      className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 ${
-                        pageTab === tab
-                          ? 'border-b-4 border-green-500 text-green-500'
-                          : ''
-                      }`}
-                      value={tab}
-                    >
-                      {tab === 'Transactions' ? (
-                        <h2>{t ? t('address:txns') : tab}</h2>
-                      ) : tab === 'Token Txns' ? (
-                        <h2>{t ? t('address:tokenTxns') : tab}</h2>
-                      ) : tab === 'Contract' ? (
-                        <div className=" flex h-full">
-                          <h2>{tab}</h2>
-                          <div className="text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-1 -mt-2 px-1 ">
-                            NEW
-                          </div>
-                        </div>
-                      ) : tab === 'Comments' ? (
-                        <h2>{t ? t('address:comments') : tab}</h2>
-                      ) : (
+          <Tabs.Root defaultValue={pageTab}>
+            <Tabs.List>
+              {tabs &&
+                tabs.map((tab, index) => (
+                  <Tabs.Trigger
+                    key={index}
+                    onClick={() => {
+                      onTab(index);
+                    }}
+                    className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                      pageTab === tab
+                        ? 'rounded-lg bg-green-600 text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                    }`}
+                    value={tab}
+                  >
+                    {tab === 'Transactions' ? (
+                      <h2>{t ? t('address:txns') : tab}</h2>
+                    ) : tab === 'Token Txns' ? (
+                      <h2>{t ? t('address:tokenTxns') : tab}</h2>
+                    ) : tab === 'Contract' ? (
+                      <div className="flex h-full">
                         <h2>{tab}</h2>
-                      )}
-                    </Tabs.Trigger>
-                  ))}
-              </Tabs.List>
+                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
+                          NEW
+                        </div>
+                      </div>
+                    ) : tab === 'Comments' ? (
+                      <h2>{t ? t('address:comments') : tab}</h2>
+                    ) : (
+                      <h2>{tab}</h2>
+                    )}
+                  </Tabs.Trigger>
+                ))}
+            </Tabs.List>
+            <div>
               <Tabs.Content value={tabs[0]}>
-                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
-                  <span className="text-xs sm:-mt-12  text-gray-700">
-                    <a
-                      href={`/exportdata?address=${id}`}
-                      className="hover:no-underline"
-                      target="_blank"
-                    >
-                      <a
-                        target="_blank"
-                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
-                      >
-                        <p>CSV Export </p>
-                        <span className="ml-2">
-                          <Download />
-                        </span>
-                      </a>
-                    </a>
-                  </span>
-                </div>
                 {
                   <Widget
                     src={`${config.ownerId}/widget/bos-components.components.Address.Transactions`}
@@ -772,24 +750,6 @@ export default function ({ network, t, id }: Props) {
                 }
               </Tabs.Content>
               <Tabs.Content value={tabs[1]}>
-                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
-                  <span className="text-xs sm:-mt-12  text-gray-700">
-                    <a
-                      href="/nft-token/exportdata/address/id"
-                      className="hover:no-underline"
-                    >
-                      <a
-                        target="_blank"
-                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
-                      >
-                        <p>CSV Export </p>
-                        <span className="ml-2">
-                          <Download />
-                        </span>
-                      </a>
-                    </a>
-                  </span>
-                </div>
                 {
                   <Widget
                     src={`${config.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
@@ -805,24 +765,6 @@ export default function ({ network, t, id }: Props) {
                 }
               </Tabs.Content>
               <Tabs.Content value={tabs[2]}>
-                <div className=" px-2 sm:py-0  py-3 flex items-center justify-end md:px-4">
-                  <span className="text-xs sm:-mt-12  text-gray-700">
-                    <a
-                      href="/nft-token/exportdata/address/id"
-                      className="hover:no-underline"
-                    >
-                      <a
-                        target="_blank"
-                        className="cursor-pointer mx-1 flex items-center text-white font-thin py-2  border border-green-900/10 px-4 rounded-md bg-green-500 hover:bg-green-400 hover:no-underline"
-                      >
-                        <p>CSV Export </p>
-                        <span className="ml-2">
-                          <Download />
-                        </span>
-                      </a>
-                    </a>
-                  </span>
-                </div>
                 {
                   <Widget
                     src={`${config.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
@@ -849,32 +791,14 @@ export default function ({ network, t, id }: Props) {
                   />
                 }
               </Tabs.Content>
-              <Tabs.Content value={tabs[3]}>
-                {
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
-                    props={{
-                      network: network,
-                      id: id,
-                      t: t,
-                    }}
-                  />
-                }
+              <Tabs.Content value={tabs[4]}>
+                <div className="px-4 sm:px-6 py-3"></div>
               </Tabs.Content>
-              <Tabs.Content value={tabs[3]}>
-                {
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
-                    props={{
-                      network: network,
-                      id: id,
-                      t: t,
-                    }}
-                  />
-                }
+              <Tabs.Content value={tabs[5]}>
+                <div className="px-4 sm:px-6 py-3"></div>
               </Tabs.Content>
-            </Tabs.Root>
-          </div>
+            </div>
+          </Tabs.Root>
         </div>
       </div>
     </>

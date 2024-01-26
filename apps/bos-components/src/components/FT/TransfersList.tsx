@@ -18,6 +18,7 @@ interface Props {
   setPage: (page: number) => void;
 }
 
+import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
 import {
   formatTimestampToString,
@@ -99,14 +100,6 @@ export default function ({ network, t, currentPage, setPage }: Props) {
   }, [config?.backendUrl, currentPage]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
 
   const columns = [
     {
@@ -418,12 +411,11 @@ export default function ({ network, t, currentPage, setPage }: Props) {
 
   return (
     <>
-      <div className="bg-white border soft-shadow rounded-lg pb-1">
+      <div className="bg-white border soft-shadow rounded-xl pb-1">
         {isLoading ? (
-          <Loader
-            className="leading-7"
-            wrapperClassName="pl-3 max-w-sm py-4 h-[60px]"
-          />
+          <div className="max-w-lg w-full pl-3 py-5">
+            <Skeleton className="h-4" />
+          </div>
         ) : (
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">

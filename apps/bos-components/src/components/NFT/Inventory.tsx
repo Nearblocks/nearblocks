@@ -10,6 +10,7 @@
  */
 
 import Paginator from '@/includes/Common/Paginator';
+import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat } from '@/includes/formats';
 import { getConfig } from '@/includes/libs';
 import { Token } from '@/includes/types';
@@ -118,25 +119,16 @@ export default function ({ network, id, token }: Props) {
     }
   }, [token]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
-
   return (
     <>
       {isLoading ? (
-        <Loader
-          className="leading-7"
-          wrapperClassName="pl-3 max-w-sm py-4 h-[60px]"
-        />
+        <div className="pl-6 max-w-lg w-full py-5 ">
+          <Skeleton className="h-4" />
+        </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4 border-t`}>
+        <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
               A total of {localFormat(totalCount)} tokens found
             </p>
           </div>
@@ -153,13 +145,15 @@ export default function ({ network, id, token }: Props) {
                 href="#"
                 className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden"
               >
-                <Loader wrapperClassName="w-40 h-40" className="h-40" />
+                <div className="w-40 h-40 ">
+                  <Skeleton className="h-40" />
+                </div>
               </a>
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-gray-500 mt-4">
-                <Loader />
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
+                <Skeleton className="h-4" />
               </div>
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-gray-500">
-                <Loader />
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
+                <Skeleton className="h-4" />
               </div>
             </div>
           ))}
@@ -186,7 +180,7 @@ export default function ({ network, id, token }: Props) {
                 }
               </a>
             </a>
-            <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-gray-500 mt-4">
+            <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
               Token ID:{' '}
               <a
                 href={`/nft-token/${nft.contract}/${nft.token}`}
@@ -196,7 +190,7 @@ export default function ({ network, id, token }: Props) {
               </a>
             </div>
             {nft.asset && (
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-gray-500">
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
                 Owner:{' '}
                 <a
                   href={`/address/${nft.asset?.owner}`}

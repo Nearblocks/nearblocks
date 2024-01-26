@@ -14,6 +14,7 @@ interface Props {
 }
 
 import Links from '@/includes/Common/Links';
+import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat } from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
 import { getConfig } from '@/includes/libs';
@@ -98,14 +99,6 @@ export default function ({ network, id }: Props) {
     fetchHoldersCount();
   }, [config.backendUrl, id]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
-
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
   };
@@ -114,9 +107,11 @@ export default function ({ network, id }: Props) {
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
         {!token ? (
-          <Loader className="h-7" wrapperClassName="flex w-full px-2 py-4" />
+          <div className="w-80 max-w-xs px-3 py-5">
+            <Skeleton className="h-7" />
+          </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+          <h1 className="break-all space-x-2 text-xl text-nearblue-600 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 src={token.icon}
@@ -131,27 +126,22 @@ export default function ({ network, id }: Props) {
             </span>
           </h1>
         )}
-        {
-          <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Shared.SponsoredBox`}
-          />
-        }
       </div>
       <div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+            <div className="h-full bg-white soft-shadow rounded-xl">
+              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                 Overview
               </h2>
 
-              <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="px-3 divide-y text-sm text-nearblue-600">
                 <div className="flex flex-wrap py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Total Supply:
                   </div>
                   {isLoading ? (
-                    <Loader wrapperClassName="w-32" />
+                    <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
                       {localFormat(token?.tokens || 0)}
@@ -163,7 +153,7 @@ export default function ({ network, id }: Props) {
                     Transfers:
                   </div>
                   {txnLoading ? (
-                    <Loader wrapperClassName="w-32" />
+                    <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
                       {localFormat(transfers)}
@@ -173,7 +163,7 @@ export default function ({ network, id }: Props) {
                 <div className="flex flex-wrap py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Holders:</div>
                   {holderLoading ? (
-                    <Loader wrapperClassName="w-32" />
+                    <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
                       {localFormat(holders)}
@@ -184,16 +174,16 @@ export default function ({ network, id }: Props) {
             </div>
           </div>
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
-              <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                 Profile Summary
               </h2>
-              <div className="px-3 divide-y text-sm text-gray-600">
+              <div className="px-3 divide-y text-sm text-nearblue-600">
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
                   {isLoading ? (
                     <div className="w-full md:w-3/4 break-words">
-                      <Loader wrapperClassName="w-32" />
+                      <Skeleton className="h-4 w-32" />
                     </div>
                   ) : (
                     <div className="w-full text-green-500 md:w-3/4 break-words">
@@ -214,10 +204,7 @@ export default function ({ network, id }: Props) {
                   </div>
                   <div className="w-full md:w-3/4 text-green-500 break-words">
                     {isLoading ? (
-                      <Loader
-                        className="h-full"
-                        wrapperClassName="flex w-32 h-4"
-                      />
+                      <Skeleton className="h-4 w-32" />
                     ) : (
                       <a
                         href={`${token?.website}`}
@@ -235,10 +222,7 @@ export default function ({ network, id }: Props) {
                   <div className="w-full md:w-3/4 break-words">
                     {/* corrections needed */}
                     {isLoading ? (
-                      <Loader
-                        className="h-full"
-                        wrapperClassName="flex w-32 h-4"
-                      />
+                      <Skeleton className="h-4 w-32" />
                     ) : (
                       <Links meta={token} />
                     )}
@@ -251,25 +235,25 @@ export default function ({ network, id }: Props) {
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <div className="bg-white soft-shadow rounded-lg pb-1">
-              <Tabs.Root defaultValue={pageTab}>
-                <Tabs.List>
-                  {tabs &&
-                    tabs.map((tab, index) => (
-                      <Tabs.Trigger
-                        key={index}
-                        onClick={() => onTab(index)}
-                        className={`text-gray-600 text-sm font-semibold border-green-500  overflow-hidden inline-block cursor-pointer p-3 focus:outline-none hover:text-green-500 ${
-                          pageTab === tab
-                            ? 'border-b-4 border-green-500 text-green-500'
-                            : ''
-                        }`}
-                        value={tab}
-                      >
-                        <h2>{tab}</h2>
-                      </Tabs.Trigger>
-                    ))}
-                </Tabs.List>
+            <Tabs.Root defaultValue={pageTab}>
+              <Tabs.List>
+                {tabs &&
+                  tabs.map((tab, index) => (
+                    <Tabs.Trigger
+                      key={index}
+                      onClick={() => onTab(index)}
+                      className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                        pageTab === tab
+                          ? 'rounded-lg bg-green-600 text-white'
+                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                      }`}
+                      value={tab}
+                    >
+                      <h2>{tab}</h2>
+                    </Tabs.Trigger>
+                  ))}
+              </Tabs.List>
+              <div className="bg-white soft-shadow rounded-xl pb-1">
                 <Tabs.Content value={tabs[0]}>
                   {
                     <Widget
@@ -306,8 +290,8 @@ export default function ({ network, id }: Props) {
                 <Tabs.Content value={tabs[3]}>
                   <div className="px-4 sm:px-6 py-3"></div>
                 </Tabs.Content>
-              </Tabs.Root>
-            </div>
+              </div>
+            </Tabs.Root>
           </div>
         </div>
       </div>

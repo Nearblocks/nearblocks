@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
 interface Props {
   showRounded?: boolean;
 }
-const List = ({ showRounded }: Props) => {
+const List = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div className="absolute w-full h-full z-10">
+    <div className="absolute w-full h-full z-50">
       <div
+        ref={ref}
         className={`bg-white border soft-shadow ${
-          !showRounded ? 'rounded-xl' : ''
+          !props.showRounded ? 'rounded-xl' : ''
         } overflow-hidden`}
       >
         <div className=" flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
@@ -111,6 +112,6 @@ const List = ({ showRounded }: Props) => {
       </div>
     </div>
   );
-};
-
+});
+List.displayName = 'List';
 export default List;

@@ -702,7 +702,7 @@ export type NFTImageProps = {
   base?: string;
   media?: string;
   alt?: string;
-  reference?: string;
+  reference: string;
   className?: string;
   network: string;
 };

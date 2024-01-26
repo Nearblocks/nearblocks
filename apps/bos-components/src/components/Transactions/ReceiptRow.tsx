@@ -79,7 +79,6 @@ export default function (props: Props) {
       ></div>
     );
   };
-
   return (
     <div className="divide-solid divide-gray-200 divide-y">
       <div

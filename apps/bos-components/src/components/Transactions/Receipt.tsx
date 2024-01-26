@@ -25,7 +25,6 @@ export default function (props: Props) {
   const { network, rpcTxn, txn, t } = props;
   const [receipt, setReceipt] = useState(null);
   const config = getConfig(network);
-
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any = txn.transaction.actions.map((txn) =>
       mapRpcActionToAction(txn),
@@ -90,7 +89,7 @@ export default function (props: Props) {
   }, [rpcTxn]);
 
   return (
-    <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y">
+    <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       {
         <Widget
           src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}

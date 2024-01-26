@@ -15,6 +15,7 @@ interface Props {
   token?: Token;
 }
 
+import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat, serialNumber } from '@/includes/formats';
 import { getConfig, holderPercentage } from '@/includes/libs';
 import { HoldersPropsInfo, Token } from '@/includes/types';
@@ -121,14 +122,6 @@ export default function ({ network, id, token }: Props) {
     }
   }, [token]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
-
   const columns = [
     {
       header: <span>Rank</span>,
@@ -137,9 +130,9 @@ export default function ({ network, id, token }: Props) {
         <span>{serialNumber(index, currentPage, 25)}</span>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500 w-[50px]',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 w-[50px]',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[50px]',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[50px]',
     },
     {
       header: <span> Address</span>,
@@ -171,17 +164,17 @@ export default function ({ network, id, token }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>Quantity</span>,
       key: 'quantity',
       cell: (row: HoldersPropsInfo) => <span>{row.quantity}</span>,
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[200px]',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[200px]',
     },
     {
       header: <span> Percentage</span>,
@@ -206,23 +199,22 @@ export default function ({ network, id, token }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[300px] ',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[300px] ',
     },
   ];
 
   return (
     <>
       {isLoading ? (
-        <Loader
-          className="leading-7"
-          wrapperClassName="pl-3 max-w-sm py-4 h-[60px]"
-        />
+        <div className="pl-6 max-w-lg w-full py-5 ">
+          <Skeleton className="h-4" />
+        </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4 border-t`}>
+        <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
               A total of {localFormat(totalCount)} transactions found
             </p>
           </div>

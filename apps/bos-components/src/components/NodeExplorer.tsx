@@ -234,7 +234,7 @@ export default function ({ network, currentPage, setPage }: Props) {
         <div
           className={`inline-block ${
             getStatusColorClass(row?.stakingStatus ?? '').bgColor
-          } rounded-lg p-1 text-center`}
+          } rounded-xl p-1 text-center`}
         >
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
@@ -330,7 +330,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       cell: (row: ValidatorEpochData) => {
         return (
           <div>
-            <div className="relative w-50 h-7 soft-shadow rounded-lg overflow-hidden bg-gray-300">
+            <div className="relative w-50 h-7 soft-shadow rounded-xl overflow-hidden bg-gray-300">
               <div
                 className="absolute top-0 left-0 right-0 bottom-0 h-full bg-green-500 text-center flex items-center justify-center"
                 style={{
@@ -738,7 +738,7 @@ export default function ({ network, currentPage, setPage }: Props) {
     <div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
             <div>
               <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
                 <span>Staking Overview</span>
@@ -819,7 +819,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         </div>
         <div className="w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-lg overflow-hidden">
+          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
             <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
               Epoch Information
             </h2>
@@ -878,7 +878,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       </div>
       <div className="py-5"></div>
       <div className="w-full mb-10">
-        <div className="bg-white soft-shadow rounded-lg pb-1">
+        <div className="bg-white soft-shadow rounded-xl pb-1">
           <div className="flex flex-col pt-4">
             <div className="flex flex-col">
               {isLoading ? (

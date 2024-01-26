@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       darkMode: 'class',
       fontFamily: {
-        sans: "'Manrope', sans-serif",
+        sans: "'Roboto'",
       },
       fontSize: {
         tiny: '.65625rem',
@@ -37,12 +37,15 @@ module.exports = {
         nearblue: {
           DEFAULT: '#F1F9FF',
           600: '#4b5563',
+          700: '#9CA3AF',
         },
         neargray: {
           DEFAULT: '#676767',
           25: '#FAFAFA',
           50: '#8E8E8E',
           600: '#676767',
+          700: '#E9ECEF',
+          800: '#DEE2E6',
         },
         blue: {
           DEFAULT: '#8adbc9',
