@@ -8,6 +8,7 @@ import {
 } from 'near-lockup-helper';
 
 import { Block } from 'nb-types';
+import { retry, sleep } from 'nb-utils';
 
 import config from '#config';
 
@@ -57,37 +58,52 @@ const getLockupAccounts = async (blockHeight: number) => {
 };
 
 export const circulatingSupply = async (block: Block) => {
+  const lockedAmount = Big(0);
   const foundationAccounts = ['contributors.near', 'lockup.near'];
   const blockRef: BlockReference = { block_id: +block.block_height };
 
   const lockupAccounts = await getLockupAccounts(block.block_height);
 
-  const lockedTokens = await Promise.all(
-    lockupAccounts.map(async (account) => {
-      const lockupState = await viewLockupState(
-        account.account_id,
-        options,
-        blockRef,
-      );
+  for (const account of lockupAccounts) {
+    await retry(async () => {
+      try {
+        await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
+        const lockupState = await viewLockupState(account, options, blockRef);
 
-      if (lockupState) {
-        return Big((await getLockedTokenAmount(lockupState)).toString());
-      } else {
-        return Big(0);
+        if (!lockupState) return;
+
+        return lockedAmount.add(getLockedTokenAmount(lockupState).toString());
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error?.message.includes('does not exist while viewing')
+        ) {
+          return;
+        }
+
+        throw error;
       }
-    }),
-  );
-
-  const lockedAmount = lockedTokens.reduce(
-    (acc, current) => acc.add(current),
-    Big(0),
-  );
+    });
+  }
 
   const foundationLockedTokens = await Promise.all(
     foundationAccounts.map(async (account) => {
-      const resp = await viewAccountBalance(account, options, blockRef);
+      return await retry(async () => {
+        try {
+          const resp = await viewAccountBalance(account, options, blockRef);
 
-      return Big(resp.amount.toString());
+          return Big(resp.amount.toString());
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            error?.message.includes('does not exist while viewing')
+          ) {
+            return Big(0);
+          }
+
+          throw error;
+        }
+      });
     }),
   );
 

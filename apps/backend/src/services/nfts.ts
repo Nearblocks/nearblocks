@@ -120,5 +120,5 @@ const updateToken = async (contract: string, token: string) => {
     //
   }
 
-  return upsertErrorContract(contract, 'nft', null);
+  return upsertErrorContract(contract, 'nft', token);
 };
