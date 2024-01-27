@@ -11,7 +11,7 @@ import { syncStats } from '#services/stats';
     await syncStats();
   } catch (error) {
     sentry.captureException(error);
-    logger.error(error);
+    logger.error({ error, job: 'stats' });
     await sleep(1000);
   }
 
