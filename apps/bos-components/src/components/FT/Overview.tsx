@@ -201,10 +201,12 @@ export default function ({ network, id, t }: Props) {
                     )}
                   </div>
                   <div className="flex-col flex-1 flex-wrap py-1 px-3">
-                    <div className="w-full text-nearblue-700 text-xs uppercase mb-1 flex  text-[80%]">
-                      {showMarketCap
-                        ? 'CIRCULATING SUPPLY MARKET CAP'
-                        : 'FULLY DILUTED MARKET CAP'}
+                    <div className="w-full text-nearblue-700 text-xs  mb-1 flex  text-[80%]">
+                      <span className="uppercase">
+                        {showMarketCap
+                          ? 'CIRCULATING SUPPLY MARKET CAP'
+                          : 'FULLY DILUTED MARKET CAP'}
+                      </span>
                       <span>
                         <Tooltip.Provider>
                           <Tooltip.Root>

@@ -142,7 +142,7 @@ export default function (props: Props) {
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="text-xl text-nearblue-600 px-2 py-4">
+          <h1 className="text-xl text-nearblue-600 px-2 py-5">
             {t ? (
               <>
                 {t('blocks:block.heading.0')}

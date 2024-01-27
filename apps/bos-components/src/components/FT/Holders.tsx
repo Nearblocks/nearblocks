@@ -206,11 +206,7 @@ export default function ({ network, id, token }: Props) {
       key: 'tokens',
       cell: (row: HoldersPropsInfo) => {
         return (
-          <span>
-            $
-            {token?.price !== null &&
-              price(row.amount, tokens?.decimals, tokens?.price)}
-          </span>
+          <span>${price(row.amount, tokens?.decimals, tokens?.price)}</span>
         );
       },
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',

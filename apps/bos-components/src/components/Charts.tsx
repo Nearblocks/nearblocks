@@ -5,17 +5,17 @@
  * Description: Charts component for Near Charts & Statistics
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
- * @param {boolean} [fetchStyles] - Use Nearblocks styles in the component
  * @param {boolean} [poweredBy] - Powered by attribution
 
  */
 
 interface Props {
   chartTypes: string;
-  fetchStyles?: boolean;
   poweredBy?: boolean;
   network: string;
+  t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -23,7 +23,7 @@ import { getConfig, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const [css, setCss] = useState({});
+  const { t } = props;
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
@@ -36,66 +36,55 @@ export default function (props: Props) {
   const charts = [
     {
       link: '/charts/near-price',
-      text: 'Near Daily Price (USD) Chart',
+      text: t ? t('charts:nearPrice.heading') : 'Near Daily Price (USD) Chart',
       image: `${config.appUrl}images/charts/near-price.svg`,
       exclude: `${props.network}` === 'testnet',
     },
     {
       link: '/charts/market-cap',
-      text: 'Near Market Capitalization Chart',
+      text: t
+        ? t('charts:marketCap.heading')
+        : 'Near Market Capitalization Chart',
       image: `${config.appUrl}images/charts/market-cap.svg`,
       exclude: `${props.network}` === 'testnet',
     },
     {
       link: '/charts/near-supply',
-      text: 'Near Supply Growth Chart',
+      text: t ? t('charts:nearSupply.heading') : 'Near Supply Growth Chart',
       image: `${config.appUrl}images/charts/near-supply.svg`,
       exclude: false,
     },
     {
       link: '/charts/txns',
-      text: 'Near Daily Transactions Chart',
+      text: t ? t('charts:txns.heading') : 'Near Daily Transactions Chart',
       image: `${config.appUrl}images/charts/txns.svg`,
       exclude: false,
     },
     {
       link: '/charts/blocks',
-      text: 'Near Block Count',
+      text: t ? t('charts:blocks.heading') : 'Near Block Count',
       image: `${config.appUrl}images/charts/blocks.svg`,
       exclude: false,
     },
     {
       link: '/charts/addresses',
-      text: 'Near Unique Accounts Chart',
+      text: t ? t('charts:addresses.heading') : 'Near Unique Accounts Chart',
       image: `${config.appUrl}images/charts/addresses.svg`,
       exclude: false,
     },
     {
       link: '/charts/txn-fee',
-      text: 'Transaction Fee Chart',
+      text: t ? t('charts:txnFee.heading') : 'Transaction Fee Chart',
       image: `${config.appUrl}images/charts/txn-fee.svg`,
       exclude: `${props.network}` === 'testnet',
     },
     {
       link: '/charts/txn-volume',
-      text: 'Transaction Volume Chart',
+      text: t ? t('charts:txnVolume.heading') : 'Transaction Volume Chart',
       image: `${config.appUrl}images/charts/txn-volume.svg`,
       exclude: `${props.network}` === 'testnet',
     },
   ];
-
-  /**
-   * Fetches styles asynchronously from a nearblocks gateway.
-   */
-  function fetchStyles() {
-    asyncFetch('https://beta.nearblocks.io/common.css').then(
-      (res: { body: string }) => {
-        if (res?.body) {
-          setCss(res.body);
-        }
-      },
-    );
-  }
 
   const chartData = useMemo(() => {
     try {
@@ -171,12 +160,8 @@ export default function (props: Props) {
       );
     }
 
-    if (props?.fetchStyles) {
-      fetchStyles();
-    }
-
     fetchChartData();
-  }, [props?.fetchStyles, config.backendUrl]);
+  }, [config.backendUrl]);
 
   useEffect(() => {
     const fetchData = () => {
@@ -423,76 +408,66 @@ export default function (props: Props) {
     </body>
   </html>
 `;
-  const Theme = styled.div`
-    ${css}
-  `;
 
   return (
-    <Theme>
-      <div>
-        <div className="bg-hero-pattern h-72">
-          <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
-              {props.chartTypes ? chartInfo.title : 'Near Charts & Statistics'}
-            </h1>
-          </div>
-        </div>
-        <div className="container mx-auto px-3 -mt-36">
-          {props.chartTypes && (
-            <div
-              className="block bg-white border soft-shadow rounded-xl overflow-hidden mb-10"
-              style={{ height: 580 }}
-            >
-              <p className="leading-7 px-4 text-sm py-4 text-gray-500 border-b">
-                {chartInfo?.description}
-              </p>
-              <div className="pl-2 pr-2 py-8 h-full">
-                {chartData?.length ? (
-                  <iframe
-                    srcDoc={iframeSrc}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: 'none',
-                    }}
-                  />
-                ) : (
-                  <Skeleton className="h-[93%] w-full" />
-                )}
-              </div>
+    <div>
+      {props.chartTypes && (
+        <>
+          <div
+            className="block bg-white border soft-shadow rounded-xl overflow-hidden mb-10"
+            style={{ height: 580 }}
+          >
+            <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 border-b">
+              {chartInfo?.description}
+            </p>
+            <div className="pl-2 pr-2 py-8 h-full">
+              {chartData?.length ? (
+                <iframe
+                  srcDoc={iframeSrc}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                  }}
+                />
+              ) : (
+                <Skeleton className="h-[93%] w-full" />
+              )}
             </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {charts.map(
-              (chart, index) =>
-                chart.exclude === false && (
-                  <div
-                    key={index}
-                    className="block bg-white border soft-shadow rounded-xl overflow-hidden"
-                  >
-                    <a
-                      href={chart.link}
-                      className="block leading-7 p-3 text-sm text-gray-500 border-b truncate"
-                    >
-                      <h2>{chart.text}</h2>
-                    </a>
-                    <div className="pl-2 pr-4 py-6">
-                      <a href={chart.link}>
-                        <img
-                          src={chart.image}
-                          alt={chart.text}
-                          width={600}
-                          height={550}
-                        />
-                      </a>
-                    </div>
-                  </div>
-                ),
-            )}
           </div>
-        </div>
-        <div className="py-8"></div>
+          <h2 className="mb-4 px-2 text-lg text-gray-700">
+            {t('charts:otherHeading')}
+          </h2>
+        </>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {charts.map(
+          (chart, index) =>
+            chart.exclude === false && (
+              <div
+                key={index}
+                className="block bg-white border soft-shadow rounded-xl overflow-hidden"
+              >
+                <a
+                  href={chart.link}
+                  className="block leading-7 p-3 text-sm text-nearblue-600 border-b truncate"
+                >
+                  <h2>{chart.text}</h2>
+                </a>
+                <div className="pl-2 pr-4 py-6">
+                  <a href={chart.link}>
+                    <img
+                      src={chart.image}
+                      alt={chart.text}
+                      width={600}
+                      height={550}
+                    />
+                  </a>
+                </div>
+              </div>
+            ),
+        )}
       </div>
-    </Theme>
+    </div>
   );
 }

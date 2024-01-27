@@ -95,7 +95,6 @@ const TransactionList = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
-  console.log(height);
   return (
     <>
       <div className="bg-hero-pattern h-72">

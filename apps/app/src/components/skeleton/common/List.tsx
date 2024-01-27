@@ -12,7 +12,7 @@ const List = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
           !props.showRounded ? 'rounded-xl' : ''
         } overflow-hidden`}
       >
-        <div className=" flex flex-row items-center justify-between text-left text-sm  text-gray-500 px-3 py-2">
+        <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 px-3 py-2">
           <div className="max-w-lg pl-3 w-full py-3.5 ">
             <Skeleton className=" h-4" />
           </div>
@@ -23,49 +23,49 @@ const List = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
                 >
                   <Skeleton className="h-4" />
                 </th>
@@ -74,28 +74,28 @@ const List = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {[...Array(25)].map((_, i) => (
                 <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500  align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  align-top">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-tiny align-top ">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                     <Skeleton className="h-4" />
                   </td>
                 </tr>

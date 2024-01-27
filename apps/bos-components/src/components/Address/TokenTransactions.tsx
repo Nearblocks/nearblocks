@@ -473,7 +473,7 @@ export default function ({
       header: <>Quantity</>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
-        <span>{tokenAmount(Number(row.amount), row.ft?.decimals, true)}</span>
+        <span>{tokenAmount(row.amount, row.ft?.decimals, true)}</span>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',

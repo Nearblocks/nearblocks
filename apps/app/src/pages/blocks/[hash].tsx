@@ -35,19 +35,21 @@ const Block = () => {
     setHeight({});
   };
   return (
-    <div style={height} className="relative container mx-auto">
-      <VmComponent
-        src={components?.blocksDetail}
-        props={{
-          hash: hash,
-          network: networkId,
-          t: t,
-        }}
-        skeleton={<Detail ref={heightRef} network={networkId} />}
-        onChangeHeight={onChangeHeight}
-      />
+    <>
+      <div style={height} className="relative container mx-auto">
+        <VmComponent
+          src={components?.blocksDetail}
+          props={{
+            hash: hash,
+            network: networkId,
+            t: t,
+          }}
+          skeleton={<Detail ref={heightRef} network={networkId} />}
+          onChangeHeight={onChangeHeight}
+        />
+      </div>{' '}
       <div className="py-8"></div>
-    </div>
+    </>
   );
 };
 

@@ -34,7 +34,7 @@ export type TokenInfo = {
 };
 
 export type MetaInfo = {
-  decimals: number;
+  decimals: string;
   icon: string;
   name: string;
   price: number;
@@ -644,7 +644,7 @@ export type Token = {
   asset: {
     owner: string;
   };
-  decimals: number;
+  decimals: string;
   title: string;
   nft: Token;
 };
@@ -661,8 +661,8 @@ export type TransActionProps = {
 
 export type TokenInfoProps = {
   contract: string;
-  amount: number;
-  decimals: number;
+  amount: string;
+  decimals: string;
   network: string;
 };
 
@@ -695,7 +695,7 @@ export type ReceiptStatsProps = {
 export type HoldersPropsInfo = {
   account: string;
   quantity: number;
-  amount: number;
+  amount: string;
 };
 
 export type NFTImageProps = {

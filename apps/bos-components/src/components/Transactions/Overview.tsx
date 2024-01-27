@@ -259,11 +259,11 @@ export default function ({ network, t }: Props) {
                           </span>{' '}
                           {stats?.change_24 > 0 ? (
                             <span className="text-neargreen text-sm">
-                              ({dollarFormat(stats?.change_24)}%)
+                              ({dollarFormat(stats?.change_24 ?? 0)}%)
                             </span>
                           ) : (
                             <span className="text-red-500 text-sm">
-                              ({dollarFormat(stats?.change_24)}%)
+                              ({dollarFormat(stats?.change_24 ?? 0)}%)
                             </span>
                           )}
                         </a>

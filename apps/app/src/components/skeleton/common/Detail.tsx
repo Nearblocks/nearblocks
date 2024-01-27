@@ -34,7 +34,7 @@ const Detail = forwardRef(
             </div>{' '}
           </div>
         )}
-        <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
+        <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
           {network === 'testnet' && (
             <div className="flex flex-wrap p-4 text-red-500">
               <div className="max-w-lg w-44 py-0.5">
