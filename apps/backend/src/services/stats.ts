@@ -9,7 +9,7 @@ import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import lcw from '#libs/lcw';
 import near from '#libs/near';
-import { circulatingSupply } from '#libs/supply.js';
+import { circulatingSupply } from '#libs/supply';
 
 const blockTime = async (timestamp: string) => {
   const start = Big(timestamp)
