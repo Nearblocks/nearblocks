@@ -152,7 +152,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'name',
       cell: (row: Token) => (
-        <span>
+        <>
           <div className="flex items-center">
             <TokenImage
               src={row?.icon}
@@ -165,16 +165,14 @@ export default function ({ network, currentPage, setPage, t }: Props) {
               className="hover:no-underline"
             >
               <a className=" text-green-500 hover:no-underline">
-                <span className="inline-block truncate max-w-[200px] mr-1">
-                  {row.name}
-                </span>
-                <span className="text-nearblue-700 inline-block truncate max-w-[80px]">
+                <span className="truncate max-w-[200px] mr-1">{row.name}</span>
+                <span className="text-nearblue-700 truncate max-w-[80px]">
                   {row.symbol}
                 </span>
               </a>
             </a>
           </div>
-        </span>
+        </>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm  w-80 text-nearblue-600 align-top',

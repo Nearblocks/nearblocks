@@ -297,7 +297,7 @@ export default function ({ network, id, token }: Props) {
               {tokenTicker} in circulation for a total supply of{' '}
               {tokens?.total_supply !== null &&
                 tokens?.total_supply !== undefined &&
-                `$${dollarNonCentFormat(tokens?.total_supply)}`}
+                `${dollarNonCentFormat(tokens?.total_supply)}`}
               {tokenTicker}. {tokenTicker}&apos;s supply is split between{' '}
               {localFormat(holders)} different wallet addresses.{' '}
               {largestHolder?.account && (
@@ -311,7 +311,7 @@ export default function ({ network, id, token }: Props) {
                     </a>
                   )}
                   , who currently holds{' '}
-                  {tokenAmount(largestHolder?.amount, tokens?.decimals, false)}{' '}
+                  {tokenAmount(largestHolder?.amount, tokens?.decimals, true)}{' '}
                   {tokenTicker} of all {tokenTicker}.
                 </span>
               )}

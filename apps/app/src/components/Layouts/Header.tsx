@@ -131,7 +131,23 @@ const languages = [
     locale: 'it',
   },
 ];
-
+const profile = [
+  {
+    id: 1,
+    title: 'My Profile',
+    link: '/user/overview',
+  },
+  {
+    id: 2,
+    title: 'Settings',
+    link: '/user/settings',
+  },
+  {
+    id: 3,
+    title: 'API Keys',
+    link: '/user/keys',
+  },
+];
 const Header = () => {
   const components = useBosComponents();
   const router = useRouter();
@@ -141,7 +157,7 @@ const Header = () => {
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const user = null;
   useEffect(() => {
     let delay = 5000;
     async function fetchStats() {
@@ -219,9 +235,12 @@ const Header = () => {
 
   const showSearch = router.pathname !== '/';
   const userLoading = false;
+  const onSignOut = () => {
+    router.push('/login');
+  };
 
   return (
-    <div className="bg-white soft-shadow z-20 relative">
+    <div className="bg-white soft-shadow z-[99] relative">
       {!status && (
         <div className="flex flex-wrap">
           <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue py-2 text-green text-sm ">
@@ -287,7 +306,7 @@ const Header = () => {
               <Menu />
             </button>
           </div>
-          <div className="flex flex-col flex-grow w-full md:!w-auto">
+          <div className="flex flex-col flex-grow w-full md:!w-auto mb-2 md:mb-0">
             {showSearch && (
               <div className="relative h-full w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 md:!pt-2 md:!pb-0 order-2 md:!order-1">
                 <div className="h-11">
@@ -314,7 +333,7 @@ const Header = () => {
                 open ? 'flex ' : 'hidden'
               }`}
             >
-              <ul className="w-full  md:flex justify-end text-gray-500 py-0 md:py-0 bg-red-900s">
+              <ul className="w-full  md:flex justify-end text-gray-500 py-0 md:py-0">
                 {menus.map((menu) => (
                   <li key={menu.id}>
                     {menu.submenu?.length ? (
@@ -322,7 +341,7 @@ const Header = () => {
                         <Collapse
                           trigger={({ show, onClick }) => (
                             <a
-                              className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4 hover:no-underline"
+                              className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4"
                               href="#"
                               onClick={onClick}
                             >
@@ -335,12 +354,12 @@ const Header = () => {
                             </a>
                           )}
                         >
-                          <ul className="border-l-2 border-green-500 md:hidden ml-4">
+                          <ul className="border-l-2 border-green-500 md:!hidden ml-4">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
                                 <ActiveLink href={submenu.link}>
                                   <a
-                                    className="block w-full hover:text-green-500 py-2 px-4 hover:no-underline"
+                                    className="block w-full hover:text-green-500 py-2 px-4"
                                     onClick={() => setOpen(false)}
                                   >
                                     {t(submenu.title)}
@@ -352,20 +371,20 @@ const Header = () => {
                         </Collapse>
                         <span className="group hidden md:flex h-full w-full relative">
                           <a
-                            className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4 hover:no-underline`}
+                            className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
                             href="#"
                           >
                             {t(menu.title)}
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </a>
-                          <ul className="bg-white soft-shadow hidden min-w-full absolute top-full rounded-b-lg border-t-2 border-green-500 group-hover:block py-2">
+                          <ul className="bg-white soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
                                 <ActiveLink
                                   href={submenu.link}
                                   activeClassName="text-green-500"
                                 >
-                                  <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4 hover:no-underline">
+                                  <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4">
                                     {t(submenu.title)}
                                   </a>
                                 </ActiveLink>
@@ -379,7 +398,7 @@ const Header = () => {
                         href={menu.link || ''}
                         activeClassName="text-green-500"
                       >
-                        <a className="flex items-center w-full h-full hover:text-green-500 py-2 px-4 hover:no-underline">
+                        <a className="flex items-center w-full h-full hover:text-green-500 py-2 px-4">
                           {t(menu.title)}
                         </a>
                       </ActiveLink>
@@ -391,7 +410,7 @@ const Header = () => {
                     <Collapse
                       trigger={({ show, onClick }) => (
                         <a
-                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4 hover:no-underline"
+                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4"
                           href="#"
                           onClick={onClick}
                         >
@@ -404,7 +423,7 @@ const Header = () => {
                         </a>
                       )}
                     >
-                      <ul className="border-l-2 border-green-500 md:hidden ml-4">
+                      <ul className="border-l-2 border-green-500 md:!hidden ml-4">
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <ActiveLink href="/" locale={language.locale}>
@@ -418,17 +437,17 @@ const Header = () => {
                     </Collapse>
                     <span className="group hidden md:flex h-full w-full relative">
                       <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4 hover:no-underline`}
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
                         href="#"
                       >
                         {t('header.menu.languages')}
                         <ArrowDown className="fill-current w-4 h-4 ml-2" />
                       </a>
-                      <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg border-t-2 border-green-500 group-hover:block py-2">
+                      <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <ActiveLink href="/" locale={language.locale}>
-                              <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4 hover:no-underline">
+                              <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4">
                                 {language.title}
                               </a>
                             </ActiveLink>
@@ -440,27 +459,108 @@ const Header = () => {
                 </li>
                 <li>
                   <>
-                    <span className="group hidden md:flex h-full w-full relative">
-                      <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:no-underline hover:text-green-500 py-2 px-4`}
-                        href="#"
-                      >
-                        <ActiveLink href="/login">
-                          <div className="flex items-center">
-                            {userLoading ? (
-                              <>
-                                <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                <Skeleton className="flex w-14 h-4" />
-                              </>
+                    <Collapse
+                      trigger={({ show, onClick }) => (
+                        <a
+                          className="flex md:!hidden items-center justify-between w-full hover:text-green-500 py-2 px-4"
+                          href="#"
+                          onClick={onClick}
+                        >
+                          <div className="w-full">
+                            {user ? (
+                              <div className="flex justify-between">
+                                <div className="flex items-center">{user}</div>
+                                <ArrowDown
+                                  className={`fill-current transition-transform w-5 h-5 ${
+                                    show && 'transform rotate-180'
+                                  }`}
+                                />
+                              </div>
                             ) : (
-                              <>
-                                <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                Sign In
-                              </>
+                              <ActiveLink href="/login">
+                                <div className="flex items-center">Sign In</div>
+                              </ActiveLink>
                             )}
                           </div>
-                        </ActiveLink>
+                        </a>
+                      )}
+                    >
+                      {user && (
+                        <ul className="border-l-2 border-green-500 md:hidden ml-2">
+                          {profile.map((menu) => (
+                            <li key={menu.id}>
+                              <ActiveLink href={menu.link}>
+                                <a className="block w-full hover:text-green-500 py-2 px-4">
+                                  {menu.title}
+                                </a>
+                              </ActiveLink>
+                            </li>
+                          ))}
+                          <li className="border-t my-3"></li>
+                          <li className="px-4 pb-1">
+                            <button
+                              onClick={onSignOut}
+                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 px-4"
+                            >
+                              Signout
+                            </button>
+                          </li>
+                        </ul>
+                      )}
+                    </Collapse>
+
+                    <span className="group hidden md:flex h-full w-full relative">
+                      <a
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
+                        href="#"
+                      >
+                        {user ? (
+                          <>
+                            <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
+                            {/* {user} username */}
+                            <ArrowDown className="fill-current w-4 h-4 ml-2" />
+                          </>
+                        ) : (
+                          <ActiveLink href="/login">
+                            <div className="flex items-center">
+                              {userLoading ? (
+                                <>
+                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
+                                  {/* <Loader wrapperClassName="flex w-14 h-4" /> */}
+                                </>
+                              ) : (
+                                <>
+                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
+                                  Sign In
+                                </>
+                              )}
+                            </div>
+                          </ActiveLink>
+                        )}
                       </a>
+
+                      {user && (
+                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
+                          {profile.map((menu) => (
+                            <li key={menu.id}>
+                              <ActiveLink href={menu.link}>
+                                <a className="block w-full hover:hover:text-green-500  py-2 px-4">
+                                  {menu.title}
+                                </a>
+                              </ActiveLink>
+                            </li>
+                          ))}
+                          <li className="border-t my-3"></li>
+                          <li className="px-4 pb-1">
+                            <button
+                              onClick={onSignOut}
+                              className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4"
+                            >
+                              Signout
+                            </button>
+                          </li>
+                        </ul>
+                      )}
                     </span>
                   </>
                 </li>
@@ -507,7 +607,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href="https://nearblocks.io"
+                            href="https://beta.nearblocks.io"
                           >
                             Mainnet
                           </a>
@@ -515,7 +615,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href="https://testnet.nearblocks.io/"
+                            href="https://beta-testnet.nearblocks.io/"
                           >
                             Testnet
                           </a>
@@ -537,7 +637,7 @@ const Header = () => {
                           />
                         </div>
                       </a>
-                      <ul className="bg-white soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg border-t-2 border-green-500 group-hover:block py-2">
+                      <ul className="bg-white soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
                         <li>
                           <a
                             className={`block w-full hover:text-green-500 hover:no-underline py-2 px-4 text-gray-500 ${

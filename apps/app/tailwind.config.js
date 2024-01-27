@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       darkMode: 'class',
       fontFamily: {
-        sans: "'Roboto'",
+        sans: "'Roboto Flex', sans-serif",
       },
       fontSize: {
         tiny: '.65625rem',

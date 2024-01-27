@@ -175,26 +175,22 @@ export default function ({ network, id, t }: Props) {
       key: 'event_kind',
       cell: (row: TransactionInfo) => (
         <>
-          {row.token_old_owner_account_id ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                    <span className="block truncate">{row.event_kind}</span>
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="center"
-                  side="bottom"
-                >
-                  {row.event_kind}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          ) : (
-            'system'
-          )}
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                  <span className="block truncate">{row.event_kind}</span>
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="bottom"
+              >
+                {row.event_kind}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -298,7 +294,7 @@ export default function ({ network, id, t }: Props) {
       header: <span>Quantity</span>,
       key: 'amount',
       cell: (row: TransactionInfo) => (
-        <>{tokenAmount(Number(row.amount), row.ft?.decimals, true)}</>
+        <>{tokenAmount(row.amount, row.ft?.decimals, true)}</>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:

@@ -31,7 +31,6 @@ const NFToken = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
-  console.log(height);
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
@@ -42,7 +41,8 @@ const NFToken = () => {
           id: id,
           network: networkId,
         }}
-      />
+      />{' '}
+      <div className="py-8"></div>
     </div>
   );
 };

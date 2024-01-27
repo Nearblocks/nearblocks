@@ -41,6 +41,7 @@ const Token = () => {
         src={components?.ftOverview}
         props={{ id: id, t: t, network: networkId }}
       />
+      <div className="py-8"></div>
     </div>
   );
 };

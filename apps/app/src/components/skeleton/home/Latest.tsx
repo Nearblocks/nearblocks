@@ -25,7 +25,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                         <Skeleton className="h-4" />
                       </div>
                     </div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-nearblue-600-400 text-xs">
                       <div className="h-3 w-24">
                         <Skeleton className="h-3" />
                       </div>
@@ -36,7 +36,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                   <div className="h-5 w-36">
                     <Skeleton className="h-4" />
                   </div>
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-nearblue-600-400 text-sm">
                     <div className="h-5 w-14">
                       <Skeleton className="h-4" />
                     </div>
@@ -51,7 +51,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
             ))}
           </div>
         </div>
-        <div className="border-t px-2 py-3 text-gray-700">
+        <div className="border-t px-2 py-3 text-nearblue-600-700">
           <Skeleton className="h-10" />
         </div>
       </div>

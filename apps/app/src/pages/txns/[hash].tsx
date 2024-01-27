@@ -35,15 +35,17 @@ const Txn = () => {
     setHeight({});
   };
   return (
-    <div style={height} className="relative container mx-auto">
-      <VmComponent
-        src={components?.transactionsHash}
-        props={{ hash: hash, network: networkId, t: t }}
-        skeleton={<Detail txns={true} ref={heightRef} network={networkId} />}
-        onChangeHeight={onChangeHeight}
-      />
+    <>
+      <div style={height} className="relative container mx-auto">
+        <VmComponent
+          src={components?.transactionsHash}
+          props={{ hash: hash, network: networkId, t: t }}
+          skeleton={<Detail txns={true} ref={heightRef} network={networkId} />}
+          onChangeHeight={onChangeHeight}
+        />
+      </div>
       <div className="py-8"></div>
-    </div>
+    </>
   );
 };
 

@@ -81,7 +81,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="h-full relative w-full">
               <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
-                <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
+                <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                   {t('home:latestBlocks')}
                 </h2>
 
@@ -96,7 +96,7 @@ const HomePage = () => {
             </div>
             <div className="h-full relative w-full">
               <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
-                <h2 className="border-b p-3 text-gray-500 text-sm font-semibold">
+                <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                   {t('home:latestTxns')}
                 </h2>
                 <div style={latestHeight}>

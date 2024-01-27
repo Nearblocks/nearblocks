@@ -44,25 +44,26 @@ export function gasPrice(yacto: number) {
   return `${localFormat(near)} Ⓝ / Tgas`;
 }
 
-export function tokenAmount(amount: number, decimal: number, format: boolean) {
+export function tokenAmount(amount: string, decimal: string, format: boolean) {
   if (amount === undefined || amount === null) return 'N/A';
-
   const near = Big(amount).div(Big(10).pow(decimal));
-
-  return format ? near.toFixed(8) : near.toFixed(decimal);
+  const formattedValue = format
+    ? near.toFixed(8).replace(/\.?0+$/, '')
+    : near.toFixed(decimal).replace(/\.?0+$/, '');
+  return formattedValue;
 }
 
 export function tokenPercentage(
   supply: number,
-  amount: number,
-  decimal: number,
+  amount: string,
+  decimal: string,
 ) {
   const nearAmount = Big(amount).div(Big(10).pow(decimal));
   const nearSupply = Big(supply);
 
   return nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
 }
-export function price(amount: number, decimal: number, price: number) {
+export function price(amount: string, decimal: string, price: number) {
   const nearAmount = Big(amount).div(Big(10).pow(decimal));
   return dollarFormat(nearAmount.mul(Big(price || 0)).toString());
 }
