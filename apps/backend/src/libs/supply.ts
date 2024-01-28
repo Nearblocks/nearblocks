@@ -65,7 +65,7 @@ export const circulatingSupply = async (block: Block) => {
   const lockupAccounts = await getLockupAccounts(block.block_height);
 
   for (const account of lockupAccounts) {
-    await retry(async () => {
+    await retry(async ({ attempt }) => {
       try {
         await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
         const lockupState = await viewLockupState(account, options, blockRef);
@@ -81,6 +81,8 @@ export const circulatingSupply = async (block: Block) => {
           return;
         }
 
+        if (attempt >= 3) return;
+
         throw error;
       }
     });
@@ -88,7 +90,7 @@ export const circulatingSupply = async (block: Block) => {
 
   const foundationLockedTokens = await Promise.all(
     foundationAccounts.map(async (account) => {
-      return await retry(async () => {
+      return await retry(async ({ attempt }) => {
         try {
           const resp = await viewAccountBalance(account, options, blockRef);
 
@@ -100,6 +102,8 @@ export const circulatingSupply = async (block: Block) => {
           ) {
             return Big(0);
           }
+
+          if (attempt >= 3) return Big(0);
 
           throw error;
         }
