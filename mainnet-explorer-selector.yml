@@ -1,7 +1,7 @@
 #name: explorer-selector
 services:
   mainnet:
-    image: ${REGISTRY:-explorer-selector}:${COMMIT_SHA:-lastest}
+    image: ${REGISTRY:-explorer-selector}:${COMMIT_SHA:-latest}
     build:
       context: .
       dockerfile: ./apps/explorer-selector/Dockerfile
