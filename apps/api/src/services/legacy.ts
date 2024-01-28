@@ -11,9 +11,7 @@ const supply = catchAsync(async (_req: Request, res: Response) => {
       SELECT
         *
       FROM
-        daily_stats
-      ORDER BY
-        date DESC
+        stats
       LIMIT
         1
     `,
@@ -21,7 +19,7 @@ const supply = catchAsync(async (_req: Request, res: Response) => {
 
   return res.status(200).json({
     circulating_supply_in_yoctonear: rows?.[0]?.circulating_supply,
-    timestamp: msToNsTime(dayjs.utc(rows?.[0]?.date).valueOf()),
+    timestamp: msToNsTime(dayjs.utc().startOf('day').valueOf()),
   });
 });
 
@@ -31,9 +29,7 @@ const supplyInNear = catchAsync(async (_req: Request, res: Response) => {
       SELECT
         *
       FROM
-        daily_stats
-      ORDER BY
-        date DESC
+        stats
       LIMIT
         1
     `,
