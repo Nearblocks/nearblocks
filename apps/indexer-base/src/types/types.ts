@@ -15,8 +15,8 @@ export interface Config {
   insertLimit: number;
   network: Network;
   preloadSize: number;
+  redisPassword: string;
   redisSentinelName: string;
-  redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
   s3BucketName: string;

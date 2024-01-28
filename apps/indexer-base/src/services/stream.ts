@@ -47,6 +47,8 @@ export const onMessage = async (message: types.StreamerMessage) => {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
 
+    const start = performance.now();
+
     await prepareCache(message);
     await storeBlock(knex, message.block);
     await storeChunks(knex, message);
@@ -57,6 +59,11 @@ export const onMessage = async (message: types.StreamerMessage) => {
       storeAccounts(knex, message),
       storeAccessKeys(knex, message),
     ]);
+
+    logger.info({
+      block: message.block.header.height,
+      time: `${performance.now() - start} ms`,
+    });
   } catch (error) {
     logger.error(
       `aborting... block ${message.block.header.height} ${message.block.header.hash}`,

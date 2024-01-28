@@ -12,13 +12,32 @@ interface Props {
   className?: string;
   appUrl?: string;
   onLoad?: () => void;
+  onSetSrc?: (src: string) => void;
 }
 
-const TokenImage = ({ appUrl, src, alt, className, onLoad }: Props) => {
+const TokenImage = ({
+  appUrl,
+  src,
+  alt,
+  className,
+  onLoad,
+  onSetSrc,
+}: Props) => {
   const placeholder = `${appUrl}images/tokenplaceholder.svg`;
-  const onError = (e: any) => {
-    e.target.onError = null;
-    e.target.src = placeholder;
+
+  const handleLoad = () => {
+    if (onLoad) {
+      onLoad();
+    }
+  };
+
+  const handleError = () => {
+    if (onSetSrc) {
+      onSetSrc(placeholder);
+    }
+    if (onLoad) {
+      onLoad();
+    }
   };
 
   return (
@@ -26,10 +45,9 @@ const TokenImage = ({ appUrl, src, alt, className, onLoad }: Props) => {
       src={src || placeholder}
       alt={alt}
       className={className}
-      onLoad={onLoad}
-      onError={onError}
+      onLoad={handleLoad}
+      onError={handleError}
     />
   );
 };
-
 export default TokenImage;

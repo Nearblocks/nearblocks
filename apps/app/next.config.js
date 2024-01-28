@@ -15,6 +15,20 @@ const nextConfig = nextTranslate({
 
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/transactions',
+        destination: '/txns',
+        permanent: true,
+      },
+      {
+        source: '/transactions/:slug',
+        destination: '/txns/:slug',
+        permanent: true,
+      },
+    ];
+  },
 });
 
 module.exports = nextConfig;

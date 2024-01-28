@@ -4,28 +4,28 @@
  * License: Business Source License 1.1
  * Description: Table of Transactions on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
- *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [handleFilter] - Function to handle filter changes. (Optional)
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
- * @param {function} onFilterClear - Function to clear a specific or all filters. (Optional)
+ * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
   network: string;
+  t: (key: string, options?: { count?: string }) => string;
   currentPage: number;
-  filters: { [key: string]: string };
   setPage: (page: number) => void;
+  filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
-  t: (key: string, options?: { count?: string }) => string;
 }
 
 import {
@@ -48,6 +48,7 @@ import { TransactionInfo } from '@/includes/types';
 import SortIcon from '@/includes/icons/SortIcon';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Skeleton from '@/includes/Common/Skeleton';
+import Clock from '@/includes/icons/Clock';
 
 export default function (props: Props) {
   const {
@@ -60,8 +61,8 @@ export default function (props: Props) {
     t,
   } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(1);
-  const [txns, setTxns] = useState<TransactionInfo[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
@@ -84,21 +85,23 @@ export default function (props: Props) {
             body: {
               txns: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.txns?.[0];
-            setTotalCount(0);
-            setTotalCount(resp?.count);
+            if (data.status === 200) {
+              setTotalCount(resp?.count);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchTxnsData(qs?: string, sqs?: string) {
+    function fetchTxnsData(qs: string, sqs: string, page: number) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -106,10 +109,12 @@ export default function (props: Props) {
           },
         },
       )
-        .then((data: { body: { txns: TransactionInfo[] } }) => {
+        .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
           const resp = data?.body?.txns;
-          if (Array.isArray(resp) && resp.length > 0) {
-            setTxns(resp);
+          if (data.status === 200) {
+            if (Array.isArray(resp) && resp.length > 0) {
+              setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           }
         })
         .catch(() => {})
@@ -129,13 +134,10 @@ export default function (props: Props) {
 
     if (urlString && sorting) {
       fetchTotalTxns(urlString);
-      fetchTxnsData(urlString, sorting);
-    } else if (urlString) {
-      fetchTotalTxns(urlString);
-      fetchTxnsData(urlString);
+      fetchTxnsData(urlString, sorting, currentPage);
     } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
       fetchTotalTxns();
-      fetchTxnsData('', sorting);
+      fetchTxnsData('', sorting, currentPage);
     }
   }, [config?.backendUrl, currentPage, filters, sorting]);
 
@@ -174,7 +176,7 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-500  flex justify-end ',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end ',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -206,9 +208,9 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -232,7 +234,7 @@ export default function (props: Props) {
                 value={filters ? filters?.method : ''}
                 onChange={onInputChange}
                 placeholder="Search by method"
-                className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+                className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
               />
               <div className="flex">
                 <button
@@ -262,7 +264,7 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-gray-500 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">
                     {txnMethod(row.actions, t)}
                   </span>
@@ -279,7 +281,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
@@ -287,7 +289,7 @@ export default function (props: Props) {
       cell: (row: TransactionInfo) => (
         <span>{yoctoToNear(row.actions_agg?.deposit || 0, true)} Ⓝ</span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -300,9 +302,9 @@ export default function (props: Props) {
           {yoctoToNear(row.outcomes_agg?.transaction_fee || 0, true)} Ⓝ
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -327,7 +329,7 @@ export default function (props: Props) {
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
-              className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+              className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
             />
             <div className="flex">
               <button
@@ -379,7 +381,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span></span>,
@@ -413,7 +415,7 @@ export default function (props: Props) {
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
-              className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+              className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
             />
             <div className="flex">
               <button
@@ -465,7 +467,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
@@ -483,34 +485,48 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
-        <span>
-          <div className="w-full inline-flex px-5 py-4">
-            <button
-              type="button"
-              onClick={toggleShowAge}
-              className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 focus:outline-none whitespace-nowrap"
-            >
-              {showAge
-                ? t
-                  ? t('txns:age')
-                  : 'AGE'
-                : t
-                ? t('txns:ageDT')
-                : 'DATE TIME (UTC)'}
-            </button>
-            <button type="button" onClick={onOrder} className="px-2">
-              <div className="text-gray-500 font-semibold">
-                <SortIcon order={sorting} />
-              </div>
-            </button>
-          </div>
-        </span>
+        <div className="w-full inline-flex px-5 py-4">
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleShowAge}
+                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 focus:outline-none whitespace-nowrap"
+                >
+                  {showAge
+                    ? t
+                      ? t('txns:age')
+                      : 'AGE'
+                    : t
+                    ? t('txns:ageDT')
+                    : 'DATE TIME (UTC)'}
+                  {showAge && <Clock className="text-green-500 ml-2" />}
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="top"
+              >
+                {showAge
+                  ? 'Click to show Datetime Format'
+                  : 'Click to show Age Format'}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+          <button type="button" onClick={onOrder} className="px-2">
+            <div className="text-nearblue-600 font-semibold">
+              <SortIcon order={sorting} />
+            </div>
+          </button>
+        </div>
       ),
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
@@ -520,12 +536,8 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )
-                    : getTimeAgoString(
-                        nanoToMilli(Number(row.block_timestamp || 0)),
-                      )}
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -534,24 +546,20 @@ export default function (props: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )
-                  : getTimeAgoString(
-                      nanoToMilli(Number(row.block_timestamp || 0)),
-                    )}
+                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-gray-500',
-      thClassName: 'inline-flex',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      thClassName: 'inline-flex whitespace-nowrap',
     },
   ];
 
   return (
-    <div className=" bg-white border soft-shadow rounded-lg overflow-hidden">
+    <div className=" bg-white border soft-shadow rounded-xl overflow-hidden">
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
@@ -559,7 +567,7 @@ export default function (props: Props) {
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-gray-500">
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               {t
                 ? t('txns:listing', {
                     count: localFormat(totalCount),
@@ -568,7 +576,7 @@ export default function (props: Props) {
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
-            <div className="flex items-center px-2 text-sm mb-4 text-gray-500 lg:ml-auto">
+            <div className="flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
               Filtered By:
               <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
                 {filters &&
@@ -594,7 +602,7 @@ export default function (props: Props) {
           src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: txns,
+            data: txns[currentPage],
             isLoading: isLoading,
             isPagination: true,
             count: totalCount,

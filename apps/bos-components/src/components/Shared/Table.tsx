@@ -42,30 +42,41 @@ interface Props {
 export default function (props: Props) {
   if (props.isLoading) {
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y border-t">
-          <thead className="bg-gray-100 h-[51px]">
-            <tr>
-              {props.columns.map((column, index) => (
-                <th key={index} scope="col" className={column.thClassName}>
-                  {column.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {[...Array(50)].map((_, index) => (
-              <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
-                {props.columns.map((column, colIndex) => (
-                  <td key={colIndex} className={column.tdClassName}>
-                    <Skeleton className="h-4" />
-                  </td>
+      <>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y border-t">
+            <thead className="bg-gray-100 h-[51px]">
+              <tr>
+                {props.columns.map((column, index) => (
+                  <th key={index} scope="col" className={column.thClassName}>
+                    {column.header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {[...Array(props.limit)].map((_, index) => (
+                <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
+                  {props.columns.map((column, colIndex) => (
+                    <td key={colIndex} className={column.tdClassName}>
+                      <Skeleton className="h-4" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {props.isPagination ? (
+          <Paginator
+            count={props.count}
+            page={props.page}
+            limit={props.limit}
+            pageLimit={props.pageLimit}
+            setPage={props.setPage}
+          />
+        ) : null}
+      </>
     );
   }
   return (
@@ -83,19 +94,25 @@ export default function (props: Props) {
               </tr>
             </thead>
             <tbody>
-              {!props.isLoading && props.data.length === 0 && (
+              {!props.isLoading && props.data === undefined && (
                 <tr className="h-[53px]">
-                  <td className="px-6 py-4 text-gray-400 text-xs">
+                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
                 </tr>
               )}
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
-                  <>
-                    <tr key={rowIndex} className=" hover:bg-blue-900/5">
+                  <Fragment key={rowIndex}>
+                    <tr
+                      key={`expandRow-${rowIndex}`}
+                      className=" hover:bg-blue-900/5"
+                    >
                       {props.columns.map((column: column, colIndex: number) => (
-                        <td key={colIndex} className={column.tdClassName}>
+                        <td
+                          key={`expandCol-${colIndex}`}
+                          className={column.tdClassName}
+                        >
                           {column.cell
                             ? column.cell(row, rowIndex)
                             : row[column.key]}
@@ -105,6 +122,7 @@ export default function (props: Props) {
                     {row?.showWarning && (
                       <tr className="h-[25px] hover:bg-blue-900/5">
                         <td
+                          key={`expandWarning-${rowIndex}`}
                           colSpan={props.columns.length}
                           className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
                         >
@@ -112,7 +130,7 @@ export default function (props: Props) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
             </tbody>
           </table>
@@ -130,22 +148,25 @@ export default function (props: Props) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {!props.isLoading && props.data.length === 0 && (
+              {!props.isLoading && props.data === undefined && (
                 <tr className="h-[53px]">
-                  <td className="px-6 py-4 text-gray-400 text-xs">
+                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
                 </tr>
               )}
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
-                  <>
+                  <Fragment key={rowIndex}>
                     <tr
-                      key={rowIndex}
+                      key={`row-${rowIndex}`}
                       className=" hover:bg-blue-900/5 h-[53px]"
                     >
                       {props.columns.map((column: column, colIndex: number) => (
-                        <td key={colIndex} className={column.tdClassName}>
+                        <td
+                          key={`col-${colIndex}`}
+                          className={column.tdClassName}
+                        >
                           {column.cell
                             ? column.cell(row, rowIndex)
                             : row[column.key]}
@@ -153,7 +174,10 @@ export default function (props: Props) {
                       ))}
                     </tr>
                     {row?.showWarning && (
-                      <tr className="h-[57px] hover:bg-blue-900/5">
+                      <tr
+                        key={`warning-${rowIndex}`}
+                        className="h-[57px] hover:bg-blue-900/5"
+                      >
                         <td
                           colSpan={props.columns.length}
                           className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
@@ -162,13 +186,12 @@ export default function (props: Props) {
                         </td>
                       </tr>
                     )}
-
                     {row.isExpanded ||
                     (props.expanded.length > 0 &&
-                      props.expanded.includes(rowIndex))
+                      props.expanded.includes(row.index))
                       ? props.renderRowSubComponent(row)
                       : null}
-                  </>
+                  </Fragment>
                 ))}
             </tbody>
           </table>
@@ -176,7 +199,6 @@ export default function (props: Props) {
       )}
       {props.isPagination ? (
         <Paginator
-          loading={props?.isLoading}
           count={props.count}
           page={props.page}
           limit={props.limit}

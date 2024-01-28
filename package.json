@@ -12,8 +12,8 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:check": "turbo run lint:check",
-    "format": "prettier --config .prettierrc --write --cache .",
-    "format:check": "prettier --config .prettierrc --check --cache .",
+    "format": "prettier --config .prettierrc --write --ignore-unknown './**/*'",
+    "format:check": "prettier --config .prettierrc --check --ignore-unknown './**/*'",
     "prepare": "husky install"
   },
   "dependencies": {},

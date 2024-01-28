@@ -4,8 +4,8 @@
  * License: Business Source License 1.1
  * Description: Transactions Overview.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
@@ -30,7 +30,7 @@ import {
 } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [charts, setCharts] = useState<ChartInfo[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(
@@ -41,39 +41,36 @@ export default function ({ network, t }: Props) {
 
   useEffect(() => {
     let delay = 15000;
-    let retries = 0;
 
     function fetchStats() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}stats`)
-        .then((data: { body: { stats: StatusInfo[] } }) => {
+        .then((data: { body: { stats: StatusInfo[] }; status: number }) => {
           const resp = data?.body?.stats?.[0];
-          setStats({
-            avg_block_time: resp.avg_block_time,
-            block: resp.block,
-            change_24: resp.change_24,
-            gas_price: resp.gas_price,
-            high_24h: resp.high_24h,
-            high_all: resp.high_all,
-            low_24h: resp.low_24h,
-            low_all: resp.low_all,
-            market_cap: resp.market_cap,
-            near_btc_price: resp.near_btc_price,
-            near_price: resp.near_price,
-            nodes: resp.nodes,
-            nodes_online: resp.nodes_online,
-            total_supply: resp.total_supply,
-            total_txns: resp.total_txns,
-            volume: resp.volume,
-          });
-        })
-        .catch((error: any) => {
-          if (error.response && error.response.status === 429) {
-            delay = Math.min(2 ** retries * 15000, 60000);
-            retries++;
+          if (data.status === 200) {
+            setStats({
+              avg_block_time: resp.avg_block_time,
+              block: resp.block,
+              change_24: resp.change_24,
+              gas_price: resp.gas_price,
+              high_24h: resp.high_24h,
+              high_all: resp.high_all,
+              low_24h: resp.low_24h,
+              low_all: resp.low_all,
+              market_cap: resp.market_cap,
+              near_btc_price: resp.near_btc_price,
+              near_price: resp.near_price,
+              nodes: resp.nodes,
+              nodes_online: resp.nodes_online,
+              total_supply: resp.total_supply,
+              total_txns: resp.total_txns,
+              volume: resp.volume,
+            });
           }
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (isLoading) setIsLoading(false);
         });
-      setIsLoading(false);
     }
 
     fetchStats();
@@ -81,7 +78,7 @@ export default function ({ network, t }: Props) {
     const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
-  }, [config?.backendUrl]);
+  }, [config?.backendUrl, isLoading]);
 
   useEffect(() => {
     function fetchChartData() {
@@ -224,7 +221,7 @@ export default function ({ network, t }: Props) {
 
   return (
     <div className="container mx-auto px-3">
-      <div className="bg-white soft-shadow rounded-lg overflow-hidden px-5 md:py lg:px-0">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             network === 'mainnet'
@@ -240,31 +237,33 @@ export default function ({ network, t }: Props) {
                     <img
                       src={`${config.appUrl}images/near price.svg`}
                       alt={t ? t('home:nearPrice') : 'nearPrice'}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-gray-600 text-sm ">
+                    <p className="uppercase font-semibold text-nearblue-600 text-sm ">
                       {t ? t('home:nearPrice') : 'NEAR PRICE'}
                     </p>
                     {isLoading ? (
-                      <Skeleton className="h-4" />
+                      <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a href="/charts/near-price">
-                        <a className="leading-6 text-gray-500">
+                      <a
+                        href="/charts/near-price"
+                        className="hover:no-underline"
+                      >
+                        <a className="leading-6 text-nearblue-600 hover:no-underline">
                           ${dollarFormat(stats?.near_price ?? 0)}{' '}
-                          <span className="text-gray-400">
+                          <span className="text-nearblue-700">
                             @{localFormat(stats?.near_btc_price ?? 0)} BTC
                           </span>{' '}
                           {stats?.change_24 > 0 ? (
                             <span className="text-neargreen text-sm">
-                              ({dollarFormat(stats?.change_24)}%)
+                              ({dollarFormat(stats?.change_24 ?? 0)}%)
                             </span>
                           ) : (
                             <span className="text-red-500 text-sm">
-                              ({dollarFormat(stats?.change_24)}%)
+                              ({dollarFormat(stats?.change_24 ?? 0)}%)
                             </span>
                           )}
                         </a>
@@ -277,20 +276,22 @@ export default function ({ network, t }: Props) {
                     <img
                       src={`${config.appUrl}images/market.svg`}
                       alt={t ? t('home:marketCap') : 'marketCap'}
-                      className="h-9 w-9"
                       width="24"
                       height="24"
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-gray-500 text-sm">
+                    <p className="uppercase font-semibold text-nearblue-600 text-sm">
                       {t ? t('home:marketCap') : ' MARKET CAP'}
                     </p>
                     {isLoading ? (
-                      <Skeleton className="h-4" />
+                      <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a href="/charts/market-cap">
-                        <a className="leading-6 text-gray-400">
+                      <a
+                        href="/charts/market-cap"
+                        className="hover:no-underline"
+                      >
+                        <a className="leading-6 text-nearblue-700 hover:no-underline">
                           ${dollarFormat(stats?.market_cap ?? 0)}
                         </a>
                       </a>
@@ -307,33 +308,32 @@ export default function ({ network, t }: Props) {
                   <img
                     src={`${config.appUrl}images/transactions.svg`}
                     alt={t ? t('home:transactions') : 'transactions'}
-                    className="h-9 w-9"
                     width="24"
                     height="24"
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-gray-500 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
                     {t ? t('home:transactions') : 'TRANSACTIONS'}
                   </p>
                   {isLoading ? (
-                    <Skeleton className="h-4" />
+                    <Skeleton className="my-1 h-4" />
                   ) : (
-                    <p className="leading-6 text-gray-400">
+                    <p className="leading-6 text-nearblue-700">
                       {currency(Number(stats?.total_txns ?? 0))}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-gray-500 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 text-sm">
                   {' '}
                   {t ? t('home:gasPrice') : 'GAS PRICE'}
                 </p>
                 {isLoading ? (
-                  <Skeleton className="h-4" />
+                  <Skeleton className="my-1 h-4" />
                 ) : (
-                  <p className="leading-6 text-gray-400">
+                  <p className="leading-6 text-nearblue-700">
                     {gasPrice(Number(stats?.gas_price ?? 0))}
                   </p>
                 )}
@@ -345,20 +345,19 @@ export default function ({ network, t }: Props) {
                   <img
                     src={`${config.appUrl}images/pickaxe.svg`}
                     alt={t ? t('home:activeValidator') : 'activeValidator'}
-                    className="h-9 w-9"
                     width="24"
                     height="24"
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-gray-500 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
                     {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}
                   </p>
                   {isLoading ? (
-                    <Skeleton className="h-4" />
+                    <Skeleton className="my-1 h-4" />
                   ) : (
-                    <a href="/node-explorer">
-                      <a className="leading-6 text-gray-400">
+                    <a href="/node-explorer" className="hover:no-underline">
+                      <a className="leading-6 text-nearblue-700 hover:no-underline">
                         {localFormat(stats?.nodes_online ?? 0)}
                       </a>
                     </a>
@@ -366,14 +365,14 @@ export default function ({ network, t }: Props) {
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-gray-500 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 text-sm">
                   {t ? t('home:avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
                 {isLoading ? (
-                  <Skeleton className="h-4" />
+                  <Skeleton className="my-1 h-4" />
                 ) : (
-                  <a href="/charts/blocks">
-                    <a className="leading-6 text-gray-400">
+                  <a href="/charts/blocks" className="hover:no-underline">
+                    <a className="leading-6 text-nearblue-700 hover:no-underline">
                       {stats?.avg_block_time ?? 0} s
                     </a>
                   </a>
@@ -382,25 +381,24 @@ export default function ({ network, t }: Props) {
             </div>
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:px-5">
-            <div className="flex-1 lg:px-0">
-              <p className="uppercase font-semibold text-gray-500 text-sm">
+            <div className="flex-1 py-5 lg:px-0">
+              <p className="uppercase font-semibold text-nearblue-600 text-sm">
                 {' '}
                 {t
                   ? t('home:transactionHistory', { days: 14 })
                   : 'NEAR TRANSACTION HISTORY IN 14 DAYS'}
               </p>
-              <div className="pl-2 pr-4 h-full">
+              <div className="mt-1 h-28">
                 {chartData ? (
                   <iframe
                     srcDoc={iframeSrc}
                     style={{
                       width: '100%',
-                      height: '100%',
                       border: 'none',
                     }}
                   />
                 ) : (
-                  <Skeleton className="h-36" />
+                  <Skeleton className="h-28" />
                 )}
               </div>
             </div>

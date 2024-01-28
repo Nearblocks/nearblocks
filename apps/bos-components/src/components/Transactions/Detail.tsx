@@ -4,19 +4,19 @@
  * License: Business Source License 1.1
  * Description: Details of specific Transaction on Near Protocol.
  * @interface Props
- * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
+  network: string;
+  t: (key: string) => string | undefined;
   loading: boolean;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
-  network: string;
-  t: (key: string) => string | undefined;
 }
 
 import EventLogs from '@/includes/Common/Action/index';
@@ -36,7 +36,6 @@ import {
 import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import FaCaretRight from '@/includes/icons/FaCaretRight';
-import { NFTImage } from '@/includes/icons/NFTImage';
 import TokenImage from '@/includes/icons/TokenImage';
 import {
   fiatValue,
@@ -83,7 +82,7 @@ export default function (props: Props) {
       receipts.forEach(
         (receipt) =>
           receipt?.fts?.forEach((ft) => {
-            if (ft.ft_meta) fts.push(ft);
+            if (ft.ft_metas) fts.push(ft);
           }),
       );
       receipts.forEach(
@@ -124,9 +123,12 @@ export default function (props: Props) {
               body: {
                 stats: StatusInfo;
               };
+              status: number;
             }) => {
               const resp = res?.body?.stats;
-              setStatsData(resp);
+              if (res.status === 200) {
+                setStatsData(resp);
+              }
             },
           )
           .catch(() => {});
@@ -142,34 +144,36 @@ export default function (props: Props) {
   const currentPrice = statsData?.near_price || 0;
 
   const date = useMemo(() => {
-    const timestamp = new Date(nanoToMilli(Number(txn?.block_timestamp || 0)));
-    function fetchPriceAtDate(date: string) {
-      asyncFetch(
-        `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
-      ).then(
-        (data: {
-          body: {
-            market_data: { current_price: { usd: number } };
-          };
-        }) => {
-          const resp = data?.body?.market_data?.current_price?.usd;
-          setPrice(resp);
-        },
-      );
-    }
-
-    let dt;
-    const currentDate = new Date();
-    if (currentDate > timestamp) {
-      const day = timestamp.getUTCDate();
-      const month = timestamp.getUTCMonth() + 1;
-      const year = timestamp.getUTCFullYear();
-
-      dt = `${day < 10 ? '0' : ''}${day}-${
-        month < 10 ? '0' : ''
-      }${month}-${year}`;
-
-      fetchPriceAtDate(dt);
+    if (txn?.block_timestamp) {
+      const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
+      function fetchPriceAtDate(date: string) {
+        asyncFetch(
+          `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
+        ).then(
+          (data: {
+            body: {
+              market_data: { current_price: { usd: number } };
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.market_data?.current_price?.usd;
+            if (data.status === 200) {
+              setPrice(resp);
+            }
+          },
+        );
+      }
+      let dt;
+      const currentDate = new Date();
+      if (currentDate > timestamp) {
+        const day = timestamp.getUTCDate();
+        const month = timestamp.getUTCMonth() + 1;
+        const year = timestamp.getUTCFullYear();
+        dt = `${day < 10 ? '0' : ''}${day}-${
+          month < 10 ? '0' : ''
+        }${month}-${year}`;
+        fetchPriceAtDate(dt);
+      }
     }
   }, [txn?.block_timestamp]);
 
@@ -216,8 +220,8 @@ export default function (props: Props) {
   }, [logs]);
 
   return (
-    <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y">
-      <div className="bg-white text-sm text-gray-500">
+    <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+      <div className="text-sm text-nearblue-600">
         {context.networkId === 'testnet' && (
           <div className="flex flex-wrap p-4 text-red-500">
             {t
@@ -236,8 +240,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.hash.tooltip')
@@ -253,7 +257,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold break-words">
-              {txn.transaction_hash}
+              {txn.transaction_hash ? txn.transaction_hash : ''}
             </div>
           )}
         </div>
@@ -268,8 +272,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.status.tooltip')
@@ -285,7 +289,11 @@ export default function (props: Props) {
             </div>
           ) : (
             <div>
-              <TxnStatus showLabel status={txn.outcomes?.status} />
+              {txn.outcomes?.status ? (
+                <TxnStatus showLabel status={txn.outcomes?.status} />
+              ) : (
+                ''
+              )}
               {errorMessage && (
                 <div className="text-xs bg-orange-50 my-2 rounded-md text-center px-2 py-1">
                   {errorMessage}
@@ -305,8 +313,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.block.tooltip')
@@ -320,7 +328,7 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-14" />
             </div>
-          ) : (
+          ) : txn.block?.block_height ? (
             <div className="w-full md:w-3/4 font-semibold break-words">
               <a
                 href={`/blocks/${txn.included_in_block_hash}`}
@@ -331,6 +339,8 @@ export default function (props: Props) {
                 </a>
               </a>
             </div>
+          ) : (
+            ''
           )}
         </div>
         <div className="flex flex-wrap p-4">
@@ -344,8 +354,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.timestamp.tooltip')
@@ -359,21 +369,19 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
-          ) : (
+          ) : txn?.block_timestamp ? (
             <div className="w-full md:w-3/4 break-words">
-              {getTimeAgoString(nanoToMilli(Number(txn?.block_timestamp || 0)))}{' '}
-              (
-              {convertToUTC(
-                nanoToMilli(Number(txn?.block_timestamp || 0)),
-                true,
-              )}{' '}
-              +UTC)
+              {getTimeAgoString(nanoToMilli(txn?.block_timestamp))} (
+              {convertToUTC(nanoToMilli(txn?.block_timestamp), true)} +UTC)
             </div>
+          ) : (
+            ''
           )}
         </div>
       </div>
-      {(actions.length > 0 || logs.length > 0) && (
-        <div id="action-row" className="bg-white text-sm text-gray-500">
+      {((actions.length > 0 && actions[0]?.action_kind) ||
+        (logs.length > 0 && logs[0]?.contract)) && (
+        <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
               <Tooltip.Provider>
@@ -385,8 +393,8 @@ export default function (props: Props) {
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    sideOffset={8}
-                    place="bottom"
+                    align="start"
+                    side="bottom"
                   >
                     Highlighted events of the transaction
                   </Tooltip.Content>
@@ -425,7 +433,7 @@ export default function (props: Props) {
           </div>
         </div>
       )}
-      <div className="bg-white text-sm text-gray-500">
+      <div className="bg-white text-sm text-nearblue-600">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -437,8 +445,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.from.tooltip')
@@ -476,8 +484,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.to.tooltip')
@@ -521,8 +529,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   List of tokens transferred in the transaction
                 </Tooltip.Content>
@@ -536,186 +544,199 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="relative w-full md:w-3/4">
-              <ScrollArea.Root>
-                <ScrollArea.Viewport />
-                <div className="max-h-[302px] break-words space-y-3">
-                  {fts?.map((ft: any) => (
-                    <div
-                      className="flex items-center flex-wrap break-all leading-7"
-                      key={ft.key}
-                    >
-                      <FaCaretRight className="inline-flex text-gray-400 text-xs" />
-                      <div className="font-semibold text-gray px-1">
-                        From{' '}
-                        {ft.token_old_owner_account_id ? (
-                          <a
-                            href={`/address/${ft.token_old_owner_account_id}`}
-                            className="hover:no-underline"
-                          >
-                            <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                              {shortenAddress(ft.token_old_owner_account_id)}
-                            </a>
-                          </a>
-                        ) : (
-                          <span className="font-normal pl-1">system</span>
-                        )}
-                      </div>
-                      <div className="font-semibold text-gray px-1">
-                        To{' '}
-                        {ft.token_new_owner_account_id ? (
-                          <a
-                            href={`/address/${ft.token_new_owner_account_id}`}
-                            className="hover:no-underline"
-                          >
-                            <a className="text-green-500 font-normal pl-1">
-                              {shortenAddress(ft.token_new_owner_account_id)}
-                            </a>
-                          </a>
-                        ) : (
-                          <span className="font-normal pl-1">system</span>
-                        )}
-                      </div>
-                      <div className="font-semibold text-gray px-1">
-                        For{' '}
-                        <span className="pl-1 font-normal">
-                          {tokenAmount(ft.amount, ft.ft_metas.decimals, true)}
-                        </span>
-                      </div>
-                      <a
-                        href={`/token/${ft.ft_metas.contract}`}
-                        className="hover:no-underline"
+              <ScrollArea.Root className="w-full h-[302px] rounded overflow-hidden bg-white">
+                <ScrollArea.Viewport className="w-full h-full rounded">
+                  <div className="max-h-[302px] break-words space-y-3">
+                    {fts?.map((ft: any) => (
+                      <div
+                        className="flex items-center flex-wrap break-all leading-7"
+                        key={ft.key}
                       >
-                        <a className="text-green flex items-center hover:no-underline">
-                          <TokenImage
-                            src={ft.ft_metas.icon}
-                            alt={ft.ft_metas.name}
-                            className="w-4 h-4 mx-1"
-                          />
-                          {shortenToken(ft.ft_metas.name)}
-                          <span>
-                            &nbsp;({shortenTokenSymbol(ft.ft_metas.symbol)})
+                        <FaCaretRight className="inline-flex text-gray-400 text-xs" />
+                        <div className="font-semibold text-gray px-1">
+                          From{' '}
+                          {ft.token_old_owner_account_id ? (
+                            <a
+                              href={`/address/${ft.token_old_owner_account_id}`}
+                              className="hover:no-underline"
+                            >
+                              <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                {shortenAddress(ft.token_old_owner_account_id)}
+                              </a>
+                            </a>
+                          ) : (
+                            <span className="font-normal pl-1">system</span>
+                          )}
+                        </div>
+                        <div className="font-semibold text-gray px-1">
+                          To{' '}
+                          {ft.token_new_owner_account_id ? (
+                            <a
+                              href={`/address/${ft.token_new_owner_account_id}`}
+                              className="hover:no-underline"
+                            >
+                              <a className="text-green-500 font-normal pl-1">
+                                {shortenAddress(ft.token_new_owner_account_id)}
+                              </a>
+                            </a>
+                          ) : (
+                            <span className="font-normal pl-1">system</span>
+                          )}
+                        </div>
+                        <div className="font-semibold text-gray px-1">
+                          For{' '}
+                          <span className="pl-1 font-normal">
+                            {tokenAmount(ft.amount, ft.ft_metas.decimals, true)}
                           </span>
+                        </div>
+                        <a
+                          href={`/token/${ft.ft_metas.contract}`}
+                          className="hover:no-underline"
+                        >
+                          <a className="text-green flex items-center hover:no-underline">
+                            <TokenImage
+                              src={ft.ft_metas.icon}
+                              alt={ft.ft_metas.name}
+                              className="w-4 h-4 mx-1"
+                            />
+                            {shortenToken(ft.ft_metas.name)}
+                            <span>
+                              &nbsp;({shortenTokenSymbol(ft.ft_metas.symbol)})
+                            </span>
+                          </a>
                         </a>
-                      </a>
-                    </div>
-                  ))}
-                  {nfts?.map((nft: any) => (
-                    <div className="flex" key={nft.key}>
-                      <div className="flex justify-start items-start">
-                        <FaCaretRight className="inline-flex text-gray-400 text-xs mt-1" />
-                        <div className="flex flex-wrap">
-                          <div>
-                            <div className="sm:flex">
-                              <div className="font-semibold text-gray px-1">
-                                From{' '}
-                                {nft.token_old_owner_account_id ? (
-                                  <a
-                                    href={`/address/${nft.token_old_owner_account_id}`}
-                                    className="hover:no-underline"
-                                  >
-                                    <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                      {shortenAddress(
-                                        nft.token_old_owner_account_id,
-                                      )}
+                      </div>
+                    ))}
+                    {nfts?.map((nft: any) => (
+                      <div className="flex" key={nft.key}>
+                        <div className="flex justify-start items-start">
+                          <FaCaretRight className="inline-flex text-gray-400 text-xs mt-1" />
+                          <div className="flex flex-wrap">
+                            <div>
+                              <div className="sm:flex">
+                                <div className="font-semibold text-gray px-1">
+                                  From{' '}
+                                  {nft.token_old_owner_account_id ? (
+                                    <a
+                                      href={`/address/${nft.token_old_owner_account_id}`}
+                                      className="hover:no-underline"
+                                    >
+                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                        {shortenAddress(
+                                          nft.token_old_owner_account_id,
+                                        )}
+                                      </a>
                                     </a>
-                                  </a>
-                                ) : (
-                                  <span className="font-normal pl-1">
-                                    system
-                                  </span>
-                                )}
+                                  ) : (
+                                    <span className="font-normal pl-1">
+                                      system
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="font-semibold text-gray px-1">
+                                  To{' '}
+                                  {nft.token_new_owner_account_id ? (
+                                    <a
+                                      href={`/address/${nft.token_new_owner_account_id}`}
+                                      className="hover:no-underline"
+                                    >
+                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                        {shortenAddress(
+                                          nft.token_new_owner_account_id,
+                                        )}
+                                      </a>
+                                    </a>
+                                  ) : (
+                                    <span className="font-normal pl-1">
+                                      system
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <div className="font-semibold text-gray px-1">
-                                To{' '}
-                                {nft.token_new_owner_account_id ? (
-                                  <a
-                                    href={`/address/${nft.token_new_owner_account_id}`}
-                                    className="hover:no-underline"
-                                  >
-                                    <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                      {shortenAddress(
-                                        nft.token_new_owner_account_id,
-                                      )}
+                              <div className="sm:flex mt-1">
+                                <div className="text-gray px-1">
+                                  <span className="text-gray-400">For </span>
+                                  <span className="pl-1 font-normal">
+                                    NFT Token ID [
+                                    <a
+                                      href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
+                                      className="hover:no-underline"
+                                    >
+                                      <a className="text-green hover:no-underline">
+                                        {shortenToken(nft.token_id)}
+                                      </a>
                                     </a>
-                                  </a>
-                                ) : (
-                                  <span className="font-normal pl-1">
-                                    system
+                                    ]
                                   </span>
-                                )}
+                                </div>
+                                <a
+                                  href={`/nft-token/${nft.nft_meta.contract}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green flex items-center hover:no-underline">
+                                    <TokenImage
+                                      src={nft.nft_meta.icon}
+                                      alt={nft.nft_meta.name}
+                                      className="w-4 h-4 mx-1"
+                                    />
+                                    {shortenToken(nft.nft_meta.name)}
+                                    <span>
+                                      &nbsp;(
+                                      {shortenTokenSymbol(nft.nft_meta.symbol)})
+                                    </span>
+                                  </a>
+                                </a>
                               </div>
                             </div>
-                            <div className="sm:flex mt-1">
-                              <div className="text-gray px-1">
-                                <span className="text-gray-400">For </span>
-                                <span className="pl-1 font-normal">
-                                  NFT Token ID [
-                                  <a
-                                    href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
-                                    className="hover:no-underline"
-                                  >
-                                    <a className="text-green hover:no-underline">
-                                      {shortenToken(nft.token_id)}
-                                    </a>
-                                  </a>
-                                  ]
-                                </span>
-                              </div>
+                            <div className="border rounded ml-2 w-11 h-11 p-1">
                               <a
-                                href={`/nft-token/${nft.nft_meta.contract}`}
+                                href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
                                 className="hover:no-underline"
                               >
-                                <a className="text-green flex items-center hover:no-underline">
-                                  <TokenImage
-                                    src={nft.nft_meta.icon}
-                                    alt={nft.nft_meta.name}
-                                    className="w-4 h-4 mx-1"
-                                  />
-                                  {shortenToken(nft.nft_meta.name)}
-                                  <span>
-                                    &nbsp;(
-                                    {shortenTokenSymbol(nft.nft_meta.symbol)})
-                                  </span>
+                                <a>
+                                  {
+                                    <Widget
+                                      src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                                      props={{
+                                        base: nft.nft_meta.base_uri,
+                                        media: nft.nft_token_meta.media,
+                                        reference:
+                                          nft.nft_meta.reference ||
+                                          nft.nft_token_meta.reference,
+                                        alt: nft.nft_token_meta.title,
+                                        className: 'max-h-full rounded',
+                                        network: network,
+                                      }}
+                                    />
+                                  }
                                 </a>
                               </a>
                             </div>
                           </div>
-                          <div className="border rounded ml-2 w-11 h-11 p-1">
-                            <a
-                              href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
-                              className="hover:no-underline"
-                            >
-                              <a>
-                                <NFTImage
-                                  base={nft.nft_meta.base_uri}
-                                  media={nft.nft_token_meta.media}
-                                  reference={
-                                    nft.nft_meta.reference ||
-                                    nft.nft_token_meta.reference
-                                  }
-                                  alt={nft.nft_token_meta.title}
-                                  className="max-h-full rounded"
-                                />
-                              </a>
-                            </a>
-                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                <ScrollArea.Scrollbar orientation="horizontal">
-                  <ScrollArea.Thumb />
+                    ))}
+                  </div>
+                </ScrollArea.Viewport>
+                <ScrollArea.Scrollbar
+                  className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                  orientation="vertical"
+                >
+                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                 </ScrollArea.Scrollbar>
-                <ScrollArea.Scrollbar orientation="vertical">
-                  <ScrollArea.Thumb />
+                <ScrollArea.Scrollbar
+                  className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                  orientation="horizontal"
+                >
+                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                 </ScrollArea.Scrollbar>
+                <ScrollArea.Corner className="bg-neargray-50" />
               </ScrollArea.Root>
             </div>
           )}
         </div>
       )}
-      <div className="bg-white text-sm text-gray-500">
+      <div className="bg-white text-sm text-nearblue-600">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -727,8 +748,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.deposit.tooltip')
@@ -759,8 +780,8 @@ export default function (props: Props) {
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    sideOffset={8}
-                    place="bottom"
+                    align="start"
+                    side="bottom"
                   >
                     {t
                       ? t('txns:txn.deposit.tooltip')
@@ -780,8 +801,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.fee.tooltip')
@@ -818,8 +839,8 @@ export default function (props: Props) {
                 </Tooltip.Trigger>
                 <Tooltip.Content
                   className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  sideOffset={8}
-                  place="bottom"
+                  align="start"
+                  side="bottom"
                 >
                   {t
                     ? t('txns:txn.price.tooltip')
@@ -843,24 +864,26 @@ export default function (props: Props) {
 
       <Accordion.Root
         type="single"
-        className="text-sm text-gray-500 divide-solid divide-gray-200 divide-y border-b"
+        className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y border-b"
         defaultValue={more ? 'item-1' : undefined}
         collapsible
       >
         <Accordion.Item value="item-1">
-          <div className="flex flex-wrap p-4">
-            <Accordion.Trigger asChild onClick={toggleContent}>
-              {!more ? (
-                <span className="text-green-500 flex items-center">
-                  Click to see more <ArrowDown className="fill-current" />
-                </span>
-              ) : (
-                <span className="text-green-500 flex items-center">
-                  Click to see less <ArrowUp className="fill-current" />
-                </span>
-              )}
-            </Accordion.Trigger>
-          </div>
+          <Accordion.Header data-orientation="vertical">
+            <div className="flex flex-wrap p-4">
+              <Accordion.Trigger asChild onClick={toggleContent}>
+                {!more ? (
+                  <span className="text-green-500 flex items-center">
+                    Click to see more <ArrowDown className="fill-current" />
+                  </span>
+                ) : (
+                  <span className="text-green-500 flex items-center">
+                    Click to see less <ArrowUp className="fill-current" />
+                  </span>
+                )}
+              </Accordion.Trigger>
+            </div>
+          </Accordion.Header>
           <Accordion.Content>
             <div>
               <div className="flex flex-wrap p-4">
@@ -872,8 +895,8 @@ export default function (props: Props) {
                       </Tooltip.Trigger>
                       <Tooltip.Content
                         className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        sideOffset={8}
-                        place="bottom"
+                        align="start"
+                        side="bottom"
                       >
                         {t
                           ? t('txns:txn.gas.tooltip')
@@ -914,8 +937,8 @@ export default function (props: Props) {
                       </Tooltip.Trigger>
                       <Tooltip.Content
                         className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        sideOffset={8}
-                        place="bottom"
+                        align="start"
+                        side="bottom"
                       >
                         {t
                           ? t('txns:txn.burnt.tooltip')

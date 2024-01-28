@@ -7,6 +7,7 @@ export type Context = {
 };
 
 const NS_IN_A_MS = 10n ** 6n;
+const YOCTO_IN_A_NEAR = 10n ** 24n;
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -39,3 +40,5 @@ export const retry = async <A>(
 export const msToNsTime = (ms: number) => String(BigInt(ms) * NS_IN_A_MS);
 
 export const nsToMsTime = (ns: string) => +String(BigInt(ns) / NS_IN_A_MS);
+
+export const yoctoToNear = (yn: string) => String(BigInt(yn) / YOCTO_IN_A_NEAR);

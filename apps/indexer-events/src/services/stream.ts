@@ -43,7 +43,14 @@ export const onMessage = async (message: types.StreamerMessage) => {
       logger.info(`syncing block: ${message.block.header.height}`);
     }
 
+    const start = performance.now();
+
     await storeEvents(knex, message);
+
+    logger.info({
+      block: message.block.header.height,
+      time: `${performance.now() - start} ms`,
+    });
 
     if (message.block.header.height % 100 === 0) {
       await knex('settings')

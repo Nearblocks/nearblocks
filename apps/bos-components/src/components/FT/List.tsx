@@ -4,11 +4,11 @@
  * License: Business Source License 1.1
  * Description: Top Tokens on Near Protocol.
  * @interface Props
- *  @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
- *  @param {string}  [network] - The network data to show, either mainnet or testnet.
- *  @param {number} [currentPage] - The current page number being displayed. (Optional)
+ * @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- *  @param {function} [setPage] - A function used to set the current page. (Optional)
+ * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 interface Props {
@@ -43,7 +43,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [tokens, setTokens] = useState<Token[]>([]);
+  const [tokens, setTokens] = useState<{ [key: number]: Token[] }>({});
+
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
   const config = getConfig(network);
@@ -76,20 +77,23 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             body: {
               tokens: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens?.[0];
-            setTotalCount(resp?.count | 0);
+            if (data.status === 200) {
+              setTotalCount(resp?.count | 0);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchTokens(qs?: string, sqs?: Sorting) {
+    function fetchTokens(qs: string, sqs: Sorting, page: number) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -102,9 +106,12 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             body: {
               tokens: Token[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.tokens;
-            setTokens(resp || []);
+            if (data.status === 200) {
+              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           },
         )
         .catch(() => {})
@@ -114,10 +121,10 @@ export default function ({ t, network, currentPage, setPage }: Props) {
     }
 
     fetchTotalTokens();
-    fetchTokens('', sorting);
+    fetchTokens('', sorting, currentPage);
     if (sorting) {
       fetchTotalTokens();
-      fetchTokens('', sorting);
+      fetchTokens('', sorting, currentPage);
     }
   }, [config?.backendUrl, currentPage, sorting]);
 
@@ -167,9 +174,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -180,7 +187,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'name' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -190,7 +197,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       key: 'name',
       cell: (row: Token) => (
-        <span>
+        <>
           <div className="flex items-center">
             <TokenImage
               src={row?.icon}
@@ -200,19 +207,17 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             />
             <a href={`/token/${row.contract}`} className="hover:no-underline">
               <a className=" text-green-500 hover:no-underline">
-                <span className="inline-block truncate max-w-[200px] mr-1">
-                  {row.name}
-                </span>
-                <span className="text-gray-400 inline-block truncate max-w-[80px]">
+                <span className="truncate max-w-[200px] mr-1">{row.name}</span>
+                <span className="text-nearblue-700 truncate max-w-[80px]">
                   {row.symbol}
                 </span>
               </a>
             </a>
           </div>
-        </span>
+        </>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-80  align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 w-80  align-top',
     },
     {
       header: (
@@ -224,7 +229,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'price' && (
-              <div className="text-gray-500">
+              <div className="text-nearblue-600">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -243,7 +248,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
     {
       header: (
@@ -254,7 +259,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'change' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -280,7 +285,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
     {
       header: (
@@ -288,10 +293,10 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           <button
             type="button"
             onClick={() => onOrder('volume')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
+            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
           >
             {sorting.sort === 'volume' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -310,7 +315,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
     {
       header: (
@@ -321,11 +326,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'market_cap' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
-            <span className="uppercase">Circulating MC</span>
+            <span className="uppercase whitespace-nowrap">Circulating MC</span>
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
@@ -358,7 +363,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
     {
       header: (
@@ -370,11 +375,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'onchain_market_cap' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
-            <span className="uppercase">On-Chain MC</span>
+            <span className="uppercase whitespace-nowrap">On-Chain MC</span>
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
@@ -407,7 +412,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
     {
       header: (
@@ -418,7 +423,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
             {sorting.sort === 'holders' && (
-              <div className="text-gray-500 font-semibold">
+              <div className="text-nearblue-600 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -429,13 +434,13 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       key: 'holders',
       cell: (row: Token) => <span>{localFormat(row.holders)}</span>,
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
   ];
 
   return (
-    <div className=" bg-white border soft-shadow rounded-lg pb-1 ">
-      <div className="flex flex-row items-center justify-between text-left text-sm text-gray-500 px-3 py-2">
+    <div className=" bg-white border soft-shadow rounded-xl pb-1 ">
+      <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
         {isLoading ? (
           <div className="max-w-lg w-full pl-3">
             <Skeleton className="h-4" />
@@ -449,15 +454,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         )}
         <div className={`flex w-full h-10 sm:w-80 mr-2`}>
           <div className="flex-grow">
-            <label htmlFor="token-search" className="relative">
+            <label htmlFor="token-search" id="token-search">
               <input
                 name="search"
                 autoComplete="off"
                 placeholder="Search"
-                className="search ml-2 pl-8 token-search bg-white w-full h-full text-sm py-2 outline-none border rounded-lg"
+                className="search ml-2 pl-8 token-search bg-white w-full h-full text-sm py-2 outline-none border rounded-xl"
                 onChange={onChange}
               />
-              <span className="bg-token-search absolute left-[18px] top-0 bottom-0 w-[14px] bg-no-repeat bg-center bg-contain "></span>
             </label>
             {searchResults?.length > 0 && (
               <div className="z-50 relative">
@@ -482,7 +486,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                           </div>
                           <p className="font-semibold text-sm truncate">
                             {token.name}
-                            <span className="text-gray-400 ml-2">
+                            <span className="text-nearblue-700 ml-2">
                               {token.symbol}
                             </span>
                           </p>
@@ -500,7 +504,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
-          data: tokens,
+          data: tokens[currentPage],
           isLoading: isLoading,
           isPagination: true,
           count: totalCount,

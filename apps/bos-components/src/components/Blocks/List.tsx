@@ -4,8 +4,8 @@
  * License: Business Source License 1.1
  * Description: Table of blocks on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string}  [network] - The network data to show, either mainnet or testnet.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {number} [currentPage] - The current page number being displayed. (Optional)
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
@@ -20,24 +20,25 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
+import Clock from '@/includes/icons/Clock';
 import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
-  currentPage: number;
-  setPage: (page: number) => void;
   network: string;
   t: (
     key: string,
     options?: { from: string; to: string; count: string },
   ) => string | undefined;
+  currentPage: number;
+  setPage: (page: number) => void;
 }
 
 export default function ({ currentPage, setPage, t, network }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
   const [showAge, setShowAge] = useState(true);
+  const [blocks, setBlocks] = useState<{ [key: number]: BlocksInfo[] }>({});
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
 
   const config = getConfig(network);
@@ -55,34 +56,37 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             body: {
               blocks: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.blocks?.[0];
-            setTotalCount(resp?.count);
+            if (data.status === 200) {
+              setTotalCount(resp?.count);
+            }
           },
         )
         .catch(() => {})
         .finally(() => {});
     }
 
-    function fetchBlocks() {
+    function fetchBlocks(page: number) {
       setIsLoading(true);
-      asyncFetch(
-        `${config?.backendUrl}blocks?page=${currentPage}&per_page=25`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${config?.backendUrl}blocks?page=${page}&per_page=25`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+      })
         .then(
           (data: {
             body: {
               blocks: BlocksInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.blocks;
-            setBlocks(resp || []);
+            if (data.status === 200) {
+              setBlocks((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
           },
         )
         .catch(() => {})
@@ -92,12 +96,11 @@ export default function ({ currentPage, setPage, t, network }: Props) {
     }
 
     fetchTotalBlocks();
-    fetchBlocks();
+    fetchBlocks(currentPage);
   }, [config?.backendUrl, currentPage]);
 
-  const start = blocks?.[0];
-  const end = blocks?.[blocks?.length - 1];
-
+  const start = blocks[currentPage]?.[0];
+  const end = blocks[currentPage]?.[blocks[currentPage]?.length - 1];
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const columns = [
@@ -114,20 +117,42 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
         <div>
-          <button
-            type="button"
-            onClick={toggleShowAge}
-            className="px-6 py-2 text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-500 focus:outline-none whitespace-nowrap"
-          >
-            {showAge ? (t ? t('blocks:age') : 'AGE') : 'DATE TIME (UTC)'}
-          </button>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  type="button"
+                  onClick={toggleShowAge}
+                  className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row"
+                >
+                  {showAge ? (
+                    <>
+                      {t ? t('blocks:age') : 'AGE'}
+                      <Clock className="text-green-500 ml-2" />
+                    </>
+                  ) : (
+                    'DATE TIME (UTC)'
+                  )}
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="top"
+              >
+                {showAge
+                  ? 'Click to show Datetime Format'
+                  : 'Click to show Age Format'}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </div>
       ),
       key: 'block_timestamp',
@@ -136,12 +161,10 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span>
                   {!showAge
-                    ? formatTimestampToString(
-                        nanoToMilli(row.block_timestamp || 0),
-                      )
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp || 0))}
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -150,16 +173,14 @@ export default function ({ currentPage, setPage, t, network }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(
-                      nanoToMilli(row.block_timestamp || 0),
-                    )
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp || 0))}
+                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,
@@ -167,7 +188,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       cell: (row: BlocksInfo) => (
         <span>{localFormat(row.transactions_agg.count)}</span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -177,7 +198,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       cell: (row: BlocksInfo) => (
         <span>{localFormat(row.receipts_agg.count)}</span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -197,7 +218,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -211,7 +232,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 gas'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -225,12 +246,12 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 gas'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('block.gasFee') : 'GAS FEE'}</span>,
+      header: <span>{t ? t('blocks:block.gasFee') : 'GAS FEE'}</span>,
       key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>
@@ -239,20 +260,20 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             : '0 Ⓝ'}
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
+      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
   return (
-    <div className="bg-white border soft-shadow rounded-lg pb-1 ">
+    <div className="bg-white border soft-shadow rounded-xl pb-1 ">
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <p className="leading-7 pl-6 text-sm py-4 text-gray-500">
+        <p className="leading-7 pl-6 text-sm py-4 text-nearblue-600">
           {t
             ? t('blocks:listing', {
                 from: localFormat(start?.block_height | 0),
@@ -269,7 +290,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: blocks,
+            data: blocks[currentPage],
             isLoading: isLoading,
             isPagination: true,
             count: totalCount,

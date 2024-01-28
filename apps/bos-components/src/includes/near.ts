@@ -1,4 +1,4 @@
-import { localFormat } from '@/includes/formats';
+import { dollarFormat, localFormat } from '@/includes/formats';
 import { yoctoToNear } from '@/includes/libs';
 import {
   ActionType,
@@ -22,7 +22,7 @@ export function decodeArgs(args: number[]) {
 
 export function txnMethod(
   actions: { action: string; method: string }[],
-  t: (key: string, options?: { count?: string | undefined }) => string,
+  t?: (key: string, options?: { count?: string | undefined }) => string,
 ) {
   const count = actions?.length || 0;
 
@@ -44,19 +44,29 @@ export function gasPrice(yacto: number) {
   return `${localFormat(near)} Ⓝ / Tgas`;
 }
 
-export function tokenAmount(amount: number, decimal: number, format: boolean) {
+export function tokenAmount(amount: string, decimal: string, format: boolean) {
   if (amount === undefined || amount === null) return 'N/A';
-
-  const near = Big(amount).div(Big(10).pow(+decimal));
-
-  return format
-    ? near.toString().toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 8,
-      })
-    : near;
+  const near = Big(amount).div(Big(10).pow(decimal));
+  const formattedValue = format
+    ? near.toFixed(8).replace(/\.?0+$/, '')
+    : near.toFixed(decimal).replace(/\.?0+$/, '');
+  return formattedValue;
 }
 
+export function tokenPercentage(
+  supply: number,
+  amount: string,
+  decimal: string,
+) {
+  const nearAmount = Big(amount).div(Big(10).pow(decimal));
+  const nearSupply = Big(supply);
+
+  return nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
+}
+export function price(amount: string, decimal: string, price: number) {
+  const nearAmount = Big(amount).div(Big(10).pow(decimal));
+  return dollarFormat(nearAmount.mul(Big(price || 0)).toString());
+}
 export function mapRpcActionToAction(action: string | ActionType) {
   if (action === 'CreateAccount') {
     return {
@@ -77,7 +87,7 @@ export function mapRpcActionToAction(action: string | ActionType) {
   return null;
 }
 
-const valueFromObj = (obj: Obj): string | undefined => {
+function valueFromObj(obj: Obj): string | undefined {
   const keys = Object.keys(obj);
 
   for (let i = 0; i < keys.length; i++) {
@@ -97,7 +107,7 @@ const valueFromObj = (obj: Obj): string | undefined => {
   }
 
   return undefined;
-};
+}
 
 export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
   let txLogs: TransactionLog[] = [];

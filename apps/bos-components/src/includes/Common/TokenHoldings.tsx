@@ -49,7 +49,7 @@ const TokenHoldings = (props: Props) => {
   }
   return (
     <Select.Root>
-      <Select.Trigger className="w-80 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
+      <Select.Trigger className="w-96 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
           ${dollarFormat(props.ft?.amount || 0)}{' '}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
@@ -59,7 +59,7 @@ const TokenHoldings = (props: Props) => {
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
       </Select.Trigger>
       <Select.Content>
-        <ScrollArea.Root className="w-80 h-72 rounded overflow-hidden shadow-[0_2px_10px] drop-shadow-md bg-white">
+        <ScrollArea.Root className="w-96 h-72 rounded overflow-hidden shadow-[0_2px_10px] drop-shadow-md bg-white">
           <ScrollArea.Viewport className="w-full h-full rounded  bg-white w-full rounded-b-lg shadow border z-50 pb-2">
             <div className="max-h-60">
               {props.ft?.tokens?.length > 0 && (
@@ -74,36 +74,42 @@ const TokenHoldings = (props: Props) => {
                     {props.ft?.tokens?.map((token, index) => (
                       <a
                         href={`/token/${token.contract}?a=${props.id}`}
-                        className="no-underline hover:no-underline"
+                        className="hover:no-underline"
                         key={token.contract}
                       >
-                        <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate no-underline">
+                        <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
                           <div key={index}>
                             <div className="flex items-center">
                               <div className="flex mr-1">
                                 <img
                                   src={
-                                    token.ft_meta?.icon ||
+                                    token.ft_metas?.icon ||
                                     `${props.appUrl}images/tokenplaceholder.svg`
                                   }
-                                  alt={token.ft_meta?.name}
+                                  alt={token.ft_metas?.name}
                                   className="w-4 h-4"
                                 />
                               </div>
                               <span>
-                                {truncateString(token.ft_meta?.name, 15, '...')}{' '}
-                                ({token.ft_meta?.symbol})
+                                {token.ft_metas.name
+                                  ? truncateString(
+                                      token.ft_metas?.name,
+                                      15,
+                                      '...',
+                                    )
+                                  : ''}
+                                ({token.ft_metas?.symbol})
                               </span>
                             </div>
                             <div className="text-gray-400 flex items-center mt-1">
                               {localFormat(token?.rpcAmount)}
                             </div>
                           </div>
-                          {token.ft_meta?.price && (
+                          {token.ft_metas?.price && (
                             <div className="text-right">
                               <div>${dollarFormat(token.amountUsd)}</div>
                               <div className="text-gray-400">
-                                @{Big(token.ft_meta?.price).toString()}
+                                @{Big(token.ft_metas?.price).toString()}
                               </div>
                             </div>
                           )}
@@ -140,8 +146,14 @@ const TokenHoldings = (props: Props) => {
                                 />
                               </div>
                               <span>
-                                {truncateString(nft.nft_meta?.name, 15, '...')}(
-                                {nft.nft_meta?.symbol})
+                                {nft.nft_meta?.name
+                                  ? truncateString(
+                                      nft.nft_meta?.name,
+                                      15,
+                                      '...',
+                                    )
+                                  : ''}
+                                ({nft.nft_meta?.symbol})
                               </span>
                             </div>
                             <div className="text-gray-400 flex items-center mt-1">

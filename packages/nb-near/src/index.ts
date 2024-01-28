@@ -37,12 +37,12 @@ export class RPC {
     return this.query({ ...params, finality: 'final' });
   }
 
-  decodeResult<T>(result: string): T {
-    return JSON.parse(Buffer.from(result, 'base64').toString());
+  decodeResult<T>(...args: Parameters<typeof Buffer.from>): T {
+    return JSON.parse(Buffer.from(...args).toString());
   }
 
-  encodeArgs(args: unknown) {
-    return Buffer.from(JSON.stringify(args)).toString('base64');
+  encodeArgs(args: unknown, encoding: BufferEncoding = 'base64') {
+    return Buffer.from(JSON.stringify(args)).toString(encoding);
   }
 
   async query(params: unknown, method = 'query') {
@@ -59,6 +59,15 @@ export class RPC {
       account_id: accountId,
       block_id: blockId,
       request_type: 'view_account',
+    });
+  }
+
+  async viewState(accountId: string, blockId: number | string) {
+    return this.query({
+      account_id: accountId,
+      block_id: blockId,
+      prefix_base64: '',
+      request_type: 'view_state',
     });
   }
 }

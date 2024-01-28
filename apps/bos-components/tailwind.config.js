@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       darkMode: 'class',
       fontFamily: {
-        sans: "'Manrope', sans-serif",
+        sans: "'Roboto Flex', sans-serif",
       },
       fontSize: {
         tiny: '.65625rem',
@@ -37,12 +37,15 @@ module.exports = {
         nearblue: {
           DEFAULT: '#F1F9FF',
           600: '#4b5563',
+          700: '#9CA3AF',
         },
         neargray: {
           DEFAULT: '#676767',
           25: '#FAFAFA',
           50: '#8E8E8E',
           600: '#676767',
+          700: '#E9ECEF',
+          800: '#DEE2E6',
         },
         blue: {
           DEFAULT: '#8adbc9',
@@ -76,8 +79,11 @@ module.exports = {
       borderRadius: {
         '4xl': '30px',
       },
+      backgroundColor: {
+        'blue-900-15': 'rgba(76 ,189 ,187  ,0.15)',
+      },
       backgroundImage: (theme) => ({
-        'hero-pattern': "url('/images/wavey-fingerprint.png')",
+        'hero-pattern': "url('/images/wavey_fingerprint.png')",
       }),
     },
   },

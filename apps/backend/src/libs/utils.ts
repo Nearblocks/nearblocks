@@ -1,3 +1,5 @@
+import Big from 'big.js';
+
 import { logger } from 'nb-logger';
 
 import Sentry from '#libs/sentry';
@@ -31,4 +33,10 @@ export const validator = {
 export const errorHandler = (error: Error) => {
   logger.error(error);
   Sentry.captureException(error);
+};
+
+export const tokenAmount = (amount: string, decimal: number) => {
+  if (amount === undefined || amount === null) return '';
+
+  return Big(amount).div(Big(10).pow(+decimal)).toFixed();
 };

@@ -3,4 +3,5 @@ dist
 out
 static
 .next
+.bos
 *.css

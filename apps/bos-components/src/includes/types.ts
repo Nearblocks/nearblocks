@@ -5,7 +5,7 @@ export type SatsInfo = {
 };
 
 export type AccountTimestampInfo = {
-  block_timestamp: number;
+  block_timestamp: string;
   transaction_hash: string;
 };
 
@@ -34,7 +34,7 @@ export type TokenInfo = {
 };
 
 export type MetaInfo = {
-  decimals: number;
+  decimals: string;
   icon: string;
   name: string;
   price: number;
@@ -45,7 +45,7 @@ export type MetaInfo = {
 export type FtsInfo = {
   amount: number;
   contract: string;
-  ft_meta: MetaInfo;
+  ft_metas: MetaInfo;
 };
 
 export type NftsInfo = {
@@ -91,7 +91,7 @@ export type ContractInfo = {
 export type TokenListInfo = {
   amount: number;
   contract: string;
-  ft_meta: MetaInfo;
+  ft_metas: MetaInfo;
   rpcAmount: number;
   amountUsd: number;
 };
@@ -105,7 +105,7 @@ export type BlocksInfo = {
   author_account_id: string;
   block_hash: string;
   block_height: number;
-  block_timestamp: number;
+  block_timestamp: string;
   chunks_agg: {
     gas_limit: number;
     gas_used: number;
@@ -229,6 +229,14 @@ export type TransactionInfo = {
   signer_account_id: string;
   transaction_hash: string;
   receipts: InventoryInfo[];
+  event_kind: string;
+  token_old_owner_account_id: string;
+  token_new_owner_account_id: string;
+  token_id: string;
+  nft: Token;
+  amount: string;
+  ft: Token;
+  predecessor_account_id: string;
 };
 
 export type ChartStat = {
@@ -423,6 +431,8 @@ export type AccountContractInfo = {
   storage_paid_at: number;
   storage_usage: number;
   account_id: string;
+  public_key: string;
+  permission_kind: string;
   created: {
     transaction_hash: string;
     block_timestamp: string;
@@ -604,11 +614,17 @@ export type Token = {
   contract: string;
   icon: string;
   symbol: string;
-  price: number | null;
+  price: number;
   change_24: number | null;
   volume_24h: number | null;
   market_cap: number | null;
   onchain_market_cap: number | null;
+  fully_diluted_market_cap: number | null;
+  total_supply: number | null;
+  circulating_supply: number | null;
+  description: string;
+  coingecko_id: string;
+  coinmarketcap_id: string;
   holders: number;
   base_uri: string;
   reference: string;
@@ -623,6 +639,14 @@ export type Token = {
     telegram: string;
     coingecko_id: string;
   };
+  token: string;
+  media: string;
+  asset: {
+    owner: string;
+  };
+  decimals: string;
+  title: string;
+  nft: Token;
 };
 
 export type TransActionProps = {
@@ -637,8 +661,8 @@ export type TransActionProps = {
 
 export type TokenInfoProps = {
   contract: string;
-  amount: number;
-  decimals: number;
+  amount: string;
+  decimals: string;
   network: string;
 };
 
@@ -666,4 +690,35 @@ export type ReceiptStatsProps = {
       };
     };
   };
+};
+
+export type HoldersPropsInfo = {
+  account: string;
+  quantity: number;
+  amount: string;
+};
+
+export type NFTImageProps = {
+  base?: string;
+  media?: string;
+  alt?: string;
+  reference: string;
+  className?: string;
+  network: string;
+};
+
+export type AccessInfo = {
+  block_hash: string;
+  block_height: number;
+  keys: KeysInfo[];
+  hash: string;
+  nonce: number;
+  permission: {
+    FunctionCall: {
+      allowance: number;
+      method_names: [];
+      receiver_id: string;
+    };
+  };
+  error: string;
 };

@@ -5,16 +5,16 @@
  * Description: Details of Transaction Receipt on Near Protocol.
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
-  txn: TransactionInfo;
-  rpcTxn: RPCTransactionInfo;
   network: string;
   t: (key: string) => string | undefined;
+  txn: TransactionInfo;
+  rpcTxn: RPCTransactionInfo;
 }
 
 import { getConfig } from '@/includes/libs';
@@ -25,7 +25,6 @@ export default function (props: Props) {
   const { network, rpcTxn, txn, t } = props;
   const [receipt, setReceipt] = useState(null);
   const config = getConfig(network);
-
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any = txn.transaction.actions.map((txn) =>
       mapRpcActionToAction(txn),
@@ -85,13 +84,12 @@ export default function (props: Props) {
   useEffect(() => {
     if (rpcTxn) {
       const receipt = transactionReceipts(rpcTxn);
-      console.log('efewf', receipt);
       setReceipt(receipt);
     }
   }, [rpcTxn]);
 
   return (
-    <div className="bg-white text-sm text-gray-500 divide-solid divide-gray-200 divide-y">
+    <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       {
         <Widget
           src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}

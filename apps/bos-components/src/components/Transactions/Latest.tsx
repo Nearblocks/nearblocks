@@ -4,13 +4,13 @@
  * License: Business Source License 1.1
  * Description: Latest Transactions on Near Protocol.
  * @interface Props
- * @property {Function} t - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
-  t: (key: string) => string | undefined;
   network: string;
+  t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -24,7 +24,7 @@ import {
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({ t, network }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
@@ -32,59 +32,53 @@ export default function ({ t, network }: Props) {
 
   useEffect(() => {
     let delay = 5000;
-    let retries = 0;
 
     function fetchLatestTxns() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}txns/latest`)
         .then(
           (data: {
             body: {
               txns: TransactionInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.txns;
-            setTxns(resp);
-            setError(false);
-            setIsLoading(false);
-
-            delay = 5000;
-            retries = 0;
+            if (data.status === 200) {
+              setTxns(resp);
+              setError(false);
+            }
           },
         )
-        .catch((error: any) => {
-          if (error.response && error.response.status === 429) {
-            delay = Math.min(2 ** retries * 1000, 60000);
-            retries++;
-          }
-          setIsLoading(false);
+        .catch(() => {
           setError(true);
+        })
+        .finally(() => {
+          if (isLoading) setIsLoading(false);
         });
     }
-
     fetchLatestTxns();
 
     const interval = setInterval(fetchLatestTxns, delay);
 
     return () => clearInterval(interval);
-  }, [config.backendUrl]);
+  }, [config.backendUrl, isLoading]);
 
   return (
     <>
       <div className="relative">
         <ScrollArea.Root>
           <ScrollArea.Viewport>
-            {!txns && (
-              <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
+            {!txns && error && (
+              <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
                 {t ? t('home:error') : ' Error!'}
               </div>
             )}
             {!error && !isLoading && txns.length === 0 && (
-              <div className="flex items-center h-16 mx-3 py-2 text-gray-400 text-xs">
+              <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
                 {t ? t('home:noTxns') : ' No transactions found!'}
               </div>
             )}
-            {txns.length === 0 && (
+            {isLoading && txns.length === 0 && (
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -101,7 +95,7 @@ export default function ({ t, network }: Props) {
                             <Skeleton className="h-4" />
                           </div>
                         </div>
-                        <div className="text-gray-400 text-xs">
+                        <div className="text-nearblue-700 text-xs">
                           <div className="h-4 w-24">
                             <Skeleton className="h-3" />
                           </div>
@@ -112,7 +106,7 @@ export default function ({ t, network }: Props) {
                       <div className="h-5 w-36">
                         <Skeleton className="h-4" />
                       </div>
-                      <div className="text-gray-400 text-sm">
+                      <div className="text-nearblue-700 text-sm">
                         <div className="h-5 w-14">
                           <Skeleton className="h-4" />
                         </div>
@@ -151,9 +145,7 @@ export default function ({ t, network }: Props) {
                             </a>
                           </div>
                           <div className="text-gray-400 text-xs truncate">
-                            {getTimeAgoString(
-                              nanoToMilli(Number(txn.block_timestamp)),
-                            )}
+                            {getTimeAgoString(nanoToMilli(txn.block_timestamp))}
                           </div>
                         </div>
                       </div>
@@ -185,7 +177,7 @@ export default function ({ t, network }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <span className="u-label--badge-in  text-gray-400 truncate">
+                              <span className="u-label--badge-in  text-nearblue-700 truncate">
                                 {yoctoToNear(
                                   txn.actions_agg?.deposit || 0,
                                   true,
@@ -209,27 +201,27 @@ export default function ({ t, network }: Props) {
             )}
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none p-0.5 bg-gray-400 transition-colors duration-[160ms] ease-out hover:bg-blend-darken data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
             orientation="vertical"
           >
-            <ScrollArea.Thumb className="flex-1 bg-gray-400 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
           </ScrollArea.Scrollbar>
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none p-0.5 bg-gray-400 transition-colors duration-[160ms] ease-out hover:bg-blend-darken data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
             orientation="horizontal"
           >
-            <ScrollArea.Thumb className="flex-1 bg-gray-400 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
           </ScrollArea.Scrollbar>
-          <ScrollArea.Corner className="bg-black-500" />
+          <ScrollArea.Corner className="bg-neargray-50" />
         </ScrollArea.Root>
       </div>
-      {txns.length === 0 && (
-        <div className="border-t px-2 py-3 text-gray-700">
+      {isLoading && txns.length === 0 && (
+        <div className="border-t px-2 py-3 text-nearblue-600">
           <Skeleton className="h-10" />
         </div>
       )}
       {txns && txns.length > 0 && (
-        <div className="border-t px-2 py-3 text-gray-700">
+        <div className="border-t px-2 py-3 text-nearblue-600">
           <a href="/txns">
             <a className="block text-center border border-green-900/10 font-thin bg-green-500 hover:bg-green-400 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all transactions

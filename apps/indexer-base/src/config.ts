@@ -14,8 +14,8 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  REDIS_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_NAME: str({ default: '' }),
-  REDIS_SENTINEL_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: url({ default: '' }),
   S3_ENDPOINT: url({ default: '' }),
@@ -57,8 +57,8 @@ const config: Config = {
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,
   preloadSize: 100, // blocks to preload in nearlake
+  redisPassword: env.REDIS_PASSWORD,
   redisSentinelName: env.REDIS_SENTINEL_NAME,
-  redisSentinelPassword: env.REDIS_SENTINEL_PASSWORD,
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
   s3BucketName,

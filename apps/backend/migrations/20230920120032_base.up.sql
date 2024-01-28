@@ -45,7 +45,7 @@ CREATE TYPE app__stripe_status AS ENUM(
 
 CREATE TYPE app__verifications_type AS ENUM('VERIFY_EMAIL', 'RESET_PASSWORD', 'UPDATE_EMAIL');
 
-CREATE FUNCTION count_cost_estimate (query text) RETURNS TABLE (rows NUMERIC, cost NUMERIC) AS $$
+CREATE FUNCTION count_cost_estimate (query TEXT) RETURNS TABLE (rows NUMERIC, cost NUMERIC) AS $$
   DECLARE
     rec JSON;
   BEGIN
@@ -304,30 +304,30 @@ CREATE INDEX a_account_id_created_by_block_height_block_timestamp_idx ON account
 
 CREATE INDEX ara_action_kind_idx ON action_receipt_actions USING btree (action_kind);
 
-CREATE INDEX ara_args_method_name_idx ON action_receipt_actions USING btree ((args ->> 'method_name'::text))
+CREATE INDEX ara_args_method_name_idx ON action_receipt_actions USING btree ((args ->> 'method_name'::TEXT))
 WHERE
   (action_kind = 'FUNCTION_CALL'::action_kind);
 
 CREATE INDEX ara_args_function_call_receipt_receiver_account_id_idx ON action_receipt_actions USING btree (
-  (args ->> 'method_name'::text),
+  (args ->> 'method_name'::TEXT),
   receipt_receiver_account_id
 )
 WHERE
   (action_kind = 'FUNCTION_CALL'::action_kind);
 
 CREATE INDEX ara_args_method_name_receipt_receiver_account_id_idx ON action_receipt_actions USING btree (
-  (args ->> 'method_name'::text),
+  (args ->> 'method_name'::TEXT),
   receipt_receiver_account_id
 );
 
 CREATE INDEX ara_args_receiver_id_idx ON action_receipt_actions USING btree (
   (
-    (args -> 'args_json'::text) ->> 'receiver_id'::text
+    (args -> 'args_json'::TEXT) ->> 'receiver_id'::TEXT
   )
 )
 WHERE
   (action_kind = 'FUNCTION_CALL'::action_kind)
-  AND (args ->> 'args_json'::text) IS NOT NULL;
+  AND (args ->> 'args_json'::TEXT) IS NOT NULL;
 
 CREATE INDEX ara_receipt_included_in_block_timestamp_action_receipt_idx ON action_receipt_actions USING btree (
   receipt_included_in_block_timestamp DESC,

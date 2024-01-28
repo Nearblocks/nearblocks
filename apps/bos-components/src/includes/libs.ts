@@ -34,13 +34,13 @@ export function convertTimestampToTime(timestamp: number) {
 
 export function yoctoToNear(yocto: number, format: boolean) {
   const YOCTO_PER_NEAR = Big(10).pow(24).toString();
+
   const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
 
   return format ? localFormat(near) : near;
 }
 
 export function fiatValue(big: number, price: number) {
-  // @ts-ignore
   const value = Big(big).mul(Big(price)).toString();
   const formattedNumber = Number(value).toLocaleString('en', {
     minimumFractionDigits: 2,
@@ -49,7 +49,7 @@ export function fiatValue(big: number, price: number) {
   return formattedNumber;
 }
 
-export function nanoToMilli(nano: number) {
+export function nanoToMilli(nano: string) {
   return new Big(nano).div(new Big(10).pow(6)).round().toNumber();
 }
 
@@ -82,6 +82,7 @@ export function getConfig(network: string) {
       return {};
   }
 }
+
 export function debounce<TArgs extends any[]>(
   delay: any,
   func: any,
@@ -138,4 +139,30 @@ export function shortenAddress(address: string) {
   if (string.length <= 20) return string;
 
   return `${string.substr(0, 10)}...${string.substr(-7)}`;
+}
+
+export function urlHostName(url: string) {
+  try {
+    const domain = new URL(url);
+    return domain?.hostname ?? null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function holderPercentage(supply: number, quantity: number) {
+  return Math.min(Big(quantity).div(Big(supply)).mul(Big(100)).toFixed(2), 100);
+}
+
+export function isAction(type: string) {
+  const actions = [
+    'DEPLOY_CONTRACT',
+    'TRANSFER',
+    'STAKE',
+    'ADD_KEY',
+    'DELETE_KEY',
+    'DELETE_ACCOUNT',
+  ];
+
+  return actions.includes(type.toUpperCase());
 }

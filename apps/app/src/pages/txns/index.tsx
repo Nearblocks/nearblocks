@@ -2,16 +2,18 @@ import Router from 'next/router';
 import useTranslation from 'next-translate/useTranslation';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { networkId } from '@/utils/config';
 import List from '@/components/skeleton/common/List';
+import Layout from '@/components/Layouts';
 
 const TransactionList = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const heightRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState({});
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const filtersFromURL: { [key: string]: string } = {};
@@ -74,7 +76,25 @@ const TransactionList = () => {
   };
 
   const filtersObject = filters ? filters : {};
+  const updateOuterDivHeight = () => {
+    if (heightRef.current) {
+      const Height = heightRef.current.offsetHeight;
+      setHeight({ height: Height });
+    } else {
+      setHeight({});
+    }
+  };
+  useEffect(() => {
+    updateOuterDivHeight();
+    window.addEventListener('resize', updateOuterDivHeight);
 
+    return () => {
+      window.removeEventListener('resize', updateOuterDivHeight);
+    };
+  }, []);
+  const onChangeHeight = () => {
+    setHeight({});
+  };
   return (
     <>
       <div className="bg-hero-pattern h-72">
@@ -85,11 +105,12 @@ const TransactionList = () => {
         </div>
       </div>
       <div className="container mx-auto px-3 -mt-48">
-        <div className=" relative block lg:flex lg:space-x-2">
+        <div style={height} className="relative block lg:flex lg:space-x-2">
           <div className=" w-full">
             <VmComponent
-              skeleton={<List />}
               src={components?.transactionsList}
+              skeleton={<List ref={heightRef} />}
+              onChangeHeight={onChangeHeight}
               props={{
                 currentPage: currentPage,
                 t: t,
@@ -103,8 +124,11 @@ const TransactionList = () => {
           </div>
         </div>
       </div>
+      <div className="py-8"></div>
     </>
   );
 };
+
+TransactionList.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default TransactionList;
