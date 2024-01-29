@@ -63,10 +63,16 @@ export const circulatingSupply = async (block: Block) => {
   const blockRef: BlockReference = { block_id: +block.block_height };
 
   const lockupAccounts = await getLockupAccounts(block.block_height);
+  const count = lockupAccounts.length;
 
-  for (const account of lockupAccounts) {
+  console.log({ count, job: 'circulating-supply' });
+
+  for (let index = 0; index < count; index++) {
+    const account = lockupAccounts[index];
+
     await retry(async ({ attempt }) => {
       try {
+        console.log({ account, attempt, index, job: 'circulating-supply' });
         await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
         const lockupState = await viewLockupState(account, options, blockRef);
 
@@ -74,6 +80,14 @@ export const circulatingSupply = async (block: Block) => {
 
         return lockedAmount.add(getLockedTokenAmount(lockupState).toString());
       } catch (error) {
+        console.log({
+          account,
+          attempt,
+          error,
+          index,
+          job: 'circulating-supply',
+        });
+
         if (
           error instanceof Error &&
           error?.message.includes('does not exist while viewing')
@@ -92,6 +106,7 @@ export const circulatingSupply = async (block: Block) => {
     foundationAccounts.map(async (account) => {
       return await retry(async ({ attempt }) => {
         try {
+          console.log({ account, attempt, job: 'circulating-supply' });
           const resp = await viewAccountBalance(account, options, blockRef);
 
           return Big(resp.amount.toString());
