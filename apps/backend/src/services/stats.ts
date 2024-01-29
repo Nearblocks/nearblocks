@@ -11,18 +11,25 @@ import near from '#libs/near';
 import { circulatingSupply } from '#libs/supply';
 
 const blockTime = async (timestamp: string) => {
-  const start = Big(timestamp)
-    .minus(Big(msToNsTime(60000)))
-    .toFixed();
+  try {
+    const start = Big(timestamp)
+      .minus(Big(msToNsTime(60000)))
+      .toFixed();
 
-  const blocks = await knex('blocks')
-    .where('block_timestamp', '>', start)
-    .count()
-    .first();
+    console.log({ job: 'stats', start, timestamp });
 
-  if (!blocks?.count) return;
+    const blocks = await knex('blocks')
+      .where('block_timestamp', '>', start)
+      .count()
+      .first();
 
-  return Big(60 / +blocks.count).toFixed(4);
+    if (!blocks?.count) return;
+
+    return Big(60 / +blocks.count).toFixed(4);
+  } catch (error) {
+    console.log({ error, job: 'stats' });
+    return null;
+  }
 };
 
 const blockData = async () => {
@@ -41,6 +48,14 @@ const blockData = async () => {
   }
 
   const avgTime = await blockTime(block.block_timestamp);
+
+  if (!avgTime) {
+    return {
+      circulating_supply: supply,
+      gas_price: block.gas_price,
+      total_supply: block.total_supply,
+    };
+  }
 
   return {
     avg_block_time: avgTime,
@@ -83,21 +98,26 @@ const networkData = async () => {
 };
 
 export const txnData = async () => {
-  const start = dayjs.utc().startOf('day').valueOf();
+  try {
+    const start = dayjs.utc().startOf('day').valueOf();
 
-  const [stats, txns] = await Promise.all([
-    knex('daily_stats').sum('txns').first(),
-    knex('transactions')
-      .count('block_timestamp')
-      .where('block_timestamp', '>', msToNsTime(start))
-      .first(),
-  ]);
+    const [stats, txns] = await Promise.all([
+      knex('daily_stats').sum('txns').first(),
+      knex('transactions')
+        .count('block_timestamp')
+        .where('block_timestamp', '>', msToNsTime(start))
+        .first(),
+    ]);
 
-  return {
-    total_txns: Big(stats?.sum ?? 0)
-      .add(txns?.count ?? 0)
-      .toString(),
-  };
+    return {
+      total_txns: Big(stats?.sum ?? 0)
+        .add(txns?.count ?? 0)
+        .toFixed(),
+    };
+  } catch (error) {
+    console.log({ error, job: 'stats' });
+    return {};
+  }
 };
 
 export const syncStats = async () => {
