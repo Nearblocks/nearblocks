@@ -18,7 +18,7 @@ const logger: Bree.BreeLogger = {
 };
 
 const jobs: Bree.JobOptions[] = [
-  { cron: '*/5 * * * * *', hasSeconds: true, name: 'stats' }, // every 5s
+  { interval: '10m', name: 'stats', timeout: '1s' }, // every 10m
   // { cron: '0 * * * *', name: 'daily-stats' }, // run every hour for now
   // { cron: '* * * * *', name: 'ft-meta' }, // every minute
   // { cron: '* * * * *', name: 'ft-market-data' }, // every minute
