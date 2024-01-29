@@ -74,7 +74,11 @@ export const circulatingSupply = async (block: Block) => {
       try {
         console.log({ account, attempt, index, job: 'circulating-supply' });
         await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
-        const lockupState = await viewLockupState(account, options, blockRef);
+        const lockupState = await viewLockupState(
+          account.account_id,
+          options,
+          blockRef,
+        );
 
         if (!lockupState) return;
 
