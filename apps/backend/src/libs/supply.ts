@@ -58,85 +58,105 @@ const getLockupAccounts = async (blockHeight: number) => {
 };
 
 export const circulatingSupply = async (block: Block) => {
-  const lockedAmount = Big(0);
-  const foundationAccounts = ['contributors.near', 'lockup.near'];
-  const blockRef: BlockReference = { block_id: +block.block_height };
+  try {
+    let lockedAmount = Big(0);
+    const foundationAccounts = ['contributors.near', 'lockup.near'];
+    const blockRef: BlockReference = { block_id: +block.block_height };
 
-  const lockupAccounts = await getLockupAccounts(block.block_height);
-  const count = lockupAccounts.length;
+    const lockupAccounts = await getLockupAccounts(block.block_height);
+    const count = lockupAccounts.length;
 
-  console.log({ count, job: 'circulating-supply' });
+    console.log({ count, job: 'circulating-supply' });
 
-  for (let index = 0; index < count; index++) {
-    const account = lockupAccounts[index];
+    for (let index = 0; index < count; index++) {
+      const account = lockupAccounts[index];
 
-    await retry(async ({ attempt }) => {
-      try {
-        console.log({ account, attempt, index, job: 'circulating-supply' });
-        await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
-        const lockupState = await viewLockupState(
-          account.account_id,
-          options,
-          blockRef,
-        );
-
-        if (!lockupState) return;
-
-        return lockedAmount.add(getLockedTokenAmount(lockupState).toString());
-      } catch (error) {
-        console.log({
-          account,
-          attempt,
-          error,
-          index,
-          job: 'circulating-supply',
-        });
-
-        if (
-          error instanceof Error &&
-          error?.message.includes('does not exist while viewing')
-        ) {
-          return;
-        }
-
-        if (attempt >= 3) return;
-
-        throw error;
-      }
-    });
-  }
-
-  const foundationLockedTokens = await Promise.all(
-    foundationAccounts.map(async (account) => {
-      return await retry(async ({ attempt }) => {
+      await retry(async ({ attempt }) => {
         try {
-          console.log({ account, attempt, job: 'circulating-supply' });
-          const resp = await viewAccountBalance(account, options, blockRef);
+          console.log({ account, attempt, index, job: 'circulating-supply' });
+          await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
+          const lockupState = await viewLockupState(
+            account.account_id,
+            options,
+            blockRef,
+          );
 
-          return Big(resp.amount.toString());
+          if (!lockupState) return;
+
+          const amount = getLockedTokenAmount(lockupState).toString();
+
+          console.log({
+            account,
+            amount,
+            index,
+            job: 'circulating-supply',
+          });
+
+          lockedAmount = lockedAmount.add(amount);
         } catch (error) {
+          console.log({
+            account,
+            attempt,
+            error,
+            index,
+            job: 'circulating-supply',
+          });
+
           if (
             error instanceof Error &&
             error?.message.includes('does not exist while viewing')
           ) {
-            return Big(0);
+            return;
           }
 
-          if (attempt >= 3) return Big(0);
+          if (attempt >= 3) return;
 
           throw error;
         }
       });
-    }),
-  );
+    }
 
-  const foundationLockedAmount = foundationLockedTokens.reduce(
-    (acc, current) => acc.add(current),
-    Big(0),
-  );
+    const foundationLockedTokens = await Promise.all(
+      foundationAccounts.map(async (account) => {
+        return await retry(async ({ attempt }) => {
+          try {
+            console.log({ account, attempt, job: 'circulating-supply' });
+            const resp = await viewAccountBalance(account, options, blockRef);
 
-  return Big(block.total_supply)
-    .sub(foundationLockedAmount)
-    .sub(lockedAmount)
-    .toString();
+            return Big(resp.amount.toString());
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error?.message.includes('does not exist while viewing')
+            ) {
+              return Big(0);
+            }
+
+            if (attempt >= 3) return Big(0);
+
+            throw error;
+          }
+        });
+      }),
+    );
+
+    const foundationLockedAmount = foundationLockedTokens.reduce(
+      (acc, current) => acc.add(current),
+      Big(0),
+    );
+
+    console.log({
+      foundationLockedAmount: foundationLockedAmount.toFixed(),
+      lockedAmount: lockedAmount.toFixed(),
+      totalSupply: block.total_supply,
+    });
+
+    return Big('1174473231334933968283134274377401')
+      .sub(foundationLockedAmount)
+      .sub(lockedAmount)
+      .toFixed();
+  } catch (error) {
+    console.log({ error, job: 'stats' });
+    return null;
+  }
 };

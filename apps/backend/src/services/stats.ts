@@ -1,6 +1,5 @@
 import { Big } from 'big.js';
 
-import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
@@ -37,6 +36,8 @@ const blockData = async () => {
 
   if (config.network === Network.MAINNET && block) {
     supply = await circulatingSupply(block);
+
+    console.log({ job: 'stats', supply });
   }
 
   const avgTime = await blockTime(block.block_timestamp);
@@ -73,7 +74,7 @@ const networkData = async () => {
   try {
     validators = await near.query([null], 'validators');
   } catch (error) {
-    logger.error({ error });
+    console.log({ error });
   }
 
   return {
@@ -100,21 +101,25 @@ export const txnData = async () => {
 };
 
 export const syncStats = async () => {
-  const [block, price, network, txn, stats] = await Promise.all([
-    blockData(),
-    marketData(),
-    networkData(),
-    txnData(),
-    knex('stats').first(),
-  ]);
+  try {
+    const [block, price, network, txn, stats] = await Promise.all([
+      blockData(),
+      marketData(),
+      networkData(),
+      txnData(),
+      knex('stats').first(),
+    ]);
 
-  const data = { ...block, ...price, ...network, ...txn };
+    const data = { ...block, ...price, ...network, ...txn };
 
-  logger.warn({ data, job: 'stats' });
+    console.log({ data, job: 'stats' });
 
-  if (stats) {
-    return await knex('stats').update(data);
+    if (stats) {
+      return await knex('stats').update(data);
+    }
+
+    return await knex('stats').insert(data);
+  } catch (error) {
+    return console.log({ error, job: 'stats' });
   }
-
-  return await knex('stats').insert(data);
 };

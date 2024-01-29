@@ -1,6 +1,5 @@
 import { parentPort } from 'worker_threads';
 
-import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
 import sentry from '#libs/sentry';
@@ -11,7 +10,7 @@ import { syncStats } from '#services/stats';
     await syncStats();
   } catch (error) {
     sentry.captureException(error);
-    logger.error({ error, job: 'stats' });
+    console.log({ error, job: 'stats' });
     await sleep(1000);
   }
 
