@@ -57,7 +57,8 @@ const Blocks = () => {
         <div style={height} className=" relative block lg:flex lg:space-x-2">
           <div className="w-full ">
             <VmComponent
-              skeleton={<List ref={heightRef} />}
+              skeleton={<List className="absolute" ref={heightRef} />}
+              defaultSkelton={<List />}
               onChangeHeight={onChangeHeight}
               src={components?.blocksList}
               props={{

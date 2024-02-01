@@ -84,7 +84,8 @@ const Token = () => {
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
-        skeleton={<Overview ref={heightRef} />}
+        skeleton={<Overview className="absolute" ref={heightRef} />}
+        defaultSkelton={<Overview />}
         onChangeHeight={onChangeHeight}
         src={components?.ftOverview}
         props={{

@@ -45,7 +45,14 @@ const TxnFeeChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'txn-fee'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'txn-fee'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'txn-fee'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'txn-fee',

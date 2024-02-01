@@ -45,7 +45,14 @@ const MarketCapChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'market-cap'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'market-cap'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'market-cap'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'market-cap',

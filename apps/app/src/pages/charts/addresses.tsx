@@ -44,7 +44,14 @@ const AddressesChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'addresses'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'addresses'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'addresses'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'addresses',

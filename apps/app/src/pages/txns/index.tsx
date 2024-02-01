@@ -109,7 +109,8 @@ const TransactionList = () => {
           <div className=" w-full">
             <VmComponent
               src={components?.transactionsList}
-              skeleton={<List ref={heightRef} />}
+              skeleton={<List className="absolute" ref={heightRef} />}
+              defaultSkelton={<List />}
               onChangeHeight={onChangeHeight}
               props={{
                 currentPage: currentPage,

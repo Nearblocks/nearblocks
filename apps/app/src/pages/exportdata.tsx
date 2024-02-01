@@ -35,7 +35,8 @@ const ExportData = () => {
     <div style={height} className="relative">
       <VmComponent
         src={components?.exportData}
-        skeleton={<Export ref={heightRef} />}
+        skeleton={<Export className="absolute" ref={heightRef} />}
+        defaultSkelton={<Export />}
         onChangeHeight={onChangeHeight}
         props={{
           network: networkId,

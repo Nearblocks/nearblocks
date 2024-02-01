@@ -4,12 +4,13 @@ import useTranslation from 'next-translate/useTranslation';
 interface Props {
   network: string;
   txns?: boolean;
+  className?: string;
 }
 const Detail = forwardRef(
-  ({ network, txns }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ network, txns, className }: Props, ref: Ref<HTMLDivElement>) => {
     const { t } = useTranslation('txns');
     return (
-      <div ref={ref} className="absolute w-full z-50">
+      <div ref={ref} className={`w-full z-10 ${className}`}>
         <div className="md:flex items-center justify-between">
           <div className="w-80 max-w-xs px-3 py-5">
             <Skeleton className="h-7" />
