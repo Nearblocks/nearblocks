@@ -136,239 +136,132 @@ export default function (props: Props) {
   }, [block?.block_timestamp]);
   return (
     <>
-      <div className="md:flex items-center justify-between">
-        {isLoading ? (
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-7" />
-          </div>
-        ) : (
-          <h1 className="text-xl text-nearblue-600 px-2 py-5">
-            {t ? (
-              <>
-                {t('blocks:block.heading.0')}
-                <span key={1} className="font-semibold">
-                  {t('blocks:block.heading.1', {
-                    block: localFormat(block.block_height | 0),
-                  })}
-                </span>
-              </>
-            ) : (
-              <>
-                Block
-                <span key={1} className="font-semibold">
-                  #{localFormat(block.block_height | 0)}
-                </span>
-              </>
-            )}
-          </h1>
-        )}
-      </div>
       {error || (!isLoading && Object.keys(block).length === 0) ? (
-        <div className="text-nearblue-700 text-xs px-2 mb-4">
+        <div className="text-nearblue-700 text-xs px-2 mb-4 py-5">
           {t ? t('blocks:blockError') : 'Block Error'}
         </div>
       ) : (
-        <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
-          {network === 'testnet' && (
-            <div className="flex flex-wrap p-4 text-red-500">
-              {t
-                ? t('blocks:testnetNotice')
-                : '[ This is a Testnet block only ]'}
-            </div>
-          )}
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.height') : 'Block Height'}
-            </div>
+        <>
+          <div className="md:flex items-center justify-between">
             {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-20" />
+              <div className="w-80 max-w-xs px-3 py-5">
+                <Skeleton className="h-7" />
               </div>
             ) : (
-              <div className="w-full md:w-3/4 font-semibold break-words">
-                {localFormat(block.block_height | 0)}
-              </div>
+              <h1 className="text-xl text-nearblue-600 px-2 py-5">
+                {t ? (
+                  <>
+                    {t('blocks:block.heading.0')}
+                    <span key={1} className="font-semibold">
+                      {t('blocks:block.heading.1', {
+                        block: localFormat(block.block_height | 0),
+                      })}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Block
+                    <span key={1} className="font-semibold">
+                      #{localFormat(block.block_height | 0)}
+                    </span>
+                  </>
+                )}
+              </h1>
             )}
           </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.hash') : 'Hash'}
+          <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
+            {network === 'testnet' && (
+              <div className="flex flex-wrap p-4 text-red-500">
+                {t
+                  ? t('blocks:testnetNotice')
+                  : '[ This is a Testnet block only ]'}
+              </div>
+            )}
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.height') : 'Block Height'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-20" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 font-semibold break-words">
+                  {localFormat(block.block_height | 0)}
+                </div>
+              )}
             </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-xl" />
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.hash') : 'Hash'}
               </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {block.block_hash}
-              </div>
-            )}
-          </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block.block_hash}
+                </div>
+              )}
+            </div>
 
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.timestamp') : 'Timestamp'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-sm" />
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.timestamp') : 'Timestamp'}
               </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {block?.block_timestamp &&
-                  `${getTimeAgoString(nanoToMilli(block?.block_timestamp))} (
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-sm" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.block_timestamp &&
+                    `${getTimeAgoString(nanoToMilli(block?.block_timestamp))} (
                 ${convertToUTC(
                   nanoToMilli(block?.block_timestamp),
                   true,
                 )}) +UTC`}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.transactions.0') : 'Transactions'}
+                </div>
+              )}
             </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-xs" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {t ? (
-                  <>
-                    <LinkWrapper href={`/txns?block=${block.block_hash}`}>
-                      {t('blocks:block.transactions.1', {
-                        txns: localFormat(block.transactions_agg.count || 0),
-                      })}
-                    </LinkWrapper>
-                    &nbsp;
-                    {t('blocks:block.transactions.2', {
-                      receipts: localFormat(block.receipts_agg.count || 0),
-                    })}
-                  </>
-                ) : (
-                  (
-                    <LinkWrapper href={`/txns?block=${block.block_hash}`}>
-                      {localFormat(block.transactions_agg.count || 0) +
-                        ' transactions'}
-                    </LinkWrapper>
-                  ) +
-                  `and ${localFormat(block.receipts_agg.count || 0)} receipts`
-                )}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.author') : 'Author'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                <a
-                  href={`/address/${block.author_account_id}`}
-                  className="hover:no-underline"
-                >
-                  <a className="text-green-500 hover:no-underline">
-                    {block.author_account_id}
-                  </a>
-                </a>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.gasUsed') : 'GAS Used'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {block.chunks_agg.gas_used
-                  ? convertToMetricPrefix(block.chunks_agg.gas_used) + 'gas'
-                  : '0 gas'}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.gasLimit') : 'Gas limit'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {block.chunks_agg.gas_limit
-                  ? convertToMetricPrefix(block.chunks_agg.gas_limit) + 'gas'
-                  : '0 gas'}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.gasPrice') : 'GAS Price'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {gasPrice(Number(block.gas_price | 0))}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.gasFee') : 'Gas Fee'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {block.chunks_agg.gas_used && block.gas_price
-                  ? gasFee(
-                      Number(block.chunks_agg.gas_used),
-                      Number(block.gas_price),
-                    )
-                  : '0 Ⓝ'}
-              </div>
-            )}
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              {t ? t('blocks:block.parenthash') : 'Parent hash'}
-            </div>
-            {isLoading ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full max-w-lg" />
-              </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                <a
-                  href={`/blocks/${block.prev_block_hash}`}
-                  className="hover:no-underline"
-                >
-                  <a className="text-green-500 hover:no-underline">
-                    {block.prev_block_hash}
-                  </a>
-                </a>
-              </div>
-            )}
-          </div>
-          {network === 'mainnet' && date && (
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.price') : 'Price'}
+                {t ? t('blocks:block.transactions.0') : 'Transactions'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-xs" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {t ? (
+                    <>
+                      <LinkWrapper href={`/txns?block=${block.block_hash}`}>
+                        {t('blocks:block.transactions.1', {
+                          txns: localFormat(block.transactions_agg.count || 0),
+                        })}
+                      </LinkWrapper>
+                      &nbsp;
+                      {t('blocks:block.transactions.2', {
+                        receipts: localFormat(block.receipts_agg.count || 0),
+                      })}
+                    </>
+                  ) : (
+                    (
+                      <LinkWrapper href={`/txns?block=${block.block_hash}`}>
+                        {localFormat(block.transactions_agg.count || 0) +
+                          ' transactions'}
+                      </LinkWrapper>
+                    ) +
+                    `and ${localFormat(block.receipts_agg.count || 0)} receipts`
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.author') : 'Author'}
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
@@ -376,12 +269,121 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {price ? `$${dollarFormat(price)} / Ⓝ` : 'N/A'}
+                  <a
+                    href={`/address/${block.author_account_id}`}
+                    className="hover:no-underline"
+                  >
+                    <a className="text-green-500 hover:no-underline">
+                      {block.author_account_id}
+                    </a>
+                  </a>
                 </div>
               )}
             </div>
-          )}
-        </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.gasUsed') : 'GAS Used'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block.chunks_agg.gas_used
+                    ? convertToMetricPrefix(block.chunks_agg.gas_used) + 'gas'
+                    : '0 gas'}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.gasLimit') : 'Gas limit'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block.chunks_agg.gas_limit
+                    ? convertToMetricPrefix(block.chunks_agg.gas_limit) + 'gas'
+                    : '0 gas'}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.gasPrice') : 'GAS Price'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {gasPrice(Number(block.gas_price | 0))}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.gasFee') : 'Gas Fee'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block.chunks_agg.gas_used && block.gas_price
+                    ? gasFee(
+                        Number(block.chunks_agg.gas_used),
+                        Number(block.gas_price),
+                      )
+                    : '0 Ⓝ'}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('blocks:block.parenthash') : 'Parent hash'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  <a
+                    href={`/blocks/${block.prev_block_hash}`}
+                    className="hover:no-underline"
+                  >
+                    <a className="text-green-500 hover:no-underline">
+                      {block.prev_block_hash}
+                    </a>
+                  </a>
+                </div>
+              )}
+            </div>
+            {network === 'mainnet' && date && (
+              <div className="flex flex-wrap p-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                  {t ? t('blocks:block.price') : 'Price'}
+                </div>
+                {isLoading ? (
+                  <div className="w-full md:w-3/4">
+                    <Loader className="flex w-full max-w-lg" />
+                  </div>
+                ) : (
+                  <div className="w-full md:w-3/4 break-words">
+                    {price ? `$${dollarFormat(price)} / Ⓝ` : 'N/A'}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </>
   );

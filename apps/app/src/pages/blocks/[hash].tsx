@@ -44,7 +44,10 @@ const Block = () => {
             network: networkId,
             t: t,
           }}
-          skeleton={<Detail ref={heightRef} network={networkId} />}
+          skeleton={
+            <Detail className="absolute" ref={heightRef} network={networkId} />
+          }
+          defaultSkelton={<Detail network={networkId} />}
           onChangeHeight={onChangeHeight}
         />
       </div>{' '}

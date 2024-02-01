@@ -44,7 +44,14 @@ const TxnsChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'txns'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'txns'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'txns'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'txns',

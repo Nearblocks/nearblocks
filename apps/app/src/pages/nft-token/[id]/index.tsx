@@ -34,7 +34,8 @@ const NFToken = () => {
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
-        skeleton={<Overview nft={true} ref={heightRef} />}
+        skeleton={<Overview className="absolute" nft={true} ref={heightRef} />}
+        defaultSkelton={<Overview />}
         onChangeHeight={onChangeHeight}
         src={components?.nftOverview}
         props={{

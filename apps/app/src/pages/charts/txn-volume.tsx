@@ -45,7 +45,14 @@ const TxnVolumeChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'txn-volume'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'txn-volume'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'txn-volume'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'txn-volume',

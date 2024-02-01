@@ -40,7 +40,15 @@ const Txn = () => {
         <VmComponent
           src={components?.transactionsHash}
           props={{ hash: hash, network: networkId, t: t }}
-          skeleton={<Detail txns={true} ref={heightRef} network={networkId} />}
+          skeleton={
+            <Detail
+              className="absolute"
+              txns={true}
+              ref={heightRef}
+              network={networkId}
+            />
+          }
+          defaultSkelton={<Detail txns={true} network={networkId} />}
           onChangeHeight={onChangeHeight}
         />
       </div>

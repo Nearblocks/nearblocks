@@ -70,7 +70,8 @@ const HomePage = () => {
       <div style={overviewHeight} className=" relative -mt-14 ">
         <VmComponent
           src={components?.transactionsOverview}
-          skeleton={<Overview ref={overviewRef} />}
+          skeleton={<Overview className="absolute" ref={overviewRef} />}
+          defaultSkelton={<Overview />}
           props={{ t: t, network: networkId }}
         />
       </div>
@@ -79,29 +80,31 @@ const HomePage = () => {
       <section>
         <div className="container mx-auto px-3  z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="h-full relative w-full">
+            <div className="h-full w-full">
               <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                   {t('home:latestBlocks')}
                 </h2>
 
-                <div style={latestHeight}>
+                <div style={latestHeight} className="relative">
                   <VmComponent
                     src={components?.blocksLatest}
-                    skeleton={<Latest ref={latestRef} />}
+                    skeleton={<Latest className="absolute" ref={latestRef} />}
+                    defaultSkelton={<Latest />}
                     props={{ t: t, network: networkId }}
                   />
                 </div>
               </div>
             </div>
-            <div className="h-full relative w-full">
+            <div className="h-full  w-full">
               <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
                 <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
                   {t('home:latestTxns')}
                 </h2>
-                <div style={latestHeight}>
+                <div style={latestHeight} className="relative">
                   <VmComponent
-                    skeleton={<Latest ref={latestRef} />}
+                    skeleton={<Latest className="absolute" ref={latestRef} />}
+                    defaultSkelton={<Latest />}
                     src={components?.transactionsLatest}
                     props={{ t: t, network: networkId }}
                   />

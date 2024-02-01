@@ -43,7 +43,14 @@ const NearSupplyChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'near-supply'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'near-supply'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'near-supply'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'near-supply',

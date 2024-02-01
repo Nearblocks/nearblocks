@@ -1,9 +1,11 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
-
-const Export = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
+interface Props {
+  className?: string;
+}
+const Export = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div ref={ref} className="absolute w-full z-50">
+    <div ref={ref} className={`w-full z-10 ${className}`}>
       <div className="bg-neargray-25 py-16 flex flex-col items-center">
         <div className="w-20 py-1">
           <Skeleton className="h-6" />

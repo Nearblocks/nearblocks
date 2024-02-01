@@ -3,6 +3,9 @@ import Skeleton from '../common/Skeleton';
 import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
 
+interface Props {
+  className?: string;
+}
 const charts = [
   {
     link: '/charts/near-price',
@@ -53,10 +56,10 @@ const charts = [
     exclude: networkId === 'testnet',
   },
 ];
-const Index = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
+const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   const { t } = useTranslation('charts');
   return (
-    <div ref={ref} className="absolute w-full z-50">
+    <div ref={ref} className={`w-full z-10 ${props.className}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {charts.map((chart) => (
           <>

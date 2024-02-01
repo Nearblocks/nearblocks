@@ -1,9 +1,11 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-
-const Detail = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
+interface Props {
+  className?: string;
+}
+const Detail = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div ref={ref} className="absolute w-full z-10">
+    <div ref={ref} className={`w-full z-10 ${props.className}`}>
       <div className="grid md:grid-cols-12 pt-4 mb-2">
         <div className="md:col-span-5 lg:col-span-4 pt-4">
           <div className="bg-white border rounded-lg soft-shadow p-3 aspect-square"></div>

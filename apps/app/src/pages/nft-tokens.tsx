@@ -58,7 +58,8 @@ const TopNFTTokens = () => {
             <div className="w-full ">
               <VmComponent
                 src={components?.nftList}
-                skeleton={<List ref={heightRef} />}
+                skeleton={<List className="absolute" ref={heightRef} />}
+                defaultSkelton={<List />}
                 onChangeHeight={onChangeHeight}
                 props={{
                   currentPage: currentPage,

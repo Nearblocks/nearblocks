@@ -35,7 +35,8 @@ const Address = () => {
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
-        skeleton={<Overview ref={heightRef} />}
+        skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
+        defaultSkelton={<Overview />}
         onChangeHeight={onChangeHeight}
         src={components?.account}
         props={{

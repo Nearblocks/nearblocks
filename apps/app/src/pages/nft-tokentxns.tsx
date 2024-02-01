@@ -59,7 +59,8 @@ const NftToxenTxns = () => {
           <div className="w-full ">
             <VmComponent
               src={components?.nftTransfersList}
-              skeleton={<List ref={heightRef} />}
+              skeleton={<List className="absolute" ref={heightRef} />}
+              defaultSkelton={<List />}
               onChangeHeight={onChangeHeight}
               props={{
                 t: t,
