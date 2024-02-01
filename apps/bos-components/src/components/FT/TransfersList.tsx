@@ -36,7 +36,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('token:fts.noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
   const [tokens, setTokens] = useState<{ [key: number]: TransactionInfo[] }>(
     {},
   );

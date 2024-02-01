@@ -125,3 +125,19 @@ a {
 .loading-pulse div {
   box-sizing: content-box;
 }
+
+.errorBg {
+  background: url('../../public/images/leaf.jpg') no-repeat;
+  mix-blend-mode: multiply;
+  height: 570px;
+  background-position: center top;
+  background-size: cover;
+  width: 100%;
+  margin-top: 170px;
+}
+.errorContent {
+  top: 50px;
+}
+.errorContainer {
+  width: 100%;
+}

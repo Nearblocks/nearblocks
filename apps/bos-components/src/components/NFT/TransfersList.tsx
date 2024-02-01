@@ -231,7 +231,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
     },
     {
       header: <span>{t ? t('to') : 'To'}</span>,
-      key: 'receiver_account_id',
+      key: 'token_new_owner_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           {row.token_new_owner_account_id ? (
@@ -254,7 +254,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                   align="start"
                   side="bottom"
                 >
-                  {row.receiver_account_id}
+                  {row.token_new_owner_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -263,8 +263,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           )}
         </span>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },

@@ -536,7 +536,7 @@ export default function ({ network, t, id }: Props) {
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens'}:
                 </div>
-                <div className="w-full md:w-3/4 break-words -my-1">
+                <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
                     data={inventoryData}
                     loading={loading}
