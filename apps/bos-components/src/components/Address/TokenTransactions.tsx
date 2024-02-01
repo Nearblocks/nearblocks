@@ -53,7 +53,7 @@ export default function ({
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const errorMessage = t ? t('noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
   const [tokens, setTokens] = useState<{ [key: number]: TransactionInfo[] }>(
     {},
   );
@@ -115,7 +115,11 @@ export default function ({
           }) => {
             const resp = data?.body?.txns;
             if (data.status === 200) {
-              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              } else if (resp.length === 0) {
+                setTokens({});
+              }
             }
           },
         )
@@ -434,7 +438,7 @@ export default function ({
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'receiver_account_id',
+      key: 'token_new_owner_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           {row.token_new_owner_account_id ? (
@@ -457,7 +461,7 @@ export default function ({
                   align="start"
                   side="bottom"
                 >
-                  {row.receiver_account_id}
+                  {row.token_new_owner_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>

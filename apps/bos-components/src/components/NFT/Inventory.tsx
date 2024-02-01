@@ -126,7 +126,7 @@ export default function ({ network, id, token }: Props) {
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4`}>
+        <div className={`flex flex-col lg:flex-row pt-4 border-b`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
               A total of {localFormat(totalCount)} tokens found
@@ -173,6 +173,7 @@ export default function ({ network, id, token }: Props) {
                     props={{
                       base: tokenData.base_uri,
                       reference: nft.reference,
+                      media: nft.media,
                       className: 'rounded max-h-full',
                       network: network,
                     }}

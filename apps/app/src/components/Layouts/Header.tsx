@@ -478,7 +478,10 @@ const Header = () => {
                               </div>
                             ) : (
                               <ActiveLink href="/login">
-                                <div className="flex items-center">Sign In</div>
+                                <div className="w-full flex items-center">
+                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
+                                  Sign In
+                                </div>
                               </ActiveLink>
                             )}
                           </div>

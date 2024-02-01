@@ -289,10 +289,8 @@ export default function (props: Props) {
             </div>
           ) : (
             <div>
-              {txn.outcomes?.status ? (
+              {txn.outcomes?.status !== undefined && (
                 <TxnStatus showLabel status={txn.outcomes?.status} />
-              ) : (
-                ''
               )}
               {errorMessage && (
                 <div className="text-xs bg-orange-50 my-2 rounded-md text-center px-2 py-1">
@@ -379,8 +377,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {((actions.length > 0 && actions[0]?.action_kind) ||
-        (logs.length > 0 && logs[0]?.contract)) && (
+      {(actions.length > 0 || logs.length > 0) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">

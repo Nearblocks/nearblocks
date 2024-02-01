@@ -4,15 +4,23 @@
  * License: Business Source License 1.1
  * Description: Fungible Token Overview on Near Protocol.
  * @interface Props
- * @param {string} id - The token identifier passed as a string
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} [id] - The token identifier passed as a string
+ * @param {string} [tokenFilter] - The token filter identifier passed as a string
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
+ * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
+ *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
-  id: string;
   network: string;
   t: (key: string) => string;
+  id: string;
+  tokenFilter?: string;
+  filters?: { [key: string]: string };
+  onFilterClear?: (name: string) => void;
 }
 
 import Links from '@/includes/Common/Links';
@@ -27,7 +35,14 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { getConfig } from '@/includes/libs';
 import { StatusInfo, Token } from '@/includes/types';
 
-export default function ({ network, id, t }: Props) {
+export default function ({
+  network,
+  t,
+  id,
+  tokenFilter,
+  filters,
+  onFilterClear,
+}: Props) {
   const tabs = [
     t ? t('token:fts.ft.transfers') : 'Transfers',
     t ? t('token:fts.ft.holders') : 'Holders',
@@ -129,6 +144,7 @@ export default function ({ network, id, t }: Props) {
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
+    onFilterClear && onFilterClear('');
   };
 
   const onToggle = () => setShowMarketCap((o) => !o);
@@ -405,6 +421,16 @@ export default function ({ network, id, t }: Props) {
           </div>
         </div>
         <div className="py-6"></div>
+        {tokenFilter && (
+          <Widget
+            src={`${config.ownerId}/widget/bos-components.components.FT.TokenFilter`}
+            props={{
+              network: network,
+              id: id,
+              tokenFilter: tokenFilter,
+            }}
+          />
+        )}
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
             <Tabs.Root defaultValue={pageTab}>
@@ -434,6 +460,8 @@ export default function ({ network, id, t }: Props) {
                         network: network,
                         id: id,
                         t: t,
+                        filters: filters,
+                        onFilterClear: onFilterClear,
                       }}
                     />
                   }

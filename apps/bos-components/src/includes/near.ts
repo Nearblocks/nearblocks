@@ -46,10 +46,13 @@ export function gasPrice(yacto: number) {
 
 export function tokenAmount(amount: string, decimal: string, format: boolean) {
   if (amount === undefined || amount === null) return 'N/A';
+
   const near = Big(amount).div(Big(10).pow(decimal));
+
   const formattedValue = format
     ? near.toFixed(8).replace(/\.?0+$/, '')
-    : near.toFixed(decimal).replace(/\.?0+$/, '');
+    : near.toFixed(Big(decimal, 10)).replace(/\.?0+$/, '');
+
   return formattedValue;
 }
 
@@ -126,7 +129,6 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
       txLogs = [...txLogs, ...mappedLogs];
     }
   }
-
   return txLogs;
 }
 
@@ -178,17 +180,20 @@ export function txnErrorMessage(txn: RPCTransactionInfo) {
 export function formatLine(line: any, offset: any, format: any) {
   let result = `${offset.toString(16).padStart(8, '0')}  `;
 
-  const bytes = line.split(' ').filter(Boolean);
-  bytes.forEach((byte: any, index: any) => {
+  const hexValues = line.match(/[0-9a-fA-F]{2}/g) || [];
+
+  hexValues.forEach((byte: any, index: any) => {
     if (index > 0 && index % 4 === 0) {
       result += ' ';
     }
     result += byte.toUpperCase().padEnd(2, ' ') + ' ';
   });
 
-  if (format === 'default') {
+  if (format === 'twos') {
+    result = result.replace(/(.{4})/g, '$1 ');
+  } else if (format === 'default') {
     result += ` ${String.fromCharCode(
-      ...bytes.map((b: any) => parseInt(b, 16)),
+      ...hexValues.map((b: any) => parseInt(b, 16)),
     )}`;
   }
 
