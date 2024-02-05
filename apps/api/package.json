@@ -12,7 +12,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn dist && yarn start\" --watch src --ext ts",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
     "build": "yarn clean && tsc",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"

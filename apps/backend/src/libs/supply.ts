@@ -1,23 +1,18 @@
+import { createRequire } from 'module';
+
 import Big from 'big.js';
-import {
-  BlockReference,
-  ConnectOptions,
-  getLockedTokenAmount,
-  viewAccountBalance,
-  viewLockupState,
-} from 'near-lockup-helper';
+import { chunk } from 'lodash-es';
 
 import { Block } from 'nb-types';
-import { retry, sleep } from 'nb-utils';
+import { retry } from 'nb-utils';
 
 import config from '#config';
 
 import knex from './knex.js';
+import { nearBalance } from './near.js';
 
-const options: ConnectOptions = {
-  networkId: config.network,
-  nodeUrl: config.rpcUrl,
-};
+const require = createRequire(import.meta.url);
+const lockup = require('nb-lockup');
 
 const getLockupAccounts = async (blockHeight: number) => {
   return knex('accounts')
@@ -61,69 +56,69 @@ export const circulatingSupply = async (block: Block) => {
   try {
     let lockedAmount = Big(0);
     const foundationAccounts = ['contributors.near', 'lockup.near'];
-    const blockRef: BlockReference = { block_id: +block.block_height };
 
     const lockupAccounts = await getLockupAccounts(block.block_height);
-    const count = lockupAccounts.length;
+    const chunks = chunk(lockupAccounts, 4);
+    const count = chunks.length;
 
-    console.log({ count, job: 'circulating-supply' });
+    console.log({ accounts: count * 4, job: 'daily-stats' });
 
     for (let index = 0; index < count; index++) {
-      const account = lockupAccounts[index];
+      const accounts = chunks[index];
 
-      await retry(async ({ attempt }) => {
-        try {
-          console.log({ account, attempt, index, job: 'circulating-supply' });
-          await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
-          const lockupState = await viewLockupState(
-            account.account_id,
-            options,
-            blockRef,
-          );
+      await Promise.all(
+        accounts.map(async (account) => {
+          await retry(async ({ attempt }) => {
+            try {
+              const amount = await lockup.locked(
+                config.rpcUrl,
+                account.account_id,
+                +block.block_height,
+                block.block_timestamp,
+              );
 
-          if (!lockupState) return;
+              console.log({
+                account,
+                amount,
+                attempt,
+                index,
+                job: 'daily-stats',
+              });
 
-          const amount = getLockedTokenAmount(lockupState).toString();
+              lockedAmount = lockedAmount.add(amount);
+            } catch (error) {
+              console.log({
+                account,
+                attempt,
+                error,
+                index,
+                job: 'daily-stats',
+              });
 
-          console.log({
-            account,
-            amount,
-            index,
-            job: 'circulating-supply',
+              if (
+                error instanceof Error &&
+                error?.message.includes('does not exist while viewing')
+              ) {
+                return;
+              }
+
+              if (attempt >= 3) return;
+
+              throw error;
+            }
           });
-
-          lockedAmount = lockedAmount.add(amount);
-        } catch (error) {
-          console.log({
-            account,
-            attempt,
-            error,
-            index,
-            job: 'circulating-supply',
-          });
-
-          if (
-            error instanceof Error &&
-            error?.message.includes('does not exist while viewing')
-          ) {
-            return;
-          }
-
-          if (attempt >= 3) return;
-
-          throw error;
-        }
-      });
+        }),
+      );
     }
 
     const foundationLockedTokens = await Promise.all(
       foundationAccounts.map(async (account) => {
         return await retry(async ({ attempt }) => {
           try {
-            console.log({ account, attempt, job: 'circulating-supply' });
-            const resp = await viewAccountBalance(account, options, blockRef);
+            const amount = await nearBalance(account, +block.block_height);
 
-            return Big(resp.amount.toString());
+            if (amount) return Big(amount);
+            return Big(0);
           } catch (error) {
             if (
               error instanceof Error &&
@@ -151,12 +146,12 @@ export const circulatingSupply = async (block: Block) => {
       totalSupply: block.total_supply,
     });
 
-    return Big('1174473231334933968283134274377401')
+    return Big(block.total_supply)
       .sub(foundationLockedAmount)
       .sub(lockedAmount)
       .toFixed();
   } catch (error) {
-    console.log({ error, job: 'stats' });
+    console.log({ error, job: 'daily-stats' });
     return null;
   }
 };
