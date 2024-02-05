@@ -69,8 +69,6 @@ const marketHistory = async (
       },
     );
 
-    logger.warn({ price });
-
     return {
       market_cap: price?.data?.history?.[0]?.cap ?? null,
       price: price?.data?.history?.[0]?.rate ?? null,

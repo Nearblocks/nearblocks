@@ -98,41 +98,34 @@ const networkData = async () => {
 };
 
 export const txnData = async () => {
-  try {
-    const start = dayjs.utc().startOf('day').valueOf();
+  const start = dayjs.utc().startOf('day').valueOf();
 
-    const [stats, txns] = await Promise.all([
-      knex('daily_stats').sum('txns').first(),
-      knex('transactions')
-        .count('block_timestamp')
-        .where('block_timestamp', '>', msToNsTime(start))
-        .first(),
-    ]);
+  const [stats, txns] = await Promise.all([
+    knex('daily_stats').sum('txns').first(),
+    knex('transactions')
+      .count('block_timestamp')
+      .where('block_timestamp', '>', msToNsTime(start))
+      .first(),
+  ]);
 
-    return {
-      total_txns: Big(stats?.sum ?? 0)
-        .add(txns?.count ?? 0)
-        .toFixed(),
-    };
-  } catch (error) {
-    console.log({ error, job: 'stats' });
-    return {};
-  }
+  return {
+    total_txns: Big(stats?.sum ?? 0)
+      .add(txns?.count ?? 0)
+      .toFixed(),
+  };
 };
 
 export const syncStats = async () => {
   try {
-    const [block, price, network, txn, stats] = await Promise.all([
-      blockData(),
+    const block = await blockData();
+    const stats = await knex('stats').first();
+    const [price, network, txn] = await Promise.all([
       marketData(),
       networkData(),
       txnData(),
-      knex('stats').first(),
     ]);
 
     const data = { ...block, ...price, ...network, ...txn };
-
-    console.log({ data, job: 'stats' });
 
     if (stats) {
       return await knex('stats').update(data);

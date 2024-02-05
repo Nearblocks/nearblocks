@@ -5,6 +5,19 @@ import { FTMetadata, NFTMetadata, NFTTokenInfo } from '#types/types.js';
 
 const near = new RPC(config.rpcUrl);
 
+export const nearBalance = async (
+  account: string,
+  block: number | string,
+): Promise<null | string> => {
+  const { data } = await near.viewAccount(account, block);
+
+  if (data.result) {
+    return data.result.amount;
+  }
+
+  return null;
+};
+
 export const ftBalance = async (
   near: RPC,
   contract: string,
