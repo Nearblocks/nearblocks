@@ -1,42 +1,24 @@
 import { Request, Response } from 'express';
 
 import catchAsync from '#libs/async';
-import db from '#libs/db';
+import sql from '#libs/postgres';
 import redis from '#libs/redis';
 
-const EXPIRY = 15; // 15 sec
+const EXPIRY = 5; // 5 sec
 
 const latest = catchAsync(async (_req: Request, res: Response) => {
   const stats = await redis.cache(
     'stats:latest',
     async () => {
       try {
-        const { rows } = await db.query(
-          `
-            SELECT
-              block,
-              gas_price,
-              avg_block_time,
-              nodes,
-              nodes_online,
-              near_price,
-              near_btc_price,
-              market_cap,
-              volume,
-              high_24h,
-              high_all,
-              low_24h,
-              low_all,
-              change_24,
-              total_supply,
-              total_txns
-            FROM 
-              stats
-            LIMIT 1
-          `,
-        );
-
-        return rows;
+        return await sql`
+          SELECT
+            *
+          FROM
+            stats
+          LIMIT
+            1
+        `;
       } catch (error) {
         return null;
       }

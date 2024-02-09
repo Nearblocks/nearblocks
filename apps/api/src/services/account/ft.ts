@@ -4,6 +4,7 @@ import config from '#config';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import db from '#libs/db';
+import sql from '#libs/postgres';
 import { FtTxns, FtTxnsCount, FtTxnsExport } from '#libs/schema/account';
 import { streamCsv } from '#libs/stream';
 import {
@@ -22,208 +23,141 @@ import {
 const txns = catchAsync(
   async (req: RequestValidator<FtTxns>, res: Response) => {
     const account = req.validator.data.account;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
 
-    if (from && to && from !== account && to !== account) {
-      return res.status(200).json({ txns: [] });
-    }
-
     const { limit, offset } = getPagination(page, per_page);
-    // Use the same inner join query for txn count query below
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
-          amount,
-          event_kind,
-          txn.transaction_hash,
-          txn.included_in_block_hash,
-          txn.block_timestamp,
-          txn.block,
-          txn.outcomes,
-          (
-            SELECT
-              json_build_object(
-                'contract',
-                contract,
-                'name',
-                name,
-                'symbol',
-                symbol,
-                'decimals',
-                decimals,
-                'icon',
-                icon,
-                'reference',
-                reference
-              )
-            FROM
-              ft_meta
-            WHERE
-              ft_meta.contract = emitted_by_contract_account_id
-          ) AS ft
-        FROM
-          assets__fungible_token_events
-          INNER JOIN (
-            SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
-            FROM
-              assets__fungible_token_events a
-            WHERE
-              ${
-                from || to
-                  ? `
-                    token_old_owner_account_id = ${from ? `:from` : `:account`}
-                    AND token_new_owner_account_id = ${to ? `:to` : `:account`}
-                  `
-                  : `
-                    (
-                      token_old_owner_account_id = :account
-                      OR token_new_owner_account_id = :account
-                    )
-                  `
-              }
-              AND ${event ? `event_kind = :event` : true}
-              AND EXISTS (
-                SELECT
-                  1
-                FROM
-                  ft_meta ft
-                WHERE
-                  ft.contract = a.emitted_by_contract_account_id
-              )
-            ORDER BY
-              emitted_at_block_timestamp + 0 ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              },
-              emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_index_of_event_entry_in_shard ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              }
-            LIMIT
-              :limit OFFSET :offset
-          ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          )
-          LEFT JOIN LATERAL (
-            SELECT
-              transactions.transaction_hash,
-              transactions.included_in_block_hash,
-              transactions.block_timestamp,
-              (
-                SELECT
-                  json_build_object(
-                    'block_height',
-                    block_height
+    const txns = await sql`
+      SELECT
+        event_index,
+        affected_account_id,
+        involved_account_id,
+        delta_amount,
+        cause,
+        txn.transaction_hash,
+        txn.included_in_block_hash,
+        txn.block_timestamp,
+        txn.block,
+        txn.outcomes,
+        (
+          SELECT
+            JSON_BUILD_OBJECT(
+              'contract',
+              contract,
+              'name',
+              name,
+              'symbol',
+              symbol,
+              'decimals',
+              decimals,
+              'icon',
+              icon,
+              'reference',
+              reference
+            )
+          FROM
+            ft_meta
+          WHERE
+            ft_meta.contract = contract_account_id
+        ) AS ft
+      FROM
+        ft_events
+        INNER JOIN (
+          SELECT
+            event_index
+          FROM
+            ft_events a
+          WHERE
+            affected_account_id = ${account}
+            AND ${event ? `cause = ${event}` : true}
+            AND EXISTS (
+              SELECT
+                1
+              FROM
+                ft_meta ft
+              WHERE
+                ft.contract = a.contract_account_id
+            )
+          ORDER BY
+            event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          LIMIT
+            ${limit}
+          OFFSET
+            ${offset}
+        ) AS tmp using (event_index)
+        LEFT JOIN LATERAL (
+          SELECT
+            transactions.transaction_hash,
+            transactions.included_in_block_hash,
+            transactions.block_timestamp,
+            (
+              SELECT
+                JSON_BUILD_OBJECT('block_height', block_height)
+              FROM
+                blocks
+              WHERE
+                blocks.block_hash = transactions.included_in_block_hash
+            ) AS block,
+            (
+              SELECT
+                JSON_BUILD_OBJECT(
+                  'status',
+                  BOOL_AND(
+                    CASE
+                      WHEN status = 'SUCCESS_RECEIPT_ID'
+                      OR status = 'SUCCESS_VALUE' THEN TRUE
+                      ELSE FALSE
+                    END
                   )
-                FROM
-                  blocks
-                WHERE
-                  blocks.block_hash = transactions.included_in_block_hash
-              ) AS block,
-              (
-                SELECT
-                  json_build_object(
-                    'status',
-                    BOOL_AND (
-                      CASE WHEN status = 'SUCCESS_RECEIPT_ID'
-                      OR status = 'SUCCESS_VALUE' THEN TRUE ELSE FALSE END
-                    )
-                  )
-                FROM
-                  execution_outcomes
-                WHERE
-                  execution_outcomes.receipt_id = transactions.converted_into_receipt_id
-              ) AS outcomes
-            FROM
-              transactions
-              JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
-            WHERE
-              receipts.receipt_id = assets__fungible_token_events.emitted_for_receipt_id
-          ) txn ON TRUE
-        ORDER BY
-          emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_index_of_event_entry_in_shard ${
-            order === 'desc' ? 'DESC' : 'ASC'
-          }
-      `,
-      { account, event, from, limit, offset, to },
-    );
+                )
+              FROM
+                execution_outcomes
+              WHERE
+                execution_outcomes.receipt_id = transactions.converted_into_receipt_id
+            ) AS outcomes
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = ft_events.receipt_id
+        ) txn ON TRUE
+      ORDER BY
+        event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ txns: rows });
+    return res.status(200).json({ txns });
   },
 );
 
 const txnsCount = catchAsync(
   async (req: RequestValidator<FtTxnsCount>, res: Response) => {
     const account = req.validator.data.account;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
 
-    if (from && to && from !== account && to !== account) {
-      return res.status(200).json({ txns: [] });
-    }
-
     const useFormat = true;
-    const bindings = { account, event, from, to };
+    const bindings = { account, event };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
-        assets__fungible_token_events a
+        ft_events a
       WHERE
-        ${
-          from || to
-            ? `
-              token_old_owner_account_id = ${from ? `:from` : `:account`}
-              AND token_new_owner_account_id = ${to ? `:to` : `:account`}
-            `
-            : `
-              (
-                token_old_owner_account_id = :account
-                OR token_new_owner_account_id = :account
-              )
-            `
-        }
-        AND ${event ? `event_kind = :event` : true}
+        affected_account_id = :account
+        AND ${event ? `cause = :event` : true}
         AND EXISTS (
           SELECT
             1
           FROM
             ft_meta ft
           WHERE
-            ft.contract = a.emitted_by_contract_account_id
+            ft.contract = a.contract_account_id
         )
     `;
 
     const { query, values } = keyBinder(
-      rawQuery({ select: 'emitted_for_receipt_id' }),
+      rawQuery({ select: 'receipt_id' }),
       bindings,
       useFormat,
     );
@@ -233,15 +167,14 @@ const txnsCount = catchAsync(
       values,
     );
 
-    const cost = +rows?.[0]?.cost;
     const count = +rows?.[0]?.count;
 
-    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
+    if (count > config.maxQueryRows) {
       return res.status(200).json({ txns: rows });
     }
 
     const { query: countQuery, values: countValues } = keyBinder(
-      rawQuery({ select: 'COUNT(emitted_for_receipt_id)' }),
+      rawQuery({ select: 'COUNT(receipt_id)' }),
       bindings,
     );
 
@@ -268,18 +201,11 @@ const txnsExport = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
-          amount,
-          event_kind,
+          event_index,
+          affected_account_id,
+          involved_account_id,
+          delta_amount,
+          cause,
           txn.transaction_hash,
           txn.included_in_block_hash,
           txn.block_timestamp,
@@ -304,47 +230,34 @@ const txnsExport = catchAsync(
             FROM
               ft_meta
             WHERE
-              ft_meta.contract = emitted_by_contract_account_id
+              ft_meta.contract = contract_account_id
           ) AS ft
         FROM
-          assets__fungible_token_events
+          ft_events
           INNER JOIN (
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              event_index
             FROM
-              assets__fungible_token_events a
-              JOIN receipts r ON r.receipt_id = a.emitted_for_receipt_id
+              ft_events a
+              JOIN receipts r ON r.receipt_id = a.receipt_id
               JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
             WHERE
-              (
-                token_old_owner_account_id = :account
-                OR token_new_owner_account_id = :account
-              )
+              affected_account_id = :account
               AND EXISTS (
                 SELECT
                   1
                 FROM
                   ft_meta ft
                 WHERE
-                  ft.contract = a.emitted_by_contract_account_id
+                  ft.contract = a.contract_account_id
               )
               AND t.block_timestamp BETWEEN :start AND :end
             ORDER BY
-              emitted_at_block_timestamp ASC,
-              emitted_in_shard_id ASC,
-              emitted_index_of_event_entry_in_shard ASC
+              event_index ASC
             LIMIT
               5000
           ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           )
           LEFT JOIN LATERAL (
             SELECT
@@ -380,12 +293,10 @@ const txnsExport = catchAsync(
               transactions
               JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
             WHERE
-              receipts.receipt_id = assets__fungible_token_events.emitted_for_receipt_id
+              receipts.receipt_id = ft_events.receipt_id
           ) txn ON TRUE
         ORDER BY
-          emitted_at_block_timestamp ASC,
-          emitted_in_shard_id ASC,
-          emitted_index_of_event_entry_in_shard ASC
+          event_index ASC
       `,
       { account, end, start },
     );
@@ -409,23 +320,23 @@ const txnsExport = catchAsync(
         stringifier.write({
           block: row.block.block_height,
           contract: row.ft ? row.ft.contract : '',
-          from: row.token_old_owner_account_id || 'system',
+          from: row.affected_account_id || 'system',
           hash: row.transaction_hash,
-          method: row.event_kind,
+          method: row.cause,
           quantity: row.ft
-            ? tokenAmount(row.amount, row.ft.decimals)
-            : row.amount,
+            ? tokenAmount(row.delta_amount, row.ft.decimals)
+            : row.delta_amount,
           status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.token_new_owner_account_id || 'system',
+          to: row.involved_account_id || 'system',
           token: row.ft ? `${row.ft.name} (${row.ft.symbol})` : '',
         });
         callback();
       };
 
-    streamCsv(res, query, values, columns, transform);
+    return streamCsv(res, query, values, columns, transform);
   },
 );
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Big from 'big.js';
 
 import { BlockHeader } from 'nb-near';
@@ -10,7 +11,6 @@ import {
   yoctoToNear,
 } from '#libs/utils';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type ValidatorSortFn = (a: ValidatorFullData, b: ValidatorFullData) => number;
 
 export const validatorsSortFns: ValidatorSortFn[] = [
@@ -50,9 +50,9 @@ export const timeRemaining = (
     !latestBlockSub?.timestamp ||
     !epochStartBlock?.timestamp ||
     !epochProgress
-  ) {
+  )
     return 0;
-  }
+
   const epochTimestamp = Number(nsToMsTime(epochStartBlock?.timestamp || 0));
   const latestBlockTimestamp = Number(
     nsToMsTime(latestBlockSub?.timestamp || 0),
@@ -65,10 +65,10 @@ export const timeRemaining = (
 };
 
 export const elapsedTime = (epochStartBlock: BlockHeader) => {
-  if (!epochStartBlock?.timestamp) {
-    return 0;
-  }
+  if (!epochStartBlock?.timestamp) return 0;
+
   const epochTimestamp = Number(nsToMsTime(epochStartBlock?.timestamp || 0));
+
   return (Date.now() - epochTimestamp) / 1000;
 };
 
@@ -81,9 +81,7 @@ export const stakePercents = (
   totalStake: number,
   cumulativeStake: any,
 ) => {
-  if (!validator.currentEpoch) {
-    return null;
-  }
+  if (!validator.currentEpoch) return null;
 
   const extra = Big(EXTRA_PRECISION_MULTIPLIER);
   const stake = currentStake ? Big(currentStake) : Big(0);
@@ -140,47 +138,33 @@ export const getStakingStatus = (
   validator: ValidatorFullData,
   seatPrice?: string,
 ) => {
-  if (validator.currentEpoch) {
-    if (validator.nextEpoch) {
-      return 'active';
-    }
-    return 'leaving';
-  }
-  if (validator.nextEpoch) {
-    return 'joining';
-  }
-  if (validator.afterNextEpoch) {
-    return 'proposal';
-  }
-  if (!seatPrice) {
-    return null;
-  }
+  if (validator.currentEpoch) return validator.nextEpoch ? 'active' : 'leaving';
+  if (validator.nextEpoch) return 'joining';
+  if (validator.afterNextEpoch) return 'proposal';
+  if (!seatPrice) return null;
+
   const contractStake = validator.contractStake
     ? Big(validator.contractStake)
     : undefined;
 
-  if (!contractStake) {
-    return null;
-  }
+  if (!contractStake) return null;
+
   const seatPriceBN = Big(seatPrice);
-  if (contractStake.gte(seatPriceBN)) {
-    return 'onHold';
-  }
-  if (contractStake.gte(seatPriceBN.times(Big(20)).div(Big(100)))) {
+
+  if (contractStake.gte(seatPriceBN)) return 'onHold';
+  if (contractStake.gte(seatPriceBN.times(Big(20)).div(Big(100))))
     return 'newcomer';
-  }
 
   return 'idle';
 };
 
 export const findStakeChange = (stakeDelta: number) => {
   if (!stakeDelta) return null;
+  if (Big(stakeDelta).eq(Big(0))) return null;
 
-  if (Big(stakeDelta).eq(Big(0))) {
-    return null;
-  }
   const amount = Number(yoctoToNear(stakeDelta.toString()));
   const symbol = Big(stakeDelta).gte(Big(0)) ? `+` : `-`;
+
   return {
     symbol,
     value: Big(amount).lt(1)

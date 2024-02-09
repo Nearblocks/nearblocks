@@ -22,20 +22,20 @@ const list = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          ntm.contract,
-          ntm.token,
-          ntm.title,
-          ntm.description,
-          ntm.media,
-          ntm.copies,
-          ntm.extra,
-          ntm.reference,
+          tm.contract,
+          tm.token,
+          tm.title,
+          tm.description,
+          tm.media,
+          tm.copies,
+          tm.extra,
+          tm.reference,
           json_build_object(
             'owner',
-            nft.token_new_owner_account_id
+            nft.affected_account_id
           ) AS asset
         FROM
-          nft_token_meta ntm
+          nft_token_meta tm
           INNER JOIN (
             SELECT
               contract,
@@ -49,16 +49,15 @@ const list = catchAsync(
           ) AS tmp using(contract, token)
           INNER JOIN LATERAL (
             SELECT
-              token_new_owner_account_id
+              affected_account_id
             FROM
-              assets__non_fungible_token_events
+              nft_events
             WHERE
-              emitted_by_contract_account_id = ntm.contract
-              AND token_id = ntm.token
+              contract_account_id = tm.contract
+              AND token_id = tm.token
+              AND delta_amount = 1
             ORDER BY
-              emitted_at_block_timestamp DESC,
-              emitted_in_shard_id DESC,
-              emitted_index_of_event_entry_in_shard DESC
+              event_index DESC
             LIMIT
               1
           ) nft ON TRUE
@@ -102,14 +101,14 @@ const item = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          ntm.contract,
-          ntm.token,
-          ntm.title,
-          ntm.description,
-          ntm.media,
-          ntm.copies,
-          ntm.extra,
-          ntm.reference,
+          tm.contract,
+          tm.token,
+          tm.title,
+          tm.description,
+          tm.media,
+          tm.copies,
+          tm.extra,
+          tm.reference,
           json_build_object(
             'contract',
             meta.contract,
@@ -126,10 +125,10 @@ const item = catchAsync(
           ) AS nft,
           json_build_object(
             'owner',
-            nft.token_new_owner_account_id
+            nft.affected_account_id
           ) AS asset
         FROM
-          nft_token_meta ntm
+          nft_token_meta tm
           INNER JOIN LATERAL (
             SELECT
               contract,
@@ -141,26 +140,25 @@ const item = catchAsync(
             FROM
               nft_meta
             WHERE
-              contract = ntm.contract
+              contract = tm.contract
           ) meta ON TRUE
           INNER JOIN LATERAL (
             SELECT
-              token_new_owner_account_id
+              affected_account_id
             FROM
-              assets__non_fungible_token_events
+              nft_events
             WHERE
-              emitted_by_contract_account_id = ntm.contract
-              AND token_id = ntm.token
+              contract_account_id = tm.contract
+              AND token_id = tm.token
+              AND delta_amount = 1
             ORDER BY
-              emitted_at_block_timestamp DESC,
-              emitted_in_shard_id DESC,
-              emitted_index_of_event_entry_in_shard DESC
+              event_index DESC
             LIMIT
               1
           ) nft ON TRUE
         WHERE
-          ntm.contract = :contract
-          AND ntm.token = :token
+          tm.contract = :contract
+          AND tm.token = :token
       `,
       { contract, token },
     );
@@ -175,74 +173,50 @@ const txns = catchAsync(
   async (req: RequestValidator<TokenTxns>, res: Response) => {
     const contract = req.validator.data.contract;
     const token = req.validator.data.token;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
 
     const { limit, offset } = getPagination(page, per_page);
-    // Use the same inner join query for txn count query below
     const { query, values } = keyBinder(
       `
         SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
+          event_index,
+          affected_account_id,
+          involved_account_id,
           token_id,
-          event_kind,
+          cause,
           txn.transaction_hash,
           txn.included_in_block_hash,
           txn.block_timestamp,
           txn.block,
           txn.outcomes
         FROM
-          assets__non_fungible_token_events
+          nft_events
           INNER JOIN (
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              event_index
             FROM
-              assets__non_fungible_token_events a
+              nft_events a
             WHERE
-              emitted_by_contract_account_id = :contract
+              contract_account_id = :contract
               AND token_id = :token
-              AND ${from ? `token_old_owner_account_id = :from` : true}
-              AND ${to ? `token_new_owner_account_id = :to` : true}
-              AND ${event ? `event_kind = :event` : true}
+              AND ${event ? `cause = :event` : true}
               AND EXISTS (
                 SELECT
                   1
                 FROM
                   nft_meta nft
                 WHERE
-                  nft.contract = a.emitted_by_contract_account_id
+                  nft.contract = a.contract_account_id
               )
             ORDER BY
-              emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_index_of_event_entry_in_shard ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              }
+              event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
               :limit OFFSET :offset
           ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           )
           INNER JOIN LATERAL (
             SELECT
@@ -278,16 +252,12 @@ const txns = catchAsync(
               transactions
               JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
             WHERE
-              receipts.receipt_id = assets__non_fungible_token_events.emitted_for_receipt_id
+              receipts.receipt_id = nft_events.receipt_id
           ) txn ON TRUE
         ORDER BY
-          emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_index_of_event_entry_in_shard ${
-            order === 'desc' ? 'DESC' : 'ASC'
-          }
+          event_index ${order === 'desc' ? 'DESC' : 'ASC'}
       `,
-      { contract, event, from, limit, offset, to, token },
+      { contract, event, limit, offset, token },
     );
 
     const { rows } = await db.query(query, values);
@@ -300,8 +270,6 @@ const txnsCount = catchAsync(
   async (req: RequestValidator<TokenTxnsCount>, res: Response) => {
     const contract = req.validator.data.contract;
     const token = req.validator.data.token;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
 
     const { query, values } = keyBinder(
@@ -309,23 +277,21 @@ const txnsCount = catchAsync(
         SELECT
           COUNT(*)
         FROM
-          assets__non_fungible_token_events a
+          nft_events a
         WHERE
-          emitted_by_contract_account_id = :contract
+          contract_account_id = :contract
           AND token_id = :token
-          AND ${from ? `token_old_owner_account_id = :from` : true}
-          AND ${to ? `token_new_owner_account_id = :to` : true}
-          AND ${event ? `event_kind = :event` : true}
+          AND ${event ? `cause = :event` : true}
           AND EXISTS (
             SELECT
               1
             FROM
               nft_meta nft
             WHERE
-              nft.contract = a.emitted_by_contract_account_id
+              nft.contract = a.contract_account_id
           )
       `,
-      { contract, event, from, to, token },
+      { contract, event, token },
     );
 
     const { rows } = await db.query(query, values);
