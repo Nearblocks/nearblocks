@@ -32,17 +32,10 @@ const txns = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
-          event_kind,
+          event_index,
+          affected_account_id,
+          involved_account_id,
+          cause,
           token_id,
           txn.transaction_hash,
           txn.included_in_block_hash,
@@ -68,59 +61,33 @@ const txns = catchAsync(
             FROM
               nft_meta
             WHERE
-              nft_meta.contract = emitted_by_contract_account_id
+              nft_meta.contract = contract_account_id
           ) AS nft
         FROM
-          assets__non_fungible_token_events
+          nft_events
           INNER JOIN (
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              event_index
             FROM
-              assets__non_fungible_token_events a
+              nft_events a
             WHERE
-              ${
-                from || to
-                  ? `
-                    token_old_owner_account_id = ${from ? `:from` : `:account`}
-                    AND token_new_owner_account_id = ${to ? `:to` : `:account`}
-                  `
-                  : `
-                    (
-                      token_old_owner_account_id = :account
-                      OR token_new_owner_account_id = :account
-                    )
-                  `
-              }
-              AND ${event ? `event_kind = :event` : true}
+              affected_account_id = :account
+              AND ${event ? `cause = :event` : true}
               AND EXISTS (
                 SELECT
                   1
                 FROM
                   nft_token_meta nft
                 WHERE
-                  nft.contract = a.emitted_by_contract_account_id
+                  nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
             ORDER BY
-              emitted_at_block_timestamp + 0 ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              },
-              emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_index_of_event_entry_in_shard ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              }
+              event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
               :limit OFFSET :offset
           ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           )
           LEFT JOIN LATERAL (
             SELECT
@@ -156,14 +123,10 @@ const txns = catchAsync(
               transactions
               JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
             WHERE
-              receipts.receipt_id = assets__non_fungible_token_events.emitted_for_receipt_id
+              receipts.receipt_id = nft_events.receipt_id
           ) txn ON TRUE
         ORDER BY
-          emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_index_of_event_entry_in_shard ${
-            order === 'desc' ? 'DESC' : 'ASC'
-          }
+          event_index ${order === 'desc' ? 'DESC' : 'ASC'}
       `,
       { account, event, from, limit, offset, to },
     );
@@ -191,34 +154,34 @@ const txnsCount = catchAsync(
       SELECT
         ${options.select}
       FROM
-        assets__non_fungible_token_events a
+        nft_events a
       WHERE
         ${
           from || to
             ? `
-              token_old_owner_account_id = ${from ? `:from` : `:account`}
-              AND token_new_owner_account_id = ${to ? `:to` : `:account`}
+              affected_account_id = ${from ? `:from` : `:account`}
+              AND involved_account_id = ${to ? `:to` : `:account`}
             `
             : `
               (
-                token_old_owner_account_id = :account
-                OR token_new_owner_account_id = :account
+                affected_account_id = :account
+                OR involved_account_id = :account
               )
             `
         }
-        AND ${event ? `event_kind = :event` : true}
+        AND ${event ? `cause = :event` : true}
         AND EXISTS (
           SELECT
             1
           FROM
             nft_token_meta nft
           WHERE
-            nft.contract = a.emitted_by_contract_account_id
+            nft.contract = a.contract_account_id
             AND nft.token = a.token_id
         )
     `;
     const { query, values } = keyBinder(
-      rawQuery({ select: 'emitted_for_receipt_id' }),
+      rawQuery({ select: 'receipt_id' }),
       bindings,
       useFormat,
     );
@@ -236,7 +199,7 @@ const txnsCount = catchAsync(
     }
 
     const { query: countQuery, values: countValues } = keyBinder(
-      rawQuery({ select: 'COUNT(emitted_for_receipt_id)' }),
+      rawQuery({ select: 'COUNT(receipt_id)' }),
       bindings,
     );
 
@@ -263,17 +226,10 @@ const txnsExport = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
-          event_kind,
+          event_index,
+          affected_account_id,
+          involved_account_id,
+          cause,
           token_id,
           txn.transaction_hash,
           txn.included_in_block_hash,
@@ -299,48 +255,35 @@ const txnsExport = catchAsync(
             FROM
               nft_meta
             WHERE
-              nft_meta.contract = emitted_by_contract_account_id
+              nft_meta.contract = contract_account_id
           ) AS nft
         FROM
-          assets__non_fungible_token_events
+          nft_events
           INNER JOIN (
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              event_index
             FROM
-              assets__non_fungible_token_events a
-              JOIN receipts r ON r.receipt_id = a.emitted_for_receipt_id
+              nft_events a
+              JOIN receipts r ON r.receipt_id = a.receipt_id
               JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
             WHERE
-              (
-                token_old_owner_account_id = :account
-                OR token_new_owner_account_id = :account
-              )
+              affected_account_id = :account
               AND EXISTS (
                 SELECT
                   1
                 FROM
                   nft_token_meta nft
                 WHERE
-                  nft.contract = a.emitted_by_contract_account_id
+                  nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
               AND t.block_timestamp BETWEEN :start AND :end
             ORDER BY
-              emitted_at_block_timestamp ASC,
-              emitted_in_shard_id ASC,
-              emitted_index_of_event_entry_in_shard ASC
+              event_index ASC
             LIMIT
               5000
           ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           )
           LEFT JOIN LATERAL (
             SELECT
@@ -376,15 +319,19 @@ const txnsExport = catchAsync(
               transactions
               JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
             WHERE
-              receipts.receipt_id = assets__non_fungible_token_events.emitted_for_receipt_id
+              receipts.receipt_id = nft_events.receipt_id
           ) txn ON TRUE
         ORDER BY
-          emitted_at_block_timestamp ASC,
-          emitted_in_shard_id ASC,
-          emitted_index_of_event_entry_in_shard ASC
+          event_index ASC
       `,
       { account, end, start },
     );
+
+    if (query) {
+      const { rows } = await db.query(query, values);
+
+      return res.status(200).json({ txns: rows });
+    }
 
     const columns = [
       { header: 'Status', key: 'status' },
@@ -405,21 +352,21 @@ const txnsExport = catchAsync(
         stringifier.write({
           block: row.block.block_height,
           contract: row.nft ? row.nft.contract : '',
-          from: row.token_old_owner_account_id || 'system',
+          from: row.affected_account_id || 'system',
           hash: row.transaction_hash,
           id: row.token_id,
-          method: row.event_kind,
+          method: row.cause,
           status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.token_new_owner_account_id || 'system',
+          to: row.involved_account_id || 'system',
           token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
         });
         callback();
       };
 
-    streamCsv(res, query, values, columns, transform);
+    return streamCsv(res, query, values, columns, transform);
   },
 );
 

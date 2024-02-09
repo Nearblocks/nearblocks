@@ -71,18 +71,14 @@ const txnsExport = z.object({
 const ftTxns = z.object({
   account: z.string(),
   event: z.nativeEnum(EventKind).optional(),
-  from: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  to: z.string().optional(),
 });
 
 const ftTxnsCount = z.object({
   account: z.string(),
   event: z.nativeEnum(EventKind).optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
 });
 
 const ftTxnsExport = z.object({

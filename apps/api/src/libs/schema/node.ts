@@ -7,10 +7,7 @@ const accountId = z
   .regex(/^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/i)
   .transform((value) => value.toLowerCase());
 
-const blockHash = z.string().min(43).max(44);
-const blockHeight = z.number();
-
-const nodeTelemetry = z.object({
+const telemetry = z.object({
   agent: z.object({
     build: z.string(),
     name: z.string(),
@@ -20,17 +17,15 @@ const nodeTelemetry = z.object({
     account_id: accountId.nullish(),
     block_production_tracking_delay: z.number().optional(),
     is_validator: z.boolean(),
-    latest_block_hash: blockHash,
-    latest_block_height: blockHeight,
+    latest_block_hash: z.string().min(43).max(44),
+    latest_block_height: z.number(),
     max_block_production_delay: z.number().optional(),
     max_block_wait_delay: z.number().optional(),
-
     min_block_production_delay: z.number().optional(),
     node_id: z.string(),
     num_peers: z.number(),
     status: z.string(),
   }),
-  ipAddress: z.string(),
   signature: z.string().optional(),
   system: z.object({
     bandwidth_download: z.number(),
@@ -41,6 +36,6 @@ const nodeTelemetry = z.object({
   }),
 });
 
-export type NodeTelemetry = z.infer<typeof nodeTelemetry>;
+export type NodeTelemetry = z.infer<typeof telemetry>;
 
-export default { nodeTelemetry };
+export default { telemetry };

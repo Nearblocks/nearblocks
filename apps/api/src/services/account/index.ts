@@ -4,6 +4,7 @@ import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
 import catchAsync from '#libs/async';
 import db from '#libs/db';
 import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
+import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import {
   Action,
@@ -21,42 +22,37 @@ const EXPIRY = 60; // 1 mins
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const account = req.validator.data.account;
 
-  const { query, values } = keyBinder(
-    `
-      SELECT
-        a.account_id,
-        json_build_object(
-          'transaction_hash',
-          cbrt.transaction_hash,
-          'block_timestamp',
-          cbrt.block_timestamp
-        ) AS created,
-        json_build_object(
-          'transaction_hash',
-          dbrt.transaction_hash,
-          'block_timestamp',
-          dbrt.block_timestamp
-        ) AS deleted
-      FROM
-        accounts a
-        LEFT JOIN receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
-        LEFT JOIN transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
-        LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
-        LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
-      WHERE
-        a.account_id = :account
-    `,
-    { account },
-  );
+  const query = sql`
+    SELECT
+      a.account_id,
+      JSON_BUILD_OBJECT(
+        'transaction_hash',
+        cbrt.transaction_hash,
+        'block_timestamp',
+        cbrt.block_timestamp
+      ) AS created,
+      JSON_BUILD_OBJECT(
+        'transaction_hash',
+        dbrt.transaction_hash,
+        'block_timestamp',
+        dbrt.block_timestamp
+      ) AS deleted
+    FROM
+      accounts a
+      LEFT JOIN receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
+      LEFT JOIN transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
+      LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
+      LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
+    WHERE
+      a.account_id = ${account}
+  `;
 
   const [actions, info] = await Promise.all([
     redis.cache(
       `account:${account}:action`,
       async () => {
         try {
-          const { rows } = await db.query(query, values);
-
-          return rows;
+          return await query;
         } catch (error) {
           return null;
         }
@@ -119,25 +115,28 @@ const deployments = catchAsync(
   async (req: RequestValidator<Deployments>, res: Response) => {
     const account = req.validator.data.account;
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          transaction_hash,
-          block_timestamp,
-          receipt_predecessor_account_id
-        FROM (
+    const deployments = await sql`
+      SELECT
+        transaction_hash,
+        block_timestamp,
+        receipt_predecessor_account_id
+      FROM
+        (
           SELECT
             t.transaction_hash as transaction_hash,
             t.block_timestamp as block_timestamp,
             a.receipt_predecessor_account_id as receipt_predecessor_account_id,
-            ROW_NUMBER() OVER (ORDER BY t.block_timestamp ASC) as rank,
+            ROW_NUMBER() OVER (
+              ORDER BY
+                t.block_timestamp ASC
+            ) as rank,
             COUNT(*) OVER () as total
           FROM
             action_receipt_actions a
             JOIN receipts r ON r.receipt_id = a.receipt_id
             JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
           WHERE
-            a.receipt_receiver_account_id = :account
+            a.receipt_receiver_account_id = ${account}
             AND a.action_kind = 'DEPLOY_CONTRACT'
             AND EXISTS (
               SELECT
@@ -152,18 +151,14 @@ const deployments = catchAsync(
                 )
             )
         ) tmp
-        WHERE
-          rank = 1
-          OR rank = total
-        ORDER BY
-          block_timestamp ASC
-      `,
-      { account },
-    );
+      WHERE
+        rank = 1
+        OR rank = total
+      ORDER BY
+        block_timestamp ASC
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ deployments: rows });
+    return res.status(200).json({ deployments });
   },
 );
 
@@ -172,24 +167,19 @@ const action = catchAsync(
     const account = req.validator?.data.account;
     const method = req.validator?.data.method;
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          args
-        FROM
-          action_receipt_actions
-        WHERE
-          receipt_receiver_account_id = :account
-          AND args ->> 'method_name' =  :method
-        LIMIT
-          1
-      `,
-      { account, method },
-    );
+    const action = await sql`
+      SELECT
+        args
+      FROM
+        action_receipt_actions
+      WHERE
+        receipt_receiver_account_id = ${account}
+        AND args ->> 'method_name' = ${method}
+      LIMIT
+        1
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ action: rows });
+    return res.status(200).json({ action });
   },
 );
 
@@ -200,8 +190,8 @@ const inventory = catchAsync(
     const { query: ftQuery, values: ftValues } = keyBinder(
       `
         SELECT
-          ft_holders.contract,
-          ft_holders.amount,
+          ft_holders_monthly.contract,
+          SUM(ft_holders_monthly.amount) AS amount,
           json_build_object(
             'name',
             ft.name,
@@ -217,7 +207,7 @@ const inventory = catchAsync(
             ft.price
           ) AS ft_meta
         FROM
-          ft_holders
+          ft_holders_monthly
           INNER JOIN LATERAL (
             SELECT
               contract,
@@ -230,13 +220,15 @@ const inventory = catchAsync(
             FROM
               ft_meta
             WHERE
-              ft_meta.contract = ft_holders.contract
+              ft_meta.contract = ft_holders_monthly.contract
           ) AS ft ON TRUE
         WHERE
-          ft_holders.account = :account
-          AND ft_holders.amount > 0
+          ft_holders_monthly.account = :account
+        GROUP BY
+          ft_holders_monthly.contract,
+          ft_holders_monthly.account
         ORDER BY
-          ft_holders.amount DESC
+          ft_holders_monthly.amount DESC
       `,
       { account },
     );
@@ -244,8 +236,8 @@ const inventory = catchAsync(
     const { query: nftQuery, values: nftValues } = keyBinder(
       `
         SELECT
-          nft_holders.contract,
-          nft_holders.quantity,
+          nft_holders_daily.contract,
+          nft_holders_daily.quantity,
           json_build_object(
             'name',
             nft.name,
@@ -257,7 +249,7 @@ const inventory = catchAsync(
             nft.reference
           ) AS nft_meta
         FROM
-          nft_holders
+          nft_holders_daily
           INNER JOIN LATERAL (
             SELECT
               contract,
@@ -268,13 +260,12 @@ const inventory = catchAsync(
             FROM
               nft_meta
             WHERE
-              nft_meta.contract = nft_holders.contract
+              nft_meta.contract = nft_holders_daily.contract
           ) AS nft ON TRUE
         WHERE
-          nft_holders.account = :account
-          AND nft_holders.quantity > 0
+          nft_holders_daily.account = :account
         ORDER BY
-          nft_holders.quantity DESC
+          nft_holders_daily.quantity DESC
       `,
       { account },
     );
@@ -303,22 +294,13 @@ const tokens = catchAsync(
     const { query: ftQuery, values: ftValues } = keyBinder(
       `
         SELECT
-          emitted_by_contract_account_id
+          contract_account_id
         FROM
-          assets__fungible_token_events
+          ft_events
         WHERE
-          token_old_owner_account_id = :account
+          affected_account_id = :account
         GROUP BY
-          emitted_by_contract_account_id
-        UNION
-        SELECT
-          emitted_by_contract_account_id
-        FROM
-          assets__fungible_token_events
-        WHERE
-          token_new_owner_account_id = :account
-        GROUP BY
-          emitted_by_contract_account_id
+          contract_account_id
       `,
       { account },
     );
@@ -326,22 +308,13 @@ const tokens = catchAsync(
     const { query: nftQuery, values: nftValues } = keyBinder(
       `
         SELECT
-          emitted_by_contract_account_id
+          contract_account_id
         FROM
-          assets__non_fungible_token_events
+          nft_events
         WHERE
-          token_old_owner_account_id = :account
+          affected_account_id = :account
         GROUP BY
-          emitted_by_contract_account_id
-        UNION
-        SELECT
-          emitted_by_contract_account_id
-        FROM
-          assets__non_fungible_token_events
-        WHERE
-          token_new_owner_account_id = :account
-        GROUP BY
-          emitted_by_contract_account_id
+          contract_account_id
       `,
       { account },
     );
