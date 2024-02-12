@@ -15,6 +15,10 @@ const deployments = z.object({
   account: z.string(),
 });
 
+const parse = z.object({
+  account: z.string(),
+});
+
 const action = z.object({
   account: z.string(),
   method: z.string(),
@@ -121,6 +125,7 @@ const nftTxnsExport = z.object({
 export type Item = z.infer<typeof item>;
 export type Contract = z.infer<typeof contract>;
 export type Deployments = z.infer<typeof deployments>;
+export type Parse = z.infer<typeof parse>;
 export type Action = z.infer<typeof action>;
 export type Inventory = z.infer<typeof inventory>;
 export type Tokens = z.infer<typeof tokens>;
@@ -150,6 +155,7 @@ export default {
   nftTxns,
   nftTxnsCount,
   nftTxnsExport,
+  parse,
   tokens,
   txns,
   txnsCount,
