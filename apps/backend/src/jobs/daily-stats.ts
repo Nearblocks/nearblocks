@@ -7,6 +7,7 @@ import sentry from '#libs/sentry';
 import { syncStats } from '#services/dailyStats';
 
 (async () => {
+  logger.info({ action: 'job started', job: 'daily-stats' });
   try {
     await syncStats();
   } catch (error) {
@@ -14,6 +15,7 @@ import { syncStats } from '#services/dailyStats';
     logger.error(error);
     await sleep(1000);
   }
+  logger.info({ action: 'job ended', job: 'daily-stats' });
 
   if (parentPort) {
     return parentPort.postMessage('done');

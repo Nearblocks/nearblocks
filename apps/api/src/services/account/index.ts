@@ -1,8 +1,10 @@
 import { Response } from 'express';
 import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
+import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
 import db from '#libs/db';
+import logger from '#libs/logger';
 import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
@@ -12,6 +14,7 @@ import {
   Deployments,
   Inventory,
   Item,
+  Parse,
   Tokens,
 } from '#libs/schema/account';
 import { keyBinder } from '#libs/utils';
@@ -108,6 +111,26 @@ const contract = catchAsync(
     return res
       .status(200)
       .json({ contract: [{ ...contract, keys: keys, locked }] });
+  },
+);
+
+const parse = catchAsync(
+  async (req: RequestValidator<Parse>, res: Response) => {
+    let contract = undefined;
+    const account = req.validator.data.account;
+
+    try {
+      const code = await redis.cache(
+        `contract:${account}`,
+        async () => viewCode(account),
+        EXPIRY * 5, // 5 mins
+      );
+      contract = await parser.parseContract(code.code_base64);
+    } catch (error) {
+      logger.error({ contractParseError: error });
+    }
+
+    return res.status(200).json({ contract: [contract] });
   },
 );
 
@@ -348,5 +371,6 @@ export default {
   deployments,
   inventory,
   item,
+  parse,
   tokens,
 };

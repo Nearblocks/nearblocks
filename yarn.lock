@@ -9652,6 +9652,11 @@ near-api-js@2.1.4:
     node-fetch "^2.6.1"
     tweetnacl "^1.0.1"
 
+near-contract-parser@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/near-contract-parser/-/near-contract-parser-1.0.0.tgz#8fa6a7b45e2221a806ce207c0a17332389e27900"
+  integrity sha512-ZltdyO8DueUyQASu9NcrtYZv1I37SbCrA1h3leOQ51xjP+s7ZFOp1ji1un1ixOrCMqXUiq5nU2kXnhhMvmWhOQ==
+
 near-lake-framework@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/near-lake-framework/-/near-lake-framework-2.0.0.tgz#de10f98561e44e80f6e47e3023d07d6efe73236f"

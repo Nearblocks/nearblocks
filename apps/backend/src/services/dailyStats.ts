@@ -258,6 +258,8 @@ export const syncStats = async () => {
     .orderBy('block_timestamp', 'desc')
     .first();
 
+  logger.info({ job: 'daily-stats', latestBlock, start: start.toISOString() });
+
   if (!latestBlock || dayjs.utc().isSameOrBefore(start, 'day')) return;
 
   const end = dayjs
@@ -273,6 +275,13 @@ export const syncStats = async () => {
   if (latestStat) {
     start = dayjs.utc(latestStat.date).add(1, 'day');
   }
+
+  logger.info({
+    end: end.toISOString(),
+    job: 'daily-stats',
+    latestBlock,
+    start: start.toISOString(),
+  });
 
   let diff = end.diff(start, 'day');
   diff = diff < 20 ? diff + 1 : 20;
