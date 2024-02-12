@@ -129,7 +129,7 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4 border-b`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} tokens found
+              A total of {localFormat(totalCount.toString())} tokens found
             </p>
           </div>
         </div>
@@ -157,54 +157,55 @@ export default function ({ network, id, token }: Props) {
               </div>
             </div>
           ))}
-        {tokens.map((nft: Token) => (
-          <div
-            className="max-w-full border rounded p-3 mx-auto md:mx-0"
-            key={nft.contract + nft.token}
-          >
-            <a
-              href={`/nft-token/${nft.contract}/${nft.token}`}
-              className="hover:no-underline"
+        {tokens &&
+          tokens.map((nft: Token) => (
+            <div
+              className="max-w-full border rounded p-3 mx-auto md:mx-0"
+              key={nft.contract + nft.token}
             >
-              <a className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline">
-                {
-                  <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
-                    props={{
-                      base: tokenData.base_uri,
-                      reference: nft.reference,
-                      media: nft.media,
-                      className: 'rounded max-h-full',
-                      network: network,
-                    }}
-                  />
-                }
-              </a>
-            </a>
-            <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
-              Token ID:{' '}
               <a
                 href={`/nft-token/${nft.contract}/${nft.token}`}
                 className="hover:no-underline"
               >
-                <a className="text-green hover:no-underline">{nft.token}</a>
+                <a className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline">
+                  {
+                    <Widget
+                      src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                      props={{
+                        base: tokenData.base_uri,
+                        reference: nft.reference,
+                        media: nft.media,
+                        className: 'rounded max-h-full',
+                        network: network,
+                      }}
+                    />
+                  }
+                </a>
               </a>
-            </div>
-            {nft.asset && (
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
-                Owner:{' '}
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
+                Token ID:{' '}
                 <a
-                  href={`/address/${nft.asset?.owner}`}
+                  href={`/nft-token/${nft.contract}/${nft.token}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green hover:no-underline">
-                    {nft.asset?.owner}
-                  </a>
+                  <a className="text-green hover:no-underline">{nft.token}</a>
                 </a>
               </div>
-            )}
-          </div>
-        ))}
+              {nft.asset && (
+                <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
+                  Owner:{' '}
+                  <a
+                    href={`/address/${nft.asset?.owner}`}
+                    className="hover:no-underline"
+                  >
+                    <a className="text-green hover:no-underline">
+                      {nft.asset?.owner}
+                    </a>
+                  </a>
+                </div>
+              )}
+            </div>
+          ))}
       </div>
       <Paginator
         count={totalCount}

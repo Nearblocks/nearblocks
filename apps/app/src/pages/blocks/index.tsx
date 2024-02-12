@@ -18,7 +18,7 @@ const Blocks = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/blocks?page=${pageNumber}`);
+    Router.push(`/blocks?page=${pageNumber}`, undefined, { shallow: true });
     setCurrentPage(pageNumber);
   };
 

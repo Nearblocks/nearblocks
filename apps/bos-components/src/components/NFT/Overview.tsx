@@ -27,8 +27,8 @@ export default function ({ network, id }: Props) {
   const [txnLoading, setTxnLoading] = useState(false);
   const [holderLoading, setHolderLoading] = useState(false);
   const [token, setToken] = useState<Token>({} as Token);
-  const [transfers, setTransfers] = useState(0);
-  const [holders, setHolders] = useState(0);
+  const [transfers, setTransfers] = useState('');
+  const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
 
   const config = getConfig(network);
@@ -60,7 +60,7 @@ export default function ({ network, id }: Props) {
         .then(
           (data: {
             body: {
-              txns: { count: number }[];
+              txns: { count: string }[];
             };
             status: number;
           }) => {
@@ -80,7 +80,7 @@ export default function ({ network, id }: Props) {
         .then(
           (data: {
             body: {
-              holders: { count: number }[];
+              holders: { count: string }[];
             };
             status: number;
           }) => {
@@ -144,7 +144,7 @@ export default function ({ network, id }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(token?.tokens || 0)}
+                      {token?.tokens ? localFormat(token?.tokens) : ''}
                     </div>
                   )}
                 </div>
@@ -156,7 +156,7 @@ export default function ({ network, id }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(transfers)}
+                      {transfers ? localFormat(transfers) : ''}
                     </div>
                   )}
                 </div>
@@ -166,7 +166,7 @@ export default function ({ network, id }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(holders)}
+                      {holders ? localFormat(holders) : ''}
                     </div>
                   )}
                 </div>

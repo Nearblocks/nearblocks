@@ -1,38 +1,41 @@
 import { localFormat, formatWithCommas } from '@/includes/formats';
 import { Debounce } from './types';
 
-export function convertAmountToReadableString(amount: number, type: string) {
+export function convertAmountToReadableString(amount: string, type: string) {
   if (!amount) return null;
 
   let value;
   let suffix;
 
-  const nearNomination = Math.pow(10, 24);
+  const nearNomination = new Big(10).pow(24);
 
-  const amountInNear = Number(amount) / nearNomination;
+  const amountInNear = new Big(amount).div(nearNomination);
 
   if (type === 'totalSupply' || type === 'totalStakeAmount') {
-    value = formatWithCommas((amountInNear / 1e6).toFixed(1));
+    value = formatWithCommas(amountInNear.div(1e6).toFixed(1));
     suffix = 'M';
   } else if (type === 'seatPriceAmount') {
-    value = formatWithCommas(Math.round(amountInNear).toString());
+    value = formatWithCommas(amountInNear.round().toString());
   } else {
     value = amount.toString();
   }
   return `${value}${suffix}`;
 }
 
-export function convertTimestampToTime(timestamp: number) {
-  const hours = Math.floor(timestamp / 3600);
-  const minutes = Math.floor((timestamp % 3600) / 60);
-  const seconds = Math.floor(timestamp % 60);
+export function convertTimestampToTime(timestamp: string) {
+  const timestampBig = new Big(timestamp);
 
-  return `${hours.toString().padStart(2, '0')}H ${minutes
-    .toString()
-    .padStart(2, '0')}M ${seconds.toString().padStart(2, '0')}S`;
+  const hours = timestampBig.div(3600).round(0, 0).toString();
+  const minutes = timestampBig.mod(3600).div(60).round(0, 0).toString();
+  const seconds = timestampBig.mod(60).round(0, 0).toString();
+
+  return `${hours.padStart(2, '0')}H ${minutes.padStart(
+    2,
+    '0',
+  )}M ${seconds.padStart(2, '0')}S`;
 }
 
-export function yoctoToNear(yocto: number, format: boolean) {
+export function yoctoToNear(yocto: string, format: boolean) {
   const YOCTO_PER_NEAR = Big(10).pow(24).toString();
 
   const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
@@ -40,17 +43,28 @@ export function yoctoToNear(yocto: number, format: boolean) {
   return format ? localFormat(near) : near;
 }
 
-export function fiatValue(big: number, price: number) {
-  const value = Big(big).mul(Big(price)).toString();
-  const formattedNumber = Number(value).toLocaleString('en', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
-  });
+export function fiatValue(big: string, price: string) {
+  const value = Big(big).mul(Big(price));
+  const stringValue = value.toFixed(6); // Set the desired maximum fraction digits
+
+  const [integerPart, fractionalPart] = stringValue.split('.');
+
+  // Format integer part with commas
+  const formattedIntegerPart = integerPart.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    ',',
+  );
+
+  // Combine formatted integer and fractional parts
+  const formattedNumber = fractionalPart
+    ? `${formattedIntegerPart}.${fractionalPart}`
+    : formattedIntegerPart;
+
   return formattedNumber;
 }
 
 export function nanoToMilli(nano: string) {
-  return new Big(nano).div(new Big(10).pow(6)).round().toNumber();
+  return Big(nano).div(Big(10).pow(6)).round().toNumber();
 }
 
 export function truncateString(str: string, maxLength: number, suffix: string) {
@@ -133,6 +147,7 @@ export function timeAgo(unixTimestamp: number): string {
     return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
   }
 }
+
 export function shortenAddress(address: string) {
   const string = String(address);
 
@@ -150,7 +165,7 @@ export function urlHostName(url: string) {
   }
 }
 
-export function holderPercentage(supply: number, quantity: number) {
+export function holderPercentage(supply: string, quantity: string) {
   return Math.min(Big(quantity).div(Big(supply)).mul(Big(100)).toFixed(2), 100);
 }
 

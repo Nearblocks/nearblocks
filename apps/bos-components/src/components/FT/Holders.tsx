@@ -114,11 +114,13 @@ export default function ({ network, id, token }: Props) {
     fetchTotalHolders();
     fetchHoldersData(currentPage);
   }, [config?.backendUrl, currentPage, id, token]);
+
   useEffect(() => {
     if (token) {
       setTokens(token);
     }
   }, [token]);
+
   const columns = [
     {
       header: 'Rank',
@@ -169,7 +171,12 @@ export default function ({ network, id, token }: Props) {
       header: 'Quantity',
       key: '',
       cell: (row: HoldersPropsInfo) => (
-        <> {tokenAmount(row.amount, tokens?.decimals, true)}</>
+        <>
+          {' '}
+          {row.amount && tokens?.decimals
+            ? tokenAmount(row.amount, tokens?.decimals, true)
+            : ''}
+        </>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -206,7 +213,12 @@ export default function ({ network, id, token }: Props) {
       key: 'tokens',
       cell: (row: HoldersPropsInfo) => {
         return (
-          <span>${price(row.amount, tokens?.decimals, tokens?.price)}</span>
+          <span>
+            $
+            {row.amount && tokens?.decimals && tokens?.price
+              ? price(row.amount, tokens?.decimals, tokens?.price)
+              : ''}
+          </span>
         );
       },
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -225,7 +237,7 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
         </div>

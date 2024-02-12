@@ -183,7 +183,7 @@ export default function ({ network, id, token }: Props) {
       key: 'tokens',
       cell: (row: HoldersPropsInfo) => {
         const percentage =
-          tokens?.tokens > 0
+          Number(tokens?.tokens) > 0
             ? holderPercentage(tokens.tokens, row.quantity)
             : null;
         return (
@@ -217,7 +217,7 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
         </div>

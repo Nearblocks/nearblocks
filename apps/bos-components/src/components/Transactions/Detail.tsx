@@ -65,7 +65,7 @@ export default function (props: Props) {
   const { loading, txn, network, t, rpcTxn } = props;
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState('');
   const [more, setMore] = useState(false);
 
   const { fts, nfts } = useMemo(() => {
@@ -152,7 +152,7 @@ export default function (props: Props) {
         ).then(
           (data: {
             body: {
-              market_data: { current_price: { usd: number } };
+              market_data: { current_price: { usd: string } };
             };
             status: number;
           }) => {
@@ -333,7 +333,9 @@ export default function (props: Props) {
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
-                  {localFormat(txn.block?.block_height)}
+                  {txn.block?.block_height
+                    ? localFormat(txn.block?.block_height)
+                    : ''}
                 </a>
               </a>
             </div>
@@ -377,7 +379,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {(actions.length > 0 || logs.length > 0) && (
+      {(actions.length > 0 || (logs.length > 0 && logs.contract)) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
@@ -583,7 +585,13 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
-                            {tokenAmount(ft.amount, ft.ft_metas.decimals, true)}
+                            {ft.amount && ft.ft_metas.decimals
+                              ? tokenAmount(
+                                  ft.amount,
+                                  ft.ft_metas.decimals,
+                                  true,
+                                )
+                              : ''}
                           </span>
                         </div>
                         <a
@@ -766,10 +774,13 @@ export default function (props: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span>
-                      {yoctoToNear(txn.actions_agg?.deposit || 0, true)} Ⓝ
-                      {currentPrice && context.networkId === 'mainnet'
+                      {txn.actions_agg?.deposit
+                        ? yoctoToNear(txn.actions_agg?.deposit, true)
+                        : ''}{' '}
+                      Ⓝ
+                      {currentPrice && network === 'mainnet'
                         ? ` ($${fiatValue(
-                            yoctoToNear(txn.actions_agg?.deposit || 0, false),
+                            yoctoToNear(txn.actions_agg?.deposit, false),
                             currentPrice,
                           )})`
                         : ''}
@@ -815,10 +826,13 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words">
-              {yoctoToNear(txn.outcomes_agg?.transaction_fee || 0, true)} Ⓝ
-              {currentPrice && context.networkId === 'mainnet'
+              {txn.outcomes_agg?.transaction_fee
+                ? yoctoToNear(txn.outcomes_agg?.transaction_fee, true)
+                : ''}{' '}
+              Ⓝ
+              {currentPrice && network === 'mainnet'
                 ? ` ($${fiatValue(
-                    yoctoToNear(txn.outcomes_agg?.transaction_fee || 0, false),
+                    yoctoToNear(txn.outcomes_agg?.transaction_fee, false),
                     currentPrice,
                   )})`
                 : ''}
@@ -826,7 +840,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {context.networkId === 'mainnet' && date && (
+      {network === 'mainnet' && date && (
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -909,18 +923,22 @@ export default function (props: Props) {
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {convertToMetricPrefix(
-                      Number(txn.actions_agg?.gas_attached || 0),
-                    ) + 'gas'}
+                    {txn.actions_agg?.gas_attached
+                      ? convertToMetricPrefix(txn.actions_agg?.gas_attached) +
+                        'gas'
+                      : ''}
                     <span className="text-gray-300 px-1">|</span>{' '}
-                    {convertToMetricPrefix(
-                      Number(txn.outcomes_agg?.gas_used || 0),
-                    ) + 'gas'}
+                    {txn.outcomes_agg?.gas_used
+                      ? convertToMetricPrefix(txn.outcomes_agg?.gas_used) +
+                        'gas'
+                      : ''}
                     (
-                    {gasPercentage(
-                      txn.outcomes_agg?.gas_used,
-                      txn.actions_agg?.gas_attached,
-                    )}
+                    {txn.outcomes_agg?.gas_used && txn.actions_agg?.gas_attached
+                      ? gasPercentage(
+                          txn.outcomes_agg?.gas_used,
+                          txn.actions_agg?.gas_attached,
+                        )
+                      : ''}
                     )
                   </div>
                 )}
@@ -953,14 +971,15 @@ export default function (props: Props) {
                   <div className="w-full  text-xs items-center flex md:w-3/4 break-words">
                     <div className="bg-orange-50 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥</span>
-                      {convertToMetricPrefix(
-                        Number(txn.receipt_conversion_gas_burnt || 0),
-                      ) + 'gas'}
+                      {txn.receipt_conversion_gas_burnt
+                        ? convertToMetricPrefix(
+                            txn.receipt_conversion_gas_burnt,
+                          ) + 'gas'
+                        : ''}
                       <span className="text-gray-300 px-1">|</span>{' '}
-                      {yoctoToNear(
-                        Number(txn.receipt_conversion_tokens_burnt || 0),
-                        true,
-                      )}{' '}
+                      {txn.receipt_conversion_tokens_burnt
+                        ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)
+                        : ''}{' '}
                       Ⓝ
                     </div>
                   </div>

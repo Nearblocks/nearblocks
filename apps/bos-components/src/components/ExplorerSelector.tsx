@@ -177,7 +177,7 @@ export default function (props: Props) {
         <h1 className="text-center text-lg font-medium mb-2">
           Choose from the available NEAR Explorers below
         </h1>
-        <div className="flex justify-center md:flex-col md:items-center gap-3 mt-2">
+        <div className="flex justify-center md!:flex-col md:items-center gap-3 mt-2">
           <a
             href={
               !hasLinkNearblocks

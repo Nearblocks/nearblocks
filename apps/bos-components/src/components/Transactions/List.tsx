@@ -287,7 +287,13 @@ export default function (props: Props) {
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
       key: 'deposit',
       cell: (row: TransactionInfo) => (
-        <span>{yoctoToNear(row.actions_agg?.deposit || 0, true)} Ⓝ</span>
+        <span>
+          {row.actions_agg?.deposit !== undefined &&
+          row.actions_agg?.deposit !== null
+            ? yoctoToNear(row.actions_agg?.deposit, true)
+            : ''}{' '}
+          Ⓝ
+        </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -299,7 +305,11 @@ export default function (props: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           {' '}
-          {yoctoToNear(row.outcomes_agg?.transaction_fee || 0, true)} Ⓝ
+          {row.outcomes_agg?.transaction_fee !== undefined &&
+          row.outcomes_agg?.transaction_fee !== null
+            ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
+            : ''}{' '}
+          Ⓝ
         </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -479,7 +489,9 @@ export default function (props: Props) {
             className="hover:no-underline"
           >
             <a className="text-green-500 hover:no-underline">
-              {localFormat(row.block?.block_height)}
+              {row.block?.block_height
+                ? localFormat(row.block?.block_height)
+                : ''}
             </a>
           </a>
         </span>
@@ -536,8 +548,14 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -546,8 +564,12 @@ export default function (props: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -570,7 +592,7 @@ export default function (props: Props) {
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               {t
                 ? t('txns:listing', {
-                    count: localFormat(totalCount),
+                    count: localFormat(totalCount.toString()),
                   })
                 : `More than > ${totalCount} transactions found`}
             </p>

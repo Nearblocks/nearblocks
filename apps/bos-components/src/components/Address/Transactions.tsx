@@ -294,7 +294,12 @@ export default function ({
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
       key: 'deposit',
       cell: (row: TransactionInfo) => (
-        <span>{yoctoToNear(row.actions_agg?.deposit || 0, true)} Ⓝ</span>
+        <span>
+          {row.actions_agg?.deposit
+            ? yoctoToNear(row.actions_agg?.deposit, true)
+            : ''}{' '}
+          Ⓝ
+        </span>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -305,8 +310,10 @@ export default function ({
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
-          {' '}
-          {yoctoToNear(row.outcomes_agg?.transaction_fee || 0, true)} Ⓝ
+          {row.outcomes_agg?.transaction_fee
+            ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
+            : ''}{' '}
+          Ⓝ
         </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -496,7 +503,9 @@ export default function ({
             className="hover:no-underline"
           >
             <a className="text-green-500 hover:no-underline">
-              {localFormat(row.block?.block_height)}
+              {row.block?.block_height
+                ? localFormat(row.block?.block_height)
+                : ''}
             </a>
           </a>
         </span>
@@ -553,8 +562,14 @@ export default function ({
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -563,8 +578,12 @@ export default function ({
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -585,7 +604,8 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-3 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {totalCount ? localFormat(totalCount.toString()) : 0}{' '}
+              transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

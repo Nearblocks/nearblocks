@@ -271,9 +271,14 @@ export default function (props: Props) {
             <div className="w-full items-center text-xs flex md:w-3/4 break-words">
               <div className="bg-orange-50 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
-                {convertToMetricPrefix(receipt.outcome.gas_burnt ?? 0)}gas{' '}
+                {receipt.outcome.gas_burnt
+                  ? convertToMetricPrefix(receipt.outcome.gas_burnt) + 'gas'
+                  : ''}
                 <span className="text-gray-300 px-1">|</span>{' '}
-                {yoctoToNear(receipt.outcome.tokens_burnt, true)} Ⓝ
+                {receipt.outcome.tokens_burnt
+                  ? yoctoToNear(receipt.outcome.tokens_burnt, true)
+                  : ''}{' '}
+                Ⓝ
               </div>
             </div>
           ) : (

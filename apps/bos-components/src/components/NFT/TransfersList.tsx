@@ -401,8 +401,14 @@ export default function ({ network, t, currentPage, setPage }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -411,8 +417,12 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -434,7 +444,8 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-                A total of {localFormat(totalCount)} transactions found
+                A total of {localFormat(totalCount.toString())} transactions
+                found
               </p>
             </div>
           </div>

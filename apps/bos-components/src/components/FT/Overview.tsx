@@ -55,8 +55,8 @@ export default function ({
   const [holderLoading, setHolderLoading] = useState(false);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [token, setToken] = useState<Token>({} as Token);
-  const [transfers, setTransfers] = useState(0);
-  const [holders, setHolders] = useState(0);
+  const [transfers, setTransfers] = useState('');
+  const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
   const [showMarketCap, setShowMarketCap] = useState(false);
   const config = getConfig(network);
@@ -88,7 +88,7 @@ export default function ({
         .then(
           (data: {
             body: {
-              txns: { count: number }[];
+              txns: { count: string }[];
             };
             status: number;
           }) => {
@@ -101,6 +101,7 @@ export default function ({
         )
         .catch(() => {});
     }
+
     function fetchStatsData() {
       asyncFetch(`${config?.backendUrl}stats`, {
         method: 'GET',
@@ -123,7 +124,7 @@ export default function ({
         .then(
           (data: {
             body: {
-              holders: { count: number }[];
+              holders: { count: string }[];
             };
             status: number;
           }) => {
@@ -194,12 +195,18 @@ export default function ({
                         ${dollarFormat(token?.price)}
                         {stats?.near_price && (
                           <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
-                            @ {localFormat(token?.price / stats?.near_price)} Ⓝ
+                            @{' '}
+                            {localFormat(
+                              (
+                                Big(token?.price) / Big(stats?.near_price)
+                              ).toString(),
+                            )}{' '}
+                            Ⓝ
                           </div>
                         )}
                         {token?.change_24 !== null &&
                         token?.change_24 !== undefined ? (
-                          token?.change_24 > 0 ? (
+                          Number(token?.change_24) > 0 ? (
                             <div className="text-neargreen text-sm flex flex-row items-center">
                               {' '}
                               (+{dollarFormat(token?.change_24)}%)
@@ -207,7 +214,7 @@ export default function ({
                           ) : (
                             <div className="text-red-500 text-sm flex flex-row items-center">
                               {' '}
-                              ({dollarFormat(token?.change_24 || 0)}%)
+                              ({dollarFormat(token?.change_24)}%)
                             </div>
                           )
                         ) : null}
@@ -285,9 +292,9 @@ export default function ({
                           <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100">
                             $
                             {dollarNonCentFormat(
-                              token?.market_cap ||
-                                token?.fully_diluted_market_cap ||
-                                0,
+                              Number(token?.market_cap)
+                                ? token?.market_cap
+                                : token?.fully_diluted_market_cap,
                             )}
                           </p>
                         )}
@@ -315,7 +322,9 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {dollarNonCentFormat(token?.total_supply || 0)}
+                      {token?.total_supply
+                        ? dollarNonCentFormat(token?.total_supply)
+                        : ''}
                     </div>
                   )}
                 </div>
@@ -329,7 +338,7 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(transfers)}
+                      {transfers ? localFormat(transfers) : ''}
                     </div>
                   )}
                 </div>
@@ -341,7 +350,7 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(holders)}
+                      {holders ? localFormat(holders) : ''}
                     </div>
                   )}
                 </div>

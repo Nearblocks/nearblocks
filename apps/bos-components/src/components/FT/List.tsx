@@ -243,7 +243,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           {row.price === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            ` $${localFormat(row.price || 0)}`
+            ` $${localFormat(row.price)}`
           )}
         </span>
       ),
@@ -272,14 +272,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         <span>
           {row.change_24 === null ? (
             <span className="text-xs">N/A</span>
-          ) : row.change_24 > 0 ? (
+          ) : Number(row.change_24) > 0 ? (
             <div className="text-neargreen flex flex-row items-center">
               <ArrowUp />+{dollarFormat(row.change_24)}%
             </div>
           ) : (
             <div className="text-red-500 flex flex-row items-center">
               <ArrowDown className="h-3 w-3 fill-current mr-1" />
-              {dollarFormat(row.change_24)}%
+              {row.change_24 ? dollarFormat(row.change_24) + '%' : ''}
             </div>
           )}
         </span>
@@ -432,7 +432,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </span>
       ),
       key: 'holders',
-      cell: (row: Token) => <span>{localFormat(row.holders)}</span>,
+      cell: (row: Token) => (
+        <span>{row.holders ? localFormat(row.holders) : ''}</span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
