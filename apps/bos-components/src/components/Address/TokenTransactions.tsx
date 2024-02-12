@@ -477,7 +477,11 @@ export default function ({
       header: <>Quantity</>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
-        <span>{tokenAmount(row.amount, row.ft?.decimals, true)}</span>
+        <span>
+          {row.amount && row.ft?.decimals
+            ? tokenAmount(row.amount, row.ft?.decimals, true)
+            : ''}
+        </span>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
@@ -596,8 +600,14 @@ export default function ({
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -606,8 +616,12 @@ export default function ({
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -628,7 +642,7 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

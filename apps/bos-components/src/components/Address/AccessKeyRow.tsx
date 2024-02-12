@@ -33,10 +33,10 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
 
   const createdTime = accessKey.created?.block_timestamp
     ? nanoToMilli(accessKey.created?.block_timestamp)
-    : 0;
+    : '';
   const deletedTime = accessKey.deleted?.block_timestamp
     ? nanoToMilli(accessKey.deleted?.block_timestamp)
-    : 0;
+    : '';
 
   const txn = createdTime > deletedTime ? accessKey.created : accessKey.deleted;
 
@@ -166,16 +166,16 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             'Genesis'
           )}
         </td>
-        <td className="pl-6 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  ">
+        <td className="pl-6 pr-2 py-4 text-sm text-nearblue-600  ">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom">
+                <span className="truncate max-w-[120px] inline-block align-bottom ">
                   {accessKey.public_key}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
                 sideOffset={5}
               >
                 {accessKey.public_key}
@@ -219,7 +219,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
             keyInfo?.permission?.FunctionCall?.allowance &&
             'Ⓝ ' +
               yoctoToNear(
-                keyInfo?.permission?.FunctionCall?.allowance || 0,
+                keyInfo?.permission?.FunctionCall?.allowance || '',
                 true,
               )}
         </td>
@@ -233,10 +233,14 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
                 <Tooltip.Trigger asChild>
                   <span>
                     {showWhen
-                      ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                      : formatTimestampToString(
+                      ? txn?.block_timestamp
+                        ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
+                        : ''
+                      : txn?.block_timestamp
+                      ? formatTimestampToString(
                           nanoToMilli(txn?.block_timestamp),
-                        )}
+                        )
+                      : ''}
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -244,10 +248,12 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
                   sideOffset={5}
                 >
                   {!showWhen
-                    ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                    : formatTimestampToString(
-                        nanoToMilli(txn?.block_timestamp),
-                      )}
+                    ? txn?.block_timestamp
+                      ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
+                      : ''
+                    : txn?.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
+                    : ''}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>

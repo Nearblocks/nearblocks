@@ -35,7 +35,7 @@ export default function (props: Props) {
   const { network, hash, t } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState('');
   const [error, setError] = useState(false);
   const config = getConfig(network);
 
@@ -107,7 +107,7 @@ export default function (props: Props) {
         ).then(
           (data: {
             body: {
-              market_data: { current_price: { usd: number } };
+              market_data: { current_price: { usd: string } };
             };
             status: number;
           }) => {
@@ -154,7 +154,9 @@ export default function (props: Props) {
                     {t('blocks:block.heading.0')}
                     <span key={1} className="font-semibold">
                       {t('blocks:block.heading.1', {
-                        block: localFormat(block.block_height | 0),
+                        block: block.block_height
+                          ? localFormat(block.block_height)
+                          : '',
                       })}
                     </span>
                   </>
@@ -162,7 +164,10 @@ export default function (props: Props) {
                   <>
                     Block
                     <span key={1} className="font-semibold">
-                      #{localFormat(block.block_height | 0)}
+                      #
+                      {block.block_height
+                        ? localFormat(block.block_height)
+                        : ''}
                     </span>
                   </>
                 )}
@@ -187,7 +192,7 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 font-semibold break-words">
-                  {localFormat(block.block_height | 0)}
+                  {block.block_height ? localFormat(block.block_height) : ''}
                 </div>
               )}
             </div>
@@ -239,22 +244,31 @@ export default function (props: Props) {
                     <>
                       <LinkWrapper href={`/txns?block=${block.block_hash}`}>
                         {t('blocks:block.transactions.1', {
-                          txns: localFormat(block.transactions_agg.count || 0),
+                          txns: block.transactions_agg.count
+                            ? localFormat(block.transactions_agg.count)
+                            : '',
                         })}
                       </LinkWrapper>
                       &nbsp;
                       {t('blocks:block.transactions.2', {
-                        receipts: localFormat(block.receipts_agg.count || 0),
+                        receipts: block.receipts_agg.count
+                          ? localFormat(block.receipts_agg.count)
+                          : '',
                       })}
                     </>
                   ) : (
                     (
                       <LinkWrapper href={`/txns?block=${block.block_hash}`}>
-                        {localFormat(block.transactions_agg.count || 0) +
-                          ' transactions'}
+                        {block.transactions_agg.count
+                          ? localFormat(block.transactions_agg.count)
+                          : '' + ' transactions'}
                       </LinkWrapper>
                     ) +
-                    `and ${localFormat(block.receipts_agg.count || 0)} receipts`
+                    `and ${
+                      block.receipts_agg.count
+                        ? localFormat(block.receipts_agg.count)
+                        : ''
+                    } receipts`
                   )}
                 </div>
               )}
@@ -290,9 +304,10 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {block.chunks_agg.gas_used
+                  {block.chunks_agg.gas_used !== undefined &&
+                  block.chunks_agg.gas_used !== null
                     ? convertToMetricPrefix(block.chunks_agg.gas_used) + 'gas'
-                    : '0 gas'}
+                    : ''}
                 </div>
               )}
             </div>
@@ -308,7 +323,7 @@ export default function (props: Props) {
                 <div className="w-full md:w-3/4 break-words">
                   {block.chunks_agg.gas_limit
                     ? convertToMetricPrefix(block.chunks_agg.gas_limit) + 'gas'
-                    : '0 gas'}
+                    : ''}
                 </div>
               )}
             </div>
@@ -322,7 +337,7 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {gasPrice(Number(block.gas_price | 0))}
+                  {block.gas_price ? gasPrice(block.gas_price) : ''}
                 </div>
               )}
             </div>
@@ -337,10 +352,7 @@ export default function (props: Props) {
               ) : (
                 <div className="w-full md:w-3/4 break-words">
                   {block.chunks_agg.gas_used && block.gas_price
-                    ? gasFee(
-                        Number(block.chunks_agg.gas_used),
-                        Number(block.gas_price),
-                      )
+                    ? gasFee(block.chunks_agg.gas_used, block.gas_price) + 'Ⓝ'
                     : '0 Ⓝ'}
                 </div>
               )}

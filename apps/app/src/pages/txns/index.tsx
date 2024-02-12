@@ -44,7 +44,7 @@ const TransactionList = () => {
       .join('&');
 
     const url = `/txns${queryString ? `?${queryString}` : ''}`;
-    Router.push(url);
+    Router.push(url, undefined, { shallow: true });
   };
 
   const setPage = (pageNumber: number) => {

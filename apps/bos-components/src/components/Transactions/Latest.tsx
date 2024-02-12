@@ -145,7 +145,11 @@ export default function ({ t, network }: Props) {
                             </a>
                           </div>
                           <div className="text-gray-400 text-xs truncate">
-                            {getTimeAgoString(nanoToMilli(txn.block_timestamp))}
+                            {txn.block_timestamp
+                              ? getTimeAgoString(
+                                  nanoToMilli(txn.block_timestamp),
+                                )
+                              : ''}
                           </div>
                         </div>
                       </div>
@@ -178,10 +182,9 @@ export default function ({ t, network }: Props) {
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <span className="u-label--badge-in  text-nearblue-700 truncate">
-                                {yoctoToNear(
-                                  txn.actions_agg?.deposit || 0,
-                                  true,
-                                )}{' '}
+                                {txn.actions_agg?.deposit
+                                  ? yoctoToNear(txn.actions_agg?.deposit, true)
+                                  : ''}{' '}
                                 Ⓝ
                               </span>
                             </Tooltip.Trigger>

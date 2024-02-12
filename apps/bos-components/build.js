@@ -1,6 +1,8 @@
 import fs from 'fs';
+import fsp from 'fs/promises';
 import replaceInFiles from 'replace-in-files';
 
+const basePath = '.bos/transpiled';
 const transpiledPathPrefix = '.bos/transpiled/src/bos-components';
 
 async function build() {
@@ -171,16 +173,30 @@ async function build() {
   const packageJson = JSON.parse(
     fs.readFileSync(new URL('./package.json', import.meta.url)),
   );
+  const newPath = `${basePath}/common/src/${packageJson.name}`;
 
-  await new Promise((resolve) => {
-    fs.rename(
-      transpiledPathPrefix,
-      `${transpiledPathPrefix}/../${packageJson.name}`,
-      () => {
-        resolve();
-      },
-    );
-  });
+  await fsp.rename(transpiledPathPrefix, newPath);
+  await fsp.rename(
+    `${newPath}/components/Address`,
+    `${basePath}/address/src/bos-components/components/Address`,
+  );
+  await fsp.rename(
+    `${newPath}/components/Blocks`,
+    `${basePath}/blocks/src/bos-components/components/Blocks`,
+  );
+  await fsp.rename(
+    `${newPath}/components/FT`,
+    `${basePath}/ft/src/bos-components/components/FT`,
+  );
+  await fsp.rename(
+    `${newPath}/components/NFT`,
+    `${basePath}/nft/src/bos-components/components/NFT`,
+  );
+  await fsp.rename(
+    `${newPath}/components/Transactions`,
+    `${basePath}/txn/src/bos-components/components/Transactions`,
+  );
+
   console.log('DONE');
 }
 build();

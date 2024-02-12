@@ -633,7 +633,7 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

@@ -257,13 +257,21 @@ export default function ({ network, t }: Props) {
                           <span className="text-nearblue-700">
                             @{localFormat(stats?.near_btc_price ?? 0)} BTC
                           </span>{' '}
-                          {stats?.change_24 > 0 ? (
+                          {Number(stats?.change_24) > 0 ? (
                             <span className="text-neargreen text-sm">
-                              ({dollarFormat(stats?.change_24 ?? 0)}%)
+                              (
+                              {stats?.change_24
+                                ? dollarFormat(stats?.change_24)
+                                : ''}
+                              %)
                             </span>
                           ) : (
                             <span className="text-red-500 text-sm">
-                              ({dollarFormat(stats?.change_24 ?? 0)}%)
+                              (
+                              {stats?.change_24
+                                ? dollarFormat(stats?.change_24)
+                                : ''}
+                              %)
                             </span>
                           )}
                         </a>
@@ -320,7 +328,7 @@ export default function ({ network, t }: Props) {
                     <Skeleton className="my-1 h-4" />
                   ) : (
                     <p className="leading-6 text-nearblue-700">
-                      {currency(Number(stats?.total_txns ?? 0))}
+                      {stats?.total_txns ? currency(stats?.total_txns) : ''}
                     </p>
                   )}
                 </div>
@@ -334,7 +342,7 @@ export default function ({ network, t }: Props) {
                   <Skeleton className="my-1 h-4" />
                 ) : (
                   <p className="leading-6 text-nearblue-700">
-                    {gasPrice(Number(stats?.gas_price ?? 0))}
+                    {stats?.gas_price ? gasPrice(stats?.gas_price) : ''}
                   </p>
                 )}
               </div>
@@ -358,7 +366,9 @@ export default function ({ network, t }: Props) {
                   ) : (
                     <a href="/node-explorer" className="hover:no-underline">
                       <a className="leading-6 text-nearblue-700 hover:no-underline">
-                        {localFormat(stats?.nodes_online ?? 0)}
+                        {stats?.nodes_online
+                          ? localFormat(stats?.nodes_online)
+                          : ''}
                       </a>
                     </a>
                   )}

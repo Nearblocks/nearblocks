@@ -17,7 +17,7 @@ const TopNFTTokens = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/nft-tokens?page=${pageNumber}`);
+    Router.push(`/nft-tokens?page=${pageNumber}`, undefined, { shallow: true });
     setCurrentPage(pageNumber);
   };
 

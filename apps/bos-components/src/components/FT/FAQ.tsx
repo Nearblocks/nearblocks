@@ -35,8 +35,8 @@ export default function ({ network, id, token }: Props) {
   const [contract, setContract] = useState<DeploymentsInfo>(
     {} as DeploymentsInfo,
   );
-  const [transfers, setTransfers] = useState(0);
-  const [holders, setHolders] = useState(0);
+  const [transfers, setTransfers] = useState('');
+  const [holders, setHolders] = useState('');
   const [largestHolder, setLargestHolder] = useState<HoldersPropsInfo>(
     {} as HoldersPropsInfo,
   );
@@ -102,7 +102,7 @@ export default function ({ network, id, token }: Props) {
         .then(
           (data: {
             body: {
-              txns: { count: number }[];
+              txns: { count: string }[];
             };
             status: number;
           }) => {
@@ -136,7 +136,7 @@ export default function ({ network, id, token }: Props) {
         .then(
           (data: {
             body: {
-              holders: { count: number }[];
+              holders: { count: string }[];
             };
             status: number;
           }) => {
@@ -210,7 +210,7 @@ export default function ({ network, id, token }: Props) {
               )}
               . {tokenTicker} to USD price is updated in real-time. {name} is{' '}
               {tokens.change_24 !== null && tokens.change_24 !== undefined ? (
-                tokens.change_24 > 0 ? (
+                Number(tokens.change_24) > 0 ? (
                   dollarFormat(tokens.change_24) + '%'
                 ) : (
                   dollarFormat(tokens.change_24) + '%'
@@ -267,7 +267,7 @@ export default function ({ network, id, token }: Props) {
                 </a>
               )}
               . Since the creation of {name}, there has been{' '}
-              {localFormat(transfers)} on-chain transfers.
+              {transfers ? localFormat(transfers) : 0} on-chain transfers.
             </div>
           </div>
         </div>
@@ -290,7 +290,11 @@ export default function ({ network, id, token }: Props) {
             <div className="text-sm text-nearblue-600 py-2" itemProp="text">
               There are currently{' '}
               {tokens?.circulating_supply !== null ? (
-                `${localFormat(tokens?.circulating_supply || 0)}`
+                `${
+                  tokens?.circulating_supply
+                    ? localFormat(tokens?.circulating_supply)
+                    : 0
+                }`
               ) : (
                 <span>N/A</span>
               )}{' '}
@@ -299,7 +303,7 @@ export default function ({ network, id, token }: Props) {
                 tokens?.total_supply !== undefined &&
                 `${dollarNonCentFormat(tokens?.total_supply)}`}
               {tokenTicker}. {tokenTicker}&apos;s supply is split between{' '}
-              {localFormat(holders)} different wallet addresses.{' '}
+              {holders ? localFormat(holders) : 0} different wallet addresses.{' '}
               {largestHolder?.account && (
                 <span>
                   The largest {tokenTicker} holder is currently{' '}

@@ -111,7 +111,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         <span>
           <a href={`/blocks/${row.block_hash}`} className="hover:no-underline">
             <a className="text-green-500 hover:no-underline">
-              {localFormat(row.block_height)}
+              {row.block_height ? localFormat(row.block_height) : ''}
             </a>
           </a>
         </span>
@@ -163,8 +163,14 @@ export default function ({ currentPage, setPage, t, network }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -173,8 +179,12 @@ export default function ({ currentPage, setPage, t, network }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -186,7 +196,11 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
-        <span>{localFormat(row.transactions_agg.count)}</span>
+        <span>
+          {row.transactions_agg.count
+            ? localFormat(row.transactions_agg.count)
+            : '0'}
+        </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -196,7 +210,9 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       header: <span>{t ? t('blocks:block.receipt') : 'RECEIPT'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
-        <span>{localFormat(row.receipts_agg.count)}</span>
+        <span>
+          {row.receipts_agg.count ? localFormat(row.receipts_agg.count) : '0'}
+        </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -227,9 +243,9 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       key: 'gas_used',
       cell: (row: BlocksInfo) => (
         <span>
-          {row.chunks_agg.gas_used
+          {row.chunks_agg.gas_used !== null
             ? convertToMetricPrefix(row.chunks_agg.gas_used) + 'gas'
-            : '0 gas'}
+            : ''}
         </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -241,9 +257,9 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       key: 'gas_limit',
       cell: (row: BlocksInfo) => (
         <span>
-          {row.chunks_agg.gas_limit
+          {row.chunks_agg.gas_limit !== null
             ? convertToMetricPrefix(row.chunks_agg.gas_limit) + 'gas'
-            : '0 gas'}
+            : ''}
         </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -255,9 +271,9 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>
-          {row.chunks_agg.gas_used && row.gas_price
-            ? gasFee(row.chunks_agg.gas_used, row.gas_price)
-            : '0 Ⓝ'}
+          {row.chunks_agg.gas_used !== undefined && row.gas_price !== null
+            ? gasFee(row.chunks_agg.gas_used, row.gas_price) + 'Ⓝ'
+            : ''}
         </span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
@@ -276,13 +292,17 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         <p className="leading-7 pl-6 text-sm py-4 text-nearblue-600">
           {t
             ? t('blocks:listing', {
-                from: localFormat(start?.block_height | 0),
-                to: localFormat(end?.block_height | 0),
-                count: localFormat(totalCount | 0),
+                from: start?.block_height
+                  ? localFormat(start?.block_height)
+                  : '',
+                to: end?.block_height ? localFormat(end?.block_height) : '',
+                count: localFormat(totalCount.toString()),
               })
-            : `Block #${localFormat(start?.block_height)} to ${
-                '#' + localFormat(end?.block_height)
-              } (Total of ${localFormat(totalCount)} blocks)`}
+            : `Block #${
+                start?.block_height ? localFormat(start?.block_height) : ''
+              } to ${
+                '#' + end?.block_height ? localFormat(end?.block_height) : ''
+              } (Total of ${localFormat(totalCount.toString())} blocks)`}{' '}
         </p>
       )}
       {

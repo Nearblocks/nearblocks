@@ -19,7 +19,7 @@ interface Props {
   loading?: boolean;
   data: InventoryInfo;
   ft: {
-    amount: number;
+    amount: string;
     tokens: TokenListInfo[];
   };
   appUrl?: string;
@@ -51,7 +51,7 @@ const TokenHoldings = (props: Props) => {
     <Select.Root>
       <Select.Trigger className="w-96 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
-          ${dollarFormat(props.ft?.amount || 0)}{' '}
+          ${props.ft?.amount !== null ? dollarFormat(props.ft?.amount) : ''}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>

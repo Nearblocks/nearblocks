@@ -104,7 +104,7 @@ export default function (props: Props) {
         }),
         'near-supply': (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
-          y: Number(yoctoToNear(Number(stat.total_supply), false)),
+          y: Number(yoctoToNear(stat.total_supply, false)),
           date: stat.date,
         }),
         blocks: (stat: ChartStat) => ({

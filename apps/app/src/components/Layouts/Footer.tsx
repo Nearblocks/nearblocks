@@ -6,7 +6,7 @@ import Arrow from '../Icons/Arrow';
 
 const Footer = () => {
   const { t } = useTranslation('common');
-
+  const currentDate = new Date();
   return (
     <footer className="footer">
       <div className="bg-bottom-right">
@@ -181,7 +181,7 @@ const Footer = () => {
             </div>
             <div className="flex justify-between border-t border-gray-200">
               <p className="text-green-500 text-xs py-4 text-center ">
-                NearBlocks © 2023
+                NearBlocks © {currentDate.getFullYear()}
               </p>
             </div>
             <div>
