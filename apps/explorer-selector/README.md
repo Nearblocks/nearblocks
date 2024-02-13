@@ -53,6 +53,6 @@ For deployment we use network (testnet, mainnet) by env variable ;
 There are two included docker-compose files which can be started with:
 
 ```
-docker compose -f docker-compose.mainnet.yml up -d --build
-docker compose -f docker-compose.testnet.yml up -d --build
+docker compose -f mainnet-explorer-selector.yml up -d --build
+docker compose -f testnet-explorer-selector.yml up -d --build
 ```

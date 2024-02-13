@@ -46,7 +46,6 @@ const blockData = async (day: Dayjs) => {
     knex('blocks')
       .where('block_timestamp', '>=', start)
       .where('block_timestamp', '<', end)
-      .whereBetween('block_timestamp', [start, end])
       .count()
       .first(),
     knex('blocks')
@@ -117,7 +116,6 @@ const txnData = async (start: string, end: string, price?: null | string) => {
       knex('execution_outcomes')
         .where('executed_in_block_timestamp', '>=', start)
         .where('executed_in_block_timestamp', '<', end)
-        .whereBetween('executed_in_block_timestamp', [start, end])
         .sum('tokens_burnt')
         .first(),
     ]);
