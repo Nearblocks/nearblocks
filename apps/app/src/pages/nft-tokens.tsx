@@ -17,7 +17,7 @@ const TopNFTTokens = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/nft-tokens?page=${pageNumber}`);
+    Router.push(`/nft-tokens?page=${pageNumber}`, undefined, { shallow: true });
     setCurrentPage(pageNumber);
   };
 
@@ -58,7 +58,8 @@ const TopNFTTokens = () => {
             <div className="w-full ">
               <VmComponent
                 src={components?.nftList}
-                skeleton={<List ref={heightRef} />}
+                skeleton={<List className="absolute" ref={heightRef} />}
+                defaultSkelton={<List />}
                 onChangeHeight={onChangeHeight}
                 props={{
                   currentPage: currentPage,

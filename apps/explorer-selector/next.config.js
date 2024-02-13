@@ -17,7 +17,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/telemetry',
+        source: '/api/nodes',
         destination:
           process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
             ? 'https://api3.nearblocks.io/v1/node/telemetry'
@@ -27,15 +27,36 @@ const nextConfig = {
         source: '/api/circulating-supply',
         destination:
           process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/supply'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/supply',
+            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply',
       },
       {
         source: '/api/circulating-supply-in-near',
         destination:
           process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/supply-in-near'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/supply-in-near',
+            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply?unit=near'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply?unit=near',
+      },
+      {
+        source: '/api/fees-of-previous-day-utc',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=day'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=day',
+      },
+      {
+        source: '/api/fees-of-previous-7-days-utc',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=week'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=week',
+      },
+      {
+        source: '/api/ping',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/ping'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/ping',
       },
       {
         source: '/api/:path*',

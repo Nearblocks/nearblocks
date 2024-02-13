@@ -2,7 +2,6 @@
 import Big from 'big.js';
 import { format } from 'numerable';
 
-import { mainnetDb } from '#libs/db';
 import logger from '#libs/logger';
 import Sentry from '#libs/sentry';
 import { ValidationError } from '#types/types';
@@ -20,8 +19,8 @@ export const getPagination = (page = 1, perPage = 25) => {
 
 export const keyBinder = (raw: string, bindings: any, format = false) => {
   let index = 0;
-  const values: any[] = [];
-  const params: any[] = [];
+  const values: unknown[] = [];
+  const params: unknown[] = [];
   const regex = /:(\w+)/g;
 
   let query = raw.replace(regex, function (match, group) {
@@ -75,33 +74,15 @@ export const validationErrors = (errors: ValidationError[]) => {
   };
 };
 
-export const getFreePlan = async () => {
-  const { rows } = await mainnetDb.query(
-    `
-      SELECT
-        *
-      FROM
-        api__plans
-      WHERE
-        id = 1
-    `,
-  );
-
-  return rows?.[0];
-};
-
 export const errorHandler = (error: Error) => {
   logger.error(error);
   Sentry.captureException(error);
 };
 
 export const cmp = (a: Big, b: Big) => {
-  if (a.eq(b)) {
-    return 0;
-  }
-  if (a.gt(b)) {
-    return 1;
-  }
+  if (a.eq(b)) return 0;
+  if (a.gt(b)) return 1;
+
   return -1;
 };
 
@@ -114,13 +95,8 @@ export const sortByBNComparison = (aValue?: string, bValue?: string) => {
     return cmp(bNumeric, aNumeric);
   }
 
-  if (aValue) {
-    return -1;
-  }
-
-  if (bValue) {
-    return 1;
-  }
+  if (aValue) return -1;
+  if (bValue) return 1;
 
   return 0;
 };

@@ -15,6 +15,10 @@ const deployments = z.object({
   account: z.string(),
 });
 
+const parse = z.object({
+  account: z.string(),
+});
+
 const action = z.object({
   account: z.string(),
   method: z.string(),
@@ -71,18 +75,14 @@ const txnsExport = z.object({
 const ftTxns = z.object({
   account: z.string(),
   event: z.nativeEnum(EventKind).optional(),
-  from: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
-  to: z.string().optional(),
 });
 
 const ftTxnsCount = z.object({
   account: z.string(),
   event: z.nativeEnum(EventKind).optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
 });
 
 const ftTxnsExport = z.object({
@@ -125,6 +125,7 @@ const nftTxnsExport = z.object({
 export type Item = z.infer<typeof item>;
 export type Contract = z.infer<typeof contract>;
 export type Deployments = z.infer<typeof deployments>;
+export type Parse = z.infer<typeof parse>;
 export type Action = z.infer<typeof action>;
 export type Inventory = z.infer<typeof inventory>;
 export type Tokens = z.infer<typeof tokens>;
@@ -154,6 +155,7 @@ export default {
   nftTxns,
   nftTxnsCount,
   nftTxnsExport,
+  parse,
   tokens,
   txns,
   txnsCount,

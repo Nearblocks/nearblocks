@@ -15,7 +15,9 @@ const NodeExplorer = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/node-explorer?page=${pageNumber}`);
+    Router.push(`/node-explorer?page=${pageNumber}`, undefined, {
+      shallow: true,
+    });
     setCurrentPage(pageNumber);
   };
 
@@ -52,10 +54,11 @@ const NodeExplorer = () => {
         </div>
       </div>
       <div className="container mx-auto px-3 -mt-48">
-        <div style={height} className="relative mt-10">
+        <div style={height} className="relative">
           <VmComponent
             src={components?.nodeExplorer}
-            skeleton={<Index ref={heightRef} />}
+            skeleton={<Index className="absolute" ref={heightRef} />}
+            defaultSkelton={<Index />}
             onChangeHeight={onChangeHeight}
             props={{
               currentPage: currentPage,

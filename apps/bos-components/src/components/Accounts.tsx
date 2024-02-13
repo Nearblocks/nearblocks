@@ -277,7 +277,7 @@ export default function ({ network, t, id }: Props) {
       ).then((results: FtsInfo[]) => {
         results.forEach((rslt: FtsInfo) => {
           const ftrslt = rslt;
-          const amount = rslt?.amount;
+          const amount = rslt?.amount ? rslt?.amount : '';
 
           let sum = Big(0);
 
@@ -328,6 +328,7 @@ export default function ({ network, t, id }: Props) {
 
           return 0;
         });
+
         setFT({
           amount: total.toString(),
           tokens: [...pricedTokens, ...tokens],
@@ -424,7 +425,7 @@ export default function ({ network, t, id }: Props) {
     const locked = (key.keys || []).every(
       (key: {
         access_key: {
-          nonce: number;
+          nonce: string;
           permission: string;
         };
         public_key: string;
@@ -507,26 +508,35 @@ export default function ({ network, t, id }: Props) {
                   <Skeleton className="h-4 w-32" />
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {yoctoToNear(accountData?.amount || 0, true)} Ⓝ
+                    {accountData?.amount
+                      ? yoctoToNear(accountData?.amount, true)
+                      : ''}{' '}
+                    Ⓝ
                   </div>
                 )}
               </div>
-              {context.networkId === 'mainnet' && statsData?.near_price && (
+              {network === 'mainnet' && statsData?.near_price && (
                 <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                    {t ? t('address:value') : 'Value'}:
+                    {t ? t('address:value') : 'Value:'}
                   </div>
                   {loading ? (
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      $
-                      {fiatValue(
-                        yoctoToNear(accountData.amount || 0, false),
-                        statsData.near_price,
-                      )}{' '}
+                      {accountData.amount
+                        ? '$' +
+                          fiatValue(
+                            yoctoToNear(accountData.amount, false),
+                            statsData.near_price,
+                          )
+                        : ''}{' '}
                       <span className="text-xs">
-                        (@ ${dollarFormat(statsData.near_price)} / Ⓝ)
+                        (@ $
+                        {statsData.near_price
+                          ? dollarFormat(statsData.near_price)
+                          : ''}{' '}
+                        / Ⓝ)
                       </span>
                     </div>
                   )}
@@ -534,9 +544,9 @@ export default function ({ network, t, id }: Props) {
               )}
               <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                  {t ? t('address:tokens') : 'Tokens'}:
+                  {t ? t('address:tokens') : 'Tokens:'}
                 </div>
-                <div className="w-full md:w-3/4 break-words -my-1">
+                <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
                     data={inventoryData}
                     loading={loading}
@@ -566,7 +576,9 @@ export default function ({ network, t, id }: Props) {
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {yoctoToNear(Number(accountData?.locked || 0), true)} Ⓝ
+                      {accountData?.locked
+                        ? yoctoToNear(accountData?.locked, true) + ' Ⓝ'
+                        : ''}
                     </div>
                   )}
                 </div>
@@ -578,7 +590,9 @@ export default function ({ network, t, id }: Props) {
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {weight(Number(accountData?.storage_usage) || 0)}
+                      {accountData?.storage_usage
+                        ? weight(accountData?.storage_usage)
+                        : ''}
                     </div>
                   )}
                 </div>

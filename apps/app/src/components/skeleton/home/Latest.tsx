@@ -1,12 +1,14 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-
-const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
+interface Props {
+  className?: string;
+}
+const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <>
       <div
         ref={ref}
-        className="bg-white soft-shadow rounded-xl overflow-hidden absolute w-full z-10"
+        className={`bg-white rounded-b-xl overflow-hidden w-full z-10 ${className}`}
       >
         <div className="relative">
           <div className="px-3 divide-y h-80">
@@ -43,7 +45,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
                   </div>
                 </div>
                 <div className="items-end order-1 md:order-2">
-                  <div className="ml-auto w-32">
+                  <div className="ml-auto w-20">
                     <Skeleton className="h-4" />
                   </div>
                 </div>
@@ -51,7 +53,7 @@ const Latest = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
             ))}
           </div>
         </div>
-        <div className="border-t px-2 py-3 text-nearblue-600-700">
+        <div className="border-t px-2 py-3 text-nearblue-600">
           <Skeleton className="h-10" />
         </div>
       </div>

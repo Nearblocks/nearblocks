@@ -39,12 +39,13 @@ const Charts = () => {
           </h1>
         </div>
       </div>
-      <div className="container mx-auto px-3 -mt-48">
+      <div className="mx-auto px-3 -mt-48">
         <div className="container mx-auto px-3 -mt-36">
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Index ref={heightRef} />}
+              skeleton={<Index className="absolute" ref={heightRef} />}
+              defaultSkelton={<Index />}
               onChangeHeight={onChangeHeight}
               props={{ poweredBy: false, network: networkId, t: t }}
             />

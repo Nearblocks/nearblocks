@@ -3,6 +3,7 @@ import { Response } from 'express';
 import config from '#config';
 import catchAsync from '#libs/async';
 import db from '#libs/db';
+import sql from '#libs/postgres';
 import { FtTxns, FtTxnsCount, Holders, Item } from '#libs/schema/fts';
 import { getPagination, keyBinder } from '#libs/utils';
 import { RawQueryParams, RequestValidator } from '#types/types';
@@ -10,62 +11,51 @@ import { RawQueryParams, RequestValidator } from '#types/types';
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const contract = req.validator.data.contract;
 
-  const { query, values } = keyBinder(
-    `
-      SELECT
-        contract,
-        name,
-        symbol,
-        decimals,
-        icon,
-        reference,
-        price,
-        change_24,
-        market_cap,
-        fully_diluted_market_cap,
-        total_supply,
-        volume_24h,
-        description,
-        twitter,
-        facebook,
-        telegram,
-        reddit,
-        website,
-        coingecko_id,
-        coinmarketcap_id,
-        livecoinwatch_id,
-        list.onchain_market_cap,
-        list.transfers,
-        list.holders
-      FROM
-        ft_meta
-        LEFT JOIN LATERAL (
-          SELECT
-            onchain_market_cap,
-            transfers,
-            holders
-          FROM
-            ft_list
-          WHERE
-            contract = ft_meta.contract
-        ) list ON TRUE
-      WHERE
-        contract = :contract
-    `,
-    { contract },
-  );
+  const contracts = await sql`
+    SELECT
+      ft_meta.contract,
+      name,
+      symbol,
+      decimals,
+      icon,
+      reference,
+      price,
+      change_24,
+      market_cap,
+      fully_diluted_market_cap,
+      total_supply,
+      volume_24h,
+      description,
+      twitter,
+      facebook,
+      telegram,
+      reddit,
+      website,
+      coingecko_id,
+      coinmarketcap_id,
+      livecoinwatch_id,
+      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap
+    FROM
+      ft_meta
+      LEFT JOIN LATERAL (
+        SELECT DISTINCT
+          contract
+        FROM
+          ft_contracts_daily
+        WHERE
+          contract = ft_meta.contract
+      ) list ON TRUE
+    WHERE
+      ft_meta.contract = ${contract}
+  `;
 
-  const { rows } = await db.query(query, values);
-
-  return res.status(200).json({ contracts: rows });
+  return res.status(200).json({ contracts });
 });
 
 const txns = catchAsync(
   async (req: RequestValidator<FtTxns>, res: Response) => {
     const contract = req.validator.data.contract;
     const account = req.validator.data.a;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
@@ -76,18 +66,11 @@ const txns = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          concat_ws(
-            '-',
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
-          ) as key,
-          token_old_owner_account_id,
-          token_new_owner_account_id,
-          amount,
-          event_kind,
+          event_index,
+          affected_account_id,
+          involved_account_id,
+          delta_amount,
+          cause,
           txn.transaction_hash,
           txn.included_in_block_hash,
           txn.block_timestamp,
@@ -112,57 +95,33 @@ const txns = catchAsync(
             FROM
               ft_meta
             WHERE
-              ft_meta.contract = emitted_by_contract_account_id
+              ft_meta.contract = contract_account_id
           ) AS ft
         FROM
-          assets__fungible_token_events
+          ft_events
           INNER JOIN (
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              event_index
             FROM
-              assets__fungible_token_events a
+              ft_events a
             WHERE
-              emitted_by_contract_account_id = :contract
-              ${
-                account
-                  ? `
-                    AND (
-                      token_old_owner_account_id = :account
-                      OR token_new_owner_account_id = :account
-                    )
-                  `
-                  : `
-                    AND ${from ? `token_old_owner_account_id = :from` : true}
-                    AND ${to ? `token_new_owner_account_id = :to` : true}
-                  `
-              }
-              AND ${event ? `event_kind = :event` : true}
+              contract_account_id = :contract
+              AND ${account ? `affected_account_id = :account` : true}
+              AND ${event ? `cause = :event` : true}
               AND EXISTS (
                 SELECT
                   1
                 FROM
                   ft_meta ft
                 WHERE
-                  ft.contract = a.emitted_by_contract_account_id
+                  ft.contract = a.contract_account_id
               )
             ORDER BY
-              emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-              emitted_index_of_event_entry_in_shard ${
-                order === 'desc' ? 'DESC' : 'ASC'
-              }
+              event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
               :limit OFFSET :offset
           ) AS tmp using(
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           )
           INNER JOIN LATERAL (
             SELECT
@@ -198,16 +157,12 @@ const txns = catchAsync(
               transactions
               JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
             WHERE
-              receipts.receipt_id = assets__fungible_token_events.emitted_for_receipt_id
+              receipts.receipt_id = ft_events.receipt_id
           ) txn ON TRUE
         ORDER BY
-          emitted_at_block_timestamp ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_in_shard_id ${order === 'desc' ? 'DESC' : 'ASC'},
-          emitted_index_of_event_entry_in_shard ${
-            order === 'desc' ? 'DESC' : 'ASC'
-          }
+          event_index ${order === 'desc' ? 'DESC' : 'ASC'}
       `,
-      { account, contract, event, from, limit, offset, to },
+      { account, contract, event, limit, offset },
     );
 
     const { rows } = await db.query(query, values);
@@ -220,46 +175,32 @@ const txnsCount = catchAsync(
   async (req: RequestValidator<FtTxnsCount>, res: Response) => {
     const contract = req.validator.data.contract;
     const account = req.validator.data.a;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
     const event = req.validator.data.event;
 
     const useFormat = true;
-    const bindings = { account, contract, event, from, to };
+    const bindings = { account, contract, event };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
-        assets__fungible_token_events a
+        ft_events a
       WHERE
-        emitted_by_contract_account_id = :contract
-        ${
-          account
-            ? `
-              AND (
-                token_old_owner_account_id = :account
-                OR token_new_owner_account_id = :account
-              )
-            `
-            : `
-              AND ${from ? `token_old_owner_account_id = :from` : true}
-              AND ${to ? `token_new_owner_account_id = :to` : true}
-            `
-        }
-        AND ${event ? `event_kind = :event` : true}
+        contract_account_id = :contract
+        AND ${account ? `affected_account_id = :account` : true}
+        AND ${event ? `cause = :event` : true}
         AND EXISTS (
           SELECT
             1
           FROM
             ft_meta ft
           WHERE
-            ft.contract = a.emitted_by_contract_account_id
+            ft.contract = a.contract_account_id
         )
     `;
 
     const { query, values } = keyBinder(
       rawQuery({
-        select: 'emitted_for_receipt_id',
+        select: 'contract_account_id',
       }),
       bindings,
       useFormat,
@@ -279,7 +220,7 @@ const txnsCount = catchAsync(
 
     const { query: countQuery, values: countValues } = keyBinder(
       rawQuery({
-        select: 'COUNT(emitted_for_receipt_id)',
+        select: 'COUNT(contract_account_id)',
       }),
       bindings,
     );
@@ -303,15 +244,16 @@ const holders = catchAsync(
       `
         SELECT
           account,
-          amount
+          SUM(amount) AS amount
         FROM
-          ft_holders
+          ft_holders_monthly
         WHERE
           contract = :contract
-          AND account <> ''
-          AND amount > 0
+        GROUP BY
+          contract,
+          account
         ORDER BY
-          amount ${order === 'desc' ? 'DESC' : 'ASC'}
+          SUM(amount) ${order === 'desc' ? 'DESC' : 'ASC'}
         LIMIT
           :limit OFFSET :offset
       `,
@@ -331,13 +273,18 @@ const holdersCount = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          COUNT(account)
-        FROM
-          ft_holders
-        WHERE
-          contract = :contract
-          AND account <> ''
-          AND amount > 0
+          COUNT(*)
+        FROM (
+          SELECT
+            account
+          FROM
+            ft_holders_monthly
+          WHERE
+            contract = :contract
+          GROUP BY
+            contract,
+            account
+        ) s
       `,
       { contract },
     );

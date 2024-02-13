@@ -2,6 +2,8 @@ import Big from 'big.js';
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import redis from '#libs/redis';
+import { List } from '#libs/schema/validators';
 import {
   calculateTotalStake,
   elapsedTime,
@@ -14,9 +16,7 @@ import {
   stakePercents,
   timeRemaining,
   validatorsSortFns,
-} from '#libs/nodevalidator';
-import redis from '#libs/redis';
-import { List } from '#libs/schema/nodevalidator';
+} from '#libs/validators';
 import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -40,6 +40,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     redis.parse('latestBlock'),
     redis.parse('validatorTelemetry'),
   ]);
+
   if (combinedData && combinedData.length > 0) {
     const validatorPaginatedData = combinedData?.slice(
       page * perPage - perPage,
@@ -147,6 +148,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       validatorTelemetry,
     });
   }
+
   return res.status(200).json({
     currentValidators: 0,
     elapsedTimeData: 0,

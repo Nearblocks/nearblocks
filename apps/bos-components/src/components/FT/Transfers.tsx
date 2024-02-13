@@ -6,29 +6,39 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {string} id - The token identifier passed as a string
+ * @param {string} [id] - The token identifier passed as a string
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
+ * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
+ *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+
  */
 
 interface Props {
   network: string;
-  id: string;
   t: (key: string) => string;
+  id: string;
+  a?: string;
+  filters?: { [key: string]: string };
+  onFilterClear?: (name: string) => void;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
 import {
+  capitalizeFirstLetter,
   formatTimestampToString,
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
+import CloseCircle from '@/includes/icons/CloseCircle';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, id, t }: Props) {
+export default function ({ network, t, id, filters, onFilterClear }: Props) {
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,9 +60,10 @@ export default function ({ network, id, t }: Props) {
   }, [currentPage]);
 
   useEffect(() => {
-    function fetchTotalTxns() {
+    function fetchTotalTxns(qs?: string) {
+      const queryParams = qs ? '?' + qs : '';
       setTxnLoading(true);
-      asyncFetch(`${config?.backendUrl}fts/${id}/txns/count`, {
+      asyncFetch(`${config?.backendUrl}fts/${id}/txns/count${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -76,11 +87,11 @@ export default function ({ network, id, t }: Props) {
         .finally(() => {});
     }
 
-    function fetchTxnsData(page: number) {
+    function fetchTxnsData(page: number, qs: string) {
+      const queryParams = qs ? qs + '&' : '';
       setIsLoading(true);
-
       asyncFetch(
-        `${config?.backendUrl}fts/${id}/txns?&page=${page}&per_page=25`,
+        `${config?.backendUrl}fts/${id}/txns?${queryParams}page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -100,9 +111,19 @@ export default function ({ network, id, t }: Props) {
         });
     }
 
-    fetchTotalTxns();
-    fetchTxnsData(currentPage);
-  }, [config?.backendUrl, currentPage, id]);
+    let urlString = '';
+    if (filters && Object.keys(filters).length > 0) {
+      urlString = Object.keys(filters)
+        .map(
+          (key) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`,
+        )
+        .join('&');
+    }
+
+    fetchTotalTxns(urlString);
+    fetchTxnsData(currentPage, urlString);
+  }, [config?.backendUrl, currentPage, id, filters]);
 
   const columns = [
     {
@@ -160,7 +181,9 @@ export default function ({ network, id, t }: Props) {
             href={`/blocks/${row.included_in_block_hash}`}
           >
             <a className="text-green-500 font-medium hover:no-underline">
-              {localFormat(row.block.block_height)}
+              {row.block.block_height
+                ? localFormat(row.block.block_height)
+                : ''}
             </a>
           </a>
         </>
@@ -294,7 +317,11 @@ export default function ({ network, id, t }: Props) {
       header: <span>Quantity</span>,
       key: 'amount',
       cell: (row: TransactionInfo) => (
-        <>{tokenAmount(row.amount, row.ft?.decimals, true)}</>
+        <>
+          {row.amount && row.ft?.decimals
+            ? localFormat(tokenAmount(row.amount, row.ft?.decimals, true))
+            : ''}
+        </>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -342,8 +369,14 @@ export default function ({ network, id, t }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -352,8 +385,12 @@ export default function ({ network, id, t }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -373,8 +410,30 @@ export default function ({ network, id, t }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
+          </div>
+          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+            {filters && Object.keys(filters).length > 0 && (
+              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
+                Filtered By:
+                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
+                  {filters &&
+                    Object.keys(filters).map((key) => (
+                      <span className="flex" key={key}>
+                        {capitalizeFirstLetter(key)}:{' '}
+                        <span className="inline-block truncate max-w-[120px]">
+                          <span className="font-semibold">{filters[key]}</span>
+                        </span>
+                      </span>
+                    ))}
+                  <CloseCircle
+                    className="w-4 h-4 fill-current cursor-pointer"
+                    onClick={onFilterClear}
+                  />
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}

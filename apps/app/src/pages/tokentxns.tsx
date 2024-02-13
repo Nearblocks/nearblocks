@@ -16,7 +16,7 @@ const ToxenTxns = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/tokentxns?page=${pageNumber}`);
+    Router.push(`/tokentxns?page=${pageNumber}`, undefined, { shallow: true });
     setCurrentPage(pageNumber);
   };
 
@@ -58,7 +58,8 @@ const ToxenTxns = () => {
           <div className="w-full ">
             <VmComponent
               src={components?.ftTransfersList}
-              skeleton={<List ref={heightRef} />}
+              skeleton={<List className="absolute" ref={heightRef} />}
+              defaultSkelton={<List />}
               onChangeHeight={onChangeHeight}
               props={{
                 t: t,

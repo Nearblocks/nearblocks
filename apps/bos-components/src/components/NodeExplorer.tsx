@@ -47,14 +47,16 @@ export default function ({ network, currentPage, setPage }: Props) {
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
   const [isLoading, setIsLoading] = useState(false);
-  const [totalSuppy, setTotalSupplay] = useState(0);
+  const [totalSuppy, setTotalSupply] = useState('');
+  const [totalCount, setTotalCount] = useState('');
   const [expanded, setExpanded] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState(0);
   const errorMessage = 'No validator data!';
   const config = getConfig(network);
 
-  const TotalSupply = yoctoToNear(Number(totalSuppy || 0), false);
+  const TotalSupply = totalSuppy ? yoctoToNear(totalSuppy, false) : '';
+
   useEffect(() => {
     function fetchValidatorData(page: number) {
       setIsLoading(true);
@@ -102,7 +104,7 @@ export default function ({ network, currentPage, setPage }: Props) {
         .then((res: any) => {
           const data = res.body;
           if (res.status === 200) {
-            setTotalSupplay(data.stats[0].total_supply || 0);
+            setTotalSupply(data.stats[0].total_supply || 0);
           }
         })
         .catch(() => {})
@@ -128,6 +130,9 @@ export default function ({ network, currentPage, setPage }: Props) {
     fetchTotalSuppy();
     fetchValidatorData(currentPage);
   }, [config?.backendUrl, currentPage]);
+  validatorFullData[currentPage]?.total
+    ? setTotalCount(validatorFullData[currentPage]?.total)
+    : '';
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - 1);
@@ -212,6 +217,7 @@ export default function ({ network, currentPage, setPage }: Props) {
         return {};
     }
   };
+
   const columns = [
     {
       header: <span></span>,
@@ -247,16 +253,45 @@ export default function ({ network, currentPage, setPage }: Props) {
       header: <span>VALIDATOR</span>,
       key: 'accountId',
       cell: (row: ValidatorEpochData) => (
-        <span>
-          <a href={`/address/${row.accountId}`} className="hover:no-underline">
-            <a className="text-green-500 hover:no-underline">
-              {shortenAddress(row.accountId)}
-            </a>
-          </a>
-          <div>{row.publicKey ? shortenAddress(row.publicKey) : ''}</div>
-        </span>
+        <>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <a
+                  href={`/address/${row.accountId}`}
+                  className="hover:no-underline"
+                >
+                  <a className="text-green-500 hover:no-underline">
+                    {shortenAddress(row.accountId)}
+                  </a>
+                </a>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="start"
+                side="top"
+              >
+                {row.accountId}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <div>{row.publicKey ? shortenAddress(row.publicKey) : ''}</div>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="start"
+                side="bottom"
+              >
+                {row.publicKey}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        </>
       ),
-      tdClassName: 'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'pl-6 py-4 text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -362,7 +397,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             row?.contractStake;
           if (visibleStake) {
             return `${convertAmountToReadableString(
-              Math.abs(Number(visibleStake)),
+              visibleStake,
               'seatPriceAmount',
             )}  Ⓝ`;
           }
@@ -781,7 +816,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                     ) : (
                       <>
                         {convertAmountToReadableString(
-                          Number(validatorFullData[currentPage]?.seatPrice),
+                          validatorFullData[currentPage]?.seatPrice,
                           'seatPriceAmount',
                         )}
                         Ⓝ
@@ -799,7 +834,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <span>{formatNumber(Number(TotalSupply))}</span>
+                              <span>
+                                {TotalSupply ? formatNumber(TotalSupply) : ''}
+                              </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content
                               className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
@@ -844,7 +881,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                   {!validatorFullData[currentPage]?.totalSeconds ? (
                     <Skeleton className="h-3 w-32" />
                   ) : (
-                    convertTimestampToTime(timeRemaining)
+                    convertTimestampToTime(timeRemaining.toString())
                   )}
                 </div>
               </div>
@@ -859,15 +896,15 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <div
                           className="bg-green-500 h-2 rounded-full"
                           style={{
-                            width: `${validatorFullData[
-                              currentPage
-                            ]?.epochProgress.toFixed(1)}%`,
+                            width: `${Big(
+                              validatorFullData[currentPage]?.epochProgress,
+                            ).toFixed(1)}%`,
                           }}
                         ></div>
                       </div>
-                      {`${validatorFullData[currentPage]?.epochProgress.toFixed(
-                        0,
-                      )}%`}
+                      {`${Big(
+                        validatorFullData[currentPage]?.epochProgress,
+                      ).toFixed(0)}%`}
                     </div>
                   )}
                 </div>
@@ -898,7 +935,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                 props={{
                   columns: columns,
                   data: validatorFullData[currentPage]?.validatorEpochData,
-                  count: validatorFullData[currentPage]?.total,
+                  count: totalCount,
                   isLoading: isLoading,
                   renderRowSubComponent: ExpandedRow,
                   expanded,

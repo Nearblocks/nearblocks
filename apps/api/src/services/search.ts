@@ -1,191 +1,111 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
-import db from '#libs/db';
+import sql from '#libs/postgres';
 import { Item } from '#libs/schema/search';
-import { keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
+
+const txnQuery = (keyword: string) => {
+  return sql`
+    SELECT
+      transaction_hash
+    FROM
+      transactions
+    WHERE
+      transaction_hash = ${keyword}
+    LIMIT
+      1
+  `;
+};
+
+const blockQuery = (keyword: string) => {
+  return sql`
+    SELECT
+      block_height,
+      block_hash
+    FROM
+      blocks
+    WHERE
+      ${!isNaN(+keyword)
+      ? sql`block_height = ${keyword}`
+      : sql`block_hash = ${keyword}`}
+    LIMIT
+      1
+  `;
+};
+
+const accountQuery = (keyword: string) => {
+  return sql`
+    SELECT
+      account_id
+    FROM
+      accounts
+    WHERE
+      account_id = ${keyword}
+    LIMIT
+      1
+  `;
+};
+
+const receiptQuery = (keyword: string) => {
+  return sql`
+    SELECT
+      receipt_id,
+      originated_from_transaction_hash
+    FROM
+      receipts
+    WHERE
+      receipt_id = ${keyword}
+    LIMIT
+      1
+  `;
+};
 
 const txns = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const keyword = req.validator.data.keyword;
+  const txns = await txnQuery(keyword);
 
-  const { query, values } = keyBinder(
-    `
-      SELECT
-        transaction_hash
-      FROM
-        transactions
-      WHERE
-        transaction_hash = :keyword
-      LIMIT
-        1
-    `,
-    { keyword },
-  );
-
-  const { rows } = await db.query(query, values);
-
-  return res.status(200).json({ txns: rows });
+  return res.status(200).json({ txns });
 });
 
 const blocks = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
+    const blocks = await blockQuery(keyword);
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          block_height,
-          block_hash
-        FROM
-          blocks
-        WHERE
-          ${
-            !isNaN(keyword)
-              ? `block_height = ((:keyword) :: numeric)`
-              : 'block_hash = ((:keyword) :: text)'
-          }
-        LIMIT
-          1
-      `,
-      { keyword },
-    );
-
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ blocks: rows });
+    return res.status(200).json({ blocks });
   },
 );
 
 const accounts = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
+    const accounts = await accountQuery(keyword);
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          account_id
-        FROM
-          accounts
-        WHERE
-          account_id = :keyword
-        LIMIT
-          1
-      `,
-      { keyword },
-    );
-
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ accounts: rows });
+    return res.status(200).json({ accounts });
   },
 );
 
 const receipts = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
+    const receipts = await receiptQuery(keyword);
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          receipt_id,
-          originated_from_transaction_hash
-        FROM
-          receipts
-        WHERE
-          receipt_id = :keyword
-        LIMIT
-          1
-      `,
-      { keyword },
-    );
-
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ receipts: rows });
+    return res.status(200).json({ receipts });
   },
 );
 
 const search = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
-
-    // search txn
-    const { query, values } = keyBinder(
-      `    
-        SELECT
-          transaction_hash
-        FROM
-          transactions
-        WHERE
-          transaction_hash = :keyword
-        LIMIT
-          1
-      `,
-      { keyword },
-    );
-
-    // search in block
-    const { query: blockQry, values: blockValues } = keyBinder(
-      `
-        SELECT
-          block_height,
-          block_hash
-        FROM
-          blocks
-        WHERE
-          ${
-            !isNaN(keyword)
-              ? `block_height = ((:keyword) :: numeric)`
-              : 'block_hash = ((:keyword) :: text)'
-          }
-        LIMIT 1
-      `,
-      { keyword },
-    );
-
-    // search account
-    const { query: accountQry, values: accountValues } = keyBinder(
-      `
-        SELECT
-          account_id
-        FROM
-          accounts
-        WHERE
-          account_id = :keyword
-        LIMIT 5
-      `,
-      { keyword },
-    );
-
-    // search receipt
-    const { query: receiptQry, values: receiptValues } = keyBinder(
-      `
-        SELECT
-          receipt_id,
-          originated_from_transaction_hash
-        FROM
-          receipts
-        WHERE
-          receipt_id = :keyword
-        LIMIT  1
-      `,
-      { keyword },
-    );
-
-    const [txn, block, account, receipt] = await Promise.all([
-      db.query(query, values),
-      db.query(blockQry, blockValues),
-      db.query(accountQry, accountValues),
-      db.query(receiptQry, receiptValues),
+    const [txns, blocks, accounts, receipts] = await Promise.all([
+      txnQuery(keyword),
+      blockQuery(keyword),
+      accountQuery(keyword),
+      receiptQuery(keyword),
     ]);
 
-    return res.status(200).json({
-      accounts: account.rows,
-      blocks: block.rows,
-      receipts: receipt.rows,
-      txns: txn.rows,
-    });
+    return res.status(200).json({ accounts, blocks, receipts, txns });
   },
 );
 

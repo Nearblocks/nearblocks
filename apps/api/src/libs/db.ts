@@ -17,15 +17,11 @@ if (config.dbCa) {
 }
 
 const db = new Pool({
+  application_name: 'api',
   connectionString: config.dbUrl,
   max: 60,
   ssl: ssl?.ca ? ssl : false,
-});
-
-export const mainnetDb = new Pool({
-  connectionString: config.userDbUrl,
-  max: 60,
-  ssl: ssl?.ca ? ssl : false,
+  statement_timeout: 60 * 1000, // 60s
 });
 
 export default db;

@@ -30,10 +30,10 @@ export default function ({ network, id }: Props) {
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
-  const [txns, setTxns] = useState<TransactionInfo[]>([]);
+  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const config = getConfig(network);
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = 'No token transfers found!';
+  const errorMessage = 'No transactions found!';
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -70,11 +70,11 @@ export default function ({ network, id }: Props) {
         .finally(() => {});
     }
 
-    function fetchTxnsData() {
+    function fetchTxnsData(page: number) {
       setIsLoading(true);
 
       asyncFetch(
-        `${config?.backendUrl}nfts/${id}/txns?order=desc&page=${currentPage}&per_page=25`,
+        `${config?.backendUrl}nfts/${id}/txns?order=desc&page=${page}&per_page=25`,
         {
           method: 'GET',
           headers: {
@@ -85,7 +85,7 @@ export default function ({ network, id }: Props) {
         .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
           const resp = data?.body?.txns;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
-            setTxns(resp);
+            setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
           }
         })
         .catch(() => {})
@@ -95,7 +95,7 @@ export default function ({ network, id }: Props) {
     }
 
     fetchTotalTxns();
-    fetchTxnsData();
+    fetchTxnsData(currentPage);
   }, [config?.backendUrl, currentPage, id]);
 
   const columns = [
@@ -333,8 +333,14 @@ export default function ({ network, id }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -343,8 +349,12 @@ export default function ({ network, id }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -385,7 +395,7 @@ export default function ({ network, id }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
         </div>
@@ -394,7 +404,7 @@ export default function ({ network, id }: Props) {
         src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
-          data: txns,
+          data: txns[currentPage],
           isLoading: isLoading,
           isPagination: true,
           count: totalCount,

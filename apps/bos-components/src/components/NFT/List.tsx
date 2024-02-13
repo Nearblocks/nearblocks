@@ -131,7 +131,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       tdClassName:
         'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-700 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[1px]',
     },
     {
       header: (
@@ -175,7 +175,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm  w-80 text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm  text-nearblue-600 align-top',
+      thClassName:
+        'text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
     },
     {
       header: (
@@ -196,9 +198,12 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       key: 'tokens',
-      cell: (row: Token) => <span>{localFormat(row.tokens)}</span>,
+      cell: (row: Token) => (
+        <span>{row.tokens ? localFormat(row.tokens) : ''}</span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName: 'w-[160px]',
     },
     {
       header: (
@@ -218,9 +223,12 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       key: 'change_24',
-      cell: (row: Token) => <span>{localFormat(row.transfers_day)}</span>,
+      cell: (row: Token) => (
+        <span>{row.transfers_day ? localFormat(row.transfers_day) : ''}</span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName: 'w-[160px]',
     },
     {
       header: (
@@ -240,9 +248,14 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       key: 'transfers_3days',
-      cell: (row: Token) => <span>{localFormat(row.transfers_3days)}</span>,
+      cell: (row: Token) => (
+        <span>
+          {row.transfers_3days ? localFormat(row.transfers_3days) : ''}
+        </span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName: 'w-[160px]',
     },
     {
       header: (
@@ -262,9 +275,12 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       key: 'transfers',
-      cell: (row: Token) => <span>{localFormat(row.transfers)}</span>,
+      cell: (row: Token) => (
+        <span>{row.transfers ? localFormat(row.transfers) : ''}</span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName: 'w-[160px]',
     },
     {
       header: (
@@ -285,9 +301,12 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         </span>
       ),
       key: 'holders',
-      cell: (row: Token) => <span>{localFormat(row.holders)}</span>,
+      cell: (row: Token) => (
+        <span>{row.holders ? localFormat(row.holders) : ''}</span>
+      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName: 'w-[160px]',
     },
   ];
 
@@ -324,8 +343,8 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             <Skeleton className="max-w-lg pl-3" />
           ) : (
             <p className="pl-3">
-              A total of {localFormat(totalCount | 0)} NEP-171 Token Contracts
-              found
+              A total of {localFormat(totalCount.toString())} NEP-171 Token
+              Contracts found
             </p>
           )}
           <div className={`flex w-full h-10 sm:w-80 mr-2`}>

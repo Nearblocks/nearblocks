@@ -3,41 +3,40 @@ import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
-import { mainnetDb } from '#libs/db';
+import { userSql } from '#libs/postgres';
 import { userRedisClient } from '#libs/redis';
-import { getFreePlan, keyBinder } from '#libs/utils';
 import { SubscriptionStatus } from '#types/enums';
 import { Plan, User } from '#types/types';
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as User)?.id;
+    const date = dayjs.utc().toISOString();
 
     if (!id) {
       return await useFreePlan(res, next, req.ip!);
     }
 
-    const date = dayjs.utc().toISOString();
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          p.*
-        FROM
-          api__plans p
-          INNER JOIN api__subscriptions s ON s.plan_id = p.id
-        WHERE
-          s.user_id = :user
-          AND s.status IN ('${SubscriptionStatus.ACTIVE}', '${SubscriptionStatus.TRIALING}')
-        ORDER BY
-          s.end_date DESC
-        LIMIT
-          1
-      `,
-      { date, user: id },
-    );
+    const plans = await userSql<Plan[]>`
+      SELECT
+        p.*
+      FROM
+        api__plans p
+        INNER JOIN api__subscriptions s ON s.plan_id = p.id
+      WHERE
+        s.user_id = ${id}
+        AND s.status IN (
+          ${SubscriptionStatus.ACTIVE},
+          ${SubscriptionStatus.TRIALING}
+        )
+        AND ${date} BETWEEN s.start_data AND s.end_data
+      ORDER BY
+        s.end_date DESC
+      LIMIT
+        1
+    `;
 
-    const { rows } = await mainnetDb.query(query, values);
-    const plan = rows?.[0];
+    const plan = plans?.[0];
 
     if (!plan) {
       return await useFreePlan(res, next, id);
@@ -73,6 +72,19 @@ const useFreePlan = async (
   } catch (error) {
     return res.status(429).json({ message: 'Too Many Requests' });
   }
+};
+
+const getFreePlan = async () => {
+  const plans = await userSql<Plan[]>`
+    SELECT
+      *
+    FROM
+      api__plans
+    WHERE
+      id = 1
+  `;
+
+  return plans?.[0];
 };
 
 const rateLimiterUnion = (plan: Plan) => {

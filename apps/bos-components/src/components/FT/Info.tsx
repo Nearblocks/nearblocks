@@ -50,6 +50,7 @@ export default function ({ token, id, network }: Props) {
       setTokens(token);
     }
   }, [token]);
+
   return (
     <div className="px-3 pt-2 pb-5 text-sm text-gray">
       {tokens?.description && (
@@ -68,8 +69,8 @@ export default function ({ token, id, network }: Props) {
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Volume (24H):</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.volume_24h !== null ? (
-            `$${dollarNonCentFormat(tokens?.volume_24h || 0)}`
+          {tokens?.volume_24h !== null && tokens?.volume_24h !== undefined ? (
+            `$${dollarNonCentFormat(tokens?.volume_24h)}`
           ) : (
             <span className="text-xs">N/A</span>
           )}
@@ -78,8 +79,8 @@ export default function ({ token, id, network }: Props) {
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating MC:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.market_cap !== null ? (
-            `$${dollarNonCentFormat(tokens?.market_cap || 0)}`
+          {tokens?.market_cap !== null && tokens?.market_cap !== undefined ? (
+            `$${dollarNonCentFormat(tokens?.market_cap)}`
           ) : (
             <span className="text-xs">N/A</span>
           )}
@@ -88,8 +89,9 @@ export default function ({ token, id, network }: Props) {
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">On-chain MC:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.onchain_market_cap !== null ? (
-            `$${dollarNonCentFormat(tokens?.onchain_market_cap || 0)}`
+          {tokens?.onchain_market_cap !== null &&
+          tokens?.onchain_market_cap !== undefined ? (
+            `$${dollarNonCentFormat(tokens?.onchain_market_cap)}`
           ) : (
             <span className="text-xs">N/A</span>
           )}
@@ -98,8 +100,9 @@ export default function ({ token, id, network }: Props) {
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating Supply:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.circulating_supply !== null ? (
-            `${localFormat(tokens?.circulating_supply || 0)}`
+          {tokens?.circulating_supply !== null &&
+          tokens?.circulating_supply !== undefined ? (
+            `${localFormat(tokens?.circulating_supply)}`
           ) : (
             <span className="text-xs">N/A</span>
           )}

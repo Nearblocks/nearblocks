@@ -2,131 +2,53 @@ import { Request, Response } from 'express';
 
 import catchAsync from '#libs/async';
 import db from '#libs/db';
+import sql from '#libs/postgres';
 import { Count, List, Txns } from '#libs/schema/fts';
 import { getPagination, keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
-const orderBy = (sort: string) => {
-  switch (sort) {
-    case 'name':
-      return 'lower(ft_list.name)';
-    case 'price':
-      return 'price';
-    case 'change':
-      return 'change_24';
-    case 'volume':
-      return 'volume_24h';
-    case 'market_cap':
-      return 'market_cap';
-    case 'holders':
-      return 'holders';
-    default:
-      return 'onchain_market_cap';
-  }
-};
-
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
-  const search = req.validator.data.search;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
-  const sort = req.validator.data.sort;
-  const order = req.validator.data.order;
-
   const { limit, offset } = getPagination(page, per_page);
-  // Use the same inner join query for count query below
-  const { query, values } = keyBinder(
-    `
-      SELECT
-        contract,
-        onchain_market_cap,
-        transfers,
-        holders,
-        ft_meta.name,
-        ft_meta.symbol,
-        ft_meta.decimals,
-        ft_meta.icon,
-        ft_meta.reference,
-        ft_meta.price,
-        ft_meta.change_24,
-        ft_meta.market_cap,
-        ft_meta.volume_24h
-      FROM
-        ft_list
-        INNER JOIN (
-          SELECT
-            contract
-          FROM
-            ft_list
-          WHERE
-            ${
-              search
-                ? `
-                  contract ILIKE :search
-                  OR symbol ILIKE :search
-                  OR name ILIKE :search
-                `
-                : true
-            }
-          ORDER BY
-            ${orderBy(sort)} ${order === 'desc' ? 'DESC NULLS LAST' : 'ASC'}
-          LIMIT
-            :limit OFFSET :offset
-        ) AS tmp using(
-          contract
-        )
-        LEFT JOIN LATERAL (
-          SELECT
-            name,
-            symbol,
-            decimals,
-            icon,
-            reference,
-            price,
-            change_24,
-            market_cap,
-            volume_24h
-          FROM
-            ft_meta
-          WHERE
-            ft_meta.contract = ft_list.contract
-        ) ft_meta ON true
-      ORDER BY
-        ${orderBy(sort)} ${order === 'desc' ? 'DESC NULLS LAST' : 'ASC'}
-    `,
-    { limit, offset, search: `%${search}%` },
-  );
 
-  const { rows } = await db.query(query, values);
+  const tokens = await sql`
+    SELECT DISTINCT
+      ft_contracts_daily.contract,
+      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap,
+      ft_meta.name,
+      ft_meta.symbol,
+      ft_meta.decimals,
+      ft_meta.icon,
+      ft_meta.reference,
+      ft_meta.price,
+      ft_meta.change_24,
+      ft_meta.market_cap,
+      ft_meta.volume_24h
+    FROM
+      ft_contracts_daily
+      JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract
+    ORDER BY
+      onchain_market_cap DESC NULLS LAST
+    LIMIT
+      ${limit}
+    OFFSET
+      ${offset}
+  `;
 
-  return res.status(200).json({ tokens: rows });
+  return res.status(200).json({ tokens });
 });
 
 const count = catchAsync(
-  async (req: RequestValidator<Count>, res: Response) => {
-    const search = req.validator.data.search;
+  async (_req: RequestValidator<Count>, res: Response) => {
+    const query = `
+      SELECT
+        COUNT (DISTINCT contract)
+      FROM
+        ft_contracts_daily
+    `;
 
-    // Use the same query from the txn inner join here
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          COUNT (contract)
-        FROM
-          ft_list
-        WHERE
-          ${
-            search
-              ? `
-                contract ILIKE :search
-                OR symbol ILIKE :search
-                OR name ILIKE :search
-              `
-              : true
-          }
-      `,
-      { search: `%${search}%` },
-    );
-
-    const { rows } = await db.query(query, values);
+    const { rows } = await db.query(query);
 
     return res.status(200).json({ tokens: rows });
   },
@@ -137,22 +59,14 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const per_page = req.validator.data.per_page;
 
   const { limit, offset } = getPagination(page, per_page);
-  // Use the same inner join query for count query below
   const { query, values } = keyBinder(
     `
       SELECT
-        concat_ws(
-          '-',
-          emitted_for_receipt_id,
-          emitted_at_block_timestamp,
-          emitted_in_shard_id,
-          emitted_for_event_type,
-          emitted_index_of_event_entry_in_shard
-        ) as key,
-        token_old_owner_account_id,
-        token_new_owner_account_id,
-        amount,
-        event_kind,
+        event_index,
+        affected_account_id,
+        involved_account_id,
+        delta_amount,
+        cause,
         txn.transaction_hash,
         txn.included_in_block_hash,
         txn.block_timestamp,
@@ -177,19 +91,15 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           FROM
             ft_meta
           WHERE
-            ft_meta.contract = emitted_by_contract_account_id
+            ft_meta.contract = contract_account_id
         ) AS ft
       FROM
-        assets__fungible_token_events
+        ft_events
         INNER JOIN (
           SELECT
-            emitted_for_receipt_id,
-            emitted_at_block_timestamp,
-            emitted_in_shard_id,
-            emitted_for_event_type,
-            emitted_index_of_event_entry_in_shard
+            event_index
           FROM
-            assets__fungible_token_events a
+            ft_events a
           WHERE
             EXISTS (
               SELECT
@@ -197,20 +107,14 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               FROM
                 ft_meta ft
               WHERE
-                ft.contract = a.emitted_by_contract_account_id
+                ft.contract = a.contract_account_id
             )
           ORDER BY
-            emitted_at_block_timestamp DESC,
-            emitted_in_shard_id DESC,
-            emitted_index_of_event_entry_in_shard DESC
+            event_index DESC
           LIMIT
             :limit OFFSET :offset
         ) AS tmp using(
-          emitted_for_receipt_id,
-          emitted_at_block_timestamp,
-          emitted_in_shard_id,
-          emitted_for_event_type,
-          emitted_index_of_event_entry_in_shard
+          event_index
         )
         INNER JOIN LATERAL (
           SELECT
@@ -246,7 +150,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             transactions
             JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
           WHERE
-            receipts.receipt_id = assets__fungible_token_events.emitted_for_receipt_id
+            receipts.receipt_id = ft_events.receipt_id
         ) txn ON TRUE
     `,
     { limit, offset },
@@ -264,13 +168,9 @@ const txnsCount = catchAsync(async (_req: Request, res: Response) => {
         count_estimate(
           '
             SELECT
-              emitted_for_receipt_id,
-              emitted_at_block_timestamp,
-              emitted_in_shard_id,
-              emitted_for_event_type,
-              emitted_index_of_event_entry_in_shard
+              contract_account_id
             FROM
-              assets__fungible_token_events a
+              ft_events a
             WHERE
               EXISTS (
                 SELECT
@@ -278,7 +178,7 @@ const txnsCount = catchAsync(async (_req: Request, res: Response) => {
                 FROM
                   ft_meta ft
                 WHERE
-                  ft.contract = a.emitted_by_contract_account_id
+                  ft.contract = a.contract_account_id
               )
           '
         ) as count

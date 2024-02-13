@@ -45,7 +45,14 @@ const BlocksChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'blocks'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'blocks'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'blocks'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'blocks',

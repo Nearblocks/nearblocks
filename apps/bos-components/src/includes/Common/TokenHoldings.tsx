@@ -19,7 +19,7 @@ interface Props {
   loading?: boolean;
   data: InventoryInfo;
   ft: {
-    amount: number;
+    amount: string;
     tokens: TokenListInfo[];
   };
   appUrl?: string;
@@ -51,7 +51,7 @@ const TokenHoldings = (props: Props) => {
     <Select.Root>
       <Select.Trigger className="w-96 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
-          ${dollarFormat(props.ft?.amount || 0)}{' '}
+          ${props.ft?.amount !== null ? dollarFormat(props.ft?.amount) : ''}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
@@ -59,8 +59,8 @@ const TokenHoldings = (props: Props) => {
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
       </Select.Trigger>
       <Select.Content>
-        <ScrollArea.Root className="w-96 h-72 rounded overflow-hidden shadow-[0_2px_10px] drop-shadow-md bg-white">
-          <ScrollArea.Viewport className="w-full h-full rounded  bg-white w-full rounded-b-lg shadow border z-50 pb-2">
+        <ScrollArea.Root className="w-96 h-72  overflow-hidden rounded-b-xl soft-shadow bg-white">
+          <ScrollArea.Viewport className="w-full h-full border z-50 pb-2">
             <div className="max-h-60">
               {props.ft?.tokens?.length > 0 && (
                 <>
@@ -72,49 +72,50 @@ const TokenHoldings = (props: Props) => {
                   </div>
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {props.ft?.tokens?.map((token, index) => (
-                      <a
-                        href={`/token/${token.contract}?a=${props.id}`}
-                        className="hover:no-underline"
-                        key={token.contract}
-                      >
-                        <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
-                          <div key={index}>
-                            <div className="flex items-center">
-                              <div className="flex mr-1">
-                                <img
-                                  src={
-                                    token.ft_metas?.icon ||
-                                    `${props.appUrl}images/tokenplaceholder.svg`
-                                  }
-                                  alt={token.ft_metas?.name}
-                                  className="w-4 h-4"
-                                />
+                      <div key={token.contract}>
+                        <a
+                          href={`/token/${token.contract}?a=${props.id}`}
+                          className="hover:no-underline"
+                        >
+                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
+                            <div key={index}>
+                              <div className="flex items-center">
+                                <div className="flex mr-1">
+                                  <img
+                                    src={
+                                      token.ft_metas?.icon ||
+                                      `${props.appUrl}images/tokenplaceholder.svg`
+                                    }
+                                    alt={token.ft_metas?.name}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <span>
+                                  {token.ft_metas.name
+                                    ? truncateString(
+                                        token.ft_metas?.name,
+                                        15,
+                                        '...',
+                                      )
+                                    : ''}
+                                  ({token.ft_metas?.symbol})
+                                </span>
                               </div>
-                              <span>
-                                {token.ft_metas.name
-                                  ? truncateString(
-                                      token.ft_metas?.name,
-                                      15,
-                                      '...',
-                                    )
-                                  : ''}
-                                ({token.ft_metas?.symbol})
-                              </span>
-                            </div>
-                            <div className="text-gray-400 flex items-center mt-1">
-                              {localFormat(token?.rpcAmount)}
-                            </div>
-                          </div>
-                          {token.ft_metas?.price && (
-                            <div className="text-right">
-                              <div>${dollarFormat(token.amountUsd)}</div>
-                              <div className="text-gray-400">
-                                @{Big(token.ft_metas?.price).toString()}
+                              <div className="text-gray-400 flex items-center mt-1">
+                                {localFormat(token?.rpcAmount)}
                               </div>
                             </div>
-                          )}
+                            {token.ft_metas?.price && (
+                              <div className="text-right">
+                                <div>${dollarFormat(token.amountUsd)}</div>
+                                <div className="text-gray-400">
+                                  @{Big(token.ft_metas?.price).toString()}
+                                </div>
+                              </div>
+                            )}
+                          </a>
                         </a>
-                      </a>
+                      </div>
                     ))}
                   </div>
                 </>
@@ -127,41 +128,42 @@ const TokenHoldings = (props: Props) => {
                   </div>
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {nfts.map((nft) => (
-                      <a
-                        href={`/nft-token/${nft.contract}?a=${props.id}`}
-                        className="hover:no-underline"
-                        key={nft.contract}
-                      >
-                        <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
-                          <div>
-                            <div className="flex items-center">
-                              <div className="flex mr-1">
-                                <img
-                                  src={
-                                    nft.nft_meta?.icon ||
-                                    `${props.appUrl}images/tokenplaceholder.svg`
-                                  }
-                                  alt={nft.nft_meta?.name}
-                                  className="w-4 h-4"
-                                />
+                      <div key={nft.contract}>
+                        <a
+                          href={`/nft-token/${nft.contract}?a=${props.id}`}
+                          className="hover:no-underline"
+                        >
+                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
+                            <div>
+                              <div className="flex items-center">
+                                <div className="flex mr-1">
+                                  <img
+                                    src={
+                                      nft.nft_meta?.icon ||
+                                      `${props.appUrl}images/tokenplaceholder.svg`
+                                    }
+                                    alt={nft.nft_meta?.name}
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <span>
+                                  {nft.nft_meta?.name
+                                    ? truncateString(
+                                        nft.nft_meta?.name,
+                                        15,
+                                        '...',
+                                      )
+                                    : ''}
+                                  ({nft.nft_meta?.symbol})
+                                </span>
                               </div>
-                              <span>
-                                {nft.nft_meta?.name
-                                  ? truncateString(
-                                      nft.nft_meta?.name,
-                                      15,
-                                      '...',
-                                    )
-                                  : ''}
-                                ({nft.nft_meta?.symbol})
-                              </span>
+                              <div className="text-gray-400 flex items-center mt-1">
+                                {localFormat(nft.quantity)}
+                              </div>
                             </div>
-                            <div className="text-gray-400 flex items-center mt-1">
-                              {localFormat(nft.quantity)}
-                            </div>
-                          </div>
+                          </a>
                         </a>
-                      </a>
+                      </div>
                     ))}
                   </div>
                 </>
@@ -169,18 +171,18 @@ const TokenHoldings = (props: Props) => {
             </div>
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none p-0.5 bg-gray-400 transition-colors duration-[160ms] ease-out hover:bg-blend-darken data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
             orientation="vertical"
           >
-            <ScrollArea.Thumb className="flex-1 bg-gray-400 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
           </ScrollArea.Scrollbar>
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none p-0.5 bg-gray-400 transition-colors duration-[160ms] ease-out hover:bg-blend-darken data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
             orientation="horizontal"
           >
-            <ScrollArea.Thumb className="flex-1 bg-gray-400 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+            <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
           </ScrollArea.Scrollbar>
-          <ScrollArea.Corner className="bg-black-500" />
+          <ScrollArea.Corner className="bg-neargray-50" />
         </ScrollArea.Root>
       </Select.Content>
     </Select.Root>

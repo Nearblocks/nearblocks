@@ -1,23 +1,18 @@
+import { createRequire } from 'module';
+
 import Big from 'big.js';
-import {
-  BlockReference,
-  ConnectOptions,
-  getLockedTokenAmount,
-  viewAccountBalance,
-  viewLockupState,
-} from 'near-lockup-helper';
+import { chunk } from 'lodash-es';
 
 import { Block } from 'nb-types';
-import { retry, sleep } from 'nb-utils';
+import { retry } from 'nb-utils';
 
 import config from '#config';
 
 import knex from './knex.js';
+import { nearBalance } from './near.js';
 
-const options: ConnectOptions = {
-  networkId: config.network,
-  nodeUrl: config.rpcUrl,
-};
+const require = createRequire(import.meta.url);
+const lockup = require('nb-lockup');
 
 const getLockupAccounts = async (blockHeight: number) => {
   return knex('accounts')
@@ -58,62 +53,105 @@ const getLockupAccounts = async (blockHeight: number) => {
 };
 
 export const circulatingSupply = async (block: Block) => {
-  const lockedAmount = Big(0);
-  const foundationAccounts = ['contributors.near', 'lockup.near'];
-  const blockRef: BlockReference = { block_id: +block.block_height };
+  try {
+    let lockedAmount = Big(0);
+    const foundationAccounts = ['contributors.near', 'lockup.near'];
 
-  const lockupAccounts = await getLockupAccounts(block.block_height);
+    const lockupAccounts = await getLockupAccounts(block.block_height);
+    const chunks = chunk(lockupAccounts, 4);
+    const count = chunks.length;
 
-  for (const account of lockupAccounts) {
-    await retry(async () => {
-      try {
-        await sleep(Math.floor(Math.random() * (100 - 10 + 1) + 10));
-        const lockupState = await viewLockupState(account, options, blockRef);
+    console.log({ accounts: count * 4, job: 'daily-stats' });
 
-        if (!lockupState) return;
+    for (let index = 0; index < count; index++) {
+      const accounts = chunks[index];
 
-        return lockedAmount.add(getLockedTokenAmount(lockupState).toString());
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error?.message.includes('does not exist while viewing')
-        ) {
-          return;
-        }
+      await Promise.all(
+        accounts.map(async (account) => {
+          await retry(async ({ attempt }) => {
+            try {
+              const amount = await lockup.locked(
+                config.rpcUrl,
+                account.account_id,
+                +block.block_height,
+                block.block_timestamp,
+              );
 
-        throw error;
-      }
-    });
-  }
+              console.log({
+                account,
+                amount,
+                attempt,
+                index,
+                job: 'daily-stats',
+              });
 
-  const foundationLockedTokens = await Promise.all(
-    foundationAccounts.map(async (account) => {
-      return await retry(async () => {
-        try {
-          const resp = await viewAccountBalance(account, options, blockRef);
+              lockedAmount = lockedAmount.add(amount);
+            } catch (error) {
+              console.log({
+                account,
+                attempt,
+                error,
+                index,
+                job: 'daily-stats',
+              });
 
-          return Big(resp.amount.toString());
-        } catch (error) {
-          if (
-            error instanceof Error &&
-            error?.message.includes('does not exist while viewing')
-          ) {
+              if (
+                error instanceof Error &&
+                error?.message.includes('does not exist while viewing')
+              ) {
+                return;
+              }
+
+              if (attempt >= 3) return;
+
+              throw error;
+            }
+          });
+        }),
+      );
+    }
+
+    const foundationLockedTokens = await Promise.all(
+      foundationAccounts.map(async (account) => {
+        return await retry(async ({ attempt }) => {
+          try {
+            const amount = await nearBalance(account, +block.block_height);
+
+            if (amount) return Big(amount);
             return Big(0);
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error?.message.includes('does not exist while viewing')
+            ) {
+              return Big(0);
+            }
+
+            if (attempt >= 3) return Big(0);
+
+            throw error;
           }
+        });
+      }),
+    );
 
-          throw error;
-        }
-      });
-    }),
-  );
+    const foundationLockedAmount = foundationLockedTokens.reduce(
+      (acc, current) => acc.add(current),
+      Big(0),
+    );
 
-  const foundationLockedAmount = foundationLockedTokens.reduce(
-    (acc, current) => acc.add(current),
-    Big(0),
-  );
+    console.log({
+      foundationLockedAmount: foundationLockedAmount.toFixed(),
+      lockedAmount: lockedAmount.toFixed(),
+      totalSupply: block.total_supply,
+    });
 
-  return Big(block.total_supply)
-    .sub(foundationLockedAmount)
-    .sub(lockedAmount)
-    .toString();
+    return Big(block.total_supply)
+      .sub(foundationLockedAmount)
+      .sub(lockedAmount)
+      .toFixed();
+  } catch (error) {
+    console.log({ error, job: 'daily-stats' });
+    return null;
+  }
 };

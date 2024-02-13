@@ -36,7 +36,8 @@ const NFTokenInfo = () => {
   return (
     <div style={height} className="relative container mx-auto">
       <VmComponent
-        skeleton={<Detail ref={heightRef} />}
+        skeleton={<Detail className="absolute" ref={heightRef} />}
+        defaultSkelton={<Detail />}
         src={components?.nftDetail}
         onChangeHeight={onChangeHeight}
         props={{

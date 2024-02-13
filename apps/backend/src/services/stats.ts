@@ -1,6 +1,5 @@
 import { Big } from 'big.js';
 
-import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
@@ -12,18 +11,25 @@ import near from '#libs/near';
 import { circulatingSupply } from '#libs/supply';
 
 const blockTime = async (timestamp: string) => {
-  const start = Big(timestamp)
-    .minus(Big(msToNsTime(60000)))
-    .toFixed();
+  try {
+    const start = Big(timestamp)
+      .minus(Big(msToNsTime(60000)))
+      .toFixed();
 
-  const blocks = await knex('blocks')
-    .where('block_timestamp', '>', start)
-    .count()
-    .first();
+    console.log({ job: 'stats', start, timestamp });
 
-  if (!blocks?.count) return;
+    const blocks = await knex('blocks')
+      .where('block_timestamp', '>', start)
+      .count()
+      .first();
 
-  return Big(60 / +blocks.count).toFixed(4);
+    if (!blocks?.count) return;
+
+    return Big(60 / +blocks.count).toFixed(4);
+  } catch (error) {
+    console.log({ error, job: 'stats' });
+    return null;
+  }
 };
 
 const blockData = async () => {
@@ -37,9 +43,19 @@ const blockData = async () => {
 
   if (config.network === Network.MAINNET && block) {
     supply = await circulatingSupply(block);
+
+    console.log({ job: 'stats', supply });
   }
 
   const avgTime = await blockTime(block.block_timestamp);
+
+  if (!avgTime) {
+    return {
+      circulating_supply: supply,
+      gas_price: block.gas_price,
+      total_supply: block.total_supply,
+    };
+  }
 
   return {
     avg_block_time: avgTime,
@@ -73,7 +89,7 @@ const networkData = async () => {
   try {
     validators = await near.query([null], 'validators');
   } catch (error) {
-    logger.error({ error });
+    console.log({ error });
   }
 
   return {
@@ -95,26 +111,28 @@ export const txnData = async () => {
   return {
     total_txns: Big(stats?.sum ?? 0)
       .add(txns?.count ?? 0)
-      .toString(),
+      .toFixed(),
   };
 };
 
 export const syncStats = async () => {
-  const [block, price, network, txn, stats] = await Promise.all([
-    blockData(),
-    marketData(),
-    networkData(),
-    txnData(),
-    knex('stats').first(),
-  ]);
+  try {
+    const block = await blockData();
+    const stats = await knex('stats').first();
+    const [price, network, txn] = await Promise.all([
+      marketData(),
+      networkData(),
+      txnData(),
+    ]);
 
-  const data = { ...block, ...price, ...network, ...txn };
+    const data = { ...block, ...price, ...network, ...txn };
 
-  logger.warn({ data, job: 'stats' });
+    if (stats) {
+      return await knex('stats').update(data);
+    }
 
-  if (stats) {
-    return await knex('stats').update(data);
+    return await knex('stats').insert(data);
+  } catch (error) {
+    return console.log({ error, job: 'stats' });
   }
-
-  return await knex('stats').insert(data);
 };

@@ -9,10 +9,10 @@ export const componentsByNetworkId: Record<
   NetworkComponents | undefined
 > = {
   testnet: {
-    home: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/ExplorerSelector`,
+    home: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.ExplorerSelector`,
   },
 
   mainnet: {
-    home: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/ExplorerSelector`,
+    home: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.ExplorerSelector`,
   },
 };

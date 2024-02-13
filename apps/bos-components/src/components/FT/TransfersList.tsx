@@ -36,7 +36,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('token:fts.noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
   const [tokens, setTokens] = useState<{ [key: number]: TransactionInfo[] }>(
     {},
   );
@@ -273,7 +273,11 @@ export default function ({ network, t, currentPage, setPage }: Props) {
       header: <span> Quantity</span>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
-        <span>{tokenAmount(row.amount, row.ft?.decimals, true)}</span>
+        <span>
+          {row.amount && row.ft?.decimals
+            ? tokenAmount(row.amount, row.ft?.decimals, true)
+            : ''}
+        </span>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
@@ -387,8 +391,14 @@ export default function ({ network, t, currentPage, setPage }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -397,8 +407,12 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -420,7 +434,8 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-                A total of {localFormat(totalCount)} transactions found
+                A total of {localFormat(totalCount.toString())} transactions
+                found
               </p>
             </div>
           </div>

@@ -11,6 +11,10 @@ import knex from '#libs/knex';
 import lcw from '#libs/lcw';
 import { circulatingSupply } from '#libs/supply';
 
+// The timestamp when transfers were enabled in the Mainnet
+// Tuesday, 13 October 2020 18:38:58.293
+const TRANSFERS_ENABLED = dayjs(1602614338293);
+
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
     return {
@@ -34,12 +38,14 @@ const marketData = async (date: Dayjs) => {
   };
 };
 
-const blockData = async (start: string, end: string) => {
-  const [blocks, latestBlock, gasUsed, gasFee] = await Promise.all([
+const blockData = async (day: Dayjs) => {
+  const start = msToNsTime(day.clone().startOf('day').valueOf());
+  const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
+
+  const [blocks, lastBlock, gasUsed, gasFee] = await Promise.all([
     knex('blocks')
       .where('block_timestamp', '>=', start)
       .where('block_timestamp', '<', end)
-      .whereBetween('block_timestamp', [start, end])
       .count()
       .first(),
     knex('blocks')
@@ -64,8 +70,12 @@ const blockData = async (start: string, end: string) => {
 
   let supply: null | string = null;
 
-  if (config.network === Network.MAINNET && latestBlock) {
-    supply = await circulatingSupply(latestBlock);
+  if (
+    config.network === Network.MAINNET &&
+    lastBlock &&
+    day.isSameOrAfter(TRANSFERS_ENABLED, 'day')
+  ) {
+    supply = await circulatingSupply(lastBlock);
   }
 
   return {
@@ -73,7 +83,7 @@ const blockData = async (start: string, end: string) => {
     circulating_supply: supply,
     gas_fee: gasFee?.sum?.toString(),
     gas_used: gasUsed?.sum?.toString(),
-    total_supply: latestBlock?.total_supply,
+    total_supply: lastBlock?.total_supply,
   };
 };
 
@@ -106,7 +116,6 @@ const txnData = async (start: string, end: string, price?: null | string) => {
       knex('execution_outcomes')
         .where('executed_in_block_timestamp', '>=', start)
         .where('executed_in_block_timestamp', '<', end)
-        .whereBetween('executed_in_block_timestamp', [start, end])
         .sum('tokens_burnt')
         .first(),
     ]);
@@ -216,20 +225,18 @@ const addressData = async (start: string, end: string) => {
   };
 };
 
-const dayStats = async (date: string) => {
-  const day = dayjs.utc(date);
-
+const dayStats = async (day: Dayjs) => {
   if (dayjs.utc().isSameOrBefore(day)) return;
 
-  const start = msToNsTime(day.startOf('day').valueOf());
-  const end = msToNsTime(day.add(1, 'day').startOf('day').valueOf());
+  console.log({ day: day.toISOString(), job: 'daily-stats' });
 
-  const price = await marketData(day);
-  const [block, txn, address] = await Promise.all([
-    blockData(start, end),
-    txnData(start, end, price.near_price),
-    addressData(start, end),
-  ]);
+  const start = msToNsTime(day.clone().startOf('day').valueOf());
+  const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
+
+  const block = await blockData(day.clone());
+  const price = await marketData(day.clone());
+  const txn = await txnData(start, end, price.near_price);
+  const address = await addressData(start, end);
 
   const data = {
     date: day.format('YYYY-MM-DD'),
@@ -238,8 +245,6 @@ const dayStats = async (date: string) => {
     ...txn,
     ...address,
   };
-
-  logger.warn({ data });
 
   await knex('daily_stats').insert(data);
 };
@@ -250,6 +255,8 @@ export const syncStats = async () => {
     .table('blocks')
     .orderBy('block_timestamp', 'desc')
     .first();
+
+  logger.info({ job: 'daily-stats', latestBlock, start: start.toISOString() });
 
   if (!latestBlock || dayjs.utc().isSameOrBefore(start, 'day')) return;
 
@@ -267,6 +274,13 @@ export const syncStats = async () => {
     start = dayjs.utc(latestStat.date).add(1, 'day');
   }
 
+  logger.info({
+    end: end.toISOString(),
+    job: 'daily-stats',
+    latestBlock,
+    start: start.toISOString(),
+  });
+
   let diff = end.diff(start, 'day');
   diff = diff < 20 ? diff + 1 : 20;
 
@@ -277,7 +291,7 @@ export const syncStats = async () => {
   for (const day of days) {
     const date = start.clone().add(day, 'day');
 
-    await dayStats(date.format('YYYY-MM-DD'));
+    await dayStats(date);
     await sleep(1000);
   }
 };

@@ -6,6 +6,4 @@ const item = z.object({
 
 export type Item = z.infer<typeof item>;
 
-export default {
-  item,
-};
+export default { item };

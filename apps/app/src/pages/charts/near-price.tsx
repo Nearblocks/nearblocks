@@ -45,7 +45,14 @@ const NearPriceChart = () => {
           <div style={height} className="relative">
             <VmComponent
               src={components?.charts}
-              skeleton={<Detail chartTypes={'near-price'} ref={heightRef} />}
+              skeleton={
+                <Detail
+                  className="absolute"
+                  chartTypes={'near-price'}
+                  ref={heightRef}
+                />
+              }
+              defaultSkelton={<Detail chartTypes={'near-price'} />}
               onChangeHeight={onChangeHeight}
               props={{
                 chartTypes: 'near-price',

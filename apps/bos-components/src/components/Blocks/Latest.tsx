@@ -133,14 +133,18 @@ export default function ({ network, t }: Props) {
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 hover:no-underline">
-                                {localFormat(block.block_height)}
+                                {block.block_height
+                                  ? localFormat(block.block_height)
+                                  : ''}
                               </a>
                             </a>
                           </div>
                           <div className="text-nearblue-700 text-xs truncate">
-                            {getTimeAgoString(
-                              nanoToMilli(block.block_timestamp),
-                            )}
+                            {block.block_timestamp
+                              ? getTimeAgoString(
+                                  nanoToMilli(block.block_timestamp),
+                                )
+                              : ''}
                           </div>
                         </div>
                       </div>
@@ -155,7 +159,10 @@ export default function ({ network, t }: Props) {
                           </a>
                         </a>
                         <div className="text-nearblue-700 text-sm ">
-                          {localFormat(block?.transactions_agg.count || 0)} txns{' '}
+                          {block?.transactions_agg.count
+                            ? localFormat(block?.transactions_agg.count)
+                            : ''}{' '}
+                          txns{' '}
                         </div>
                       </div>
                       <div className="text-right order-1 md:order-2 overflow-hidden">

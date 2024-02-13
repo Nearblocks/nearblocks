@@ -11,9 +11,9 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn dist && yarn start\" --watch src --ext ts",
     "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"
   },
@@ -31,12 +31,14 @@
     "ioredis": "5.3.2",
     "lodash-es": "4.17.21",
     "near-api-js": "1.1.0",
+    "near-contract-parser": "1.0.0",
     "numerable": "0.3.15",
     "passport": "0.7.0",
     "passport-anonymous": "1.0.1",
     "passport-http-bearer": "1.0.1",
     "pg": "8.11.3",
     "pg-query-stream": "4.5.3",
+    "postgres": "3.4.3",
     "query-string": "8.1.0",
     "rate-limiter-flexible": "3.0.4",
     "zod": "3.22.4"
@@ -60,7 +62,7 @@
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "nodemon": "~3.0",
+    "nodemon": "~2.0",
     "rimraf": "~5.0",
     "typescript": "~5.2"
   }

@@ -18,7 +18,7 @@ const Blocks = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const setPage = (pageNumber: number) => {
-    Router.push(`/blocks?page=${pageNumber}`);
+    Router.push(`/blocks?page=${pageNumber}`, undefined, { shallow: true });
     setCurrentPage(pageNumber);
   };
 
@@ -57,7 +57,8 @@ const Blocks = () => {
         <div style={height} className=" relative block lg:flex lg:space-x-2">
           <div className="w-full ">
             <VmComponent
-              skeleton={<List ref={heightRef} />}
+              skeleton={<List className="absolute" ref={heightRef} />}
+              defaultSkelton={<List />}
               onChangeHeight={onChangeHeight}
               src={components?.blocksList}
               props={{

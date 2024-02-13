@@ -4,15 +4,23 @@
  * License: Business Source License 1.1
  * Description: Fungible Token Overview on Near Protocol.
  * @interface Props
- * @param {string} id - The token identifier passed as a string
- * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [network] - The network data to show, either mainnet or testnet
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} [id] - The token identifier passed as a string
+ * @param {string} [tokenFilter] - The token filter identifier passed as a string
+ * @param {Object.<string, string>} [filters] - Key-value pairs for filtering transactions. (Optional)
+ *                                              Example: If provided, method=batch will filter the blocks with method=batch.
+ * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
+ *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  */
 
 interface Props {
-  id: string;
   network: string;
   t: (key: string) => string;
+  id: string;
+  tokenFilter?: string;
+  filters?: { [key: string]: string };
+  onFilterClear?: (name: string) => void;
 }
 
 import Links from '@/includes/Common/Links';
@@ -27,7 +35,14 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { getConfig } from '@/includes/libs';
 import { StatusInfo, Token } from '@/includes/types';
 
-export default function ({ network, id, t }: Props) {
+export default function ({
+  network,
+  t,
+  id,
+  tokenFilter,
+  filters,
+  onFilterClear,
+}: Props) {
   const tabs = [
     t ? t('token:fts.ft.transfers') : 'Transfers',
     t ? t('token:fts.ft.holders') : 'Holders',
@@ -40,8 +55,8 @@ export default function ({ network, id, t }: Props) {
   const [holderLoading, setHolderLoading] = useState(false);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [token, setToken] = useState<Token>({} as Token);
-  const [transfers, setTransfers] = useState(0);
-  const [holders, setHolders] = useState(0);
+  const [transfers, setTransfers] = useState('');
+  const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
   const [showMarketCap, setShowMarketCap] = useState(false);
   const config = getConfig(network);
@@ -73,7 +88,7 @@ export default function ({ network, id, t }: Props) {
         .then(
           (data: {
             body: {
-              txns: { count: number }[];
+              txns: { count: string }[];
             };
             status: number;
           }) => {
@@ -86,6 +101,7 @@ export default function ({ network, id, t }: Props) {
         )
         .catch(() => {});
     }
+
     function fetchStatsData() {
       asyncFetch(`${config?.backendUrl}stats`, {
         method: 'GET',
@@ -108,7 +124,7 @@ export default function ({ network, id, t }: Props) {
         .then(
           (data: {
             body: {
-              holders: { count: number }[];
+              holders: { count: string }[];
             };
             status: number;
           }) => {
@@ -129,6 +145,7 @@ export default function ({ network, id, t }: Props) {
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
+    onFilterClear && onFilterClear('');
   };
 
   const onToggle = () => setShowMarketCap((o) => !o);
@@ -178,12 +195,18 @@ export default function ({ network, id, t }: Props) {
                         ${dollarFormat(token?.price)}
                         {stats?.near_price && (
                           <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
-                            @ {localFormat(token?.price / stats?.near_price)} Ⓝ
+                            @{' '}
+                            {localFormat(
+                              (
+                                Big(token?.price) / Big(stats?.near_price)
+                              ).toString(),
+                            )}{' '}
+                            Ⓝ
                           </div>
                         )}
                         {token?.change_24 !== null &&
                         token?.change_24 !== undefined ? (
-                          token?.change_24 > 0 ? (
+                          Number(token?.change_24) > 0 ? (
                             <div className="text-neargreen text-sm flex flex-row items-center">
                               {' '}
                               (+{dollarFormat(token?.change_24)}%)
@@ -191,7 +214,7 @@ export default function ({ network, id, t }: Props) {
                           ) : (
                             <div className="text-red-500 text-sm flex flex-row items-center">
                               {' '}
-                              ({dollarFormat(token?.change_24 || 0)}%)
+                              ({dollarFormat(token?.change_24)}%)
                             </div>
                           )
                         ) : null}
@@ -269,9 +292,9 @@ export default function ({ network, id, t }: Props) {
                           <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100">
                             $
                             {dollarNonCentFormat(
-                              token?.market_cap ||
-                                token?.fully_diluted_market_cap ||
-                                0,
+                              Number(token?.market_cap)
+                                ? token?.market_cap
+                                : token?.fully_diluted_market_cap,
                             )}
                           </p>
                         )}
@@ -299,7 +322,9 @@ export default function ({ network, id, t }: Props) {
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {dollarNonCentFormat(token?.total_supply || 0)}
+                      {token?.total_supply
+                        ? dollarNonCentFormat(token?.total_supply)
+                        : ''}
                     </div>
                   )}
                 </div>
@@ -313,7 +338,7 @@ export default function ({ network, id, t }: Props) {
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(transfers)}
+                      {transfers ? localFormat(transfers) : ''}
                     </div>
                   )}
                 </div>
@@ -325,7 +350,7 @@ export default function ({ network, id, t }: Props) {
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {localFormat(holders)}
+                      {holders ? localFormat(holders) : ''}
                     </div>
                   )}
                 </div>
@@ -405,6 +430,16 @@ export default function ({ network, id, t }: Props) {
           </div>
         </div>
         <div className="py-6"></div>
+        {tokenFilter && (
+          <Widget
+            src={`${config.ownerId}/widget/bos-components.components.FT.TokenFilter`}
+            props={{
+              network: network,
+              id: id,
+              tokenFilter: tokenFilter,
+            }}
+          />
+        )}
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
             <Tabs.Root defaultValue={pageTab}>
@@ -434,6 +469,8 @@ export default function ({ network, id, t }: Props) {
                         network: network,
                         id: id,
                         t: t,
+                        filters: filters,
+                        onFilterClear: onFilterClear,
                       }}
                     />
                   }

@@ -53,7 +53,7 @@ export default function ({
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const errorMessage = t ? t('noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
   const [tokens, setTokens] = useState<{ [key: number]: TransactionInfo[] }>(
     {},
   );
@@ -115,7 +115,11 @@ export default function ({
           }) => {
             const resp = data?.body?.txns;
             if (data.status === 200) {
-              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              } else if (resp.length === 0) {
+                setTokens({});
+              }
             }
           },
         )
@@ -434,7 +438,7 @@ export default function ({
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'receiver_account_id',
+      key: 'token_new_owner_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           {row.token_new_owner_account_id ? (
@@ -457,7 +461,7 @@ export default function ({
                   align="start"
                   side="bottom"
                 >
-                  {row.receiver_account_id}
+                  {row.token_new_owner_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -473,7 +477,11 @@ export default function ({
       header: <>Quantity</>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
-        <span>{tokenAmount(row.amount, row.ft?.decimals, true)}</span>
+        <span>
+          {row.amount && row.ft?.decimals
+            ? tokenAmount(row.amount, row.ft?.decimals, true)
+            : ''}
+        </span>
       ),
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
@@ -592,8 +600,14 @@ export default function ({
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row.block_timestamp),
+                        )
+                      : ''
+                    : row.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -602,8 +616,12 @@ export default function ({
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                    : ''
+                  : row.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -624,7 +642,7 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount)} transactions found
+              A total of {localFormat(totalCount.toString())} transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

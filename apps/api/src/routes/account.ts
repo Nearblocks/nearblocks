@@ -47,6 +47,19 @@ const routes = (app: Router) => {
   );
 
   /**
+   * GET /v1/account/{account}/contract/parse
+   * @summary Get parsed contract info
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/contract/parse',
+    validator(schema.contract),
+    account.parse,
+  );
+
+  /**
    * GET /v1/account/{account}/contract/{method}
    * @summary Get latest action args for contract method
    * @tags Account

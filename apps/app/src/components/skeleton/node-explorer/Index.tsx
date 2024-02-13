@@ -1,9 +1,11 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-
-const Index = forwardRef((_props: any, ref: Ref<HTMLDivElement>) => {
+interface Props {
+  className?: string;
+}
+const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div ref={ref} className="absolute w-full z-10">
+    <div ref={ref} className={`w-full z-10 ${props.className}`}>
       <div className="flex flex-col md:flex-row gap-4 ">
         <div className=" w-full md:w-1/2">
           <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
