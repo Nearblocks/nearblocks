@@ -38,6 +38,27 @@ const nextConfig = {
             : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply?unit=near',
       },
       {
+        source: '/api/fees-of-previous-day-utc',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=day'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=day',
+      },
+      {
+        source: '/api/fees-of-previous-7-days-utc',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=week'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=week',
+      },
+      {
+        source: '/api/ping',
+        destination:
+          process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+            ? 'https://api3.nearblocks.io/v1/legacy/ping'
+            : 'https://api3-testnet.nearblocks.io/v1/legacy/ping',
+      },
+      {
         source: '/api/:path*',
         destination:
           process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
