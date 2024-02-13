@@ -30,32 +30,196 @@ jobs:
 
       - name: Install near-social CLI
         run: |
-          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/FroVolod/bos-cli-rs/releases/download/v0.3.5/bos-cli-installer.sh | sh
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
 
       - name: Deploy components
         run: |
           cd apps/bos-components/.bos/transpiled  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-address:
+    runs-on: ubuntu-latest
+    name: Deploy address components to social.near (testnet)
+    needs: deploy-testnet
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy address components
         run: |
           cd apps/bos-components/.bos/transpiled/address  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-block:
+    runs-on: ubuntu-latest
+    name: Deploy blocks components to social.near (testnet)
+    needs: [deploy-testnet, deploy-address]
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy blocks components
         run: |
           cd apps/bos-components/.bos/transpiled/blocks  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-ft:
+    runs-on: ubuntu-latest
+    name: Deploy ft components to social.near (testnet)
+    needs: [deploy-testnet, deploy-address, deploy-block]
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy ft components
         run: |
           cd apps/bos-components/.bos/transpiled/ft  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-nft:
+    runs-on: ubuntu-latest
+    name: Deploy nft components to social.near (testnet)
+    needs: [deploy-testnet, deploy-address, deploy-block, deploy-ft]
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy nft components
         run: |
           cd apps/bos-components/.bos/transpiled/nft  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-txn:
+    runs-on: ubuntu-latest
+    name: Deploy txn components to social.near (testnet)
+    needs: [deploy-testnet, deploy-address, deploy-block, deploy-ft, deploy-nft]
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy txn components
         run: |
           cd apps/bos-components/.bos/transpiled/txn  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+
+  deploy-common:
+    runs-on: ubuntu-latest
+    name: Deploy common components to social.near (testnet)
+    needs:
+      [
+        deploy-testnet,
+        deploy-address,
+        deploy-block,
+        deploy-ft,
+        deploy-nft,
+        deploy-txn,
+      ]
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
+
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
       - name: Deploy commmon components
         run: |
           cd apps/bos-components/.bos/transpiled/common  &&
