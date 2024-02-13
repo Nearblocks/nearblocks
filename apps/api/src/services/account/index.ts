@@ -213,82 +213,95 @@ const inventory = catchAsync(
     const { query: ftQuery, values: ftValues } = keyBinder(
       `
         SELECT
-          ft_holders_monthly.contract,
-          SUM(ft_holders_monthly.amount) AS amount,
+          ft.contract,
+          ft.amount,
           json_build_object(
             'name',
-            ft.name,
+            meta.name,
             'symbol',
-            ft.symbol,
+            meta.symbol,
             'decimals',
-            ft.decimals,
+            meta.decimals,
             'icon',
-            ft.icon,
+            meta.icon,
             'reference',
-            ft.reference,
+            meta.reference,
             'price',
-            ft.price
+            meta.price
           ) AS ft_meta
         FROM
-          ft_holders_monthly
-          INNER JOIN LATERAL (
+          (
             SELECT
-              contract,
-              name,
-              symbol,
-              decimals,
-              icon,
-              reference,
-              price
+              ft_holders_monthly.contract,
+              SUM(ft_holders_monthly.amount) AS amount
             FROM
-              ft_meta
+              ft_holders_monthly
             WHERE
-              ft_meta.contract = ft_holders_monthly.contract
-          ) AS ft ON TRUE
-        WHERE
-          ft_holders_monthly.account = :account
-        GROUP BY
-          ft_holders_monthly.contract,
-          ft_holders_monthly.account
-        ORDER BY
-          ft_holders_monthly.amount DESC
+              ft_holders_monthly.account = 'aurora'
+            GROUP BY
+              ft_holders_monthly.contract,
+              ft_holders_monthly.account
+            HAVING SUM(ft_holders_monthly.amount) > 0
+            ORDER BY
+            SUM(ft_holders_monthly.amount) DESC
+          ) ft
+        INNER JOIN LATERAL (
+          SELECT
+            contract,
+            name,
+            symbol,
+            decimals,
+            icon,
+            reference,
+            price
+          FROM
+            ft_meta
+          WHERE
+            ft_meta.contract = ft.contract
+        ) AS meta ON TRUE
       `,
       { account },
     );
 
     const { query: nftQuery, values: nftValues } = keyBinder(
       `
-        SELECT
-          nft_holders_daily.contract,
-          nft_holders_daily.quantity,
+        SELECT 
+          nft.contract,
+          nft.quantity,
           json_build_object(
             'name',
-            nft.name,
+            meta.name,
             'symbol',
-            nft.symbol,
+            meta.symbol,
             'icon',
-            nft.icon,
+            meta.icon,
             'reference',
-            nft.reference
+            meta.reference
           ) AS nft_meta
         FROM
-          nft_holders_daily
-          INNER JOIN LATERAL (
+          (
             SELECT
-              contract,
-              name,
-              symbol,
-              icon,
-              reference
+              nft_holders_daily.contract,
+              nft_holders_daily.quantity
             FROM
-              nft_meta
+              nft_holders_daily
             WHERE
-              nft_meta.contract = nft_holders_daily.contract
-          ) AS nft ON TRUE
-        WHERE
-          nft_holders_daily.account = :account
-        ORDER BY
-          nft_holders_daily.quantity DESC
+              nft_holders_daily.account = :account
+            ORDER BY
+              nft_holders_daily.quantity DESC
+          ) nft
+        INNER JOIN LATERAL (
+          SELECT
+            contract,
+            name,
+            symbol,
+            icon,
+            reference
+          FROM
+            nft_meta
+          WHERE
+            nft_meta.contract = nft.contract
+        ) AS meta ON TRUE
       `,
       { account },
     );
@@ -350,8 +363,8 @@ const tokens = catchAsync(
           db.query(nftQuery, nftValues),
         ]);
 
-        const ftList = fts.map((ft) => ft.emitted_by_contract_account_id);
-        const nftList = nfts.map((nft) => nft.emitted_by_contract_account_id);
+        const ftList = fts.map((ft) => ft.contract_account_id);
+        const nftList = nfts.map((nft) => nft.contract_account_id);
 
         ftList.sort();
         nftList.sort();
