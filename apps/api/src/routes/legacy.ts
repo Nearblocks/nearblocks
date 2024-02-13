@@ -28,6 +28,17 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get('/circulating-supply', validator(schema.supply), legacy.supply);
+
+  /**
+   * GET /v1/legacy/fees
+   * @summary Get tokens burnt per day
+   * @tags Legacy
+   * @param {string} period.query - json:{"enum": ["day", "week"], "default": "day"} - Data period
+   * @return 200 - success response
+   */
+  route.get('/fees', validator(schema.fees), legacy.fees);
+
+  route.get('/ping', legacy.ping);
 };
 
 export default routes;
