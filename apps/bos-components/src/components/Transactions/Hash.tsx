@@ -16,6 +16,7 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
+import ArrowDown from '@/includes/icons/ArrowDown';
 import { getConfig } from '@/includes/libs';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
@@ -26,6 +27,7 @@ export default function (props: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [txn, setTxn] = useState<TransactionInfo>({} as TransactionInfo);
   const [error, setError] = useState(false);
+  const [isToggle, setIsToggle] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<RPCTransactionInfo>(
     {} as RPCTransactionInfo,
   );
@@ -135,9 +137,56 @@ export default function (props: Props) {
                   {hash === ' ' ? (
                     <h2>{t ? t('txns:txn.tabs.overview') : 'Overview'}</h2>
                   ) : hash === 'execution' ? (
-                    <h2>
-                      {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
-                    </h2>
+                    pageHash !== 'execution' ? (
+                      <>
+                        <h2>
+                          {isToggle
+                            ? 'Enhanced Plan'
+                            : t
+                            ? t('txns:txn.tabs.execution')
+                            : 'Execution Plan'}
+                        </h2>
+                      </>
+                    ) : (
+                      <Popover.Root key={isToggle}>
+                        <Popover.Trigger asChild>
+                          <button
+                            className="flex border border-green-900/10 text-xs  rounded focus:outline-none"
+                            aria-label="Update dimensions"
+                          >
+                            {isToggle
+                              ? 'Enhanced Plan'
+                              : t
+                              ? t('txns:txn.tabs.execution')
+                              : 'Execution Plan'}
+                            <ArrowDown className="h-4 w-4 fill-current ml-1" />
+                          </button>
+                        </Popover.Trigger>
+                        <Popover.Content
+                          className="bg-white w-60 shadow-lg border rounded-lg slide-down mt-4"
+                          sideOffset={5}
+                        >
+                          <ul className="divide-y">
+                            <li
+                              onClick={() => setIsToggle(false)}
+                              className={`py-2 text-nearblue-600 ${
+                                !isToggle ? 'bg-gray-300' : ''
+                              }`}
+                            >
+                              {t('txns:txn.tabs.execution') || 'Execution Plan'}
+                            </li>
+                            <li
+                              onClick={() => setIsToggle(true)}
+                              className={`py-2 text-nearblue-600 ${
+                                isToggle ? 'bg-gray-300' : ''
+                              }`}
+                            >
+                              Enhanced Plan
+                            </li>
+                          </ul>
+                        </Popover.Content>
+                      </Popover.Root>
+                    )
                   ) : (
                     <h2>{t ? t('txns:txn.tabs.comments') : 'Comments'}</h2>
                   )}
@@ -160,18 +209,29 @@ export default function (props: Props) {
               }
             </Tabs.Content>
             <Tabs.Content value={hashes[1]}>
-              {
+              {isToggle ? (
                 <Widget
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Receipt`}
+                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Execution`}
                   props={{
+                    network: network,
+                    t: t,
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
-                    network: network,
-                    t: t,
                   }}
                 />
-              }
+              ) : (
+                <Widget
+                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Receipt`}
+                  props={{
+                    network: network,
+                    t: t,
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
+                  }}
+                />
+              )}
             </Tabs.Content>
             <Tabs.Content value={hashes[2]}>
               <div className="px-4 sm:px-6 py-3"></div>
