@@ -485,10 +485,12 @@ export default function ({ network, t, id }: Props) {
               </h2>
               {tokenData?.name && (
                 <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
-                  <div className="truncate max-w-[110px]">{tokenData.name}</div>
-                  {tokenData.website && (
+                  <div className="truncate max-w-[110px]">
+                    {tokenData?.name}
+                  </div>
+                  {tokenData?.website && (
                     <a
-                      href={tokenData.website}
+                      href={tokenData?.website}
                       className="ml-1"
                       target="_blank"
                       rel="noopener noreferrer nofollow"
@@ -510,7 +512,7 @@ export default function ({ network, t, id }: Props) {
                   <div className="w-full md:w-3/4 break-words">
                     {accountData?.amount
                       ? yoctoToNear(accountData?.amount, true)
-                      : ''}{' '}
+                      : accountData?.amount ?? ''}{' '}
                     Ⓝ
                   </div>
                 )}
@@ -524,18 +526,18 @@ export default function ({ network, t, id }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {accountData.amount
-                        ? '$' +
-                          fiatValue(
-                            yoctoToNear(accountData.amount, false),
-                            statsData.near_price,
+                      $
+                      {accountData?.amount
+                        ? fiatValue(
+                            yoctoToNear(accountData?.amount, false),
+                            statsData?.near_price,
                           )
-                        : ''}{' '}
+                        : accountData?.amount ?? ''}
                       <span className="text-xs">
                         (@ $
-                        {statsData.near_price
-                          ? dollarFormat(statsData.near_price)
-                          : ''}{' '}
+                        {statsData?.near_price
+                          ? dollarFormat(statsData?.near_price)
+                          : statsData?.near_price ?? ''}{' '}
                         / Ⓝ)
                       </span>
                     </div>
@@ -577,8 +579,9 @@ export default function ({ network, t, id }: Props) {
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
                       {accountData?.locked
-                        ? yoctoToNear(accountData?.locked, true) + ' Ⓝ'
-                        : ''}
+                        ? yoctoToNear(accountData?.locked, true)
+                        : accountData?.locked ?? ''}
+                      Ⓝ
                     </div>
                   )}
                 </div>
@@ -592,7 +595,7 @@ export default function ({ network, t, id }: Props) {
                     <div className="w-full break-words xl:mt-0 mt-2">
                       {accountData?.storage_usage
                         ? weight(accountData?.storage_usage)
-                        : ''}
+                        : accountData?.storage_usage ?? ''}
                     </div>
                   )}
                 </div>
@@ -618,12 +621,12 @@ export default function ({ network, t, id }: Props) {
                     <div className="w-full break-words xl:mt-0 mt-2">
                       {accountData?.deleted?.transaction_hash
                         ? convertToUTC(
-                            nanoToMilli(accountData.deleted.block_timestamp),
+                            nanoToMilli(accountData?.deleted.block_timestamp),
                             false,
                           )
                         : accountData?.created?.transaction_hash
                         ? convertToUTC(
-                            nanoToMilli(accountData.created.block_timestamp),
+                            nanoToMilli(accountData?.created.block_timestamp),
                             false,
                           )
                         : accountData?.code_hash
@@ -650,22 +653,22 @@ export default function ({ network, t, id }: Props) {
                   </div>
                   <div className="w-full md:w-3/4 break-words">
                     <a
-                      href={`/address/${deploymentData.receipt_predecessor_account_id}`}
+                      href={`/address/${deploymentData?.receipt_predecessor_account_id}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
                         {shortenAddress(
-                          deploymentData.receipt_predecessor_account_id,
+                          deploymentData?.receipt_predecessor_account_id,
                         )}
                       </a>
                     </a>
                     {' at txn  '}
                     <a
-                      href={`/txns/${deploymentData.transaction_hash}`}
+                      href={`/txns/${deploymentData?.transaction_hash}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {shortenAddress(deploymentData.transaction_hash)}
+                        {shortenAddress(deploymentData?.transaction_hash)}
                       </a>
                     </a>
                   </div>
@@ -687,18 +690,18 @@ export default function ({ network, t, id }: Props) {
                       <a href={`/token/${id}`} className="hover:no-underline">
                         <a className="flex text-green-500 hover:no-underline">
                           <span className="inline-block truncate max-w-[110px] mr-1">
-                            {tokenData.name}
+                            {tokenData?.name}
                           </span>
                           (
                           <span className="inline-block truncate max-w-[80px]">
-                            {tokenData.symbol}
+                            {tokenData?.symbol}
                           </span>
                           )
                         </a>
                       </a>
-                      {tokenData.price && (
+                      {tokenData?.price && (
                         <div className="text-nearblue-600 ml-1">
-                          (@ ${localFormat(tokenData.price)})
+                          (@ ${localFormat(tokenData?.price)})
                         </div>
                       )}
                     </div>
