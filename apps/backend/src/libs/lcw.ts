@@ -3,7 +3,6 @@ import { default as axios } from 'axios';
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import sentry from '#libs/sentry';
 import { FTMarketData } from '#types/types';
 
 const marketData = async (id: string, full = false) => {
@@ -44,7 +43,6 @@ const marketData = async (id: string, full = false) => {
     return data;
   } catch (error) {
     logger.error(error);
-    sentry.captureException(error);
 
     return null;
   }
@@ -75,7 +73,6 @@ const marketHistory = async (
     };
   } catch (error) {
     logger.error(error);
-    sentry.captureException(error);
 
     return null;
   }
