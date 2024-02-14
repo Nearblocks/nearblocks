@@ -230,23 +230,27 @@ const dayStats = async (day: Dayjs) => {
 
   console.log({ day: day.toISOString(), job: 'daily-stats' });
 
-  const start = msToNsTime(day.clone().startOf('day').valueOf());
-  const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
+  try {
+    const start = msToNsTime(day.clone().startOf('day').valueOf());
+    const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
 
-  const block = await blockData(day.clone());
-  const price = await marketData(day.clone());
-  const txn = await txnData(start, end, price.near_price);
-  const address = await addressData(start, end);
+    const block = await blockData(day.clone());
+    const price = await marketData(day.clone());
+    const txn = await txnData(start, end, price.near_price);
+    const address = await addressData(start, end);
 
-  const data = {
-    date: day.format('YYYY-MM-DD'),
-    ...price,
-    ...block,
-    ...txn,
-    ...address,
-  };
+    const data = {
+      date: day.format('YYYY-MM-DD'),
+      ...price,
+      ...block,
+      ...txn,
+      ...address,
+    };
 
-  await knex('daily_stats').insert(data);
+    await knex('daily_stats').insert(data);
+  } catch (error) {
+    console.log({ error, job: 'daily-stats' });
+  }
 };
 
 export const syncStats = async () => {

@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import sentry from '#libs/sentry';
 import { CGCoin, FTCoin, FTMarketData } from '#types/types';
 
 const coinList = async (): Promise<FTCoin[]> => {
@@ -63,7 +62,6 @@ const marketData = async (id: string, full = false) => {
     return data;
   } catch (error) {
     logger.error(error);
-    sentry.captureException(error);
 
     return null;
   }
@@ -84,7 +82,6 @@ const marketHistory = async (
     };
   } catch (error) {
     logger.error(error);
-    sentry.captureException(error);
 
     return null;
   }

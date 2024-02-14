@@ -127,11 +127,13 @@ const getRPCBalance = async (
     { retries: 1 },
   );
 
-  if (balance) return balance;
+  if (balance === null) {
+    logger.error({
+      job: 'events',
+      params: { accountId, blockId, contractId },
+    });
+    throw Error();
+  }
 
-  logger.error({
-    job: 'events',
-    params: { accountId, blockId, contractId },
-  });
-  throw Error();
+  return balance;
 };
