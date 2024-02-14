@@ -2,7 +2,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { networkId } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import Overview from '@/components/skeleton/common/Overview';
+import Overview from '@/components/skeleton/nft/Overview';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 
@@ -34,7 +34,7 @@ const NFToken = () => {
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
-        skeleton={<Overview className="absolute" nft={true} ref={heightRef} />}
+        skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
         defaultSkelton={<Overview />}
         onChangeHeight={onChangeHeight}
         src={components?.nftOverview}

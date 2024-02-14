@@ -1,11 +1,10 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
 interface Props {
-  nft?: boolean;
   className?: string;
 }
 const Overview = forwardRef(
-  ({ nft, className }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ className }: Props, ref: Ref<HTMLDivElement>) => {
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
@@ -38,16 +37,6 @@ const Overview = forwardRef(
 
                     <Skeleton className="h-4 w-40" />
                   </div>
-                  {nft && (
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-4 w-28" />
-                      </div>
-                      <div className="w-full md:w-3/4 break-words">
-                        <Skeleton className="h-4 w-40" />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -75,16 +64,6 @@ const Overview = forwardRef(
 
                     <Skeleton className="h-4 w-40" />
                   </div>
-                  {nft && (
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-4 w-28" />
-                      </div>
-                      <div className="w-full md:w-3/4 break-words">
-                        <Skeleton className="h-4 w-40" />
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -96,41 +75,39 @@ const Overview = forwardRef(
                 <div
                   className={`rounded-lg bg-green-600 text-white text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
                 >
-                  {nft ? 'Transfers' : 'Transactions'}
+                  Transactions
                 </div>{' '}
                 <div
                   className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
                 >
-                  {nft ? 'Holders' : 'Token Txns'}
+                  Token Txns
                 </div>{' '}
                 <div
                   className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
                 >
-                  {nft ? 'Inventory' : 'NFT Token Txns'}
+                  NFT Token Txns
                 </div>{' '}
                 <div
                   className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
                 >
-                  {nft ? 'Comments' : 'Access Keys'}
+                  Access Keys
                 </div>
-                {!nft && (
-                  <>
-                    {' '}
-                    <div
-                      className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                    >
-                      Contract
-                      <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -ml-3 -mt-3 px-1 ">
-                        NEW
-                      </div>
+                <>
+                  {' '}
+                  <div
+                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  >
+                    Contract
+                    <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -ml-3 -mt-3 px-1 ">
+                      NEW
                     </div>
-                    <div
-                      className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                    >
-                      Comments
-                    </div>
-                  </>
-                )}
+                  </div>
+                  <div
+                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  >
+                    Comments
+                  </div>
+                </>
               </div>
               <div className="relative">
                 <div

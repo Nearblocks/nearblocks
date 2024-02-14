@@ -10,7 +10,9 @@ const Stake = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaCoins className="inline-flex text-yellow-500 mr-1" />
       {t ? t('txns:txn.actions.stake.0') : 'Staked'}
-      <span className="font-bold">{yoctoToNear(args.stake, true)} Ⓝ</span>{' '}
+      <span className="font-bold">
+        {args.stake ? yoctoToNear(args.stake, true) : args.stake ?? ''}Ⓝ
+      </span>{' '}
       {t ? t('txns:txn.actions.stake.1') : 'with'} {shortenHex(args.public_key)}
     </div>
   );

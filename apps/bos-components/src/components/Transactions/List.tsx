@@ -153,7 +153,9 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    handleFilter(name, filterValue);
+    if (filterValue !== null && filterValue !== undefined) {
+      handleFilter(name, filterValue);
+    }
   };
 
   const onClear = (name: string) => {
@@ -225,7 +227,7 @@ export default function (props: Props) {
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="bg-white shadow-lg border rounded-b-lg p-2 z-50"
             sideOffset={5}
           >
             <div className="flex flex-col">
@@ -329,7 +331,7 @@ export default function (props: Props) {
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="bg-white shadow-lg border rounded-b-lg p-2 z-50"
             sideOffset={5}
           >
             <input
@@ -415,7 +417,7 @@ export default function (props: Props) {
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="bg-white shadow-lg border rounded-b-lg p-2 z-50"
             sideOffset={5}
           >
             <input

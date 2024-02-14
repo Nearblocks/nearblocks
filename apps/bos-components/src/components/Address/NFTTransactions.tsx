@@ -469,7 +469,7 @@ export default function (props: Props) {
                   href={`/nft-token/${row.nft?.contract}/${row.token_id}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 font-medium hover:no-underline">
+                  <a className="text-green-500 font-medium hover:no-underline whitespace-nowrap">
                     {row.token_id}
                   </a>
                 </a>
@@ -486,9 +486,9 @@ export default function (props: Props) {
         </Tooltip.Provider>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
+        'px-5 py-4 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: <>Token</>,
@@ -601,8 +601,14 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                    : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                    ? row?.block_timestamp
+                      ? formatTimestampToString(
+                          nanoToMilli(row?.block_timestamp),
+                        )
+                      : ''
+                    : row?.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                    : ''}
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -611,8 +617,12 @@ export default function (props: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? formatTimestampToString(nanoToMilli(row.block_timestamp))
-                  : getTimeAgoString(nanoToMilli(row.block_timestamp))}
+                  ? row?.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                    : ''
+                  : row?.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                  : ''}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>

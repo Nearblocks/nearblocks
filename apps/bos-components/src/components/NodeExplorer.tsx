@@ -757,7 +757,6 @@ export default function ({ network, currentPage, setPage }: Props) {
                   rel="noreferrer noopener"
                   target="_blank"
                 >
-                  {' '}
                   data{' '}
                 </a>
                 &nbsp;to promote your own node!
