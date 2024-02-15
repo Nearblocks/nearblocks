@@ -291,7 +291,7 @@ export default function (props: Props) {
             </span>
             <img
               className="h-16 w-44"
-              src={'https://nearblocks.io/images/nearblocksblack.svg'}
+              src={'https://beta.nearblocks.io/images/nearblocksblack.svg'}
               alt="Nearblocks"
             />
             <p className="text-nearblue-600 mt-2">Nearblocks</p>
