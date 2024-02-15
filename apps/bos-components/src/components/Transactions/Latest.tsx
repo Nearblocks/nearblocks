@@ -140,7 +140,7 @@ export default function ({ t, network }: Props) {
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-medium hover:no-underline">
-                                {shortenHex(txn.transaction_hash)}
+                                {shortenHex(txn.transaction_hash ?? '')}
                               </a>
                             </a>
                           </div>
@@ -161,7 +161,7 @@ export default function ({ t, network }: Props) {
                             className="hover:no-underline"
                           >
                             <a className="text-green-500  font-medium hover:no-underline">
-                              {shortenAddress(txn.signer_account_id)}
+                              {shortenAddress(txn.signer_account_id ?? '')}
                             </a>
                           </a>
                         </div>
@@ -172,7 +172,7 @@ export default function ({ t, network }: Props) {
                             className="hover:no-underline"
                           >
                             <a className="text-green-500 font-medium hover:no-underline">
-                              {shortenAddress(txn.receiver_account_id)}
+                              {shortenAddress(txn.receiver_account_id ?? '')}
                             </a>
                           </a>
                         </div>

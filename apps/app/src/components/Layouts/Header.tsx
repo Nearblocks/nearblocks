@@ -164,8 +164,8 @@ const Header = () => {
       try {
         const response = await fetch(
           networkId === 'mainnet'
-            ? 'https://api2.nearblocks.io/v1/stats'
-            : 'https://api2-testnet.nearblocks.io/v1/stats',
+            ? 'https://api3.nearblocks.io/v1/stats'
+            : 'https://api3-testnet.nearblocks.io/v1/stats',
           {
             method: 'GET',
             headers: {
@@ -190,8 +190,8 @@ const Header = () => {
       try {
         const response = await fetch(
           networkId === 'mainnet'
-            ? 'https://api2.nearblocks.io/v1/blocks/latests?limit=1'
-            : 'https://api2-testnet.nearblocks.io/v1/blocks/latests?limit=1',
+            ? 'https://api3.nearblocks.io/v1/blocks/latest?limit=1'
+            : 'https://api3-testnet.nearblocks.io/v1/blocks/latest?limit=1',
           {
             method: 'GET',
             headers: {
@@ -266,11 +266,13 @@ const Header = () => {
               </Link>
               {showSearch &&
                 (error || isLoading ? (
-                  <Skeleton className="h-4 mt-[5px]" />
+                  <div className="py-3">
+                    <Skeleton className="h-4 mt-[5px]" />
+                  </div>
                 ) : (
                   <div style={{ marginTop: '5px' }} className="mb-2">
                     {networkId === 'testnet' ? (
-                      <p className="text-xs  text-gray-500 leading-6 px-2">
+                      <p className="text-xs py-1 text-gray-500 leading-6 px-2">
                         Testnet Network
                       </p>
                     ) : (
@@ -283,14 +285,25 @@ const Header = () => {
                           height={15}
                         />
                         <p className="text-sm text-gray-500 font-medium leading-6 px-2">
-                          ${dollarFormat(stats?.near_price || 0)}{' '}
+                          $
+                          {stats?.near_price
+                            ? dollarFormat(stats?.near_price)
+                            : stats?.near_price ?? ''}
                           {stats?.change_24 > 0 ? (
                             <span className="text-neargreen text-xs">
-                              (+{dollarFormat(stats?.change_24)}%)
+                              (+
+                              {stats?.change_24
+                                ? dollarFormat(stats?.change_24)
+                                : stats?.change_24 ?? ''}
+                              %)
                             </span>
                           ) : (
                             <span className="text-red-500 text-xs">
-                              ({dollarFormat(stats?.change_24)}%)
+                              (
+                              {stats?.change_24
+                                ? dollarFormat(stats?.change_24)
+                                : stats?.change_24 ?? ''}
+                              %)
                             </span>
                           )}
                         </p>
