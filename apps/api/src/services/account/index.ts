@@ -17,7 +17,7 @@ import {
   Parse,
   Tokens,
 } from '#libs/schema/account';
-import { keyBinder } from '#libs/utils';
+import { keyBinder, raenSchema } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const EXPIRY = 60; // 1 mins
@@ -116,21 +116,38 @@ const contract = catchAsync(
 
 const parse = catchAsync(
   async (req: RequestValidator<Parse>, res: Response) => {
-    let contract = undefined;
+    let code = null;
+    let contract = null;
+    let schema = null;
     const account = req.validator.data.account;
 
     try {
-      const code = await redis.cache(
+      code = await redis.cache(
         `contract:${account}`,
         async () => viewCode(account),
         EXPIRY * 5, // 5 mins
       );
-      contract = await parser.parseContract(code.code_base64);
+    } catch (error) {
+      logger.error({ contractViewError: error });
+    }
+
+    try {
+      if (code?.code_base64) {
+        contract = await parser.parseContract(code.code_base64);
+      }
     } catch (error) {
       logger.error({ contractParseError: error });
     }
 
-    return res.status(200).json({ contract: [contract] });
+    try {
+      if (code?.code_base64) {
+        schema = await raenSchema(code.code_base64);
+      }
+    } catch (error) {
+      logger.error({ contractParseError: error });
+    }
+
+    return res.status(200).json({ contract: [{ contract, schema }] });
   },
 );
 
