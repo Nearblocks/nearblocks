@@ -255,9 +255,7 @@ export default function (props: Props) {
               </span>
               <img
                 className="h-16 w-44"
-                src={
-                  'https://pikespeak.ai/static/media/pikespeak_logo.0e695acc13a944a571c4.png'
-                }
+                src="/images/pikespeak_logo.png"
                 alt="Nearblocks"
               />
               <p className="text-nearblue-600 mt-2">Pikespeak</p>
