@@ -254,9 +254,9 @@ export default function (props: Props) {
                 New
               </span>
               <img
-                className="h-16 w-44"
+                className="h-16"
                 src="/images/pikespeak_logo.png"
-                alt="Nearblocks"
+                alt="Pikespeak"
               />
               <p className="text-nearblue-600 mt-2">Pikespeak</p>
             </a>
