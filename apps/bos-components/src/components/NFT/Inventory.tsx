@@ -158,19 +158,19 @@ export default function ({ network, id, token }: Props) {
             </div>
           ))}
         {tokens &&
-          tokens.map((nft: Token) => (
+          tokens?.map((nft: Token) => (
             <div
               className="max-w-full border rounded p-3 mx-auto md:mx-0"
-              key={nft.contract + nft.token}
+              key={nft?.contract + nft?.token}
             >
               <a
-                href={`/nft-token/${nft.contract}/${nft.token}`}
+                href={`/nft-token/${nft?.contract}/${nft?.token}`}
                 className="hover:no-underline"
               >
                 <a className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline">
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
                       props={{
                         base: tokenData.base_uri,
                         reference: nft.reference,
@@ -185,21 +185,21 @@ export default function ({ network, id, token }: Props) {
               <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
                 Token ID:{' '}
                 <a
-                  href={`/nft-token/${nft.contract}/${nft.token}`}
+                  href={`/nft-token/${nft?.contract}/${nft?.token}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green hover:no-underline">{nft.token}</a>
+                  <a className="text-green hover:no-underline">{nft?.token}</a>
                 </a>
               </div>
-              {nft.asset && (
+              {nft?.asset && (
                 <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
                   Owner:{' '}
                   <a
-                    href={`/address/${nft.asset?.owner}`}
+                    href={`/address/${nft?.asset?.owner}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green hover:no-underline">
-                      {nft.asset?.owner}
+                      {nft?.asset?.owner}
                     </a>
                   </a>
                 </div>

@@ -26,7 +26,6 @@ import {
   localFormat,
 } from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TokenImage from '@/includes/icons/TokenImage';
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
@@ -59,7 +58,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
-              setTotalCount(resp?.count | 0);
+              setTotalCount(resp?.count ?? 0);
             }
           },
         )
@@ -106,7 +105,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -120,13 +119,13 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
-                    href={`/txns/${row.transaction_hash}`}
+                    href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
-                      {row.transaction_hash}
+                      {row?.transaction_hash}
                     </a>
                   </a>
                 </span>
@@ -136,26 +135,26 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 align="start"
                 side="bottom"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span> {t ? t('type') : 'TYPE'}</span>,
-      key: 'actions',
+      key: 'cause',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                  <span className="block truncate">{row.event_kind}</span>
+                  <span className="block truncate">{row?.cause}</span>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -163,7 +162,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 align="center"
                 side="bottom"
               >
-                {row.event_kind}
+                {row?.cause}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -174,21 +173,21 @@ export default function ({ network, t, currentPage, setPage }: Props) {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('from') : 'FROM'}</span>,
-      key: 'signer_account_id',
+      header: <span>Affected</span>,
+      key: 'affected_account_id',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.token_old_owner_account_id ? (
+          {row?.affected_account_id ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                     <a
-                      href={`/address/${row.token_old_owner_account_id}`}
+                      href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {row.token_old_owner_account_id}
+                        {row?.affected_account_id}
                       </a>
                     </a>
                   </span>
@@ -198,7 +197,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                   align="start"
                   side="bottom"
                 >
-                  {row.token_old_owner_account_id}
+                  {row?.affected_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -213,38 +212,21 @@ export default function ({ network, t, currentPage, setPage }: Props) {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: <span></span>,
-      key: '',
-      cell: (row: TransactionInfo) => {
-        return row.token_old_owner_account_id ===
-          row.token_new_owner_account_id ? (
-          <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
-            {t('txnSelf')}
-          </span>
-        ) : (
-          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
-            <FaLongArrowAltRight />
-          </div>
-        );
-      },
-      tdClassName: 'text-center',
-    },
-    {
-      header: <span>{t ? t('to') : 'To'}</span>,
-      key: 'token_new_owner_account_id',
+      header: <span>Involved</span>,
+      key: 'involved_account_id',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.token_new_owner_account_id ? (
+          {row?.involved_account_id ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                     <a
-                      href={`/address/${row.token_new_owner_account_id}`}
+                      href={`/address/${row?.involved_account_id}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {row.token_new_owner_account_id}
+                        {row?.involved_account_id}
                       </a>
                     </a>
                   </span>
@@ -254,7 +236,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                   align="start"
                   side="bottom"
                 >
-                  {row.token_new_owner_account_id}
+                  {row?.involved_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -276,11 +258,11 @@ export default function ({ network, t, currentPage, setPage }: Props) {
             <Tooltip.Trigger asChild>
               <span>
                 <a
-                  href={`/nft-token/${row.nft?.contract}/${row.token_id}`}
+                  href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 font-medium hover:no-underline">
-                    {row.token_id}
+                    {row?.token_id}
                   </a>
                 </a>
               </span>
@@ -290,7 +272,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
               align="start"
               side="bottom"
             >
-              {row.token_id}
+              {row?.token_id}
             </Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
@@ -305,12 +287,12 @@ export default function ({ network, t, currentPage, setPage }: Props) {
       key: 'block_height',
       cell: (row: TransactionInfo) => {
         return (
-          row.nft && (
+          row?.nft && (
             <div className="flex flex-row items-center">
               <span className="inline-flex mr-1">
                 <TokenImage
-                  src={row.nft?.icon}
-                  alt={row.nft?.name}
+                  src={row?.nft?.icon}
+                  alt={row?.nft?.name}
                   className="w-4 h-4"
                   appUrl={config.appUrl}
                 />
@@ -320,11 +302,11 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                   <Tooltip.Trigger asChild>
                     <div className="text-sm text-nearblue-600 max-w-[110px] inline-block truncate">
                       <a
-                        href={`/token/${row.nft?.contract}`}
+                        href={`/token/${row?.nft?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="text-green-500 font-medium hover:no-underline">
-                          {row.nft?.name}
+                          {row?.nft?.name}
                         </a>
                       </a>
                     </div>
@@ -334,16 +316,16 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                     align="start"
                     side="bottom"
                   >
-                    {row.nft?.name}
+                    {row?.nft?.name}
                   </Tooltip.Content>
                 </Tooltip.Root>
               </Tooltip.Provider>
-              {row.nft?.symbol && (
+              {row?.nft?.symbol && (
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate">
-                        &nbsp; {row.nft.symbol}
+                        &nbsp; {row?.nft?.symbol}
                       </div>
                     </Tooltip.Trigger>
                     <Tooltip.Content
@@ -351,7 +333,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                       align="start"
                       side="bottom"
                     >
-                      {row.nft.symbol}
+                      {row?.nft?.symbol}
                     </Tooltip.Content>
                   </Tooltip.Root>
                 </Tooltip.Provider>
@@ -401,13 +383,13 @@ export default function ({ network, t, currentPage, setPage }: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? row.block_timestamp
+                    ? row?.block_timestamp
                       ? formatTimestampToString(
-                          nanoToMilli(row.block_timestamp),
+                          nanoToMilli(row?.block_timestamp),
                         )
                       : ''
-                    : row.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : row?.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                     : ''}
                 </span>
               </Tooltip.Trigger>
@@ -417,11 +399,11 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? row.block_timestamp
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  ? row?.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
                     : ''
-                  : row.block_timestamp
-                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : row?.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                   : ''}
               </Tooltip.Content>
             </Tooltip.Root>
@@ -451,7 +433,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </div>
         )}
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

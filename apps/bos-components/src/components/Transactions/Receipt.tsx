@@ -26,59 +26,59 @@ export default function (props: Props) {
   const [receipt, setReceipt] = useState(null);
   const config = getConfig(network);
   function transactionReceipts(txn: RPCTransactionInfo) {
-    const actions: any = txn.transaction.actions.map((txn) =>
+    const actions: any = txn?.transaction?.actions?.map((txn) =>
       mapRpcActionToAction(txn),
     );
-    const receipts = txn.receipts;
-    const receiptsOutcome = txn.receipts_outcome;
+    const receipts = txn?.receipts;
+    const receiptsOutcome = txn?.receipts_outcome;
 
     if (
-      receipts.length === 0 ||
-      receipts[0].receipt_id !== receiptsOutcome[0].id
+      receipts?.length === 0 ||
+      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
     ) {
-      receipts.unshift({
-        predecessor_id: txn.transaction.signer_id,
+      receipts?.unshift({
+        predecessor_id: txn?.transaction?.signer_id,
         receipt: actions,
-        receipt_id: receiptsOutcome[0].id,
-        receiver_id: txn.transaction.receiver_id,
+        receipt_id: receiptsOutcome[0]?.id,
+        receiver_id: txn?.transaction?.receiver_id,
       });
     }
 
     const receiptOutcomesByIdMap = new Map();
     const receiptsByIdMap = new Map();
 
-    receiptsOutcome.forEach((receipt) => {
-      receiptOutcomesByIdMap.set(receipt.id, receipt);
+    receiptsOutcome?.forEach((receipt) => {
+      receiptOutcomesByIdMap?.set(receipt?.id, receipt);
     });
 
-    receipts.forEach((receiptItem) => {
-      receiptsByIdMap.set(receiptItem.receipt_id, {
+    receipts?.forEach((receiptItem) => {
+      receiptsByIdMap?.set(receiptItem?.receipt_id, {
         ...receiptItem,
         actions:
-          receiptItem.receipt_id === receiptsOutcome[0].id
+          receiptItem?.receipt_id === receiptsOutcome[0]?.id
             ? actions
-            : receiptItem.receipt?.Action?.actions.map((receipt) =>
+            : receiptItem?.receipt?.Action?.actions.map((receipt) =>
                 mapRpcActionToAction(receipt),
               ),
       });
     });
 
     const collectReceipts = (receiptHash: any) => {
-      const receipt = receiptsByIdMap.get(receiptHash);
-      const receiptOutcome = receiptOutcomesByIdMap.get(receiptHash);
+      const receipt = receiptsByIdMap?.get(receiptHash);
+      const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
 
       return {
         ...receipt,
         ...receiptOutcome,
         outcome: {
-          ...receiptOutcome.outcome,
+          ...receiptOutcome?.outcome,
           outgoing_receipts:
-            receiptOutcome.outcome.receipt_ids.map(collectReceipts),
+            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
         },
       };
     };
 
-    return collectReceipts(receiptsOutcome[0].id);
+    return collectReceipts(receiptsOutcome[0]?.id);
   }
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function (props: Props) {
     <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+          src={`${config?.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
           props={{
             txn: txn,
             receipt: receipt,

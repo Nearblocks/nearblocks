@@ -49,21 +49,24 @@ const TokenHoldings = (props: Props) => {
   }
   return (
     <Select.Root>
-      <Select.Trigger className="w-96 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
+      <Select.Trigger className="w-full h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
-          $
           {props.ft?.amount
-            ? dollarFormat(props.ft?.amount)
-            : props.ft?.amount ?? ''}
+            ? '$' + dollarFormat(props.ft?.amount)
+            : '$' + (props.ft?.amount ?? '')}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
         </span>
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
       </Select.Trigger>
-      <Select.Content>
-        <ScrollArea.Root className="w-96 h-72  overflow-hidden rounded-b-xl soft-shadow bg-white">
-          <ScrollArea.Viewport className="w-full h-full border z-50 pb-2">
+      <Select.Content
+        position="popper"
+        sideOffset={5}
+        className="SelectContent"
+      >
+        <ScrollArea.Root className="overflow-hidden rounded-b-xl soft-shadow bg-white">
+          <ScrollArea.Viewport className="border z-50 pb-2">
             <div className="max-h-60">
               {props.ft?.tokens?.length > 0 && (
                 <>
@@ -113,16 +116,15 @@ const TokenHoldings = (props: Props) => {
                             {token?.ft_metas?.price && (
                               <div className="text-right">
                                 <div>
-                                  $
                                   {token?.amountUsd
-                                    ? dollarFormat(token?.amountUsd)
-                                    : token.amountUsd ?? ''}
+                                    ? '$' + dollarFormat(token?.amountUsd)
+                                    : '$' + (token.amountUsd ?? '')}
                                 </div>
                                 <div className="text-gray-400">
-                                  @
                                   {token?.ft_metas?.price
-                                    ? Big(token?.ft_metas?.price).toString()
-                                    : token?.ft_metas?.price ?? ''}
+                                    ? '@' +
+                                      Big(token?.ft_metas?.price).toString()
+                                    : '@' + (token?.ft_metas?.price ?? '')}
                                 </div>
                               </div>
                             )}

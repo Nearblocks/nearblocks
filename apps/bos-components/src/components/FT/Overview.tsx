@@ -160,14 +160,14 @@ export default function ({
           <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
-                src={token.icon}
-                alt={token.name}
+                src={token?.icon}
+                alt={token?.name}
                 className="w-7 h-7"
               />
             </span>
             <span className="inline-flex align-middle ">Token: </span>
             <span className="inline-flex align-middle font-semibold">
-              {token.name}
+              {token?.name}
             </span>
           </h1>
         )}
@@ -324,7 +324,7 @@ export default function ({
                     <div className="w-full md:w-3/4 break-words">
                       {token?.total_supply
                         ? dollarNonCentFormat(token?.total_supply)
-                        : ''}
+                        : token?.total_supply ?? ''}
                     </div>
                   )}
                 </div>
@@ -338,7 +338,7 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {transfers ? localFormat(transfers) : ''}
+                      {transfers ? localFormat(transfers) : transfers ?? ''}
                     </div>
                   )}
                 </div>
@@ -350,7 +350,7 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {holders ? localFormat(holders) : ''}
+                      {holders ? localFormat(holders) : holders ?? ''}
                     </div>
                   )}
                 </div>

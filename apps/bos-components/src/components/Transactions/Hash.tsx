@@ -197,7 +197,7 @@ export default function (props: Props) {
             <Tabs.Content value={hashes[0]}>
               {
                 <Widget
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Detail`}
+                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Detail`}
                   props={{
                     txn: txn,
                     rpcTxn: rpcTxn,
@@ -211,7 +211,7 @@ export default function (props: Props) {
             <Tabs.Content value={hashes[1]}>
               {isToggle ? (
                 <Widget
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Execution`}
+                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Execution`}
                   props={{
                     network: network,
                     t: t,
@@ -222,7 +222,7 @@ export default function (props: Props) {
                 />
               ) : (
                 <Widget
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.Receipt`}
+                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Receipt`}
                   props={{
                     network: network,
                     t: t,

@@ -141,9 +141,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             onClick={() => onOrder('name')}
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
-            {sorting.sort === 'name' && (
+            {sorting?.sort === 'name' && (
               <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             Token
@@ -157,17 +157,19 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             <TokenImage
               src={row?.icon}
               alt={row?.name}
-              appUrl={config.appUrl}
+              appUrl={config?.appUrl}
               className="w-5 h-5 mr-2"
             />
             <a
-              href={`/nft-token/${row.contract}`}
+              href={`/nft-token/${row?.contract}`}
               className="hover:no-underline"
             >
-              <a className=" text-green-500 hover:no-underline">
-                <span className="truncate max-w-[200px] mr-1">{row.name}</span>
-                <span className="text-nearblue-700 truncate max-w-[80px]">
-                  {row.symbol}
+              <a className="flex text-green-500 hover:no-underline">
+                <span className="inline-block truncate max-w-[200px] mr-1">
+                  {row?.name}
+                </span>
+                <span className="text-nearblue-700 inline-block truncate max-w-[80px]">
+                  {row?.symbol}
                 </span>
               </a>
             </a>
@@ -188,9 +190,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             onClick={() => onOrder('tokens')}
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
-            {sorting.sort === 'tokens' && (
+            {sorting?.sort === 'tokens' && (
               <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             Tokens
@@ -199,7 +201,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'tokens',
       cell: (row: Token) => (
-        <span>{row.tokens ? localFormat(row.tokens) : ''}</span>
+        <span>
+          {row?.tokens ? localFormat(row?.tokens) : row?.tokens ?? ''}
+        </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
@@ -224,7 +228,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'change_24',
       cell: (row: Token) => (
-        <span>{row.transfers_day ? localFormat(row.transfers_day) : ''}</span>
+        <span>{row?.transfers_day ? localFormat(row?.transfers_day) : ''}</span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
@@ -238,9 +242,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             onClick={() => onOrder('txns_3days')}
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
           >
-            {sorting.sort === 'txns_3days' && (
+            {sorting?.sort === 'txns_3days' && (
               <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             Transfers (3D)
@@ -250,7 +254,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       key: 'transfers_3days',
       cell: (row: Token) => (
         <span>
-          {row.transfers_3days ? localFormat(row.transfers_3days) : ''}
+          {row?.transfers_3days
+            ? localFormat(row?.transfers_3days)
+            : row?.transfers_3days ?? ''}
         </span>
       ),
       tdClassName:
@@ -265,9 +271,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             onClick={() => onOrder('txns')}
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
           >
-            {sorting.sort === 'txns' && (
+            {sorting?.sort === 'txns' && (
               <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             All Transfers
@@ -276,7 +282,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'transfers',
       cell: (row: Token) => (
-        <span>{row.transfers ? localFormat(row.transfers) : ''}</span>
+        <span>
+          {row?.transfers ? localFormat(row?.transfers) : row?.transfers ?? ''}
+        </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
@@ -291,9 +299,9 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             onClick={() => onOrder('holders')}
             className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
           >
-            {sorting.sort === 'holders' && (
+            {sorting?.sort === 'holders' && (
               <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             Holders
@@ -302,7 +310,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'holders',
       cell: (row: Token) => (
-        <span>{row.holders ? localFormat(row.holders) : ''}</span>
+        <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
@@ -312,7 +320,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
 
   const debouncedSearch = useMemo(() => {
     return debounce(500, (value: string) => {
-      if (!value || value.trim() === '') {
+      if (!value || value?.trim() === '') {
         setSearchResults([]);
         return;
       }
@@ -363,23 +371,23 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                   <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
                     {searchResults.map((token) => (
                       <div
-                        key={token.contract}
+                        key={token?.contract}
                         className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <a href={`/token/${token.contract}`}>
+                        <a href={`/token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage
                                 src={token?.icon}
                                 alt={token?.name}
-                                appUrl={config.appUrl}
+                                appUrl={config?.appUrl}
                                 className="w-5 h-5"
                               />
                             </div>
                             <p className="font-semibold text-sm truncate">
-                              {token.name}
+                              {token?.name}
                               <span className="text-nearblue-700 ml-2">
-                                {token.symbol}
+                                {token?.symbol}
                               </span>
                             </p>
                           </a>
@@ -393,7 +401,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
           </div>
         </div>
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

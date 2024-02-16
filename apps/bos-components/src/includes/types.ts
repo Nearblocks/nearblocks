@@ -229,12 +229,12 @@ export type TransactionInfo = {
   signer_account_id: string;
   transaction_hash: string;
   receipts: InventoryInfo[];
-  event_kind: string;
-  token_old_owner_account_id: string;
-  token_new_owner_account_id: string;
+  cause: string;
+  affected_account_id: string;
+  involved_account_id: string;
   token_id: string;
   nft: Token;
-  amount: string;
+  delta_amount: string;
   ft: Token;
   predecessor_account_id: string;
 };
