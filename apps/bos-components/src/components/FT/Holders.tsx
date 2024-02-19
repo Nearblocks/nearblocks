@@ -141,7 +141,7 @@ export default function ({ network, id, token }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[200px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
                     href={`/address/${row.account}`}
                     className="hover:no-undeline"
@@ -163,7 +163,7 @@ export default function ({ network, id, token }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -214,9 +214,8 @@ export default function ({ network, id, token }: Props) {
       cell: (row: HoldersPropsInfo) => {
         return (
           <span>
-            $
             {row.amount && tokens?.decimals && tokens?.price
-              ? price(row.amount, tokens?.decimals, tokens?.price)
+              ? '$' + price(row.amount, tokens?.decimals, tokens?.price)
               : ''}
           </span>
         );

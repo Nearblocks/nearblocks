@@ -80,7 +80,7 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
-              setTotalCount(resp?.count);
+              setTotalCount(resp?.count ?? 0);
             }
           },
         )
@@ -145,7 +145,9 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    handleFilter(name, filterValue);
+    if (filterValue !== null && filterValue !== undefined) {
+      handleFilter(name, filterValue);
+    }
   };
 
   const onClear = (name: string) => {
@@ -164,7 +166,7 @@ export default function (props: Props) {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -178,13 +180,13 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
-                    href={`/txns/${row.transaction_hash}`}
+                    href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
-                      {row.transaction_hash}
+                      {row?.transaction_hash}
                     </a>
                   </a>
                 </span>
@@ -194,13 +196,13 @@ export default function (props: Props) {
                 align="start"
                 side="bottom"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
@@ -217,7 +219,7 @@ export default function (props: Props) {
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
             sideOffset={5}
           >
             <div className="flex flex-col">
@@ -250,14 +252,14 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'event_kind',
+      key: 'cause',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="bg-blue-900/10 text-xs text-nearblue-600  rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                  <span className="block truncate">{row.event_kind}</span>
+                  <span className="block truncate">{row?.cause}</span>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -265,7 +267,7 @@ export default function (props: Props) {
                 align="center"
                 side="bottom"
               >
-                {row.event_kind}
+                {row?.cause}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -281,12 +283,12 @@ export default function (props: Props) {
             className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
-              {t ? t('txns:from') : 'FROM'}
+              Affected
               <Filter className="h-4 w-4 fill-current ml-2" />
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
             sideOffset={5}
           >
             <input
@@ -319,20 +321,20 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'token_old_owner_account_id',
+      key: 'affected_account_id',
       cell: (row: TransactionInfo) => (
         <>
-          {row.token_old_owner_account_id ? (
+          {row?.affected_account_id ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                     <a
-                      href={`/address/${row.token_old_owner_account_id}`}
+                      href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {row.token_old_owner_account_id}
+                        {row?.affected_account_id}
                       </a>
                     </a>
                   </span>
@@ -342,7 +344,7 @@ export default function (props: Props) {
                   align="start"
                   side="bottom"
                 >
-                  {row.token_old_owner_account_id}
+                  {row?.affected_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -351,31 +353,30 @@ export default function (props: Props) {
           )}
         </>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600  font-medium',
     },
-    {
-      header: '',
-      key: 'token_old_owner_account_id',
-      cell: (row: TransactionInfo) => (
-        <>
-          {row.token_old_owner_account_id === row.token_new_owner_account_id ? (
-            <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
-              {t ? t('txns:txnSelf') : 'Self'}
-            </span>
-          ) : id === row.token_old_owner_account_id ? (
-            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
-              {t ? t('txns:txnOut') : 'OUT'}
-            </span>
-          ) : (
-            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
-              {t ? t('txns:txnIn') : 'IN'}
-            </span>
-          )}
-        </>
-      ),
-      tdClassName: 'text-center',
-    },
+    // {
+    //   header: '',
+    //   key: 'token_old_owner_account_id',
+    //   cell: (row: TransactionInfo) => (
+    //     <>
+    //       {row.token_old_owner_account_id === row.token_new_owner_account_id ? (
+    //         <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
+    //           {t ? t('txns:txnSelf') : 'Self'}
+    //         </span>
+    //       ) : id === row.token_old_owner_account_id ? (
+    //         <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
+    //           {t ? t('txns:txnOut') : 'OUT'}
+    //         </span>
+    //       ) : (
+    //         <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
+    //           {t ? t('txns:txnIn') : 'IN'}
+    //         </span>
+    //       )}
+    //     </>
+    //   ),
+    //   tdClassName: 'text-center',
+    // },
     {
       header: (
         <Popover.Root>
@@ -384,7 +385,7 @@ export default function (props: Props) {
             className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
-              {t ? t('txns:to') : 'To'}
+              Involved
               <Filter className="h-4 w-4 fill-current ml-2" />
             </button>
           </Popover.Trigger>
@@ -422,20 +423,20 @@ export default function (props: Props) {
           </Popover.Content>
         </Popover.Root>
       ),
-      key: 'token_new_owner_account_id',
+      key: 'involved_account_id',
       cell: (row: TransactionInfo) => (
         <>
-          {row.token_new_owner_account_id ? (
+          {row.involved_account_id ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span>
                     <a
-                      href={`/address/${row.token_new_owner_account_id}`}
+                      href={`/address/${row.involved_account_id}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {row.token_new_owner_account_id}
+                        {row.involved_account_id}
                       </a>
                     </a>
                   </span>
@@ -445,7 +446,7 @@ export default function (props: Props) {
                   align="start"
                   side="bottom"
                 >
-                  {row.token_new_owner_account_id}
+                  {row.involved_account_id}
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
@@ -466,11 +467,11 @@ export default function (props: Props) {
             <Tooltip.Trigger asChild>
               <span>
                 <a
-                  href={`/nft-token/${row.nft?.contract}/${row.token_id}`}
+                  href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 font-medium hover:no-underline whitespace-nowrap">
-                    {row.token_id}
+                  <a className="text-green-500 font-medium hover:no-underline">
+                    {row?.token_id}
                   </a>
                 </a>
               </span>
@@ -480,7 +481,7 @@ export default function (props: Props) {
               align="start"
               side="bottom"
             >
-              {row.token_id}
+              {row?.token_id}
             </Tooltip.Content>
           </Tooltip.Root>
         </Tooltip.Provider>
@@ -495,12 +496,12 @@ export default function (props: Props) {
       key: 'block_height',
       cell: (row: TransactionInfo) => {
         return (
-          row.nft && (
+          row?.nft && (
             <div className="flex flex-row items-center">
               <span className="inline-flex mr-1">
                 <TokenImage
-                  src={row.nft?.icon}
-                  alt={row.nft?.name}
+                  src={row?.nft?.icon}
+                  alt={row?.nft?.name}
                   className="w-4 h-4"
                   appUrl={config.appUrl}
                 />
@@ -508,13 +509,13 @@ export default function (props: Props) {
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <div className="text-sm text-nearblue-600  max-w-[110px] inline-block truncate">
+                    <div className="text-sm text-nearblue-600  max-w-[110px] inline-block truncate whitespace-nowrap">
                       <a
-                        href={`/nft-token/${row.nft?.contract}`}
+                        href={`/nft-token/${row?.nft?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="text-green-500 font-medium hover:no-underline">
-                          {row.nft?.name}
+                          {row?.nft?.name}
                         </a>
                       </a>
                     </div>
@@ -524,16 +525,16 @@ export default function (props: Props) {
                     align="start"
                     side="bottom"
                   >
-                    {row.nft?.name}
+                    {row?.nft?.name}
                   </Tooltip.Content>
                 </Tooltip.Root>
               </Tooltip.Provider>
-              {row.nft?.symbol && (
+              {row?.nft?.symbol && (
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
-                      <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate">
-                        &nbsp; {row.nft.symbol}
+                      <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate whitespace-nowrap">
+                        &nbsp; {row?.nft?.symbol}
                       </div>
                     </Tooltip.Trigger>
                     <Tooltip.Content
@@ -541,7 +542,7 @@ export default function (props: Props) {
                       align="start"
                       side="bottom"
                     >
-                      {row.nft.symbol}
+                      {row?.nft?.symbol}
                     </Tooltip.Content>
                   </Tooltip.Root>
                 </Tooltip.Provider>
@@ -550,7 +551,7 @@ export default function (props: Props) {
           )
         );
       },
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },

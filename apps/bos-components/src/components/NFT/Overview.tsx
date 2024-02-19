@@ -114,15 +114,15 @@ export default function ({ network, id }: Props) {
           <h1 className="break-all space-x-2 text-xl text-nearblue-600 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
-                src={token.icon}
-                alt={token.name}
+                src={token?.icon}
+                alt={token?.name}
                 className="w-7 h-7"
-                appUrl={config.appUrl}
+                appUrl={config?.appUrl}
               />
             </span>
             <span className="inline-flex align-middle ">Token: </span>
             <span className="inline-flex align-middle font-semibold">
-              {token.name}
+              {token?.name}
             </span>
           </h1>
         )}
@@ -238,7 +238,7 @@ export default function ({ network, id }: Props) {
             <Tabs.Root defaultValue={pageTab}>
               <Tabs.List>
                 {tabs &&
-                  tabs.map((tab, index) => (
+                  tabs?.map((tab, index) => (
                     <Tabs.Trigger
                       key={index}
                       onClick={() => onTab(index)}
@@ -257,7 +257,7 @@ export default function ({ network, id }: Props) {
                 <Tabs.Content value={tabs[0]}>
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.NFT.Transfers`}
+                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Transfers`}
                       props={{
                         network: network,
                         id: id,
@@ -268,7 +268,7 @@ export default function ({ network, id }: Props) {
                 <Tabs.Content value={tabs[1]}>
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.NFT.Holders`}
+                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Holders`}
                       props={{
                         network: network,
                         id: id,
@@ -279,7 +279,7 @@ export default function ({ network, id }: Props) {
                 <Tabs.Content value={tabs[2]}>
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.NFT.Inventory`}
+                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Inventory`}
                       props={{
                         network: network,
                         id: id,

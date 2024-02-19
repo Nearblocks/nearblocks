@@ -222,7 +222,7 @@ export default function (props: Props) {
   return (
     <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       <div className="text-sm text-nearblue-600">
-        {context.networkId === 'testnet' && (
+        {network === 'testnet' && (
           <div className="flex flex-wrap p-4 text-red-500">
             {t
               ? t('txns:testnetNotice')
@@ -257,7 +257,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold break-words">
-              {txn.transaction_hash ? txn.transaction_hash : ''}
+              {txn?.transaction_hash ? txn?.transaction_hash : ''}
             </div>
           )}
         </div>
@@ -289,8 +289,8 @@ export default function (props: Props) {
             </div>
           ) : (
             <div>
-              {txn.outcomes?.status !== undefined && (
-                <TxnStatus showLabel status={txn.outcomes?.status} />
+              {txn?.outcomes?.status !== undefined && (
+                <TxnStatus showLabel status={txn?.outcomes?.status} />
               )}
               {errorMessage && (
                 <div className="text-xs bg-orange-50 my-2 rounded-md text-center px-2 py-1">
@@ -326,16 +326,16 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-14" />
             </div>
-          ) : txn.block?.block_height ? (
+          ) : txn?.block?.block_height ? (
             <div className="w-full md:w-3/4 font-semibold break-words">
               <a
-                href={`/blocks/${txn.included_in_block_hash}`}
+                href={`/blocks/${txn?.included_in_block_hash}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
-                  {txn.block?.block_height
-                    ? localFormat(txn.block?.block_height)
-                    : ''}
+                  {txn?.block?.block_height
+                    ? localFormat(txn?.block?.block_height)
+                    : txn?.block?.block_height ?? ''}
                 </a>
               </a>
             </div>
@@ -379,7 +379,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {(actions.length > 0 || (logs.length > 0 && logs.contract)) && (
+      {(actions?.length > 0 || (logs?.length > 0 && logs?.contract)) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
@@ -413,10 +413,10 @@ export default function (props: Props) {
                     id="action-column"
                     className="max-h-[194px] break-words space-y-2"
                   >
-                    {logs.map((event: TransactionLog, i: number) => (
+                    {logs?.map((event: TransactionLog, i: number) => (
                       <EventLogs key={i} event={event} network={network} />
                     ))}
-                    {actions.map((action: any, i: number) => (
+                    {actions?.map((action: any, i: number) => (
                       <Actions key={i} action={action} />
                     ))}
                   </div>
@@ -462,11 +462,11 @@ export default function (props: Props) {
           ) : (
             <div className="w-full md:w-3/4 break-all">
               <a
-                href={`/address/${txn.signer_account_id}`}
+                href={`/address/${txn?.signer_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
-                  {txn.signer_account_id}
+                  {txn?.signer_account_id}
                 </a>
               </a>
             </div>
@@ -505,11 +505,11 @@ export default function (props: Props) {
           ) : (
             <div className="w-full md:w-3/4 break-all">
               <a
-                href={`/address/${txn.receiver_account_id}`}
+                href={`/address/${txn?.receiver_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
-                  {txn.receiver_account_id}
+                  {txn?.receiver_account_id}
                 </a>
               </a>
             </div>
@@ -549,18 +549,20 @@ export default function (props: Props) {
                     {fts?.map((ft: any) => (
                       <div
                         className="flex items-center flex-wrap break-all leading-7"
-                        key={ft.key}
+                        key={ft?.key}
                       >
                         <FaCaretRight className="inline-flex text-gray-400 text-xs" />
                         <div className="font-semibold text-gray px-1">
                           From{' '}
-                          {ft.token_old_owner_account_id ? (
+                          {ft?.token_old_owner_account_id ? (
                             <a
-                              href={`/address/${ft.token_old_owner_account_id}`}
+                              href={`/address/${ft?.token_old_owner_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                {shortenAddress(ft.token_old_owner_account_id)}
+                                {shortenAddress(
+                                  ft?.token_old_owner_account_id ?? '',
+                                )}
                               </a>
                             </a>
                           ) : (
@@ -569,13 +571,15 @@ export default function (props: Props) {
                         </div>
                         <div className="font-semibold text-gray px-1">
                           To{' '}
-                          {ft.token_new_owner_account_id ? (
+                          {ft?.token_new_owner_account_id ? (
                             <a
-                              href={`/address/${ft.token_new_owner_account_id}`}
+                              href={`/address/${ft?.token_new_owner_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1">
-                                {shortenAddress(ft.token_new_owner_account_id)}
+                                {shortenAddress(
+                                  ft?.token_new_owner_account_id ?? '',
+                                )}
                               </a>
                             </a>
                           ) : (
@@ -585,35 +589,36 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
-                            {ft.amount && ft.ft_metas.decimals
+                            {ft?.amount && ft?.ft_metas?.decimals
                               ? tokenAmount(
-                                  ft.amount,
-                                  ft.ft_metas.decimals,
+                                  ft?.amount,
+                                  ft?.ft_metas?.decimals,
                                   true,
                                 )
                               : ''}
                           </span>
                         </div>
                         <a
-                          href={`/token/${ft.ft_metas.contract}`}
+                          href={`/token/${ft?.ft_metas?.contract}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green flex items-center hover:no-underline">
                             <TokenImage
-                              src={ft.ft_metas.icon}
-                              alt={ft.ft_metas.name}
+                              src={ft?.ft_metas?.icon}
+                              alt={ft?.ft_metas?.name}
                               className="w-4 h-4 mx-1"
                             />
-                            {shortenToken(ft.ft_metas.name)}
+                            {shortenToken(ft?.ft_metas?.name ?? '')}
                             <span>
-                              &nbsp;({shortenTokenSymbol(ft.ft_metas.symbol)})
+                              &nbsp;(
+                              {shortenTokenSymbol(ft?.ft_metas?.symbol ?? '')})
                             </span>
                           </a>
                         </a>
                       </div>
                     ))}
                     {nfts?.map((nft: any) => (
-                      <div className="flex" key={nft.key}>
+                      <div className="flex" key={nft?.key}>
                         <div className="flex justify-start items-start">
                           <FaCaretRight className="inline-flex text-gray-400 text-xs mt-1" />
                           <div className="flex flex-wrap">
@@ -621,14 +626,14 @@ export default function (props: Props) {
                               <div className="sm:flex">
                                 <div className="font-semibold text-gray px-1">
                                   From{' '}
-                                  {nft.token_old_owner_account_id ? (
+                                  {nft?.token_old_owner_account_id ? (
                                     <a
-                                      href={`/address/${nft.token_old_owner_account_id}`}
+                                      href={`/address/${nft?.token_old_owner_account_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green-500 font-normal pl-1 hover:no-underline">
                                         {shortenAddress(
-                                          nft.token_old_owner_account_id,
+                                          nft?.token_old_owner_account_id ?? '',
                                         )}
                                       </a>
                                     </a>
@@ -640,14 +645,14 @@ export default function (props: Props) {
                                 </div>
                                 <div className="font-semibold text-gray px-1">
                                   To{' '}
-                                  {nft.token_new_owner_account_id ? (
+                                  {nft?.token_new_owner_account_id ? (
                                     <a
-                                      href={`/address/${nft.token_new_owner_account_id}`}
+                                      href={`/address/${nft?.token_new_owner_account_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green-500 font-normal pl-1 hover:no-underline">
                                         {shortenAddress(
-                                          nft.token_new_owner_account_id,
+                                          nft?.token_new_owner_account_id ?? '',
                                         )}
                                       </a>
                                     </a>
@@ -664,30 +669,33 @@ export default function (props: Props) {
                                   <span className="pl-1 font-normal">
                                     NFT Token ID [
                                     <a
-                                      href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
+                                      href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green hover:no-underline">
-                                        {shortenToken(nft.token_id)}
+                                        {shortenToken(nft?.token_id ?? '')}
                                       </a>
                                     </a>
                                     ]
                                   </span>
                                 </div>
                                 <a
-                                  href={`/nft-token/${nft.nft_meta.contract}`}
+                                  href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="hover:no-underline"
                                 >
                                   <a className="text-green flex items-center hover:no-underline">
                                     <TokenImage
-                                      src={nft.nft_meta.icon}
-                                      alt={nft.nft_meta.name}
+                                      src={nft?.nft_meta?.icon}
+                                      alt={nft?.nft_meta?.name}
                                       className="w-4 h-4 mx-1"
                                     />
-                                    {shortenToken(nft.nft_meta.name)}
+                                    {shortenToken(nft?.nft_meta?.name ?? '')}
                                     <span>
                                       &nbsp;(
-                                      {shortenTokenSymbol(nft.nft_meta.symbol)})
+                                      {shortenTokenSymbol(
+                                        nft?.nft_meta?.symbol ?? '',
+                                      )}
+                                      )
                                     </span>
                                   </a>
                                 </a>
@@ -695,20 +703,20 @@ export default function (props: Props) {
                             </div>
                             <div className="border rounded ml-2 w-11 h-11 p-1">
                               <a
-                                href={`/nft-token/${nft.nft_meta.contract}/${nft.token_id}`}
+                                href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                 className="hover:no-underline"
                               >
                                 <a>
                                   {
                                     <Widget
-                                      src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
                                       props={{
-                                        base: nft.nft_meta.base_uri,
-                                        media: nft.nft_token_meta.media,
+                                        base: nft?.nft_meta?.base_uri,
+                                        media: nft?.nft_token_meta?.media,
                                         reference:
-                                          nft.nft_meta.reference ||
-                                          nft.nft_token_meta.reference,
-                                        alt: nft.nft_token_meta.title,
+                                          nft?.nft_meta?.reference ||
+                                          nft?.nft_token_meta?.reference,
+                                        alt: nft?.nft_token_meta?.title,
                                         className: 'max-h-full rounded',
                                         network: network,
                                       }}
@@ -776,7 +784,7 @@ export default function (props: Props) {
                     <span>
                       {txn.actions_agg?.deposit
                         ? yoctoToNear(txn.actions_agg?.deposit, true)
-                        : ''}{' '}
+                        : txn.actions_agg?.deposit ?? ''}{' '}
                       Ⓝ
                       {currentPrice && network === 'mainnet'
                         ? ` ($${fiatValue(
@@ -826,9 +834,9 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words">
-              {txn.outcomes_agg?.transaction_fee
-                ? yoctoToNear(txn.outcomes_agg?.transaction_fee, true)
-                : ''}{' '}
+              {txn?.outcomes_agg?.transaction_fee
+                ? yoctoToNear(txn?.outcomes_agg?.transaction_fee, true)
+                : txn?.outcomes_agg?.transaction_fee ?? ''}{' '}
               Ⓝ
               {currentPrice && network === 'mainnet'
                 ? ` ($${fiatValue(
@@ -923,20 +931,20 @@ export default function (props: Props) {
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {txn.actions_agg?.gas_attached
-                      ? convertToMetricPrefix(txn.actions_agg?.gas_attached) +
-                        'gas'
-                      : ''}
+                    {txn?.actions_agg?.gas_attached
+                      ? convertToMetricPrefix(txn?.actions_agg?.gas_attached)
+                      : txn?.actions_agg?.gas_attached ?? ''}
+                    gas
                     <span className="text-gray-300 px-1">|</span>{' '}
-                    {txn.outcomes_agg?.gas_used
-                      ? convertToMetricPrefix(txn.outcomes_agg?.gas_used) +
-                        'gas'
-                      : ''}
-                    (
-                    {txn.outcomes_agg?.gas_used && txn.actions_agg?.gas_attached
+                    {txn?.outcomes_agg?.gas_used
+                      ? convertToMetricPrefix(txn?.outcomes_agg?.gas_used)
+                      : txn?.outcomes_agg?.gas_used ?? ''}
+                    gas (
+                    {txn?.outcomes_agg?.gas_used &&
+                    txn?.actions_agg?.gas_attached
                       ? gasPercentage(
-                          txn.outcomes_agg?.gas_used,
-                          txn.actions_agg?.gas_attached,
+                          txn?.outcomes_agg?.gas_used,
+                          txn?.actions_agg?.gas_attached,
                         )
                       : ''}
                     )
@@ -974,12 +982,13 @@ export default function (props: Props) {
                       {txn.receipt_conversion_gas_burnt
                         ? convertToMetricPrefix(
                             txn.receipt_conversion_gas_burnt,
-                          ) + 'gas'
-                        : ''}
+                          )
+                        : txn.receipt_conversion_gas_burnt ?? ''}
+                      gas
                       <span className="text-gray-300 px-1">|</span>{' '}
                       {txn.receipt_conversion_tokens_burnt
                         ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)
-                        : ''}{' '}
+                        : txn.receipt_conversion_tokens_burnt ?? ''}{' '}
                       Ⓝ
                     </div>
                   </div>

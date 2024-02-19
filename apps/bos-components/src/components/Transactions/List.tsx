@@ -89,7 +89,7 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
-              setTotalCount(resp?.count);
+              setTotalCount(resp?.count ?? 0);
             }
           },
         )
@@ -174,7 +174,7 @@ export default function (props: Props) {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -188,13 +188,13 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500">
                   <a
-                    href={`/txns/${row.transaction_hash}`}
+                    href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
-                      {row.transaction_hash}
+                      {row?.transaction_hash}
                     </a>
                   </a>
                 </span>
@@ -204,13 +204,13 @@ export default function (props: Props) {
                 align="start"
                 side="bottom"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -268,7 +268,7 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">
-                    {txnMethod(row.actions, t)}
+                    {txnMethod(row?.actions, t)}
                   </span>
                 </span>
               </Tooltip.Trigger>
@@ -277,7 +277,7 @@ export default function (props: Props) {
                 align="center"
                 side="bottom"
               >
-                {txnMethod(row.actions, t)}
+                {txnMethod(row?.actions, t)}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
@@ -290,10 +290,9 @@ export default function (props: Props) {
       key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.actions_agg?.deposit !== undefined &&
-          row.actions_agg?.deposit !== null
-            ? yoctoToNear(row.actions_agg?.deposit, true)
-            : ''}{' '}
+          {row?.actions_agg?.deposit
+            ? yoctoToNear(row?.actions_agg?.deposit, true)
+            : row?.actions_agg?.deposit ?? ''}{' '}
           Ⓝ
         </span>
       ),
@@ -306,11 +305,9 @@ export default function (props: Props) {
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
-          {' '}
-          {row.outcomes_agg?.transaction_fee !== undefined &&
-          row.outcomes_agg?.transaction_fee !== null
-            ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
-            : ''}{' '}
+          {row?.outcomes_agg?.transaction_fee
+            ? yoctoToNear(row?.outcomes_agg?.transaction_fee, true)
+            : row?.outcomes_agg?.transaction_fee ?? ''}{' '}
           Ⓝ
         </span>
       ),
@@ -370,13 +367,13 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
-                    href={`/address/${row.signer_account_id}`}
+                    href={`/address/${row?.signer_account_id}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 hover:no-underline">
-                      {row.signer_account_id}
+                      {row?.signer_account_id}
                     </a>
                   </a>
                 </span>
@@ -386,14 +383,13 @@ export default function (props: Props) {
                 align="start"
                 side="bottom"
               >
-                {truncateString(row.signer_account_id, 18, '...')}
+                {row?.signer_account_id}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span></span>,
@@ -458,11 +454,11 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   <a
-                    href={`/address/${row.receiver_account_id}`}
-                    className="hover:no-underline"
+                    href={`/address/${row?.receiver_account_id}`}
+                    className="hover:no-underline whitespace-nowrap"
                   >
                     <a className="text-green-500 hover:no-underline">
-                      {truncateString(row.receiver_account_id, 17, '...')}
+                      {truncateString(row?.receiver_account_id, 17, '...')}
                     </a>
                   </a>
                 </span>
@@ -472,14 +468,13 @@ export default function (props: Props) {
                 align="start"
                 side="bottom"
               >
-                {row.receiver_account_id}
+                {row?.receiver_account_id}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
@@ -487,13 +482,13 @@ export default function (props: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           <a
-            href={`/blocks/${row.included_in_block_hash}`}
+            href={`/blocks/${row?.included_in_block_hash}`}
             className="hover:no-underline"
           >
             <a className="text-green-500 hover:no-underline">
-              {row.block?.block_height
-                ? localFormat(row.block?.block_height)
-                : ''}
+              {row?.block?.block_height
+                ? localFormat(row?.block?.block_height)
+                : row?.block?.block_height ?? ''}
             </a>
           </a>
         </span>
@@ -550,13 +545,13 @@ export default function (props: Props) {
               <Tooltip.Trigger asChild>
                 <span>
                   {!showAge
-                    ? row.block_timestamp
+                    ? row?.block_timestamp
                       ? formatTimestampToString(
-                          nanoToMilli(row.block_timestamp),
+                          nanoToMilli(row?.block_timestamp),
                         )
                       : ''
-                    : row.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                    : row?.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                     : ''}
                 </span>
               </Tooltip.Trigger>
@@ -566,11 +561,11 @@ export default function (props: Props) {
                 side="bottom"
               >
                 {showAge
-                  ? row.block_timestamp
-                    ? formatTimestampToString(nanoToMilli(row.block_timestamp))
+                  ? row?.block_timestamp
+                    ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
                     : ''
-                  : row.block_timestamp
-                  ? getTimeAgoString(nanoToMilli(row.block_timestamp))
+                  : row?.block_timestamp
+                  ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                   : ''}
               </Tooltip.Content>
             </Tooltip.Root>
@@ -623,7 +618,7 @@ export default function (props: Props) {
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

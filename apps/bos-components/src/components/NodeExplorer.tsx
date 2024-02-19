@@ -445,7 +445,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div className="flex">
+                              <div className="flex uppercase">
                                 <div>Uptime</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -478,14 +478,14 @@ export default function ({ network, currentPage, setPage }: Props) {
                       tdClassName:
                         'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div className="flex">
+                              <div className="flex uppercase">
                                 <div>Latest block</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -525,14 +525,14 @@ export default function ({ network, currentPage, setPage }: Props) {
                       tdClassName:
                         'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div className="flex">
+                              <div className="flex uppercase">
                                 <div>Latest Telemetry Update</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -563,14 +563,14 @@ export default function ({ network, currentPage, setPage }: Props) {
                       tdClassName:
                         'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div className="flex">
+                              <div className="flex uppercase">
                                 <div>Node Agent Name</div>
                                 <div>
                                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -607,7 +607,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                       tdClassName:
                         'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: 'Node Agent Version / Build',
@@ -750,14 +750,14 @@ export default function ({ network, currentPage, setPage }: Props) {
               />
             ) : (
               <div className="flex justify-center text-sm text-nearblue-600 font-medium py-4 ">
-                If you are node owner feel free to fill all &nbsp;
+                If you are node owner feel free to fill all&nbsp;
                 <a
                   href="https://github.com/zavodil/near-pool-details#description"
                   className="text-green-500 hover:no-underline"
                   rel="noreferrer noopener"
                   target="_blank"
                 >
-                  data{' '}
+                  data
                 </a>
                 &nbsp;to promote your own node!
               </div>

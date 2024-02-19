@@ -33,7 +33,7 @@ export default function ({ network, t }: Props) {
     let delay = 5000;
 
     function fetchLatestBlocks() {
-      asyncFetch(`${config.backendUrl}blocks/latest`)
+      asyncFetch(`${config?.backendUrl}blocks/latest`)
         .then((data: { body: { blocks: BlocksInfo[] }; status: number }) => {
           const resp = data?.body?.blocks;
           if (data.status === 200) {
@@ -66,12 +66,12 @@ export default function ({ network, t }: Props) {
                 {t ? t('home:error') : 'Error!'}
               </div>
             )}
-            {!error && !isLoading && blocks.length === 0 && (
+            {!error && !isLoading && blocks?.length === 0 && (
               <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
                 {t ? t('home:noBlocks') : 'No blocks found'}
               </div>
             )}
-            {isLoading && blocks.length === 0 && (
+            {isLoading && blocks?.length === 0 && (
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
@@ -114,13 +114,13 @@ export default function ({ network, t }: Props) {
                 ))}
               </div>
             )}
-            {blocks.length > 0 && (
+            {blocks?.length > 0 && (
               <div className="px-3 divide-y h-80">
-                {blocks.map((block) => {
+                {blocks?.map((block) => {
                   return (
                     <div
                       className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
-                      key={block.block_hash}
+                      key={block?.block_hash}
                     >
                       <div className=" flex items-center">
                         <div className="flex-shrink-0 rounded-xl h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm">
@@ -129,20 +129,20 @@ export default function ({ network, t }: Props) {
                         <div className="overflow-hidden pl-2">
                           <div className="text-green-500 text-sm font-medium ">
                             <a
-                              href={`/blocks/${block.block_hash}`}
+                              href={`/blocks/${block?.block_hash}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 hover:no-underline">
-                                {block.block_height
-                                  ? localFormat(block.block_height)
-                                  : ''}
+                                {block?.block_height
+                                  ? localFormat(block?.block_height)
+                                  : block?.block_height ?? ''}
                               </a>
                             </a>
                           </div>
                           <div className="text-nearblue-700 text-xs truncate">
-                            {block.block_timestamp
+                            {block?.block_timestamp
                               ? getTimeAgoString(
-                                  nanoToMilli(block.block_timestamp),
+                                  nanoToMilli(block?.block_timestamp),
                                 )
                               : ''}
                           </div>
@@ -151,17 +151,17 @@ export default function ({ network, t }: Props) {
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
                         {t ? t('home:blockMiner') : 'Author'}{' '}
                         <a
-                          href={`/address/${block.author_account_id}`}
+                          href={`/address/${block?.author_account_id}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green-500 font-medium hover:no-underline">
-                            {block.author_account_id}
+                            {block?.author_account_id}
                           </a>
                         </a>
                         <div className="text-nearblue-700 text-sm ">
-                          {block?.transactions_agg.count
-                            ? localFormat(block?.transactions_agg.count)
-                            : ''}{' '}
+                          {block?.transactions_agg?.count
+                            ? localFormat(block?.transactions_agg?.count)
+                            : block?.transactions_agg?.count ?? ''}{' '}
                           txns{' '}
                         </div>
                       </div>
@@ -170,11 +170,11 @@ export default function ({ network, t }: Props) {
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <span className="u-label--badge-in text-nearblue-700 truncate">
-                                {block.chunks_agg.gas_used
+                                {block?.chunks_agg?.gas_used
                                   ? convertToMetricPrefix(
-                                      block.chunks_agg.gas_used,
+                                      block?.chunks_agg?.gas_used,
                                     ) + 'gas'
-                                  : '0 gas'}
+                                  : block?.chunks_agg?.gas_used ?? '' + 'gas'}
                               </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content
@@ -207,12 +207,12 @@ export default function ({ network, t }: Props) {
           <ScrollArea.Corner className="bg-neargray-50" />
         </ScrollArea.Root>
       </div>
-      {isLoading && blocks.length === 0 && (
+      {isLoading && blocks?.length === 0 && (
         <div className="border-t px-2 py-3 text-nearblue-600">
           <Skeleton className="h-10" />
         </div>
       )}
-      {blocks && blocks.length > 0 && (
+      {blocks && blocks?.length > 0 && (
         <div className="border-t px-2 py-3 text-nearblue-600">
           <a href="/blocks">
             <a className="block text-center border border-green-900/10 bg-green-500 hover:bg-green-400 font-thin text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
