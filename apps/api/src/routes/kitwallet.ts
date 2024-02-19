@@ -12,37 +12,41 @@ const routes = (app: Router) => {
   app.use('/kitwallet', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/kitwallet/staking-pools
+   * GET /v1/kitwallet/stakingPools
    * @summary Get all staking pools
    * @tags Kitwallet
    * @return 200 - success response
    */
-  route.get('/staking-pools', kitwallet.pools);
+  route.get('/stakingPools', kitwallet.pools);
 
   /**
-   * GET /v1/kitwallet/{key}/accounts
+   * GET /v1/kitwallet/publicKey/{key}/accounts
    * @summary Get accounts by public key
    * @tags Kitwallet
    * @param {string} key.path.required - public key
    * @return 200 - success response
    */
-  route.get('/:key/accounts', validator(schema.accounts), kitwallet.accounts);
+  route.get(
+    '/publicKey/:key/accounts',
+    validator(schema.accounts),
+    kitwallet.accounts,
+  );
 
   /**
-   * GET /v1/kitwallet/{account}/likely-tokens
+   * GET /v1/kitwallet/account/{account}/likelyTokens
    * @summary Get likely tokens for an account
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
    */
   route.get(
-    '/:account/likely-tokens',
+    '/account/:account/likelyTokens',
     validator(schema.tokens),
     kitwallet.tokens,
   );
 
   /**
-   * GET /v1/kitwallet/{account}/likely-tokens-from-block
+   * GET /v1/kitwallet/account/{account}/likelyTokensFromBlock
    * @summary Get likely tokens for an account from block
    * @tags Kitwallet
    * @param {string} account.path.required - account id
@@ -50,22 +54,26 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get(
-    '/:account/likely-tokens-from-block',
+    '/account/:account/likelyTokensFromBlock',
     validator(schema.tokensFromBlock),
     kitwallet.tokensFromBlock,
   );
 
   /**
-   * GET /v1/kitwallet/{account}/likely-nfts
+   * GET /v1/kitwallet/account/{account}/likelyNFTs
    * @summary Get likely nfts for an account
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
    */
-  route.get('/:account/likely-nfts', validator(schema.nfts), kitwallet.nfts);
+  route.get(
+    '/account/:account/likelyNFTs',
+    validator(schema.nfts),
+    kitwallet.nfts,
+  );
 
   /**
-   * GET /v1/kitwallet/{account}/likely-nfts-from-block
+   * GET /v1/kitwallet/account/{account}/likelyNFTsFromBlock
    * @summary Get likely nfts for an account from block
    * @tags Kitwallet
    * @param {string} account.path.required - account id
@@ -73,7 +81,7 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get(
-    '/:account/likely-nfts-from-block',
+    '/account/:account/likelyNFTsFromBlock',
     validator(schema.nftsFromBlock),
     kitwallet.nftsFromBlock,
   );
