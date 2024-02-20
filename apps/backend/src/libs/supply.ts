@@ -77,24 +77,8 @@ export const circulatingSupply = async (block: Block) => {
                 block.block_timestamp,
               );
 
-              console.log({
-                account,
-                amount,
-                attempt,
-                index,
-                job: 'daily-stats',
-              });
-
               lockedAmount = lockedAmount.add(amount);
             } catch (error) {
-              console.log({
-                account,
-                attempt,
-                error,
-                index,
-                job: 'daily-stats',
-              });
-
               if (
                 error instanceof Error &&
                 error?.message.includes('does not exist while viewing')
