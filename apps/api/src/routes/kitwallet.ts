@@ -20,6 +20,19 @@ const routes = (app: Router) => {
   route.get('/stakingPools', kitwallet.pools);
 
   /**
+   * GET /v1/kitwallet/staking-deposits/{account}
+   * @summary Get staking deposits for an account
+   * @tags Kitwallet
+   * @param {string} account.path.required - account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/staking-deposits/:account',
+    validator(schema.deposits),
+    kitwallet.deposits,
+  );
+
+  /**
    * GET /v1/kitwallet/publicKey/{key}/accounts
    * @summary Get accounts by public key
    * @tags Kitwallet
@@ -30,6 +43,32 @@ const routes = (app: Router) => {
     '/publicKey/:key/accounts',
     validator(schema.accounts),
     kitwallet.accounts,
+  );
+
+  /**
+   * GET /v1/kitwallet/account/{account}/activities
+   * @summary Get activities for an account
+   * @tags Kitwallet
+   * @param {string} account.path.required - account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/account/:account/activities',
+    validator(schema.activities),
+    kitwallet.activities,
+  );
+
+  /**
+   * GET /v1/kitwallet/account/{account}/callReceivers
+   * @summary Get call receivers for an account
+   * @tags Kitwallet
+   * @param {string} account.path.required - account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/account/:account/callReceivers',
+    validator(schema.receivers),
+    kitwallet.receivers,
   );
 
   /**
