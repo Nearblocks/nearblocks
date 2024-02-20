@@ -7,8 +7,11 @@ import catchAsync from '#libs/async';
 import sql from '#libs/postgres';
 import {
   Accounts,
+  Activities,
+  Deposits,
   Nfts,
   NftsFromBlock,
+  Receivers,
   Tokens,
   TokensFromBlock,
 } from '#libs/schema/kitwallet';
@@ -218,11 +221,129 @@ const pools = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json(pools.map(({ account_id }) => account_id));
 });
 
+const deposits = catchAsync(
+  async (req: RequestValidator<Deposits>, res: Response) => {
+    const account = req.validator.data.account;
+
+    const deposits = await sql`
+      WITH
+        deposit_in AS (
+          SELECT
+            SUM(
+              TO_NUMBER(
+                args ->> 'deposit',
+                '99999999999999999999999999999999999999'
+              )
+            ) deposit,
+            receipt_receiver_account_id validator_id
+          FROM
+            action_receipt_actions
+          WHERE
+            action_kind = 'FUNCTION_CALL'
+            AND args ->> 'method_name' LIKE 'deposit%'
+            AND receipt_predecessor_account_id = ${account}
+            AND receipt_receiver_account_id LIKE ANY (${POOLS})
+          GROUP BY
+            receipt_receiver_account_id
+        ),
+        deposit_out AS (
+          SELECT
+            SUM(
+              TO_NUMBER(
+                args ->> 'deposit',
+                '99999999999999999999999999999999999999'
+              )
+            ) deposit,
+            receipt_predecessor_account_id validator_id
+          FROM
+            action_receipt_actions
+          WHERE
+            action_kind = 'TRANSFER'
+            AND receipt_receiver_account_id = ${account}
+            AND receipt_predecessor_account_id LIKE ANY (${POOLS})
+          GROUP BY
+            receipt_predecessor_account_id
+        )
+      SELECT
+        SUM(
+          deposit_in.deposit - COALESCE(deposit_out.deposit, 0)
+        ) deposit,
+        deposit_in.validator_id
+      FROM
+        deposit_in
+        LEFT JOIN deposit_out ON deposit_in.validator_id = deposit_out.validator_id
+      GROUP BY
+        deposit_in.validator_id
+    `;
+
+    return res.status(200).json(deposits);
+  },
+);
+
+const activities = catchAsync(
+  async (req: RequestValidator<Activities>, res: Response) => {
+    const account = req.validator.data.account;
+    const limit = req.validator.data.limit;
+    const offset = String(req.validator.data.offset ?? '9223372036854775807');
+
+    const activities = await sql`
+      SELECT
+        included_in_block_hash block_hash,
+        included_in_block_timestamp block_timestamp,
+        originated_from_transaction_hash hash,
+        index_in_action_receipt action_index,
+        predecessor_account_id signer_id,
+        receiver_account_id receiver_id,
+        action_kind,
+        args
+      FROM
+        action_receipt_actions
+        JOIN receipts USING (receipt_id)
+      WHERE
+        receipt_predecessor_account_id != 'system'
+        AND (
+          receipt_predecessor_account_id = ${account}
+          OR receipt_receiver_account_id = ${account}
+        )
+        AND ${offset} > receipt_included_in_block_timestamp
+      ORDER BY
+        receipt_included_in_block_timestamp DESC
+      LIMIT
+        ${limit + 100}
+    `;
+
+    return res.status(200).json(activities.slice(0, limit));
+  },
+);
+
+const receivers = catchAsync(
+  async (req: RequestValidator<Receivers>, res: Response) => {
+    const account = req.validator.data.account;
+
+    const pools = await sql`
+      SELECT DISTINCT
+        receipt_receiver_account_id AS receiver_account_id
+      FROM
+        action_receipt_actions
+      WHERE
+        receipt_predecessor_account_id = ${account}
+        AND action_kind = 'FUNCTION_CALL'
+    `;
+
+    return res
+      .status(200)
+      .json(pools.map(({ receiver_account_id }) => receiver_account_id));
+  },
+);
+
 export default {
   accounts,
+  activities,
+  deposits,
   nfts,
   nftsFromBlock,
   pools,
+  receivers,
   tokens,
   tokensFromBlock,
 };
