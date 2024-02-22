@@ -37,7 +37,6 @@ export interface TTables {
 export type AccessKey = {
   account_id: string;
   created_by_block_height: number;
-  created_by_block_timestamp: string;
   created_by_receipt_id: null | string;
   deleted_by_block_height: null | number;
   deleted_by_receipt_id: null | string;
@@ -48,7 +47,6 @@ export type AccessKey = {
 export type Account = {
   account_id: string;
   created_by_block_height: number;
-  created_by_block_timestamp: string;
   created_by_receipt_id: null | string;
   deleted_by_block_height: null | number;
   deleted_by_receipt_id: null | string;
@@ -67,7 +65,6 @@ export type ActionReceiptAction = {
 export type ActionReceiptOutputData = {
   output_data_id: string;
   output_from_receipt_id: string;
-  receipt_included_in_block_timestamp: string;
   receiver_account_id: string;
 };
 
@@ -148,7 +145,6 @@ export type ErroredContracts = {
 };
 
 export type ExecutionOutcomeReceipt = {
-  executed_in_block_timestamp: string;
   executed_receipt_id: string;
   index_in_execution_outcome: number;
   produced_receipt_id: string;

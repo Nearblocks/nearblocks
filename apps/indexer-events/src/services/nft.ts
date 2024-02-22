@@ -151,9 +151,6 @@ export const storeNFTEvents = async (
 
 export const saveNFTData = async (knex: Knex, data: NFTEvent[]) => {
   await retry(async () => {
-    await knex('nft_events')
-      .insert(data)
-      .onConflict(['event_index', 'block_timestamp'])
-      .ignore();
+    await knex('nft_events').insert(data).onConflict(['event_index']).ignore();
   });
 };

@@ -22,7 +22,7 @@ export const storeGenesisAccessKeys = async (
   await retry(async () => {
     await knex('access_keys')
       .insert(accessKeys)
-      .onConflict(['public_key', 'account_id', 'created_by_block_timestamp'])
+      .onConflict(['public_key', 'account_id'])
       .ignore();
   });
 };
@@ -32,7 +32,6 @@ export const getGenesisAccessKeyData = (
   publicKey: string,
   permission: string,
   blockHeight: number,
-  blockTimestamp: string,
 ): AccessKey => {
   const permissionKind =
     permission === 'string'
@@ -42,7 +41,6 @@ export const getGenesisAccessKeyData = (
   return {
     account_id: account,
     created_by_block_height: blockHeight,
-    created_by_block_timestamp: blockTimestamp,
     created_by_receipt_id: null,
     deleted_by_block_height: null,
     deleted_by_receipt_id: null,
@@ -114,7 +112,7 @@ export const storeChunkAccessKeys = async (
           accessKeys.set(
             `${accountId}:${publicKey}`,
             getAccessKeyData(
-              block,
+              block.height,
               accountId,
               publicKey,
               accessKey.permission,
@@ -140,7 +138,7 @@ export const storeChunkAccessKeys = async (
           accessKeysToUpdate.set(
             `${accountId}:${publicKey}`,
             getAccessKeyData(
-              block,
+              block.height,
               accountId,
               publicKey,
               AccessKeyPermissionKind.FULL_ACCESS,
@@ -159,7 +157,7 @@ export const storeChunkAccessKeys = async (
             accessKeys.set(
               `${accountId}:${publicKey}`,
               getAccessKeyData(
-                block,
+                block.height,
                 accountId,
                 publicKey,
                 AccessKeyPermissionKind.FULL_ACCESS,
@@ -191,7 +189,7 @@ export const storeChunkAccessKeys = async (
     await retry(async () => {
       await knex('access_keys')
         .insert([...accessKeys.values()])
-        .onConflict(['public_key', 'account_id', 'created_by_block_timestamp'])
+        .onConflict(['public_key', 'account_id'])
         .ignore();
     });
   }
@@ -214,7 +212,7 @@ export const storeChunkAccessKeys = async (
 };
 
 const getAccessKeyData = (
-  block: types.BlockHeader,
+  blockHeight: number,
   account: string,
   publicKey: string,
   permission: string | types.AccessKeyFunctionCallPermission,
@@ -229,8 +227,7 @@ const getAccessKeyData = (
 
   return {
     account_id: account,
-    created_by_block_height: block.height,
-    created_by_block_timestamp: block.timestampNanosec,
+    created_by_block_height: blockHeight,
     created_by_receipt_id: receipt,
     deleted_by_block_height: deletedBlock,
     deleted_by_receipt_id: deletedReceipt,

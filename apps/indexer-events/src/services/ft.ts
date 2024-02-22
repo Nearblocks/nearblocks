@@ -190,10 +190,7 @@ export const getLegacyEvents = (
 
 export const saveFTData = async (knex: Knex, data: FTEvent[]) => {
   await retry(async () => {
-    await knex('ft_events')
-      .insert(data)
-      .onConflict(['event_index', 'block_timestamp'])
-      .ignore();
+    await knex('ft_events').insert(data).onConflict(['event_index']).ignore();
   });
 };
 

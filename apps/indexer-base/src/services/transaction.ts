@@ -40,7 +40,7 @@ const storeChunkTransactions = async (
     await retry(async () => {
       await knex('transactions')
         .insert(data)
-        .onConflict(['transaction_hash', 'block_timestamp'])
+        .onConflict(['transaction_hash'])
         .ignore();
     });
   }
