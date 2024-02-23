@@ -20,10 +20,7 @@ export const storeChunks = async (
 
   if (data.length) {
     await retry(async () => {
-      await knex('chunks')
-        .insert(data)
-        .onConflict(['chunk_hash', 'included_in_block_timestamp'])
-        .ignore();
+      await knex('chunks').insert(data).onConflict(['chunk_hash']).ignore();
     });
   }
 };

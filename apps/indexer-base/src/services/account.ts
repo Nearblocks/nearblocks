@@ -14,21 +14,16 @@ type AccountMap = Map<string, Account>;
 
 export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
   await retry(async () => {
-    await knex('accounts')
-      .insert(accounts)
-      .onConflict(['account_id', 'created_by_block_timestamp'])
-      .ignore();
+    await knex('accounts').insert(accounts).onConflict(['account_id']).ignore();
   });
 };
 
 export const getGenesisAccountData = (
   account: string,
   blockHeight: number,
-  blockTimestamp: string,
 ): Account => ({
   account_id: account,
   created_by_block_height: blockHeight,
-  created_by_block_timestamp: blockTimestamp,
   created_by_receipt_id: null,
   deleted_by_block_height: null,
   deleted_by_receipt_id: null,
@@ -74,7 +69,10 @@ export const storeChunkAccounts = async (
         const accountId = receipt.receiverId;
 
         if (isCreateAccountAction(action)) {
-          accounts.set(accountId, getAccountData(block, accountId, receiptId));
+          accounts.set(
+            accountId,
+            getAccountData(block.height, accountId, receiptId),
+          );
           continue;
         }
 
@@ -92,31 +90,22 @@ export const storeChunkAccounts = async (
 
           accountsToUpdate.set(
             accountId,
-            getAccountData(block, accountId, null, receiptId),
+            getAccountData(
+              block.height,
+              accountId,
+              null,
+              receiptId,
+              block.height,
+            ),
           );
           continue;
         }
 
         if (isTransferAction(action) && accountId.length === 64) {
-          const existing = await knex('accounts')
-            .select('account_id')
-            .where('account_id', accountId)
-            .where('created_by_block_height', '<', block.height)
-            .where(function () {
-              this.whereNull('deleted_by_block_height').orWhere(
-                'deleted_by_block_height',
-                '>',
-                block.height,
-              );
-            })
-            .first();
-
-          if (!existing) {
-            accounts.set(
-              accountId,
-              getAccountData(block, accountId, receiptId),
-            );
-          }
+          accounts.set(
+            accountId,
+            getAccountData(block.height, accountId, receiptId),
+          );
         }
       }
     }
@@ -126,7 +115,7 @@ export const storeChunkAccounts = async (
     await retry(async () => {
       await knex('accounts')
         .insert([...accounts.values()])
-        .onConflict(['account_id', 'created_by_block_timestamp'])
+        .onConflict(['account_id'])
         .ignore();
     });
   }
@@ -152,15 +141,14 @@ export const storeChunkAccounts = async (
 };
 
 const getAccountData = (
-  block: types.BlockHeader,
+  blockHeight: number,
   account: string,
   receipt: null | string,
   deletedReceipt: null | string = null,
   deletedBlock: null | number = null,
 ): Account => ({
   account_id: account,
-  created_by_block_height: block.height,
-  created_by_block_timestamp: block.timestampNanosec,
+  created_by_block_height: blockHeight,
   created_by_receipt_id: receipt,
   deleted_by_block_height: deletedBlock,
   deleted_by_receipt_id: deletedReceipt,

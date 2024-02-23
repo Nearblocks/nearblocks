@@ -87,7 +87,6 @@ export const insertGenesisData = async (path: string) => {
       const accountData = getGenesisAccountData(
         chunk.value.account_id,
         config.genesisHeight,
-        config.genesisTimestamp,
       );
 
       accounts.push(accountData);
@@ -100,7 +99,6 @@ export const insertGenesisData = async (path: string) => {
         chunk.value.public_key,
         typeof chunk.value.access_key.permission,
         config.genesisHeight,
-        config.genesisTimestamp,
       );
 
       accessKeys.push(accessKeyData);

@@ -45,7 +45,6 @@ export const storeChunkExecutionOutcomes = async (
       executionOutcome.executionOutcome.outcome.receiptIds.map(
         (receiptId, receiptIndex) =>
           getExecutionOutcomeReceiptData(
-            blockTimestamp,
             executionOutcome.executionOutcome.id,
             receiptId,
             receiptIndex,
@@ -59,7 +58,7 @@ export const storeChunkExecutionOutcomes = async (
     await retry(async () => {
       await knex('execution_outcomes')
         .insert(outcomes)
-        .onConflict(['receipt_id', 'executed_in_block_timestamp'])
+        .onConflict(['receipt_id'])
         .ignore();
     });
   }
@@ -72,7 +71,6 @@ export const storeChunkExecutionOutcomes = async (
           'executed_receipt_id',
           'index_in_execution_outcome',
           'produced_receipt_id',
-          'executed_in_block_timestamp',
         ])
         .ignore();
     });
@@ -97,12 +95,10 @@ const getExecutionOutcomeData = (
 });
 
 const getExecutionOutcomeReceiptData = (
-  blockTimestamp: string,
   executedReceipt: string,
   producedReceipt: string,
   receiptIndex: number,
 ): ExecutionOutcomeReceipt => ({
-  executed_in_block_timestamp: blockTimestamp,
   executed_receipt_id: executedReceipt,
   index_in_execution_outcome: receiptIndex,
   produced_receipt_id: producedReceipt,
