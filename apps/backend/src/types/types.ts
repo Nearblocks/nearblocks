@@ -20,8 +20,10 @@ export interface Config {
   dbUrl: string;
   genesisDate: string;
   genesisHeight: number;
+  lastAccountId: string;
   lcwApiKey: string;
   network: Network;
+  oldDbUrl: string;
   redisPassword: string;
   redisSentinelName: string;
   redisSentinelUrls: string;

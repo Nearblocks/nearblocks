@@ -28,7 +28,8 @@
     "dayjs": "1.11.10",
     "envalid": "8.0.0",
     "lodash-es": "4.17.21",
-    "p-map": "5.5.0"
+    "p-map": "5.5.0",
+    "pg-query-stream": "4.5.3"
   },
   "devDependencies": {
     "@types/big.js": "~6.2.2",

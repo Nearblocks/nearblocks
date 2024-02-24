@@ -1,3 +1,5 @@
+import { parentPort } from 'worker_threads';
+
 import knexPkg from 'knex';
 
 import { logger } from 'nb-logger';
@@ -41,27 +43,14 @@ type OldAccount = {
 
     for await (const account of stream) {
       console.log({ account });
-
       const block = await knex
         .select('b.block_height')
-        .table('receipts as r')
+        .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
         .join('blocks as b', 'b.block_hash', '=', 'r.included_in_block_hash')
         .where('r.receipt_id', account.deleted_by_receipt_id)
         .first();
 
-      if (!block) throw Error('No receipt found!');
-
       console.log({ block });
-
-      await knex('accounts')
-        .where('account_id', account.account_id)
-        .whereNull('deleted_by_block_height')
-        .whereNull('deleted_by_receipt_id')
-        .update({
-          deleted_by_block_height: block.block_height,
-          deleted_by_receipt_id: account.deleted_by_receipt_id,
-        });
-
       await knex('settings')
         .insert({
           key: 'deleted-accounts',
@@ -69,10 +58,18 @@ type OldAccount = {
         })
         .onConflict('key')
         .merge();
+
+      await sleep(1000);
     }
   } catch (error) {
     console.log({ error });
     await sleep(3000);
   }
   logger.info('accounts job finished...');
+
+  if (parentPort) {
+    return parentPort.postMessage('done');
+  }
+
+  process.exit(0);
 })();
