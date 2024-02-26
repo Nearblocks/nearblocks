@@ -10,6 +10,8 @@ import { RequestValidator } from '#types/types';
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
+  const order = req.validator.data.order;
+  const search = req.validator.data.search;
   const { limit, offset } = getPagination(page, per_page);
 
   const tokens = await sql`
@@ -27,9 +29,16 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       ft_meta.volume_24h
     FROM
       ft_contracts_daily
-      JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract
+      JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract ${search
+      ? sql`
+          WHERE
+            ft_meta.contract ILIKE ${search + '%'}
+            OR ft_meta.symbol ILIKE ${search + '%'}
+            OR ft_meta.name ILIKE ${search + '%'}
+        `
+      : sql``}
     ORDER BY
-      onchain_market_cap DESC NULLS LAST
+      onchain_market_cap ${order === 'desc' ? sql`DESC NULLS LAST` : sql`ASC`}
     LIMIT
       ${limit}
     OFFSET
@@ -40,15 +49,31 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
 });
 
 const count = catchAsync(
-  async (_req: RequestValidator<Count>, res: Response) => {
-    const query = `
-      SELECT
-        COUNT (DISTINCT contract)
-      FROM
-        ft_contracts_daily
-    `;
+  async (req: RequestValidator<Count>, res: Response) => {
+    const search = req.validator.data.search;
 
-    const { rows } = await db.query(query);
+    const { query, values } = keyBinder(
+      `
+        SELECT
+          COUNT (DISTINCT ft_contracts_daily.contract)
+        FROM
+          ft_contracts_daily
+          JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract
+        WHERE
+          ${
+            search
+              ? `
+                ft_meta.contract ILIKE :search
+                OR ft_meta.symbol ILIKE :search
+                OR ft_meta.name ILIKE :search
+              `
+              : true
+          }
+      `,
+      { search: `%${search}%` },
+    );
+
+    const { rows } = await db.query(query, values);
 
     return res.status(200).json({ tokens: rows });
   },

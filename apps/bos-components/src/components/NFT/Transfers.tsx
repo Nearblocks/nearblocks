@@ -23,6 +23,7 @@ import {
 import Clock from '@/includes/icons/Clock';
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
+import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
 export default function ({ network, id }: Props) {
   const [isLoading, setIsLoading] = useState(false);
@@ -209,6 +210,26 @@ export default function ({ network, id }: Props) {
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+    },
+    {
+      header: <span></span>,
+      key: '',
+      cell: (row: TransactionInfo) => {
+        return row.affected_account_id === row.involved_account_id ? (
+          <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
+            SELF
+          </span>
+        ) : Number(row?.delta_amount) > 0 ? (
+          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white rotate-180">
+            <FaLongArrowAltRight />
+          </div>
+        ) : (
+          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
+            <FaLongArrowAltRight />
+          </div>
+        );
+      },
+      tdClassName: 'text-center',
     },
     {
       header: <span>Involved</span>,

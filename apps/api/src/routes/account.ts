@@ -100,7 +100,7 @@ const routes = (app: Router) => {
    * @summary Get access keys by pagination
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -125,7 +125,7 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -150,10 +150,9 @@ const routes = (app: Router) => {
    * @summary Get account token txns by pagination
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
+   * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -165,8 +164,7 @@ const routes = (app: Router) => {
    * @summary Get account token txns count
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
+   * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
    * @return 200 - success response
    */
@@ -181,10 +179,9 @@ const routes = (app: Router) => {
    * @summary Get account nft txns by pagination
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
+   * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -196,8 +193,7 @@ const routes = (app: Router) => {
    * @summary Get account nft txns count
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
+   * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
    * @return 200 - success response
    */

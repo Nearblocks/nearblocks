@@ -8,6 +8,8 @@ import { getPagination, keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
+  const search = req.validator.data.search;
+  const order = req.validator.data.order;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const { limit, offset } = getPagination(page, per_page);
@@ -20,11 +22,20 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       nft_meta.icon,
       nft_meta.base_uri,
       nft_meta.reference,
+      tokens.count AS tokens,
       day.count AS transfers_day,
       holders.count AS holders
     FROM
       nft_contracts_daily
       JOIN nft_meta ON nft_meta.contract = nft_contracts_daily.contract
+      LEFT JOIN LATERAL (
+        SELECT
+          COUNT(contract)
+        FROM
+          nft_token_meta
+        WHERE
+          contract = nft_contracts_daily.contract
+      ) tokens ON TRUE
       LEFT JOIN LATERAL (
         SELECT
           COUNT(contract_account_id)
@@ -56,8 +67,16 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
               account
           ) s
       ) holders ON TRUE
+    WHERE
+      ${search
+      ? sql`
+          nft_meta.contract ILIKE ${search + '%'}
+          OR nft_meta.symbol ILIKE ${search + '%'}
+          OR nft_meta.name ILIKE ${search + '%'}
+        `
+      : true}
     ORDER BY
-      transfers_day DESC
+      transfers_day ${order === 'desc' ? sql`DESC NULLS LAST` : sql`ASC`}
     LIMIT
       ${limit}
     OFFSET
@@ -68,12 +87,23 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
 });
 
 const count = catchAsync(
-  async (_req: RequestValidator<Count>, res: Response) => {
+  async (req: RequestValidator<Count>, res: Response) => {
+    const search = req.validator.data.search;
+
     const tokens = await sql`
       SELECT
-        COUNT(DISTINCT contract)
+        COUNT(DISTINCT nft_contracts_daily.contract)
       FROM
         nft_contracts_daily
+        JOIN nft_meta ON nft_meta.contract = nft_contracts_daily.contract
+      WHERE
+        ${search
+        ? sql`
+            nft_meta.contract ILIKE ${search + '%'}
+            OR nft_meta.symbol ILIKE ${search + '%'}
+            OR nft_meta.name ILIKE ${search + '%'}
+          `
+        : true}
     `;
 
     return res.status(200).json({ tokens });
@@ -93,6 +123,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         involved_account_id,
         token_id,
         cause,
+        delta_amount,
         txn.transaction_hash,
         txn.included_in_block_hash,
         txn.block_timestamp,

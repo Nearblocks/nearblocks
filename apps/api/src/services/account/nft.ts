@@ -16,19 +16,13 @@ import {
 const txns = catchAsync(
   async (req: RequestValidator<NftTxns>, res: Response) => {
     const account = req.validator.data.account;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
+    const involved = req.validator.data.involved;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
 
-    if (from && to && from !== account && to !== account) {
-      return res.status(200).json({ txns: [] });
-    }
-
     const { limit, offset } = getPagination(page, per_page);
-    // Use the same inner join query for txn count query below
     const { query, values } = keyBinder(
       `
         SELECT
@@ -36,6 +30,7 @@ const txns = catchAsync(
           affected_account_id,
           involved_account_id,
           cause,
+          delta_amount,
           token_id,
           txn.transaction_hash,
           txn.included_in_block_hash,
@@ -72,6 +67,7 @@ const txns = catchAsync(
               nft_events a
             WHERE
               affected_account_id = :account
+              AND ${involved ? `involved_account_id = :involved` : true}
               AND ${event ? `cause = :event` : true}
               AND EXISTS (
                 SELECT
@@ -128,7 +124,7 @@ const txns = catchAsync(
         ORDER BY
           event_index ${order === 'desc' ? 'DESC' : 'ASC'}
       `,
-      { account, event, from, limit, offset, to },
+      { account, event, involved, limit, offset },
     );
 
     const { rows } = await db.query(query, values);
@@ -140,35 +136,19 @@ const txns = catchAsync(
 const txnsCount = catchAsync(
   async (req: RequestValidator<NftTxnsCount>, res: Response) => {
     const account = req.validator.data.account;
-    const from = req.validator.data.from;
-    const to = req.validator.data.to;
+    const involved = req.validator.data.involved;
     const event = req.validator.data.event;
 
-    if (from && to && from !== account && to !== account) {
-      return res.status(200).json({ txns: [] });
-    }
-
     const useFormat = true;
-    const bindings = { account, event, from, to };
+    const bindings = { account, event, involved };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
       FROM
         nft_events a
       WHERE
-        ${
-          from || to
-            ? `
-              affected_account_id = ${from ? `:from` : `:account`}
-              AND involved_account_id = ${to ? `:to` : `:account`}
-            `
-            : `
-              (
-                affected_account_id = :account
-                OR involved_account_id = :account
-              )
-            `
-        }
+        affected_account_id = :account
+        AND ${involved ? `involved_account_id = :involved` : true}
         AND ${event ? `cause = :event` : true}
         AND EXISTS (
           SELECT

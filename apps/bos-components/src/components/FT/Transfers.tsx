@@ -266,10 +266,14 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             {t ? t('txnSelf') : 'Self'}
           </span>
-        ) : (
-          <span className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
+        ) : Number(row?.delta_amount) > 0 ? (
+          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white rotate-180">
             <FaLongArrowAltRight />
-          </span>
+          </div>
+        ) : (
+          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
+            <FaLongArrowAltRight />
+          </div>
         ),
       tdClassName: 'text-center',
     },
@@ -316,22 +320,15 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
       key: 'amount',
       cell: (row: TransactionInfo) => (
         <>
-          {Number(row?.delta_amount) > 0 ? (
-            <div className="text-neargreen flex flex-row items-center">
-              {'+' +
-                localFormat(
-                  tokenAmount(row?.delta_amount, row?.ft?.decimals, true),
-                )}
-            </div>
-          ) : (
-            <div className="text-red-500 flex flex-row items-center">
-              {row?.delta_amount
-                ? localFormat(
-                    tokenAmount(row?.delta_amount, row?.ft?.decimals, true),
-                  )
-                : ''}
-            </div>
-          )}
+          {row?.delta_amount
+            ? localFormat(
+                tokenAmount(
+                  Big(row.delta_amount).abs().toString(),
+                  row?.ft?.decimals,
+                  true,
+                ),
+              )
+            : ''}
         </>
       ),
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',

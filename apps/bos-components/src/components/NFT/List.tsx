@@ -134,22 +134,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[1px]',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('name')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'name' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            Token
-          </button>
-        </span>
-      ),
+      header: <span>Token</span>,
       key: 'name',
       cell: (row: Token) => (
         <>
@@ -179,26 +164,10 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm  text-nearblue-600 align-top',
       thClassName:
-        'text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('tokens')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'tokens' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            Tokens
-          </button>
-        </span>
-      ),
+      header: <span>Tokens</span>,
       key: 'tokens',
       cell: (row: Token) => (
         <span>
@@ -207,7 +176,19 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
+    },
+    {
+      header: <span>Holders</span>,
+      key: 'holders',
+      cell: (row: Token) => (
+        <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
+      ),
+      tdClassName:
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
     },
     {
       header: (
@@ -229,88 +210,6 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       key: 'change_24',
       cell: (row: Token) => (
         <span>{row?.transfers_day ? localFormat(row?.transfers_day) : ''}</span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('txns_3days')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting?.sort === 'txns_3days' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            Transfers (3D)
-          </button>
-        </span>
-      ),
-      key: 'transfers_3days',
-      cell: (row: Token) => (
-        <span>
-          {row?.transfers_3days
-            ? localFormat(row?.transfers_3days)
-            : row?.transfers_3days ?? ''}
-        </span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('txns')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting?.sort === 'txns' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            All Transfers
-          </button>
-        </span>
-      ),
-      key: 'transfers',
-      cell: (row: Token) => (
-        <span>
-          {row?.transfers ? localFormat(row?.transfers) : row?.transfers ?? ''}
-        </span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('holders')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting?.sort === 'holders' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            Holders
-          </button>
-        </span>
-      ),
-      key: 'holders',
-      cell: (row: Token) => (
-        <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
