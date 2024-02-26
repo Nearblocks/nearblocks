@@ -20,7 +20,7 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response

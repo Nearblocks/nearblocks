@@ -3,14 +3,18 @@ import { z } from 'zod';
 import { EventKind } from '#types/enums';
 
 const list = z.object({
-  page: z.number().positive().max(200).optional().default(1),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(50).optional().default(50),
+  search: z.string().optional(),
 });
 
-const count = z.object({});
+const count = z.object({
+  search: z.string().optional(),
+});
 
 const txns = z.object({
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -24,7 +28,7 @@ const nftTxns = z.object({
   contract: z.string(),
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -36,7 +40,7 @@ const nftTxnsCount = z.object({
 const holders = z.object({
   contract: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -46,7 +50,7 @@ const holdersCount = z.object({
 
 const tokens = z.object({
   contract: z.string(),
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -63,7 +67,7 @@ const tokenTxns = z.object({
   contract: z.string(),
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
   token: z.string(),
 });

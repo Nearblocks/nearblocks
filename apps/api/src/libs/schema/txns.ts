@@ -8,7 +8,7 @@ const list = z.object({
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
+  page: z.number().positive().optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
   to: z.string().optional(),
 });

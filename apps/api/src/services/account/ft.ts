@@ -23,6 +23,7 @@ import {
 const txns = catchAsync(
   async (req: RequestValidator<FtTxns>, res: Response) => {
     const account = req.validator.data.account;
+    const involved = req.validator.data.involved;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
@@ -71,7 +72,8 @@ const txns = catchAsync(
             ft_events a
           WHERE
             affected_account_id = ${account}
-            AND ${event ? `cause = ${event}` : true}
+            AND ${involved ? sql` involved_account_id = ${involved}` : true}
+            AND ${event ? sql` cause = ${event}` : true}
             AND EXISTS (
               SELECT
                 1
@@ -134,10 +136,11 @@ const txns = catchAsync(
 const txnsCount = catchAsync(
   async (req: RequestValidator<FtTxnsCount>, res: Response) => {
     const account = req.validator.data.account;
+    const involved = req.validator.data.involved;
     const event = req.validator.data.event;
 
     const useFormat = true;
-    const bindings = { account, event };
+    const bindings = { account, event, involved };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -145,6 +148,7 @@ const txnsCount = catchAsync(
         ft_events a
       WHERE
         affected_account_id = :account
+        AND ${involved ? `involved_account_id = :involved` : true}
         AND ${event ? `cause = :event` : true}
         AND EXISTS (
           SELECT

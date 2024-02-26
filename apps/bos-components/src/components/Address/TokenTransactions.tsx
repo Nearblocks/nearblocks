@@ -292,51 +292,7 @@ export default function ({
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
-      header: (
-        <Popover.Root>
-          <Popover.Trigger
-            asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
-          >
-            <button className="IconButton" aria-label="Update dimensions">
-              Affected
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </Popover.Trigger>
-          <Popover.Content
-            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
-            sideOffset={5}
-          >
-            <input
-              name="from"
-              value={filters ? filters?.from : ''}
-              onChange={onInputChange}
-              placeholder={
-                t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
-              }
-              className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
-            />
-            <div className="flex">
-              <button
-                type="submit"
-                onClick={(e) => onFilter(e, 'from')}
-                className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
-              >
-                <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                {t ? t('txns:filter.filter') : 'Filter'}
-              </button>
-              <button
-                name="from"
-                type="button"
-                onClick={() => onClear('from')}
-                className="flex-1 rounded bg-gray-300 text-xs h-7"
-              >
-                {t ? t('txns:filter.clear') : 'Clear'}
-              </button>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
-      ),
+      header: <>Affected</>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => (
         <span>
@@ -370,6 +326,8 @@ export default function ({
         </span>
       ),
       tdClassName: 'px-5 py-4 text-sm text-nearblue-600  font-medium',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -410,8 +368,8 @@ export default function ({
             sideOffset={5}
           >
             <input
-              name="to"
-              value={filters ? filters?.to : ''}
+              name="involved"
+              value={filters ? filters?.involved : ''}
               onChange={onInputChange}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
@@ -421,16 +379,16 @@ export default function ({
             <div className="flex">
               <button
                 type="submit"
-                onClick={(e) => onFilter(e, 'to')}
+                onClick={(e) => onFilter(e, 'involved')}
                 className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
               >
                 <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                 {t ? t('txns:filter.filter') : 'Filter'}
               </button>
               <button
-                name="to"
+                name="involved"
                 type="button"
-                onClick={() => onClear('to')}
+                onClick={() => onClear('involved')}
                 className="flex-1 rounded bg-gray-300 text-xs h-7"
               >
                 {t ? t('txns:filter.clear') : 'Clear'}

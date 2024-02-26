@@ -179,22 +179,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('name')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'name' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.token') : 'TOKEN'}
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.token') : 'TOKEN'}</span>,
       key: 'name',
       cell: (row: Token) => (
         <>
@@ -218,25 +203,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 w-80  align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('price')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'price' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.price') : 'PRICE'}
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.price') : 'PRICE'}</span>,
       key: 'price',
       cell: (row: Token) => (
         <span>
@@ -249,24 +220,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('change')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'change' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.change') : 'CHANGE'}(%)
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.change') : 'CHANGE'} (%)</span>,
       key: 'change_24',
       cell: (row: Token) => (
         <span>
@@ -286,24 +244,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('volume')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting?.sort === 'volume' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.volume') : 'VOLUME'} (24H)
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.volume') : 'VOLUME'} (24H)</span>,
       key: 'volume_24h',
       cell: (row: Token) => (
         <span>
@@ -316,40 +261,31 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('market_cap')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting?.sort === 'market_cap' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting?.order} />
-              </div>
-            )}
-            <span className="uppercase whitespace-nowrap">Circulating MC</span>
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
-                  align="start"
-                  side="bottom"
-                >
-                  {
-                    ' Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
-                  }
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </button>
+        <span className="flex">
+          <span className="uppercase whitespace-nowrap">Circulating MC</span>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span>
+                  <Question className="w-4 h-4 fill-current ml-1" />
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
+                align="start"
+                side="bottom"
+              >
+                {
+                  'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
+                }
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </span>
       ),
       key: 'market_cap',
@@ -364,6 +300,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (

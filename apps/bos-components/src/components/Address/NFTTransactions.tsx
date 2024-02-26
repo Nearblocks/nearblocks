@@ -276,51 +276,7 @@ export default function (props: Props) {
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
-      header: (
-        <Popover.Root>
-          <Popover.Trigger
-            asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
-          >
-            <button className="IconButton" aria-label="Update dimensions">
-              Affected
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </Popover.Trigger>
-          <Popover.Content
-            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
-            sideOffset={5}
-          >
-            <input
-              name="from"
-              value={filters ? filters?.from : ''}
-              onChange={onInputChange}
-              placeholder={
-                t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
-              }
-              className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
-            />
-            <div className="flex">
-              <button
-                type="submit"
-                onClick={(e) => onFilter(e, 'from')}
-                className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
-              >
-                <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                {t ? t('txns:filter.filter') : 'Filter'}
-              </button>
-              <button
-                name="from"
-                type="button"
-                onClick={() => onClear('from')}
-                className="flex-1 rounded bg-gray-300 text-xs h-7"
-              >
-                {t ? t('txns:filter.clear') : 'Clear'}
-              </button>
-            </div>
-          </Popover.Content>
-        </Popover.Root>
-      ),
+      header: <>Affected</>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => (
         <>
@@ -354,29 +310,31 @@ export default function (props: Props) {
         </>
       ),
       tdClassName: 'px-5 py-4 text-sm text-nearblue-600  font-medium',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
-    // {
-    //   header: '',
-    //   key: 'token_old_owner_account_id',
-    //   cell: (row: TransactionInfo) => (
-    //     <>
-    //       {row.token_old_owner_account_id === row.token_new_owner_account_id ? (
-    //         <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
-    //           {t ? t('txns:txnSelf') : 'Self'}
-    //         </span>
-    //       ) : id === row.token_old_owner_account_id ? (
-    //         <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
-    //           {t ? t('txns:txnOut') : 'OUT'}
-    //         </span>
-    //       ) : (
-    //         <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
-    //           {t ? t('txns:txnIn') : 'IN'}
-    //         </span>
-    //       )}
-    //     </>
-    //   ),
-    //   tdClassName: 'text-center',
-    // },
+    {
+      header: '',
+      key: '',
+      cell: (row: TransactionInfo) => (
+        <>
+          {row.involved_account_id === row.affected_account_id ? (
+            <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 text-white text-xs font-semibold">
+              {t ? t('txns:txnSelf') : 'SELF'}
+            </span>
+          ) : Number(row?.delta_amount) < 0 ? (
+            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 text-yellow-700 text-xs font-semibold">
+              {t ? t('txns:txnOut') : 'OUT'}
+            </span>
+          ) : (
+            <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen text-white text-xs font-semibold">
+              {t ? t('txns:txnIn') : 'IN'}
+            </span>
+          )}
+        </>
+      ),
+      tdClassName: 'text-center',
+    },
     {
       header: (
         <Popover.Root>
@@ -394,8 +352,8 @@ export default function (props: Props) {
             sideOffset={5}
           >
             <input
-              name="to"
-              value={filters ? filters?.to : ''}
+              name="involved"
+              value={filters ? filters?.involved : ''}
               onChange={onInputChange}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
@@ -405,16 +363,16 @@ export default function (props: Props) {
             <div className="flex">
               <button
                 type="submit"
-                onClick={(e) => onFilter(e, 'to')}
+                onClick={(e) => onFilter(e, 'involved')}
                 className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
               >
                 <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                 {t ? t('txns:filter.filter') : 'Filter'}
               </button>
               <button
-                name="to"
+                name="involved"
                 type="button"
-                onClick={() => onClear('to')}
+                onClick={() => onClear('involved')}
                 className="flex-1 rounded bg-gray-300 text-xs h-7"
               >
                 {t ? t('txns:filter.clear') : 'Clear'}
