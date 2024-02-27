@@ -20,13 +20,13 @@
   "dependencies": {
     "@sentry/node": "7.74.1",
     "big.js": "6.2.1",
-    "brotli-wasm": "2.0.1",
     "cors": "2.8.5",
     "csv-stringify": "6.4.4",
     "dayjs": "1.11.10",
     "envalid": "8.0.0",
     "express": "4.18.2",
     "express-jsdoc-swagger": "1.8.0",
+    "fzstd": "0.1.0",
     "geoip-lite": "1.4.9",
     "helmet": "7.1.0",
     "ioredis": "5.3.2",
@@ -42,7 +42,6 @@
     "postgres": "3.4.3",
     "query-string": "8.1.0",
     "rate-limiter-flexible": "3.0.4",
-    "wasm-walrus-tools": "AhaLabs/wasm-walrus-tools",
     "zod": "3.22.4"
   },
   "devDependencies": {

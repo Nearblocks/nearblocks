@@ -1,4 +1,5 @@
 import { providers } from 'near-api-js';
+import { QueryResponseKind } from 'near-api-js/lib/providers/provider.js';
 
 import config from '#config';
 
@@ -31,12 +32,12 @@ export const viewCode = async (contract: string) =>
     request_type: 'view_code',
   });
 
-export const callFunction = async (
+export const callFunction = async <T extends QueryResponseKind>(
   contract: string,
   method: string,
   args: unknown = {},
 ) =>
-  provider.query({
+  provider.query<T>({
     account_id: contract,
     args_base64: bytesStringify(args),
     finality: 'final',
