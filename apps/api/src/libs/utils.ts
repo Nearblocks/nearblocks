@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createRequire } from 'module';
-
 import Big from 'big.js';
+import { decompress } from 'fzstd';
 import { format } from 'numerable';
-import { readCustomSection } from 'wasm-walrus-tools';
 
 import logger from '#libs/logger';
 import Sentry from '#libs/sentry';
 import { ValidationError } from '#types/types';
 
-const require = createRequire(import.meta.url);
-const brotli = require('brotli-wasm');
+import { callFunction } from './near.js';
+
+type ABIResponse = {
+  block_hash: string;
+  block_height: number;
+  result: Uint8Array;
+};
 
 Big.NE = -18;
 const MS_PER_NS = Big(10).pow(6);
@@ -107,37 +110,9 @@ export const sortByBNComparison = (aValue?: string, bValue?: string) => {
   return 0;
 };
 
-export const raenSchema = async (code: string) => {
-  const wasm = Buffer.from(code, 'base64');
-  const json = await readCustomSection(wasm, 'json');
+export const abiSchema = async (contract: string) => {
+  const response: ABIResponse = await callFunction(contract, '__contract_abi');
+  const decompressed = decompress(new Uint8Array(response.result));
 
-  if (!json) return null;
-
-  let urlOrData = Buffer.from(json.slice(0, 20)).toString('utf8');
-
-  if (urlOrData.startsWith('https://')) {
-    return fetchRaenSchema(Buffer.from(json).toString('utf8'));
-  }
-
-  const decompressed = brotli.decompress(json);
-
-  if (!decompressed) return null;
-
-  urlOrData = Buffer.from(decompressed).toString('utf8');
-
-  if (urlOrData.startsWith('https://')) {
-    return fetchRaenSchema(Buffer.from(json).toString('utf8'));
-  }
-
-  return JSON.parse(urlOrData);
-};
-
-export const fetchRaenSchema = async (urlOrData: string) => {
-  const response = await fetch(urlOrData);
-
-  if (response.ok) {
-    return response.json();
-  }
-
-  return null;
+  return JSON.parse(Buffer.from(decompressed).toString());
 };

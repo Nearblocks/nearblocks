@@ -17,7 +17,7 @@ import {
   Parse,
   Tokens,
 } from '#libs/schema/account';
-import { keyBinder, raenSchema } from '#libs/utils';
+import { abiSchema, keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const EXPIRY = 60; // 1 mins
@@ -140,11 +140,9 @@ const parse = catchAsync(
     }
 
     try {
-      if (code?.code_base64) {
-        schema = await raenSchema(code.code_base64);
-      }
+      schema = await abiSchema(account);
     } catch (error) {
-      logger.error({ contractParseError: error });
+      logger.error({ abiSchemaError: error });
     }
 
     return res.status(200).json({ contract: [{ contract, schema }] });
