@@ -18,9 +18,8 @@ const routes = (app: Router) => {
    * @summary Get top nfts by pagination
    * @tags NFTs
    * @param {string} search.query - search keyword
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
-   * @param {string} sort.query - json:{"enum": ["name", "tokens", "txns_day", "txns_3days", "txns", "holders"], "default": "txns_day"}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
    */
@@ -39,7 +38,7 @@ const routes = (app: Router) => {
    * GET /v1/nfts/txns
    * @summary Get nft txns by pagination
    * @tags NFTs
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @return 200 - success response
    */
@@ -67,12 +66,8 @@ const routes = (app: Router) => {
    * @summary Get nft txns by pagination
    * @tags NFTs
    * @param {string} contract.path.required - contract id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
    */
   route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
@@ -82,9 +77,6 @@ const routes = (app: Router) => {
    * @summary Get nft txns count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} event.query - event kind
    * @return 200 - success response
    */
   route.get(
@@ -98,9 +90,8 @@ const routes = (app: Router) => {
    * @summary Get nft holders by pagination
    * @tags NFTs
    * @param {string} contract.path.required - contract id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
@@ -124,9 +115,8 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
    */
   route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
@@ -165,12 +155,8 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
    */
   route.get(
@@ -185,9 +171,6 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} event.query - event kind
    * @return 200 - success response
    */
   route.get(

@@ -8,17 +8,18 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     data: any,
     options: {
       width?: number;
-      format?: string;
+      format: string;
     },
   ) {
-    const { width = 16, format = 'default' } = options;
+    const { width, format } = options;
 
     let result = '';
     let line = '';
+    const w = width ? width : 16;
 
     for (let i = 0; i < data.length; i++) {
-      if (i > 0 && i % width === 0) {
-        result += formatLine(line, i - width, format) + '\n';
+      if (i > 0 && i % w === 0) {
+        result += formatLine(line, i - w, format) + '\n';
         line = '';
       }
 
@@ -28,7 +29,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
 
     if (line.length > 0) {
       result +=
-        formatLine(line, data.length - (data.length % width), format) + '\n';
+        formatLine(line, data.length - (data.length % w), format) + '\n';
     }
 
     return result;
@@ -42,7 +43,11 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
 
     try {
       const parsed = JSON.parse(decoded.toString());
-      pretty = JSON.stringify(parsed, null, 2);
+      if (parsed) {
+        pretty = JSON.stringify(parsed, null, 2);
+      } else {
+        pretty = hexDump(decoded, { format: 'twos' });
+      }
     } catch {
       pretty = hexDump(decoded, { format: 'twos' });
     }

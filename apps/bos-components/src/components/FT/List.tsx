@@ -81,7 +81,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           }) => {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
-              setTotalCount(resp?.count | 0);
+              setTotalCount(resp?.count ?? 0);
             }
           },
         )
@@ -93,7 +93,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
       asyncFetch(
-        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${page}&per_page=25`,
+        `${config?.backendUrl}fts?${queryParams}order=${sqs?.order}&sort=${sqs?.sort}&page=${page}&per_page=50`,
         {
           method: 'GET',
           headers: {
@@ -179,22 +179,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('name')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'name' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.token') : 'TOKEN'}
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.token') : 'TOKEN'}</span>,
       key: 'name',
       cell: (row: Token) => (
         <>
@@ -202,14 +187,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             <TokenImage
               src={row?.icon}
               alt={row?.name}
-              appUrl={config.appUrl}
+              appUrl={config?.appUrl}
               className="w-5 h-5 mr-2"
             />
-            <a href={`/token/${row.contract}`} className="hover:no-underline">
+            <a href={`/token/${row?.contract}`} className="hover:no-underline">
               <a className=" text-green-500 hover:no-underline">
-                <span className="truncate max-w-[200px] mr-1">{row.name}</span>
+                <span className="truncate max-w-[200px] mr-1">{row?.name}</span>
                 <span className="text-nearblue-700 truncate max-w-[80px]">
-                  {row.symbol}
+                  {row?.symbol}
                 </span>
               </a>
             </a>
@@ -218,152 +203,105 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 w-80  align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('price')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'price' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.price') : 'PRICE'}
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.price') : 'PRICE'}</span>,
       key: 'price',
       cell: (row: Token) => (
         <span>
-          {row.price === null ? (
+          {row?.price === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            ` $${localFormat(row.price)}`
+            ` $${localFormat(row?.price)}`
           )}
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('change')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'change' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.change') : 'CHANGE'}(%)
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.change') : 'CHANGE'} (%)</span>,
       key: 'change_24',
       cell: (row: Token) => (
         <span>
-          {row.change_24 === null ? (
+          {row?.change_24 === null ? (
             <span className="text-xs">N/A</span>
-          ) : Number(row.change_24) > 0 ? (
+          ) : Number(row?.change_24) > 0 ? (
             <div className="text-neargreen flex flex-row items-center">
-              <ArrowUp />+{dollarFormat(row.change_24)}%
+              <ArrowUp />+{dollarFormat(row?.change_24)}%
             </div>
           ) : (
             <div className="text-red-500 flex flex-row items-center">
               <ArrowDown className="h-3 w-3 fill-current mr-1" />
-              {row.change_24 ? dollarFormat(row.change_24) + '%' : ''}
+              {row?.change_24 ? dollarFormat(row?.change_24) + '%' : ''}
             </div>
           )}
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('volume')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting.sort === 'volume' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            {t ? t('token:fts.top.volume') : 'VOLUME'} (24H)
-          </button>
-        </span>
-      ),
+      header: <span>{t ? t('token:fts.top.volume') : 'VOLUME'} (24H)</span>,
       key: 'volume_24h',
       cell: (row: Token) => (
         <span>
-          {row.volume_24h === null ? (
+          {row?.volume_24h === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            `$${dollarNonCentFormat(row.volume_24h)}`
+            `$${dollarNonCentFormat(row?.volume_24h)}`
           )}
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('market_cap')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'market_cap' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            <span className="uppercase whitespace-nowrap">Circulating MC</span>
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
-                  align="start"
-                  side="bottom"
-                >
-                  {
-                    ' Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
-                  }
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          </button>
+        <span className="flex">
+          <span className="uppercase whitespace-nowrap">Circulating MC</span>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span>
+                  <Question className="w-4 h-4 fill-current ml-1" />
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
+                align="start"
+                side="bottom"
+              >
+                {
+                  'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
+                }
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </span>
       ),
       key: 'market_cap',
       cell: (row: Token) => (
         <span>
-          {row.market_cap === null ? (
+          {row?.market_cap === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            `$${dollarNonCentFormat(row.market_cap)}`
+            `$${dollarNonCentFormat(row?.market_cap)}`
           )}
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -374,9 +312,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             onClick={() => onOrder('onchain_market_cap')}
             className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
           >
-            {sorting.sort === 'onchain_market_cap' && (
+            {sorting?.sort === 'onchain_market_cap' && (
               <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
+                <SortIcon order={sorting?.order} />
               </div>
             )}
             <span className="uppercase whitespace-nowrap">On-Chain MC</span>
@@ -404,40 +342,44 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       key: 'onchain_market_cap',
       cell: (row: Token) => (
         <span>
-          {row.onchain_market_cap === null ? (
+          {row?.onchain_market_cap === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            `$${dollarNonCentFormat(row.onchain_market_cap)}`
+            `$${
+              row?.onchain_market_cap
+                ? dollarNonCentFormat(row?.onchain_market_cap)
+                : row?.onchain_market_cap ?? ''
+            }`
           )}
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
     },
-    {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('holders')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'holders' && (
-              <div className="text-nearblue-600 font-semibold">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            Holders
-          </button>{' '}
-        </span>
-      ),
-      key: 'holders',
-      cell: (row: Token) => (
-        <span>{row.holders ? localFormat(row.holders) : ''}</span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-    },
+    // {
+    //   header: (
+    //     <span>
+    //       <button
+    //         type="button"
+    //         onClick={() => onOrder('holders')}
+    //         className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
+    //       >
+    //         {sorting?.sort === 'holders' && (
+    //           <div className="text-nearblue-600 font-semibold">
+    //             <SortIcon order={sorting?.order} />
+    //           </div>
+    //         )}
+    //         Holders
+    //       </button>{' '}
+    //     </span>
+    //   ),
+    //   key: 'holders',
+    //   cell: (row: Token) => (
+    //     <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
+    //   ),
+    //   tdClassName:
+    //     'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+    // },
   ];
 
   return (
@@ -470,11 +412,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                 <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
                   {searchResults.map((token) => (
                     <div
-                      key={token.contract}
+                      key={token?.contract}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                     >
                       <a
-                        href={`/token/${token.contract}`}
+                        href={`/token/${token?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="hover:no-underline flex items-center my-1 whitespace-nowrap ">
@@ -482,14 +424,14 @@ export default function ({ t, network, currentPage, setPage }: Props) {
                             <TokenImage
                               src={token?.icon}
                               alt={token?.name}
-                              appUrl={config.appUrl}
+                              appUrl={config?.appUrl}
                               className="w-5 h-5"
                             />
                           </div>
                           <p className="font-semibold text-sm truncate">
-                            {token.name}
+                            {token?.name}
                             <span className="text-nearblue-700 ml-2">
-                              {token.symbol}
+                              {token?.symbol}
                             </span>
                           </p>
                         </a>
@@ -503,7 +445,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </div>
       </div>
       <Widget
-        src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: tokens[currentPage],
@@ -511,7 +453,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           isPagination: true,
           count: totalCount,
           page: currentPage,
-          limit: 25,
+          limit: 50,
           pageLimit: 200,
           setPage: setPage,
           Error: errorMessage,

@@ -6,7 +6,7 @@ interface Props {
 const Overview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
     return (
-      <div ref={ref} className={`w-full pr-6 z-50 ${className}`}>
+      <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
           <div className="w-80 max-w-xs px-3 py-5">
             <Skeleton className="h-7" />

@@ -24,7 +24,7 @@ const Footer = () => {
                     layout="fixed"
                   />
                 </div>
-                <p className="max-w-xs text-black text-xs leading-6 pb-6">
+                <p className="max-w-xs text-black text-xs leading-6 pb-3">
                   {t('footer.description')}
                 </p>
                 <div>
@@ -180,7 +180,7 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex justify-between border-t border-gray-200">
-              <p className="text-green-500 text-xs py-4 text-center ">
+              <p className="text-green-500 text-xs pb-1 pt-6 text-center ">
                 NearBlocks © {currentDate.getFullYear()}
               </p>
             </div>

@@ -82,7 +82,7 @@ export default function ({
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
-              setTotalCount(resp?.count);
+              setTotalCount(resp?.count ?? 0);
             }
           },
         )
@@ -148,14 +148,16 @@ export default function ({
   ): void => {
     e.preventDefault();
 
-    if (name === 'type') {
-      if (isAction(filterValue)) {
-        handleFilter('action', filterValue);
+    if (filterValue !== null && filterValue !== undefined) {
+      if (name === 'type') {
+        if (isAction(filterValue)) {
+          handleFilter('action', filterValue);
+        } else {
+          handleFilter('method', filterValue);
+        }
       } else {
-        handleFilter('method', filterValue);
+        handleFilter(name, filterValue);
       }
-    } else {
-      handleFilter(name, filterValue);
     }
   };
 
@@ -193,7 +195,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
                     href={`/txns/${row.transaction_hash}`}
                     className="hover:no-underline"
@@ -215,9 +217,9 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
@@ -232,7 +234,7 @@ export default function ({
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
             sideOffset={5}
           >
             <div className="flex flex-col">
@@ -297,7 +299,7 @@ export default function ({
         <span>
           {row.actions_agg?.deposit
             ? yoctoToNear(row.actions_agg?.deposit, true)
-            : ''}{' '}
+            : row.actions_agg?.deposit ?? ''}{' '}
           Ⓝ
         </span>
       ),
@@ -333,7 +335,7 @@ export default function ({
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
             sideOffset={5}
           >
             <input
@@ -372,7 +374,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
                     href={`/address/${row.predecessor_account_id}`}
                     className="hover:no-underline"
@@ -394,8 +396,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span></span>,
@@ -429,7 +430,7 @@ export default function ({
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
             sideOffset={5}
           >
             <input
@@ -468,7 +469,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
                     href={`/address/${row.receiver_account_id}`}
                     className="hover:no-underline"
@@ -490,8 +491,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,

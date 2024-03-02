@@ -134,22 +134,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[1px]',
     },
     {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('name')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'name' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            Token
-          </button>
-        </span>
-      ),
+      header: <span>Token</span>,
       key: 'name',
       cell: (row: Token) => (
         <>
@@ -157,17 +142,19 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             <TokenImage
               src={row?.icon}
               alt={row?.name}
-              appUrl={config.appUrl}
+              appUrl={config?.appUrl}
               className="w-5 h-5 mr-2"
             />
             <a
-              href={`/nft-token/${row.contract}`}
+              href={`/nft-token/${row?.contract}`}
               className="hover:no-underline"
             >
-              <a className=" text-green-500 hover:no-underline">
-                <span className="truncate max-w-[200px] mr-1">{row.name}</span>
-                <span className="text-nearblue-700 truncate max-w-[80px]">
-                  {row.symbol}
+              <a className="flex text-green-500 hover:no-underline">
+                <span className="inline-block truncate max-w-[200px] mr-1">
+                  {row?.name}
+                </span>
+                <span className="text-nearblue-700 inline-block truncate max-w-[80px]">
+                  {row?.symbol}
                 </span>
               </a>
             </a>
@@ -177,33 +164,31 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm  text-nearblue-600 align-top',
       thClassName:
-        'text-left text-xs font-semibold text-gray-500 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('tokens')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row"
-          >
-            {sorting.sort === 'tokens' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            Tokens
-          </button>
-        </span>
-      ),
+      header: <span>Tokens</span>,
       key: 'tokens',
       cell: (row: Token) => (
-        <span>{row.tokens ? localFormat(row.tokens) : ''}</span>
+        <span>
+          {row?.tokens ? localFormat(row?.tokens) : row?.tokens ?? ''}
+        </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
+    },
+    {
+      header: <span>Holders</span>,
+      key: 'holders',
+      cell: (row: Token) => (
+        <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
+      ),
+      tdClassName:
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
     },
     {
       header: (
@@ -224,85 +209,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       ),
       key: 'change_24',
       cell: (row: Token) => (
-        <span>{row.transfers_day ? localFormat(row.transfers_day) : ''}</span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('txns_3days')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting.sort === 'txns_3days' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            Transfers (3D)
-          </button>
-        </span>
-      ),
-      key: 'transfers_3days',
-      cell: (row: Token) => (
-        <span>
-          {row.transfers_3days ? localFormat(row.transfers_3days) : ''}
-        </span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          <button
-            type="button"
-            onClick={() => onOrder('txns')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting.sort === 'txns' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            All Transfers
-          </button>
-        </span>
-      ),
-      key: 'transfers',
-      cell: (row: Token) => (
-        <span>{row.transfers ? localFormat(row.transfers) : ''}</span>
-      ),
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
-      thClassName: 'w-[160px]',
-    },
-    {
-      header: (
-        <span>
-          {' '}
-          <button
-            type="button"
-            onClick={() => onOrder('holders')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
-          >
-            {sorting.sort === 'holders' && (
-              <div className="text-nearblue-600">
-                <SortIcon order={sorting.order} />
-              </div>
-            )}
-            Holders
-          </button>
-        </span>
-      ),
-      key: 'holders',
-      cell: (row: Token) => (
-        <span>{row.holders ? localFormat(row.holders) : ''}</span>
+        <span>{row?.transfers_day ? localFormat(row?.transfers_day) : ''}</span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
@@ -312,7 +219,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
 
   const debouncedSearch = useMemo(() => {
     return debounce(500, (value: string) => {
-      if (!value || value.trim() === '') {
+      if (!value || value?.trim() === '') {
         setSearchResults([]);
         return;
       }
@@ -363,23 +270,23 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                   <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
                     {searchResults.map((token) => (
                       <div
-                        key={token.contract}
+                        key={token?.contract}
                         className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <a href={`/token/${token.contract}`}>
+                        <a href={`/token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage
                                 src={token?.icon}
                                 alt={token?.name}
-                                appUrl={config.appUrl}
+                                appUrl={config?.appUrl}
                                 className="w-5 h-5"
                               />
                             </div>
                             <p className="font-semibold text-sm truncate">
-                              {token.name}
+                              {token?.name}
                               <span className="text-nearblue-700 ml-2">
-                                {token.symbol}
+                                {token?.symbol}
                               </span>
                             </p>
                           </a>
@@ -393,7 +300,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
           </div>
         </div>
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

@@ -84,7 +84,7 @@ export const storeChunkBalance = async (
   await retry(async () => {
     await knex('balance_events')
       .insert(changes)
-      .onConflict(['event_index', 'block_timestamp'])
+      .onConflict(['event_index'])
       .ignore();
   });
 };

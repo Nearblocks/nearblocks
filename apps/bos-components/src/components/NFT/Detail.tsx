@@ -77,7 +77,7 @@ export default function ({ network, t, id, tid }: Props) {
           <div className="bg-white border rounded-xl soft-shadow p-3 aspect-square">
             {
               <Widget
-                src={`${config.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
                 props={{
                   base: token?.nft?.base_uri,
                   media: token?.media,
@@ -112,7 +112,7 @@ export default function ({ network, t, id, tid }: Props) {
                       src={token?.nft?.icon}
                       alt={token?.nft?.name}
                       className="w-5 h-5"
-                      appUrl={config.appUrl}
+                      appUrl={config?.appUrl}
                     />
                   </span>
                   <span>{token?.nft?.name}</span>
@@ -133,7 +133,7 @@ export default function ({ network, t, id, tid }: Props) {
                   className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 border-b focus:outline-none p-3"
                 >
                   <h2>Details</h2>
-                  {indices.includes(1) ? (
+                  {indices?.includes(1) ? (
                     <ArrowUp className="fill-current" />
                   ) : (
                     <ArrowDown className="fill-current" />
@@ -165,11 +165,11 @@ export default function ({ network, t, id, tid }: Props) {
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
                         <a
-                          href={`/address/${token.asset.owner}`}
+                          href={`/address/${token?.asset?.owner}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green hover:no-underline">
-                            {shortenAddress(token.asset.owner)}
+                            {shortenAddress(token?.asset?.owner ?? '')}
                           </a>
                         </a>
                       </div>
@@ -198,7 +198,7 @@ export default function ({ network, t, id, tid }: Props) {
                     <div className="w-full xl:w-3/4 word-break">
                       <a href={`/address/${id}`} className="hover:no-underline">
                         <a className="text-green hover:no-underline">
-                          {shortenAddress(id)}
+                          {shortenAddress(id ?? '')}
                         </a>
                       </a>
                     </div>

@@ -49,18 +49,24 @@ const TokenHoldings = (props: Props) => {
   }
   return (
     <Select.Root>
-      <Select.Trigger className="w-96 h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
+      <Select.Trigger className="w-full h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
-          ${props.ft?.amount !== null ? dollarFormat(props.ft?.amount) : ''}
+          {props.ft?.amount
+            ? '$' + dollarFormat(props.ft?.amount)
+            : '$' + (props.ft?.amount ?? '')}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
         </span>
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
       </Select.Trigger>
-      <Select.Content>
-        <ScrollArea.Root className="w-96 h-72  overflow-hidden rounded-b-xl soft-shadow bg-white">
-          <ScrollArea.Viewport className="w-full h-full border z-50 pb-2">
+      <Select.Content
+        position="popper"
+        sideOffset={5}
+        className="SelectContent"
+      >
+        <ScrollArea.Root className="overflow-hidden rounded-b-xl soft-shadow bg-white">
+          <ScrollArea.Viewport className="border z-50 pb-2">
             <div className="max-h-60">
               {props.ft?.tokens?.length > 0 && (
                 <>
@@ -72,9 +78,9 @@ const TokenHoldings = (props: Props) => {
                   </div>
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {props.ft?.tokens?.map((token, index) => (
-                      <div key={token.contract}>
+                      <div key={token?.contract}>
                         <a
-                          href={`/token/${token.contract}?a=${props.id}`}
+                          href={`/token/${token?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
                           <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
@@ -83,7 +89,7 @@ const TokenHoldings = (props: Props) => {
                                 <div className="flex mr-1">
                                   <img
                                     src={
-                                      token.ft_metas?.icon ||
+                                      token?.ft_metas?.icon ||
                                       `${props.appUrl}images/tokenplaceholder.svg`
                                     }
                                     alt={token.ft_metas?.name}
@@ -91,25 +97,34 @@ const TokenHoldings = (props: Props) => {
                                   />
                                 </div>
                                 <span>
-                                  {token.ft_metas.name
+                                  {token?.ft_metas?.name
                                     ? truncateString(
-                                        token.ft_metas?.name,
+                                        token?.ft_metas?.name,
                                         15,
                                         '...',
                                       )
                                     : ''}
-                                  ({token.ft_metas?.symbol})
+                                  ({token?.ft_metas?.symbol})
                                 </span>
                               </div>
                               <div className="text-gray-400 flex items-center mt-1">
-                                {localFormat(token?.rpcAmount)}
+                                {token?.rpcAmount
+                                  ? localFormat(token?.rpcAmount)
+                                  : token?.rpcAmount ?? ''}
                               </div>
                             </div>
-                            {token.ft_metas?.price && (
+                            {token?.ft_metas?.price && (
                               <div className="text-right">
-                                <div>${dollarFormat(token.amountUsd)}</div>
+                                <div>
+                                  {token?.amountUsd
+                                    ? '$' + dollarFormat(token?.amountUsd)
+                                    : '$' + (token.amountUsd ?? '')}
+                                </div>
                                 <div className="text-gray-400">
-                                  @{Big(token.ft_metas?.price).toString()}
+                                  {token?.ft_metas?.price
+                                    ? '@' +
+                                      Big(token?.ft_metas?.price).toString()
+                                    : '@' + (token?.ft_metas?.price ?? '')}
                                 </div>
                               </div>
                             )}
@@ -128,9 +143,9 @@ const TokenHoldings = (props: Props) => {
                   </div>
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {nfts.map((nft) => (
-                      <div key={nft.contract}>
+                      <div key={nft?.contract}>
                         <a
-                          href={`/nft-token/${nft.contract}?a=${props.id}`}
+                          href={`/nft-token/${nft?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
                           <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
@@ -139,26 +154,28 @@ const TokenHoldings = (props: Props) => {
                                 <div className="flex mr-1">
                                   <img
                                     src={
-                                      nft.nft_meta?.icon ||
+                                      nft?.nft_meta?.icon ||
                                       `${props.appUrl}images/tokenplaceholder.svg`
                                     }
-                                    alt={nft.nft_meta?.name}
+                                    alt={nft?.nft_meta?.name}
                                     className="w-4 h-4"
                                   />
                                 </div>
                                 <span>
-                                  {nft.nft_meta?.name
+                                  {nft?.nft_meta?.name
                                     ? truncateString(
-                                        nft.nft_meta?.name,
+                                        nft?.nft_meta?.name,
                                         15,
                                         '...',
                                       )
-                                    : ''}
-                                  ({nft.nft_meta?.symbol})
+                                    : nft?.nft_meta?.name ?? ''}
+                                  ({nft?.nft_meta?.symbol})
                                 </span>
                               </div>
                               <div className="text-gray-400 flex items-center mt-1">
-                                {localFormat(nft.quantity)}
+                                {nft?.quantity
+                                  ? localFormat(nft?.quantity)
+                                  : nft?.quantity ?? ''}
                               </div>
                             </div>
                           </a>

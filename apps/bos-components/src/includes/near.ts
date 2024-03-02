@@ -21,6 +21,7 @@ import {
   ParsedReceipt,
   NestedReceiptWithOutcome,
   FailedToFindReceipt,
+  OutcomeInfo,
 } from '@/includes/types';
 
 export function encodeArgs(args: object) {
@@ -193,12 +194,12 @@ export function txnErrorMessage(txn: RPCTransactionInfo) {
   return null;
 }
 
-export function formatLine(line: any, offset: any, format: any) {
+export function formatLine(line: string, offset: number, format: string) {
   let result = `${offset.toString(16).padStart(8, '0')}  `;
 
   const hexValues = line.match(/[0-9a-fA-F]{2}/g) || [];
 
-  hexValues.forEach((byte: any, index: any) => {
+  hexValues.forEach((byte: string, index: number) => {
     if (index > 0 && index % 4 === 0) {
       result += ' ';
     }
@@ -209,7 +210,7 @@ export function formatLine(line: any, offset: any, format: any) {
     result = result.replace(/(.{4})/g, '$1 ');
   } else if (format === 'default') {
     result += ` ${String.fromCharCode(
-      ...hexValues.map((b: any) => parseInt(b, 16)),
+      ...hexValues.map((b: string) => parseInt(b, 16)),
     )}`;
   }
 
@@ -238,8 +239,8 @@ export function collectNestedReceiptWithOutcomeOld(
 
 export function parseReceipt(
   receipt: ReceiptView | ReceiptsInfo | undefined,
-  outcome: any,
-  transaction: any,
+  outcome: OutcomeInfo,
+  transaction: NonDelegateActionView,
 ) {
   if (!receipt) {
     return {
@@ -467,9 +468,7 @@ function mapRpcFunctionCallError(error: RPCFunctionCallError) {
   }
   return UNKNOWN_ERROR;
 }
-function mapRpcNewReceiptValidationError(
-  error: RPCNewReceiptValidationError | any,
-) {
+function mapRpcNewReceiptValidationError(error: RPCNewReceiptValidationError) {
   const UNKNOWN_ERROR = { type: 'unknown' };
   if ('InvalidPredecessorId' in error) {
     return {
@@ -791,7 +790,7 @@ export function mapRpcReceiptStatus(status: ExecutionStatusView) {
   return { type: 'unknown' };
 }
 
-export function mapRpcActionToAction1(rpcAction: NonDelegateActionView | any) {
+export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
   if (typeof rpcAction === 'object' && 'Delegate' in rpcAction) {
     return {
       kind: 'delegateAction',
@@ -810,7 +809,7 @@ export function mapRpcActionToAction1(rpcAction: NonDelegateActionView | any) {
   return mapNonDelegateRpcActionToAction(rpcAction);
 }
 
-export function parseOutcomeOld(outcome: ParseOutcomeInfo | any) {
+export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
   return {
     blockHash: outcome.block_hash,
     tokensBurnt: outcome.outcome.tokens_burnt,

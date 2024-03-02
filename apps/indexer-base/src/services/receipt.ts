@@ -64,7 +64,7 @@ const storeChunkReceipts = async (
     if ('Action' in receipt.receipt) {
       receipt.receipt.Action.outputDataReceivers.forEach((receiver) => {
         receiptOutputData.push(
-          getActionReceiptOutputData(blockTimestamp, receiptOrDataId, receiver),
+          getActionReceiptOutputData(receiptOrDataId, receiver),
         );
       });
 
@@ -98,7 +98,7 @@ const storeChunkReceipts = async (
     await retry(async () => {
       await knex('receipts')
         .insert(receiptData)
-        .onConflict(['receipt_id', 'included_in_block_timestamp'])
+        .onConflict(['receipt_id'])
         .ignore();
     });
   }
@@ -107,11 +107,7 @@ const storeChunkReceipts = async (
     await retry(async () => {
       await knex('action_receipt_actions')
         .insert(receiptActionsData)
-        .onConflict([
-          'receipt_id',
-          'index_in_action_receipt',
-          'receipt_included_in_block_timestamp',
-        ])
+        .onConflict(['receipt_id', 'index_in_action_receipt'])
         .ignore();
     });
   }
@@ -120,11 +116,7 @@ const storeChunkReceipts = async (
     await retry(async () => {
       await knex('action_receipt_output_data')
         .insert(receiptOutputData)
-        .onConflict([
-          'output_data_id',
-          'output_from_receipt_id',
-          'receipt_included_in_block_timestamp',
-        ])
+        .onConflict(['output_data_id', 'output_from_receipt_id'])
         .ignore();
     });
   }
@@ -272,12 +264,10 @@ const getActionReceiptActionData = (
 };
 
 const getActionReceiptOutputData = (
-  blockTimestamp: string,
   receiptId: string,
   dataReceiver: types.DataReceiver,
 ): ActionReceiptOutputData => ({
   output_data_id: dataReceiver.dataId,
   output_from_receipt_id: receiptId,
-  receipt_included_in_block_timestamp: blockTimestamp,
   receiver_account_id: dataReceiver.receiverId,
 });

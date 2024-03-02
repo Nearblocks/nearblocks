@@ -256,7 +256,7 @@ export default function ({ network, t, id }: Props) {
     }
 
     function loadBalances() {
-      const fts = inventoryData.fts;
+      const fts = inventoryData?.fts;
       if (!fts?.length) {
         if (fts?.length === 0) setLoading(false);
         return;
@@ -270,27 +270,27 @@ export default function ({ network, t, id }: Props) {
 
       Promise.all(
         fts.map((ft: FtsInfo) => {
-          return ftBalanceOf(ft.contract, id).then((rslt: string) => {
+          return ftBalanceOf(ft?.contract, id).then((rslt: string) => {
             return { ...ft, amount: rslt };
           });
         }),
       ).then((results: FtsInfo[]) => {
         results.forEach((rslt: FtsInfo) => {
           const ftrslt = rslt;
-          const amount = rslt?.amount ? rslt?.amount : '';
+          const amount = rslt?.amount ?? 0;
 
           let sum = Big(0);
 
           let rpcAmount = Big(0);
 
-          if (amount) {
-            rpcAmount = ftrslt.ft_metas?.decimals
-              ? Big(amount).div(Big(10).pow(ftrslt.ft_metas?.decimals))
+          if (Number(amount)) {
+            rpcAmount = ftrslt?.ft_metas?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt?.ft_metas?.decimals))
               : 0;
           }
 
-          if (ftrslt.ft_metas?.price) {
-            sum = rpcAmount.mul(Big(ftrslt.ft_metas?.price));
+          if (ftrslt?.ft_metas?.price) {
+            sum = rpcAmount.mul(Big(ftrslt?.ft_metas?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -405,8 +405,8 @@ export default function ({ network, t, id }: Props) {
             setKey({
               block_hash: resp.block_hash,
               block_height: resp.block_height,
-              keys: resp.keys,
-              hash: resp.hash,
+              keys: resp?.keys,
+              hash: resp?.hash,
             });
           },
         )
@@ -466,7 +466,7 @@ export default function ({ network, t, id }: Props) {
             )}
             {
               <Widget
-                src={`${config.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
                 props={{
                   id: id,
                   config: config,
@@ -485,10 +485,12 @@ export default function ({ network, t, id }: Props) {
               </h2>
               {tokenData?.name && (
                 <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
-                  <div className="truncate max-w-[110px]">{tokenData.name}</div>
-                  {tokenData.website && (
+                  <div className="truncate max-w-[110px]">
+                    {tokenData?.name}
+                  </div>
+                  {tokenData?.website && (
                     <a
-                      href={tokenData.website}
+                      href={tokenData?.website}
                       className="ml-1"
                       target="_blank"
                       rel="noopener noreferrer nofollow"
@@ -510,7 +512,7 @@ export default function ({ network, t, id }: Props) {
                   <div className="w-full md:w-3/4 break-words">
                     {accountData?.amount
                       ? yoctoToNear(accountData?.amount, true)
-                      : ''}{' '}
+                      : accountData?.amount ?? ''}{' '}
                     Ⓝ
                   </div>
                 )}
@@ -524,18 +526,18 @@ export default function ({ network, t, id }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {accountData.amount
+                      {accountData?.amount && statsData?.near_price
                         ? '$' +
                           fiatValue(
-                            yoctoToNear(accountData.amount, false),
-                            statsData.near_price,
+                            yoctoToNear(accountData?.amount, false),
+                            statsData?.near_price,
                           )
                         : ''}{' '}
                       <span className="text-xs">
                         (@ $
-                        {statsData.near_price
-                          ? dollarFormat(statsData.near_price)
-                          : ''}{' '}
+                        {statsData?.near_price
+                          ? dollarFormat(statsData?.near_price)
+                          : statsData?.near_price ?? ''}{' '}
                         / Ⓝ)
                       </span>
                     </div>
@@ -552,7 +554,7 @@ export default function ({ network, t, id }: Props) {
                     loading={loading}
                     ft={ft}
                     id={id}
-                    appUrl={config.appUrl}
+                    appUrl={config?.appUrl}
                   />
                 </div>
               </div>
@@ -578,7 +580,7 @@ export default function ({ network, t, id }: Props) {
                     <div className="w-full break-words xl:mt-0 mt-2">
                       {accountData?.locked
                         ? yoctoToNear(accountData?.locked, true) + ' Ⓝ'
-                        : ''}
+                        : accountData?.locked ?? ''}
                     </div>
                   )}
                 </div>
@@ -592,7 +594,7 @@ export default function ({ network, t, id }: Props) {
                     <div className="w-full break-words xl:mt-0 mt-2">
                       {accountData?.storage_usage
                         ? weight(accountData?.storage_usage)
-                        : ''}
+                        : accountData?.storage_usage ?? ''}
                     </div>
                   )}
                 </div>
@@ -655,7 +657,7 @@ export default function ({ network, t, id }: Props) {
                     >
                       <a className="text-green-500 hover:no-underline">
                         {shortenAddress(
-                          deploymentData.receipt_predecessor_account_id,
+                          deploymentData.receipt_predecessor_account_id ?? '',
                         )}
                       </a>
                     </a>
@@ -665,7 +667,7 @@ export default function ({ network, t, id }: Props) {
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
-                        {shortenAddress(deploymentData.transaction_hash)}
+                        {shortenAddress(deploymentData.transaction_hash ?? '')}
                       </a>
                     </a>
                   </div>
@@ -751,7 +753,7 @@ export default function ({ network, t, id }: Props) {
               <Tabs.Content value={tabs[0]}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.Transactions`}
+                    src={`${config?.ownerId}/widget/bos-components.components.Address.Transactions`}
                     props={{
                       network: network,
                       t: t,
@@ -766,7 +768,7 @@ export default function ({ network, t, id }: Props) {
               <Tabs.Content value={tabs[1]}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
+                    src={`${config?.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
                     props={{
                       network: network,
                       id: id,
@@ -781,7 +783,7 @@ export default function ({ network, t, id }: Props) {
               <Tabs.Content value={tabs[2]}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
+                    src={`${config?.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
                     props={{
                       network: network,
                       id: id,
@@ -796,7 +798,7 @@ export default function ({ network, t, id }: Props) {
               <Tabs.Content value={tabs[3]}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    src={`${config?.ownerId}/widget/bos-components.components.Address.AccessKeys`}
                     props={{
                       network: network,
                       id: id,

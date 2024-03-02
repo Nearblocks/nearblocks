@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Big from 'big.js';
+import { decompress } from 'fzstd';
 import { format } from 'numerable';
 
 import logger from '#libs/logger';
 import Sentry from '#libs/sentry';
 import { ValidationError } from '#types/types';
+
+import { callFunction } from './near.js';
+
+type ABIResponse = {
+  block_hash: string;
+  block_height: number;
+  result: Uint8Array;
+};
 
 Big.NE = -18;
 const MS_PER_NS = Big(10).pow(6);
@@ -99,4 +108,11 @@ export const sortByBNComparison = (aValue?: string, bValue?: string) => {
   if (bValue) return 1;
 
   return 0;
+};
+
+export const abiSchema = async (contract: string) => {
+  const response: ABIResponse = await callFunction(contract, '__contract_abi');
+  const decompressed = decompress(new Uint8Array(response.result));
+
+  return JSON.parse(Buffer.from(decompressed).toString());
 };

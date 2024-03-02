@@ -144,13 +144,13 @@ export default function ({ network, id, token }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[200px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
                   <a
-                    href={`/address/${row.account}`}
+                    href={`/address/${row?.account}`}
                     className="hover:no-undeline"
                   >
                     <a className="text-green-500 font-medium hover:no-undeline">
-                      {row.account}
+                      {row?.account}
                     </a>
                   </a>
                 </span>
@@ -160,20 +160,20 @@ export default function ({ network, id, token }: Props) {
                 align="start"
                 side="bottom"
               >
-                {row.account}
+                {row?.account}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>Quantity</span>,
       key: 'quantity',
-      cell: (row: HoldersPropsInfo) => <span>{row.quantity}</span>,
+      cell: (row: HoldersPropsInfo) => <span>{row?.quantity}</span>,
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[200px]',
@@ -184,7 +184,7 @@ export default function ({ network, id, token }: Props) {
       cell: (row: HoldersPropsInfo) => {
         const percentage =
           Number(tokens?.tokens) > 0
-            ? holderPercentage(tokens.tokens, row.quantity)
+            ? holderPercentage(tokens?.tokens, row?.quantity)
             : null;
         return (
           <span>
@@ -223,7 +223,7 @@ export default function ({ network, id, token }: Props) {
         </div>
       )}
       <Widget
-        src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: holder[currentPage],

@@ -59,12 +59,18 @@ export default function (props: TokenInfoProps) {
   ) : (
     <>
       <span className="font-normal px-1">
-        {tokenAmount(amount, meta.decimals || decimals, true)}
+        {amount
+          ? tokenAmount(amount, meta?.decimals || decimals, true)
+          : amount ?? ''}
       </span>
       <span className="flex items-center">
-        <TokenImage src={meta.icon} alt={meta.name} className="w-4 h-4 mx-1" />
-        {shortenToken(meta.name)}
-        <span>&nbsp;({shortenTokenSymbol(meta.symbol)})</span>
+        <TokenImage
+          src={meta?.icon}
+          alt={meta?.name}
+          className="w-4 h-4 mx-1"
+        />
+        {shortenToken(meta?.name)}
+        <span>&nbsp;({shortenTokenSymbol(meta?.symbol)})</span>
       </span>
     </>
   );

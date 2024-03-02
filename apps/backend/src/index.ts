@@ -12,13 +12,18 @@ import sentry from '#libs/sentry';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'jobs');
 
 const logger: Bree.BreeLogger = {
-  error: () => {},
-  info: () => {},
+  error: console.log,
+  info: console.log,
   warn: () => {},
 };
 
+const errorHandler = (error: unknown) => {
+  log.error(error);
+  sentry.captureException(error);
+};
+
 const jobs: Bree.JobOptions[] = [
-  { interval: '60m', name: 'stats', timeout: '1s' }, // every 60m for now
+  { interval: '60m', name: 'stats', timeout: '30m' }, // every 60m for now
   { cron: '0 * * * *', name: 'daily-stats', timeout: '1s' }, // run every hour for now
   { cron: '* * * * *', name: 'ft-meta' }, // every minute
   { cron: '* * * * *', name: 'ft-market-data' }, // every minute
@@ -37,7 +42,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '*/5 * * * * *', hasSeconds: true, name: 'nodes-telemetry' }, // every 5s
 ];
 
-const bree = new Bree({ jobs, logger, root });
+const bree = new Bree({ errorHandler, jobs, logger, root });
 
 (async () => {
   try {

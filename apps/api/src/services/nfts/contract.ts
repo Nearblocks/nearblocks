@@ -23,9 +23,18 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
         facebook,
         telegram,
         reddit,
-        website
+        website,
+        tokens.count AS tokens
       FROM
         nft_meta
+        LEFT JOIN LATERAL (
+          SELECT
+            COUNT(contract)
+          FROM
+            nft_token_meta
+          WHERE
+            contract = nft_meta.contract
+        ) tokens ON TRUE
       WHERE
         contract = :contract
     `,
@@ -54,6 +63,7 @@ const txns = catchAsync(
           involved_account_id,
           token_id,
           cause,
+          delta_amount,
           txn.transaction_hash,
           txn.included_in_block_hash,
           txn.block_timestamp,
@@ -203,7 +213,7 @@ const holders = catchAsync(
       `
         SELECT
           account,
-          COUNT(quantity)
+          COUNT(quantity) AS quantity
         FROM
           nft_holders_daily
         WHERE

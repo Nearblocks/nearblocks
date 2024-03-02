@@ -141,12 +141,12 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
   return (
     <>
       <tr key={accessKey.public_key} className="hover:bg-blue-900/5">
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
+        <td className="px-6 py-4 text-sm text-nearblue-600 ">
           {txn?.transaction_hash ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 font-medium">
+                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 font-medium whitespace-nowrap">
                     <a href={`/txns/${txn?.transaction_hash}`}>
                       <a className="text-green-500">
                         {txn?.transaction_hash && txn?.transaction_hash}
@@ -155,7 +155,7 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
+                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
                   sideOffset={5}
                 >
                   {txn?.transaction_hash}

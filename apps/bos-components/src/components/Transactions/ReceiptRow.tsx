@@ -112,7 +112,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
-              {receipt.receipt_id ? receipt.receipt_id : ''}
+              {receipt?.receipt_id ? receipt?.receipt_id : ''}
             </div>
           )}
         </div>
@@ -182,14 +182,14 @@ export default function (props: Props) {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-sm" />
               </div>
-            ) : receipt.predecessor_id ? (
+            ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <a
-                  href={`/address/${receipt.predecessor_id}`}
+                  href={`/address/${receipt?.predecessor_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
-                    {receipt.predecessor_id}
+                    {receipt?.predecessor_id}
                   </a>
                 </a>
               </div>
@@ -223,14 +223,14 @@ export default function (props: Props) {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-xs" />
               </div>
-            ) : receipt.receiver_id ? (
+            ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <a
-                  href={`/address/${receipt.receiver_id}`}
+                  href={`/address/${receipt?.receiver_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
-                    {receipt.receiver_id}
+                    {receipt?.receiver_id}
                   </a>
                 </a>
               </div>
@@ -267,16 +267,16 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
-          ) : receipt.outcome.gas_burnt ? (
+          ) : receipt?.outcome?.gas_burnt ? (
             <div className="w-full items-center text-xs flex md:w-3/4 break-words">
               <div className="bg-orange-50 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
-                {receipt.outcome.gas_burnt
-                  ? convertToMetricPrefix(receipt.outcome.gas_burnt) + 'gas'
+                {receipt?.outcome?.gas_burnt
+                  ? convertToMetricPrefix(receipt?.outcome?.gas_burnt) + 'gas'
                   : ''}
                 <span className="text-gray-300 px-1">|</span>{' '}
-                {receipt.outcome.tokens_burnt
-                  ? yoctoToNear(receipt.outcome.tokens_burnt, true)
+                {receipt?.outcome?.tokens_burnt
+                  ? yoctoToNear(receipt?.outcome?.tokens_burnt, true)
                   : ''}{' '}
                 Ⓝ
               </div>
@@ -320,7 +320,7 @@ export default function (props: Props) {
                 <TransactionActions
                   key={i}
                   action={action}
-                  receiver={receipt.receiver_id}
+                  receiver={receipt?.receiver_id}
                   t={t}
                 />
               ))}
@@ -397,7 +397,7 @@ export default function (props: Props) {
                 <textarea
                   readOnly
                   rows={4}
-                  defaultValue={receipt.outcome.logs.join('\n')}
+                  defaultValue={receipt?.outcome?.logs?.join('\n')}
                   className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 mt-3 resize-y"
                 ></textarea>
               ) : (
@@ -409,12 +409,12 @@ export default function (props: Props) {
       </div>
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
-          {receipt.outcome.outgoing_receipts.map((rcpt: any) => (
-            <div className="pl-4 pt-6" key={rcpt.receipt_id}>
+          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
+            <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+                    src={`${config?.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
                     props={{
                       receipt: rcpt,
                       borderFlag: true,

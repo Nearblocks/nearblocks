@@ -229,12 +229,12 @@ export type TransactionInfo = {
   signer_account_id: string;
   transaction_hash: string;
   receipts: InventoryInfo[];
-  event_kind: string;
-  token_old_owner_account_id: string;
-  token_new_owner_account_id: string;
+  cause: string;
+  affected_account_id: string;
+  involved_account_id: string;
   token_id: string;
   nft: Token;
-  amount: string;
+  delta_amount: string;
   ft: Token;
   predecessor_account_id: string;
 };
@@ -851,13 +851,22 @@ export type InvalidTxError =
 
 export type TxExecutionError =
   | { ActionError: ActionError }
-  | { InvalidTxError: InvalidTxError };
+  | { InvalidTxError: InvalidTxError }
+  | {};
 
 export type ExecutionStatusView =
   | { Unknown: unknown }
   | { Failure: TxExecutionError }
   | { SuccessValue: String }
-  | { SuccessReceiptId: CryptoHash };
+  | { SuccessReceiptId: CryptoHash }
+  | {
+      Failure: {
+        ActionError: {
+          index: number;
+          kind: { FunctionCallError: { ExecutionError: string } };
+        };
+      };
+    };
 
 export type ExecutionOutcomeView = {
   logs: Vec<String>;
@@ -935,7 +944,8 @@ export type ActionView =
   | AddKeyActionView
   | DeleteKeyActionView
   | DeleteAccountActionView
-  | DelegateActionView;
+  | DelegateActionView
+  | any;
 
 export type PublicKey = string;
 type DataReceiverView = {
@@ -1056,7 +1066,8 @@ export type RPCNewReceiptValidationError =
         limit: U64;
       };
     }
-  | { ActionsValidation: ActionsValidation };
+  | { ActionsValidation: ActionsValidation }
+  | {};
 
 export type NewReceiptValidationError =
   | { type: 'invalidPredecessorId'; accountId: String }
@@ -1367,11 +1378,37 @@ export type NonDelegateActionView = Exclude<ActionView, DelegateActionView>;
 export type ParseOutcomeInfo = {
   block_hash: string;
   outcome: {
+    executor_id: string;
+    gas_burnt: string;
+    logs: [];
+    metadata: {
+      gas_profile: GasProfileInfo[]; // Make sure GasProfileInfo is correctly imported or defined
+      version: string;
+    };
+    outgoing_receipts: {
+      actions: {
+        action_kind: string;
+        args: {
+          stake: string;
+          deposit: string;
+        };
+      }[];
+      outcome: OutcomePropsInfo; // Adjust the type to OutcomePropsInfo
+    };
+    receipt_ids: string[];
+    status: {
+      Failure: {
+        ActionError: {
+          index: number;
+          kind: {
+            FunctionCallError: {
+              ExecutionError: string;
+            };
+          };
+        };
+      };
+    };
     tokens_burnt: string;
-    gasBurnt: string;
-    status: ExecutionStatusView;
-    logs: string;
-    receiptIds: string;
   };
 };
 

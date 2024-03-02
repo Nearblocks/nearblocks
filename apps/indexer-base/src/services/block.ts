@@ -8,10 +8,7 @@ export const storeBlock = async (knex: Knex, block: types.Block) => {
   const data = getBlockData(block);
 
   await retry(async () => {
-    await knex('blocks')
-      .insert(data)
-      .onConflict(['block_hash', 'block_timestamp'])
-      .ignore();
+    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
   });
 };
 
