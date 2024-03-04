@@ -56,7 +56,7 @@ const ExportData = () => {
           network: networkId,
           id: address,
           onHandleDowload: onHandleDowload,
-          exportType: 'Transactions',
+          exportType: 'Token Transactions',
         }}
       />
     </div>

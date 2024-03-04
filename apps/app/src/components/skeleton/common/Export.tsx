@@ -13,8 +13,6 @@ const Export = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
         <div className="text-sm text-neargray-600 py-2 max-w-lg md:mx-12 mx-4">
           <div className="text-center">
             The information you requested can be downloaded from this page.
-            Before continuing please verify that you are not a robot by
-            completing the captcha below.
           </div>
           <div className="bg-white border rounded-md shadow-md w-full px-4 py-4 my-10">
             <p className="text-gray-900 my-3 mx-2">
