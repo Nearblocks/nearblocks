@@ -26,3 +26,7 @@ declare const Tabs;
 declare const Accordion;
 declare const Fragment;
 declare const useCallback;
+declare const Markdown;
+declare const InfiniteScroll;
+declare const Files;
+declare const CommitButton;

@@ -512,7 +512,18 @@ export default function ({
                   }
                 </Tabs.Content>{' '}
                 <Tabs.Content value={tabs[4]}>
-                  <div className="px-4 sm:px-6 py-3"></div>
+                  <div className="py-3">
+                    {
+                      <Widget
+                        src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                        props={{
+                          network: network,
+                          path: `nearblocks.io/ft/${id}`,
+                          limit: 10,
+                        }}
+                      />
+                    }
+                  </div>
                 </Tabs.Content>
               </div>
             </Tabs.Root>
