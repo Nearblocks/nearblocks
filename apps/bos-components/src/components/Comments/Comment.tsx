@@ -1,5 +1,5 @@
 /**
- * Component: CommentsPost
+ * Component: CommentsComment
  * Author: Nearblocks Pte Ltd
  * License: Business Source License 1.1
  * Description: The component displays a single post/comment.
@@ -23,14 +23,14 @@ interface Props {
     };
   };
 }
-
+import { timeAgo } from '@/includes/libs';
 export default function ({ accountId, blockHeight, post }: Props) {
   const BlockHeight = blockHeight === 'now' ? 'now' : parseInt(blockHeight);
 
   const profile: { name: string } | any = Social.getr(`${accountId}/profile`);
   const name = profile.name || 'No-name profile';
   const title = `@${accountId}`;
-  const [timeAgo, setTimeAgo] = useState('');
+  const [time, setTime] = useState('');
   const [imageUrl, setImageUrl] = useState<string | any>('');
   const [fallbackUrl, _setFallbackUrl] = useState(
     'https://ipfs.near.social/ipfs/bafkreibmiy4ozblcgv3fm3gc6q62s55em33vconbavfd2ekkuliznaq3zm',
@@ -38,6 +38,7 @@ export default function ({ accountId, blockHeight, post }: Props) {
 
   useEffect(() => {
     async function fetchTime() {
+      setTime('Loading');
       try {
         asyncFetch(
           `https://api.near.social/time?blockHeight=${BlockHeight}`,
@@ -50,32 +51,11 @@ export default function ({ accountId, blockHeight, post }: Props) {
             return 'unknown';
           }
           const timeMs = parseFloat(res.body);
-
-          const date = new Date(timeMs);
-          const dateNow = new Date();
-
-          const timeAgo = (diffSec: number) =>
-            diffSec < 60000
-              ? `${(diffSec / 1000) | 0}s`
-              : diffSec < 3600000
-              ? `${(diffSec / 60000) | 0}m`
-              : diffSec < 86400000
-              ? `${(diffSec / 3600000) | 0}h`
-              : date.getFullYear() === dateNow.getFullYear()
-              ? date.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })
-              : date.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                });
-          return setTimeAgo(timeAgo(dateNow.getTime() - timeMs));
+          return setTime(timeAgo(timeMs / 1000));
         });
       } catch (error) {
         console.error('Error fetching time:', error);
-        setTimeAgo('Loading');
+        setTime('Loading');
       }
     }
     fetchTime();
@@ -120,7 +100,7 @@ export default function ({ accountId, blockHeight, post }: Props) {
             {blockHeight === 'now' ? (
               'now'
             ) : (
-              <p className="text-muted">. {timeAgo}</p>
+              <p className="text-muted">. {time}</p>
             )}
           </p>
         </div>

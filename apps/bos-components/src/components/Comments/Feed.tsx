@@ -52,20 +52,20 @@ export default function (props: Props) {
     setContent(newContent.content);
   };
 
-  const renderItem = (a: {
+  const renderItem = (item: {
     accountId: string;
     blockHeight: number;
     value: { type: string; post: {} };
   }) =>
-    a.value.type === 'md' && (
-      <div key={JSON.stringify(a)} className="">
+    item.value.type === 'md' && (
+      <div key={JSON.stringify(item)} className="">
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Comments.Post`}
+          src={`${config.ownerId}/widget/bos-components.components.Comments.Comment`}
           props={{
-            accountId: a.accountId,
-            blockHeight: a.blockHeight,
+            accountId: item.accountId,
+            blockHeight: item.blockHeight,
             ownerId: config.ownerId,
-            post: a.value.post,
+            post: item.value.post,
           }}
         />
       </div>

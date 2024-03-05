@@ -17,7 +17,6 @@ interface Props {
 }
 export default function (props: Props) {
   const [text, setText] = useState<string>('');
-  const [jContent, setJContent] = useState('');
   const [img, setImg] = useState<{ cid?: string; url?: string }>({});
   const [msg, setMsg] = useState('Upload an Image');
   const [markdownEditor, setMarkdownEditor] = useState(false);
@@ -51,10 +50,7 @@ export default function (props: Props) {
     setText(text);
   };
 
-  const JContent = JSON.stringify(content);
-  if (props.onChange && JContent !== jContent) {
-    setJContent(JContent);
-
+  if (props.onChange) {
     props.onChange({ content });
   }
 
@@ -166,7 +162,7 @@ window.addEventListener("message", (event) => {
       {markdownEditor ? (
         <>
           <Iframe
-            className="ml-2 w-full border"
+            className="mx-2 w-full border"
             srcDoc={code}
             message={text || ''}
             onMessage={onChange}

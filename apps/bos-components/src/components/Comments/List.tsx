@@ -44,8 +44,7 @@ export default function (props: Props) {
   const [displayCount, setDisplayCount] = useState<number>(0);
   const [initialNextFetchFrom, setInitialNextFetchFrom] = useState<number>(0);
   const [items, setItems] = useState<CommentItem[] | any>([]);
-  const [jIndex, setjIndex] = useState('');
-  const [jInitialItems, setjInitialItems] = useState('');
+
   const index = JSON.parse(JSON.stringify(props.index));
   if (!index) {
     return 'props.index is not defined';
@@ -104,21 +103,16 @@ export default function (props: Props) {
     return Items;
   };
 
-  const JInitialItems = JSON.stringify(initialItems);
-  if (jInitialItems !== JInitialItems) {
-    const JIndex = JSON.stringify(index);
+  if (!fetchFrom) {
     const nextFetchFrom = computeFetchFrom(initialItems, index.options.limit);
-    if (JIndex !== jIndex || nextFetchFrom !== initialNextFetchFrom) {
+    if (nextFetchFrom !== initialNextFetchFrom) {
       setFetchFrom(false);
       setNextFetchFrom(nextFetchFrom);
       setDisplayCount(initialRenderLimit);
       setInitialNextFetchFrom(nextFetchFrom);
       setItems(initialItems);
-      setjInitialItems(JInitialItems);
-      setjIndex(JIndex);
     } else {
       setItems(mergeItems(initialItems));
-      setjInitialItems(JInitialItems);
     }
   }
 
