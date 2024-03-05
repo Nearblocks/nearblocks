@@ -811,7 +811,20 @@ export default function ({ network, t, id }: Props) {
                 <div className="px-4 sm:px-6 py-3"></div>
               </Tabs.Content>
               <Tabs.Content value={tabs[5]}>
-                <div className="px-4 sm:px-6 py-3"></div>
+                <div className="bg-white soft-shadow rounded-xl pb-1">
+                  <div className="py-3">
+                    {
+                      <Widget
+                        src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                        props={{
+                          network: network,
+                          path: `nearblocks.io/address/${id}`,
+                          limit: 10,
+                        }}
+                      />
+                    }
+                  </div>
+                </div>
               </Tabs.Content>
             </div>
           </Tabs.Root>

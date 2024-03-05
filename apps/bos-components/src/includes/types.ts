@@ -1429,3 +1429,26 @@ export type ReceiptKindInfo = {
   onClick?: any;
   isTxTypeActive: boolean;
 };
+export type CommentItem = {
+  accountId: string;
+  blockHeight: number;
+  value: {
+    post: {
+      image?: {
+        ipfs_cid: string;
+      };
+      text?: string;
+    };
+  };
+  type: string;
+};
+export type CommentContent = {
+  type: string;
+  text?: string;
+  image?:
+    | {
+        cid?: string;
+        url?: string;
+      }
+    | undefined;
+};

@@ -234,7 +234,18 @@ export default function (props: Props) {
               )}
             </Tabs.Content>
             <Tabs.Content value={hashes[2]}>
-              <div className="px-4 sm:px-6 py-3"></div>
+              <div className="py-3">
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                    props={{
+                      network: network,
+                      path: `nearblocks.io/txns/${hash}`,
+                      limit: 10,
+                    }}
+                  />
+                }
+              </div>
             </Tabs.Content>
           </div>
         </Tabs.Root>
