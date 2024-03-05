@@ -12,6 +12,8 @@
  * @param {string} post.image.ipfs_cid - The IPFS CID of the image.
  * @param {string} post.image.url - The URL of the image.
  */
+
+import { timeAgo } from '@/includes/libs';
 interface Props {
   accountId: string;
   blockHeight: string;
@@ -23,7 +25,6 @@ interface Props {
     };
   };
 }
-import { timeAgo } from '@/includes/libs';
 export default function ({ accountId, blockHeight, post }: Props) {
   const BlockHeight = blockHeight === 'now' ? 'now' : parseInt(blockHeight);
 

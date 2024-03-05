@@ -9,13 +9,13 @@
  * @param {number} [limit] - The maximum number of comments to display.
  */
 
+import { getConfig } from '@/includes/libs';
+
 interface Props {
   network: string;
   path: string;
   limit: number;
 }
-
-import { getConfig } from '@/includes/libs';
 
 export default function (props: Props) {
   const [content, setContent] = useState('');
