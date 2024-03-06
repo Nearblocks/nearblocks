@@ -16,6 +16,7 @@ interface Props {
     key: string,
     options?: { block?: string; txns?: string; receipts?: string },
   ) => string | undefined;
+  Link: Link;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -29,10 +30,10 @@ import {
 } from '@/includes/formats';
 import { getConfig, nanoToMilli } from '@/includes/libs';
 import { gasPrice } from '@/includes/near';
-import { BlocksInfo } from '@/includes/types';
+import { BlocksInfo, Link } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, hash, t } = props;
+  const { network, hash, t, Link } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [price, setPrice] = useState('');
@@ -53,11 +54,11 @@ export default function (props: Props) {
   }
 
   const LinkWrapper = (props: Props) => (
-    <a href={props.href} className="hover:no-underline">
+    <Link href={props.href} className="hover:no-underline">
       <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
         {props.children}
       </a>
-    </a>
+    </Link>
   );
 
   useEffect(() => {

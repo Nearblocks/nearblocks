@@ -2,6 +2,7 @@
  * @interface Props
  * @param {string} [id] - Optional identifier for the account, passed as a string.
  * @param {boolean} [loading] - Flag indicating whether data is currently loading.
+ * @param {boolean} [inventoryLoading] - Flag indicating whether inventory data is currently loading.
  * @param {InventoryInfo} [data] - Information related to the inventory.
  * @param {Object} [ft] - Object containing details about the tokens.
  * @param {number} [ft.amount] -  amount in USD of tokens.
@@ -17,6 +18,7 @@ import { InventoryInfo, TokenListInfo } from '@/includes/types';
 interface Props {
   id?: string;
   loading?: boolean;
+  inventoryLoading?: boolean;
   data: InventoryInfo;
   ft: {
     amount: string;
@@ -36,7 +38,7 @@ const TokenHoldings = (props: Props) => {
 
   const nfts = props.data?.nfts || [];
 
-  if (props.loading) {
+  if (props.loading || props.inventoryLoading) {
     return <Loading className="h-full" wrapperClassName="flex w-full h-7" />;
   }
 
@@ -89,22 +91,22 @@ const TokenHoldings = (props: Props) => {
                                 <div className="flex mr-1">
                                   <img
                                     src={
-                                      token?.ft_metas?.icon ||
+                                      token?.ft_meta?.icon ||
                                       `${props.appUrl}images/tokenplaceholder.svg`
                                     }
-                                    alt={token.ft_metas?.name}
+                                    alt={token.ft_meta?.name}
                                     className="w-4 h-4"
                                   />
                                 </div>
                                 <span>
-                                  {token?.ft_metas?.name
+                                  {token?.ft_meta?.name
                                     ? truncateString(
-                                        token?.ft_metas?.name,
+                                        token?.ft_meta?.name,
                                         15,
                                         '...',
                                       )
                                     : ''}
-                                  ({token?.ft_metas?.symbol})
+                                  ({token?.ft_meta?.symbol})
                                 </span>
                               </div>
                               <div className="text-gray-400 flex items-center mt-1">
@@ -113,7 +115,7 @@ const TokenHoldings = (props: Props) => {
                                   : token?.rpcAmount ?? ''}
                               </div>
                             </div>
-                            {token?.ft_metas?.price && (
+                            {token?.ft_meta?.price && (
                               <div className="text-right">
                                 <div>
                                   {token?.amountUsd
@@ -121,10 +123,10 @@ const TokenHoldings = (props: Props) => {
                                     : '$' + (token.amountUsd ?? '')}
                                 </div>
                                 <div className="text-gray-400">
-                                  {token?.ft_metas?.price
+                                  {token?.ft_meta?.price
                                     ? '@' +
-                                      Big(token?.ft_metas?.price).toString()
-                                    : '@' + (token?.ft_metas?.price ?? '')}
+                                      Big(token?.ft_meta?.price).toString()
+                                    : '@' + (token?.ft_meta?.price ?? '')}
                                 </div>
                               </div>
                             )}

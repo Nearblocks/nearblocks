@@ -260,12 +260,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       header: <span>{t ? t('blocks:block.gasLimit') : 'GAS LIMIT'}</span>,
       key: 'gas_limit',
       cell: (row: BlocksInfo) => (
-        <span>
-          {row?.chunks_agg?.gas_limit
-            ? convertToMetricPrefix(row?.chunks_agg?.gas_limit)
-            : row?.chunks_agg?.gas_limit ?? ''}
-          gas
-        </span>
+        <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:

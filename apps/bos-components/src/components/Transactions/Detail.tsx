@@ -69,12 +69,6 @@ export default function (props: Props) {
   const [more, setMore] = useState(false);
 
   const { fts, nfts } = useMemo(() => {
-    function customUniqWith(array: FtsInfo[], comparator: any) {
-      return array.filter((item, index, arr) => {
-        return arr.findIndex((el) => comparator(item, el)) === index;
-      });
-    }
-
     function tokensTransfers(receipts: InventoryInfo[]) {
       let fts: FtsInfo[] = [];
       let nfts: NftsInfo[] = [];
@@ -82,25 +76,23 @@ export default function (props: Props) {
       receipts.forEach(
         (receipt) =>
           receipt?.fts?.forEach((ft) => {
-            if (ft.ft_metas) fts.push(ft);
+            if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
           }),
       );
       receipts.forEach(
         (receipt) =>
           receipt?.nfts?.forEach((nft) => {
-            if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+            if (
+              nft.nft_meta &&
+              nft.nft_token_meta &&
+              Number(nft.delta_amount) < 0
+            )
+              nfts.push(nft);
           }),
       );
 
       return {
-        fts: customUniqWith(fts, (a: any, b: any) => {
-          return (
-            a.emitted_at_block_timestamp === b.emitted_at_block_timestamp &&
-            a.token_new_owner_account_id === b.token_new_owner_account_id &&
-            a.token_old_owner_account_id === b.token_old_owner_account_id &&
-            a.amount === b.amount
-          );
-        }),
+        fts,
         nfts,
       };
     }
@@ -111,6 +103,10 @@ export default function (props: Props) {
 
     return { fts: [], nfts: [] };
   }, [txn]);
+
+  function absoluteValue(number: string) {
+    return new Big(number).abs().toString();
+  }
 
   const config = getConfig(network);
 
@@ -172,9 +168,13 @@ export default function (props: Props) {
         dt = `${day < 10 ? '0' : ''}${day}-${
           month < 10 ? '0' : ''
         }${month}-${year}`;
+
         fetchPriceAtDate(dt);
+
+        return dt;
       }
     }
+    return;
   }, [txn?.block_timestamp]);
 
   const [logs, actions, errorMessage] = useMemo(() => {
@@ -206,18 +206,6 @@ export default function (props: Props) {
       );
     }
   }, [txn, config.backendUrl]);
-
-  useEffect(() => {
-    // Hide txn actions row
-    if (typeof document !== 'undefined') {
-      const row = document.getElementById('action-row');
-      const column = document.getElementById('action-column');
-
-      if (row && column && !column.hasChildNodes()) {
-        row.style.display = 'none';
-      }
-    }
-  }, [logs]);
 
   return (
     <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
@@ -379,7 +367,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {(actions?.length > 0 || (logs?.length > 0 && logs?.contract)) && (
+      {(actions?.length > 0 || (logs?.length > 0 && logs.contract)) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
@@ -543,7 +531,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="relative w-full md:w-3/4">
-              <ScrollArea.Root className="w-full h-[302px] rounded overflow-hidden bg-white">
+              <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
                 <ScrollArea.Viewport className="w-full h-full rounded">
                   <div className="max-h-[302px] break-words space-y-3">
                     {fts?.map((ft: any) => (
@@ -554,15 +542,13 @@ export default function (props: Props) {
                         <FaCaretRight className="inline-flex text-gray-400 text-xs" />
                         <div className="font-semibold text-gray px-1">
                           From{' '}
-                          {ft?.token_old_owner_account_id ? (
+                          {ft?.affected_account_id ? (
                             <a
-                              href={`/address/${ft?.token_old_owner_account_id}`}
+                              href={`/address/${ft?.affected_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                {shortenAddress(
-                                  ft?.token_old_owner_account_id ?? '',
-                                )}
+                                {shortenAddress(ft?.affected_account_id ?? '')}
                               </a>
                             </a>
                           ) : (
@@ -571,15 +557,13 @@ export default function (props: Props) {
                         </div>
                         <div className="font-semibold text-gray px-1">
                           To{' '}
-                          {ft?.token_new_owner_account_id ? (
+                          {ft?.involved_account_id ? (
                             <a
-                              href={`/address/${ft?.token_new_owner_account_id}`}
+                              href={`/address/${ft?.involved_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1">
-                                {shortenAddress(
-                                  ft?.token_new_owner_account_id ?? '',
-                                )}
+                                {shortenAddress(ft?.involved_account_id ?? '')}
                               </a>
                             </a>
                           ) : (
@@ -589,29 +573,29 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
-                            {ft?.amount && ft?.ft_metas?.decimals
+                            {ft?.delta_amount && ft?.ft_meta?.decimals
                               ? tokenAmount(
-                                  ft?.amount,
-                                  ft?.ft_metas?.decimals,
+                                  absoluteValue(ft?.delta_amount),
+                                  ft?.ft_meta?.decimals,
                                   true,
                                 )
                               : ''}
                           </span>
                         </div>
                         <a
-                          href={`/token/${ft?.ft_metas?.contract}`}
+                          href={`/token/${ft?.ft_meta?.contract}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green flex items-center hover:no-underline">
                             <TokenImage
-                              src={ft?.ft_metas?.icon}
-                              alt={ft?.ft_metas?.name}
+                              src={ft?.ft_meta?.icon}
+                              alt={ft?.ft_meta?.name}
                               className="w-4 h-4 mx-1"
                             />
-                            {shortenToken(ft?.ft_metas?.name ?? '')}
+                            {shortenToken(ft?.ft_meta?.name ?? '')}
                             <span>
                               &nbsp;(
-                              {shortenTokenSymbol(ft?.ft_metas?.symbol ?? '')})
+                              {shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})
                             </span>
                           </a>
                         </a>
@@ -626,14 +610,14 @@ export default function (props: Props) {
                               <div className="sm:flex">
                                 <div className="font-semibold text-gray px-1">
                                   From{' '}
-                                  {nft?.token_old_owner_account_id ? (
+                                  {nft?.affected_account_id ? (
                                     <a
-                                      href={`/address/${nft?.token_old_owner_account_id}`}
+                                      href={`/address/${nft?.affected_account_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green-500 font-normal pl-1 hover:no-underline">
                                         {shortenAddress(
-                                          nft?.token_old_owner_account_id ?? '',
+                                          nft?.affected_account_id ?? '',
                                         )}
                                       </a>
                                     </a>
@@ -645,14 +629,14 @@ export default function (props: Props) {
                                 </div>
                                 <div className="font-semibold text-gray px-1">
                                   To{' '}
-                                  {nft?.token_new_owner_account_id ? (
+                                  {nft?.involved_account_id ? (
                                     <a
-                                      href={`/address/${nft?.token_new_owner_account_id}`}
+                                      href={`/address/${nft?.involved_account_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green-500 font-normal pl-1 hover:no-underline">
                                         {shortenAddress(
-                                          nft?.token_new_owner_account_id ?? '',
+                                          nft?.involved_account_id ?? '',
                                         )}
                                       </a>
                                     </a>
@@ -788,7 +772,7 @@ export default function (props: Props) {
                       Ⓝ
                       {currentPrice && network === 'mainnet'
                         ? ` ($${fiatValue(
-                            yoctoToNear(txn.actions_agg?.deposit, false),
+                            yoctoToNear(txn.actions_agg?.deposit ?? 0, false),
                             currentPrice,
                           )})`
                         : ''}
@@ -840,7 +824,7 @@ export default function (props: Props) {
               Ⓝ
               {currentPrice && network === 'mainnet'
                 ? ` ($${fiatValue(
-                    yoctoToNear(txn.outcomes_agg?.transaction_fee, false),
+                    yoctoToNear(txn.outcomes_agg?.transaction_fee ?? 0, false),
                     currentPrice,
                   )})`
                 : ''}
@@ -931,22 +915,16 @@ export default function (props: Props) {
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {txn?.actions_agg?.gas_attached
-                      ? convertToMetricPrefix(txn?.actions_agg?.gas_attached)
-                      : txn?.actions_agg?.gas_attached ?? ''}
-                    gas
-                    <span className="text-gray-300 px-1">|</span>{' '}
-                    {txn?.outcomes_agg?.gas_used
-                      ? convertToMetricPrefix(txn?.outcomes_agg?.gas_used)
-                      : txn?.outcomes_agg?.gas_used ?? ''}
-                    gas (
-                    {txn?.outcomes_agg?.gas_used &&
-                    txn?.actions_agg?.gas_attached
-                      ? gasPercentage(
-                          txn?.outcomes_agg?.gas_used,
-                          txn?.actions_agg?.gas_attached,
-                        )
-                      : ''}
+                    {convertToMetricPrefix(
+                      txn?.actions_agg?.gas_attached ?? 0,
+                    ) + 'gas'}
+                    <span className="text-gray-300 px-1">|</span>
+                    {convertToMetricPrefix(txn?.outcomes_agg?.gas_used ?? 0)}gas
+                    (
+                    {gasPercentage(
+                      txn?.outcomes_agg?.gas_used ?? 0,
+                      txn?.actions_agg?.gas_attached ?? 0,
+                    )}
                     )
                   </div>
                 )}
@@ -979,12 +957,9 @@ export default function (props: Props) {
                   <div className="w-full  text-xs items-center flex md:w-3/4 break-words">
                     <div className="bg-orange-50 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥</span>
-                      {txn.receipt_conversion_gas_burnt
-                        ? convertToMetricPrefix(
-                            txn.receipt_conversion_gas_burnt,
-                          )
-                        : txn.receipt_conversion_gas_burnt ?? ''}
-                      gas
+                      {convertToMetricPrefix(
+                        txn.receipt_conversion_gas_burnt ?? 0,
+                      ) + 'gas'}
                       <span className="text-gray-300 px-1">|</span>{' '}
                       {txn.receipt_conversion_tokens_burnt
                         ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)

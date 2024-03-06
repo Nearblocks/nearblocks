@@ -23,6 +23,8 @@ export type DeploymentsInfo = {
   block_timestamp: string;
   receipt_predecessor_account_id: string;
   transaction_hash: string;
+  createAction: { block_timestamp: string; transaction_hash: string };
+  updateAction: { block_timestamp: string; transaction_hash: string };
 };
 
 export type TokenInfo = {
@@ -40,20 +42,29 @@ export type MetaInfo = {
   price: string;
   reference: string;
   symbol: string;
+  contract: string;
 };
 
 export type FtsInfo = {
-  amount: string;
+  affected_account_id: string;
+  block_timestamp: string;
+  delta_amount: string;
+  ft_meta: MetaInfo;
+  event_index: string;
+  involved_account_id: string;
   contract: string;
-  ft_metas: MetaInfo;
 };
 
 export type NftsInfo = {
-  amount: string;
-  contract: string;
+  affected_account_id: string;
+  block_timestamp: string;
+  delta_amount: string;
   nft_meta: MetaInfo;
   quantity: string;
   nft_token_meta: string;
+  event_index: string;
+  involved_account_id: string;
+  contract: string;
 };
 
 export type InventoryInfo = {
@@ -91,7 +102,7 @@ export type ContractInfo = {
 export type TokenListInfo = {
   amount: string;
   contract: string;
-  ft_metas: MetaInfo;
+  ft_meta: MetaInfo;
   rpcAmount: string;
   amountUsd: string;
 };
@@ -1382,7 +1393,7 @@ export type ParseOutcomeInfo = {
     gas_burnt: string;
     logs: [];
     metadata: {
-      gas_profile: GasProfileInfo[]; // Make sure GasProfileInfo is correctly imported or defined
+      gas_profile: GasProfileInfo[];
       version: string;
     };
     outgoing_receipts: {
@@ -1393,7 +1404,7 @@ export type ParseOutcomeInfo = {
           deposit: string;
         };
       }[];
-      outcome: OutcomePropsInfo; // Adjust the type to OutcomePropsInfo
+      outcome: OutcomePropsInfo;
     };
     receipt_ids: string[];
     status: {
@@ -1451,4 +1462,71 @@ export type CommentContent = {
         url?: string;
       }
     | undefined;
+};
+export type Link = React.FC<{
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}>;
+
+export type ContractParseInfo = {
+  byMethod: {
+    [methodName: string]: [];
+  };
+  methodNames: [];
+  probableInterfaces: [];
+};
+
+export type FieldType = {
+  id: number;
+  name: string;
+  type: string;
+  value: string;
+  placeholder: string;
+};
+
+export type SchemaInfo = {
+  schema_version: string;
+  metadata: {
+    name: string;
+    version: string;
+    build: {
+      compiler: string;
+      builder: string;
+    };
+  };
+  body: {
+    functions: {
+      name: string;
+      kind: string;
+      params: {
+        serialization_type: string;
+        args: [
+          {
+            name: string;
+            type_schema: {
+              $ref: string;
+            };
+          },
+        ];
+      };
+      result: {
+        serialization_type: string;
+        type_schema: {
+          type: [];
+        };
+      };
+    }[];
+    root_schema: {
+      $schema: string;
+      title: String;
+      type: string;
+      definitions: {
+        AccountId: {
+          description: string;
+          type: string;
+        };
+      };
+    };
+  };
 };

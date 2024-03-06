@@ -181,3 +181,18 @@ export function isAction(type: string) {
 
   return actions.includes(type.toUpperCase());
 }
+
+export function isJson(string: string) {
+  const str = string.replace(/\\/g, '');
+
+  try {
+    JSON.parse(str);
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function uniqueId() {
+  return Math.floor(Math.random() * 1000);
+}

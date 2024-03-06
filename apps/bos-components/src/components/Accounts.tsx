@@ -7,12 +7,20 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
+ * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
+ * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
+ * @param {Function} [logOut] - Function to log out.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  requestSignInWithWallet: (id: string) => void;
+  signedIn: boolean;
+  accountId: string;
+  logOut: () => void;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -44,6 +52,8 @@ import {
   ContractInfo,
   FtInfo,
   TokenListInfo,
+  ContractParseInfo,
+  SchemaInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 
@@ -56,8 +66,19 @@ const tabs = [
   'Comments',
 ];
 
-export default function ({ network, t, id }: Props) {
+export default function (props: Props) {
+  const {
+    network,
+    t,
+    id,
+    requestSignInWithWallet,
+    signedIn,
+    accountId,
+    logOut,
+  } = props;
   const [loading, setLoading] = useState(false);
+  const [isloading, setIsLoading] = useState(true);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
   const [statsData, setStatsData] = useState<SatsInfo>({} as SatsInfo);
   const [pageTab, setPageTab] = useState('Transactions');
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
@@ -75,6 +96,10 @@ export default function ({ network, t, id }: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [code, setCode] = useState<ContractCodeInfo>({} as ContractCodeInfo);
   const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
+  const [schema, setSchema] = useState<SchemaInfo>({} as SchemaInfo);
+  const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
+    {} as ContractParseInfo,
+  );
 
   const config = getConfig(network);
 
@@ -101,10 +126,12 @@ export default function ({ network, t, id }: Props) {
             setStatsData({ near_price: statsResp.near_price });
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {});
     }
 
     function fetchAccountData() {
+      setLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}`, {
         method: 'GET',
         headers: {
@@ -129,7 +156,10 @@ export default function ({ network, t, id }: Props) {
             });
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          setLoading(false);
+        });
     }
 
     function fetchContractData() {
@@ -146,12 +176,7 @@ export default function ({ network, t, id }: Props) {
             };
           }) => {
             const depResp = data?.body?.deployments?.[0];
-            setDeploymentData({
-              block_timestamp: depResp.block_timestamp,
-              receipt_predecessor_account_id:
-                depResp.receipt_predecessor_account_id,
-              transaction_hash: depResp.transaction_hash,
-            });
+            setDeploymentData(depResp);
           },
         )
         .catch(() => {});
@@ -184,6 +209,7 @@ export default function ({ network, t, id }: Props) {
     }
 
     function fetchInventoryData() {
+      setInventoryLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}/inventory`, {
         method: 'GET',
         headers: {
@@ -203,7 +229,10 @@ export default function ({ network, t, id }: Props) {
             });
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {
+          setInventoryLoading(false);
+        });
     }
 
     fetchStatsData();
@@ -245,7 +274,7 @@ export default function ({ network, t, id }: Props) {
         .then(
           (data: {
             body: {
-              result: { result: number[] };
+              result: { result: string[] };
             };
           }) => {
             const resp = data?.body?.result;
@@ -254,11 +283,10 @@ export default function ({ network, t, id }: Props) {
         )
         .catch(() => {});
     }
-
     function loadBalances() {
       const fts = inventoryData?.fts;
       if (!fts?.length) {
-        if (fts?.length === 0) setLoading(false);
+        if (fts?.length === 0) setIsLoading(false);
         return;
       }
 
@@ -274,8 +302,8 @@ export default function ({ network, t, id }: Props) {
             return { ...ft, amount: rslt };
           });
         }),
-      ).then((results: FtsInfo[]) => {
-        results.forEach((rslt: FtsInfo) => {
+      ).then((results: TokenListInfo[]) => {
+        results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
           const amount = rslt?.amount ?? 0;
 
@@ -283,14 +311,13 @@ export default function ({ network, t, id }: Props) {
 
           let rpcAmount = Big(0);
 
-          if (Number(amount)) {
-            rpcAmount = ftrslt?.ft_metas?.decimals
-              ? Big(amount).div(Big(10).pow(ftrslt?.ft_metas?.decimals))
+          if (amount) {
+            rpcAmount = ftrslt?.ft_meta?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt.ft_meta.decimals))
               : 0;
           }
-
-          if (ftrslt?.ft_metas?.price) {
-            sum = rpcAmount.mul(Big(ftrslt?.ft_metas?.price));
+          if (ftrslt?.ft_meta?.price) {
+            sum = rpcAmount.mul(Big(ftrslt?.ft_meta?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -334,7 +361,7 @@ export default function ({ network, t, id }: Props) {
           tokens: [...pricedTokens, ...tokens],
         });
 
-        setLoading(false);
+        setIsLoading(false);
       });
     }
 
@@ -421,19 +448,48 @@ export default function ({ network, t, id }: Props) {
     loadSchema();
   }, [id, config?.rpcUrl]);
 
-  if (code?.code_base64) {
-    const locked = (key.keys || []).every(
-      (key: {
-        access_key: {
-          nonce: string;
-          permission: string;
-        };
-        public_key: string;
-      }) => key.access_key.permission !== 'FullAccess',
-    );
+  useEffect(() => {
+    if (code?.code_base64) {
+      const locked = (key.keys || []).every(
+        (key: {
+          access_key: {
+            nonce: string;
+            permission: string;
+          };
+          public_key: string;
+        }) => key.access_key.permission !== 'FullAccess',
+      );
 
-    setContract({ ...code, locked });
-  }
+      function fetchContractInfo() {
+        asyncFetch(`${config?.backendUrl}account/${id}/contract/parse`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(
+            (res: {
+              body: {
+                contract: { contract: ContractParseInfo; schema: SchemaInfo }[];
+              };
+              status: number;
+            }) => {
+              const resp = res.body.contract;
+              if (res.status === 200 && resp && resp.length > 0) {
+                const [{ contract, schema }] = resp;
+                setContractInfo(contract);
+                setSchema(schema);
+              }
+            },
+          )
+          .catch(() => {});
+      }
+
+      fetchContractInfo();
+
+      setContract({ ...code, locked });
+    }
+  }, [code, key, config?.backendUrl, id]);
 
   const handleFilter = (name: string, value: string) => {
     const updatedFilters = { ...filters, [name]: value };
@@ -551,7 +607,8 @@ export default function ({ network, t, id }: Props) {
                 <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
                     data={inventoryData}
-                    loading={loading}
+                    loading={isloading}
+                    inventoryLoading={inventoryLoading}
                     ft={ft}
                     id={id}
                     appUrl={config?.appUrl}
@@ -717,37 +774,45 @@ export default function ({ network, t, id }: Props) {
           <Tabs.Root defaultValue={pageTab}>
             <Tabs.List>
               {tabs &&
-                tabs.map((tab, index) => (
-                  <Tabs.Trigger
-                    key={index}
-                    onClick={() => {
-                      onTab(index);
-                    }}
-                    className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                      pageTab === tab
-                        ? 'rounded-lg bg-green-600 text-white'
-                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
-                    }`}
-                    value={tab}
-                  >
-                    {tab === 'Transactions' ? (
-                      <h2>{t ? t('address:txns') : tab}</h2>
-                    ) : tab === 'Token Txns' ? (
-                      <h2>{t ? t('address:tokenTxns') : tab}</h2>
-                    ) : tab === 'Contract' ? (
-                      <div className="flex h-full">
-                        <h2>{tab}</h2>
-                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
-                          NEW
+                tabs.map((tab, index) => {
+                  if (
+                    tab === 'Contract' &&
+                    !(contractInfo?.methodNames?.length > 0)
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <Tabs.Trigger
+                      key={index}
+                      onClick={() => {
+                        onTab(index);
+                      }}
+                      className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                        pageTab === tab
+                          ? 'rounded-lg bg-green-600 text-white'
+                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                      }`}
+                      value={tab}
+                    >
+                      {tab === 'Transactions' ? (
+                        <h2>{t ? t('address:txns') : tab}</h2>
+                      ) : tab === 'Token Txns' ? (
+                        <h2>{t ? t('address:tokenTxns') : tab}</h2>
+                      ) : tab === 'Contract' ? (
+                        <div className="flex h-full">
+                          <h2>{tab}</h2>
+                          <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
+                            NEW
+                          </div>
                         </div>
-                      </div>
-                    ) : tab === 'Comments' ? (
-                      <h2>{t ? t('address:comments') : tab}</h2>
-                    ) : (
-                      <h2>{tab}</h2>
-                    )}
-                  </Tabs.Trigger>
-                ))}
+                      ) : tab === 'Comments' ? (
+                        <h2>{t ? t('address:comments') : tab}</h2>
+                      ) : (
+                        <h2>{tab}</h2>
+                      )}
+                    </Tabs.Trigger>
+                  );
+                })}
             </Tabs.List>
             <div>
               <Tabs.Content value={tabs[0]}>
@@ -807,9 +872,27 @@ export default function ({ network, t, id }: Props) {
                   />
                 }
               </Tabs.Content>
-              <Tabs.Content value={tabs[4]}>
-                <div className="px-4 sm:px-6 py-3"></div>
-              </Tabs.Content>
+              {contractInfo && contractInfo?.methodNames?.length > 0 && (
+                <Tabs.Content value={tabs[4]}>
+                  {
+                    <Widget
+                      src={`${config.ownerId}/widget/bos-components.components.Contract.Overview`}
+                      props={{
+                        network: network,
+                        t: t,
+                        id: id,
+                        contract: contract,
+                        schema: schema,
+                        contractInfo: contractInfo,
+                        requestSignInWithWallet: requestSignInWithWallet,
+                        connected: signedIn,
+                        accountId: accountId,
+                        logOut: logOut,
+                      }}
+                    />
+                  }
+                </Tabs.Content>
+              )}
               <Tabs.Content value={tabs[5]}>
                 <div className="bg-white soft-shadow rounded-xl pb-1">
                   <div className="py-3">
