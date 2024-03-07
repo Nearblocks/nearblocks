@@ -130,7 +130,7 @@ export const storeFTEvents = async (
   if (eventData.length) {
     eventData = setEventIndex(
       shardId,
-      blockHeader.timestamp,
+      blockHeader.timestampNanosec,
       EventType.NEP141,
       EventStandard.FT,
       eventData,

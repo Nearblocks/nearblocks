@@ -97,21 +97,21 @@ export const extractEvents = (outcome: types.ExecutionOutcomeWithReceipt) => {
 
 export function setEventIndex(
   shardId: number,
-  blockTimestamp: number,
+  blockTimestamp: string,
   eventType: EventType,
   eventStandard: EventStandard,
   events: FTEvent[],
 ): FTEvent[];
 export function setEventIndex(
   shardId: number,
-  blockTimestamp: number,
+  blockTimestamp: string,
   eventType: EventType,
   eventStandard: EventStandard,
   events: NFTEvent[],
 ): NFTEvent[];
 export function setEventIndex(
   shardId: number,
-  blockTimestamp: number,
+  blockTimestamp: string,
   eventType: EventType,
   eventStandard: EventStandard,
   events: FTEvent[] | NFTEvent[],
