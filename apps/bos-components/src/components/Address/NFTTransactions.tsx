@@ -48,6 +48,7 @@ export default function (props: Props) {
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [address, setAddress] = useState('');
 
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
@@ -158,6 +159,12 @@ export default function (props: Props) {
 
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
   };
 
   const columns = [
@@ -284,12 +291,23 @@ export default function (props: Props) {
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                  <span
+                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      row?.affected_account_id === address
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        : 'text-green-500 p-0.5 px-1'
+                    }`}
+                  >
                     <a
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a
+                        className="text-green-500 hover:no-underline"
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.affected_account_id)
+                        }
+                      >
                         {row?.affected_account_id}
                       </a>
                     </a>
@@ -393,7 +411,16 @@ export default function (props: Props) {
                       href={`/address/${row.involved_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a
+                        className={`text-green-500 hover:no-underline ${
+                          row?.involved_account_id === address
+                            ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                            : 'text-green-500 p-1'
+                        }`}
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.involved_account_id)
+                        }
+                      >
                         {row.involved_account_id}
                       </a>
                     </a>
