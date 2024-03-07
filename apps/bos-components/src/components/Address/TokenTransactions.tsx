@@ -636,11 +636,11 @@ export default function ({
                 </span>
               </div>
             )}
-
             <span className="text-xs text-nearblue-600">
               <a
-                href="/nft-token/exportdata/address/id"
+                href={`/token/exportdata?address=${id}`}
                 className="hover:no-underline"
+                target="_blank"
               >
                 <a
                   target="_blank"

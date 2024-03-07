@@ -5,7 +5,7 @@
  * @param {boolean} [inventoryLoading] - Flag indicating whether inventory data is currently loading.
  * @param {InventoryInfo} [data] - Information related to the inventory.
  * @param {Object} [ft] - Object containing details about the tokens.
- * @param {number} [ft.amount] -  amount in USD of tokens.
+ * @param {string} [ft.amount] -  amount in USD of tokens.
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
  */
