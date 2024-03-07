@@ -76,9 +76,6 @@ const Footer = () => {
                     <Link href="https://nearblocks.io/apis" legacyBehavior>
                       <a target="_blank" rel="noreferrer nofollow noopener">
                         {t('footer.links.api')}
-                        <span className="mx-2 px-1 py-0.5 font-semibold animate-pulse text-white bg-brightgreen rounded text-tiny">
-                          New
-                        </span>
                       </a>
                     </Link>
                   </li>
@@ -90,20 +87,6 @@ const Footer = () => {
                         rel="noreferrer nofollow noopener"
                       >
                         Near Token Bulksender
-                        <span>
-                          <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
-                        </span>
-                      </a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="https://nkyc.io" legacyBehavior>
-                      <a
-                        className="flex"
-                        target="_blank"
-                        rel="noreferrer nofollow noopener"
-                      >
-                        Near KYC Platform
                         <span>
                           <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
                         </span>
@@ -130,6 +113,11 @@ const Footer = () => {
                   <li>
                     <Link href="/charts" legacyBehavior>
                       <a>{t('footer.links.charts')}</a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/node-explorer" legacyBehavior>
+                      <a>{t('footer.links.nearValidator')}</a>
                     </Link>
                   </li>
                 </ul>
