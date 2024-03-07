@@ -1,7 +1,12 @@
 import { useBosLoaderStore } from '@/stores/bos-loader';
 import { useVmStore } from '@/stores/vm';
 import { useEffect, useRef, useState } from 'react';
+import Link, { LinkProps } from 'next/link';
 
+interface NavLinkProps extends LinkProps {
+  children: React.ReactNode;
+  legacybehaviour?: boolean;
+}
 type Props = {
   src: string;
   props?: Record<string, unknown>;
@@ -9,12 +14,18 @@ type Props = {
   onChangeHeight?: () => void;
   defaultSkelton?: JSX.Element;
 };
-
+const NavLink: React.FC<NavLinkProps> = ({ href, children, ...rest }) => {
+  return (
+    <Link legacybehaviour href={href} {...rest}>
+      {children}
+    </Link>
+  );
+};
 export function VmComponent(props: Props) {
   const { skeleton, onChangeHeight, defaultSkelton } = props;
   const onChangeHeightCalled = useRef(false);
 
-  const { EthersProvider, Widget } = useVmStore();
+  const { EthersProvider, ethersContext, Widget } = useVmStore();
   const redirectMapStore = useBosLoaderStore();
   const [showLoader, setShowLoader] = useState(true);
   const [Loader, setLoader] = useState(true);
@@ -39,12 +50,15 @@ export function VmComponent(props: Props) {
       {Loader ? (
         defaultSkelton
       ) : (
-        <Widget
-          config={{
-            redirectMap: redirectMapStore.redirectMap,
-          }}
-          {...props}
-        />
+        <EthersProvider value={ethersContext}>
+          <Widget
+            config={{
+              redirectMap: redirectMapStore.redirectMap,
+            }}
+            {...props}
+            props={{ Link: NavLink, ...props.props }}
+          />
+        </EthersProvider>
       )}
     </>
   );

@@ -32,13 +32,13 @@ const Swap = (props: EventPropsInfo) => {
       {
         <Widget
           src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: log[2], amount: log[1] }}
+          props={{ network: props.network, contract: log[2], amount: log[1] }}
         />
       }
       {
         <Widget
           src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: log[4], amount: log[3] }}
+          props={{ network: props.network, contract: log[4], amount: log[3] }}
         />
       }
       <span className="font-bold text-gray px-1">

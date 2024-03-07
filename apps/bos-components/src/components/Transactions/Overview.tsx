@@ -300,10 +300,7 @@ export default function ({ network, t }: Props) {
                         className="hover:no-underline"
                       >
                         <a className="leading-6 text-nearblue-700 hover:no-underline">
-                          $
-                          {stats?.market_cap
-                            ? dollarFormat(stats?.market_cap)
-                            : stats?.market_cap ?? ''}
+                          ${dollarFormat(stats?.market_cap ?? 0)}
                         </a>
                       </a>
                     )}

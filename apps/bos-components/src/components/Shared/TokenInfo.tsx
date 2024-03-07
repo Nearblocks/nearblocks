@@ -11,7 +11,7 @@ export default function (props: TokenInfoProps) {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
       ></div>
     );
   };
@@ -40,7 +40,7 @@ export default function (props: TokenInfoProps) {
           .then(
             (data: {
               body: {
-                result: { result: number[] };
+                result: { result: string[] };
               };
             }) => {
               const resp = data?.body?.result;
@@ -54,7 +54,7 @@ export default function (props: TokenInfoProps) {
     fetchMetadata(contract);
   }, [contract, config?.rpcUrl]);
 
-  return !meta ? (
+  return !meta?.name ? (
     <Loader wrapperClassName="flex w-full max-w-xl" />
   ) : (
     <>

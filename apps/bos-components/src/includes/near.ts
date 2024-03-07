@@ -30,11 +30,10 @@ export function encodeArgs(args: object) {
   return Buffer.from(JSON.stringify(args)).toString('base64');
 }
 
-export function decodeArgs(args: number[]) {
+export function decodeArgs(args: string[]) {
   if (!args || typeof args === 'undefined') return {};
 
-  const encodedString = Buffer.from(args).toString('base64');
-  return JSON.parse(Buffer.from(encodedString, 'base64').toString());
+  return JSON.parse(Buffer.from(args, 'base64').toString());
 }
 
 export function txnMethod(

@@ -96,7 +96,7 @@ export default function ({ network, id, tokenFilter }: Props) {
         .then(
           (data: {
             body: {
-              result: { result: number[] };
+              result: { result: string[] };
             };
           }) => {
             const resp = data?.body?.result;
@@ -129,8 +129,8 @@ export default function ({ network, id, tokenFilter }: Props) {
             return { ...ft, amount: rslt };
           });
         }),
-      ).then((results: FtsInfo[]) => {
-        results.forEach((rslt: FtsInfo) => {
+      ).then((results: TokenListInfo[]) => {
+        results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
           const amount = rslt?.amount;
 
@@ -139,13 +139,13 @@ export default function ({ network, id, tokenFilter }: Props) {
           let rpcAmount = Big(0);
 
           if (amount) {
-            rpcAmount = ftrslt.ft_metas?.decimals
-              ? Big(amount).div(Big(10).pow(ftrslt.ft_metas?.decimals))
+            rpcAmount = ftrslt.ft_meta?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt.ft_meta?.decimals))
               : 0;
           }
 
-          if (ftrslt.ft_metas?.price) {
-            sum = rpcAmount.mul(Big(ftrslt.ft_metas?.price));
+          if (ftrslt.ft_meta?.price) {
+            sum = rpcAmount.mul(Big(ftrslt.ft_meta?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -222,9 +222,9 @@ export default function ({ network, id, tokenFilter }: Props) {
                   <p className="text-sm my-1 flex">
                     ${ft?.amount ? dollarFormat(ft?.amount) : ft?.amount ?? ''}
                     <span>
-                      {filterToken?.ft_metas?.price && (
+                      {filterToken?.ft_meta?.price && (
                         <div className="text-gray-400 ml-2">
-                          @{filterToken?.ft_metas?.price}
+                          @{filterToken?.ft_meta?.price}
                         </div>
                       )}
                     </span>

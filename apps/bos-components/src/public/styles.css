@@ -146,6 +146,72 @@ pre[class*='language-']>code {
     outline: 0;
 }
 
+.contract-accordian [data-reach-accordion-button][data-state='open'] {
+    @apply rounded-b-none;
+  }
+  .contract-accordian [data-reach-accordion-panel][data-state='open'] {
+    @apply rounded-t-none;
+  }
+  .contract-icon {
+    transition: transform 300ms;
+  }
+  .contract-accordian
+    [data-reach-accordion-button][data-state='open']
+    .contract-icon {
+    transform: rotate(90deg);
+  }
+/* Styles for modal */
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    background-color: rgba(63, 65, 66, 0.5);
+    overflow: hidden;
+    outline: 0;
+}
+
+.fade {
+    transition: opacity 0.15s linear;
+}
+
+.modal-xl {
+    max-width: 1140px;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: auto;
+    pointer-events: none;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - (0.5rem * 2));
+}
+
+.modal-dialog-scrollable {
+    max-height: calc(100% - (0.5rem * 2));
+    overflow-y: auto;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border-radius: 0.75rem;
+    outline: 0;
+}
+
 .modal-header {
     display: flex;
     align-items: flex-start;

@@ -346,3 +346,13 @@ export function capitalizeWords(str: string) {
   const result: string = capitalizedWords.join(' ');
   return result;
 }
+
+export function toSnakeCase(str: string) {
+  return str
+    .replace(/[A-Z]/g, (match) => '_' + match.toLowerCase())
+    .replace(/^_/, '');
+}
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

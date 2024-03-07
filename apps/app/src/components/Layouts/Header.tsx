@@ -3,7 +3,7 @@ import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-
+import { useAuthStore } from '@/stores/auth';
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
 import ArrowDown from '../Icons/ArrowDown';
@@ -12,7 +12,7 @@ import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { VmComponent } from '../vm/VmComponent';
 import { networkId } from '@/utils/config';
-import { convertToUTC, dollarFormat, nanoToMilli } from '@/utils/libs';
+import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 
@@ -157,7 +157,14 @@ const Header = () => {
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const user = null;
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+  const signedIn = useAuthStore((store) => store.signedIn);
+  const accountId = useAuthStore((store) => store.accountId);
+  const logOut = useAuthStore((store) => store.logOut);
+  const user = signedIn;
+
   useEffect(() => {
     let delay = 5000;
     async function fetchStats() {
@@ -186,6 +193,14 @@ const Header = () => {
       }
     }
 
+    fetchStats();
+
+    const interval = setInterval(fetchStats, delay);
+
+    return () => clearInterval(interval);
+  }, [router, isLoading]);
+
+  useEffect(() => {
     async function fetchBlocks() {
       try {
         const response = await fetch(
@@ -210,23 +225,16 @@ const Header = () => {
       }
     }
 
-    fetchStats();
     fetchBlocks();
-
-    const interval = setInterval(fetchStats, delay);
-
-    return () => clearInterval(interval);
-  }, [router, isLoading]);
+  }, []);
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
-      const timestamp = +convertToUTC(
-        nanoToMilli(block?.block_timestamp),
-        true,
-      );
+      const timestamp = nanoToMilli(block?.block_timestamp);
+      const utcDate = new Date(timestamp).getTime();
       const currentTime = new Date().getTime();
 
-      if ((currentTime - timestamp) / (1000 * 60) > 10) {
+      if ((currentTime - utcDate) / (1000 * 60) > 10) {
         return false;
       }
     }
@@ -236,7 +244,7 @@ const Header = () => {
   const showSearch = router.pathname !== '/';
   const userLoading = false;
   const onSignOut = () => {
-    router.push('/login');
+    logOut();
   };
 
   return (
@@ -482,7 +490,9 @@ const Header = () => {
                           <div className="w-full">
                             {user ? (
                               <div className="flex justify-between">
-                                <div className="flex items-center">{user}</div>
+                                <div className="flex items-center">
+                                  {accountId}
+                                </div>
                                 <ArrowDown
                                   className={`fill-current transition-transform w-5 h-5 ${
                                     show && 'transform rotate-180'
@@ -490,12 +500,12 @@ const Header = () => {
                                 />
                               </div>
                             ) : (
-                              <ActiveLink href="/login">
+                              <div onClick={requestSignInWithWallet}>
                                 <div className="w-full flex items-center">
                                   <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
                                   Sign In
                                 </div>
-                              </ActiveLink>
+                              </div>
                             )}
                           </div>
                         </a>
@@ -533,16 +543,16 @@ const Header = () => {
                         {user ? (
                           <>
                             <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                            {/* {user} username */}
+                            {accountId}
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </>
                         ) : (
-                          <ActiveLink href="/login">
+                          <div onClick={requestSignInWithWallet}>
                             <div className="flex items-center">
                               {userLoading ? (
                                 <>
                                   <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                  {/* <Loader wrapperClassName="flex w-14 h-4" /> */}
+                                  <Skeleton className="flex w-14 h-4" />
                                 </>
                               ) : (
                                 <>
@@ -551,13 +561,13 @@ const Header = () => {
                                 </>
                               )}
                             </div>
-                          </ActiveLink>
+                          </div>
                         )}
                       </a>
 
                       {user && (
                         <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
-                          {profile.map((menu) => (
+                          {/* {profile.map((menu) => (
                             <li key={menu.id}>
                               <ActiveLink href={menu.link}>
                                 <a className="block w-full hover:hover:text-green-500  py-2 px-4">
@@ -565,8 +575,8 @@ const Header = () => {
                                 </a>
                               </ActiveLink>
                             </li>
-                          ))}
-                          <li className="border-t my-3"></li>
+                          ))} */}
+                          {/* <li className="border-t my-3"></li> */}
                           <li className="px-4 pb-1">
                             <button
                               onClick={onSignOut}

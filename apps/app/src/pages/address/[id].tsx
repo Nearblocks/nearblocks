@@ -5,7 +5,10 @@ import Overview from '@/components/skeleton/common/Overview';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
+import { useAuthStore } from '@/stores/auth';
+
 import { ReactElement, useEffect, useRef, useState } from 'react';
+
 const Address = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -13,6 +16,7 @@ const Address = () => {
   const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -21,6 +25,7 @@ const Address = () => {
       setHeight({});
     }
   };
+
   useEffect(() => {
     updateOuterDivHeight();
     window.addEventListener('resize', updateOuterDivHeight);
@@ -29,9 +34,19 @@ const Address = () => {
       window.removeEventListener('resize', updateOuterDivHeight);
     };
   }, []);
+
   const onChangeHeight = () => {
     setHeight({});
   };
+
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
+  const signedIn = useAuthStore((store) => store.signedIn);
+  const account = useAuthStore((store) => store.account);
+  const logOut = useAuthStore((store) => store.logOut);
+
   return (
     <div style={height} className="relative container mx-auto px-3">
       <VmComponent
@@ -43,6 +58,11 @@ const Address = () => {
           id: id,
           network: networkId,
           t: t,
+          requestSignInWithWallet: requestSignInWithWallet,
+          signedIn: signedIn,
+          accountId:
+            account && account?.loading === false ? account?.accountId : null,
+          logOut: logOut,
         }}
       />
     </div>
