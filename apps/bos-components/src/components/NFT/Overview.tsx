@@ -17,7 +17,7 @@ import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat } from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
@@ -48,6 +48,8 @@ export default function ({ network, id }: Props) {
             if (data.status === 200) {
               setToken(resp);
               setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
           },
         )
@@ -68,6 +70,8 @@ export default function ({ network, id }: Props) {
             if (data.status === 200) {
               setTransfers(resp.count);
               setTxnLoading(false);
+            } else {
+              handleRateLimit(data, fetchTxnsCount, () => setTxnLoading(false));
             }
           },
         )
@@ -88,6 +92,10 @@ export default function ({ network, id }: Props) {
             if (data.status === 200) {
               setHolders(resp.count);
               setHolderLoading(false);
+            } else {
+              handleRateLimit(data, fetchHoldersCount, () =>
+                setHolderLoading(false),
+              );
             }
           },
         )

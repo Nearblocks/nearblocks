@@ -18,7 +18,7 @@ interface Props {
 }
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { nanoToMilli, yoctoToNear } from '@/includes/libs';
 import {
   formatTimestampToString,
@@ -125,10 +125,13 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
           'Content-Type': 'application/json',
         },
       })
-        .then((data: { body: { result: AccessInfo } }) => {
+        .then((data: { body: { result: AccessInfo }; status: number }) => {
           const resp = data?.body?.result;
-
-          setKeyInfo(resp);
+          if (data.status === 200) {
+            setKeyInfo(resp);
+          } else {
+            handleRateLimit(data, () => tokenInfo(view_access_key, account_id));
+          }
         })
         .catch(() => {});
     }

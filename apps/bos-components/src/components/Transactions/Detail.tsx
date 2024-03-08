@@ -40,6 +40,7 @@ import TokenImage from '@/includes/icons/TokenImage';
 import {
   fiatValue,
   getConfig,
+  handleRateLimit,
   nanoToMilli,
   shortenAddress,
   yoctoToNear,
@@ -124,6 +125,8 @@ export default function (props: Props) {
               const resp = res?.body?.stats;
               if (res.status === 200) {
                 setStatsData(resp);
+              } else {
+                handleRateLimit(res, fetchStatsDatas);
               }
             },
           )
@@ -155,6 +158,8 @@ export default function (props: Props) {
             const resp = data?.body?.market_data?.current_price?.usd;
             if (data.status === 200) {
               setPrice(resp);
+            } else {
+              handleRateLimit(data, () => fetchPriceAtDate(date));
             }
           },
         );
@@ -199,6 +204,7 @@ export default function (props: Props) {
           body: {
             account: AccountContractInfo[];
           };
+          status: number;
         }) => {
           const resp = data?.body?.account?.[0];
           setIsContract(resp?.code_hash !== '11111111111111111111111111111111');

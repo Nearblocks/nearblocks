@@ -16,7 +16,7 @@ interface Props {
 }
 
 import { AccountContractInfo } from '@/includes/types';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
@@ -58,34 +58,42 @@ export default function ({ network, t, id }: Props) {
             body: {
               keys: AccountContractInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.keys;
-            Setkeys(resp);
+            if (data.status === 200) {
+              Setkeys(resp);
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchAccountData(),
+                () => setIsLoading(false),
+              );
+            }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     function fetchCountData() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}/keys/count`)
         .then(
           (data: {
             body: {
               keys: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.keys?.[0]?.count || 0;
-            setCount(resp);
+            if (data.status === 200) {
+              setCount(resp);
+            } else {
+              handleRateLimit(data, fetchCountData);
+            }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     fetchAccountData();
     fetchCountData();

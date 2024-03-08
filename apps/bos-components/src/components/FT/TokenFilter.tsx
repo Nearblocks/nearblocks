@@ -12,7 +12,7 @@
 import Skeleton from '@/includes/Common/Skeleton';
 import { dollarFormat, localFormat } from '@/includes/formats';
 import FaAddressBook from '@/includes/icons/FaAddressBook';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { decodeArgs, encodeArgs } from '@/includes/near';
 import {
   FtInfo,
@@ -55,8 +55,12 @@ export default function ({ network, id, tokenFilter }: Props) {
             const response = data?.body?.inventory;
             if (data.status === 200) {
               setInventoryData(response);
+              setInventoryLoading(false);
+            } else {
+              handleRateLimit(data, fetchInventoryData, () =>
+                setInventoryLoading(false),
+              );
             }
-            setInventoryLoading(false);
           },
         )
         .catch(() => {});

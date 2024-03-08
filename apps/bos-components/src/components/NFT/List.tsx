@@ -19,7 +19,7 @@ interface Props {
 }
 
 import { localFormat, serialNumber } from '@/includes/formats';
-import { debounce, getConfig } from '@/includes/libs';
+import { debounce, getConfig, handleRateLimit } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
@@ -62,6 +62,8 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, () => fetchTotalTokens(qs));
             }
           },
         )
@@ -90,13 +92,18 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             const resp = data?.body?.tokens;
             if (data.status === 200) {
               setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTokens(qs, sorting, page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     fetchTotalTokens();

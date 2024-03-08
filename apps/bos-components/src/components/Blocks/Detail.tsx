@@ -28,7 +28,7 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { gasPrice } from '@/includes/near';
 import { BlocksInfo, Link } from '@/includes/types';
 
@@ -85,8 +85,10 @@ export default function (props: Props) {
                 receipts_agg: resp.receipts_agg,
                 transactions_agg: resp.transactions_agg,
               });
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchBlock, () => setIsLoading(false));
             }
-            setIsLoading(false);
           },
         )
         .catch((error: Error) => {
@@ -115,6 +117,8 @@ export default function (props: Props) {
             const resp = data?.body?.market_data?.current_price?.usd;
             if (data.status === 200) {
               setPrice(resp);
+            } else {
+              handleRateLimit(data, () => fetchPriceAtDate(date));
             }
           },
         );

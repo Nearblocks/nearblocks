@@ -17,7 +17,7 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat, serialNumber } from '@/includes/formats';
-import { getConfig, holderPercentage } from '@/includes/libs';
+import { getConfig, handleRateLimit, holderPercentage } from '@/includes/libs';
 import { HoldersPropsInfo, Token } from '@/includes/types';
 
 export default function ({ network, id, token }: Props) {
@@ -55,6 +55,8 @@ export default function ({ network, id, token }: Props) {
             if (data.status === 200) {
               setTokens(resp);
               setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
           },
         )
@@ -79,6 +81,8 @@ export default function ({ network, id, token }: Props) {
             if (data.status === 200) {
               setTotalCount(0);
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalHolders);
             }
           },
         )
@@ -103,13 +107,18 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders;
             if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
               setHolder((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchHoldersData(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     if (!token && token === undefined) {
       fetchNFTData();

@@ -34,7 +34,7 @@ import {
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
@@ -79,8 +79,10 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+              setTxnLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
-            setTxnLoading(false);
           },
         )
         .catch(() => {})
@@ -103,12 +105,12 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
           const resp = data?.body?.txns;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
             setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, () => fetchTxnsData(page, qs));
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     let urlString = '';

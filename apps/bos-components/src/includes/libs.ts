@@ -196,3 +196,20 @@ export function isJson(string: string) {
 export function uniqueId() {
   return Math.floor(Math.random() * 1000);
 }
+export function handleRateLimit(
+  data: { status: number },
+  reFetch: () => void,
+  Loading?: () => void,
+) {
+  if (data.status === 429 || data.status === undefined) {
+    const retryCount = 4;
+    const delay = Math.pow(2, retryCount) * 1000;
+    setTimeout(() => {
+      reFetch();
+    }, delay);
+  } else {
+    if (Loading) {
+      Loading();
+    }
+  }
+}

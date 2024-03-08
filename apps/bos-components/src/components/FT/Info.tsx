@@ -15,7 +15,7 @@ interface Props {
 }
 
 import { localFormat, dollarNonCentFormat } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 export default function ({ token, id, network }: Props) {
@@ -34,6 +34,8 @@ export default function ({ token, id, network }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )

@@ -32,7 +32,7 @@ import {
 } from '@/includes/formats';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { StatusInfo, Token } from '@/includes/types';
 
 export default function ({
@@ -75,8 +75,10 @@ export default function ({
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setToken(resp);
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchFTData, () => setIsLoading(false));
             }
-            setIsLoading(false);
           },
         )
         .catch(() => {});
@@ -95,8 +97,10 @@ export default function ({
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTransfers(resp.count);
+              setTxnLoading(false);
+            } else {
+              handleRateLimit(data, fetchTxnsCount, () => setTxnLoading(false));
             }
-            setTxnLoading(false);
           },
         )
         .catch(() => {});
@@ -113,6 +117,8 @@ export default function ({
           const data = res.body;
           if (res.status === 200) {
             setStats(data.stats[0]);
+          } else {
+            handleRateLimit(data, fetchStatsData);
           }
         })
         .catch(() => {})
@@ -131,8 +137,12 @@ export default function ({
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setHolders(resp.count);
+              setHolderLoading(false);
+            } else {
+              handleRateLimit(data, fetchHoldersCount, () =>
+                setHolderLoading(false),
+              );
             }
-            setHolderLoading(false);
           },
         )
         .catch(() => {});

@@ -24,7 +24,7 @@ import {
   dollarNonCentFormat,
   serialNumber,
 } from '@/includes/formats';
-import { debounce, getConfig } from '@/includes/libs';
+import { debounce, getConfig, handleRateLimit } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import ArrowDown from '@/includes/icons/ArrowDown';
@@ -82,6 +82,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTokens(qs));
             }
           },
         )
@@ -111,13 +113,17 @@ export default function ({ t, network, currentPage, setPage }: Props) {
             const resp = data?.body?.tokens;
             if (data.status === 200) {
               setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTokens(qs, sorting, page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchTotalTokens();

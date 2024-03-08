@@ -22,7 +22,7 @@ import {
   localFormat,
 } from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
@@ -61,6 +61,8 @@ export default function ({ network, t, id, tid }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, fetchTotalTokens);
             }
           },
         )
@@ -89,13 +91,18 @@ export default function ({ network, t, id, tid }: Props) {
             const resp = data?.body?.txns;
             if (data.status === 200) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTokens(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     fetchTotalTokens();

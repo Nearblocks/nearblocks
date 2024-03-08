@@ -19,7 +19,7 @@ import {
   getTimeAgoString,
   localFormat,
 } from '@/includes/formats';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
@@ -39,13 +39,15 @@ export default function ({ network, t }: Props) {
           if (data.status === 200) {
             setBlocks(resp);
             setError(false);
+            if (isLoading) setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchLatestBlocks, () => {
+              if (isLoading) setIsLoading(false);
+            });
           }
         })
         .catch(() => {
           setError(true);
-        })
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
         });
     }
 

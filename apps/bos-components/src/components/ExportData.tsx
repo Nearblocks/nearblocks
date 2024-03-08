@@ -10,7 +10,7 @@
  * @param {string} [exportType] - Type of data to be exported, available options are (transactions, ft and nft token transaction)
  */
 
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 
 interface Props {
   network: string;
@@ -90,14 +90,15 @@ export default function ({ network, id, onHandleDowload, exportType }: Props) {
               const blob = new Blob([resp.body], { type: 'text/csv' });
               const href = URL.createObjectURL(blob);
               setExportData(href);
+              setLoading(false);
+            } else {
+              handleRateLimit(resp, fetchData, () => setLoading(false));
             }
           })
           .catch((error: any) => {
             console.log(error);
           })
-          .finally(() => {
-            setLoading(false);
-          });
+          .finally(() => {});
       } catch (error) {
       } finally {
         setLoading(false);

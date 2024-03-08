@@ -16,7 +16,7 @@ interface Props {
 }
 
 import { convertToMetricPrefix } from '@/includes/formats';
-import { getConfig, yoctoToNear } from '@/includes/libs';
+import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
@@ -56,12 +56,14 @@ export default function (props: Props) {
                   receipts_agg: resp.receipts_agg,
                   transactions_agg: resp.transactions_agg,
                 });
+                setLoading(false);
+              } else {
+                handleRateLimit(res, fetchBlocks, () => setLoading(false));
               }
             },
           )
           .catch(() => {});
       }
-      setLoading(false);
     }
 
     fetchBlocks();

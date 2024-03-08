@@ -17,7 +17,7 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 const hashes = [' ', 'execution', 'comments'];
@@ -37,7 +37,6 @@ export default function (props: Props) {
   const onTab = (index: number) => {
     setHash(hashes[index]);
   };
-
   useEffect(() => {
     function fetchTxn() {
       setIsLoading(true);
@@ -52,8 +51,10 @@ export default function (props: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTxn(resp);
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchTxn, () => setIsLoading(false));
             }
-            setIsLoading(false);
           },
         )
         .catch((error: Error) => {
@@ -90,6 +91,8 @@ export default function (props: Props) {
               const resp = res?.body?.result;
               if (res.status === 200) {
                 setRpcTxn(resp);
+              } else {
+                handleRateLimit(res, fetchTransactionStatus);
               }
             },
           )

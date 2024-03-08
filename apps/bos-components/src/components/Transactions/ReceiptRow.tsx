@@ -26,7 +26,7 @@ import {
 } from '@/includes/types';
 import Question from '@/includes/Common/Question';
 import { convertToMetricPrefix, localFormat } from '@/includes/formats';
-import { getConfig, yoctoToNear } from '@/includes/libs';
+import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
@@ -61,12 +61,14 @@ export default function (props: Props) {
                   receipts_agg: resp.receipts_agg,
                   transactions_agg: resp.transactions_agg,
                 });
+                setLoading(false);
+              } else {
+                handleRateLimit(res, fetchBlocks, () => setLoading(false));
               }
             },
           )
           .catch(() => {});
       }
-      setLoading(false);
     }
 
     fetchBlocks();

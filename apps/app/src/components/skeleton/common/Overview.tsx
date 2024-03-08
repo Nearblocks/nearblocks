@@ -92,22 +92,11 @@ const Overview = forwardRef(
                 >
                   Access Keys
                 </div>
-                <>
-                  {' '}
-                  <div
-                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                  >
-                    Contract
-                    <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -ml-3 -mt-3 px-1 ">
-                      NEW
-                    </div>
-                  </div>
-                  <div
-                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                  >
-                    Comments
-                  </div>
-                </>
+                <div
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                >
+                  Comments
+                </div>
               </div>
               <div className="relative">
                 <div

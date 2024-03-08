@@ -37,6 +37,7 @@ import {
 import { txnMethod } from '@/includes/near';
 import {
   getConfig,
+  handleRateLimit,
   nanoToMilli,
   truncateString,
   yoctoToNear,
@@ -90,6 +91,8 @@ export default function (props: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
@@ -114,13 +117,18 @@ export default function (props: Props) {
           if (data.status === 200) {
             if (Array.isArray(resp) && resp.length > 0) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
             }
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {

@@ -21,7 +21,12 @@ import {
   dollarNonCentFormat,
   convertToUTC,
 } from '@/includes/formats';
-import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
+import {
+  getConfig,
+  handleRateLimit,
+  nanoToMilli,
+  shortenAddress,
+} from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import {
   AccountInfo,
@@ -58,6 +63,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )
@@ -75,6 +82,8 @@ export default function ({ network, id, token }: Props) {
             const accountResp = data?.body?.account?.[0];
             if (data.status === 200) {
               setAccount(accountResp);
+            } else {
+              handleRateLimit(data, fetchAccountData);
             }
           },
         )
@@ -92,6 +101,8 @@ export default function ({ network, id, token }: Props) {
             const depResp = data?.body?.deployments?.[0];
             if (data.status === 200) {
               setContract(depResp);
+            } else {
+              handleRateLimit(data, fetchContractData);
             }
           },
         )
@@ -109,6 +120,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTransfers(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalTxns);
             }
           },
         )
@@ -126,6 +139,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setLargestHolder(resp);
+            } else {
+              handleRateLimit(data, fetchHoldersdata);
             }
           },
         )
@@ -143,6 +158,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setHolders(resp?.count);
+            } else {
+              handleRateLimit(data, fetchHoldersCount);
             }
           },
         )
