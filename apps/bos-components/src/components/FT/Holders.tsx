@@ -17,7 +17,7 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat, serialNumber } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { price, tokenAmount, tokenPercentage } from '@/includes/near';
 import { HoldersPropsInfo, Token } from '@/includes/types';
 
@@ -54,6 +54,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )
@@ -76,6 +78,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalHolders);
             }
           },
         )
@@ -100,13 +104,14 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders;
             if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
               setHolder((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchHoldersData(page));
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     if (!token && token === undefined) {
       fetchFTData();

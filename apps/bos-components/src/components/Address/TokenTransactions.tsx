@@ -37,7 +37,7 @@ import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
@@ -87,11 +87,12 @@ export default function ({
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count | 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTokens(qs));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchTokens(qs: string, sqs: string, page: number) {
@@ -120,13 +121,13 @@ export default function ({
               } else if (resp.length === 0) {
                 setTokens({});
               }
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchTokens(qs, sorting, page));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {

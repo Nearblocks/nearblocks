@@ -22,6 +22,7 @@ import {
   convertAmountToReadableString,
   convertTimestampToTime,
   getConfig,
+  handleRateLimit,
   shortenAddress,
   timeAgo,
   yoctoToNear,
@@ -85,14 +86,13 @@ export default function ({ network, currentPage, setPage }: Props) {
               ...prevData,
               [page]: validators || [],
             }));
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, () => fetchValidatorData(page));
           }
           setExpanded([]);
         })
-        .catch(() => {})
-
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     function fetchTotalSuppy() {
       asyncFetch(`${config?.backendUrl}stats`, {
@@ -105,6 +105,8 @@ export default function ({ network, currentPage, setPage }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setTotalSupply(data.stats[0].total_supply || 0);
+          } else {
+            handleRateLimit(data, fetchTotalSuppy);
           }
         })
         .catch(() => {})
@@ -121,6 +123,8 @@ export default function ({ network, currentPage, setPage }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setLatestBlock(data.blocks[0].block_height || 0);
+          } else {
+            handleRateLimit(data, fetchLatestBlock);
           }
         })
         .catch(() => {})

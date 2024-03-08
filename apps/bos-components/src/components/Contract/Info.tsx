@@ -16,7 +16,7 @@ interface Props {
 }
 import { convertToUTC } from '@/includes/formats';
 import Question from '@/includes/icons/Question';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { ContractInfo, DeploymentsInfo } from '@/includes/types';
 
 export default function (props: Props) {
@@ -44,13 +44,13 @@ export default function (props: Props) {
             if (data?.status === 200) {
               const depResp = data?.body?.deployments;
               setDeploymentData(depResp);
+              setLoading(false);
+            } else {
+              handleRateLimit(data, fetchContractData);
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchContractData();

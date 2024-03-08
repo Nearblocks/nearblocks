@@ -15,7 +15,7 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, shortenAddress } from '@/includes/libs';
+import { getConfig, handleRateLimit, shortenAddress } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -50,13 +50,13 @@ export default function ({ network, t, id, tid }: Props) {
             const resp = res?.body?.tokens?.[0];
             if (res.status === 200) {
               setToken(resp);
+              setLoading(false);
+            } else {
+              handleRateLimit(res, fetchToken);
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchToken();

@@ -37,7 +37,13 @@ import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
-import { getConfig, isAction, nanoToMilli, yoctoToNear } from '@/includes/libs';
+import {
+  getConfig,
+  handleRateLimit,
+  isAction,
+  nanoToMilli,
+  yoctoToNear,
+} from '@/includes/libs';
 import { txnMethod } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
@@ -83,11 +89,12 @@ export default function ({
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchTxnsData(qs: string, sqs: string, page: number) {
@@ -110,12 +117,12 @@ export default function ({
             } else if (resp.length === 0) {
               setTxns({});
             }
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, () => fetchTxnsData(qs, sorting, page));
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {

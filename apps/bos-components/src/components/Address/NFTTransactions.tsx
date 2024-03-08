@@ -30,7 +30,7 @@ import {
   formatTimestampToString,
   capitalizeFirstLetter,
 } from '@/includes/formats';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
@@ -81,11 +81,12 @@ export default function (props: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchTxnsData(qs: string, sqs: string, page: number) {
@@ -108,12 +109,12 @@ export default function (props: Props) {
             } else if (resp.length === 0) {
               setTxns({});
             }
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, () => fetchTxnsData(qs, sorting, page));
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {

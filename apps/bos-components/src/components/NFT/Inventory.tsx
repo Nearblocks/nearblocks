@@ -12,7 +12,7 @@
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
 import { localFormat } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -53,6 +53,8 @@ export default function ({ network, id, token }: Props) {
             if (data.status === 200) {
               setTokenData(resp);
               setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchNFTData);
             }
           },
         )
@@ -76,6 +78,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalToken);
             }
           },
         )
@@ -99,12 +103,12 @@ export default function ({ network, id, token }: Props) {
           const resp = data?.body?.tokens;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
             setTokens(resp);
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchTokenData);
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     if (!token && token === undefined) {
       fetchNFTData();

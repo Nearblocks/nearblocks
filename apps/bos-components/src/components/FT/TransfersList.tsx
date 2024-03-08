@@ -28,7 +28,7 @@ import {
 import Clock from '@/includes/icons/Clock';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, nanoToMilli } from '@/includes/libs';
+import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
@@ -61,6 +61,8 @@ export default function ({ network, t, currentPage, setPage }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, fetchTotalTokens);
             }
           },
         )
@@ -86,13 +88,14 @@ export default function ({ network, t, currentPage, setPage }: Props) {
             const resp = data?.body?.txns;
             if (data.status === 200) {
               setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchTokens(page));
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
 
     fetchTotalTokens();

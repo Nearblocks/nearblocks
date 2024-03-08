@@ -17,6 +17,7 @@ import Skeleton from '@/includes/Common/Skeleton';
 import { getTimeAgoString, shortenHex } from '@/includes/formats';
 import {
   getConfig,
+  handleRateLimit,
   nanoToMilli,
   shortenAddress,
   yoctoToNear,
@@ -46,14 +47,14 @@ export default function ({ t, network }: Props) {
             if (data.status === 200) {
               setTxns(resp);
               setError(false);
+              if (isLoading) setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchLatestTxns);
             }
           },
         )
         .catch(() => {
           setError(true);
-        })
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
         });
     }
     fetchLatestTxns();

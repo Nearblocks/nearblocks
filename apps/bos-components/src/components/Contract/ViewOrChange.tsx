@@ -25,7 +25,7 @@ import { capitalize, toSnakeCase } from '@/includes/formats';
 import ArrowRight from '@/includes/icons/ArrowRight';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Question from '@/includes/icons/Question';
-import { getConfig, isJson, uniqueId } from '@/includes/libs';
+import { getConfig, handleRateLimit, isJson, uniqueId } from '@/includes/libs';
 import { FieldType } from '@/includes/types';
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -211,6 +211,9 @@ export default function (props: Props) {
                     setHideQuery(true);
                   }
                 });
+              setLoading(false);
+            } else {
+              handleRateLimit(data, () => onDetect(e));
             }
           },
         )
@@ -218,8 +221,6 @@ export default function (props: Props) {
     } catch (error) {
       console.log({ error });
     }
-
-    setLoading(false);
   };
 
   return (

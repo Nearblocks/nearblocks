@@ -21,7 +21,12 @@ import {
   localFormat,
 } from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
+import {
+  getConfig,
+  handleRateLimit,
+  nanoToMilli,
+  shortenAddress,
+} from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
@@ -61,6 +66,8 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             const resp = data?.body?.blocks?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, fetchTotalBlocks);
             }
           },
         )
@@ -86,13 +93,13 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             const resp = data?.body?.blocks;
             if (data.status === 200) {
               setBlocks((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchBlocks(page));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchTotalBlocks();

@@ -19,7 +19,7 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { getConfig, yoctoToNear } from '@/includes/libs';
+import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
@@ -152,9 +152,13 @@ export default function (props: Props) {
   useEffect(() => {
     function fetchChartData() {
       asyncFetch(`${config.backendUrl}charts`).then(
-        (res: { body: { charts: ChartStat[] } }) => {
-          if (res?.body) {
-            setData(res.body?.charts as ChartStat[]);
+        (res: { body: { charts: ChartStat[] }; status: number }) => {
+          if (res.status === 200) {
+            if (res?.body) {
+              setData(res.body?.charts as ChartStat[]);
+            }
+          } else {
+            handleRateLimit(res, fetchChartData);
           }
         },
       );

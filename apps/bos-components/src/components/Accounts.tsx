@@ -30,6 +30,7 @@ import {
   nanoToMilli,
   shortenAddress,
   getConfig,
+  handleRateLimit,
 } from '@/includes/libs';
 import {
   dollarFormat,
@@ -121,9 +122,14 @@ export default function (props: Props) {
             body: {
               stats: SatsInfo[];
             };
+            status: number;
           }) => {
             const statsResp = data?.body?.stats?.[0];
-            setStatsData({ near_price: statsResp.near_price });
+            if (data.status === 200) {
+              setStatsData({ near_price: statsResp.near_price });
+            } else {
+              handleRateLimit(data, fetchStatsData);
+            }
           },
         )
         .catch(() => {})
@@ -143,23 +149,26 @@ export default function (props: Props) {
             body: {
               account: AccountInfo[];
             };
+            status: number;
           }) => {
             const accountResp = data?.body?.account?.[0];
-            setAccountData({
-              account_id: accountResp.account_id,
-              amount: accountResp.amount,
-              code_hash: accountResp.code_hash,
-              created: accountResp.created,
-              deleted: accountResp.deleted,
-              locked: accountResp.locked,
-              storage_usage: accountResp.storage_usage,
-            });
+            if (data.status === 200) {
+              setAccountData({
+                account_id: accountResp.account_id,
+                amount: accountResp.amount,
+                code_hash: accountResp.code_hash,
+                created: accountResp.created,
+                deleted: accountResp.deleted,
+                locked: accountResp.locked,
+                storage_usage: accountResp.storage_usage,
+              });
+              setLoading(false);
+            } else {
+              handleRateLimit(data, fetchAccountData);
+            }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => {});
     }
 
     function fetchContractData() {
@@ -174,9 +183,14 @@ export default function (props: Props) {
             body: {
               deployments: DeploymentsInfo[];
             };
+            status: number;
           }) => {
             const depResp = data?.body?.deployments?.[0];
-            setDeploymentData(depResp);
+            if (data.status === 200) {
+              setDeploymentData(depResp);
+            } else {
+              handleRateLimit(data, fetchContractData);
+            }
           },
         )
         .catch(() => {});
@@ -194,15 +208,20 @@ export default function (props: Props) {
             body: {
               contracts: TokenInfo[];
             };
+            status: number;
           }) => {
             const tokenResp = data?.body?.contracts?.[0];
-            setTokenData({
-              name: tokenResp.name,
-              icon: tokenResp.icon,
-              symbol: tokenResp.symbol,
-              price: tokenResp.price,
-              website: tokenResp.website,
-            });
+            if (data.status === 200) {
+              setTokenData({
+                name: tokenResp.name,
+                icon: tokenResp.icon,
+                symbol: tokenResp.symbol,
+                price: tokenResp.price,
+                website: tokenResp.website,
+              });
+            } else {
+              handleRateLimit(data, fetchTokenData);
+            }
           },
         )
         .catch(() => {});
@@ -221,12 +240,18 @@ export default function (props: Props) {
             body: {
               inventory: InventoryInfo;
             };
+            status: number;
           }) => {
             const response = data?.body?.inventory;
-            setInventoryData({
-              fts: response.fts,
-              nfts: response.nfts,
-            });
+            if (data.status === 200) {
+              setInventoryData({
+                fts: response.fts,
+                nfts: response.nfts,
+              });
+              setInventoryLoading(false);
+            } else {
+              handleRateLimit(data, fetchInventoryData);
+            }
           },
         )
         .catch(() => {})

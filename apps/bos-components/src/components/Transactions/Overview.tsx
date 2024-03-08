@@ -20,7 +20,7 @@ import {
   formatCustomDate,
   localFormat,
 } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
+import { getConfig, handleRateLimit } from '@/includes/libs';
 import { gasPrice } from '@/includes/near';
 import {
   ChartConfigType,
@@ -65,12 +65,12 @@ export default function ({ network, t }: Props) {
               total_txns: resp.total_txns,
               volume: resp.volume,
             });
+            if (isLoading) setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchStats);
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchStats();
@@ -88,9 +88,14 @@ export default function ({ network, t }: Props) {
             body: {
               charts: { date: string; near_price: string; txns: string }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.charts;
-            setCharts(resp);
+            if (data.status === 200) {
+              setCharts(resp);
+            } else {
+              handleRateLimit(data, fetchChartData);
+            }
           },
         )
         .catch(() => {});
