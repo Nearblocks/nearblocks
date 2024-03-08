@@ -57,7 +57,9 @@ export default function ({ network, id, tokenFilter }: Props) {
               setInventoryData(response);
               setInventoryLoading(false);
             } else {
-              handleRateLimit(data, fetchInventoryData);
+              handleRateLimit(data, fetchInventoryData, () =>
+                setInventoryLoading(false),
+              );
             }
           },
         )

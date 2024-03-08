@@ -56,14 +56,14 @@ export default function (props: Props) {
                   receipts_agg: resp.receipts_agg,
                   transactions_agg: resp.transactions_agg,
                 });
+                setLoading(false);
               } else {
-                handleRateLimit(res, fetchBlocks);
+                handleRateLimit(res, fetchBlocks, () => setLoading(false));
               }
             },
           )
           .catch(() => {});
       }
-      setLoading(false);
     }
 
     fetchBlocks();

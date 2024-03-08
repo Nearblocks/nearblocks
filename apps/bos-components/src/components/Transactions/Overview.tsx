@@ -67,7 +67,9 @@ export default function ({ network, t }: Props) {
             });
             if (isLoading) setIsLoading(false);
           } else {
-            handleRateLimit(data, fetchStats);
+            handleRateLimit(data, fetchStats, () => {
+              if (isLoading) setIsLoading(false);
+            });
           }
         })
         .catch(() => {});

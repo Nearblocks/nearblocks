@@ -119,7 +119,11 @@ export default function ({
             }
             setIsLoading(false);
           } else {
-            handleRateLimit(data, () => fetchTxnsData(qs, sorting, page));
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
         .catch(() => {});

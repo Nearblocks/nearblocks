@@ -94,7 +94,11 @@ export default function ({ network, currentPage, setPage, t }: Props) {
               setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchTokens(qs, sorting, page));
+              handleRateLimit(
+                data,
+                () => fetchTokens(qs, sorting, page),
+                () => setIsLoading(false),
+              );
             }
           },
         )

@@ -106,7 +106,11 @@ export default function ({ network, id, token }: Props) {
               setHolder((prevData) => ({ ...prevData, [page]: resp || [] }));
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchHoldersData(page));
+              handleRateLimit(
+                data,
+                () => fetchHoldersData(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )

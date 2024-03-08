@@ -65,7 +65,11 @@ export default function ({ network, t, id }: Props) {
               Setkeys(resp);
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchAccountData());
+              handleRateLimit(
+                data,
+                () => fetchAccountData(),
+                () => setIsLoading(false),
+              );
             }
           },
         )

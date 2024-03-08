@@ -88,7 +88,11 @@ export default function ({ network, currentPage, setPage }: Props) {
             }));
             setIsLoading(false);
           } else {
-            handleRateLimit(data, () => fetchValidatorData(page));
+            handleRateLimit(
+              data,
+              () => fetchValidatorData(page),
+              () => setIsLoading(false),
+            );
           }
           setExpanded([]);
         })

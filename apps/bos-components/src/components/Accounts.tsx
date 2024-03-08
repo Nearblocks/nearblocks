@@ -164,7 +164,7 @@ export default function (props: Props) {
               });
               setLoading(false);
             } else {
-              handleRateLimit(data, fetchAccountData);
+              handleRateLimit(data, fetchAccountData, () => setLoading(false));
             }
           },
         )
@@ -250,14 +250,13 @@ export default function (props: Props) {
               });
               setInventoryLoading(false);
             } else {
-              handleRateLimit(data, fetchInventoryData);
+              handleRateLimit(data, fetchInventoryData, () =>
+                setInventoryLoading(false),
+              );
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setInventoryLoading(false);
-        });
+        .catch(() => {});
     }
 
     fetchStatsData();

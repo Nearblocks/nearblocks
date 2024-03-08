@@ -87,7 +87,7 @@ export default function (props: Props) {
               });
               setIsLoading(false);
             } else {
-              handleRateLimit(data, fetchBlock);
+              handleRateLimit(data, fetchBlock, () => setIsLoading(false));
             }
           },
         )

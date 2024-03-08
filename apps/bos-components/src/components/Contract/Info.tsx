@@ -46,7 +46,7 @@ export default function (props: Props) {
               setDeploymentData(depResp);
               setLoading(false);
             } else {
-              handleRateLimit(data, fetchContractData);
+              handleRateLimit(data, fetchContractData, () => setLoading(false));
             }
           },
         )

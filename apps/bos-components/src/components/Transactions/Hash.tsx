@@ -53,7 +53,7 @@ export default function (props: Props) {
               setTxn(resp);
               setIsLoading(false);
             } else {
-              handleRateLimit(data, fetchTxn);
+              handleRateLimit(data, fetchTxn, () => setIsLoading(false));
             }
           },
         )

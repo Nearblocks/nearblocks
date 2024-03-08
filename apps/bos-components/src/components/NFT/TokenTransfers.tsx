@@ -93,7 +93,11 @@ export default function ({ network, t, id, tid }: Props) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchTokens(page));
+              handleRateLimit(
+                data,
+                () => fetchTokens(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )

@@ -92,7 +92,7 @@ export default function ({ network, id, onHandleDowload, exportType }: Props) {
               setExportData(href);
               setLoading(false);
             } else {
-              handleRateLimit(resp, fetchData);
+              handleRateLimit(resp, fetchData, () => setLoading(false));
             }
           })
           .catch((error: any) => {

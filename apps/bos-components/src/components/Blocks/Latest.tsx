@@ -41,7 +41,9 @@ export default function ({ network, t }: Props) {
             setError(false);
             if (isLoading) setIsLoading(false);
           } else {
-            handleRateLimit(data, fetchLatestBlocks);
+            handleRateLimit(data, fetchLatestBlocks, () => {
+              if (isLoading) setIsLoading(false);
+            });
           }
         })
         .catch(() => {

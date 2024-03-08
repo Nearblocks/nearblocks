@@ -123,7 +123,11 @@ export default function ({
               }
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchTokens(qs, sorting, page));
+              handleRateLimit(
+                data,
+                () => fetchTokens(qs, sorting, page),
+                () => setIsLoading(false),
+              );
             }
           },
         )

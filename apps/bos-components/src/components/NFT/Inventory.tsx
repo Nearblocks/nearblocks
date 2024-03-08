@@ -54,7 +54,7 @@ export default function ({ network, id, token }: Props) {
               setTokenData(resp);
               setIsLoading(false);
             } else {
-              handleRateLimit(data, fetchNFTData);
+              handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
           },
         )
@@ -105,7 +105,7 @@ export default function ({ network, id, token }: Props) {
             setTokens(resp);
             setIsLoading(false);
           } else {
-            handleRateLimit(data, fetchTokenData);
+            handleRateLimit(data, fetchTokenData, () => setIsLoading(false));
           }
         })
         .catch(() => {});

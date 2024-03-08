@@ -111,7 +111,11 @@ export default function (props: Props) {
             }
             setIsLoading(false);
           } else {
-            handleRateLimit(data, () => fetchTxnsData(qs, sorting, page));
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
         .catch(() => {});

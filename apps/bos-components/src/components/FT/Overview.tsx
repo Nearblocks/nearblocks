@@ -77,7 +77,7 @@ export default function ({
               setToken(resp);
               setIsLoading(false);
             } else {
-              handleRateLimit(data, fetchFTData);
+              handleRateLimit(data, fetchFTData, () => setIsLoading(false));
             }
           },
         )
@@ -99,7 +99,7 @@ export default function ({
               setTransfers(resp.count);
               setTxnLoading(false);
             } else {
-              handleRateLimit(data, fetchTxnsCount);
+              handleRateLimit(data, fetchTxnsCount, () => setTxnLoading(false));
             }
           },
         )
@@ -139,7 +139,9 @@ export default function ({
               setHolders(resp.count);
               setHolderLoading(false);
             } else {
-              handleRateLimit(data, fetchHoldersCount);
+              handleRateLimit(data, fetchHoldersCount, () =>
+                setHolderLoading(false),
+              );
             }
           },
         )

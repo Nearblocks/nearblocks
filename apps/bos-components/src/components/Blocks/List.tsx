@@ -95,7 +95,11 @@ export default function ({ currentPage, setPage, t, network }: Props) {
               setBlocks((prevData) => ({ ...prevData, [page]: resp || [] }));
               setIsLoading(false);
             } else {
-              handleRateLimit(data, () => fetchBlocks(page));
+              handleRateLimit(
+                data,
+                () => fetchBlocks(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )

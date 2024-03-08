@@ -49,7 +49,7 @@ export default function ({ network, id }: Props) {
               setToken(resp);
               setIsLoading(false);
             } else {
-              handleRateLimit(data, fetchNFTData);
+              handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
           },
         )
@@ -71,7 +71,7 @@ export default function ({ network, id }: Props) {
               setTransfers(resp.count);
               setTxnLoading(false);
             } else {
-              handleRateLimit(data, fetchTxnsCount);
+              handleRateLimit(data, fetchTxnsCount, () => setTxnLoading(false));
             }
           },
         )
@@ -93,7 +93,9 @@ export default function ({ network, id }: Props) {
               setHolders(resp.count);
               setHolderLoading(false);
             } else {
-              handleRateLimit(data, fetchHoldersCount);
+              handleRateLimit(data, fetchHoldersCount, () =>
+                setHolderLoading(false),
+              );
             }
           },
         )

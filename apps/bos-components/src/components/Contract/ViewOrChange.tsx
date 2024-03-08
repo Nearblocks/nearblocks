@@ -213,7 +213,11 @@ export default function (props: Props) {
                 });
               setLoading(false);
             } else {
-              handleRateLimit(data, () => onDetect(e));
+              handleRateLimit(
+                data,
+                () => onDetect(e),
+                () => setLoading(false),
+              );
             }
           },
         )

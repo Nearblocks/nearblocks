@@ -52,7 +52,7 @@ export default function ({ network, t, id, tid }: Props) {
               setToken(resp);
               setLoading(false);
             } else {
-              handleRateLimit(res, fetchToken);
+              handleRateLimit(res, fetchToken, () => setLoading(false));
             }
           },
         )
