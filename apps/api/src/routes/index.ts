@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import account from '#routes/account';
+import analytics from '#routes/analytics';
 import blocks from '#routes/blocks';
 import charts from '#routes/charts';
 import exports from '#routes/exports';
@@ -19,6 +20,7 @@ const routes = () => {
   const app = Router();
 
   account(app);
+  analytics(app);
   blocks(app);
   charts(app);
   exports(app);

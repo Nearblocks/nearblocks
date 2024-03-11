@@ -69,7 +69,7 @@ export const nsToMsTime = (ns: number | string) =>
   Big(ns).div(Big(10).pow(6)).toString();
 
 export const tokenAmount = (amount: string, decimals: number) =>
-  Big(amount).div(Big(10).pow(decimals)).toString();
+  Big(amount).abs().div(Big(10).pow(decimals)).toString();
 
 export const localFormat = (string: string, decimals = 8) =>
   format(string, `0,0.${'#'.repeat(decimals)}`);

@@ -252,7 +252,7 @@ const inventory = catchAsync(
             FROM
               ft_holders_monthly
             WHERE
-              ft_holders_monthly.account = 'aurora'
+              ft_holders_monthly.account = :account
             GROUP BY
               ft_holders_monthly.contract,
               ft_holders_monthly.account
