@@ -45,7 +45,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
   const [showAge, setShowAge] = useState(true);
   const [blocks, setBlocks] = useState<{ [key: number]: BlocksInfo[] }>({});
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
-
+  const [address, setAddress] = useState('');
   const config = getConfig(network);
 
   useEffect(() => {
@@ -109,6 +109,12 @@ export default function ({ currentPage, setPage, t, network }: Props) {
     fetchTotalBlocks();
     fetchBlocks(currentPage);
   }, [config?.backendUrl, currentPage]);
+
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
 
   const start = blocks[currentPage]?.[0];
   const end = blocks[currentPage]?.[blocks[currentPage]?.length - 1];
@@ -240,9 +246,16 @@ export default function ({ currentPage, setPage, t, network }: Props) {
         <span>
           <a
             href={`/address/${row?.author_account_id}`}
-            className="hover:no-underline"
+            className={`hover:no-underline`}
           >
-            <a className="text-green-500 hover:no-underline">
+            <a
+              className={`text-green-500 hover:no-underline ${
+                row?.author_account_id === address
+                  ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                  : 'text-green-500 p-1'
+              }`}
+              onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
+            >
               {shortenAddress(row?.author_account_id ?? '')}
             </a>
           </a>

@@ -58,6 +58,7 @@ export default function ({
     {},
   );
   const [sorting, setSorting] = useState('desc');
+  const [address, setAddress] = useState('');
 
   const config = getConfig(network);
 
@@ -176,6 +177,12 @@ export default function ({
 
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
   };
 
   const columns = [
@@ -305,12 +312,23 @@ export default function ({
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                  <span
+                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      row?.affected_account_id === address
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        : 'text-green-500 p-0.5 px-1'
+                    }`}
+                  >
                     <a
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a
+                        className="text-green-500 hover:no-underline"
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.affected_account_id)
+                        }
+                      >
                         {row?.affected_account_id}
                       </a>
                     </a>
@@ -409,12 +427,23 @@ export default function ({
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                  <span
+                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      row?.involved_account_id === address
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        : 'text-green-500 p-0.5 px-1'
+                    }`}
+                  >
                     <a
                       href={`/address/${row.involved_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a
+                        className="text-green-500 hover:no-underline"
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.involved_account_id)
+                        }
+                      >
                         {row.involved_account_id}
                       </a>
                     </a>
