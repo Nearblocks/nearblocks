@@ -8,6 +8,11 @@
  * @param {string} [ft.amount] -  amount in USD of tokens.
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 import { truncateString } from '@/includes/libs';
@@ -25,9 +30,15 @@ interface Props {
     tokens: TokenListInfo[];
   };
   appUrl?: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 const TokenHoldings = (props: Props) => {
+  const { Link } = props;
   const Loading = (props: { className: string; wrapperClassName: string }) => {
     return (
       <div
@@ -81,7 +92,7 @@ const TokenHoldings = (props: Props) => {
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {props.ft?.tokens?.map((token, index) => (
                       <div key={token?.contract}>
-                        <a
+                        <Link
                           href={`/token/${token?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
@@ -131,7 +142,7 @@ const TokenHoldings = (props: Props) => {
                               </div>
                             )}
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                   </div>
@@ -146,7 +157,7 @@ const TokenHoldings = (props: Props) => {
                   <div className="text-gray-600 text-xs divide-y outline-none">
                     {nfts.map((nft) => (
                       <div key={nft?.contract}>
-                        <a
+                        <Link
                           href={`/nft-token/${nft?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
@@ -181,7 +192,7 @@ const TokenHoldings = (props: Props) => {
                               </div>
                             </div>
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                   </div>

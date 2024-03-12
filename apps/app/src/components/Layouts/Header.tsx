@@ -246,7 +246,7 @@ const Header = () => {
   const onSignOut = () => {
     logOut();
   };
-
+  const nearPrice = stats?.near_price ?? '';
   return (
     <div className="bg-white soft-shadow z-[99] relative">
       {!status && (
@@ -284,38 +284,44 @@ const Header = () => {
                         Testnet Network
                       </p>
                     ) : (
-                      <div className="ml-12 px-1 py-1 bg-blue-900/[0.05] rounded-lg flex justify-center items-center">
-                        <Image
-                          src="/images/neargrey.svg"
-                          alt="NearBlock"
-                          className="inline-flex w-5 h-5"
-                          width={15}
-                          height={15}
-                        />
-                        <p className="text-sm text-gray-500 font-medium leading-6 px-2">
-                          $
-                          {stats?.near_price
-                            ? dollarFormat(stats?.near_price)
-                            : stats?.near_price ?? ''}
-                          {stats?.change_24 > 0 ? (
-                            <span className="text-neargreen text-xs">
-                              (+
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
-                          ) : (
-                            <span className="text-red-500 text-xs">
-                              (
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
-                          )}
-                        </p>
-                      </div>
+                      <>
+                        {nearPrice ? (
+                          <div className="ml-12 px-1 py-1 bg-blue-900/[0.05] rounded-lg flex justify-center items-center">
+                            <Image
+                              src="/images/neargrey.svg"
+                              alt="NearBlock"
+                              className="inline-flex w-5 h-5"
+                              width={15}
+                              height={15}
+                            />
+                            <p className="text-sm text-gray-500 font-medium leading-6 px-2">
+                              $
+                              {stats?.near_price
+                                ? dollarFormat(stats?.near_price)
+                                : stats?.near_price ?? ''}
+                              {stats?.change_24 > 0 ? (
+                                <span className="text-neargreen text-xs">
+                                  (+
+                                  {stats?.change_24
+                                    ? dollarFormat(stats?.change_24)
+                                    : stats?.change_24 ?? ''}
+                                  %)
+                                </span>
+                              ) : (
+                                <span className="text-red-500 text-xs">
+                                  (
+                                  {stats?.change_24
+                                    ? dollarFormat(stats?.change_24)
+                                    : stats?.change_24 ?? ''}
+                                  %)
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        ) : (
+                          ''
+                        )}
+                      </>
                     )}
                   </div>
                 ))}
@@ -344,6 +350,7 @@ const Header = () => {
                       isHeader: true,
                       t: t,
                       network: networkId,
+                      router,
                     }}
                   />
                 </div>

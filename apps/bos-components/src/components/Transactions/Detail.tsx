@@ -9,6 +9,11 @@
  * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -17,6 +22,11 @@ interface Props {
   loading: boolean;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import EventLogs from '@/includes/Common/Action/index';
@@ -63,7 +73,7 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { loading, txn, network, t, rpcTxn } = props;
+  const { loading, txn, network, t, rpcTxn, Link } = props;
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
   const [price, setPrice] = useState('');
@@ -322,7 +332,7 @@ export default function (props: Props) {
             </div>
           ) : txn?.block?.block_height ? (
             <div className="w-full md:w-3/4 font-semibold break-words">
-              <a
+              <Link
                 href={`/blocks/${txn?.included_in_block_hash}`}
                 className="hover:no-underline"
               >
@@ -331,7 +341,7 @@ export default function (props: Props) {
                     ? localFormat(txn?.block?.block_height)
                     : txn?.block?.block_height ?? ''}
                 </a>
-              </a>
+              </Link>
             </div>
           ) : (
             ''
@@ -455,14 +465,14 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-all">
-              <a
+              <Link
                 href={`/address/${txn?.signer_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {txn?.signer_account_id}
                 </a>
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -498,14 +508,14 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-all">
-              <a
+              <Link
                 href={`/address/${txn?.receiver_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {txn?.receiver_account_id}
                 </a>
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -549,14 +559,14 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           From{' '}
                           {ft?.affected_account_id ? (
-                            <a
+                            <Link
                               href={`/address/${ft?.affected_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1 hover:no-underline">
                                 {shortenAddress(ft?.affected_account_id ?? '')}
                               </a>
-                            </a>
+                            </Link>
                           ) : (
                             <span className="font-normal pl-1">system</span>
                           )}
@@ -564,14 +574,14 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           To{' '}
                           {ft?.involved_account_id ? (
-                            <a
+                            <Link
                               href={`/address/${ft?.involved_account_id}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-normal pl-1">
                                 {shortenAddress(ft?.involved_account_id ?? '')}
                               </a>
-                            </a>
+                            </Link>
                           ) : (
                             <span className="font-normal pl-1">system</span>
                           )}
@@ -588,7 +598,7 @@ export default function (props: Props) {
                               : ''}
                           </span>
                         </div>
-                        <a
+                        <Link
                           href={`/token/${ft?.ft_meta?.contract}`}
                           className="hover:no-underline"
                         >
@@ -604,7 +614,7 @@ export default function (props: Props) {
                               {shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})
                             </span>
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                     {nfts?.map((nft: any) => (
@@ -617,7 +627,7 @@ export default function (props: Props) {
                                 <div className="font-semibold text-gray px-1">
                                   From{' '}
                                   {nft?.affected_account_id ? (
-                                    <a
+                                    <Link
                                       href={`/address/${nft?.affected_account_id}`}
                                       className="hover:no-underline"
                                     >
@@ -626,7 +636,7 @@ export default function (props: Props) {
                                           nft?.affected_account_id ?? '',
                                         )}
                                       </a>
-                                    </a>
+                                    </Link>
                                   ) : (
                                     <span className="font-normal pl-1">
                                       system
@@ -636,7 +646,7 @@ export default function (props: Props) {
                                 <div className="font-semibold text-gray px-1">
                                   To{' '}
                                   {nft?.involved_account_id ? (
-                                    <a
+                                    <Link
                                       href={`/address/${nft?.involved_account_id}`}
                                       className="hover:no-underline"
                                     >
@@ -645,7 +655,7 @@ export default function (props: Props) {
                                           nft?.involved_account_id ?? '',
                                         )}
                                       </a>
-                                    </a>
+                                    </Link>
                                   ) : (
                                     <span className="font-normal pl-1">
                                       system
@@ -658,18 +668,18 @@ export default function (props: Props) {
                                   <span className="text-gray-400">For </span>
                                   <span className="pl-1 font-normal">
                                     NFT Token ID [
-                                    <a
+                                    <Link
                                       href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green hover:no-underline">
                                         {shortenToken(nft?.token_id ?? '')}
                                       </a>
-                                    </a>
+                                    </Link>
                                     ]
                                   </span>
                                 </div>
-                                <a
+                                <Link
                                   href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="hover:no-underline"
                                 >
@@ -688,11 +698,11 @@ export default function (props: Props) {
                                       )
                                     </span>
                                   </a>
-                                </a>
+                                </Link>
                               </div>
                             </div>
                             <div className="border rounded ml-2 w-11 h-11 p-1">
-                              <a
+                              <Link
                                 href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                 className="hover:no-underline"
                               >
@@ -713,7 +723,7 @@ export default function (props: Props) {
                                     />
                                   }
                                 </a>
-                              </a>
+                              </Link>
                             </div>
                           </div>
                         </div>

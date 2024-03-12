@@ -7,6 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 import Paginator from '@/includes/Common/Paginator';
@@ -19,9 +24,14 @@ interface Props {
   network: string;
   id: string;
   token: Token;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -167,7 +177,7 @@ export default function ({ network, id, token }: Props) {
               className="max-w-full border rounded p-3 mx-auto md:mx-0"
               key={nft?.contract + nft?.token}
             >
-              <a
+              <Link
                 href={`/nft-token/${nft?.contract}/${nft?.token}`}
                 className="hover:no-underline"
               >
@@ -185,27 +195,27 @@ export default function ({ network, id, token }: Props) {
                     />
                   }
                 </a>
-              </a>
+              </Link>
               <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
                 Token ID:{' '}
-                <a
+                <Link
                   href={`/nft-token/${nft?.contract}/${nft?.token}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green hover:no-underline">{nft?.token}</a>
-                </a>
+                </Link>
               </div>
               {nft?.asset && (
                 <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
                   Owner:{' '}
-                  <a
+                  <Link
                     href={`/address/${nft?.asset?.owner}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green hover:no-underline">
                       {nft?.asset?.owner}
                     </a>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

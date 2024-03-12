@@ -12,6 +12,11 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -31,9 +36,14 @@ interface Props {
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
-export default function ({ network, t, id, tid }: Props) {
+export default function ({ network, t, id, tid, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,14 +149,14 @@ export default function ({ network, t, id, tid }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -207,7 +217,7 @@ export default function ({ network, t, id, tid }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
@@ -219,7 +229,7 @@ export default function ({ network, t, id, tid }: Props) {
                       >
                         {row?.affected_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -276,7 +286,7 @@ export default function ({ network, t, id, tid }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.involved_account_id}`}
                       className="hover:no-underline"
                     >
@@ -288,7 +298,7 @@ export default function ({ network, t, id, tid }: Props) {
                       >
                         {row?.involved_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -315,7 +325,7 @@ export default function ({ network, t, id, tid }: Props) {
       key: 'block_hash',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/blocks/${row?.included_in_block_hash}`}
             className="hover:no-underline"
           >
@@ -324,7 +334,7 @@ export default function ({ network, t, id, tid }: Props) {
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:

@@ -9,12 +9,22 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 import Skeleton from '@/includes/Common/Skeleton';
 import { formatNumber, formatWithCommas } from '@/includes/formats';
@@ -43,7 +53,7 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage }: Props) {
+export default function ({ network, currentPage, setPage, Link }: Props) {
   const [validatorFullData, setValidatorFullData] = useState<{
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
@@ -265,14 +275,14 @@ export default function ({ network, currentPage, setPage }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <a
+                <Link
                   href={`/address/${row.accountId}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {shortenAddress(row.accountId)}
                   </a>
-                </a>
+                </Link>
               </Tooltip.Trigger>
               <Tooltip.Content
                 className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
@@ -676,12 +686,12 @@ export default function ({ network, currentPage, setPage }: Props) {
                       cell: (row: ValidatorEpochData) => {
                         return (
                           <div>
-                            <a
+                            <Link
                               className="text-green-500 hover:no-underline"
                               href={`mailto:${row?.description?.email}`}
                             >
                               {row?.description?.email}{' '}
-                            </a>
+                            </Link>
                           </div>
                         );
                       },
@@ -720,7 +730,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                           <div>
                             <a
                               className="text-green-500 hover:no-underline"
-                              href={row?.description?.discord}
+                              href={row?.description?.discord || ''}
                               rel="noreferrer noopener"
                               target="_blank"
                             >

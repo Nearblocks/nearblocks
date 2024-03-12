@@ -7,12 +7,22 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
   token?: Token;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -20,7 +30,7 @@ import { localFormat, serialNumber } from '@/includes/formats';
 import { getConfig, handleRateLimit, holderPercentage } from '@/includes/libs';
 import { HoldersPropsInfo, Token } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -154,14 +164,14 @@ export default function ({ network, id, token }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/address/${row?.account}`}
                     className="hover:no-undeline"
                   >
                     <a className="text-green-500 font-medium hover:no-undeline">
                       {row?.account}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content

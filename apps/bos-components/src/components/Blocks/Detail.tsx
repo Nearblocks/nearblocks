@@ -7,6 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The block identifier passed as a string.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -378,14 +383,14 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  <a
+                  <Link
                     href={`/blocks/${block?.prev_block_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 hover:no-underline">
                       {block?.prev_block_hash}
                     </a>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

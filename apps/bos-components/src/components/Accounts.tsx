@@ -11,6 +11,11 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -21,6 +26,11 @@ interface Props {
   signedIn: boolean;
   accountId: string;
   logOut: () => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -76,6 +86,7 @@ export default function (props: Props) {
     signedIn,
     accountId,
     logOut,
+    Link,
   } = props;
   const [loading, setLoading] = useState(false);
   const [isloading, setIsLoading] = useState(true);
@@ -636,6 +647,7 @@ export default function (props: Props) {
                     ft={ft}
                     id={id}
                     appUrl={config?.appUrl}
+                    Link={Link}
                   />
                 </div>
               </div>
@@ -732,7 +744,7 @@ export default function (props: Props) {
                     Contract Creator:
                   </div>
                   <div className="w-full md:w-3/4 break-words">
-                    <a
+                    <Link
                       href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                       className="hover:no-underline"
                     >
@@ -741,16 +753,16 @@ export default function (props: Props) {
                           deploymentData.receipt_predecessor_account_id ?? '',
                         )}
                       </a>
-                    </a>
+                    </Link>
                     {' at txn  '}
-                    <a
+                    <Link
                       href={`/txns/${deploymentData.transaction_hash}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
                         {shortenAddress(deploymentData.transaction_hash ?? '')}
                       </a>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -767,7 +779,10 @@ export default function (props: Props) {
                         appUrl={config.appUrl}
                         className="w-4 h-4 mr-2"
                       />
-                      <a href={`/token/${id}`} className="hover:no-underline">
+                      <Link
+                        href={`/token/${id}`}
+                        className="hover:no-underline"
+                      >
                         <a className="flex text-green-500 hover:no-underline">
                           <span className="inline-block truncate max-w-[110px] mr-1">
                             {tokenData.name}
@@ -778,7 +793,7 @@ export default function (props: Props) {
                           </span>
                           )
                         </a>
-                      </a>
+                      </Link>
                       {tokenData.price && (
                         <div className="text-nearblue-600 ml-1">
                           (@ ${localFormat(tokenData.price)})
@@ -850,6 +865,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      Link,
                     }}
                   />
                 }
@@ -865,6 +881,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      Link,
                     }}
                   />
                 }
@@ -880,6 +897,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      Link,
                     }}
                   />
                 }
@@ -892,6 +910,7 @@ export default function (props: Props) {
                       network: network,
                       id: id,
                       t: t,
+                      Link,
                     }}
                   />
                 }
@@ -912,6 +931,7 @@ export default function (props: Props) {
                         connected: signedIn,
                         accountId: accountId,
                         logOut: logOut,
+                        Link,
                       }}
                     />
                   }

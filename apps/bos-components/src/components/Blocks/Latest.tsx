@@ -6,11 +6,21 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -22,7 +32,7 @@ import {
 import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
+export default function ({ network, t, Link }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
@@ -130,7 +140,7 @@ export default function ({ network, t }: Props) {
                         </div>
                         <div className="overflow-hidden pl-2">
                           <div className="text-green-500 text-sm font-medium ">
-                            <a
+                            <Link
                               href={`/blocks/${block?.block_hash}`}
                               className="hover:no-underline"
                             >
@@ -139,7 +149,7 @@ export default function ({ network, t }: Props) {
                                   ? localFormat(block?.block_height)
                                   : block?.block_height ?? ''}
                               </a>
-                            </a>
+                            </Link>
                           </div>
                           <div className="text-nearblue-700 text-xs truncate">
                             {block?.block_timestamp
@@ -152,14 +162,14 @@ export default function ({ network, t }: Props) {
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
                         {t ? t('home:blockMiner') : 'Author'}{' '}
-                        <a
+                        <Link
                           href={`/address/${block?.author_account_id}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green-500 font-medium hover:no-underline">
                             {block?.author_account_id}
                           </a>
-                        </a>
+                        </Link>
                         <div className="text-nearblue-700 text-sm ">
                           {block?.transactions_agg?.count
                             ? localFormat(block?.transactions_agg?.count)
@@ -216,11 +226,11 @@ export default function ({ network, t }: Props) {
       )}
       {blocks && blocks?.length > 0 && (
         <div className="border-t px-2 py-3 text-nearblue-600">
-          <a href="/blocks">
+          <Link href="/blocks">
             <a className="block text-center border border-green-900/10 bg-green-500 hover:bg-green-400 font-thin text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all blocks
             </a>
-          </a>
+          </Link>
         </div>
       )}
     </>
