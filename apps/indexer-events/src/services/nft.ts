@@ -140,7 +140,7 @@ export const storeNFTEvents = async (
   if (eventData.length) {
     const data = setEventIndex(
       shardId,
-      blockHeader.timestamp,
+      blockHeader.timestampNanosec,
       EventType.NEP171,
       EventStandard.NFT,
       eventData,
