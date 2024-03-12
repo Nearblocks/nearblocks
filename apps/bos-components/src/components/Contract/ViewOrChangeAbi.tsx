@@ -40,11 +40,29 @@ const sortFields = (fields: FieldType[]) => {
   return fields;
 };
 
-const mapFeilds = (fields: FieldType[]) => {
-  const args: any = {};
+type FieldValueTypes = string | boolean | number | null;
 
-  fields.forEach((fld: FieldType) => {
-    args[fld.name] = fld.value;
+const mapFeilds = <T extends Record<string, FieldValueTypes>>(
+  fields: FieldType[],
+): T => {
+  const args: T = {} as T;
+
+  fields.forEach((fld) => {
+    let value: string | boolean | number | null = fld.value;
+
+    if (fld.type === 'number') {
+      value = Number(value);
+    } else if (fld.type === 'boolean') {
+      value =
+        value.trim().length > 0 &&
+        !['false', '0'].includes(value.toLowerCase());
+    } else if (fld.type === 'json') {
+      value = JSON.parse(value);
+    } else if (fld.type === 'null') {
+      value = null;
+    }
+
+    (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
   });
 
   return args;
