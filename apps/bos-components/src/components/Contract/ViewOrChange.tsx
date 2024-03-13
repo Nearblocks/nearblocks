@@ -35,7 +35,13 @@ import { capitalize, toSnakeCase } from '@/includes/formats';
 import ArrowRight from '@/includes/icons/ArrowRight';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Question from '@/includes/icons/Question';
-import { getConfig, handleRateLimit, isJson, uniqueId } from '@/includes/libs';
+import {
+  getConfig,
+  handleRateLimit,
+  isJson,
+  mapFeilds,
+  uniqueId,
+} from '@/includes/libs';
 import { FieldType } from '@/includes/types';
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -56,16 +62,6 @@ const sortFields = (fields: FieldType[]) => {
   });
 
   return fields;
-};
-
-const mapFeilds = (fields: FieldType[]) => {
-  const args: any = {};
-
-  fields.forEach((fld: FieldType) => {
-    args[fld.name] = fld.value;
-  });
-
-  return args;
 };
 
 const getDataType = (data: string) => {

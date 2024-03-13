@@ -1,5 +1,5 @@
 import { localFormat, formatWithCommas } from '@/includes/formats';
-import { Debounce } from './types';
+import { Debounce, FieldType, FieldValueTypes } from './types';
 
 export function convertAmountToReadableString(amount: string, type: string) {
   if (!amount) return null;
@@ -212,4 +212,28 @@ export function handleRateLimit(
       Loading();
     }
   }
+}
+
+export function mapFeilds(fields: FieldType[]) {
+  const args = {};
+
+  fields.forEach((fld) => {
+    let value: string | boolean | number | null = fld.value;
+
+    if (fld.type === 'number') {
+      value = Number(value);
+    } else if (fld.type === 'boolean') {
+      value =
+        value.trim().length > 0 &&
+        !['false', '0'].includes(value.toLowerCase());
+    } else if (fld.type === 'json') {
+      value = JSON.parse(value);
+    } else if (fld.type === 'null') {
+      value = null;
+    }
+
+    (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
+  });
+
+  return args;
 }
