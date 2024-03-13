@@ -45,7 +45,7 @@ import {
 } from '@/includes/formats';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
-import FaCaretRight from '@/includes/icons/FaCaretRight';
+import FaRight from '@/includes/icons/FaRight';
 import TokenImage from '@/includes/icons/TokenImage';
 import {
   fiatValue,
@@ -87,7 +87,11 @@ export default function (props: Props) {
       receipts.forEach(
         (receipt) =>
           receipt?.fts?.forEach((ft) => {
-            if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+            if (ft.ft_meta && ft.cause === 'TRANSFER') {
+              if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+            } else {
+              if (ft.ft_meta) fts.push(ft);
+            }
           }),
       );
       receipts.forEach(
@@ -96,9 +100,17 @@ export default function (props: Props) {
             if (
               nft.nft_meta &&
               nft.nft_token_meta &&
-              Number(nft.delta_amount) < 0
-            )
-              nfts.push(nft);
+              nft.cause === 'TRANSFER'
+            ) {
+              if (
+                nft.nft_meta &&
+                nft.nft_token_meta &&
+                Number(nft.delta_amount) < 0
+              )
+                nfts.push(nft);
+            } else {
+              if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+            }
           }),
       );
 
@@ -383,7 +395,17 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {(actions?.length > 0 || (logs?.length > 0 && logs.contract)) && (
+      {(actions?.length > 0 ||
+        (logs.length > 0 &&
+          logs.some((item: TransactionLog) =>
+            [
+              'wrap.near',
+              'wrap.testnet',
+              'v2.ref-finance.near',
+              'contract.main.burrow.near',
+              'contract.1638481328.burrow.testnet',
+            ].includes(item?.contract),
+          ))) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
@@ -411,25 +433,33 @@ export default function (props: Props) {
               </div>
             ) : (
               <div className="w-full md:w-3/4">
-                <ScrollArea.Root>
-                  <ScrollArea.Viewport />
-                  <div
-                    id="action-column"
-                    className="max-h-[194px] break-words space-y-2"
+                <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
+                  <ScrollArea.Viewport className="w-full h-full rounded">
+                    <div
+                      id="action-column"
+                      className="max-h-[194px] break-words space-y-2"
+                    >
+                      {logs?.map((event: TransactionLog, i: number) => (
+                        <EventLogs key={i} event={event} network={network} />
+                      ))}
+                      {actions?.map((action: any, i: number) => (
+                        <Actions key={i} action={action} />
+                      ))}
+                    </div>
+                  </ScrollArea.Viewport>
+                  <ScrollArea.Scrollbar
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    orientation="vertical"
                   >
-                    {logs?.map((event: TransactionLog, i: number) => (
-                      <EventLogs key={i} event={event} network={network} />
-                    ))}
-                    {actions?.map((action: any, i: number) => (
-                      <Actions key={i} action={action} />
-                    ))}
-                  </div>
-                  <ScrollArea.Scrollbar orientation="horizontal">
-                    <ScrollArea.Thumb />
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
-                  <ScrollArea.Scrollbar orientation="vertical">
-                    <ScrollArea.Thumb />
+                  <ScrollArea.Scrollbar
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    orientation="horizontal"
+                  >
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
+                  <ScrollArea.Corner className="bg-neargray-50" />
                 </ScrollArea.Root>
               </div>
             )}
@@ -555,37 +585,82 @@ export default function (props: Props) {
                         className="flex items-center flex-wrap break-all leading-7"
                         key={ft?.key}
                       >
-                        <FaCaretRight className="inline-flex text-gray-400 text-xs" />
-                        <div className="font-semibold text-gray px-1">
-                          From{' '}
-                          {ft?.affected_account_id ? (
-                            <Link
-                              href={`/address/${ft?.affected_account_id}`}
-                              className="hover:no-underline"
-                            >
-                              <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                {shortenAddress(ft?.affected_account_id ?? '')}
-                              </a>
-                            </Link>
-                          ) : (
-                            <span className="font-normal pl-1">system</span>
-                          )}
-                        </div>
-                        <div className="font-semibold text-gray px-1">
-                          To{' '}
-                          {ft?.involved_account_id ? (
-                            <Link
-                              href={`/address/${ft?.involved_account_id}`}
-                              className="hover:no-underline"
-                            >
-                              <a className="text-green-500 font-normal pl-1">
-                                {shortenAddress(ft?.involved_account_id ?? '')}
-                              </a>
-                            </Link>
-                          ) : (
-                            <span className="font-normal pl-1">system</span>
-                          )}
-                        </div>
+                        <FaRight className="inline-flex text-gray-400 text-xs" />
+                        {ft?.cause === 'MINT' ? (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1">
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1">
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        )}
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
@@ -606,6 +681,7 @@ export default function (props: Props) {
                             <TokenImage
                               src={ft?.ft_meta?.icon}
                               alt={ft?.ft_meta?.name}
+                              appUrl={config?.appUrl}
                               className="w-4 h-4 mx-1"
                             />
                             {shortenToken(ft?.ft_meta?.name ?? '')}
@@ -620,48 +696,93 @@ export default function (props: Props) {
                     {nfts?.map((nft: any) => (
                       <div className="flex" key={nft?.key}>
                         <div className="flex justify-start items-start">
-                          <FaCaretRight className="inline-flex text-gray-400 text-xs mt-1" />
+                          <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
                           <div className="flex flex-wrap">
                             <div>
                               <div className="sm:flex">
-                                <div className="font-semibold text-gray px-1">
-                                  From{' '}
-                                  {nft?.affected_account_id ? (
-                                    <Link
-                                      href={`/address/${nft?.affected_account_id}`}
-                                      className="hover:no-underline"
-                                    >
-                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                        {shortenAddress(
-                                          nft?.affected_account_id ?? '',
-                                        )}
-                                      </a>
-                                    </Link>
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="font-semibold text-gray px-1">
-                                  To{' '}
-                                  {nft?.involved_account_id ? (
-                                    <Link
-                                      href={`/address/${nft?.involved_account_id}`}
-                                      className="hover:no-underline"
-                                    >
-                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                        {shortenAddress(
-                                          nft?.involved_account_id ?? '',
-                                        )}
-                                      </a>
-                                    </Link>
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
+                                {nft?.cause === 'MINT' ? (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.involved_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.affected_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.affected_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.involved_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
                               </div>
                               <div className="sm:flex mt-1">
                                 <div className="text-gray px-1">
@@ -892,11 +1013,11 @@ export default function (props: Props) {
             <div className="flex flex-wrap p-4">
               <Accordion.Trigger asChild onClick={toggleContent}>
                 {!more ? (
-                  <span className="text-green-500 flex items-center">
+                  <span className="text-green-500 flex items-center cursor-pointer">
                     Click to see more <ArrowDown className="fill-current" />
                   </span>
                 ) : (
-                  <span className="text-green-500 flex items-center">
+                  <span className="text-green-500 flex items-center cursor-pointer">
                     Click to see less <ArrowUp className="fill-current" />
                   </span>
                 )}

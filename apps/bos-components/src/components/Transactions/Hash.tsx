@@ -111,7 +111,7 @@ export default function (props: Props) {
     }
 
     fetchTransactionStatus();
-  }, [txn, hash, config?.rpcUrl]);
+  }, [txn, config?.rpcUrl]);
 
   return (
     <>

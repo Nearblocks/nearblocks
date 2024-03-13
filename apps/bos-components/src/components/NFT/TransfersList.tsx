@@ -320,32 +320,33 @@ export default function ({ network, t, currentPage, setPage, Link }: Props) {
       header: <span>Token ID</span>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
-        <Tooltip.Provider>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <span>
-                <Link
-                  href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
-                  className="hover:no-underline"
-                >
-                  <a className="text-green-500 font-medium hover:no-underline">
-                    {row?.token_id}
-                  </a>
-                </Link>
-              </span>
-            </Tooltip.Trigger>
-            <Tooltip.Content
-              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-              align="start"
-              side="bottom"
-            >
-              {row?.token_id}
-            </Tooltip.Content>
-          </Tooltip.Root>
-        </Tooltip.Provider>
+        <div className="whitespace-nowrap text-sm text-nearblue-600 max-w-[110px] inline-block truncate">
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span>
+                  <Link
+                    href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
+                    className="hover:no-underline"
+                  >
+                    <a className="text-green-500 font-medium hover:no-underline">
+                      {row?.token_id}
+                    </a>
+                  </Link>
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="start"
+                side="bottom"
+              >
+                {row?.token_id}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        </div>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 max-w-[110px] inline-block truncate',
+      tdClassName: 'px-5 py-4 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },

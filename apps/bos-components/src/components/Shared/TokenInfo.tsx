@@ -67,6 +67,7 @@ export default function (props: TokenInfoProps) {
         <TokenImage
           src={meta?.icon}
           alt={meta?.name}
+          appUrl={config?.appUrl}
           className="w-4 h-4 mx-1"
         />
         {shortenToken(meta?.name)}
