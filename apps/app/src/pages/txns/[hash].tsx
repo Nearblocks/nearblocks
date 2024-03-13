@@ -36,7 +36,6 @@ const Txn = () => {
   };
   return (
     <>
-    
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           src={components?.transactionsHash}
