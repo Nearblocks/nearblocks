@@ -25,7 +25,7 @@ import { capitalize, toSnakeCase } from '@/includes/formats';
 import ArrowRight from '@/includes/icons/ArrowRight';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Question from '@/includes/icons/Question';
-import { uniqueId } from '@/includes/libs';
+import { mapFeilds, uniqueId } from '@/includes/libs';
 import { FieldType } from '@/includes/types';
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -38,34 +38,6 @@ const sortFields = (fields: FieldType[]) => {
   });
 
   return fields;
-};
-
-type FieldValueTypes = string | boolean | number | null;
-
-const mapFeilds = <T extends Record<string, FieldValueTypes>>(
-  fields: FieldType[],
-): T => {
-  const args: T = {} as T;
-
-  fields.forEach((fld) => {
-    let value: string | boolean | number | null = fld.value;
-
-    if (fld.type === 'number') {
-      value = Number(value);
-    } else if (fld.type === 'boolean') {
-      value =
-        value.trim().length > 0 &&
-        !['false', '0'].includes(value.toLowerCase());
-    } else if (fld.type === 'json') {
-      value = JSON.parse(value);
-    } else if (fld.type === 'null') {
-      value = null;
-    }
-
-    (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
-  });
-
-  return args;
 };
 
 export default function (props: Props) {

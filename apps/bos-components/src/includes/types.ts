@@ -1530,3 +1530,5 @@ export type SchemaInfo = {
     };
   };
 };
+
+export type FieldValueTypes = string | boolean | number | null;
