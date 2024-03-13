@@ -8,6 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {AccountContractInfo} [accessKey] - Key-value pairs for Accesskey info
  * @param {boolean} [showWhen] - Controls whether to show the date and time in UTC format or as a time ago string.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -15,6 +20,11 @@ interface Props {
   t: (key: string, options?: { count?: string | undefined }) => string;
   accessKey: AccountContractInfo;
   showWhen: boolean;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
@@ -26,7 +36,7 @@ import {
   capitalizeWords,
 } from '@/includes/formats';
 
-export default function ({ network, t, accessKey, showWhen }: Props) {
+export default function ({ network, t, accessKey, showWhen, Link }: Props) {
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
 
   const config = getConfig(network);
@@ -150,11 +160,11 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 font-medium whitespace-nowrap">
-                    <a href={`/txns/${txn?.transaction_hash}`}>
+                    <Link href={`/txns/${txn?.transaction_hash}`}>
                       <a className="text-green-500">
                         {txn?.transaction_hash && txn?.transaction_hash}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content

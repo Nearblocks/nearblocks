@@ -6,11 +6,21 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -25,7 +35,7 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
-export default function ({ network, id }: Props) {
+export default function ({ network, id, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -132,14 +142,14 @@ export default function ({ network, id }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -201,7 +211,7 @@ export default function ({ network, id }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
@@ -213,7 +223,7 @@ export default function ({ network, id }: Props) {
                       >
                         {row?.affected_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -271,7 +281,7 @@ export default function ({ network, id }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.involved_account_id}`}
                       className="hover:no-underline"
                     >
@@ -283,7 +293,7 @@ export default function ({ network, id }: Props) {
                       >
                         {row?.involved_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -408,14 +418,14 @@ export default function ({ network, id }: Props) {
       key: 'contract',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
             className="hover:no-underline"
           >
             <a className="bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded hover:no-underline">
               View NFT &gt;
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:

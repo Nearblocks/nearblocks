@@ -11,6 +11,11 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
 
  */
 
@@ -21,6 +26,11 @@ interface Props {
   a?: string;
   filters?: { [key: string]: string };
   onFilterClear?: (name: string) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -38,7 +48,14 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, t, id, filters, onFilterClear }: Props) {
+export default function ({
+  network,
+  t,
+  id,
+  filters,
+  onFilterClear,
+  Link,
+}: Props) {
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -155,14 +172,14 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -185,7 +202,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
       key: 'block.block_height',
       cell: (row: TransactionInfo) => (
         <>
-          <a
+          <Link
             className="hover:no-underline"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
@@ -194,7 +211,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </>
       ),
       tdClassName:
@@ -245,7 +262,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
@@ -257,7 +274,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                       >
                         {row?.affected_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -313,7 +330,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.involved_account_id}`}
                       className="hover:no-underline"
                     >
@@ -325,7 +342,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                       >
                         {row?.involved_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content

@@ -9,6 +9,11 @@
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
  * @param {ReceiptsPropsInfo} [receipt] -  receipt of the transaction.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -17,6 +22,11 @@ interface Props {
   txn?: TransactionInfo;
   receipt: ReceiptsPropsInfo;
   borderFlag?: boolean;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import {
@@ -31,7 +41,7 @@ import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
 export default function (props: Props) {
-  const { network, receipt, borderFlag, t } = props;
+  const { network, receipt, borderFlag, t, Link } = props;
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
   const config = getConfig(network);
@@ -144,14 +154,14 @@ export default function (props: Props) {
             </div>
           ) : block?.block_height ? (
             <div className="w-full md:w-3/4 word-break">
-              <a
+              <Link
                 href={`/blocks/${receipt.block_hash}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {localFormat(block?.block_height)}
                 </a>
-              </a>
+              </Link>
             </div>
           ) : (
             ''
@@ -186,14 +196,14 @@ export default function (props: Props) {
               </div>
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <a
+                <Link
                   href={`/address/${receipt?.predecessor_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {receipt?.predecessor_id}
                   </a>
-                </a>
+                </Link>
               </div>
             ) : (
               ''
@@ -227,14 +237,14 @@ export default function (props: Props) {
               </div>
             ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <a
+                <Link
                   href={`/address/${receipt?.receiver_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {receipt?.receiver_id}
                   </a>
-                </a>
+                </Link>
               </div>
             ) : (
               ''
@@ -421,6 +431,7 @@ export default function (props: Props) {
                       receipt: rcpt,
                       borderFlag: true,
                       network: network,
+                      Link,
                     }}
                   />
                 }

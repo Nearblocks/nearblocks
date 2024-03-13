@@ -8,6 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tid] - The nf token identifier passed as a string
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -23,9 +28,14 @@ interface Props {
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
-export default function ({ network, t, id, tid }: Props) {
+export default function ({ network, t, id, tid, Link }: Props) {
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [token, setToken] = useState<Token>({} as Token);
   const [loading, setLoading] = useState(false);
@@ -84,6 +94,7 @@ export default function ({ network, t, id, tid }: Props) {
                   reference: token?.reference,
                   className: 'rounded max-h-full',
                   network: network,
+                  Link,
                 }}
               />
             }
@@ -99,7 +110,7 @@ export default function ({ network, t, id, tid }: Props) {
               token?.title || token?.token
             )}
           </h1>
-          <a href={`/nft-token/${id}`} className="hover:no-underline">
+          <Link href={`/nft-token/${id}`} className="hover:no-underline">
             <a className="break-all text-green leading-6 text-sm hover:no-underline">
               {loading ? (
                 <div className="w-60 max-w-xs py-2">
@@ -119,7 +130,7 @@ export default function ({ network, t, id, tid }: Props) {
                 </>
               )}
             </a>
-          </a>
+          </Link>
           <Accordion.Root
             type="multiple"
             className="bg-white border rounded-xl  soft-shadow mt-4"
@@ -164,14 +175,14 @@ export default function ({ network, t, id, tid }: Props) {
                         Owner:
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
-                        <a
+                        <Link
                           href={`/address/${token?.asset?.owner}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green hover:no-underline">
                             {shortenAddress(token?.asset?.owner ?? '')}
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -196,11 +207,14 @@ export default function ({ network, t, id, tid }: Props) {
                       Contract Address:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
-                      <a href={`/address/${id}`} className="hover:no-underline">
+                      <Link
+                        href={`/address/${id}`}
+                        className="hover:no-underline"
+                      >
                         <a className="text-green hover:no-underline">
                           {shortenAddress(id ?? '')}
                         </a>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                   <div className="flex p-4">
@@ -283,6 +297,7 @@ export default function ({ network, t, id, tid }: Props) {
                   t: t,
                   id: id,
                   tid: tid,
+                  Link,
                 }}
               />
             }

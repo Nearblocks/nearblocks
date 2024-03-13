@@ -7,9 +7,11 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 
 const HomePage = () => {
   const components = useBosComponents();
+  const router = useRouter();
   const overviewRef = useRef<HTMLDivElement>(null);
   const latestRef = useRef<HTMLDivElement>(null);
   const [overviewHeight, setOverviewHeight] = useState({});
@@ -58,6 +60,7 @@ const HomePage = () => {
                     isHeader: false,
                     t: t,
                     network: networkId,
+                    router,
                   }}
                 />
               </div>

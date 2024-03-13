@@ -10,12 +10,22 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 interface Props {
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   currentPage: number;
   setPage: (page: number) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -32,7 +42,7 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, t, currentPage, setPage }: Props) {
+export default function ({ network, t, currentPage, setPage, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
@@ -136,14 +146,14 @@ export default function ({ network, t, currentPage, setPage }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -204,7 +214,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
@@ -216,7 +226,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                       >
                         {row?.affected_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -273,7 +283,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                         : 'text-green-500 p-0.5 px-1'
                     }`}
                   >
-                    <a
+                    <Link
                       href={`/address/${row?.involved_account_id}`}
                       className="hover:no-underline"
                     >
@@ -285,7 +295,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                       >
                         {row?.involved_account_id}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -346,14 +356,14 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <div className="text-sm text-nearblue-600 max-w-[110px] inline-block truncate whitespace-nowrap">
-                      <a
+                      <Link
                         href={`/token/${row?.ft?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="text-green-500 font-medium hover:no-underline">
                           {row?.ft?.name}
                         </a>
-                      </a>
+                      </Link>
                     </div>
                   </Tooltip.Trigger>
                   <Tooltip.Content

@@ -14,6 +14,11 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -27,6 +32,11 @@ interface Props {
   connected: boolean;
   accountId: string;
   logOut: () => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { getConfig } from '@/includes/libs';
@@ -44,6 +54,7 @@ export default function (props: Props) {
     connected,
     accountId,
     logOut,
+    Link,
   } = props;
   const [pageTab, setPageTab] = useState('Contract Info');
   const config = getConfig(network);
@@ -90,6 +101,7 @@ export default function (props: Props) {
               t: t,
               id: id,
               contract: contract,
+              Link,
             }}
           />
         }
@@ -163,6 +175,7 @@ export default function (props: Props) {
                   connected: connected,
                   accountId: accountId,
                   schema: schema,
+                  Link,
                 }}
               />
             ))}
@@ -187,6 +200,7 @@ export default function (props: Props) {
                     method: method,
                     connected: connected,
                     accountId: accountId,
+                    Link,
                   }}
                 />
               ))}

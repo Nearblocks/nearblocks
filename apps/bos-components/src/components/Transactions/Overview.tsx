@@ -6,11 +6,21 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   t: (key: string, options?: { days?: number }) => string | undefined;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -29,7 +39,7 @@ import {
   ChartSeriesInfo,
 } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
+export default function ({ network, t, Link }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [charts, setCharts] = useState<ChartInfo[]>([]);
@@ -225,7 +235,9 @@ export default function ({ network, t }: Props) {
         </body>
       </html>
     `;
-
+  const nearPrice = stats?.near_price ?? '';
+  const nearBtcPrice = stats?.near_btc_price ?? '';
+  const change24 = stats?.change_24 ?? '';
   return (
     <div className="container mx-auto px-3">
       <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
@@ -255,34 +267,40 @@ export default function ({ network, t }: Props) {
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a
+                      <Link
                         href="/charts/near-price"
                         className="hover:no-underline"
                       >
                         <a className="leading-6 text-nearblue-600 hover:no-underline">
-                          ${dollarFormat(stats?.near_price ?? 0)}{' '}
+                          {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
-                            @{localFormat(stats?.near_btc_price ?? 0)} BTC
+                            {nearBtcPrice
+                              ? '@' + localFormat(stats?.near_btc_price) + 'BTC'
+                              : ''}
                           </span>{' '}
-                          {Number(stats?.change_24) > 0 ? (
-                            <span className="text-neargreen text-sm">
-                              (
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
+                          {change24 ? (
+                            Number(stats?.change_24) > 0 ? (
+                              <span className="text-neargreen text-sm">
+                                (
+                                {stats?.change_24
+                                  ? dollarFormat(stats?.change_24)
+                                  : stats?.change_24 ?? ''}
+                                %)
+                              </span>
+                            ) : (
+                              <span className="text-red-500 text-sm">
+                                (
+                                {stats?.change_24
+                                  ? dollarFormat(stats?.change_24)
+                                  : stats?.change_24 ?? ''}
+                                %)
+                              </span>
+                            )
                           ) : (
-                            <span className="text-red-500 text-sm">
-                              (
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
+                            ''
                           )}
                         </a>
-                      </a>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -302,14 +320,18 @@ export default function ({ network, t }: Props) {
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a
-                        href="/charts/market-cap"
-                        className="hover:no-underline"
-                      >
-                        <a className="leading-6 text-nearblue-700 hover:no-underline">
-                          ${dollarFormat(stats?.market_cap ?? 0)}
-                        </a>
-                      </a>
+                      <>
+                        <Link
+                          href="/charts/market-cap"
+                          className="hover:no-underline"
+                        >
+                          <a className="leading-6 text-nearblue-700 hover:no-underline">
+                            {stats?.market_cap
+                              ? '$ ' + dollarFormat(stats?.market_cap ?? 0)
+                              : ''}
+                          </a>
+                        </Link>
+                      </>
                     )}
                   </div>
                 </div>
@@ -375,13 +397,13 @@ export default function ({ network, t }: Props) {
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />
                   ) : (
-                    <a href="/node-explorer" className="hover:no-underline">
+                    <Link href="/node-explorer" className="hover:no-underline">
                       <a className="leading-6 text-nearblue-700 hover:no-underline">
                         {stats?.nodes_online
                           ? localFormat(stats?.nodes_online)
                           : stats?.nodes_online ?? ''}
                       </a>
-                    </a>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -392,11 +414,13 @@ export default function ({ network, t }: Props) {
                 {isLoading ? (
                   <Skeleton className="my-1 h-4" />
                 ) : (
-                  <a href="/charts/blocks" className="hover:no-underline">
+                  <Link href="/charts/blocks" className="hover:no-underline">
                     <a className="leading-6 text-nearblue-700 hover:no-underline">
-                      {stats?.avg_block_time ?? 0} s
+                      {stats?.avg_block_time
+                        ? stats?.avg_block_time + ' s'
+                        : ''}
                     </a>
-                  </a>
+                  </Link>
                 )}
               </div>
             </div>

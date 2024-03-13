@@ -9,12 +9,22 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 import Skeleton from '@/includes/Common/Skeleton';
 import { formatNumber, formatWithCommas } from '@/includes/formats';
@@ -43,7 +53,7 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage }: Props) {
+export default function ({ network, currentPage, setPage, Link }: Props) {
   const [validatorFullData, setValidatorFullData] = useState<{
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
@@ -149,7 +159,6 @@ export default function ({ network, currentPage, setPage }: Props) {
       clearInterval(intervalId);
     };
   }, []);
-
   const handleRowClick = (rowIndex: number) => {
     const isRowExpanded = expanded.includes(rowIndex);
 
@@ -265,14 +274,14 @@ export default function ({ network, currentPage, setPage }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <a
+                <Link
                   href={`/address/${row.accountId}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {shortenAddress(row.accountId)}
                   </a>
-                </a>
+                </Link>
               </Tooltip.Trigger>
               <Tooltip.Content
                 className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
@@ -429,6 +438,10 @@ export default function ({ network, currentPage, setPage }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
+  const validatorEpochData =
+    validatorFullData[currentPage]?.validatorEpochData.length > 0
+      ? validatorFullData[currentPage]?.validatorEpochData
+      : undefined;
 
   const ExpandedRow = (row: ValidatorEpochData) => {
     const telemetry =
@@ -676,12 +689,12 @@ export default function ({ network, currentPage, setPage }: Props) {
                       cell: (row: ValidatorEpochData) => {
                         return (
                           <div>
-                            <a
+                            <Link
                               className="text-green-500 hover:no-underline"
                               href={`mailto:${row?.description?.email}`}
                             >
                               {row?.description?.email}{' '}
-                            </a>
+                            </Link>
                           </div>
                         );
                       },
@@ -720,7 +733,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                           <div>
                             <a
                               className="text-green-500 hover:no-underline"
-                              href={row?.description?.discord}
+                              href={row?.description?.discord || ''}
                               rel="noreferrer noopener"
                               target="_blank"
                             >
@@ -792,10 +805,12 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Current Validators
                 </div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.currentValidators ? (
+                  {isLoading ? (
                     <Skeleton className="h-4 w-16 break-words" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.currentValidators ? (
                     validatorFullData[currentPage]?.currentValidators
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
@@ -804,13 +819,15 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Total Staked
                 </div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.totalStake ? (
+                  {isLoading ? (
                     <Skeleton className="h-4 w-16 break-words" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.totalStake ? (
                     convertAmountToReadableString(
                       validatorFullData[currentPage]?.totalStake,
                       'totalStakeAmount',
                     )
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
@@ -818,15 +835,16 @@ export default function ({ network, currentPage, setPage }: Props) {
                 <div className="flex items-center justify-between md:w-1/2 py-4">
                   <div className="w-full mb-2 md:mb-0">Current Seat Price</div>
                   <div className="w-full break-words">
-                    {!validatorFullData[currentPage]?.seatPrice ? (
+                    {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
                     ) : (
                       <>
-                        {convertAmountToReadableString(
-                          validatorFullData[currentPage]?.seatPrice,
-                          'seatPriceAmount',
-                        )}
-                        Ⓝ
+                        {validatorFullData[currentPage]?.seatPrice
+                          ? convertAmountToReadableString(
+                              validatorFullData[currentPage]?.seatPrice,
+                              'seatPriceAmount',
+                            ) + ' Ⓝ'
+                          : ''}
                       </>
                     )}
                   </div>
@@ -873,46 +891,56 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Epoch Elapsed Time
                 </div>
                 <div className="w-full text-green-500 md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.elapsedTime ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-32" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.elapsedTime ? (
                     convertTimestampToTime(
                       validatorFullData[currentPage]?.elapsedTime,
                     )
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA</div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
-                  {!validatorFullData[currentPage]?.totalSeconds ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-32" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.totalSeconds ? (
                     convertTimestampToTime(timeRemaining.toString())
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Progress</div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.epochProgress ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-full" />
                   ) : (
-                    <div className="flex space-x-4 gap-2 items-center ">
-                      <div className="bg-blue-900-15  h-2 w-full rounded-full">
-                        <div
-                          className="bg-green-500 h-2 rounded-full"
-                          style={{
-                            width: `${Big(
-                              validatorFullData[currentPage]?.epochProgress,
-                            ).toFixed(1)}%`,
-                          }}
-                        ></div>
-                      </div>
-                      {`${Big(
-                        validatorFullData[currentPage]?.epochProgress,
-                      ).toFixed(0)}%`}
-                    </div>
+                    <>
+                      {validatorFullData[currentPage]?.epochProgress ? (
+                        <div className="flex space-x-4 gap-2 items-center ">
+                          <div className="bg-blue-900-15  h-2 w-full rounded-full">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{
+                                width: `${Big(
+                                  validatorFullData[currentPage]?.epochProgress,
+                                ).toFixed(1)}%`,
+                              }}
+                            ></div>
+                          </div>
+                          {`${Big(
+                            validatorFullData[currentPage]?.epochProgress,
+                          ).toFixed(0)}%`}
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -941,7 +969,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                 src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: columns,
-                  data: validatorFullData[currentPage]?.validatorEpochData,
+                  data: validatorEpochData,
                   count: totalCount,
                   isLoading: isLoading,
                   renderRowSubComponent: ExpandedRow,
