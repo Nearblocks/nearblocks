@@ -309,8 +309,9 @@ const txnsExport = catchAsync(
       { header: 'Status', key: 'status' },
       { header: 'Txn Hash', key: 'hash' },
       { header: 'Method', key: 'method' },
-      { header: 'From', key: 'from' },
-      { header: 'To', key: 'to' },
+      { header: 'Affected', key: 'affected' },
+      { header: 'Involved', key: 'involved' },
+      { header: 'Direction', key: 'direction' },
       { header: 'Quantity', key: 'quantity' },
       { header: 'Token', key: 'token' },
       { header: 'Contract', key: 'contract' },
@@ -322,10 +323,12 @@ const txnsExport = catchAsync(
         const status = row.outcomes.status;
 
         stringifier.write({
+          affected: row.affected_account_id || 'system',
           block: row.block.block_height,
           contract: row.ft ? row.ft.contract : '',
-          from: row.affected_account_id || 'system',
+          direction: row.delta_amount > 0 ? 'In' : 'Out',
           hash: row.transaction_hash,
+          involved: row.involved_account_id || 'system',
           method: row.cause,
           quantity: row.ft
             ? tokenAmount(row.delta_amount, row.ft.decimals)
@@ -334,7 +337,6 @@ const txnsExport = catchAsync(
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.involved_account_id || 'system',
           token: row.ft ? `${row.ft.name} (${row.ft.symbol})` : '',
         });
         callback();

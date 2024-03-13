@@ -209,6 +209,7 @@ const txnsExport = catchAsync(
           event_index,
           affected_account_id,
           involved_account_id,
+          delta_amount,
           cause,
           token_id,
           txn.transaction_hash,
@@ -307,18 +308,14 @@ const txnsExport = catchAsync(
       { account, end, start },
     );
 
-    if (query) {
-      const { rows } = await db.query(query, values);
-
-      return res.status(200).json({ txns: rows });
-    }
-
     const columns = [
       { header: 'Status', key: 'status' },
       { header: 'Txn Hash', key: 'hash' },
       { header: 'Method', key: 'method' },
-      { header: 'From', key: 'from' },
-      { header: 'To', key: 'to' },
+      { header: 'Affected', key: 'affected' },
+      { header: 'Involved', key: 'involved' },
+      { header: 'Direction', key: 'direction' },
+      { header: 'Token', key: 'involved' },
       { header: 'Token ID', key: 'id' },
       { header: 'Token', key: 'token' },
       { header: 'Contract', key: 'contract' },
@@ -330,17 +327,18 @@ const txnsExport = catchAsync(
         const status = row.outcomes.status;
 
         stringifier.write({
+          affected: row.affected_account_id || 'system',
           block: row.block.block_height,
           contract: row.nft ? row.nft.contract : '',
-          from: row.affected_account_id || 'system',
+          direction: row.delta_amount > 0 ? 'In' : 'Out',
           hash: row.transaction_hash,
           id: row.token_id,
+          involved: row.involved_account_id || 'system',
           method: row.cause,
           status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.involved_account_id || 'system',
           token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
         });
         callback();
