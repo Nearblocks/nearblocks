@@ -36,7 +36,7 @@ const Block = () => {
   };
   return (
     <>
-      <div style={height} className="relative container mx-auto">
+      <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           src={components?.blocksDetail}
           props={{

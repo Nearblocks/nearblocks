@@ -550,21 +550,34 @@ export default function (props: Props) {
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="py-4 flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
-            Near Account: @&nbsp;{' '}
-            {id && (
-              <span className="font-semibold text-green-500 ">{'  ' + id}</span>
-            )}
-            {
-              <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
-                props={{
-                  id: id,
-                  config: config,
-                }}
-              />
-            }
-          </h1>
+          <div className="flex md:flex-wrap">
+            <h1 className="py-4   space-x-2 text-xl text-gray-700 leading-8 px-2">
+              Near Account: @
+              {id && (
+                <span className="font-semibold text-green-500 ">{id}</span>
+              )}
+              {
+                <Widget
+                  src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                  props={{
+                    id: id,
+                    config: config,
+                  }}
+                />
+              }
+            </h1>
+            {/* <div className="py-4 md:flex-wrap break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+              {
+                <Widget
+                  src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                  props={{
+                    id: id,
+                    config: config,
+                  }}
+                />
+              }
+            </div> */}
+          </div>
         )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
