@@ -95,7 +95,7 @@ export default function ({ t, network, Link }: Props) {
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
-                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3 h-16"
+                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
                     key={i}
                   >
                     <div className="flex items-center ">
@@ -139,7 +139,7 @@ export default function ({ t, network, Link }: Props) {
                 {txns?.map((txn) => {
                   return (
                     <div
-                      className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-3 items-center py-3"
+                      className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
                       key={txn?.transaction_hash}
                     >
                       <div className=" flex items-center">
