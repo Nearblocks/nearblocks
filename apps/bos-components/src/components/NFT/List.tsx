@@ -10,12 +10,22 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   currentPage: number;
   setPage: (page: number) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { localFormat, serialNumber } from '@/includes/formats';
@@ -34,7 +44,7 @@ const initialPagination = {
   per_page: 50,
 };
 
-export default function ({ network, currentPage, setPage, t }: Props) {
+export default function ({ network, currentPage, setPage, t, Link }: Props) {
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -152,7 +162,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
               appUrl={config?.appUrl}
               className="w-5 h-5 mr-2"
             />
-            <a
+            <Link
               href={`/nft-token/${row?.contract}`}
               className="hover:no-underline"
             >
@@ -164,7 +174,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                   {row?.symbol}
                 </span>
               </a>
-            </a>
+            </Link>
           </div>
         </>
       ),
@@ -280,7 +290,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                         key={token?.contract}
                         className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <a href={`/token/${token?.contract}`}>
+                        <Link href={`/token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage
@@ -297,7 +307,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                               </span>
                             </p>
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                   </div>

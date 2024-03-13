@@ -7,12 +7,22 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
   token?: Token;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import {
@@ -35,7 +45,7 @@ import {
   Token,
 } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, Link }: Props) {
   const [account, setAccount] = useState<AccountInfo>({} as AccountInfo);
   const [contract, setContract] = useState<DeploymentsInfo>(
     {} as DeploymentsInfo,
@@ -257,9 +267,9 @@ export default function ({ network, id, token }: Props) {
           >
             <div className="text-sm text-nearblue-600 py-2" itemProp="text">
               The{' '}
-              <a href={`/address/${id}`}>
+              <Link href={`/address/${id}`}>
                 <a className="underline">{name}</a>
-              </a>{' '}
+              </Link>{' '}
               contract was created on Near Protocol at{' '}
               {account?.created?.transaction_hash
                 ? convertToUTC(
@@ -271,17 +281,19 @@ export default function ({ network, id, token }: Props) {
                 : 'N/A'}{' '}
               by{' '}
               {contract?.receipt_predecessor_account_id && (
-                <a href={`/address/${contract.receipt_predecessor_account_id}`}>
+                <Link
+                  href={`/address/${contract.receipt_predecessor_account_id}`}
+                >
                   <a className="underline">
                     {shortenAddress(contract.receipt_predecessor_account_id)}
                   </a>
-                </a>
+                </Link>
               )}{' '}
               through this{' '}
               {contract?.transaction_hash && (
-                <a href={`/txns/${contract.transaction_hash}`}>
+                <Link href={`/txns/${contract.transaction_hash}`}>
                   <a className="underline">transaction</a>
-                </a>
+                </Link>
               )}
               . Since the creation of {name}, there has been{' '}
               {transfers ? localFormat(transfers) : 0} on-chain transfers.
@@ -325,11 +337,11 @@ export default function ({ network, id, token }: Props) {
                 <span>
                   The largest {tokenTicker} holder is currently{' '}
                   {largestHolder?.account && (
-                    <a href={`/address/${largestHolder.account}`}>
+                    <Link href={`/address/${largestHolder.account}`}>
                       <a className="underline">
                         {shortenAddress(largestHolder.account)}
                       </a>
-                    </a>
+                    </Link>
                   )}
                   , who currently holds{' '}
                   {tokenAmount(largestHolder?.amount, tokens?.decimals, true)}{' '}

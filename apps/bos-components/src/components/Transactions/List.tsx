@@ -16,6 +16,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -26,6 +31,11 @@ interface Props {
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import {
@@ -60,6 +70,7 @@ export default function (props: Props) {
     handleFilter,
     onFilterClear,
     t,
+    Link,
   } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -67,8 +78,8 @@ export default function (props: Props) {
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
   const [address, setAddress] = useState('');
+  const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
-
   const config = getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -150,10 +161,14 @@ export default function (props: Props) {
     }
   }, [config?.backendUrl, currentPage, filters, sorting]);
 
-  let filterValue: string;
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    filterValue = event.target.value;
-    // Do something with the value if needed
+  const onInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string,
+  ): void => {
+    setFilterValue((prevFilters) => ({
+      ...prevFilters,
+      [name]: event.target.value,
+    }));
   };
 
   const onFilter = (
@@ -162,14 +177,18 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    if (filterValue !== null && filterValue !== undefined) {
-      handleFilter(name, filterValue);
+    if (filterValue[name] !== undefined && filterValue[name] !== null) {
+      handleFilter(name, filterValue[name]);
     }
   };
 
   const onClear = (name: string) => {
     if (onFilterClear && filters) {
       onFilterClear(name);
+      setFilterValue((prevFilters) => ({
+        ...prevFilters,
+        [name]: '',
+      }));
     }
   };
 
@@ -204,14 +223,14 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -247,9 +266,9 @@ export default function (props: Props) {
           >
             <div className="flex flex-col">
               <input
-                name="type"
-                value={filters ? filters?.method : ''}
-                onChange={onInputChange}
+                name="method"
+                value={filterValue['method']}
+                onChange={(e) => onInputChange(e, 'method')}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
               />
@@ -348,8 +367,8 @@ export default function (props: Props) {
           >
             <input
               name="from"
-              value={filters ? filters?.from : ''}
-              onChange={onInputChange}
+              value={filterValue['from']}
+              onChange={(e) => onInputChange(e, 'from')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -389,7 +408,7 @@ export default function (props: Props) {
                       : 'text-green-500 p-0.5 px-1'
                   }`}
                 >
-                  <a
+                  <Link
                     href={`/address/${row?.signer_account_id}`}
                     className="hover:no-underline"
                   >
@@ -401,7 +420,7 @@ export default function (props: Props) {
                     >
                       {row?.signer_account_id}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -444,8 +463,8 @@ export default function (props: Props) {
           >
             <input
               name="to"
-              value={filters ? filters?.to : ''}
-              onChange={onInputChange}
+              value={filterValue['to']}
+              onChange={(e) => onInputChange(e, 'to')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -479,7 +498,7 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span>
-                  <a
+                  <Link
                     href={`/address/${row?.receiver_account_id}`}
                     className="hover:no-underline whitespace-nowrap"
                   >
@@ -495,7 +514,7 @@ export default function (props: Props) {
                     >
                       {truncateString(row?.receiver_account_id, 17, '...')}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -516,7 +535,7 @@ export default function (props: Props) {
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/blocks/${row?.included_in_block_hash}`}
             className="hover:no-underline"
           >
@@ -525,7 +544,7 @@ export default function (props: Props) {
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:

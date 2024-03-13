@@ -7,12 +7,22 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { AccountContractInfo } from '@/includes/types';
@@ -21,7 +31,7 @@ import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
 
-export default function ({ network, t, id }: Props) {
+export default function ({ network, t, id, Link }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [showWhen, setShowWhen] = useState(true);
   const [sorting, setSorting] = useState('desc');
@@ -212,6 +222,7 @@ export default function ({ network, t, id }: Props) {
                     t: t,
                     accessKey: key,
                     showWhen: showWhen,
+                    Link,
                   }}
                 />
               ))}

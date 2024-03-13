@@ -7,12 +7,22 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {ReceiptsPropsInfo | any} [receipt] -  receipt of the transaction.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   receipt: ReceiptsPropsInfo | any;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { convertToMetricPrefix } from '@/includes/formats';
@@ -20,7 +30,7 @@ import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { receipt, network } = props;
+  const { receipt, network, Link } = props;
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const onTab = (index: number) => {
@@ -184,10 +194,10 @@ export default function (props: Props) {
               <tr>
                 <td>Executed in Block</td>
                 <td>
-                  <a
+                  <Link
                     href={`/blocks/${receipt?.outcome?.blockHash}`}
                     className="whitespace-nowrap"
-                  >{`#${block?.block_height}`}</a>
+                  >{`#${block?.block_height}`}</Link>
                 </td>
               </tr>
               <tr>

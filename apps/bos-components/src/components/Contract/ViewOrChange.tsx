@@ -10,6 +10,11 @@
  * @param {number} [index] - The position index of the contract method.
  * @param {string} [method] - Specifies the method name for the contract.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
+ * @param {React.FC<{
+ *   href: string;
+ *   children: React.ReactNode;
+ *   className?: string;
+ * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -19,6 +24,11 @@ interface Props {
   index: number;
   method: string;
   accountId: string;
+  Link: React.FC<{
+    href: string;
+    children: React.ReactNode;
+    className?: string;
+  }>;
 }
 
 import { capitalize, toSnakeCase } from '@/includes/formats';
@@ -67,7 +77,7 @@ const getDataType = (data: string) => {
 };
 
 export default function (props: Props) {
-  const { network, id, index, method, connected, accountId } = props;
+  const { network, id, index, method, connected, accountId, Link } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -439,9 +449,9 @@ export default function (props: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                    <a href={`/txns/${txn}`} className="hover:no-underline">
+                    <Link href={`/txns/${txn}`} className="hover:no-underline">
                       <a className="text-green-500">{txn}</a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
