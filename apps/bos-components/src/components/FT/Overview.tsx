@@ -458,6 +458,7 @@ export default function ({
               network: network,
               id: id,
               tokenFilter: tokenFilter,
+              Link,
             }}
           />
         )}
