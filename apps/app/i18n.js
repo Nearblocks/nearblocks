@@ -25,10 +25,11 @@ module.exports = {
     'rgx:^/txns': ['txns'],
     'rgx:^/hash': ['txns'],
     'rgx:^/charts': ['charts'],
-    'rgx:^/tokentxns': ['token'],
+    'rgx:^/tokentxns': ['token', 'txns'],
     'rgx:^/token': ['token'],
     'rgx:^/events': ['home'],
-    'rgx:^/nft-tokentxns': ['token'],
+    'rgx:^/nft-tokentxns': ['token', 'txns'],
+    'rgx:^/nft-tokens': ['token', 'txns'],
     'rgx:^/kb': ['kb'],
   },
   loadLocaleFrom: (lang, ns) =>

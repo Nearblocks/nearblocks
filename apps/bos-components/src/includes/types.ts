@@ -53,6 +53,7 @@ export type FtsInfo = {
   event_index: string;
   involved_account_id: string;
   contract: string;
+  cause: string;
 };
 
 export type NftsInfo = {
@@ -65,6 +66,7 @@ export type NftsInfo = {
   event_index: string;
   involved_account_id: string;
   contract: string;
+  cause: string;
 };
 
 export type InventoryInfo = {
@@ -421,7 +423,7 @@ export type RPCTransactionInfo = {
 };
 
 export type TransactionLog = {
-  contract: string | undefined;
+  contract: string;
   logs: string;
 };
 
