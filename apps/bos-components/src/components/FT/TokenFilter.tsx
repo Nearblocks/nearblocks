@@ -195,7 +195,7 @@ export default function ({ network, id, tokenFilter, Link }: Props) {
   return (
     <>
       {tokenFilter && (
-        <div className="py-2">
+        <div className="py-2 mb-4">
           <div className="bg-white soft-shadow rounded-xl  px-2 py-3">
             <div className="grid md:grid-cols-3 grid-cols-1 divide-y md:divide-y-0 md:divide-x">
               <div className="px-4 md:py-0 py-2">
