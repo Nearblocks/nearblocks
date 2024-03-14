@@ -127,7 +127,7 @@ export default function ({ network, currentPage, setPage, Link }: Props) {
         .finally(() => {});
     }
     function fetchLatestBlock() {
-      asyncFetch(`${config?.backendUrl}blocks/latests?limit=1`, {
+      asyncFetch(`${config?.backendUrl}blocks/latest?limit=1`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
