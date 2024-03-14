@@ -215,10 +215,10 @@ const Header = () => {
           },
         );
 
-        const data: BlocksInfo = await response.json();
+        const data = await response.json();
 
         if (response.status === 200) {
-          setBlock(data);
+          setBlock(data.blocks[0]);
         }
       } catch (error) {
         console.log(error);
