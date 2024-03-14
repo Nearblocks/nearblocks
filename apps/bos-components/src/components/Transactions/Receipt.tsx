@@ -36,9 +36,9 @@ export default function (props: Props) {
   const [receipt, setReceipt] = useState(null);
   const config = getConfig(network);
   function transactionReceipts(txn: RPCTransactionInfo) {
-    const actions: any = txn?.transaction?.actions?.map((txn) =>
-      mapRpcActionToAction(txn),
-    );
+    const actions: any =
+      txn?.transaction?.actions &&
+      txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
     const receipts = txn?.receipts;
     const receiptsOutcome = txn?.receipts_outcome;
 
@@ -57,21 +57,24 @@ export default function (props: Props) {
     const receiptOutcomesByIdMap = new Map();
     const receiptsByIdMap = new Map();
 
-    receiptsOutcome?.forEach((receipt) => {
-      receiptOutcomesByIdMap?.set(receipt?.id, receipt);
-    });
-
-    receipts?.forEach((receiptItem) => {
-      receiptsByIdMap?.set(receiptItem?.receipt_id, {
-        ...receiptItem,
-        actions:
-          receiptItem?.receipt_id === receiptsOutcome[0]?.id
-            ? actions
-            : receiptItem?.receipt?.Action?.actions.map((receipt) =>
-                mapRpcActionToAction(receipt),
-              ),
+    receiptsOutcome &&
+      receiptsOutcome?.forEach((receipt) => {
+        receiptOutcomesByIdMap?.set(receipt?.id, receipt);
       });
-    });
+
+    receipts &&
+      receipts?.forEach((receiptItem) => {
+        receiptsByIdMap?.set(receiptItem?.receipt_id, {
+          ...receiptItem,
+          actions:
+            receiptItem?.receipt_id === receiptsOutcome[0]?.id
+              ? actions
+              : receiptItem?.receipt?.Action?.actions &&
+                receiptItem?.receipt?.Action?.actions.map((receipt) =>
+                  mapRpcActionToAction(receipt),
+                ),
+        });
+      });
 
     const collectReceipts = (receiptHash: any) => {
       const receipt = receiptsByIdMap?.get(receiptHash);
@@ -83,6 +86,7 @@ export default function (props: Props) {
         outcome: {
           ...receiptOutcome?.outcome,
           outgoing_receipts:
+            receiptOutcome?.outcome?.receipt_ids &&
             receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
         },
       };

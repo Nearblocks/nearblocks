@@ -1,39 +1,8 @@
-import { formatLine } from '@/includes/near';
+import { hexy } from '@/includes/hexy';
 import { ReceiptStatsProps } from '@/includes/types';
 
 const ReceiptStatus = (props: ReceiptStatsProps) => {
   const { receipt } = props;
-
-  function hexDump(
-    data: any,
-    options: {
-      width?: number;
-      format: string;
-    },
-  ) {
-    const { width, format } = options;
-
-    let result = '';
-    let line = '';
-    const w = width ? width : 16;
-
-    for (let i = 0; i < data.length; i++) {
-      if (i > 0 && i % w === 0) {
-        result += formatLine(line, i - w, format) + '\n';
-        line = '';
-      }
-
-      const byte = data[i];
-      line += byte.toString(16).padStart(2, '0') + ' ';
-    }
-
-    if (line.length > 0) {
-      result +=
-        formatLine(line, data.length - (data.length % w), format) + '\n';
-    }
-
-    return result;
-  }
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
@@ -46,10 +15,10 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
       if (parsed) {
         pretty = JSON.stringify(parsed, null, 2);
       } else {
-        pretty = hexDump(decoded, { format: 'twos' });
+        pretty = hexy(decoded, { format: 'twos' });
       }
     } catch {
-      pretty = hexDump(decoded, { format: 'twos' });
+      pretty = hexy(decoded, { format: 'twos' });
     }
 
     return pretty;

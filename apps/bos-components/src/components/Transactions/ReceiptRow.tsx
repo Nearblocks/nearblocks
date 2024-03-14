@@ -118,7 +118,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.receipt.text.0') : 'Receipt'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -190,7 +190,7 @@ export default function (props: Props) {
               </Tooltip.Provider>
               {t ? t('txns:txn.receipts.from.text.0') : 'From'}
             </div>
-            {!receipt ? (
+            {!receipt || loading ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-sm" />
               </div>
@@ -231,7 +231,7 @@ export default function (props: Props) {
               </Tooltip.Provider>
               {t ? t('txns:txn.receipts.to.text.0') : 'To'}
             </div>
-            {!receipt ? (
+            {!receipt || loading ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-xs" />
               </div>
@@ -275,7 +275,7 @@ export default function (props: Props) {
               ? t('txns:txn.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
@@ -319,7 +319,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full" />
@@ -363,7 +363,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
@@ -397,7 +397,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
