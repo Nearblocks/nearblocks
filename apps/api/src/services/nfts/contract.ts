@@ -219,12 +219,13 @@ const holders = catchAsync(
         WHERE
           contract = :contract
         GROUP BY
-          contract,
           account
         ORDER BY
           COUNT(quantity) ${order === 'desc' ? 'DESC' : 'ASC'}
         LIMIT
-          :limit OFFSET :offset
+          :limit
+        OFFSET
+          :offset
       `,
       { contract, limit, offset },
     );
@@ -241,19 +242,12 @@ const holdersCount = catchAsync(
 
     const { query, values } = keyBinder(
       `
-      SELECT
-          COUNT(*)
-        FROM (
-          SELECT
-            account
-          FROM
-            nft_holders_daily
-          WHERE
-            contract = :contract
-          GROUP BY
-            contract,
-            account
-        ) s
+        SELECT
+          COUNT(DISTINCT account)
+        FROM
+          nft_holders_daily
+        WHERE
+          contract = :contract
       `,
       { contract },
     );
