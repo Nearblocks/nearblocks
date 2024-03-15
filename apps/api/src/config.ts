@@ -26,7 +26,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  maxQueryCost: 200000,
+  maxQueryCost: 400000,
   maxQueryRows: 5000,
   network: env.NETWORK,
   port: 3001,
