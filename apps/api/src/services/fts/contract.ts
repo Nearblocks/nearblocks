@@ -250,12 +250,13 @@ const holders = catchAsync(
         WHERE
           contract = :contract
         GROUP BY
-          contract,
           account
         ORDER BY
           SUM(amount) ${order === 'desc' ? 'DESC' : 'ASC'}
         LIMIT
-          :limit OFFSET :offset
+          :limit
+        OFFSET
+          :offset
       `,
       { contract, limit, offset },
     );
@@ -273,18 +274,11 @@ const holdersCount = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          COUNT(*)
-        FROM (
-          SELECT
-            account
-          FROM
-            ft_holders_monthly
-          WHERE
-            contract = :contract
-          GROUP BY
-            contract,
-            account
-        ) s
+          COUNT(DISTINCT account)
+        FROM
+          ft_holders_monthly
+        WHERE
+          contract = :contract
       `,
       { contract },
     );
