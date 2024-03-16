@@ -185,55 +185,65 @@ export default function (props: Props) {
           </div>
         </Tabs.Content>
         <Tabs.Content value={hashes[1]}>
-          <table className="w-full my-4 mx-7">
-            <tbody>
-              <tr>
-                <td>Receipt ID</td>
-                <td>{receipt?.id}</td>
-              </tr>
-              <tr>
-                <td>Executed in Block</td>
-                <td>
-                  <Link
-                    href={`/blocks/${receipt?.outcome?.blockHash}`}
-                    className="whitespace-nowrap"
-                  >{`#${block?.block_height}`}</Link>
-                </td>
-              </tr>
-              <tr>
-                <td>Predecessor ID</td>
-                <td>{receipt?.predecessorId}</td>
-              </tr>
-
-              <tr>
-                <td>Receiver ID</td>
-                <td>{receipt?.receiverId}</td>
-              </tr>
-
-              <tr>
-                <td>Attached Gas</td>
-                <td>{receipt?.id}</td>
-              </tr>
-              <tr>
-                <td>Gas Burned</td>
-                <td>
-                  {!loading && receipt?.outcome?.gasBurnt
-                    ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
-                    : receipt?.outcome?.gasBurnt ?? ''}
-                  gas
-                </td>
-              </tr>
-              <tr>
-                <td>Tokens Burned</td>
-                <td>
-                  {!loading && receipt?.outcome?.tokensBurnt
-                    ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
-                    : receipt?.outcome?.tokensBurnt ?? ''}
-                  Ⓝ
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="my-4 mx-7 whitespace-nowrap table-auto">
+              <tbody>
+                <tr>
+                  <td className="py-2 pr-4">Receipt ID</td>
+                  <td className="py-2 pl-4">{receipt?.id}</td>
+                </tr>
+                <tr>
+                  <td
+                    className={`py-2 pr-4 ${
+                      !block ? 'whitespace-normal' : 'whitespace-nowrap'
+                    }`}
+                  >
+                    Executed in Block
+                  </td>
+                  <td className="py-2 pl-4">
+                    {block && (
+                      <Link
+                        href={`/blocks/${receipt?.outcome?.blockHash}`}
+                        className="text-green-500"
+                      >
+                        #{block?.block_height}
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Predecessor ID</td>
+                  <td className="py-2 pl-4">{receipt?.predecessorId}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Receiver ID</td>
+                  <td className="py-2 pl-4">{receipt?.receiverId}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Attached Gas</td>
+                  <td className="py-2 pl-4">{receipt?.id}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Gas Burned</td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt?.outcome?.gasBurnt
+                      ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
+                      : receipt?.outcome?.gasBurnt ?? ''}
+                    gas
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Tokens Burned</td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt?.outcome?.tokensBurnt
+                      ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
+                      : receipt?.outcome?.tokensBurnt ?? ''}
+                    Ⓝ
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </Tabs.Content>
       </Tabs.Root>
     </div>

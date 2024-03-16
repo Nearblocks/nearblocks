@@ -542,6 +542,8 @@ export default function (props: Props) {
     }
   };
 
+  const balance = accountData?.amount ?? '';
+  const nearPrice = statsData?.near_price ?? '';
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4 ">
@@ -566,17 +568,6 @@ export default function (props: Props) {
                 />
               }
             </h1>
-            {/* <div className="py-4 md:flex-wrap break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
-              {
-                <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
-                  props={{
-                    id: id,
-                    config: config,
-                  }}
-                />
-              }
-            </div> */}
           </div>
         )}
       </div>
@@ -614,40 +605,41 @@ export default function (props: Props) {
                   <Skeleton className="h-4 w-32" />
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {accountData?.amount
-                      ? yoctoToNear(accountData?.amount, true)
-                      : accountData?.amount ?? ''}{' '}
-                    Ⓝ
+                    {balance
+                      ? yoctoToNear(accountData?.amount, true) + ' Ⓝ'
+                      : ''}
                   </div>
                 )}
               </div>
-              {network === 'mainnet' && statsData?.near_price && (
-                <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                    {t ? t('address:value') : 'Value:'}
-                  </div>
-                  {loading ? (
-                    <Skeleton className="h-4 w-32" />
-                  ) : (
-                    <div className="w-full md:w-3/4 break-words">
-                      {accountData?.amount && statsData?.near_price
-                        ? '$' +
-                          fiatValue(
-                            yoctoToNear(accountData?.amount, false),
-                            statsData?.near_price,
-                          )
-                        : ''}{' '}
-                      <span className="text-xs">
-                        (@ $
-                        {statsData?.near_price
-                          ? dollarFormat(statsData?.near_price)
-                          : statsData?.near_price ?? ''}{' '}
-                        / Ⓝ)
-                      </span>
+              {network === 'mainnet' &&
+                accountData?.amount &&
+                statsData?.near_price && (
+                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                      {t ? t('address:value') : 'Value:'}
                     </div>
-                  )}
-                </div>
-              )}
+                    {loading ? (
+                      <Skeleton className="h-4 w-32" />
+                    ) : (
+                      <div className="w-full md:w-3/4 break-words">
+                        {accountData?.amount && statsData?.near_price
+                          ? '$' +
+                            fiatValue(
+                              yoctoToNear(accountData?.amount, false),
+                              statsData?.near_price,
+                            )
+                          : ''}{' '}
+                        <span className="text-xs">
+                          (@
+                          {nearPrice
+                            ? '$' + dollarFormat(statsData?.near_price)
+                            : ''}
+                          / Ⓝ)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens:'}
@@ -740,7 +732,7 @@ export default function (props: Props) {
                     </div>
                   )}
                 </div>
-                {contract?.hash ? (
+                {contract?.hash && !loading ? (
                   <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                     <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
                     <div className="w-full break-words xl:mt-0 mt-2">
@@ -823,8 +815,8 @@ export default function (props: Props) {
       <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
-          <Tabs.Root defaultValue={pageTab}>
-            <Tabs.List>
+          <>
+            <div>
               {tabs &&
                 tabs.map((tab, index) => {
                   if (
@@ -834,7 +826,7 @@ export default function (props: Props) {
                     return null;
                   }
                   return (
-                    <Tabs.Trigger
+                    <button
                       key={index}
                       onClick={() => {
                         onTab(index);
@@ -862,12 +854,12 @@ export default function (props: Props) {
                       ) : (
                         <h2>{tab}</h2>
                       )}
-                    </Tabs.Trigger>
+                    </button>
                   );
                 })}
-            </Tabs.List>
+            </div>
             <div>
-              <Tabs.Content value={tabs[0]}>
+              <div className={`${pageTab === 'Transactions' ? '' : 'hidden'} `}>
                 {
                   <Widget
                     src={`${config?.ownerId}/widget/bos-components.components.Address.Transactions`}
@@ -882,8 +874,8 @@ export default function (props: Props) {
                     }}
                   />
                 }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[1]}>
+              </div>
+              <div className={`${pageTab === 'Token Txns' ? '' : 'hidden'} `}>
                 {
                   <Widget
                     src={`${config?.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
@@ -898,8 +890,10 @@ export default function (props: Props) {
                     }}
                   />
                 }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[2]}>
+              </div>
+              <div
+                className={`${pageTab === 'NFT Token Txns' ? '' : 'hidden'} `}
+              >
                 {
                   <Widget
                     src={`${config?.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
@@ -914,8 +908,8 @@ export default function (props: Props) {
                     }}
                   />
                 }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[3]}>
+              </div>
+              <div className={`${pageTab === 'Access Keys' ? '' : 'hidden'} `}>
                 {
                   <Widget
                     src={`${config?.ownerId}/widget/bos-components.components.Address.AccessKeys`}
@@ -927,33 +921,35 @@ export default function (props: Props) {
                     }}
                   />
                 }
-              </Tabs.Content>
+              </div>
               {contractInfo && contractInfo?.methodNames?.length > 0 && (
-                <Tabs.Content value={tabs[4]}>
-                  {
-                    <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Contract.Overview`}
-                      props={{
-                        network: network,
-                        t: t,
-                        id: id,
-                        contract: contract,
-                        schema: schema,
-                        contractInfo: contractInfo,
-                        requestSignInWithWallet: requestSignInWithWallet,
-                        connected: signedIn,
-                        accountId: accountId,
-                        logOut: logOut,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-              )}
-              <Tabs.Content value={tabs[5]}>
-                <div className="bg-white soft-shadow rounded-xl pb-1">
-                  <div className="py-3">
+                <>
+                  <div className={`${pageTab === 'Contract' ? '' : 'hidden'} `}>
                     {
+                      <Widget
+                        src={`${config.ownerId}/widget/bos-components.components.Contract.Overview`}
+                        props={{
+                          network: network,
+                          t: t,
+                          id: id,
+                          contract: contract,
+                          schema: schema,
+                          contractInfo: contractInfo,
+                          requestSignInWithWallet: requestSignInWithWallet,
+                          connected: signedIn,
+                          accountId: accountId,
+                          logOut: logOut,
+                          Link,
+                        }}
+                      />
+                    }
+                  </div>
+                </>
+              )}
+              <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
+                {
+                  <div className="bg-white soft-shadow rounded-xl pb-1">
+                    <div className="py-3">
                       <Widget
                         src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
                         props={{
@@ -962,12 +958,12 @@ export default function (props: Props) {
                           limit: 10,
                         }}
                       />
-                    }
+                    </div>
                   </div>
-                </div>
-              </Tabs.Content>
+                }
+              </div>
             </div>
-          </Tabs.Root>
+          </>
         </div>
       </div>
     </>

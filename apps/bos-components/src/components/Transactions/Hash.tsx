@@ -12,6 +12,10 @@
  *   children: React.ReactNode;
  *   className?: string;
  * }>} Link - A React component for rendering links.
+ * @param {function} [onHandleTab] - Function to handle tab changes. (Optional)
+ *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
+ * @param {string} [pageTab] - The page tab being displayed. (Optional)
+ *                                 Example: If provided, tab=overview in the url it will select the overview tab of transaction details.
  */
 
 interface Props {
@@ -23,6 +27,8 @@ interface Props {
     children: React.ReactNode;
     className?: string;
   }>;
+  onHandleTab: (value: string) => void;
+  pageTab: string;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -30,23 +36,24 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import { getConfig, handleRateLimit } from '@/includes/libs';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
-const hashes = [' ', 'execution', 'comments'];
+const hashes = ['overview', 'execution', 'comments'];
 
 export default function (props: Props) {
-  const { t, network, hash, Link } = props;
+  const { t, network, hash, Link, onHandleTab, pageTab } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [txn, setTxn] = useState<TransactionInfo>({} as TransactionInfo);
+  const [txn, setTxn] = useState<TransactionInfo | null>(null);
   const [error, setError] = useState(false);
   const [isToggle, setIsToggle] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<RPCTransactionInfo>(
     {} as RPCTransactionInfo,
   );
-  const [pageHash, setHash] = useState(' ');
+
   const config = getConfig(network);
 
   const onTab = (index: number) => {
-    setHash(hashes[index]);
+    onHandleTab(hashes[index]);
   };
+
   useEffect(() => {
     function fetchTxn() {
       setIsLoading(true);
@@ -133,24 +140,24 @@ export default function (props: Props) {
           {t ? t('txns:txnError') : 'Transaction Error'}
         </div>
       ) : (
-        <Tabs.Root defaultValue={pageHash}>
-          <Tabs.List>
+        <>
+          <div>
             {hashes &&
               hashes.map((hash, index) => (
-                <Tabs.Trigger
+                <button
                   key={index}
                   onClick={() => onTab(index)}
                   className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                    pageHash === hash
+                    pageTab === hash
                       ? 'rounded-lg bg-green-600 text-white'
                       : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
                   }`}
                   value={hash}
                 >
-                  {hash === ' ' ? (
+                  {hash === 'overview' ? (
                     <h2>{t ? t('txns:txn.tabs.overview') : 'Overview'}</h2>
                   ) : hash === 'execution' ? (
-                    pageHash !== 'execution' ? (
+                    pageTab !== 'execution' ? (
                       <>
                         <h2>
                           {isToggle
@@ -203,11 +210,11 @@ export default function (props: Props) {
                   ) : (
                     <h2>{t ? t('txns:txn.tabs.comments') : 'Comments'}</h2>
                   )}
-                </Tabs.Trigger>
+                </button>
               ))}
-          </Tabs.List>
+          </div>
           <div className="bg-white soft-shadow rounded-xl pb-1">
-            <Tabs.Content value={hashes[0]}>
+            <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
               {
                 <Widget
                   src={`${config?.ownerId}/widget/bos-components.components.Transactions.Detail`}
@@ -221,21 +228,24 @@ export default function (props: Props) {
                   }}
                 />
               }
-            </Tabs.Content>
-            <Tabs.Content value={hashes[1]}>
-              {isToggle ? (
-                <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Execution`}
-                  props={{
-                    network: network,
-                    t: t,
-                    txn: txn,
-                    rpcTxn: rpcTxn,
-                    loading: isLoading,
-                    Link,
-                  }}
-                />
-              ) : (
+            </div>
+            <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
+              <div className={`${isToggle ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config?.ownerId}/widget/bos-components.components.Transactions.Execution`}
+                    props={{
+                      network: network,
+                      t: t,
+                      txn: txn,
+                      rpcTxn: rpcTxn,
+                      loading: isLoading,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${isToggle ? 'hidden' : ''} `}>
                 <Widget
                   src={`${config?.ownerId}/widget/bos-components.components.Transactions.Receipt`}
                   props={{
@@ -247,9 +257,9 @@ export default function (props: Props) {
                     Link,
                   }}
                 />
-              )}
-            </Tabs.Content>
-            <Tabs.Content value={hashes[2]}>
+              </div>
+            </div>
+            <div className={`${pageTab === 'comments' ? '' : 'hidden'} `}>
               <div className="py-3">
                 {
                   <Widget
@@ -262,9 +272,9 @@ export default function (props: Props) {
                   />
                 }
               </div>
-            </Tabs.Content>
+            </div>
           </div>
-        </Tabs.Root>
+        </>
       )}
     </>
   );

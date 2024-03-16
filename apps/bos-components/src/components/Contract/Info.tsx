@@ -66,8 +66,8 @@ export default function (props: Props) {
     fetchContractData();
   }, [config?.backendUrl, id]);
 
-  const { createAction, updateAction } =
-    deploymentData?.[0] || ({} as DeploymentsInfo);
+  const [createAction, updateAction] =
+    deploymentData || ({} as DeploymentsInfo);
   const action = updateAction || createAction;
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

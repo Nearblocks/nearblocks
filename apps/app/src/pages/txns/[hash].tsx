@@ -15,6 +15,21 @@ const Txn = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const [pageTab, setPageTab] = useState('overview');
+
+  const onHandleTab = (hashValue: string) => {
+    setPageTab(hashValue);
+    router.push(`/txns/${hash}?tab=${hashValue}`);
+  };
+
+  useEffect(() => {
+    const select = `${router?.query?.tab}` || 'overview';
+
+    if (router?.query?.tab) {
+      setPageTab(select);
+    }
+  }, [router?.query]);
+
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -23,6 +38,7 @@ const Txn = () => {
       setHeight({});
     }
   };
+
   useEffect(() => {
     updateOuterDivHeight();
     window.addEventListener('resize', updateOuterDivHeight);
@@ -31,24 +47,35 @@ const Txn = () => {
       window.removeEventListener('resize', updateOuterDivHeight);
     };
   }, []);
+
   const onChangeHeight = () => {
     setHeight({});
   };
+
   return (
     <>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           src={components?.transactionsHash}
-          props={{ hash: hash, network: networkId, t: t }}
+          props={{
+            hash: hash,
+            network: networkId,
+            t: t,
+            onHandleTab: onHandleTab,
+            pageTab: pageTab,
+          }}
           skeleton={
             <Detail
               className="absolute"
               txns={true}
               ref={heightRef}
               network={networkId}
+              pageTab={pageTab}
             />
           }
-          defaultSkelton={<Detail txns={true} network={networkId} />}
+          defaultSkelton={
+            <Detail txns={true} network={networkId} pageTab={pageTab} />
+          }
           onChangeHeight={onChangeHeight}
         />
       </div>
