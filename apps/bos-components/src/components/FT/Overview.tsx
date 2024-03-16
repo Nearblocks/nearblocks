@@ -178,19 +178,21 @@ export default function ({
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 py-4 px-2">
-            <span className="inline-flex align-middle h-7 w-7">
-              <TokenImage
-                src={token?.icon}
-                alt={token?.name}
-                className="w-7 h-7"
-              />
-            </span>
-            <span className="inline-flex align-middle ">Token: </span>
-            <span className="inline-flex align-middle font-semibold">
-              {token?.name}
-            </span>
-          </h1>
+          token && (
+            <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 py-4 px-2">
+              <span className="inline-flex align-middle h-7 w-7">
+                <TokenImage
+                  src={token?.icon}
+                  alt={token?.name}
+                  className="w-7 h-7"
+                />
+              </span>
+              <span className="inline-flex align-middle ">Token: </span>
+              <span className="inline-flex align-middle font-semibold">
+                {token?.name}
+              </span>
+            </h1>
+          )
         )}
       </div>
       <div>
@@ -464,67 +466,67 @@ export default function ({
         )}
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <Tabs.Root defaultValue={pageTab}>
-              <Tabs.List>
-                {tabs &&
-                  tabs.map((tab, index) => (
-                    <Tabs.Trigger
-                      key={index}
-                      onClick={() => onTab(index)}
-                      className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                        pageTab === tab
-                          ? 'rounded-lg bg-green-600 text-white'
-                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
-                      }`}
-                      value={tab}
-                    >
-                      <h2>{tab}</h2>
-                    </Tabs.Trigger>
-                  ))}
-              </Tabs.List>
-              <div className="bg-white soft-shadow rounded-xl pb-1">
-                <Tabs.Content value={tabs[0]}>
-                  {
-                    <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.FT.Transfers`}
-                      props={{
-                        network: network,
-                        id: id,
-                        t: t,
-                        filters: filters,
-                        onFilterClear: onFilterClear,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content value={tabs[1]}>
-                  {
-                    <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.FT.Holders`}
-                      props={{
-                        network: network,
-                        id: id,
-                        token: token,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content clssName="border-t" value={tabs[2]}>
-                  {
-                    <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.FT.Info`}
-                      props={{
-                        network: network,
-                        id: id,
-                        token: token,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content value={tabs[3]}>
+            <div>
+              {tabs &&
+                tabs.map((tab, index) => (
+                  <button
+                    key={index}
+                    onClick={() => onTab(index)}
+                    className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                      pageTab === tab
+                        ? 'rounded-lg bg-green-600 text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                    }`}
+                    value={tab}
+                  >
+                    {tab === 'FAQ' && token ? <h2>{tab}</h2> : <h2>{tab}</h2>}
+                  </button>
+                ))}
+            </div>
+            <div className="bg-white soft-shadow rounded-xl pb-1">
+              <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.FT.Transfers`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      filters: filters,
+                      onFilterClear: onFilterClear,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Holders' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.FT.Holders`}
+                    props={{
+                      network: network,
+                      id: id,
+                      token: token,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Info' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config.ownerId}/widget/bos-components.components.FT.Info`}
+                    props={{
+                      network: network,
+                      id: id,
+                      token: token,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              {token && (
+                <div className={`${pageTab === 'FAQ' ? '' : 'hidden'} `}>
                   {
                     <Widget
                       src={`${config.ownerId}/widget/bos-components.components.FT.FAQ`}
@@ -536,23 +538,23 @@ export default function ({
                       }}
                     />
                   }
-                </Tabs.Content>{' '}
-                <Tabs.Content value={tabs[4]}>
-                  <div className="py-3">
-                    {
-                      <Widget
-                        src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
-                        props={{
-                          network: network,
-                          path: `nearblocks.io/ft/${id}`,
-                          limit: 10,
-                        }}
-                      />
-                    }
-                  </div>
-                </Tabs.Content>
+                </div>
+              )}{' '}
+              <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
+                <div className="py-3">
+                  {
+                    <Widget
+                      src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                      props={{
+                        network: network,
+                        path: `nearblocks.io/ft/${id}`,
+                        limit: 10,
+                      }}
+                    />
+                  }
+                </div>
               </div>
-            </Tabs.Root>
+            </div>
           </div>
         </div>
       </div>

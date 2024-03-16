@@ -174,7 +174,7 @@ export default function ({ network, id, Link }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {transfers ? localFormat(transfers) : ''}
+                      {transfers && token ? localFormat(transfers) : ''}
                     </div>
                   )}
                 </div>
@@ -253,77 +253,75 @@ export default function ({ network, id, Link }: Props) {
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <Tabs.Root defaultValue={pageTab}>
-              <Tabs.List>
-                {tabs &&
-                  tabs?.map((tab, index) => (
-                    <Tabs.Trigger
-                      key={index}
-                      onClick={() => onTab(index)}
-                      className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                        pageTab === tab
-                          ? 'rounded-lg bg-green-600 text-white'
-                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
-                      }`}
-                      value={tab}
-                    >
-                      <h2>{tab}</h2>
-                    </Tabs.Trigger>
-                  ))}
-              </Tabs.List>
-              <div className="bg-white soft-shadow rounded-xl pb-1">
-                <Tabs.Content value={tabs[0]}>
-                  {
-                    <Widget
-                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Transfers`}
-                      props={{
-                        network: network,
-                        id: id,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content value={tabs[1]}>
-                  {
-                    <Widget
-                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Holders`}
-                      props={{
-                        network: network,
-                        id: id,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content value={tabs[2]}>
-                  {
-                    <Widget
-                      src={`${config?.ownerId}/widget/bos-components.components.NFT.Inventory`}
-                      props={{
-                        network: network,
-                        id: id,
-                        Link,
-                      }}
-                    />
-                  }
-                </Tabs.Content>
-                <Tabs.Content value={tabs[3]}>
-                  <div className="py-3">
-                    {
-                      <Widget
-                        src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
-                        props={{
-                          network: network,
-                          path: `nearblocks.io/nft/${id}`,
-                          limit: 10,
-                        }}
-                      />
-                    }
-                  </div>
-                </Tabs.Content>
+            <div>
+              {tabs &&
+                tabs?.map((tab, index) => (
+                  <button
+                    key={index}
+                    onClick={() => onTab(index)}
+                    className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                      pageTab === tab
+                        ? 'rounded-lg bg-green-600 text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                    }`}
+                    value={tab}
+                  >
+                    <h2>{tab}</h2>
+                  </button>
+                ))}
+            </div>
+            <div className="bg-white soft-shadow rounded-xl pb-1">
+              <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Transfers`}
+                    props={{
+                      network: network,
+                      id: id,
+                      Link,
+                    }}
+                  />
+                }
               </div>
-            </Tabs.Root>
+              <div className={`${pageTab === 'Holders' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Holders`}
+                    props={{
+                      network: network,
+                      id: id,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Inventory' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Inventory`}
+                    props={{
+                      network: network,
+                      id: id,
+                      Link,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
+                <div className="py-3">
+                  {
+                    <Widget
+                      src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                      props={{
+                        network: network,
+                        path: `nearblocks.io/nft/${id}`,
+                        limit: 10,
+                      }}
+                    />
+                  }
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
