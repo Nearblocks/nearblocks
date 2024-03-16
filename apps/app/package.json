@@ -24,7 +24,6 @@
     "@near-wallet-selector/narwallets": "8.9.3",
     "@near-wallet-selector/near-mobile-wallet": "8.9.3",
     "@near-wallet-selector/near-snap": "8.9.3",
-    "@near-wallet-selector/near-wallet": "8.9.3",
     "@near-wallet-selector/nearfi": "8.9.3",
     "@near-wallet-selector/neth": "8.9.3",
     "@near-wallet-selector/nightly": "8.9.3",

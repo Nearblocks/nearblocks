@@ -370,7 +370,7 @@ export default function ({ network, t, currentPage, setPage, Link }: Props) {
                   <Tooltip.Trigger asChild>
                     <div className="text-sm text-nearblue-600 max-w-[110px] inline-block truncate">
                       <Link
-                        href={`/token/${row?.nft?.contract}`}
+                        href={`/nft-token/${row?.nft?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="text-green-500 font-medium hover:no-underline">

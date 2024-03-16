@@ -40,6 +40,7 @@ export default function SearchBar({
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
+  const [isResultsVisible, setIsResultsVisible] = useState(false);
   const config = getConfig(network);
 
   // Determine whether to show search results
@@ -48,7 +49,13 @@ export default function SearchBar({
     (result?.txns && result.txns.length > 0) ||
     (result?.accounts && result.accounts.length > 0) ||
     (result?.receipts && result.receipts.length > 0);
+  const showSearchResults = () => {
+    setIsResultsVisible(true);
+  };
 
+  const hideSearchResults = () => {
+    setIsResultsVisible(false);
+  };
   // Debounced keyword update
   const debouncedSetKeyword = useMemo(
     () => debounce(500, (value: string) => setKeyword(value)),
@@ -72,14 +79,19 @@ export default function SearchBar({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
     debouncedSetKeyword(newNextValue);
+    showSearchResults();
   };
 
   const onSubmit = () => {
     if (filter && keyword) {
       search(keyword, filter, true, config.backendUrl).then((data: any) => {
+        hideSearchResults();
         redirect(data);
       });
     }
+  };
+  const onSelect = () => {
+    hideSearchResults();
   };
   useEffect(() => {
     const fetchData = (keyword: string, filter: string) => {
@@ -137,7 +149,7 @@ export default function SearchBar({
                 }
               }}
             />
-            {showResults && (
+            {isResultsVisible && showResults && (
               <div className="z-50 relative">
                 <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border">
                   {result?.accounts && result.accounts.length > 0 && (
@@ -151,7 +163,10 @@ export default function SearchBar({
                           className="hover:no-underline"
                           key={address.account_id}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenAddress(address.account_id)}
                           </div>
                         </Link>
@@ -169,7 +184,10 @@ export default function SearchBar({
                           href={`/txns/${txn.transaction_hash}`}
                           key={txn.transaction_hash}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenHex(txn.transaction_hash)}
                           </div>
                         </Link>
@@ -187,7 +205,10 @@ export default function SearchBar({
                           className="hover:no-underline"
                           key={receipt.receipt_id}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenHex(receipt.receipt_id)}
                           </div>
                         </Link>
@@ -205,7 +226,10 @@ export default function SearchBar({
                           className="hover:no-underline"
                           key={block.block_hash}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             #
                             {block.block_height
                               ? localFormat(block.block_height)

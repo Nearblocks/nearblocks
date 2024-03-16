@@ -71,7 +71,7 @@ const Overview = forwardRef(
           <div className="py-6"></div>
           <div className="block lg:flex lg:space-x-2 mb-4">
             <div className="w-full">
-              <div className=" flex">
+              <div>
                 <div
                   className={`rounded-lg bg-green-600 text-white text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
                 >

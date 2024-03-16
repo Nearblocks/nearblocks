@@ -2,7 +2,6 @@ import { setupWalletSelector } from '@near-wallet-selector/core';
 import type { WalletSelectorModal } from '@near-wallet-selector/modal-ui';
 import { setupModal } from '@near-wallet-selector/modal-ui';
 import { setupBitgetWallet } from '@near-wallet-selector/bitget-wallet';
-import { setupNearWallet } from '@near-wallet-selector/near-wallet';
 import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
 import { setupSender } from '@near-wallet-selector/sender';
 import { setupHereWallet } from '@near-wallet-selector/here-wallet';
@@ -61,7 +60,6 @@ export default function VmInitializer() {
         selector: setupWalletSelector({
           network: networkId,
           modules: [
-            setupNearWallet(),
             setupBitgetWallet(),
             setupMyNearWallet(),
             setupSender(),
