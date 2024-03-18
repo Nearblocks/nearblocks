@@ -12228,9 +12228,9 @@ near-social-vm-types@^1.0.0:
   resolved "https://registry.yarnpkg.com/near-social-vm-types/-/near-social-vm-types-1.0.0.tgz#721494a863d2c0d64da2a43d80224e4080b690db"
   integrity sha512-K5CxfiiKc7evzFb/1BGBOD2x4QqnEBuVaHkgRsRTGv02ctLkxA/Xf892SornWSkD75Hf0s9j/jeM5PpMfXcM9A==
 
-"near-social-vm@github:NearSocial/VM#2.5.5":
-  version "2.5.5"
-  resolved "https://codeload.github.com/NearSocial/VM/tar.gz/d8eb1674cca9aa3350583d40b8a46a74dbbc4ac6"
+"near-social-vm@github:NearSocial/VM#2.6.0":
+  version "2.6.0"
+  resolved "https://codeload.github.com/NearSocial/VM/tar.gz/8dbb06526f15f10d562a118a38e4c0b6412beb88"
   dependencies:
     "@radix-ui/react-accordion" "^1.1.1"
     "@radix-ui/react-alert-dialog" "^1.0.3"
@@ -12290,9 +12290,9 @@ near-social-vm-types@^1.0.0:
     styled-components "^5.3.6"
     tweetnacl "^1.0.3"
 
-"nearblock-translations@https://github.com/Nearblocks/translations.git#2181eaa84dd26604820198c5b8a3b97d8a049c4d":
+"nearblock-translations@https://github.com/Nearblocks/translations.git#267c5ebb09fb03f57421f88c706342e3219939cd":
   version "0.1.2"
-  resolved "https://github.com/Nearblocks/translations.git#2181eaa84dd26604820198c5b8a3b97d8a049c4d"
+  resolved "https://github.com/Nearblocks/translations.git#267c5ebb09fb03f57421f88c706342e3219939cd"
 
 nearley@^2.20.1:
   version "2.20.1"
