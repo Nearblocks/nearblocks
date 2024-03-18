@@ -33,7 +33,7 @@ export function VmComponent(props: Props) {
     setLoader(!EthersProvider || !redirectMapStore.hasResolved);
     const timer = setTimeout(() => {
       setShowLoader(!EthersProvider || !redirectMapStore.hasResolved);
-    }, 250);
+    }, 350);
 
     return () => clearTimeout(timer);
   }, [EthersProvider, redirectMapStore.hasResolved]);

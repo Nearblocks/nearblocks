@@ -228,7 +228,8 @@ export default function ({ network, t, accessKey, showWhen, Link }: Props) {
           )}
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
-          {Object.keys(keyInfo).length !== 0 &&
+          {keyInfo &&
+            Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
             'Ⓝ ' +
               yoctoToNear(
