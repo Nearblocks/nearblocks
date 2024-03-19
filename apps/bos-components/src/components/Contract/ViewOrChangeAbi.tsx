@@ -291,7 +291,7 @@ export default function (props: Props) {
           </div>
         </div>
         <div className="flex items-center mt-5">
-          {!hideQuery && (
+          {!hideQuery && method?.kind === 'view' && (
             <button
               type="submit"
               onClick={(e) => onRead(e)}
@@ -301,36 +301,16 @@ export default function (props: Props) {
               Query
             </button>
           )}
-          {!hideQuery && (
-            <div className="flex items-center mx-4 text-gray-400">
-              OR{' '}
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <span>
-                      <Question className="w-4 h-4 fill-current ml-1" />
-                    </span>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                    align="start"
-                    side="bottom"
-                  >
-                    We cant differentiate read/write methods for this contract,
-                    so you should choose the appropriate action
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
-            </div>
+          {method?.kind === 'call' && (
+            <button
+              type="submit"
+              onClick={(e) => onWrite(e)}
+              disabled={loading || !connected}
+              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              Write
+            </button>
           )}
-          <button
-            type="submit"
-            onClick={(e) => onWrite(e)}
-            disabled={loading || !connected}
-            className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            Write
-          </button>
         </div>
         {error && (
           <textarea
