@@ -131,23 +131,7 @@ const languages = [
     locale: 'it',
   },
 ];
-const profile = [
-  {
-    id: 1,
-    title: 'My Profile',
-    link: '/user/overview',
-  },
-  {
-    id: 2,
-    title: 'Settings',
-    link: '/user/settings',
-  },
-  {
-    id: 3,
-    title: 'API Keys',
-    link: '/user/keys',
-  },
-];
+
 const Header = () => {
   const components = useBosComponents();
   const router = useRouter();
@@ -301,6 +285,7 @@ const Header = () => {
                                 : stats?.near_price ?? ''}
                               {stats?.change_24 > 0 ? (
                                 <span className="text-neargreen text-xs">
+                                  {' '}
                                   (+
                                   {stats?.change_24
                                     ? dollarFormat(stats?.change_24)
@@ -309,6 +294,7 @@ const Header = () => {
                                 </span>
                               ) : (
                                 <span className="text-red-500 text-xs">
+                                  {' '}
                                   (
                                   {stats?.change_24
                                     ? dollarFormat(stats?.change_24)
@@ -454,7 +440,7 @@ const Header = () => {
                       <ul className="border-l-2 border-green-500 md:!hidden ml-4">
                         {languages.map((language) => (
                           <li key={language.locale}>
-                            <ActiveLink href="/" locale={language.locale}>
+                            <ActiveLink href="#" locale={language.locale}>
                               <a className="block w-full hover:text-green-500 py-2 px-4">
                                 {language.title}
                               </a>
@@ -474,7 +460,7 @@ const Header = () => {
                       <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
                         {languages.map((language) => (
                           <li key={language.locale}>
-                            <ActiveLink href="/" locale={language.locale}>
+                            <ActiveLink href="#" locale={language.locale}>
                               <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4">
                                 {language.title}
                               </a>
@@ -498,7 +484,9 @@ const Header = () => {
                             {user ? (
                               <div className="flex justify-between">
                                 <div className="flex items-center">
-                                  {accountId}
+                                  <span className="truncate max-w-[110px]">
+                                    {accountId}
+                                  </span>
                                 </div>
                                 <ArrowDown
                                   className={`fill-current transition-transform w-5 h-5 ${
@@ -520,20 +508,10 @@ const Header = () => {
                     >
                       {user && (
                         <ul className="border-l-2 border-green-500 md:hidden ml-2">
-                          {profile.map((menu) => (
-                            <li key={menu.id}>
-                              <ActiveLink href={menu.link}>
-                                <a className="block w-full hover:text-green-500 py-2 px-4">
-                                  {menu.title}
-                                </a>
-                              </ActiveLink>
-                            </li>
-                          ))}
-                          <li className="border-t my-3"></li>
                           <li className="px-4 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 px-4"
+                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1"
                             >
                               Signout
                             </button>
@@ -544,13 +522,15 @@ const Header = () => {
 
                     <span className="group hidden md:flex h-full w-full relative">
                       <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 `}
                         href="#"
                       >
                         {user ? (
                           <>
                             <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                            {accountId}
+                            <span className="truncate max-w-[110px]">
+                              {accountId}
+                            </span>
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </>
                         ) : (
@@ -584,7 +564,7 @@ const Header = () => {
                             </li>
                           ))} */}
                           {/* <li className="border-t my-3"></li> */}
-                          <li className="px-4 pb-1">
+                          <li className="px-8 pb-1">
                             <button
                               onClick={onSignOut}
                               className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4"

@@ -264,7 +264,9 @@ export default function ({ network, currentPage, setPage, t, Link }: Props) {
       <div className=" bg-white border soft-shadow rounded-xl pb-1 ">
         <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
           {isLoading ? (
-            <Skeleton className="max-w-lg pl-3" />
+            <div className="max-w-lg pl-3 w-full py-3.5 ">
+              <Skeleton className=" h-4" />
+            </div>
           ) : (
             <p className="pl-3">
               A total of {localFormat(totalCount.toString())} NEP-171 Token
