@@ -91,7 +91,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         OFFSET
           ${offset}
       ) AS tmp using (receipt_id)
-      LEFT JOIN LATERAL (
+      INNER JOIN LATERAL (
         SELECT
           transaction_hash,
           included_in_block_hash,

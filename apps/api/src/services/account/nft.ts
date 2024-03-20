@@ -78,6 +78,15 @@ const txns = catchAsync(
                   nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
             ORDER BY
               event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
@@ -85,7 +94,7 @@ const txns = catchAsync(
           ) AS tmp using(
             event_index
           )
-          LEFT JOIN LATERAL (
+          INNER JOIN LATERAL (
             SELECT
               transactions.transaction_hash,
               transactions.included_in_block_hash,
@@ -158,6 +167,15 @@ const txnsCount = catchAsync(
           WHERE
             nft.contract = a.contract_account_id
             AND nft.token = a.token_id
+        )
+        AND EXISTS (
+          SELECT
+            1
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = a.receipt_id
         )
     `;
     const { query, values } = keyBinder(
@@ -258,6 +276,15 @@ const txnsExport = catchAsync(
                   nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
               AND t.block_timestamp BETWEEN :start AND :end
             ORDER BY
               event_index ASC
@@ -266,7 +293,7 @@ const txnsExport = catchAsync(
           ) AS tmp using(
             event_index
           )
-          LEFT JOIN LATERAL (
+          INNER JOIN LATERAL (
             SELECT
               transactions.transaction_hash,
               transactions.included_in_block_hash,

@@ -50,7 +50,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         SELECT
           COUNT(DISTINCT account)
         FROM
-          nft_holders_daily
+          nft_holders
         WHERE
           contract = nft_meta.contract
       ) AS holders,
@@ -156,6 +156,15 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               WHERE
                 nft.contract = a.contract_account_id
                 AND nft.token = a.token_id
+            )
+            AND EXISTS (
+              SELECT
+                1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
             )
           ORDER BY
             event_index DESC
