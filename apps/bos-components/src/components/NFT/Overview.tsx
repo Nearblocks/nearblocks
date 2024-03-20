@@ -6,21 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Links from '@/includes/Common/Links';
@@ -32,7 +22,7 @@ import { Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
-export default function ({ network, id, Link }: Props) {
+export default function ({ network, id }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [txnLoading, setTxnLoading] = useState(false);
   const [holderLoading, setHolderLoading] = useState(false);
@@ -278,7 +268,6 @@ export default function ({ network, id, Link }: Props) {
                     props={{
                       network: network,
                       id: id,
-                      Link,
                     }}
                   />
                 }
@@ -290,7 +279,6 @@ export default function ({ network, id, Link }: Props) {
                     props={{
                       network: network,
                       id: id,
-                      Link,
                     }}
                   />
                 }
@@ -302,7 +290,6 @@ export default function ({ network, id, Link }: Props) {
                     props={{
                       network: network,
                       id: id,
-                      Link,
                     }}
                   />
                 }

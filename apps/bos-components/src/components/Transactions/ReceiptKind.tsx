@@ -21,7 +21,7 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 export default function (props: ReceiptKindInfo) {
-  const { network, t, action, onClick, isTxTypeActive, Link } = props;
+  const { network, t, action, onClick, isTxTypeActive } = props;
 
   const config = getConfig(network);
 
@@ -121,7 +121,6 @@ export default function (props: ReceiptKindInfo) {
                     t: t,
                     action: subaction,
                     isTxTypeActive: true,
-                    Link,
                   }}
                 />
               ))}

@@ -13,11 +13,6 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -27,11 +22,6 @@ interface Props {
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import {
@@ -52,7 +42,7 @@ import TokenImage from '@/includes/icons/TokenImage';
 import Download from '@/includes/icons/Download';
 
 export default function (props: Props) {
-  const { network, t, id, filters, handleFilter, onFilterClear, Link } = props;
+  const { network, t, id, filters, handleFilter, onFilterClear } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});

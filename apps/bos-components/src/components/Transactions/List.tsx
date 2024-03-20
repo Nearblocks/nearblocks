@@ -16,11 +16,6 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -31,11 +26,6 @@ interface Props {
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import {
@@ -70,7 +60,6 @@ export default function (props: Props) {
     handleFilter,
     onFilterClear,
     t,
-    Link,
   } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);

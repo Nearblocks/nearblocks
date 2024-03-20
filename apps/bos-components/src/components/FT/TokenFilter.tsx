@@ -7,11 +7,6 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tokenFilter] - The token filter identifier passed as a string
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -30,14 +25,9 @@ interface Props {
   network: string;
   id: string;
   tokenFilter?: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
-export default function ({ network, id, tokenFilter, Link }: Props) {
+export default function ({ network, id, tokenFilter }: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [inventoryData, setInventoryData] = useState<InventoryInfo>(

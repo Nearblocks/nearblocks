@@ -7,22 +7,12 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The account identifier passed as a string.
  * @param {ContractInfo} [contract] - Object containing information about the associated contract.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
   contract: ContractInfo;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 import { convertToUTC } from '@/includes/formats';
 import Question from '@/includes/icons/Question';
@@ -30,7 +20,7 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { ContractInfo, DeploymentsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, id, contract, Link } = props;
+  const { network, id, contract } = props;
   const [deploymentData, setDeploymentData] = useState<DeploymentsInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const config = getConfig(network);

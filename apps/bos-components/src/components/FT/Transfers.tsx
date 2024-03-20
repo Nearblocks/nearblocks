@@ -11,11 +11,7 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
+
 
  */
 
@@ -26,11 +22,6 @@ interface Props {
   a?: string;
   filters?: { [key: string]: string };
   onFilterClear?: (name: string) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -48,14 +39,7 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({
-  network,
-  t,
-  id,
-  filters,
-  onFilterClear,
-  Link,
-}: Props) {
+export default function ({ network, t, id, filters, onFilterClear }: Props) {
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

@@ -6,21 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   id: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -35,7 +25,7 @@ import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
-export default function ({ network, id, Link }: Props) {
+export default function ({ network, id }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);

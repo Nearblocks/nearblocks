@@ -7,11 +7,6 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The Transaction identifier passed as a string.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  * @param {function} [onHandleTab] - Function to handle tab changes. (Optional)
  *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
  * @param {string} [pageTab] - The page tab being displayed. (Optional)
@@ -22,11 +17,6 @@ interface Props {
   network: string;
   t: (key: string) => string | undefined;
   hash: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
   onHandleTab: (value: string) => void;
   pageTab: string;
 }
@@ -39,7 +29,7 @@ import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 const hashes = ['overview', 'execution', 'comments'];
 
 export default function (props: Props) {
-  const { t, network, hash, Link, onHandleTab, pageTab } = props;
+  const { t, network, hash, onHandleTab, pageTab } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [txn, setTxn] = useState<TransactionInfo | null>(null);
   const [error, setError] = useState(false);
@@ -224,7 +214,6 @@ export default function (props: Props) {
                     loading: isLoading,
                     network: network,
                     t: t,
-                    Link,
                   }}
                 />
               }
@@ -240,7 +229,6 @@ export default function (props: Props) {
                       txn: txn,
                       rpcTxn: rpcTxn,
                       loading: isLoading,
-                      Link,
                     }}
                   />
                 }
@@ -254,7 +242,6 @@ export default function (props: Props) {
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
-                    Link,
                   }}
                 />
               </div>

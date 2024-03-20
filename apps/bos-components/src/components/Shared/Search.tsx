@@ -3,11 +3,6 @@
  * @param {string}  [network] - The network data to show, either mainnet or testnet.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  * @param {{ push: (path: string) => void }} router - An object with a `push` function for routing purposes.
  */
 
@@ -15,11 +10,6 @@ interface Props {
   network: string;
   t: (key: string) => string | undefined;
   isHeader?: boolean;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
   router: { push: (path: string) => void };
 }
 
@@ -30,13 +20,7 @@ import { localFormat, shortenHex } from '@/includes/formats';
 import { debounce, getConfig, shortenAddress } from '@/includes/libs';
 import { SearchResult } from '@/includes/types';
 
-export default function SearchBar({
-  isHeader,
-  t,
-  network,
-  Link,
-  router,
-}: Props) {
+export default function SearchBar({ isHeader, t, network, router }: Props) {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');

@@ -8,11 +8,6 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tid] - The nf token identifier passed as a string
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -28,14 +23,9 @@ interface Props {
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
-export default function ({ network, t, id, tid, Link }: Props) {
+export default function ({ network, t, id, tid }: Props) {
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [token, setToken] = useState<Token>({} as Token);
   const [loading, setLoading] = useState(false);
@@ -94,7 +84,6 @@ export default function ({ network, t, id, tid, Link }: Props) {
                   reference: token?.reference,
                   className: 'rounded max-h-full',
                   network: network,
-                  Link,
                 }}
               />
             }
@@ -297,7 +286,6 @@ export default function ({ network, t, id, tid, Link }: Props) {
                   t: t,
                   id: id,
                   tid: tid,
-                  Link,
                 }}
               />
             }

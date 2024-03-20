@@ -29,4 +29,5 @@ declare const useCallback;
 declare const Markdown;
 declare const InfiniteScroll;
 declare const Files;
+declare const Link;
 declare const CommitButton;

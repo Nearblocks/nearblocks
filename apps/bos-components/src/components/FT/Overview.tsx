@@ -12,11 +12,6 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -26,11 +21,6 @@ interface Props {
   tokenFilter?: string;
   filters?: { [key: string]: string };
   onFilterClear?: (name: string) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Links from '@/includes/Common/Links';
@@ -52,7 +42,6 @@ export default function ({
   tokenFilter,
   filters,
   onFilterClear,
-  Link,
 }: Props) {
   const tabs = [
     t ? t('token:fts.ft.transfers') : 'Transfers',
@@ -460,7 +449,6 @@ export default function ({
               network: network,
               id: id,
               tokenFilter: tokenFilter,
-              Link,
             }}
           />
         )}
@@ -494,7 +482,6 @@ export default function ({
                       t: t,
                       filters: filters,
                       onFilterClear: onFilterClear,
-                      Link,
                     }}
                   />
                 }
@@ -507,7 +494,6 @@ export default function ({
                       network: network,
                       id: id,
                       token: token,
-                      Link,
                     }}
                   />
                 }
@@ -520,7 +506,6 @@ export default function ({
                       network: network,
                       id: id,
                       token: token,
-                      Link,
                     }}
                   />
                 }
@@ -534,7 +519,6 @@ export default function ({
                         network: network,
                         id: id,
                         token: token,
-                        Link,
                       }}
                     />
                   }

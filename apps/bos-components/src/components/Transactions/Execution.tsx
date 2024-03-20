@@ -8,11 +8,6 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -20,11 +15,6 @@ interface Props {
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import { getConfig } from '@/includes/libs';
@@ -41,7 +31,7 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, rpcTxn, t, Link } = props;
+  const { network, rpcTxn, t } = props;
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
@@ -123,7 +113,6 @@ export default function (props: Props) {
                 fellowOutgoingReceipts: [],
                 convertionReceipt: true,
                 className: '',
-                Link,
               }}
             />
           )}

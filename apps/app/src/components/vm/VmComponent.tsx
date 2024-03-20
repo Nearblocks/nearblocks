@@ -1,12 +1,7 @@
 import { useBosLoaderStore } from '@/stores/bos-loader';
 import { useVmStore } from '@/stores/vm';
 import { useEffect, useRef, useState } from 'react';
-import Link, { LinkProps } from 'next/link';
 
-interface NavLinkProps extends LinkProps {
-  children: React.ReactNode;
-  legacybehaviour?: boolean;
-}
 type Props = {
   src: string;
   props?: Record<string, unknown>;
@@ -14,13 +9,7 @@ type Props = {
   onChangeHeight?: () => void;
   defaultSkelton?: JSX.Element;
 };
-const NavLink: React.FC<NavLinkProps> = ({ href, children, ...rest }) => {
-  return (
-    <Link legacybehaviour href={href} {...rest}>
-      {children}
-    </Link>
-  );
-};
+
 export function VmComponent(props: Props) {
   const { skeleton, onChangeHeight, defaultSkelton } = props;
   const onChangeHeightCalled = useRef(false);
@@ -56,7 +45,6 @@ export function VmComponent(props: Props) {
               redirectMap: redirectMapStore.redirectMap,
             }}
             {...props}
-            props={{ Link: NavLink, ...props.props }}
           />
         </EthersProvider>
       )}
