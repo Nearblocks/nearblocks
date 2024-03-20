@@ -6,7 +6,9 @@ export const getLimit = (block: number) => {
       return 100;
     case block < 90_000_000:
       return 10;
-    default:
+    case block < 110_000_000:
       return 2;
+    default:
+      return 1;
   }
 };

@@ -2,6 +2,7 @@ import { Response } from 'express';
 
 import catchAsync from '#libs/async';
 import db from '#libs/db';
+import sql from '#libs/postgres';
 import { Holders, Item, NftTxns, NftTxnsCount } from '#libs/schema/nfts';
 import { getPagination, keyBinder } from '#libs/utils';
 import { RequestValidator } from '#types/types';
@@ -108,6 +109,15 @@ const txns = catchAsync(
                 WHERE
                   nft.contract = a.contract_account_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
             ORDER BY
               event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
@@ -186,6 +196,15 @@ const txnsCount = catchAsync(
             WHERE
               nft.contract = a.contract_account_id
           )
+          AND EXISTS (
+            SELECT
+              1
+            FROM
+              transactions
+              JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+            WHERE
+              receipts.receipt_id = a.receipt_id
+          )
       `,
       { contract, event },
       useFormat,
@@ -209,30 +228,26 @@ const holders = catchAsync(
 
     const { limit, offset } = getPagination(page, per_page);
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          account,
-          COUNT(quantity) AS quantity
-        FROM
-          nft_holders_daily
-        WHERE
-          contract = :contract
-        GROUP BY
-          account
-        ORDER BY
-          COUNT(quantity) ${order === 'desc' ? 'DESC' : 'ASC'}
-        LIMIT
-          :limit
-        OFFSET
-          :offset
-      `,
-      { contract, limit, offset },
-    );
+    const holders = await sql`
+      SELECT
+        account,
+        COUNT(token) AS quantity
+      FROM
+        nft_holders
+      WHERE
+        contract = ${contract}
+        AND quantity > 0
+      GROUP BY
+        account
+      ORDER BY
+        COUNT(token) ${order === 'desc' ? sql`DESC` : sql`ASC`}
+      LIMIT
+        ${limit}
+      OFFSET
+        ${offset}
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ holders: rows });
+    return res.status(200).json({ holders });
   },
 );
 
@@ -240,21 +255,17 @@ const holdersCount = catchAsync(
   async (req: RequestValidator<Holders>, res: Response) => {
     const contract = req.validator.data.contract;
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          COUNT(DISTINCT account)
-        FROM
-          nft_holders_daily
-        WHERE
-          contract = :contract
-      `,
-      { contract },
-    );
+    const holders = await sql`
+      SELECT
+        COUNT(DISTINCT account)
+      FROM
+        nft_holders
+      WHERE
+        contract = ${contract}
+        AND quantity > 0
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ holders: rows });
+    return res.status(200).json({ holders });
   },
 );
 

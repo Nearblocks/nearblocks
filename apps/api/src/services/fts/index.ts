@@ -16,29 +16,30 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
 
   const tokens = await sql`
     SELECT DISTINCT
-      ft_contracts_daily.contract,
-      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap,
-      ft_meta.name,
-      ft_meta.symbol,
-      ft_meta.decimals,
-      ft_meta.icon,
-      ft_meta.reference,
-      ft_meta.price,
-      ft_meta.change_24,
-      ft_meta.market_cap,
-      ft_meta.volume_24h
+      contract,
+      (price)::NUMERIC * (total_supply)::NUMERIC AS onchain_market_cap,
+      name,
+      symbol,
+      decimals,
+      icon,
+      reference,
+      price,
+      change_24,
+      market_cap,
+      volume_24h
     FROM
-      ft_contracts_daily
-      JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract ${search
+      ft_meta ${search
       ? sql`
           WHERE
-            ft_meta.contract ILIKE ${search + '%'}
-            OR ft_meta.symbol ILIKE ${search + '%'}
-            OR ft_meta.name ILIKE ${search + '%'}
+            contract ILIKE ${search + '%'}
+            OR symbol ILIKE ${search + '%'}
+            OR name ILIKE ${search + '%'}
         `
       : sql``}
     ORDER BY
-      onchain_market_cap ${order === 'desc' ? sql`DESC NULLS LAST` : sql`ASC`}
+      onchain_market_cap ${order === 'desc'
+      ? sql`DESC NULLS LAST`
+      : sql`ASC NULLS FIRST`}
     LIMIT
       ${limit}
     OFFSET
@@ -52,30 +53,23 @@ const count = catchAsync(
   async (req: RequestValidator<Count>, res: Response) => {
     const search = req.validator.data.search;
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          COUNT (DISTINCT ft_contracts_daily.contract)
-        FROM
-          ft_contracts_daily
-          JOIN ft_meta ON ft_meta.contract = ft_contracts_daily.contract
-        WHERE
-          ${
-            search
-              ? `
-                ft_meta.contract ILIKE :search
-                OR ft_meta.symbol ILIKE :search
-                OR ft_meta.name ILIKE :search
-              `
-              : true
-          }
-      `,
-      { search: `%${search}%` },
-    );
+    const tokens = await sql`
+      SELECT
+        COUNT(contract)
+      FROM
+        ft_meta
+      WHERE
+        ${search
+        ? sql`
+            WHERE
+              contract ILIKE ${search + '%'}
+              OR symbol ILIKE ${search + '%'}
+              OR name ILIKE ${search + '%'}
+          `
+        : sql``}
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ tokens: rows });
+    return res.status(200).json({ tokens });
   },
 );
 
@@ -133,6 +127,15 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
                 ft_meta ft
               WHERE
                 ft.contract = a.contract_account_id
+            )
+            AND EXISTS (
+              SELECT
+                1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
             )
           ORDER BY
             event_index DESC

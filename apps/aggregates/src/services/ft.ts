@@ -20,7 +20,7 @@ export const syncFTHolders = async () => {
 const syncHolders = async (): Promise<boolean> => {
   try {
     if (!TABLE) {
-      logger.warn(`FT_HOLDERS_TABLE not specified`);
+      logger.warn(`FT_HOLDERS_TABLE not specified...`);
       return true;
     }
 
@@ -60,7 +60,7 @@ const syncHolders = async (): Promise<boolean> => {
       );
       await sleep(1000);
 
-      return true;
+      return false;
     }
 
     if (diff > limit) {

@@ -3,7 +3,6 @@ import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
 import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
-import db from '#libs/db';
 import logger from '#libs/logger';
 import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
@@ -17,7 +16,7 @@ import {
   Parse,
   Tokens,
 } from '#libs/schema/account';
-import { abiSchema, keyBinder } from '#libs/utils';
+import { abiSchema } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const EXPIRY = 60; // 1 mins
@@ -225,41 +224,26 @@ const inventory = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
     const account = req.validator.data.account;
 
-    const { query: ftQuery, values: ftValues } = keyBinder(
-      `
-        SELECT
-          ft.contract,
-          ft.amount,
-          json_build_object(
-            'name',
-            meta.name,
-            'symbol',
-            meta.symbol,
-            'decimals',
-            meta.decimals,
-            'icon',
-            meta.icon,
-            'reference',
-            meta.reference,
-            'price',
-            meta.price
-          ) AS ft_meta
-        FROM
-          (
-            SELECT
-              ft_holders_monthly.contract,
-              SUM(ft_holders_monthly.amount) AS amount
-            FROM
-              ft_holders_monthly
-            WHERE
-              ft_holders_monthly.account = :account
-            GROUP BY
-              ft_holders_monthly.contract,
-              ft_holders_monthly.account
-            HAVING SUM(ft_holders_monthly.amount) > 0
-            ORDER BY
-            SUM(ft_holders_monthly.amount) DESC
-          ) ft
+    const ftQuery = sql`
+      SELECT
+        ft_holders.contract,
+        ft_holders.amount,
+        JSON_BUILD_OBJECT(
+          'name',
+          meta.name,
+          'symbol',
+          meta.symbol,
+          'decimals',
+          meta.decimals,
+          'icon',
+          meta.icon,
+          'reference',
+          meta.reference,
+          'price',
+          meta.price
+        ) AS ft_meta
+      FROM
+        ft_holders
         INNER JOIN LATERAL (
           SELECT
             contract,
@@ -272,39 +256,29 @@ const inventory = catchAsync(
           FROM
             ft_meta
           WHERE
-            ft_meta.contract = ft.contract
+            ft_meta.contract = ft_holders.contract
         ) AS meta ON TRUE
-      `,
-      { account },
-    );
+      WHERE
+        ft_holders.account = ${account}
+        AND ft_holders.amount > 0
+    `;
 
-    const { query: nftQuery, values: nftValues } = keyBinder(
-      `
-        SELECT 
-          nft.contract,
-          nft.quantity,
-          json_build_object(
-            'name',
-            meta.name,
-            'symbol',
-            meta.symbol,
-            'icon',
-            meta.icon,
-            'reference',
-            meta.reference
-          ) AS nft_meta
-        FROM
-          (
-            SELECT
-              nft_holders_daily.contract,
-              nft_holders_daily.quantity
-            FROM
-              nft_holders_daily
-            WHERE
-              nft_holders_daily.account = :account
-            ORDER BY
-              nft_holders_daily.quantity DESC
-          ) nft
+    const nftQuery = sql`
+      SELECT
+        nft_holders.contract,
+        nft_holders.quantity,
+        JSON_BUILD_OBJECT(
+          'name',
+          meta.name,
+          'symbol',
+          meta.symbol,
+          'icon',
+          meta.icon,
+          'reference',
+          meta.reference
+        ) AS nft_meta
+      FROM
+        nft_holders
         INNER JOIN LATERAL (
           SELECT
             contract,
@@ -315,23 +289,21 @@ const inventory = catchAsync(
           FROM
             nft_meta
           WHERE
-            nft_meta.contract = nft.contract
+            nft_meta.contract = nft_holders.contract
         ) AS meta ON TRUE
-      `,
-      { account },
-    );
+      WHERE
+        nft_holders.account = ${account}
+        AND nft_holders.quantity > 0
+    `;
 
     const inventory = await redis.cache(
       `account:${account}:inventory`,
       async () => {
-        const [{ rows: fts }, { rows: nfts }] = await Promise.all([
-          db.query(ftQuery, ftValues),
-          db.query(nftQuery, nftValues),
-        ]);
+        const [fts, nfts] = await Promise.all([ftQuery, nftQuery]);
 
         return { fts, nfts };
       },
-      EXPIRY * 15, // 15 mins
+      EXPIRY * 1, // 1 mins
     );
 
     return res.status(200).json({ inventory });
@@ -342,41 +314,32 @@ const tokens = catchAsync(
   async (req: RequestValidator<Tokens>, res: Response) => {
     const account = req.validator.data.account;
 
-    const { query: ftQuery, values: ftValues } = keyBinder(
-      `
-        SELECT
-          contract_account_id
-        FROM
-          ft_events
-        WHERE
-          affected_account_id = :account
-        GROUP BY
-          contract_account_id
-      `,
-      { account },
-    );
+    const ftQuery = sql`
+      SELECT
+        contract_account_id
+      FROM
+        ft_events
+      WHERE
+        affected_account_id = ${account}
+      GROUP BY
+        contract_account_id
+    `;
 
-    const { query: nftQuery, values: nftValues } = keyBinder(
-      `
-        SELECT
-          contract_account_id
-        FROM
-          nft_events
-        WHERE
-          affected_account_id = :account
-        GROUP BY
-          contract_account_id
-      `,
-      { account },
-    );
+    const nftQuery = sql`
+      SELECT
+        contract_account_id
+      FROM
+        nft_events
+      WHERE
+        affected_account_id = ${account}
+      GROUP BY
+        contract_account_id
+    `;
 
     const tokens = await redis.cache(
       `account:${account}:tokens`,
       async () => {
-        const [{ rows: fts }, { rows: nfts }] = await Promise.all([
-          db.query(ftQuery, ftValues),
-          db.query(nftQuery, nftValues),
-        ]);
+        const [fts, nfts] = await Promise.all([ftQuery, nftQuery]);
 
         const ftList = fts.map((ft) => ft.contract_account_id);
         const nftList = nfts.map((nft) => nft.contract_account_id);
