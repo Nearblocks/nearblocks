@@ -9,22 +9,12 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 import Skeleton from '@/includes/Common/Skeleton';
 import { formatNumber, formatWithCommas } from '@/includes/formats';
@@ -53,7 +43,7 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage, Link }: Props) {
+export default function ({ network, currentPage, setPage }: Props) {
   const [validatorFullData, setValidatorFullData] = useState<{
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
@@ -85,7 +75,7 @@ export default function ({ network, currentPage, setPage, Link }: Props) {
               validatorEpochData: data?.validatorFullData ?? [],
               currentValidators: data?.currentValidators,
               totalStake: data?.totalStake ?? 0,
-              seatPrice: data?.epochStatsCheck ?? [],
+              seatPrice: data?.epochStatsCheck,
               elapsedTime: data?.elapsedTimeData ?? 0,
               totalSeconds: data?.totalSeconds ?? 0,
               epochProgress: data?.epochProgressData ?? 0,

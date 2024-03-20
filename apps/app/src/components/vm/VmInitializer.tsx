@@ -34,6 +34,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useVmStore } from '@/stores/vm';
 import { networkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
+import Link from 'next/link';
 
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
@@ -78,6 +79,11 @@ export default function VmInitializer() {
             setupMintbaseWallet(),
           ],
         }),
+        customElements: {
+          Link: (props: any) => {
+            return <Link {...props} />;
+          },
+        },
       });
   }, [initNear]);
 

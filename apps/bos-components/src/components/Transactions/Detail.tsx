@@ -9,11 +9,6 @@
  * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -22,11 +17,6 @@ interface Props {
   loading: boolean;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import EventLogs from '@/includes/Common/Action/index';
@@ -73,7 +63,7 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { loading, txn, network, t, rpcTxn, Link } = props;
+  const { loading, txn, network, t, rpcTxn } = props;
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
   const [price, setPrice] = useState('');

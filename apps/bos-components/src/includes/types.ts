@@ -1433,11 +1433,6 @@ export type TransactionReceiptInfo = {
   expandAll: any;
   convertionReceipt: any;
   className: string;
-  Link?: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 };
 
 export type ReceiptKindInfo = {
@@ -1446,11 +1441,6 @@ export type ReceiptKindInfo = {
   action: any;
   onClick?: any;
   isTxTypeActive: boolean;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 };
 export type CommentItem = {
   accountId: string;
@@ -1475,11 +1465,6 @@ export type CommentContent = {
       }
     | undefined;
 };
-export type Link = React.FC<{
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}>;
 
 export type ContractParseInfo = {
   byMethod: {

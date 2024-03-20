@@ -8,11 +8,6 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
  * @param {boolean} [poweredBy] - Powered by attribution
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -20,11 +15,6 @@ interface Props {
   poweredBy?: boolean;
   network: string;
   t: (key: string) => string | undefined;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -32,7 +22,7 @@ import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { t, Link } = props;
+  const { t } = props;
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({

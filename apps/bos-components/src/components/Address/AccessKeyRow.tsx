@@ -8,11 +8,6 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {AccountContractInfo} [accessKey] - Key-value pairs for Accesskey info
  * @param {boolean} [showWhen] - Controls whether to show the date and time in UTC format or as a time ago string.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -20,11 +15,6 @@ interface Props {
   t: (key: string, options?: { count?: string | undefined }) => string;
   accessKey: AccountContractInfo;
   showWhen: boolean;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
@@ -36,7 +26,7 @@ import {
   capitalizeWords,
 } from '@/includes/formats';
 
-export default function ({ network, t, accessKey, showWhen, Link }: Props) {
+export default function ({ network, t, accessKey, showWhen }: Props) {
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
 
   const config = getConfig(network);

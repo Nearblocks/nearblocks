@@ -10,11 +10,6 @@
  * @param {object} [method] - Object containing information about the abi contract functions.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {object} [schema] - Object containing information about the near abi contract.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -24,11 +19,6 @@ interface Props {
   method: any;
   accountId: string;
   schema: any;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import { capitalize, toSnakeCase } from '@/includes/formats';
@@ -51,7 +41,7 @@ const sortFields = (fields: FieldType[]) => {
 };
 
 export default function (props: Props) {
-  const { id, index, method, connected, accountId, schema, Link } = props;
+  const { id, index, method, connected, accountId, schema } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);

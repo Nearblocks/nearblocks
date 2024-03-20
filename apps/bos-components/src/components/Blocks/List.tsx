@@ -10,11 +10,6 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -42,14 +37,9 @@ interface Props {
   ) => string | undefined;
   currentPage: number;
   setPage: (page: number) => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
-export default function ({ currentPage, setPage, t, network, Link }: Props) {
+export default function ({ currentPage, setPage, t, network }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);

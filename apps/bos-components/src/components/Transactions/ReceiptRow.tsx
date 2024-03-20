@@ -9,11 +9,6 @@
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
  * @param {ReceiptsPropsInfo} [receipt] -  receipt of the transaction.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -22,11 +17,6 @@ interface Props {
   txn?: TransactionInfo;
   receipt: ReceiptsPropsInfo;
   borderFlag?: boolean;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import {
@@ -41,7 +31,7 @@ import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
 export default function (props: Props) {
-  const { network, receipt, borderFlag, t, Link } = props;
+  const { network, receipt, borderFlag, t } = props;
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
   const config = getConfig(network);

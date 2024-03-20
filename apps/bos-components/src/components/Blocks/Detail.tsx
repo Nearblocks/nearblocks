@@ -7,11 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The block identifier passed as a string.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
+
  */
 
 interface Props {
@@ -21,7 +17,6 @@ interface Props {
     key: string,
     options?: { block?: string; txns?: string; receipts?: string },
   ) => string | undefined;
-  Link: Link;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -35,10 +30,10 @@ import {
 } from '@/includes/formats';
 import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { gasPrice } from '@/includes/near';
-import { BlocksInfo, Link } from '@/includes/types';
+import { BlocksInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, hash, t, Link } = props;
+  const { network, hash, t } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [price, setPrice] = useState('');
@@ -306,14 +301,14 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  <a
+                  <Link
                     href={`/address/${block?.author_account_id}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 hover:no-underline">
                       {block?.author_account_id}
                     </a>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

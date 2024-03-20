@@ -6,21 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -34,7 +24,7 @@ import {
 } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ t, network, Link }: Props) {
+export default function ({ t, network }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);

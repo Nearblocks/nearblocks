@@ -18,7 +18,6 @@ export default function (props: TransactionReceiptInfo) {
     expandAll,
     convertionReceipt,
     className,
-    Link,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -71,7 +70,6 @@ export default function (props: TransactionReceiptInfo) {
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
               className: 'pb-5 !mt-0',
-              Link,
             }}
           />
         ) : null}
@@ -87,7 +85,6 @@ export default function (props: TransactionReceiptInfo) {
                   action: action,
                   onClick: switchActiveTxType,
                   isTxTypeActive: isTxTypeActive,
-                  Link,
                 }}
               />
             ))}
@@ -100,7 +97,6 @@ export default function (props: TransactionReceiptInfo) {
                 network: network,
                 t,
                 receipt: receipt,
-                Link,
               }}
             />
           </div>
@@ -124,7 +120,6 @@ export default function (props: TransactionReceiptInfo) {
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
             className: '!pl-0 border-transparent',
-            Link,
           }}
         />
       ) : null}

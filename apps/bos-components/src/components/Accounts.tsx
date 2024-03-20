@@ -11,11 +11,6 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 interface Props {
@@ -26,11 +21,6 @@ interface Props {
   signedIn: boolean;
   accountId: string;
   logOut: () => void;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -86,7 +76,6 @@ export default function (props: Props) {
     signedIn,
     accountId,
     logOut,
-    Link,
   } = props;
   const [loading, setLoading] = useState(false);
   const [isloading, setIsLoading] = useState(true);
@@ -652,7 +641,6 @@ export default function (props: Props) {
                     ft={ft}
                     id={id}
                     appUrl={config?.appUrl}
-                    Link={Link}
                   />
                 </div>
               </div>
@@ -870,7 +858,6 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
-                      Link,
                     }}
                   />
                 }
@@ -886,7 +873,6 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
-                      Link,
                     }}
                   />
                 }
@@ -904,7 +890,6 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
-                      Link,
                     }}
                   />
                 }
@@ -917,7 +902,6 @@ export default function (props: Props) {
                       network: network,
                       id: id,
                       t: t,
-                      Link,
                     }}
                   />
                 }
@@ -939,7 +923,6 @@ export default function (props: Props) {
                           connected: signedIn,
                           accountId: accountId,
                           logOut: logOut,
-                          Link,
                         }}
                       />
                     }

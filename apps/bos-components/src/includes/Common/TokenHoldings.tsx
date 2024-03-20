@@ -8,11 +8,6 @@
  * @param {string} [ft.amount] -  amount in USD of tokens.
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
- * @param {React.FC<{
- *   href: string;
- *   children: React.ReactNode;
- *   className?: string;
- * }>} Link - A React component for rendering links.
  */
 
 import { truncateString } from '@/includes/libs';
@@ -30,15 +25,9 @@ interface Props {
     tokens: TokenListInfo[];
   };
   appUrl?: string;
-  Link: React.FC<{
-    href: string;
-    children: React.ReactNode;
-    className?: string;
-  }>;
 }
 
 const TokenHoldings = (props: Props) => {
-  const { Link } = props;
   const Loading = (props: { className: string; wrapperClassName: string }) => {
     return (
       <div
