@@ -189,9 +189,10 @@ const txnsCount = catchAsync(
       values,
     );
 
+    const cost = +rows?.[0]?.cost;
     const count = +rows?.[0]?.count;
 
-    if (count > config.maxQueryRows) {
+    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
       return res.status(200).json({ txns: rows });
     }
 
