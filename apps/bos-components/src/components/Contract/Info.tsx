@@ -14,16 +14,27 @@ interface Props {
   id: string;
   contract: ContractInfo;
 }
-import { convertToUTC } from '@/includes/formats';
+
 import Question from '@/includes/icons/Question';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { ContractInfo, DeploymentsInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { convertToUTC } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { network, id, contract } = props;
   const [deploymentData, setDeploymentData] = useState<DeploymentsInfo[]>([]);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchContractData() {
@@ -54,10 +65,12 @@ export default function (props: Props) {
     }
 
     fetchContractData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
 
-  const [createAction, updateAction] =
-    deploymentData || ({} as DeploymentsInfo);
+  const [createAction, updateAction] = deploymentData || [];
+
   const action = updateAction || createAction;
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -98,7 +111,7 @@ export default function (props: Props) {
           ) : (
             <div className="w-full md:w-3/4  break-words">
               {action?.block_timestamp &&
-                convertToUTC(nanoToMilli(action?.block_timestamp), false)}
+                convertToUTC(nanoToMilli(action?.block_timestamp), true)}
             </div>
           )}
         </div>

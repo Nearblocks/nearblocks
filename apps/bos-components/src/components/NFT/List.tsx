@@ -19,8 +19,6 @@ interface Props {
   setPage: (page: number) => void;
 }
 
-import { localFormat, serialNumber } from '@/includes/formats';
-import { debounce, getConfig, handleRateLimit } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
@@ -36,13 +34,25 @@ const initialPagination = {
 };
 
 export default function ({ network, currentPage, setPage, t }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, serialNumber } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { debounce, getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<{ [key: number]: Token[] }>({});
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchTotalTokens(qs?: string) {
@@ -113,6 +123,8 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
 
   const onOrder = (sortKey: string) => {
@@ -226,23 +238,28 @@ export default function ({ network, currentPage, setPage, t }: Props) {
   ];
 
   const debouncedSearch = useMemo(() => {
-    return debounce(500, (value: string) => {
-      if (!value || value?.trim() === '') {
-        setSearchResults([]);
-        return;
-      }
-      asyncFetch(`${config?.backendUrl}nfts?search=${value}&per_page=5`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((data: { body: { tokens: Token[] } }) => {
-          const resp = data?.body?.tokens;
-          setSearchResults(resp);
+    return (
+      debounce &&
+      debounce(500, (value: string) => {
+        if (!value || value?.trim() === '') {
+          setSearchResults([]);
+          return;
+        }
+        asyncFetch(`${config?.backendUrl}nfts?search=${value}&per_page=5`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch(() => {});
-    });
+          .then((data: { body: { tokens: Token[] } }) => {
+            const resp = data?.body?.tokens;
+            setSearchResults(resp);
+          })
+          .catch(() => {});
+      })
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -260,8 +277,8 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             </div>
           ) : (
             <p className="pl-3">
-              A total of {localFormat(totalCount.toString())} NEP-171 Token
-              Contracts found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              NEP-171 Token Contracts found
             </p>
           )}
           <div className={`flex w-full h-10 sm:w-80 mr-2`}>

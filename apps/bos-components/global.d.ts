@@ -31,3 +31,4 @@ declare const InfiniteScroll;
 declare const Files;
 declare const Link;
 declare const CommitButton;
+declare const VM;

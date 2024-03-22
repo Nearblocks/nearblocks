@@ -24,13 +24,6 @@ interface Props {
   onFilterClear: (name: string) => void;
 }
 
-import {
-  localFormat,
-  getTimeAgoString,
-  formatTimestampToString,
-  capitalizeFirstLetter,
-} from '@/includes/formats';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
@@ -42,6 +35,20 @@ import TokenImage from '@/includes/icons/TokenImage';
 import Download from '@/includes/icons/Download';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { network, t, id, filters, handleFilter, onFilterClear } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -54,7 +61,7 @@ export default function (props: Props) {
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const setPage = (pageNumber: number) => {
@@ -139,6 +146,8 @@ export default function (props: Props) {
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
   const onInputChange = (
@@ -644,7 +653,8 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

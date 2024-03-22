@@ -7,7 +7,6 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The block identifier passed as a string.
-
  */
 
 interface Props {
@@ -20,25 +19,36 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  convertToMetricPrefix,
-  convertToUTC,
-  dollarFormat,
-  gasFee,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
-import { gasPrice } from '@/includes/near';
 import { BlocksInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    convertToMetricPrefix,
+    convertToUTC,
+    dollarFormat,
+    gasFee,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { gasPrice } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const { network, hash, t } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [price, setPrice] = useState('');
   const [error, setError] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   const Loader = (props: { className?: string }) => {
     return (
@@ -98,6 +108,8 @@ export default function (props: Props) {
     }
 
     fetchBlock();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, hash]);
 
   const date = useMemo(() => {
@@ -141,6 +153,8 @@ export default function (props: Props) {
       }
     }
     return;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [block?.block_timestamp]);
 
   const gasUsed = block?.chunks_agg?.gas_used ?? '';

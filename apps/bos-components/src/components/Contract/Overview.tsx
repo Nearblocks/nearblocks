@@ -29,10 +29,16 @@ interface Props {
   logOut: () => void;
 }
 
-import { getConfig } from '@/includes/libs';
 import { ContractInfo, ContractParseInfo, SchemaInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const {
     network,
     t,
@@ -46,7 +52,9 @@ export default function (props: Props) {
     logOut,
   } = props;
   const [pageTab, setPageTab] = useState('Contract Info');
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
   };

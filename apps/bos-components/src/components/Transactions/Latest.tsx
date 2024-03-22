@@ -14,22 +14,29 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { getTimeAgoString, shortenHex } from '@/includes/formats';
-import {
-  getConfig,
-  handleRateLimit,
-  nanoToMilli,
-  shortenAddress,
-  yoctoToNear,
-} from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({ t, network }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getTimeAgoString, shortenHex } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    shortenAddress,
+    yoctoToNear,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -64,6 +71,8 @@ export default function ({ t, network }: Props) {
     const interval = setInterval(fetchLatestTxns, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, isLoading]);
 
   return (

@@ -28,20 +28,6 @@ interface Props {
   onFilterClear: (name: string) => void;
 }
 
-import {
-  localFormat,
-  getTimeAgoString,
-  formatTimestampToString,
-  capitalizeFirstLetter,
-} from '@/includes/formats';
-import { txnMethod } from '@/includes/near';
-import {
-  getConfig,
-  handleRateLimit,
-  nanoToMilli,
-  truncateString,
-  yoctoToNear,
-} from '@/includes/libs';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
@@ -52,6 +38,28 @@ import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { txnMethod } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    truncateString,
+    yoctoToNear,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
   const {
     network,
     currentPage,
@@ -69,7 +77,8 @@ export default function (props: Props) {
   const [address, setAddress] = useState('');
   const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -148,6 +157,8 @@ export default function (props: Props) {
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, filters, sorting]);
 
   const onInputChange = (
@@ -632,7 +643,7 @@ export default function (props: Props) {
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               {t
                 ? t('txns:listing', {
-                    count: localFormat(totalCount.toString()),
+                    count: localFormat && localFormat(totalCount.toString()),
                   })
                 : `More than > ${totalCount} transactions found`}
             </p>

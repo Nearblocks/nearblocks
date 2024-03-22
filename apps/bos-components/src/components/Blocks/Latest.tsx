@@ -14,20 +14,25 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  convertToMetricPrefix,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { convertToMetricPrefix, getTimeAgoString, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -56,6 +61,8 @@ export default function ({ network, t }: Props) {
     const interval = setInterval(fetchLatestBlocks, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, isLoading]);
 
   return (

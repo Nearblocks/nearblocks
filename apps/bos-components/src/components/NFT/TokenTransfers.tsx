@@ -16,13 +16,7 @@
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
@@ -34,6 +28,16 @@ interface Props {
 }
 
 export default function ({ network, t, id, tid }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +46,7 @@ export default function ({ network, t, id, tid }: Props) {
   const errorMessage = ' No token transfers found!';
   const [address, setAddress] = useState('');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchTotalTokens() {
@@ -108,6 +112,8 @@ export default function ({ network, t, id, tid }: Props) {
 
     fetchTotalTokens();
     fetchTokens(currentPage);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, tid]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -423,7 +429,8 @@ export default function ({ network, t, id, tid }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
         </div>

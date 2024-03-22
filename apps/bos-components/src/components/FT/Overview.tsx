@@ -25,14 +25,8 @@ interface Props {
 
 import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  dollarFormat,
-  dollarNonCentFormat,
-  localFormat,
-} from '@/includes/formats';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import { StatusInfo, Token } from '@/includes/types';
 
 export default function ({
@@ -43,6 +37,17 @@ export default function ({
   filters,
   onFilterClear,
 }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { dollarFormat, dollarNonCentFormat, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const tabs = [
     t ? t('token:fts.ft.transfers') : 'Transfers',
     t ? t('token:fts.ft.holders') : 'Holders',
@@ -59,7 +64,8 @@ export default function ({
   const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
   const [showMarketCap, setShowMarketCap] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchFTData() {
@@ -151,6 +157,8 @@ export default function ({
     fetchFTData();
     fetchTxnsCount();
     fetchHoldersCount();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);
 
   const onTab = (index: number) => {
@@ -302,12 +310,12 @@ export default function ({
                           </Tooltip.Provider>
                         ) : (
                           <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100">
-                            $
-                            {dollarNonCentFormat(
-                              Number(token?.market_cap)
-                                ? token?.market_cap
-                                : token?.fully_diluted_market_cap,
-                            )}
+                            {'$' +
+                              dollarNonCentFormat(
+                                Number(token?.market_cap)
+                                  ? token?.market_cap
+                                  : token?.fully_diluted_market_cap,
+                              )}
                           </p>
                         )}
                       </div>

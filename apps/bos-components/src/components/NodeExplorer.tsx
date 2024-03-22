@@ -17,20 +17,11 @@ interface Props {
   setPage: (page: number) => void;
 }
 import Skeleton from '@/includes/Common/Skeleton';
-import { formatNumber, formatWithCommas } from '@/includes/formats';
-import {
-  convertAmountToReadableString,
-  convertTimestampToTime,
-  getConfig,
-  handleRateLimit,
-  shortenAddress,
-  timeAgo,
-  yoctoToNear,
-} from '@/includes/libs';
 import { ValidatorFullData } from '@/includes/types';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { ValidatorEpochData } from 'nb-types';
 import Question from '@/includes/icons/Question';
+
 const initialValidatorFullData = {
   validatorEpochData: [],
   currentValidators: 0,
@@ -44,6 +35,23 @@ const initialValidatorFullData = {
 };
 
 export default function ({ network, currentPage, setPage }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    convertAmountToReadableString,
+    convertTimestampToTime,
+    getConfig,
+    handleRateLimit,
+    shortenAddress,
+    timeAgo,
+    yoctoToNear,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const { formatNumber, formatWithCommas } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
   const [validatorFullData, setValidatorFullData] = useState<{
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
@@ -54,7 +62,8 @@ export default function ({ network, currentPage, setPage }: Props) {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState(0);
   const errorMessage = 'No validator data!';
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   const TotalSupply = totalSuppy ? yoctoToNear(totalSuppy, false) : '';
 
@@ -137,10 +146,14 @@ export default function ({ network, currentPage, setPage }: Props) {
     fetchLatestBlock();
     fetchTotalSuppy();
     fetchValidatorData(currentPage);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
+
   validatorFullData[currentPage]?.total
     ? setTotalCount(validatorFullData[currentPage]?.total)
     : '';
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - 1);
@@ -149,6 +162,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       clearInterval(intervalId);
     };
   }, []);
+
   const handleRowClick = (rowIndex: number) => {
     const isRowExpanded = expanded.includes(rowIndex);
 
@@ -236,7 +250,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           />
         </button>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -252,7 +266,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -298,7 +312,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'pl-6 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'pl-6 py-2 text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -316,7 +330,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             : 'N/A'}
         </div>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -334,7 +348,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -352,7 +366,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -362,7 +376,7 @@ export default function ({ network, currentPage, setPage }: Props) {
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -388,7 +402,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -423,7 +437,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4  whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },

@@ -18,13 +18,6 @@ interface Props {
   setPage: (page: number) => void;
 }
 
-import {
-  localFormat,
-  dollarFormat,
-  dollarNonCentFormat,
-  serialNumber,
-} from '@/includes/formats';
-import { debounce, getConfig, handleRateLimit } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import ArrowDown from '@/includes/icons/ArrowDown';
@@ -40,6 +33,16 @@ const initialPagination = {
   per_page: 50,
 };
 export default function ({ t, network, currentPage, setPage }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, dollarFormat, dollarNonCentFormat, serialNumber } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { debounce, getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -47,7 +50,9 @@ export default function ({ t, network, currentPage, setPage }: Props) {
 
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const ArrowUp = () => {
     return (
       <svg
@@ -132,6 +137,8 @@ export default function ({ t, network, currentPage, setPage }: Props) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
 
   const onOrder = (sortKey: string) => {
@@ -146,30 +153,37 @@ export default function ({ t, network, currentPage, setPage }: Props) {
           : 'desc',
     }));
   };
+
   const debouncedSearch = useMemo(() => {
-    return debounce(500, (value: string) => {
-      if (!value || value.trim() === '') {
-        setSearchResults([]);
-        return;
-      }
-      asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((data: { body: { tokens: Token[] } }) => {
-          const resp = data?.body?.tokens;
-          setSearchResults(resp);
+    return (
+      debounce &&
+      debounce(500, (value: string) => {
+        if (!value || value.trim() === '') {
+          setSearchResults([]);
+          return;
+        }
+        asyncFetch(`${config?.backendUrl}fts?search=${value}&per_page=5`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch(() => {});
-    });
+          .then((data: { body: { tokens: Token[] } }) => {
+            const resp = data?.body?.tokens;
+            setSearchResults(resp);
+          })
+          .catch(() => {});
+      })
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     debouncedSearch(value);
   };
+
   const columns = [
     {
       header: <span>#</span>,

@@ -26,19 +26,11 @@ interface Props {
 import Filter from '@/includes/Common/Filter';
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  capitalizeFirstLetter,
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
-import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({
@@ -49,6 +41,24 @@ export default function ({
   handleFilter,
   onFilterClear,
 }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    capitalizeFirstLetter,
+    formatTimestampToString,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { tokenAmount } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
@@ -60,7 +70,8 @@ export default function ({
   const [sorting, setSorting] = useState('desc');
   const [address, setAddress] = useState('');
   const [filterValue, setFilterValue] = useState<Record<string, string>>({});
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -150,6 +161,8 @@ export default function ({
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -656,7 +669,8 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

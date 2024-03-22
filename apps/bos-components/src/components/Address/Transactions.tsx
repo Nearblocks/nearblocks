@@ -27,24 +27,10 @@ interface Props {
 import Filter from '@/includes/Common/Filter';
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  capitalizeFirstLetter,
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
-import {
-  getConfig,
-  handleRateLimit,
-  isAction,
-  nanoToMilli,
-  yoctoToNear,
-} from '@/includes/libs';
-import { txnMethod } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({
@@ -55,6 +41,23 @@ export default function ({
   handleFilter,
   onFilterClear,
 }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    capitalizeFirstLetter,
+    formatTimestampToString,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, isAction, nanoToMilli, yoctoToNear } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const { txnMethod } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
@@ -65,7 +68,7 @@ export default function ({
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
   const [address, setAddress] = useState('');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -147,6 +150,8 @@ export default function ({
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
   const onInputChange = (
@@ -653,7 +658,10 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-3 text-sm mb-4 text-nearblue-600">
-              A total of {totalCount ? localFormat(totalCount.toString()) : 0}{' '}
+              A total of{' '}
+              {totalCount
+                ? localFormat && localFormat(totalCount.toString())
+                : 0}{' '}
               transactions found
             </p>
           </div>

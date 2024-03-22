@@ -26,20 +26,30 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  capitalizeFirstLetter,
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
-import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({ network, t, id, filters, onFilterClear }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    capitalizeFirstLetter,
+    formatTimestampToString,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { tokenAmount } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +58,9 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [address, setAddress] = useState('');
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const errorMessage = 'No transactions found!';
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -127,6 +139,8 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
 
     fetchTotalTxns(urlString);
     fetchTxnsData(currentPage, urlString);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, filters]);
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -450,7 +464,8 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
           <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">

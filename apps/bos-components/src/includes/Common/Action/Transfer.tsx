@@ -1,7 +1,13 @@
-import { shortenAddress, yoctoToNear } from '@/includes/libs';
 import { ActionPropsInfo } from '@/includes/types';
 
 const Transfer = (props: ActionPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenAddress, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg

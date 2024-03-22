@@ -11,6 +11,7 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "7.0.1",
     "@near-wallet-selector/bitget-wallet": "8.9.3",
     "@near-wallet-selector/coin98-wallet": "8.9.3",
     "@near-wallet-selector/core": "8.1.1",

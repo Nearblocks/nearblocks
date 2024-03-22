@@ -21,48 +21,50 @@ interface Props {
   accountId: string;
 }
 
-import { capitalize, toSnakeCase } from '@/includes/formats';
 import ArrowRight from '@/includes/icons/ArrowRight';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Question from '@/includes/icons/Question';
-import {
-  getConfig,
-  handleRateLimit,
-  isJson,
-  mapFeilds,
-  uniqueId,
-} from '@/includes/libs';
 import { FieldType } from '@/includes/types';
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
 
-const field = () => ({
-  id: uniqueId(),
-  name: '',
-  type: '',
-  value: '',
-  placeholder: '',
-});
+export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
 
-const sortFields = (fields: FieldType[]) => {
-  fields.sort((a, b) => {
-    if (a.id < b.id) return -1;
-    if (a.id > b.id) return 1;
-    return 0;
+  const { capitalize, toSnakeCase } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, isJson, mapFeilds, uniqueId } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const field = () => ({
+    id: uniqueId(),
+    name: '',
+    type: '',
+    value: '',
+    placeholder: '',
   });
 
-  return fields;
-};
+  const sortFields = (fields: FieldType[]) => {
+    fields.sort((a, b) => {
+      if (a.id < b.id) return -1;
+      if (a.id > b.id) return 1;
+      return 0;
+    });
 
-const getDataType = (data: string) => {
-  if (isJson(data)) {
-    return 'json';
-  }
+    return fields;
+  };
 
-  return isNaN(Number(data)) ? typeof data : 'number';
-};
+  const getDataType = (data: string) => {
+    if (isJson(data)) {
+      return 'json';
+    }
 
-export default function (props: Props) {
+    return isNaN(Number(data)) ? typeof data : 'number';
+  };
+
   const { network, id, index, method, connected, accountId } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
@@ -74,7 +76,9 @@ export default function (props: Props) {
     attachedDeposit: '0',
     gas: '30000000000000',
   });
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const onAdd = () => setFields((flds) => [...flds, field()]);
 
   const onRemove = (id: number) => () => {

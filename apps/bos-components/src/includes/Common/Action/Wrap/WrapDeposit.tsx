@@ -1,7 +1,12 @@
-import { getConfig } from '@/includes/libs';
 import { EventPropsInfo } from '@/includes/types';
 
 const WrapDeposit = (props: EventPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -18,7 +23,9 @@ const WrapDeposit = (props: EventPropsInfo) => {
       </svg>
     );
   };
-  const config = getConfig(props.network);
+
+  const config = getConfig && getConfig(props.network);
+
   const log = props.event.logs?.match(/^Deposit (\d+) NEAR to ([\S]+)/);
 
   if (log?.length !== 3) return null;

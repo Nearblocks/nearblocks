@@ -17,14 +17,24 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-import { getConfig } from '@/includes/libs';
-import { mapRpcActionToAction } from '@/includes/near';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { mapRpcActionToAction } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
   const { network, rpcTxn, txn, t } = props;
   const [receipt, setReceipt] = useState(null);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
       txn?.transaction?.actions &&
@@ -90,6 +100,8 @@ export default function (props: Props) {
       const receipt = transactionReceipts(rpcTxn);
       setReceipt(receipt);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
   return (

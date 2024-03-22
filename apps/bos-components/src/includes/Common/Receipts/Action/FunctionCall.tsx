@@ -1,9 +1,15 @@
 import { hexy } from '@/includes/hexy';
 import FaCode from '@/includes/icons/FaCode';
-import { shortenAddress } from '@/includes/libs';
 import { TransactionActionInfo } from '@/includes/types';
 
 const FunctionCall = (props: TransactionActionInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { t, args, receiver } = props;
 
   function displayArgs(args: any) {

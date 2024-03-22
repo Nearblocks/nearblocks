@@ -15,11 +15,20 @@ interface Props {
   receipt: ReceiptsPropsInfo | any;
 }
 
-import { convertToMetricPrefix } from '@/includes/formats';
-import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { convertToMetricPrefix } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
   const { receipt, network } = props;
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
@@ -29,7 +38,8 @@ export default function (props: Props) {
 
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchBlocks() {
@@ -67,6 +77,8 @@ export default function (props: Props) {
     }
 
     fetchBlocks();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.outcome?.blockHash, config.backendUrl]);
 
   let statusInfo;

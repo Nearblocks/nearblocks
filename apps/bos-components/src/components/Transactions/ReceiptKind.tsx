@@ -5,7 +5,6 @@
  * Description: Details of Transaction Receipt Kind on Near Protocol.
  */
 
-import { getConfig, yoctoToNear } from '@/includes/libs';
 import { ReceiptKindInfo } from '@/includes/types';
 
 const backgroundColorClasses: Record<string, string> = {
@@ -21,9 +20,16 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 export default function (props: ReceiptKindInfo) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { network, t, action, onClick, isTxTypeActive } = props;
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const args = action.args.args;
   const decodedArgs = args ? Buffer.from(args, 'base64') : null;

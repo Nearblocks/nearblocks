@@ -1,13 +1,26 @@
-import { shortenToken, shortenTokenSymbol } from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig } from '@/includes/libs';
-import { decodeArgs, tokenAmount } from '@/includes/near';
 import { MetaInfo, TokenInfoProps } from '@/includes/types';
 
 export default function (props: TokenInfoProps) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenToken, shortenTokenSymbol } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { decodeArgs, tokenAmount } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const { network, contract, amount, decimals } = props;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
@@ -52,6 +65,8 @@ export default function (props: TokenInfoProps) {
     }
 
     fetchMetadata(contract);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract, config?.rpcUrl]);
 
   return !meta?.name ? (

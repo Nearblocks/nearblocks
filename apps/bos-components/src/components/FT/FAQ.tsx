@@ -14,20 +14,6 @@ interface Props {
   id: string;
   token?: Token;
 }
-
-import {
-  localFormat,
-  dollarFormat,
-  dollarNonCentFormat,
-  convertToUTC,
-} from '@/includes/formats';
-import {
-  getConfig,
-  handleRateLimit,
-  nanoToMilli,
-  shortenAddress,
-} from '@/includes/libs';
-import { tokenAmount } from '@/includes/near';
 import {
   AccountInfo,
   DeploymentsInfo,
@@ -36,6 +22,19 @@ import {
 } from '@/includes/types';
 
 export default function ({ network, id, token }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, dollarFormat, dollarNonCentFormat, convertToUTC } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const { tokenAmount } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [account, setAccount] = useState<AccountInfo>({} as AccountInfo);
   const [contract, setContract] = useState<DeploymentsInfo>(
     {} as DeploymentsInfo,
@@ -49,7 +48,9 @@ export default function ({ network, id, token }: Props) {
 
   const name = tokens?.name;
   const tokenTicker = tokens?.symbol;
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   useEffect(() => {
     function fetchFTData() {
       asyncFetch(`${config.backendUrl}fts/${id}`)
@@ -173,12 +174,16 @@ export default function ({ network, id, token }: Props) {
     fetchHoldersCount();
     fetchTotalTxns();
     fetchHoldersdata();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, config?.backendUrl, token]);
+
   useEffect(() => {
     if (token) {
       setTokens(token);
     }
   }, [token]);
+
   return (
     <div itemScope itemType="http://schema.org/FAQPage">
       <div className="px-3 pb-2 text-sm divide-y divide-gray-200 space-y-2">

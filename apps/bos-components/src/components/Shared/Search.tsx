@@ -16,16 +16,25 @@ interface Props {
 import SearchIcon from '@/includes/icons/SearchIcon';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
-import { localFormat, shortenHex } from '@/includes/formats';
-import { debounce, getConfig, shortenAddress } from '@/includes/libs';
 import { SearchResult } from '@/includes/types';
 
 export default function SearchBar({ isHeader, t, network, router }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, shortenHex } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { debounce, getConfig, shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   // Determine whether to show search results
   const showResults =
@@ -42,9 +51,12 @@ export default function SearchBar({ isHeader, t, network, router }: Props) {
   };
   // Debounced keyword update
   const debouncedSetKeyword = useMemo(
-    () => debounce(500, (value: string) => setKeyword(value)),
+    () => debounce && debounce(200, (value: string) => setKeyword(value)),
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
   const redirect = (route: any) => {
     switch (route?.type) {
       case 'block':
@@ -62,7 +74,7 @@ export default function SearchBar({ isHeader, t, network, router }: Props) {
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
-    debouncedSetKeyword(newNextValue);
+    debouncedSetKeyword && debouncedSetKeyword(newNextValue);
     showSearchResults();
   };
 
@@ -86,6 +98,8 @@ export default function SearchBar({ isHeader, t, network, router }: Props) {
       }
     };
     fetchData(keyword, filter);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword, filter, config.backendUrl]);
   // Handle filter change
   const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) =>

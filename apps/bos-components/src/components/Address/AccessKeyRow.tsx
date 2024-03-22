@@ -18,18 +18,21 @@ interface Props {
 }
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
-import { getConfig, handleRateLimit } from '@/includes/libs';
-import { nanoToMilli, yoctoToNear } from '@/includes/libs';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  capitalizeWords,
-} from '@/includes/formats';
 
 export default function ({ network, t, accessKey, showWhen }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { formatTimestampToString, getTimeAgoString, capitalizeWords } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const createdTime = accessKey.created?.block_timestamp
     ? nanoToMilli(accessKey.created?.block_timestamp)
@@ -139,6 +142,8 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
     if (accessKey.public_key && accessKey.permission_kind === 'FUNCTION_CALL') {
       tokenInfo(accessKey.account_id, accessKey.public_key);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.rpcUrl, accessKey]);
 
   return (

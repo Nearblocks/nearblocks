@@ -20,18 +20,22 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, handleRateLimit, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
 export default function ({ network, t, currentPage, setPage }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
@@ -41,7 +45,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
   );
   const [address, setAddress] = useState('');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -110,6 +114,8 @@ export default function ({ network, t, currentPage, setPage }: Props) {
 
     fetchTotalTokens();
     fetchTokens(currentPage);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -124,7 +130,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
         </>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
+        'pl-5 pr-2 py-2 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
     },
     {
       header: <span>{t ? t('hash') : 'HASH'}</span>,
@@ -156,7 +162,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-2 text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -183,7 +189,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -233,7 +239,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -302,7 +308,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           )}
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-5 py-2 text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -336,7 +342,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </div>
       ),
-      tdClassName: 'px-5 py-4 ',
+      tdClassName: 'px-5 py-2',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -401,7 +407,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
@@ -468,7 +474,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600',
       thClassName: 'inline-flex whitespace-nowrap',
     },
   ];
@@ -484,8 +490,8 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-                A total of {localFormat(totalCount.toString())} transactions
-                found
+                A total of {localFormat && localFormat(totalCount.toString())}{' '}
+                transactions found
               </p>
             </div>
           </div>

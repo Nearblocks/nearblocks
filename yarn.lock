@@ -1589,6 +1589,11 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@braintree/sanitize-url@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-7.0.1.tgz#457233b0a18741b7711855044102b82bae7a070b"
+  integrity sha512-URg8UM6lfC9ZYqFipItRSxYJdgpU5d2Z4KnjsJ+rj6tgAmGme7E+PQNCiud8g0HDaZKMovu2qjfa0f5Ge0Vlsg==
+
 "@breejs/later@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@breejs/later/-/later-4.1.0.tgz#9246907f46cc9e9c9af37d791ab468d98921bcc1"
