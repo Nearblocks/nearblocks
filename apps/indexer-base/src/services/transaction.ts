@@ -11,35 +11,22 @@ export const storeTransactions = async (
   message: types.StreamerMessage,
 ) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
-
-  await Promise.all(
-    chunks.map(async (chunk) => {
-      await storeChunkTransactions(
-        knex,
+  const transactions = chunks.flatMap((chunk) => {
+    return chunk.transactions.map((txn, index) =>
+      getTransactionData(
+        txn,
         chunk.header.chunkHash,
         message.block.header.hash,
         message.block.header.timestampNanosec,
-        chunk.transactions,
-      );
-    }),
-  );
-};
+        index,
+      ),
+    );
+  });
 
-const storeChunkTransactions = async (
-  knex: Knex,
-  chunkHash: string,
-  blockHash: string,
-  blockTimestamp: string,
-  transactions: types.IndexerTransactionWithOutcome[],
-) => {
-  const data = transactions.map((tx, index) =>
-    getTransactionData(tx, chunkHash, blockHash, blockTimestamp, index),
-  );
-
-  if (data.length) {
+  if (transactions.length) {
     await retry(async () => {
       await knex('transactions')
-        .insert(data)
+        .insert(transactions)
         .onConflict(['transaction_hash'])
         .ignore();
     });
