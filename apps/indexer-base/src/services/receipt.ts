@@ -94,32 +94,42 @@ const storeChunkReceipts = async (
     );
   });
 
+  const promises = [];
+
   if (receiptData.length) {
-    await retry(async () => {
-      await knex('receipts')
-        .insert(receiptData)
-        .onConflict(['receipt_id'])
-        .ignore();
-    });
+    promises.push(
+      retry(async () => {
+        await knex('receipts')
+          .insert(receiptData)
+          .onConflict(['receipt_id'])
+          .ignore();
+      }),
+    );
   }
 
   if (receiptActionsData.length) {
-    await retry(async () => {
-      await knex('action_receipt_actions')
-        .insert(receiptActionsData)
-        .onConflict(['receipt_id', 'index_in_action_receipt'])
-        .ignore();
-    });
+    promises.push(
+      retry(async () => {
+        await knex('action_receipt_actions')
+          .insert(receiptActionsData)
+          .onConflict(['receipt_id', 'index_in_action_receipt'])
+          .ignore();
+      }),
+    );
   }
 
   if (receiptOutputData.length) {
-    await retry(async () => {
-      await knex('action_receipt_output_data')
-        .insert(receiptOutputData)
-        .onConflict(['output_data_id', 'output_from_receipt_id'])
-        .ignore();
-    });
+    promises.push(
+      retry(async () => {
+        await knex('action_receipt_output_data')
+          .insert(receiptOutputData)
+          .onConflict(['output_data_id', 'output_from_receipt_id'])
+          .ignore();
+      }),
+    );
   }
+
+  await Promise.all(promises);
 };
 
 const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
