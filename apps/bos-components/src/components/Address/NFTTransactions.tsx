@@ -190,7 +190,9 @@ export default function (props: Props) {
 
     setAddress(id);
   };
-
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: '',
@@ -331,6 +333,7 @@ export default function (props: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.affected_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row?.affected_account_id}
                       </a>
@@ -433,7 +436,7 @@ export default function (props: Props) {
                   <span>
                     <Link
                       href={`/address/${row.involved_account_id}`}
-                      className="hover:no-underline"
+                      className="hover:no-underline truncate inline-block"
                     >
                       <a
                         className={`text-green-500 hover:no-underline ${
@@ -444,6 +447,7 @@ export default function (props: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.involved_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row.involved_account_id}
                       </a>

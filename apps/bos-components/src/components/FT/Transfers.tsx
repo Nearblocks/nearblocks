@@ -148,7 +148,9 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
 
     setAddress(id);
   };
-
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: '',
@@ -269,6 +271,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.affected_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row?.affected_account_id}
                       </a>
@@ -337,6 +340,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.involved_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row?.involved_account_id}
                       </a>

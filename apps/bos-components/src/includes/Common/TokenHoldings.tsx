@@ -62,7 +62,7 @@ const TokenHoldings = (props: Props) => {
           {props.ft?.amount
             ? '$' + dollarFormat(props.ft?.amount)
             : '$' + (props.ft?.amount ?? '')}
-          <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-1">
+          <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-0.5">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
         </span>

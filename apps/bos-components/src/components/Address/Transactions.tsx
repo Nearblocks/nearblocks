@@ -206,7 +206,9 @@ export default function ({
 
     setAddress(id);
   };
-
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: <span></span>,
@@ -422,6 +424,7 @@ export default function ({
                       onMouseOver={(e) =>
                         onHandleMouseOver(e, row?.predecessor_account_id)
                       }
+                      onMouseLeave={handleMouseLeave}
                     >
                       {row.predecessor_account_id}
                     </a>
@@ -528,6 +531,7 @@ export default function ({
                       onMouseOver={(e) =>
                         onHandleMouseOver(e, row?.receiver_account_id)
                       }
+                      onMouseLeave={handleMouseLeave}
                     >
                       {row.receiver_account_id}
                     </a>

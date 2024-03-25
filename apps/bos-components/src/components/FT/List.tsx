@@ -215,8 +215,10 @@ export default function ({ t, network, currentPage, setPage }: Props) {
               className="hover:no-underline"
             >
               <a className=" text-green-500 hover:no-underline">
-                <span className="truncate max-w-[200px] mr-1">{row?.name}</span>
-                <span className="text-nearblue-700 truncate max-w-[80px]">
+                <span className="inline-block truncate max-w-[200px] mr-1">
+                  {row?.name}
+                </span>
+                <span className="text-nearblue-700 inline-block truncate max-w-[80px]">
                   {row?.symbol}
                 </span>
               </a>
@@ -247,7 +249,11 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('token:fts.top.change') : 'CHANGE'} (%)</span>,
+      header: (
+        <span className=" whitespace-nowrap">
+          {t ? t('token:fts.top.change') : 'CHANGE'} (%)
+        </span>
+      ),
       key: 'change_24',
       cell: (row: Token) => (
         <span>

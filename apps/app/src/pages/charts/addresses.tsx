@@ -34,7 +34,7 @@ const AddressesChart = () => {
     <section>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             {t('charts:addresses.heading')}
           </h1>
         </div>

@@ -618,20 +618,23 @@ export default function (props: Props) {
                     {loading ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
-                      <div className="w-full md:w-3/4 break-words">
-                        {accountData?.amount && statsData?.near_price
-                          ? '$' +
-                            fiatValue(
-                              yoctoToNear(accountData?.amount, false),
-                              statsData?.near_price,
-                            )
-                          : ''}{' '}
+                      <div className="w-full md:w-3/4 break-words flex items-center">
+                        <span className="px-1">
+                          {accountData?.amount && statsData?.near_price
+                            ? '$' +
+                              fiatValue(
+                                yoctoToNear(accountData?.amount, false),
+                                statsData?.near_price,
+                              ) +
+                              ' '
+                            : ''}
+                        </span>
                         <span className="text-xs">
-                          (@
+                          ( @
                           {nearPrice
                             ? '$' + dollarFormat(statsData?.near_price)
                             : ''}
-                          / Ⓝ)
+                          / Ⓝ )
                         </span>
                       </div>
                     )}
