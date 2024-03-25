@@ -1,14 +1,14 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
 FROM node:20-bookworm-slim as base
 
-FROM base AS builder
+FROM --platform=$BUILDPLATFORM base AS builder
 RUN apt update && apt install -y dumb-init
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
 RUN turbo prune aggregates --docker
 
-FROM base AS installer
+FROM --platform=$BUILDPLATFORM base AS installer
 WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .

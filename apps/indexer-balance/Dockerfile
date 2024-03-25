@@ -1,14 +1,13 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
 FROM node:20-bookworm-slim as base
 
-FROM base AS builder
-RUN apt update && apt install -y dumb-init
+FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
 RUN turbo prune indexer-balance --docker
 
-FROM base AS installer
+FROM --platform=$BUILDPLATFORM base AS installer
 WORKDIR /app
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
@@ -23,6 +22,5 @@ ENV NODE_ENV production
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
-COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
 
-CMD ["dumb-init", "node", "--max-old-space-size=8192", "apps/indexer-balance/dist/index.js"]
+CMD ["node", "--max-old-space-size=8192", "apps/indexer-balance/dist/index.js"]
