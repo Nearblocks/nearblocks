@@ -272,17 +272,19 @@ export default function ({ network, t }: Props) {
                     ) : (
                       <Link
                         href="/charts/near-price"
-                        className="hover:no-underline"
+                        className="hover:no-underline flex items-center"
                       >
-                        <a className="leading-6 text-nearblue-600 hover:no-underline">
+                        <a className="leading-6 text-nearblue-600 hover:no-underline px-1 ">
                           {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
                             {nearBtcPrice
                               ? '@' + localFormat(stats?.near_btc_price) + 'BTC'
                               : ''}
-                          </span>{' '}
-                          {change24 ? (
-                            Number(stats?.change_24) > 0 ? (
+                          </span>
+                        </a>
+                        {change24 && (
+                          <>
+                            {Number(stats?.change_24) > 0 ? (
                               <span className="text-neargreen text-sm">
                                 {stats?.change_24
                                   ? '(' + dollarFormat(stats?.change_24) + '%)'
@@ -294,11 +296,9 @@ export default function ({ network, t }: Props) {
                                   ? '(' + dollarFormat(change24) + '%)'
                                   : ''}
                               </span>
-                            )
-                          ) : (
-                            ''
-                          )}
-                        </a>
+                            )}
+                          </>
+                        )}
                       </Link>
                     )}
                   </div>

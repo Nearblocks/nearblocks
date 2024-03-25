@@ -278,31 +278,34 @@ const Header = () => {
                               width={15}
                               height={15}
                             />
-                            <p className="text-sm text-gray-500 font-medium leading-6 px-2">
-                              $
-                              {stats?.near_price
-                                ? dollarFormat(stats?.near_price)
-                                : stats?.near_price ?? ''}
-                              {stats?.change_24 > 0 ? (
+                            <p className="text-sm text-gray-500 font-medium leading-6 px-1">
+                              <span>
+                                $
+                                {stats?.near_price
+                                  ? dollarFormat(stats?.near_price)
+                                  : stats?.near_price ?? ''}
+                              </span>
+                            </p>
+                            {stats?.change_24 > 0 ? (
+                              <>
                                 <span className="text-neargreen text-xs">
-                                  {' '}
                                   (+
                                   {stats?.change_24
                                     ? dollarFormat(stats?.change_24)
                                     : stats?.change_24 ?? ''}
                                   %)
                                 </span>
-                              ) : (
-                                <span className="text-red-500 text-xs">
-                                  {' '}
-                                  (
-                                  {stats?.change_24
-                                    ? dollarFormat(stats?.change_24)
-                                    : stats?.change_24 ?? ''}
-                                  %)
-                                </span>
-                              )}
-                            </p>
+                              </>
+                            ) : (
+                              <span className="text-red-500 text-xs">
+                                {' '}
+                                (
+                                {stats?.change_24
+                                  ? dollarFormat(stats?.change_24)
+                                  : stats?.change_24 ?? ''}
+                                %)
+                              </span>
+                            )}
                           </div>
                         ) : (
                           ''

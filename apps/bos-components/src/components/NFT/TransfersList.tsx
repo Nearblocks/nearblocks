@@ -52,7 +52,9 @@ export default function ({ network, t, currentPage, setPage }: Props) {
 
     setAddress(id);
   };
-
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   useEffect(() => {
     function fetchTotalTokens() {
       asyncFetch(`${config?.backendUrl}nfts/txns/count`, {
@@ -218,6 +220,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.affected_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row?.affected_account_id}
                       </a>
@@ -288,6 +291,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.involved_account_id)
                         }
+                        onMouseLeave={handleMouseLeave}
                       >
                         {row?.involved_account_id}
                       </a>

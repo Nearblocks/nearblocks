@@ -119,6 +119,9 @@ export default function ({ currentPage, setPage, t, network }: Props) {
 
     setAddress(id);
   };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
 
   const start = blocks[currentPage]?.[0];
   const end = blocks[currentPage]?.[blocks[currentPage]?.length - 1];
@@ -262,6 +265,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
                   : 'text-green-500 p-1'
               }`}
               onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
+              onMouseLeave={handleMouseLeave}
             >
               {shortenAddress(row?.author_account_id ?? '')}
             </a>

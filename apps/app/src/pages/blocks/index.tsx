@@ -48,7 +48,7 @@ const Blocks = () => {
     <>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             {t ? t('blocks:heading') : 'Latest Near Protocol Blocks'}
           </h1>
         </div>
@@ -67,7 +67,7 @@ const Blocks = () => {
                 network: networkId,
                 t: t,
               }}
-            />{' '}
+            />
           </div>
         </div>
       </div>

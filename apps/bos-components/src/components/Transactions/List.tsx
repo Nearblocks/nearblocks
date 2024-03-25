@@ -201,6 +201,9 @@ export default function (props: Props) {
 
     setAddress(id);
   };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
 
   const columns = [
     {
@@ -417,6 +420,7 @@ export default function (props: Props) {
                       onMouseOver={(e) =>
                         onHandleMouseOver(e, row?.signer_account_id)
                       }
+                      onMouseLeave={handleMouseLeave}
                     >
                       {row?.signer_account_id}
                     </a>
@@ -511,6 +515,7 @@ export default function (props: Props) {
                       onMouseOver={(e) =>
                         onHandleMouseOver(e, row?.receiver_account_id)
                       }
+                      onMouseLeave={handleMouseLeave}
                     >
                       {truncateString(row?.receiver_account_id, 17, '...')}
                     </a>
