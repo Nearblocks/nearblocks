@@ -2,9 +2,15 @@ import Trade from '@/includes/Banners/Trade';
 import Earn from '@/includes/Banners/Earn';
 import Store from '@/includes/Banners/Store';
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig } from '@/includes/libs';
 
 export default function () {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const config = getConfig(context.networkId);
 
   return (

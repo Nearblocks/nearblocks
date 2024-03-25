@@ -17,11 +17,20 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { localFormat, serialNumber } from '@/includes/formats';
-import { getConfig, handleRateLimit, holderPercentage } from '@/includes/libs';
 import { HoldersPropsInfo, Token } from '@/includes/types';
 
 export default function ({ network, id, token }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, serialNumber } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, holderPercentage } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -30,7 +39,9 @@ export default function ({ network, id, token }: Props) {
     {},
   );
   const [tokens, setTokens] = useState<Token>({} as Token);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const errorMessage = 'No token holders found!';
 
   const setPage = (pageNumber: number) => {
@@ -124,8 +135,11 @@ export default function ({ network, id, token }: Props) {
     if (!token && token === undefined) {
       fetchNFTData();
     }
+
     fetchTotalHolders();
     fetchHoldersData(currentPage);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);
 
   useEffect(() => {
@@ -227,7 +241,8 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              token holders found
             </p>
           </div>
         </div>

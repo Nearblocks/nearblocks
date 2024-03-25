@@ -1,7 +1,13 @@
-import { getConfig, shortenAddress } from '@/includes/libs';
 import { DepositPropsInfo } from '@/includes/types';
 
 const DescreaseCollateral = (props: DepositPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -19,7 +25,9 @@ const DescreaseCollateral = (props: DepositPropsInfo) => {
     );
   };
   const log = props.event?.[0];
-  const config = getConfig(props.network);
+
+  const config = getConfig && getConfig(props.network);
+
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (

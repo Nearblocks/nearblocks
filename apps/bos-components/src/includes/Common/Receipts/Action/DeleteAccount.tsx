@@ -1,8 +1,13 @@
 import FaUser from '@/includes/icons/FaUser';
-import { shortenAddress } from '@/includes/libs';
 import { TransactionActionInfo } from '@/includes/types';
 
 const DeleteAccount = (props: TransactionActionInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   return (
     <div className="py-1">
       <FaUser className="inline-flex text-red-400 mr-1" />

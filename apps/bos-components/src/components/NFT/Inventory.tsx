@@ -11,8 +11,6 @@
 
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
-import { localFormat } from '@/includes/formats';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -22,12 +20,25 @@ interface Props {
 }
 
 export default function ({ network, id, token }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const [tokenData, setTokenData] = useState<Token>({} as Token);
 
   const setPage = (pageNumber: number) => {
@@ -115,6 +126,8 @@ export default function ({ network, id, token }: Props) {
     }
     fetchTotalToken();
     fetchTokenData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);
 
   useEffect(() => {
@@ -133,7 +146,8 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4 border-b`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} tokens found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              tokens found
             </p>
           </div>
         </div>

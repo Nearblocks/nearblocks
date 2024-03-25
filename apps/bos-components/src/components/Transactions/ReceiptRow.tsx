@@ -25,16 +25,26 @@ import {
   TransactionInfo,
 } from '@/includes/types';
 import Question from '@/includes/Common/Question';
-import { convertToMetricPrefix, localFormat } from '@/includes/formats';
-import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { convertToMetricPrefix, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { network, receipt, borderFlag, t } = props;
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchBlocks() {
@@ -72,6 +82,8 @@ export default function (props: Props) {
     }
 
     fetchBlocks();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.block_hash, config.backendUrl]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -318,14 +330,15 @@ export default function (props: Props) {
             </div>
           ) : receipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {receipt?.actions?.map((action: any, i: number) => (
-                <TransactionActions
-                  key={i}
-                  action={action}
-                  receiver={receipt?.receiver_id}
-                  t={t}
-                />
-              ))}
+              {receipt &&
+                receipt?.actions?.map((action: any, i: number) => (
+                  <TransactionActions
+                    key={i}
+                    action={action}
+                    receiver={receipt?.receiver_id}
+                    t={t}
+                  />
+                ))}
             </div>
           ) : (
             ''

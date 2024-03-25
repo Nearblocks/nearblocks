@@ -6,10 +6,16 @@
  */
 
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig } from '@/includes/libs';
 import { TransactionReceiptInfo } from '@/includes/types';
 
 export default function (props: TransactionReceiptInfo) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const {
     network,
     t,
@@ -25,7 +31,9 @@ export default function (props: TransactionReceiptInfo) {
     () => setTxTypeActive((x) => !x),
     [setTxTypeActive],
   );
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   useEffect(() => switchActiveTxType, [expandAll, switchActiveTxType]);
 
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);

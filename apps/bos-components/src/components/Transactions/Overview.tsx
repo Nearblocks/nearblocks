@@ -15,14 +15,6 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import {
-  currency,
-  dollarFormat,
-  formatCustomDate,
-  localFormat,
-} from '@/includes/formats';
-import { getConfig, handleRateLimit } from '@/includes/libs';
-import { gasPrice } from '@/includes/near';
-import {
   ChartConfigType,
   StatusInfo,
   ChartInfo,
@@ -30,6 +22,21 @@ import {
 } from '@/includes/types';
 
 export default function ({ network, t }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { currency, dollarFormat, formatCustomDate, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { gasPrice } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [charts, setCharts] = useState<ChartInfo[]>([]);
@@ -37,7 +44,7 @@ export default function ({ network, t }: Props) {
     {} as ChartConfigType,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 15000;
@@ -80,6 +87,8 @@ export default function ({ network, t }: Props) {
     const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, isLoading]);
 
   useEffect(() => {
@@ -104,6 +113,8 @@ export default function ({ network, t }: Props) {
     }
 
     fetchChartData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);
 
   const chartData = useMemo(() => {
@@ -127,6 +138,8 @@ export default function ({ network, t }: Props) {
         categories: [],
       };
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charts]);
 
   useEffect(() => {

@@ -23,12 +23,18 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 const hashes = ['overview', 'execution', 'comments'];
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { t, network, hash, onHandleTab, pageTab } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [txn, setTxn] = useState<TransactionInfo | null>(null);
@@ -38,7 +44,7 @@ export default function (props: Props) {
     {} as RPCTransactionInfo,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const onTab = (index: number) => {
     onHandleTab(hashes[index]);
@@ -71,6 +77,8 @@ export default function (props: Props) {
     }
 
     fetchTxn();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, hash]);
 
   useEffect(() => {
@@ -108,6 +116,8 @@ export default function (props: Props) {
     }
 
     fetchTransactionStatus();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config?.rpcUrl]);
 
   return (

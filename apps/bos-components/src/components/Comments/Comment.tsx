@@ -13,7 +13,6 @@
  * @param {string} post.image.url - The URL of the image.
  */
 
-import { timeAgo } from '@/includes/libs';
 interface Props {
   accountId: string;
   blockHeight: string;
@@ -26,6 +25,13 @@ interface Props {
   };
 }
 export default function ({ accountId, blockHeight, post }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { timeAgo } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const BlockHeight = blockHeight === 'now' ? 'now' : parseInt(blockHeight);
 
   const profile: { name: string } | any = Social.getr(`${accountId}/profile`);
@@ -60,11 +66,16 @@ export default function ({ accountId, blockHeight, post }: Props) {
       }
     }
     fetchTime();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [BlockHeight]);
+
   useEffect(() => {
     if (JSON.stringify(post.image) !== JSON.stringify(imageUrl)) {
       setImageUrl(post.image);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [post.image, imageUrl]);
 
   function toUrl(image: { ipfs_cid?: string; url?: string }) {

@@ -17,12 +17,6 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-import { getConfig } from '@/includes/libs';
-import {
-  collectNestedReceiptWithOutcomeOld,
-  parseOutcomeOld,
-  parseReceipt,
-} from '@/includes/near';
 import {
   TransactionInfo,
   RPCTransactionInfo,
@@ -31,11 +25,23 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { collectNestedReceiptWithOutcomeOld, parseOutcomeOld, parseReceipt } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.near`);
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { network, rpcTxn, t } = props;
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const [expandAll, setExpandAll] = useState(false);
   const expandAllReceipts = useCallback(
     () => setExpandAll((x) => !x),
@@ -43,8 +49,9 @@ export default function (props: Props) {
   );
 
   function transactionReceipts(txn: RPCTransactionInfo) {
-    const receiptsMap = txn.receipts_outcome.reduce(
-      (mapping, receiptOutcome) => {
+    const receiptsMap =
+      txn?.receipts_outcome &&
+      txn?.receipts_outcome.reduce((mapping, receiptOutcome) => {
         const receipt = parseReceipt(
           txn.receipts.find(
             (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
@@ -56,9 +63,7 @@ export default function (props: Props) {
           ...receipt,
           outcome: parseOutcomeOld(receiptOutcome),
         });
-      },
-      new Map(),
-    );
+      }, new Map());
 
     const receipts = collectNestedReceiptWithOutcomeOld(
       txn.transaction_outcome.outcome.receipt_ids[0],
@@ -73,6 +78,8 @@ export default function (props: Props) {
       const receipt = transactionReceipts(rpcTxn);
       setReceipt(receipt);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash, config.backendUrl]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

@@ -14,13 +14,24 @@ interface Props {
   token?: Token;
 }
 
-import { localFormat, dollarNonCentFormat } from '@/includes/formats';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 export default function ({ token, id, network }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat, dollarNonCentFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [tokens, setTokens] = useState<Token>({} as Token);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   useEffect(() => {
     function fetchFTData() {
       asyncFetch(`${config.backendUrl}fts/${id}`)
@@ -45,6 +56,8 @@ export default function ({ token, id, network }: Props) {
     if (!token && token === undefined) {
       fetchFTData();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, token]);
 
   useEffect(() => {

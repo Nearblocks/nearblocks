@@ -1,7 +1,12 @@
-import { getConfig, shortenAddress } from '@/includes/libs';
 import { DepositPropsInfo } from '@/includes/types';
 
 const WithdrawSucceeded = (props: DepositPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const log = props.event?.[0];
   const FaRight = (props: { className: string }) => {
     return (
@@ -19,7 +24,9 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
       </svg>
     );
   };
-  const config = getConfig(props.network);
+
+  const config = getConfig && getConfig(props.network);
+
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (

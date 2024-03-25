@@ -9,10 +9,7 @@
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
  */
-
-import { truncateString } from '@/includes/libs';
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { dollarFormat, localFormat } from '@/includes/formats';
 import { InventoryInfo, TokenListInfo } from '@/includes/types';
 
 interface Props {
@@ -28,18 +25,27 @@ interface Props {
 }
 
 const TokenHoldings = (props: Props) => {
-  const Loading = (props: { className: string; wrapperClassName: string }) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { dollarFormat, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { truncateString } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const Loading = (props: { className: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 rounded shadow-sm animate-pulse ${props.className}`}
       ></div>
     );
   };
-
   const nfts = props.data?.nfts || [];
-
   if (props.loading || props.inventoryLoading) {
-    return <Loading className="h-full" wrapperClassName="flex w-full h-7" />;
+    return <Loading className="flex w-full h-8" />;
   }
 
   if (!props.ft?.tokens?.length && !nfts?.length) {

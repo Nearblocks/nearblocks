@@ -13,20 +13,7 @@
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  convertToMetricPrefix,
-  formatTimestampToString,
-  gasFee,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import {
-  getConfig,
-  handleRateLimit,
-  nanoToMilli,
-  shortenAddress,
-} from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
@@ -40,13 +27,28 @@ interface Props {
 }
 
 export default function ({ currentPage, setPage, t, network }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    convertToMetricPrefix,
+    formatTimestampToString,
+    gasFee,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
+    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
   const [blocks, setBlocks] = useState<{ [key: number]: BlocksInfo[] }>({});
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
   const [address, setAddress] = useState('');
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchTotalBlocks() {
@@ -108,6 +110,8 @@ export default function ({ currentPage, setPage, t, network }: Props) {
 
     fetchTotalBlocks();
     fetchBlocks(currentPage);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -321,22 +325,24 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           {t
             ? t('blocks:listing', {
                 from: start?.block_height
-                  ? localFormat(start?.block_height)
+                  ? localFormat && localFormat(start?.block_height)
                   : start?.block_height ?? '',
                 to: end?.block_height
-                  ? localFormat(end?.block_height)
+                  ? localFormat && localFormat(end?.block_height)
                   : end?.block_height ?? '',
-                count: localFormat(totalCount.toString()),
+                count: localFormat && localFormat(totalCount.toString()),
               })
             : `Block #${
                 start?.block_height
-                  ? localFormat(start?.block_height)
+                  ? localFormat && localFormat(start?.block_height)
                   : start?.block_height ?? ''
               } to ${
                 '#' + end?.block_height
-                  ? localFormat(end?.block_height)
+                  ? localFormat && localFormat(end?.block_height)
                   : end?.block_height ?? ''
-              } (Total of ${localFormat(totalCount.toString())} blocks)`}{' '}
+              } (Total of ${
+                localFormat && localFormat(totalCount.toString())
+              } blocks)`}{' '}
         </p>
       )}
       {

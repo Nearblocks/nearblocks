@@ -21,11 +21,9 @@ interface Props {
   schema: any;
 }
 
-import { capitalize, toSnakeCase } from '@/includes/formats';
 import ArrowRight from '@/includes/icons/ArrowRight';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Question from '@/includes/icons/Question';
-import { mapFeilds, uniqueId } from '@/includes/libs';
 import { FieldType } from '@/includes/types';
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -41,6 +39,17 @@ const sortFields = (fields: FieldType[]) => {
 };
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { capitalize, toSnakeCase } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { mapFeilds, uniqueId } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { id, index, method, connected, accountId, schema } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
@@ -153,6 +162,8 @@ export default function (props: Props) {
           setHideQuery(false);
         },
       );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method?.params?.args, schema.body.root_schema.definitions]);
 
   return (

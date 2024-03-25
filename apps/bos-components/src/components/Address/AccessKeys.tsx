@@ -16,12 +16,18 @@ interface Props {
 }
 
 import { AccountContractInfo } from '@/includes/types';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
 
 export default function ({ network, t, id }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [showWhen, setShowWhen] = useState(true);
   const [sorting, setSorting] = useState('desc');
@@ -31,7 +37,7 @@ export default function ({ network, t, id }: Props) {
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -97,6 +103,8 @@ export default function ({ network, t, id }: Props) {
     }
     fetchAccountData();
     fetchCountData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, sorting]);
 
   return (

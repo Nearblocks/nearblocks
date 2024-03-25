@@ -23,34 +23,10 @@ import EventLogs from '@/includes/Common/Action/index';
 import Actions from '@/includes/Common/Actions';
 import Question from '@/includes/Common/Question';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  convertToMetricPrefix,
-  convertToUTC,
-  dollarFormat,
-  gasPercentage,
-  getTimeAgoString,
-  localFormat,
-  shortenToken,
-  shortenTokenSymbol,
-} from '@/includes/formats';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import FaRight from '@/includes/icons/FaRight';
 import TokenImage from '@/includes/icons/TokenImage';
-import {
-  fiatValue,
-  getConfig,
-  handleRateLimit,
-  nanoToMilli,
-  shortenAddress,
-  yoctoToNear,
-} from '@/includes/libs';
-import {
-  tokenAmount,
-  txnActions,
-  txnErrorMessage,
-  txnLogs,
-} from '@/includes/near';
 import {
   AccountContractInfo,
   FtsInfo,
@@ -63,6 +39,33 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const {
+    convertToMetricPrefix,
+    convertToUTC,
+    dollarFormat,
+    gasPercentage,
+    getTimeAgoString,
+    localFormat,
+    shortenToken,
+    shortenTokenSymbol,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+
+  const {
+    fiatValue,
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    shortenAddress,
+    yoctoToNear,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const { loading, txn, network, t, rpcTxn } = props;
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
@@ -74,35 +77,37 @@ export default function (props: Props) {
       let fts: FtsInfo[] = [];
       let nfts: NftsInfo[] = [];
 
-      receipts.forEach(
-        (receipt) =>
-          receipt?.fts?.forEach((ft) => {
-            if (ft.ft_meta && ft.cause === 'TRANSFER') {
-              if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
-            } else {
-              if (ft.ft_meta) fts.push(ft);
-            }
-          }),
-      );
-      receipts.forEach(
-        (receipt) =>
-          receipt?.nfts?.forEach((nft) => {
-            if (
-              nft.nft_meta &&
-              nft.nft_token_meta &&
-              nft.cause === 'TRANSFER'
-            ) {
+      receipts &&
+        receipts.forEach(
+          (receipt) =>
+            receipt?.fts?.forEach((ft) => {
+              if (ft.ft_meta && ft.cause === 'TRANSFER') {
+                if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+              } else {
+                if (ft.ft_meta) fts.push(ft);
+              }
+            }),
+        );
+      receipts &&
+        receipts.forEach(
+          (receipt) =>
+            receipt?.nfts?.forEach((nft) => {
               if (
                 nft.nft_meta &&
                 nft.nft_token_meta &&
-                Number(nft.delta_amount) < 0
-              )
-                nfts.push(nft);
-            } else {
-              if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
-            }
-          }),
-      );
+                nft.cause === 'TRANSFER'
+              ) {
+                if (
+                  nft.nft_meta &&
+                  nft.nft_token_meta &&
+                  Number(nft.delta_amount) < 0
+                )
+                  nfts.push(nft);
+              } else {
+                if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+              }
+            }),
+        );
 
       return {
         fts,
@@ -115,13 +120,15 @@ export default function (props: Props) {
     }
 
     return { fts: [], nfts: [] };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn]);
 
   function absoluteValue(number: string) {
     return new Big(number).abs().toString();
   }
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchStatsDatas() {
@@ -147,6 +154,8 @@ export default function (props: Props) {
     }
 
     fetchStatsDatas();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config.backendUrl]);
 
   const toggleContent = () => {
@@ -192,6 +201,8 @@ export default function (props: Props) {
       }
     }
     return;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn?.block_timestamp]);
 
   const [logs, actions, errorMessage] = useMemo(() => {
@@ -199,6 +210,8 @@ export default function (props: Props) {
       return [txnLogs(rpcTxn), txnActions(rpcTxn), txnErrorMessage(rpcTxn)];
     }
     return [[], [], undefined];
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

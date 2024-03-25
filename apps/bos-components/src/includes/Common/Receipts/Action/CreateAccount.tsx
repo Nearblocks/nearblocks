@@ -1,7 +1,13 @@
 import FaUser from '@/includes/icons/FaUser';
-import { shortenAddress } from '@/includes/libs';
 
 const CreateAccount = (props: any) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   return (
     <div className="py-1">
       <FaUser className="inline-flex text-emerald-400 mr-1" />{' '}

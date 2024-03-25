@@ -18,10 +18,15 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { getConfig, handleRateLimit, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const { t } = props;
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
@@ -30,7 +35,7 @@ export default function (props: Props) {
     description: '',
   });
 
-  const config = getConfig(props?.network);
+  const config = getConfig && getConfig(props?.network);
 
   const charts = [
     {
@@ -146,6 +151,8 @@ export default function (props: Props) {
     } catch (error) {
       return [];
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, props.chartTypes]);
 
   useEffect(() => {
@@ -164,6 +171,8 @@ export default function (props: Props) {
     }
 
     fetchChartData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);
 
   useEffect(() => {
@@ -308,6 +317,8 @@ export default function (props: Props) {
     };
 
     fetchData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartData, props.chartTypes]);
 
   const iframeSrc = `

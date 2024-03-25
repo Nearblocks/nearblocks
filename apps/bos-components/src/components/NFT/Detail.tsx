@@ -15,7 +15,6 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, handleRateLimit, shortenAddress } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -26,10 +25,18 @@ interface Props {
 }
 
 export default function ({ network, t, id, tid }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit, shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [token, setToken] = useState<Token>({} as Token);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchToken() {
@@ -60,6 +67,8 @@ export default function ({ network, t, id, tid }: Props) {
     }
 
     fetchToken();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, tid]);
 
   const toggleItem = (index: number) => {

@@ -10,8 +10,6 @@
  * @param {string} [exportType] - Type of data to be exported, available options are (transactions, ft and nft token transaction)
  */
 
-import { getConfig, handleRateLimit } from '@/includes/libs';
-
 interface Props {
   network: string;
   id: string;
@@ -36,6 +34,12 @@ const initial = {
 };
 
 export default function ({ network, id, onHandleDowload, exportType }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);
   const [endDate, setEndDate] = useState(initial.end);
@@ -46,7 +50,7 @@ export default function ({ network, id, onHandleDowload, exportType }: Props) {
     file: string;
   }>({} as { apiUrl: string; tittle: string; file: string });
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let url = '';
@@ -72,6 +76,8 @@ export default function ({ network, id, onHandleDowload, exportType }: Props) {
     }
 
     setExportInfo({ apiUrl: url, tittle: text, file: file });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exportType, id, startDate, endDate]);
 
   useEffect(() => {
@@ -106,6 +112,8 @@ export default function ({ network, id, onHandleDowload, exportType }: Props) {
     }
 
     fetchData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, exportInfo.apiUrl]);
 
   const onDownload = () => {

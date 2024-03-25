@@ -15,14 +15,23 @@ interface Props {
 
 import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
-import { localFormat } from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, handleRateLimit } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
 export default function ({ network, id }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [txnLoading, setTxnLoading] = useState(false);
   const [holderLoading, setHolderLoading] = useState(false);
@@ -31,7 +40,7 @@ export default function ({ network, id }: Props) {
   const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchNFTData() {
@@ -105,6 +114,8 @@ export default function ({ network, id }: Props) {
     fetchNFTData();
     fetchTxnsCount();
     fetchHoldersCount();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);
 
   const onTab = (index: number) => {

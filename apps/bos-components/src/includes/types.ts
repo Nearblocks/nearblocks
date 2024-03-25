@@ -23,8 +23,6 @@ export type DeploymentsInfo = {
   block_timestamp: string;
   receipt_predecessor_account_id: string;
   transaction_hash: string;
-  createAction: { block_timestamp: string; transaction_hash: string };
-  updateAction: { block_timestamp: string; transaction_hash: string };
 };
 
 export type TokenInfo = {

@@ -24,23 +24,8 @@ interface Props {
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
-import {
-  yoctoToNear,
-  fiatValue,
-  nanoToMilli,
-  shortenAddress,
-  getConfig,
-  handleRateLimit,
-} from '@/includes/libs';
-import {
-  dollarFormat,
-  localFormat,
-  weight,
-  convertToUTC,
-} from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
 import TokenHoldings from '@/includes/Common/TokenHoldings';
-import { encodeArgs, decodeArgs } from '@/includes/near';
 import {
   SatsInfo,
   AccountInfo,
@@ -68,6 +53,26 @@ const tabs = [
 ];
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const {
+    yoctoToNear,
+    fiatValue,
+    nanoToMilli,
+    shortenAddress,
+    getConfig,
+    handleRateLimit,
+  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+
+  const { encodeArgs, decodeArgs } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const {
     network,
     t,
@@ -102,7 +107,7 @@ export default function (props: Props) {
     {} as ContractParseInfo,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
@@ -264,6 +269,7 @@ export default function (props: Props) {
     fetchContractData();
     fetchTokenData();
     fetchInventoryData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
 
   useEffect(() => {
@@ -390,6 +396,7 @@ export default function (props: Props) {
     }
 
     loadBalances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, config?.rpcUrl]);
 
   useEffect(() => {
@@ -513,6 +520,7 @@ export default function (props: Props) {
 
       setContract({ ...code, locked });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, key, config?.backendUrl, id]);
 
   const handleFilter = (name: string, value: string) => {

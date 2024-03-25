@@ -1,6 +1,11 @@
-import { shortenAddress } from '@/includes/libs';
 import { ActionPropsInfo } from '@/includes/types';
 const CreateAccount = (props: ActionPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { shortenAddress } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
   const FaRight = (props: { className: string }) => {
     return (
       <svg

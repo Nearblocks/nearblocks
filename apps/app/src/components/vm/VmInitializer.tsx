@@ -29,6 +29,7 @@ import {
 } from 'near-social-vm';
 import React, { useCallback, useEffect, useState } from 'react';
 import Big from 'big.js';
+import { sanitizeUrl } from '@braintree/sanitize-url';
 import { useEthersProviderContext } from '@/data/web3';
 import { useAuthStore } from '@/stores/auth';
 import { useVmStore } from '@/stores/vm';
@@ -80,9 +81,9 @@ export default function VmInitializer() {
           ],
         }),
         customElements: {
-          Link: (props: any) => {
-            return <Link {...props} />;
-          },
+          Link: ({ href, to, ...rest }: any) => (
+            <Link href={sanitizeUrl(href ?? to)} {...rest} />
+          ),
         },
       });
   }, [initNear]);

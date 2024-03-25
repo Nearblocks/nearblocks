@@ -1,9 +1,18 @@
-import { shortenHex } from '@/includes/formats';
 import FaCoins from '@/includes/icons/FaCoins';
-import { yoctoToNear } from '@/includes/libs';
 import { TransactionActionInfo } from '@/includes/types';
 
 const Stake = (props: TransactionActionInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { yoctoToNear } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { shortenHex } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
   const { t, args } = props;
 
   return (

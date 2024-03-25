@@ -10,10 +10,7 @@
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { dollarFormat, localFormat } from '@/includes/formats';
 import FaAddressBook from '@/includes/icons/FaAddressBook';
-import { getConfig, handleRateLimit } from '@/includes/libs';
-import { decodeArgs, encodeArgs } from '@/includes/near';
 import {
   FtInfo,
   FtsInfo,
@@ -28,13 +25,28 @@ interface Props {
 }
 
 export default function ({ network, id, tokenFilter }: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { dollarFormat, localFormat } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
+  const { decodeArgs, encodeArgs } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.near`,
+  );
+
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [inventoryData, setInventoryData] = useState<InventoryInfo>(
     {} as InventoryInfo,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchInventoryData() {
@@ -65,7 +77,10 @@ export default function ({ network, id, tokenFilter }: Props) {
         )
         .catch(() => {});
     }
+
     fetchInventoryData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, tokenFilter]);
 
   useEffect(() => {
@@ -176,6 +191,8 @@ export default function ({ network, id, tokenFilter }: Props) {
     }
 
     loadBalances();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, tokenFilter, config?.rpcUrl]);
 
   const filterToken: TokenListInfo = ft?.tokens?.length

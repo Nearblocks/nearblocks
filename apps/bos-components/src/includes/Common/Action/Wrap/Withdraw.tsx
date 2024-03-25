@@ -1,7 +1,13 @@
-import { getConfig } from '@/includes/libs';
 import { EventPropsInfo } from '@/includes/types';
 
 const Withdraw = (props: EventPropsInfo) => {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -18,7 +24,9 @@ const Withdraw = (props: EventPropsInfo) => {
       </svg>
     );
   };
-  const config = getConfig(props.network);
+
+  const config = getConfig && getConfig(props.network);
+
   const log = props.event.logs?.match(/^Withdraw (\d+) NEAR from ([\S]+)/);
 
   if (log?.length !== 3) return null;

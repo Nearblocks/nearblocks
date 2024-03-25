@@ -9,8 +9,6 @@
  * @param {number} [limit] - The maximum number of comments to display.
  */
 
-import { getConfig } from '@/includes/libs';
-
 interface Props {
   network: string;
   path: string;
@@ -18,8 +16,17 @@ interface Props {
 }
 
 export default function (props: Props) {
+  const networkAccountId =
+    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+
+  const { getConfig } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const [content, setContent] = useState('');
-  const config = getConfig(props.network);
+
+  const config = getConfig && getConfig(props.network);
+
   const path = props.path;
   const index = {
     action: 'post',
