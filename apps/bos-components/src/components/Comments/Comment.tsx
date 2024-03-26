@@ -11,6 +11,7 @@
  * @param {Object} post.image - The image object associated with the post.
  * @param {string} post.image.ipfs_cid - The IPFS CID of the image.
  * @param {string} post.image.url - The URL of the image.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

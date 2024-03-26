@@ -7,6 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [path] - The path identifier passed as a string.
  * @param {number} [limit] - The maximum number of comments to display.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

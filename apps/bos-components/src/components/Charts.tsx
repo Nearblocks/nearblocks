@@ -8,6 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
  * @param {boolean} [poweredBy] - Powered by attribution
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

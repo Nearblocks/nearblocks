@@ -9,6 +9,7 @@
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
  * @param {ReceiptsPropsInfo} [receipt] -  receipt of the transaction.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

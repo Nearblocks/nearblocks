@@ -8,6 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {AccountContractInfo} [accessKey] - Key-value pairs for Accesskey info
  * @param {boolean} [showWhen] - Controls whether to show the date and time in UTC format or as a time ago string.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

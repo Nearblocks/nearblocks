@@ -4,6 +4,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
  * @param {{ push: (path: string) => void }} router - An object with a `push` function for routing purposes.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

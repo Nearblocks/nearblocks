@@ -10,6 +10,7 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 interface Props {
   ownerID: string;

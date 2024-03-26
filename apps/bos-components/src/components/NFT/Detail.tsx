@@ -8,6 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tid] - The nf token identifier passed as a string
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';

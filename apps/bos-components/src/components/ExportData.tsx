@@ -8,6 +8,7 @@
  * @param {string} [id] - The account identifier passed as a string.
  * @param {function} [onHandleDowload] - function to handle the download.
  * @param {string} [exportType] - Type of data to be exported, available options are (transactions, ft and nft token transaction)
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

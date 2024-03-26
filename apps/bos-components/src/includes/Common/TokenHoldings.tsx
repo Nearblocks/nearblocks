@@ -8,6 +8,7 @@
  * @param {string} [ft.amount] -  amount in USD of tokens.
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { InventoryInfo, TokenListInfo } from '@/includes/types';

@@ -11,8 +11,7 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
-
-
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

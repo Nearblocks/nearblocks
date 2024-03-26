@@ -10,6 +10,7 @@
  * @param {object} [method] - Object containing information about the abi contract functions.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {object} [schema] - Object containing information about the near abi contract.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

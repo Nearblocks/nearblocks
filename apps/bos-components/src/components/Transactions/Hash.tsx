@@ -11,6 +11,7 @@
  *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
  * @param {string} [pageTab] - The page tab being displayed. (Optional)
  *                                 Example: If provided, tab=overview in the url it will select the overview tab of transaction details.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

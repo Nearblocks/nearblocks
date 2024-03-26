@@ -11,6 +11,7 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

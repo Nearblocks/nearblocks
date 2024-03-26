@@ -7,6 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tokenFilter] - The token filter identifier passed as a string
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';

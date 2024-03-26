@@ -10,6 +10,7 @@
  * @param {number} [index] - The position index of the contract method.
  * @param {string} [method] - Specifies the method name for the contract.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

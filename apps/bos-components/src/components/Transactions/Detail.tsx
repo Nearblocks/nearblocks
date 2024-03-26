@@ -9,6 +9,7 @@
  * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

@@ -7,6 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The block identifier passed as a string.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 
 interface Props {

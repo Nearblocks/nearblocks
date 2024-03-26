@@ -13,6 +13,7 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerID - The identifier of the owner of the component.
  */
 interface Props {
   ownerID: string;
