@@ -8,11 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {AccountContractInfo} [accessKey] - Key-value pairs for Accesskey info
  * @param {boolean} [showWhen] - Controls whether to show the date and time in UTC format or as a time ago string.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   accessKey: AccountContractInfo;
@@ -21,12 +21,12 @@ interface Props {
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
 
-export default function ({ network, t, accessKey, showWhen, ownerID }: Props) {
+export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, capitalizeWords } =
-    VM.require(`${ownerID}/widget/includes.Utils.formats`);
+    VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, yoctoToNear } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);

@@ -8,7 +8,7 @@
  * @param {string} [ft.amount] -  amount in USD of tokens.
  * @param {Object[]} [ft.tokens] - Array containing 'TokenListInfo' objects, providing information about individual token details.
  * @param {string} [appUrl] - The URL of the application.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { InventoryInfo, TokenListInfo } from '@/includes/types';
@@ -23,16 +23,16 @@ interface Props {
     tokens: TokenListInfo[];
   };
   appUrl?: string;
-  ownerID: string;
+  ownerId: string;
 }
 
 const TokenHoldings = (props: Props) => {
   const { dollarFormat, localFormat } = VM.require(
-    `${props.ownerID}/widget/includes.Utils.formats`,
+    `${props.ownerId}/widget/includes.Utils.formats`,
   );
 
   const { truncateString } = VM.require(
-    `${props.ownerID}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const Loading = (props: { className: string }) => {

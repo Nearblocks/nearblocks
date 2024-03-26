@@ -7,10 +7,10 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   id: string;
   token?: Token;
@@ -18,13 +18,13 @@ interface Props {
 
 import { Token } from '@/includes/types';
 
-export default function ({ token, id, network, ownerID }: Props) {
+export default function ({ token, id, network, ownerId }: Props) {
   const { localFormat, dollarNonCentFormat } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [tokens, setTokens] = useState<Token>({} as Token);

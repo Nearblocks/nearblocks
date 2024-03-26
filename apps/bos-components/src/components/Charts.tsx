@@ -8,13 +8,13 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
  * @param {boolean} [poweredBy] - Powered by attribution
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   chartTypes: string;
   poweredBy?: boolean;
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
 }
@@ -23,9 +23,9 @@ import Skeleton from '@/includes/Common/Skeleton';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { t, ownerID, network, chartTypes, poweredBy } = props;
+  const { t, ownerId, network, chartTypes, poweredBy } = props;
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);

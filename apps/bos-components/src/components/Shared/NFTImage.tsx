@@ -39,9 +39,9 @@ export default function ({
   reference,
   className,
   network,
-  ownerID,
+  ownerId,
 }: NFTImageProps) {
-  const { getConfig } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [src, setSrc] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);

@@ -11,11 +11,11 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string;
   id: string;
@@ -37,20 +37,20 @@ export default function ({
   id,
   filters,
   onFilterClear,
-  ownerID,
+  ownerId,
 }: Props) {
   const {
     capitalizeFirstLetter,
     formatTimestampToString,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { tokenAmount } = VM.require(`${ownerID}/widget/includes.Utils.near`);
+  const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
@@ -499,7 +499,7 @@ export default function ({
         </div>
       )}
       <Widget
-        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

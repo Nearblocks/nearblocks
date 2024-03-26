@@ -8,7 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tid] - The nf token identifier passed as a string
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -19,16 +19,16 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { Token } from '@/includes/types';
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
 }
 
-export default function ({ network, t, id, tid, ownerID }: Props) {
+export default function ({ network, t, id, tid, ownerId }: Props) {
   const { getConfig, handleRateLimit, shortenAddress } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [indices, setIndices] = useState<number[]>([1, 2]);
@@ -85,14 +85,14 @@ export default function ({ network, t, id, tid, ownerID }: Props) {
           <div className="bg-white border rounded-xl soft-shadow p-3 aspect-square">
             {
               <Widget
-                src={`${ownerID}/widget/bos-components.components.Shared.NFTImage`}
+                src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                 props={{
                   base: token?.nft?.base_uri,
                   media: token?.media,
                   reference: token?.reference,
                   className: 'rounded max-h-full',
                   network: network,
-                  ownerID,
+                  ownerId,
                 }}
               />
             }
@@ -289,13 +289,13 @@ export default function ({ network, t, id, tid, ownerID }: Props) {
           <div className="bg-white soft-shadow rounded-xl pb-1">
             {
               <Widget
-                src={`${ownerID}/widget/bos-components.components.NFT.TokenTransfers`}
+                src={`${ownerId}/widget/bos-components.components.NFT.TokenTransfers`}
                 props={{
                   network: network,
                   t: t,
                   id: id,
                   tid: tid,
-                  ownerID,
+                  ownerId,
                 }}
               />
             }

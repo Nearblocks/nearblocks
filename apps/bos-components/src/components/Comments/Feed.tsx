@@ -7,11 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [path] - The path identifier passed as a string.
  * @param {number} [limit] - The maximum number of comments to display.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   path: string;
   limit: number;
@@ -60,11 +60,11 @@ export default function (props: Props) {
     item.value.type === 'md' && (
       <div key={JSON.stringify(item)} className="">
         <Widget
-          src={`${props.ownerID}/widget/bos-components.components.Comments.Comment`}
+          src={`${props.ownerId}/widget/bos-components.components.Comments.Comment`}
           props={{
             accountId: item.accountId,
             blockHeight: item.blockHeight,
-            ownerId: props.ownerID,
+            ownerId: props.ownerId,
             post: item.value.post,
           }}
         />
@@ -76,7 +76,7 @@ export default function (props: Props) {
       <div className="border-b">
         {
           <Widget
-            src={`${props.ownerID}/widget/bos-components.components.Comments.InputField`}
+            src={`${props.ownerId}/widget/bos-components.components.Comments.InputField`}
             props={{
               onChange: onChange,
               composeButton: (onCompose: () => void) => (
@@ -130,7 +130,7 @@ export default function (props: Props) {
           <div className="px-3 pb-2">
             {
               <Widget
-                src={`${props.ownerID}/widget/bos-components.components.Comments.List`}
+                src={`${props.ownerId}/widget/bos-components.components.Comments.List`}
                 props={{
                   index,
                   renderItem,

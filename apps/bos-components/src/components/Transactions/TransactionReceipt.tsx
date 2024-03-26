@@ -17,7 +17,7 @@ export default function (props: TransactionReceiptInfo) {
     expandAll,
     convertionReceipt,
     className,
-    ownerID,
+    ownerId,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -61,7 +61,7 @@ export default function (props: TransactionReceiptInfo) {
 
         {lastFellowOutgoingReceipt ? (
           <Widget
-            src={`${ownerID}/widget/bos-components.components.Transactions.TransactionReceipt`}
+            src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
             props={{
               network: network,
               t,
@@ -70,7 +70,7 @@ export default function (props: TransactionReceiptInfo) {
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
               className: 'pb-5 !mt-0',
-              ownerID,
+              ownerId,
             }}
           />
         ) : null}
@@ -79,14 +79,14 @@ export default function (props: TransactionReceiptInfo) {
             receipt?.actions.map((action: any, index: number) => (
               <Widget
                 key={`${action.kind}_${index}`}
-                src={`${ownerID}/widget/bos-components.components.Transactions.ReceiptKind`}
+                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
                 props={{
                   network: network,
                   t,
                   action: action,
                   onClick: switchActiveTxType,
                   isTxTypeActive: isTxTypeActive,
-                  ownerID,
+                  ownerId,
                 }}
               />
             ))}
@@ -94,12 +94,12 @@ export default function (props: TransactionReceiptInfo) {
         {isTxTypeActive ? (
           <div className="border-l border-black ml-2.5">
             <Widget
-              src={`${ownerID}/widget/bos-components.components.Transactions.ReceiptInfo`}
+              src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
               props={{
                 network: network,
                 t,
                 receipt: receipt,
-                ownerID,
+                ownerId,
               }}
             />
           </div>
@@ -114,7 +114,7 @@ export default function (props: TransactionReceiptInfo) {
       </div>
       {lastNonRefundNestedReceipt ? (
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Transactions.TransactionReceipt`}
+          src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
           props={{
             network: network,
             t: t,
@@ -123,7 +123,7 @@ export default function (props: TransactionReceiptInfo) {
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
             className: '!pl-0 border-transparent',
-            ownerID,
+            ownerId,
           }}
         />
       ) : null}

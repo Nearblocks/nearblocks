@@ -9,11 +9,11 @@
  * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   loading: boolean;
@@ -41,7 +41,7 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { loading, txn, network, t, rpcTxn, ownerID } = props;
+  const { loading, txn, network, t, rpcTxn, ownerId } = props;
 
   const {
     convertToMetricPrefix,
@@ -52,7 +52,7 @@ export default function (props: Props) {
     localFormat,
     shortenToken,
     shortenTokenSymbol,
-  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const {
     fiatValue,
@@ -61,10 +61,10 @@ export default function (props: Props) {
     nanoToMilli,
     shortenAddress,
     yoctoToNear,
-  } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
-    `${ownerID}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
 
   const [isContract, setIsContract] = useState(false);
@@ -842,7 +842,7 @@ export default function (props: Props) {
                                 <a>
                                   {
                                     <Widget
-                                      src={`${ownerID}/widget/bos-components.components.Shared.NFTImage`}
+                                      src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                                       props={{
                                         base: nft?.nft_meta?.base_uri,
                                         media: nft?.nft_token_meta?.media,
@@ -852,7 +852,7 @@ export default function (props: Props) {
                                         alt: nft?.nft_token_meta?.title,
                                         className: 'max-h-full rounded',
                                         network: network,
-                                        ownerID,
+                                        ownerId,
                                       }}
                                     />
                                   }

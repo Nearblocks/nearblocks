@@ -6,11 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string, options?: { days?: number }) => string | undefined;
 }
@@ -23,16 +23,16 @@ import {
   ChartSeriesInfo,
 } from '@/includes/types';
 
-export default function ({ network, t, ownerID }: Props) {
+export default function ({ network, t, ownerId }: Props) {
   const { currency, dollarFormat, formatCustomDate, localFormat } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { gasPrice } = VM.require(`${ownerID}/widget/includes.Utils.near`);
+  const { gasPrice } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);

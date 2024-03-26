@@ -10,7 +10,7 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -18,7 +18,7 @@ import Clock from '@/includes/icons/Clock';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (
     key: string,
@@ -28,17 +28,17 @@ interface Props {
   setPage: (page: number) => void;
 }
 
-export default function ({ currentPage, setPage, t, network, ownerID }: Props) {
+export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
   const {
     convertToMetricPrefix,
     formatTimestampToString,
     gasFee,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
-    VM.require(`${ownerID}/widget/includes.Utils.libs`);
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -350,7 +350,7 @@ export default function ({ currentPage, setPage, t, network, ownerID }: Props) {
       )}
       {
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: blocks[currentPage],

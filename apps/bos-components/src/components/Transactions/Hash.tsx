@@ -11,11 +11,11 @@
  *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
  * @param {string} [pageTab] - The page tab being displayed. (Optional)
  *                                 Example: If provided, tab=overview in the url it will select the overview tab of transaction details.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   hash: string;
@@ -30,10 +30,10 @@ import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 const hashes = ['overview', 'execution', 'comments'];
 
 export default function (props: Props) {
-  const { t, network, hash, onHandleTab, pageTab, ownerID } = props;
+  const { t, network, hash, onHandleTab, pageTab, ownerId } = props;
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -217,14 +217,14 @@ export default function (props: Props) {
             <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
               {
                 <Widget
-                  src={`${ownerID}/widget/bos-components.components.Transactions.Detail`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
                   props={{
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
                     network: network,
                     t: t,
-                    ownerID,
+                    ownerId,
                   }}
                 />
               }
@@ -233,28 +233,28 @@ export default function (props: Props) {
               <div className={`${isToggle ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${ownerID}/widget/bos-components.components.Transactions.Execution`}
+                    src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
                     props={{
                       network: network,
                       t: t,
                       txn: txn,
                       rpcTxn: rpcTxn,
                       loading: isLoading,
-                      ownerID,
+                      ownerId,
                     }}
                   />
                 }
               </div>
               <div className={`${isToggle ? 'hidden' : ''} `}>
                 <Widget
-                  src={`${ownerID}/widget/bos-components.components.Transactions.Receipt`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
                   props={{
                     network: network,
                     t: t,
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
-                    ownerID,
+                    ownerId,
                   }}
                 />
               </div>
@@ -263,12 +263,12 @@ export default function (props: Props) {
               <div className="py-3">
                 {
                   <Widget
-                    src={`${ownerID}/widget/bos-components.components.Comments.Feed`}
+                    src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
                     props={{
                       network: network,
                       path: `nearblocks.io/txns/${hash}`,
                       limit: 10,
-                      ownerID,
+                      ownerId,
                     }}
                   />
                 }

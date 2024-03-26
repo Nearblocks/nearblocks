@@ -8,11 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
@@ -22,10 +22,10 @@ interface Props {
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, rpcTxn, txn, t, ownerID } = props;
+  const { network, rpcTxn, txn, t, ownerId } = props;
 
   const { mapRpcActionToAction } = VM.require(
-    `${ownerID}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
   const [receipt, setReceipt] = useState(null);
 
@@ -102,13 +102,13 @@ export default function (props: Props) {
     <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       {
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Transactions.ReceiptRow`}
+          src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
           props={{
             txn: txn,
             receipt: receipt,
             network: network,
             t: t,
-            ownerID,
+            ownerId,
           }}
         />
       }

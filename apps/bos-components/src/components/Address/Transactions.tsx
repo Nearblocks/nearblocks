@@ -13,11 +13,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   id: string;
@@ -37,7 +37,7 @@ import { TransactionInfo } from '@/includes/types';
 
 export default function ({
   network,
-  ownerID,
+  ownerId,
   t,
   id,
   filters,
@@ -49,12 +49,12 @@ export default function ({
     formatTimestampToString,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, isAction, nanoToMilli, yoctoToNear } =
-    VM.require(`${ownerID}/widget/includes.Utils.libs`);
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
-  const { txnMethod } = VM.require(`${ownerID}/widget/includes.Utils.near`);
+  const { txnMethod } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -710,7 +710,7 @@ export default function ({
       )}
       {
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

@@ -12,7 +12,7 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -22,20 +22,20 @@ import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
 }
 
-export default function ({ network, t, id, tid, ownerID }: Props) {
+export default function ({ network, t, id, tid, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -440,7 +440,7 @@ export default function ({ network, t, id, tid, ownerID }: Props) {
         </div>
       )}
       <Widget
-        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

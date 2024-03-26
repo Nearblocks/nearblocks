@@ -7,11 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The account identifier passed as a string.
  * @param {ContractInfo} [contract] - Object containing information about the associated contract.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   id: string;
   contract: ContractInfo;
@@ -21,14 +21,14 @@ import Question from '@/includes/icons/Question';
 import { ContractInfo, DeploymentsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, id, contract, ownerID } = props;
+  const { network, id, contract, ownerId } = props;
 
   const { convertToUTC } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [deploymentData, setDeploymentData] = useState<DeploymentsInfo[]>([]);

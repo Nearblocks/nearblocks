@@ -10,11 +10,11 @@
  * @param {number} [index] - The position index of the contract method.
  * @param {string} [method] - Specifies the method name for the contract.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   id: string;
   connected: boolean;
@@ -31,13 +31,13 @@ import { FieldType } from '@/includes/types';
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
 
 export default function (props: Props) {
-  const { network, id, index, method, connected, accountId, ownerID } = props;
+  const { network, id, index, method, connected, accountId, ownerId } = props;
   const { capitalize, toSnakeCase } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, isJson, mapFeilds, uniqueId } =
-    VM.require(`${ownerID}/widget/includes.Utils.libs`);
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const field = () => ({
     id: uniqueId(),

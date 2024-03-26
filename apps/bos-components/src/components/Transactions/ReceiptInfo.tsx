@@ -7,11 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {ReceiptsPropsInfo | any} [receipt] -  receipt of the transaction.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: ReceiptsPropsInfo | any;
@@ -20,13 +20,13 @@ interface Props {
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { receipt, network, ownerID } = props;
+  const { receipt, network, ownerId } = props;
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const { convertToMetricPrefix } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const hashes = ['output', 'inspect'];

@@ -8,14 +8,14 @@
  * @param {string} [id] - The account identifier passed as a string.
  * @param {function} [onHandleDowload] - function to handle the download.
  * @param {string} [exportType] - Type of data to be exported, available options are (transactions, ft and nft token transaction)
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   network: string;
   id: string;
   onHandleDowload: (blobUrl: string, file: string) => void;
-  ownerID: string;
+  ownerId: string;
   exportType: string;
 }
 
@@ -40,10 +40,10 @@ export default function ({
   id,
   onHandleDowload,
   exportType,
-  ownerID,
+  ownerId,
 }: Props) {
   const { getConfig, handleRateLimit } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);

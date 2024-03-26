@@ -14,11 +14,11 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
@@ -45,7 +45,7 @@ export default function (props: Props) {
     connected,
     accountId,
     logOut,
-    ownerID,
+    ownerId,
   } = props;
 
   const [pageTab, setPageTab] = useState('Contract Info');
@@ -87,13 +87,13 @@ export default function (props: Props) {
       <Tabs.Content value={tabs[0]}>
         {
           <Widget
-            src={`${ownerID}/widget/bos-components.components.Contract.Info`}
+            src={`${ownerId}/widget/bos-components.components.Contract.Info`}
             props={{
               network: network,
               t: t,
               id: id,
               contract: contract,
-              ownerID,
+              ownerId,
             }}
           />
         }
@@ -156,7 +156,7 @@ export default function (props: Props) {
             {schema?.body?.functions?.map((func: any, index: number) => (
               <Widget
                 key={index}
-                src={`${ownerID}/widget/bos-components.components.Contract.ViewOrChangeAbi`}
+                src={`${ownerId}/widget/bos-components.components.Contract.ViewOrChangeAbi`}
                 props={{
                   network: network,
                   t: t,
@@ -167,7 +167,7 @@ export default function (props: Props) {
                   connected: connected,
                   accountId: accountId,
                   schema: schema,
-                  ownerID,
+                  ownerId,
                 }}
               />
             ))}
@@ -182,7 +182,7 @@ export default function (props: Props) {
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <Widget
                   key={index}
-                  src={`${ownerID}/widget/bos-components.components.Contract.ViewOrChange`}
+                  src={`${ownerId}/widget/bos-components.components.Contract.ViewOrChange`}
                   props={{
                     network: network,
                     t: t,
@@ -192,7 +192,7 @@ export default function (props: Props) {
                     method: method,
                     connected: connected,
                     accountId: accountId,
-                    ownerID,
+                    ownerId,
                   }}
                 />
               ))}

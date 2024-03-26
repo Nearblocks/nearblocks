@@ -4,11 +4,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
  * @param {{ push: (path: string) => void }} router - An object with a `push` function for routing purposes.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   isHeader?: boolean;
@@ -25,14 +25,14 @@ export default function SearchBar({
   t,
   network,
   router,
-  ownerID,
+  ownerId,
 }: Props) {
   const { localFormat, shortenHex } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { debounce, getConfig, shortenAddress } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);

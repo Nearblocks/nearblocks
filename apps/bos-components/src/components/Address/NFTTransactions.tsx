@@ -13,11 +13,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   id: string;
@@ -37,17 +37,17 @@ import TokenImage from '@/includes/icons/TokenImage';
 import Download from '@/includes/icons/Download';
 
 export default function (props: Props) {
-  const { network, t, id, filters, handleFilter, onFilterClear, ownerID } =
+  const { network, t, id, filters, handleFilter, onFilterClear, ownerId } =
     props;
   const {
     localFormat,
     getTimeAgoString,
     formatTimestampToString,
     capitalizeFirstLetter,
-  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -704,7 +704,7 @@ export default function (props: Props) {
       )}
       {
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

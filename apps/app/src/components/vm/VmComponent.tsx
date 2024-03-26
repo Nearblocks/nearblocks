@@ -32,7 +32,7 @@ export function VmComponent(props: Props) {
       onChangeHeightCalled.current = true;
     }
   }, [showLoader, onChangeHeight]);
-  const hostedAccountID = process.env.NEXT_PUBLIC_ACCOUNT_ID;
+  const ownerId = process.env.NEXT_PUBLIC_ACCOUNT_ID;
   return (
     <>
       {showLoader && skeleton}
@@ -45,7 +45,7 @@ export function VmComponent(props: Props) {
               redirectMap: redirectMapStore.redirectMap,
             }}
             {...props}
-            props={{ ownerID: hostedAccountID, ...props.props }}
+            props={{ ownerId: ownerId, ...props.props }}
           />
         </EthersProvider>
       )}

@@ -10,10 +10,10 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
- * @param {string} ownerID - The identifier of the owner of the component.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
-  ownerID: string;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   currentPage: number;
@@ -34,13 +34,13 @@ const initialPagination = {
   per_page: 50,
 };
 
-export default function ({ network, currentPage, setPage, t, ownerID }: Props) {
+export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
   const { localFormat, serialNumber } = VM.require(
-    `${ownerID}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { debounce, getConfig, handleRateLimit } = VM.require(
-    `${ownerID}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [searchResults, setSearchResults] = useState<Token[]>([]);
@@ -325,7 +325,7 @@ export default function ({ network, currentPage, setPage, t, ownerID }: Props) {
           </div>
         </div>
         <Widget
-          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],
