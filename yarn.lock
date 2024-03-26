@@ -1589,7 +1589,7 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
-"@braintree/sanitize-url@^7.0.1":
+"@braintree/sanitize-url@7.0.1":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-7.0.1.tgz#457233b0a18741b7711855044102b82bae7a070b"
   integrity sha512-URg8UM6lfC9ZYqFipItRSxYJdgpU5d2Z4KnjsJ+rj6tgAmGme7E+PQNCiud8g0HDaZKMovu2qjfa0f5Ge0Vlsg==
@@ -3561,14 +3561,6 @@
     "@near-snap/sdk" "0.6.0"
     "@near-wallet-selector/core" "8.9.3"
     is-mobile "4.0.0"
-
-"@near-wallet-selector/near-wallet@8.9.3":
-  version "8.9.3"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/near-wallet/-/near-wallet-8.9.3.tgz#3a808d6ad000053e2bc5f6de4057611f3ba850c1"
-  integrity sha512-1eVCoJ0L+DjmlinTKe664cXHDZbV+r5BE1sCxJvSlcYCIw8HKXZfllmEXAKDONHsC+2MdSifWeBnX9cuQAuqeQ==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.3"
-    "@near-wallet-selector/my-near-wallet" "8.9.3"
 
 "@near-wallet-selector/nearfi@8.9.3":
   version "8.9.3"
@@ -12232,6 +12224,68 @@ near-social-vm-types@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/near-social-vm-types/-/near-social-vm-types-1.0.0.tgz#721494a863d2c0d64da2a43d80224e4080b690db"
   integrity sha512-K5CxfiiKc7evzFb/1BGBOD2x4QqnEBuVaHkgRsRTGv02ctLkxA/Xf892SornWSkD75Hf0s9j/jeM5PpMfXcM9A==
+
+"near-social-vm@github:NearSocial/VM#2.5.5":
+  version "2.5.5"
+  resolved "https://codeload.github.com/NearSocial/VM/tar.gz/d8eb1674cca9aa3350583d40b8a46a74dbbc4ac6"
+  dependencies:
+    "@radix-ui/react-accordion" "^1.1.1"
+    "@radix-ui/react-alert-dialog" "^1.0.3"
+    "@radix-ui/react-aspect-ratio" "^1.0.2"
+    "@radix-ui/react-avatar" "^1.0.2"
+    "@radix-ui/react-checkbox" "^1.0.3"
+    "@radix-ui/react-collapsible" "^1.0.2"
+    "@radix-ui/react-context-menu" "^2.1.3"
+    "@radix-ui/react-dialog" "^1.0.3"
+    "@radix-ui/react-dropdown-menu" "^2.0.4"
+    "@radix-ui/react-hover-card" "^1.0.5"
+    "@radix-ui/react-label" "^2.0.1"
+    "@radix-ui/react-menubar" "^1.0.2"
+    "@radix-ui/react-navigation-menu" "^1.1.2"
+    "@radix-ui/react-popover" "^1.0.5"
+    "@radix-ui/react-progress" "^1.0.2"
+    "@radix-ui/react-radio-group" "^1.1.2"
+    "@radix-ui/react-scroll-area" "^1.0.3"
+    "@radix-ui/react-select" "^1.2.1"
+    "@radix-ui/react-separator" "^1.0.2"
+    "@radix-ui/react-slider" "^1.1.1"
+    "@radix-ui/react-switch" "^1.0.2"
+    "@radix-ui/react-tabs" "^1.0.3"
+    "@radix-ui/react-toast" "^1.1.3"
+    "@radix-ui/react-toggle" "^1.0.2"
+    "@radix-ui/react-toggle-group" "^1.0.3"
+    "@radix-ui/react-toolbar" "^1.0.3"
+    "@radix-ui/react-tooltip" "^1.0.5"
+    acorn "^8.8.0"
+    acorn-jsx "^5.3.2"
+    big.js "^6.1.1"
+    bn.js "^5.1.1"
+    bootstrap "^5.2.1"
+    bootstrap-icons "^1.9.0"
+    collections "^5.1.12"
+    deep-equal "^2.2.0"
+    dompurify "^3.0.6"
+    elliptic "^6.5.4"
+    ethers "^5.7.2"
+    idb "^7.1.1"
+    iframe-resizer-react "^1.1.0"
+    local-storage "^2.0.0"
+    lodash.clonedeep "^4.5.0"
+    mdast-util-find-and-replace "^2.0.0"
+    nanoid "^4.0.1"
+    prettier "^2.7.1"
+    react-bootstrap "^2.5.0"
+    react-bootstrap-typeahead "^6.0.0"
+    react-error-boundary "^3.1.4"
+    react-files "^3.0.0-alpha.3"
+    react-infinite-scroller "^1.2.6"
+    react-markdown "^7.1.0"
+    react-singleton-hook "^3.1.1"
+    react-syntax-highlighter "^15.5.0"
+    react-uuid "^1.0.2"
+    remark-gfm "^3.0.1"
+    styled-components "^5.3.6"
+    tweetnacl "^1.0.3"
 
 "near-social-vm@github:NearSocial/VM#2.6.0":
   version "2.6.0"
