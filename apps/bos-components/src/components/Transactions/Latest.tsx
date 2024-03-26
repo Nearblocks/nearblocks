@@ -9,6 +9,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
 }
@@ -16,12 +17,9 @@ interface Props {
 import Skeleton from '@/includes/Common/Skeleton';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ t, network }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ t, network, ownerID }: Props) {
   const { getTimeAgoString, shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const {
@@ -30,7 +28,7 @@ export default function ({ t, network }: Props) {
     nanoToMilli,
     shortenAddress,
     yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);

@@ -19,6 +19,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   currentPage: number;
@@ -38,28 +39,6 @@ import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { txnMethod } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
-
-  const {
-    localFormat,
-    getTimeAgoString,
-    formatTimestampToString,
-    capitalizeFirstLetter,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
-
-  const {
-    getConfig,
-    handleRateLimit,
-    nanoToMilli,
-    truncateString,
-    yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
-
   const {
     network,
     currentPage,
@@ -68,7 +47,26 @@ export default function (props: Props) {
     handleFilter,
     onFilterClear,
     t,
+    ownerID,
   } = props;
+
+  const { txnMethod } = VM.require(`${ownerID}/widget/includes.Utils.near`);
+
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    truncateString,
+    yoctoToNear,
+  } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
@@ -677,7 +675,7 @@ export default function (props: Props) {
       )}
       {
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

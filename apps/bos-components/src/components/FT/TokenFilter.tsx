@@ -19,25 +19,21 @@ import {
 } from '@/includes/types';
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   tokenFilter?: string;
 }
 
-export default function ({ network, id, tokenFilter }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { dollarFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
-  );
+export default function ({ network, id, tokenFilter, ownerID }: Props) {
+  const { dollarFormat, localFormat } = VM.require(ownerID);
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const { decodeArgs, encodeArgs } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${ownerID}/widget/includes.Utils.near`,
   );
 
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);

@@ -17,6 +17,7 @@ import Clock from '@/includes/icons/Clock';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (
     key: string,
@@ -26,20 +27,17 @@ interface Props {
   setPage: (page: number) => void;
 }
 
-export default function ({ currentPage, setPage, t, network }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ currentPage, setPage, t, network, ownerID }: Props) {
   const {
     convertToMetricPrefix,
     formatTimestampToString,
     gasFee,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+    VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -351,7 +349,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: blocks[currentPage],

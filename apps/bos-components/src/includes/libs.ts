@@ -78,7 +78,6 @@ export function getConfig(network: string) {
   switch (network) {
     case 'mainnet':
       return {
-        ownerId: 'nearblocks.near',
         nodeUrl: 'https://rpc.mainnet.near.org',
         backendUrl: 'https://api3.nearblocks.io/v1/',
         rpcUrl: 'https://beta.rpc.mainnet.near.org',
@@ -86,7 +85,6 @@ export function getConfig(network: string) {
       };
     case 'testnet':
       return {
-        ownerId: 'nearblocks.testnet',
         nodeUrl: 'https://rpc.testnet.near.org',
         backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
         rpcUrl: 'https://beta.rpc.testnet.near.org/',

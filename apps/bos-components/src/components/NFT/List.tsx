@@ -13,6 +13,7 @@
 
  */
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   currentPage: number;
@@ -33,16 +34,13 @@ const initialPagination = {
   per_page: 50,
 };
 
-export default function ({ network, currentPage, setPage, t }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, currentPage, setPage, t, ownerID }: Props) {
   const { localFormat, serialNumber } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { debounce, getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [searchResults, setSearchResults] = useState<Token[]>([]);
@@ -327,7 +325,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
           </div>
         </div>
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

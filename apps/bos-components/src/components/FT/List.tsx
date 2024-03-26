@@ -12,6 +12,7 @@
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string, options?: { count?: number }) => string | undefined;
   currentPage: number;
@@ -32,15 +33,12 @@ const initialSorting: Sorting = {
 const initialPagination = {
   per_page: 50,
 };
-export default function ({ t, network, currentPage, setPage }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ t, network, currentPage, setPage, ownerID }: Props) {
   const { localFormat, dollarFormat, dollarNonCentFormat, serialNumber } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+    VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { debounce, getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [searchResults, setSearchResults] = useState<Token[]>([]);
@@ -474,7 +472,7 @@ export default function ({ t, network, currentPage, setPage }: Props) {
         </div>
       </div>
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: tokens[currentPage],

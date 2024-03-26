@@ -20,16 +20,9 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 export default function (props: ReceiptKindInfo) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { network, t, action, onClick, isTxTypeActive, ownerID } = props;
 
-  const { getConfig, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
-
-  const { network, t, action, onClick, isTxTypeActive } = props;
-
-  const config = getConfig && getConfig(network);
+  const { yoctoToNear } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const args = action.args.args;
   const decodedArgs = args ? Buffer.from(args, 'base64') : null;
@@ -121,12 +114,13 @@ export default function (props: ReceiptKindInfo) {
               .map((subaction) => (
                 <Widget
                   key={subaction.delegateIndex}
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
+                  src={`${ownerID}/widget/bos-components.components.Transactions.ReceiptKind`}
                   props={{
                     network: network,
                     t: t,
                     action: subaction,
                     isTxTypeActive: true,
+                    ownerID,
                   }}
                 />
               ))}

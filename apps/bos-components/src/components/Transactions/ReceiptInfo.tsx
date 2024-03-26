@@ -10,6 +10,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: ReceiptsPropsInfo | any;
@@ -18,18 +19,15 @@ interface Props {
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+  const { receipt, network, ownerID } = props;
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const { convertToMetricPrefix } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
-  const { receipt, network } = props;
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const onTab = (index: number) => {

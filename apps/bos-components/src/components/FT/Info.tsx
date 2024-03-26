@@ -9,6 +9,7 @@
  * @param {Token} [token] - The Token type passed as object
  */
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   token?: Token;
@@ -16,16 +17,13 @@ interface Props {
 
 import { Token } from '@/includes/types';
 
-export default function ({ token, id, network }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ token, id, network, ownerID }: Props) {
   const { localFormat, dollarNonCentFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [tokens, setTokens] = useState<Token>({} as Token);

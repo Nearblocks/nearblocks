@@ -13,6 +13,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   connected: boolean;
@@ -29,15 +30,13 @@ import { FieldType } from '@/includes/types';
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+  const { network, id, index, method, connected, accountId, ownerID } = props;
   const { capitalize, toSnakeCase } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, isJson, mapFeilds, uniqueId } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+    VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const field = () => ({
     id: uniqueId(),
@@ -65,7 +64,6 @@ export default function (props: Props) {
     return isNaN(Number(data)) ? typeof data : 'number';
   };
 
-  const { network, id, index, method, connected, accountId } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);

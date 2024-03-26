@@ -10,6 +10,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   contract: ContractInfo;
@@ -19,18 +20,16 @@ import Question from '@/includes/icons/Question';
 import { ContractInfo, DeploymentsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { network, id, contract, ownerID } = props;
 
   const { convertToUTC } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
-  const { network, id, contract } = props;
   const [deploymentData, setDeploymentData] = useState<DeploymentsInfo[]>([]);
   const [loading, setLoading] = useState(false);
 

@@ -22,18 +22,16 @@ interface Props {
     tokens: TokenListInfo[];
   };
   appUrl?: string;
+  ownerID: string;
 }
 
 const TokenHoldings = (props: Props) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { dollarFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${props.ownerID}/widget/includes.Utils.formats`,
   );
 
   const { truncateString } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerID}/widget/includes.Utils.libs`,
   );
 
   const Loading = (props: { className: string }) => {

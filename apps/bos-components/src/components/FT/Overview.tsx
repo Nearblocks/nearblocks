@@ -15,6 +15,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string;
   id: string;
@@ -36,16 +37,14 @@ export default function ({
   tokenFilter,
   filters,
   onFilterClear,
+  ownerID,
 }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { dollarFormat, dollarNonCentFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const tabs = [
@@ -452,11 +451,12 @@ export default function ({
         <div className="py-6"></div>
         {tokenFilter && (
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.FT.TokenFilter`}
+            src={`${ownerID}/widget/bos-components.components.FT.TokenFilter`}
             props={{
               network: network,
               id: id,
               tokenFilter: tokenFilter,
+              ownerID,
             }}
           />
         )}
@@ -483,13 +483,14 @@ export default function ({
               <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Transfers`}
+                    src={`${ownerID}/widget/bos-components.components.FT.Transfers`}
                     props={{
                       network: network,
                       id: id,
                       t: t,
                       filters: filters,
                       onFilterClear: onFilterClear,
+                      ownerID,
                     }}
                   />
                 }
@@ -497,11 +498,12 @@ export default function ({
               <div className={`${pageTab === 'Holders' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Holders`}
+                    src={`${ownerID}/widget/bos-components.components.FT.Holders`}
                     props={{
                       network: network,
                       id: id,
                       token: token,
+                      ownerID,
                     }}
                   />
                 }
@@ -509,11 +511,12 @@ export default function ({
               <div className={`${pageTab === 'Info' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Info`}
+                    src={`${ownerID}/widget/bos-components.components.FT.Info`}
                     props={{
                       network: network,
                       id: id,
                       token: token,
+                      ownerID,
                     }}
                   />
                 }
@@ -522,11 +525,12 @@ export default function ({
                 <div className={`${pageTab === 'FAQ' ? '' : 'hidden'} `}>
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.FT.FAQ`}
+                      src={`${ownerID}/widget/bos-components.components.FT.FAQ`}
                       props={{
                         network: network,
                         id: id,
                         token: token,
+                        ownerID,
                       }}
                     />
                   }
@@ -536,11 +540,12 @@ export default function ({
                 <div className="py-3">
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                      src={`${ownerID}/widget/bos-components.components.Comments.Feed`}
                       props={{
                         network: network,
                         path: `nearblocks.io/ft/${id}`,
                         limit: 10,
+                        ownerID,
                       }}
                     />
                   }

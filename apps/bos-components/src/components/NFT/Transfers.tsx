@@ -9,6 +9,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
 }
@@ -19,16 +20,13 @@ import Clock from '@/includes/icons/Clock';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
-export default function ({ network, id }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, ownerID }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -455,7 +453,7 @@ export default function ({ network, id }: Props) {
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

@@ -14,6 +14,7 @@ interface Props {
   network: string;
   id: string;
   onHandleDowload: (blobUrl: string, file: string) => void;
+  ownerID: string;
   exportType: string;
 }
 
@@ -33,12 +34,15 @@ const initial = {
   end: formattedEnd,
 };
 
-export default function ({ network, id, onHandleDowload, exportType }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({
+  network,
+  id,
+  onHandleDowload,
+  exportType,
+  ownerID,
+}: Props) {
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);

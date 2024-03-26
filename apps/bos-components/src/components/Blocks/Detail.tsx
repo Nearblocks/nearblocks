@@ -11,6 +11,7 @@
 
 interface Props {
   network: string;
+  ownerID: string;
   hash: string;
   t: (
     key: string,
@@ -22,9 +23,6 @@ import Skeleton from '@/includes/Common/Skeleton';
 import { BlocksInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const {
     convertToMetricPrefix,
     convertToUTC,
@@ -32,14 +30,14 @@ export default function (props: Props) {
     gasFee,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${props.ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerID}/widget/includes.Utils.libs`,
   );
 
   const { gasPrice } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${props.ownerID}/widget/includes.Utils.near`,
   );
 
   const { network, hash, t } = props;

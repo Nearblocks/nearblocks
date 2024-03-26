@@ -16,6 +16,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   id: string;
@@ -35,28 +36,24 @@ import { TransactionInfo } from '@/includes/types';
 
 export default function ({
   network,
+  ownerID,
   t,
   id,
   filters,
   handleFilter,
   onFilterClear,
 }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const {
     capitalizeFirstLetter,
     formatTimestampToString,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, isAction, nanoToMilli, yoctoToNear } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+    VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
-  const { txnMethod } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { txnMethod } = VM.require(`${ownerID}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -712,7 +709,7 @@ export default function ({
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

@@ -18,18 +18,16 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { Token } from '@/includes/types';
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
 }
 
-export default function ({ network, t, id, tid }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, id, tid, ownerID }: Props) {
   const { getConfig, handleRateLimit, shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [indices, setIndices] = useState<number[]>([1, 2]);
@@ -86,13 +84,14 @@ export default function ({ network, t, id, tid }: Props) {
           <div className="bg-white border rounded-xl soft-shadow p-3 aspect-square">
             {
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                src={`${ownerID}/widget/bos-components.components.Shared.NFTImage`}
                 props={{
                   base: token?.nft?.base_uri,
                   media: token?.media,
                   reference: token?.reference,
                   className: 'rounded max-h-full',
                   network: network,
+                  ownerID,
                 }}
               />
             }
@@ -289,12 +288,13 @@ export default function ({ network, t, id, tid }: Props) {
           <div className="bg-white soft-shadow rounded-xl pb-1">
             {
               <Widget
-                src={`${config.ownerId}/widget/bos-components.components.NFT.TokenTransfers`}
+                src={`${ownerID}/widget/bos-components.components.NFT.TokenTransfers`}
                 props={{
                   network: network,
                   t: t,
                   id: id,
                   tid: tid,
+                  ownerID,
                 }}
               />
             }

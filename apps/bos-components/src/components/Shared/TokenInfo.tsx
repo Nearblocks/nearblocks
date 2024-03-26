@@ -2,19 +2,16 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { MetaInfo, TokenInfoProps } from '@/includes/types';
 
 export default function (props: TokenInfoProps) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenToken, shortenTokenSymbol } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${props.ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerID}/widget/includes.Utils.libs`,
   );
 
   const { decodeArgs, tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerID}/widget/includes.Utils.libs`,
   );
   const { network, contract, amount, decimals } = props;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);

@@ -10,22 +10,20 @@
 
 interface Props {
   network: string;
+  ownerID: string;
   t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
 import { BlocksInfo } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, ownerID }: Props) {
   const { convertToMetricPrefix, getTimeAgoString, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(true);

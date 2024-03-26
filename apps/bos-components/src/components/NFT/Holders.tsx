@@ -11,6 +11,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   token?: Token;
@@ -19,16 +20,13 @@ interface Props {
 import Skeleton from '@/includes/Common/Skeleton';
 import { HoldersPropsInfo, Token } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, token, ownerID }: Props) {
   const { localFormat, serialNumber } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, holderPercentage } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -248,7 +246,7 @@ export default function ({ network, id, token }: Props) {
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: holder[currentPage],

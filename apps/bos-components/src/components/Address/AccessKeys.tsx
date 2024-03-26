@@ -13,6 +13,7 @@ interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  ownerID: string;
 }
 
 import { AccountContractInfo } from '@/includes/types';
@@ -20,12 +21,9 @@ import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
 
-export default function ({ network, t, id }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, id, ownerID }: Props) {
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -214,12 +212,13 @@ export default function ({ network, t, id }: Props) {
               keys.map((key) => (
                 <Widget
                   key={key.account_id + key.public_key}
-                  src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
+                  src={`${ownerID}/widget/bos-components.components.Address.AccessKeyRow`}
                   props={{
                     network: network,
                     t: t,
                     accessKey: key,
                     showWhen: showWhen,
+                    ownerID,
                   }}
                 />
               ))}

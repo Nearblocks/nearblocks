@@ -17,6 +17,7 @@ interface Props {
   connected: boolean;
   index: number;
   method: any;
+  ownerID: string;
   accountId: string;
   schema: any;
 }
@@ -39,18 +40,16 @@ const sortFields = (fields: FieldType[]) => {
 };
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { id, index, method, connected, accountId, schema, ownerID } = props;
 
   const { capitalize, toSnakeCase } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { mapFeilds, uniqueId } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
-  const { id, index, method, connected, accountId, schema } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);

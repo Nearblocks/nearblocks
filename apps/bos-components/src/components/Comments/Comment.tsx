@@ -14,6 +14,7 @@
  */
 
 interface Props {
+  ownerID: string;
   accountId: string;
   blockHeight: string;
   post: {
@@ -24,13 +25,8 @@ interface Props {
     };
   };
 }
-export default function ({ accountId, blockHeight, post }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { timeAgo } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+export default function ({ accountId, blockHeight, post, ownerID }: Props) {
+  const { timeAgo } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const BlockHeight = blockHeight === 'now' ? 'now' : parseInt(blockHeight);
 

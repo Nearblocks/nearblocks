@@ -12,6 +12,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   loading: boolean;
@@ -39,8 +40,7 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { loading, txn, network, t, rpcTxn, ownerID } = props;
 
   const {
     convertToMetricPrefix,
@@ -51,7 +51,7 @@ export default function (props: Props) {
     localFormat,
     shortenToken,
     shortenTokenSymbol,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const {
     fiatValue,
@@ -60,13 +60,12 @@ export default function (props: Props) {
     nanoToMilli,
     shortenAddress,
     yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
   const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${ownerID}/widget/includes.Utils.near`,
   );
 
-  const { loading, txn, network, t, rpcTxn } = props;
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
   const [price, setPrice] = useState('');
@@ -842,7 +841,7 @@ export default function (props: Props) {
                                 <a>
                                   {
                                     <Widget
-                                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                                      src={`${ownerID}/widget/bos-components.components.Shared.NFTImage`}
                                       props={{
                                         base: nft?.nft_meta?.base_uri,
                                         media: nft?.nft_token_meta?.media,
@@ -852,6 +851,7 @@ export default function (props: Props) {
                                         alt: nft?.nft_token_meta?.title,
                                         className: 'max-h-full rounded',
                                         network: network,
+                                        ownerID,
                                       }}
                                     />
                                   }

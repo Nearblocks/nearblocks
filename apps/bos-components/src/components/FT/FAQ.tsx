@@ -10,6 +10,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
   token?: Token;
@@ -21,19 +22,14 @@ import {
   Token,
 } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, token, ownerID }: Props) {
   const { localFormat, dollarFormat, dollarNonCentFormat, convertToUTC } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+    VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+    VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
-  const { tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount } = VM.require(`${ownerID}/widget/includes.Utils.near`);
 
   const [account, setAccount] = useState<AccountInfo>({} as AccountInfo);
   const [contract, setContract] = useState<DeploymentsInfo>(

@@ -11,6 +11,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   accessKey: AccountContractInfo;
@@ -19,15 +20,12 @@ interface Props {
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
 
-export default function ({ network, t, accessKey, showWhen }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, accessKey, showWhen, ownerID }: Props) {
   const { formatTimestampToString, getTimeAgoString, capitalizeWords } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+    VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);

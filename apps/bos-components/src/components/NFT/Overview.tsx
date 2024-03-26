@@ -9,6 +9,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   id: string;
 }
@@ -20,16 +21,13 @@ import { Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
-export default function ({ network, id }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, ownerID }: Props) {
   const { localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -275,10 +273,11 @@ export default function ({ network, id }: Props) {
               <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Transfers`}
+                    src={`${ownerID}/widget/bos-components.components.NFT.Transfers`}
                     props={{
                       network: network,
                       id: id,
+                      ownerID,
                     }}
                   />
                 }
@@ -286,10 +285,11 @@ export default function ({ network, id }: Props) {
               <div className={`${pageTab === 'Holders' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Holders`}
+                    src={`${ownerID}/widget/bos-components.components.NFT.Holders`}
                     props={{
                       network: network,
                       id: id,
+                      ownerID,
                     }}
                   />
                 }
@@ -297,10 +297,11 @@ export default function ({ network, id }: Props) {
               <div className={`${pageTab === 'Inventory' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.NFT.Inventory`}
+                    src={`${ownerID}/widget/bos-components.components.NFT.Inventory`}
                     props={{
                       network: network,
                       id: id,
+                      ownerID,
                     }}
                   />
                 }
@@ -309,11 +310,12 @@ export default function ({ network, id }: Props) {
                 <div className="py-3">
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                      src={`${ownerID}/widget/bos-components.components.Comments.Feed`}
                       props={{
                         network: network,
                         path: `nearblocks.io/nft/${id}`,
                         limit: 10,
+                        ownerID,
                       }}
                     />
                   }

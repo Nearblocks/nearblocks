@@ -7,6 +7,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   isHeader?: boolean;
@@ -18,16 +19,19 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
 import { SearchResult } from '@/includes/types';
 
-export default function SearchBar({ isHeader, t, network, router }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function SearchBar({
+  isHeader,
+  t,
+  network,
+  router,
+  ownerID,
+}: Props) {
   const { localFormat, shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { debounce, getConfig, shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);

@@ -11,6 +11,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
@@ -25,17 +26,13 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { network, rpcTxn, t, ownerID } = props;
 
   const { collectNestedReceiptWithOutcomeOld, parseOutcomeOld, parseReceipt } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.near`);
+    VM.require(`${ownerID}/widget/includes.Utils.near`);
 
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig } = VM.require(`${ownerID}/widget/includes.Utils.libs`);
 
-  const { network, rpcTxn, t } = props;
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
@@ -111,7 +108,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+              src={`${ownerID}/widget/bos-components.components.Transactions.TransactionReceipt`}
               props={{
                 network: network,
                 t: t,
@@ -120,6 +117,7 @@ export default function (props: Props) {
                 fellowOutgoingReceipts: [],
                 convertionReceipt: true,
                 className: '',
+                ownerID,
               }}
             />
           )}

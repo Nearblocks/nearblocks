@@ -12,6 +12,7 @@
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  */
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   currentPage: number;
@@ -25,21 +26,16 @@ import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TokenImage from '@/includes/icons/TokenImage';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, t, currentPage, setPage }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, currentPage, setPage, ownerID }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerID}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
-  const { tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount } = VM.require(`${ownerID}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -498,7 +494,7 @@ export default function ({ network, t, currentPage, setPage }: Props) {
           </div>
         )}
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerID}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

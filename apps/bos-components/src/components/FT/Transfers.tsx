@@ -16,6 +16,7 @@
  */
 
 interface Props {
+  ownerID: string;
   network: string;
   t: (key: string) => string;
   id: string;
@@ -31,24 +32,26 @@ import CloseCircle from '@/includes/icons/CloseCircle';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, t, id, filters, onFilterClear }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({
+  network,
+  t,
+  id,
+  filters,
+  onFilterClear,
+  ownerID,
+}: Props) {
   const {
     capitalizeFirstLetter,
     formatTimestampToString,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerID}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
 
-  const { tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount } = VM.require(`${ownerID}/widget/includes.Utils.near`);
 
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
@@ -497,7 +500,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerID}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

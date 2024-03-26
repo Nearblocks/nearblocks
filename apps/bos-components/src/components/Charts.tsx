@@ -13,6 +13,7 @@
 interface Props {
   chartTypes: string;
   poweredBy?: boolean;
+  ownerID: string;
   network: string;
   t: (key: string) => string | undefined;
 }
@@ -21,13 +22,10 @@ import Skeleton from '@/includes/Common/Skeleton';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+  const { t, ownerID, network, chartTypes, poweredBy } = props;
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerID}/widget/includes.Utils.libs`,
   );
-  const { t } = props;
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
@@ -35,14 +33,14 @@ export default function (props: Props) {
     description: '',
   });
 
-  const config = getConfig && getConfig(props?.network);
+  const config = getConfig && getConfig(network);
 
   const charts = [
     {
       link: '/charts/near-price',
       text: t ? t('charts:nearPrice.heading') : 'Near Daily Price (USD) Chart',
       image: `${config?.appUrl}images/charts/near-price.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/market-cap',
@@ -50,7 +48,7 @@ export default function (props: Props) {
         ? t('charts:marketCap.heading')
         : 'Near Market Capitalization Chart',
       image: `${config?.appUrl}images/charts/market-cap.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/near-supply',
@@ -80,13 +78,13 @@ export default function (props: Props) {
       link: '/charts/txn-fee',
       text: t ? t('charts:txnFee.heading') : 'Transaction Fee Chart',
       image: `${config?.appUrl}images/charts/txn-fee.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/txn-volume',
       text: t ? t('charts:txnVolume.heading') : 'Transaction Volume Chart',
       image: `${config?.appUrl}images/charts/txn-volume.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      exclude: `${network}` === 'testnet',
     },
   ];
 
@@ -142,7 +140,7 @@ export default function (props: Props) {
       };
 
       const mappingFunction =
-        chartTypeMappings[props.chartTypes as keyof typeof chartTypeMappings];
+        chartTypeMappings[chartTypes as keyof typeof chartTypeMappings];
       if (mappingFunction) {
         return data.map(mappingFunction);
       } else {
@@ -153,7 +151,7 @@ export default function (props: Props) {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, props.chartTypes]);
+  }, [data, chartTypes]);
 
   useEffect(() => {
     function fetchChartData() {
@@ -180,7 +178,7 @@ export default function (props: Props) {
       let titleText = '';
       let yLabel = '';
       let description = '';
-      switch (props.chartTypes) {
+      switch (chartTypes) {
         case 'market-cap':
           titleText = 'Near Market Capitalization Chart';
           yLabel = 'Near Market Cap (USD)';
@@ -319,7 +317,7 @@ export default function (props: Props) {
     fetchData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartData, props.chartTypes]);
+  }, [chartData, chartTypes]);
 
   const iframeSrc = `
   <html>
@@ -332,7 +330,7 @@ export default function (props: Props) {
     <body>
       <div id="chart-container" style="width: 100%; height: 100%;"></div>
       ${
-        props.poweredBy
+        poweredBy
           ? '<p style="text-align: center; color: #000; font-size: 0.75rem; padding-top: 1rem; padding-bottom: 1rem; font-family: sans-serif;">Powered by <a href="https://beta.nearblocks.io/?utm_source=bos_widget&utm_medium=Charts" target="_blank" style="font-weight: 600; font-family: sans-serif; color: #000; text-decoration: none;">NearBlocks</a></p>'
           : ''
       }
@@ -353,7 +351,7 @@ export default function (props: Props) {
 
             let tooltipContent = "";
 
-            switch ("${props.chartTypes}") {
+            switch ("${chartTypes}") {
               case "market-cap":
                 tooltipContent = \`
                   \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
@@ -425,7 +423,7 @@ export default function (props: Props) {
 
   return (
     <div>
-      {props.chartTypes && (
+      {chartTypes && (
         <>
           <div
             className="block bg-white border soft-shadow rounded-xl overflow-hidden mb-10"
