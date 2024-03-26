@@ -9,9 +9,11 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
@@ -34,10 +36,7 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, currentPage, setPage, ownerId }: Props) {
   const {
     convertAmountToReadableString,
     convertTimestampToTime,
@@ -46,10 +45,10 @@ export default function ({ network, currentPage, setPage }: Props) {
     shortenAddress,
     timeAgo,
     yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { formatNumber, formatWithCommas } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const [validatorFullData, setValidatorFullData] = useState<{
@@ -462,7 +461,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           <td colSpan={9} className="bg-gray-50">
             {telemetry && (
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: [
                     {
@@ -657,7 +656,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             )}
             {row?.description ? (
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: [
                     {
@@ -970,7 +969,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             </div>
             <div className="flex flex-col">
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: columns,
                   data: validatorEpochData,

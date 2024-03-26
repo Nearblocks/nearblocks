@@ -8,9 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
@@ -25,17 +27,13 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { network, rpcTxn, t, ownerId } = props;
 
   const { collectNestedReceiptWithOutcomeOld, parseOutcomeOld, parseReceipt } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.near`);
+    VM.require(`${ownerId}/widget/includes.Utils.near`);
 
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
-  const { network, rpcTxn, t } = props;
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
@@ -111,7 +109,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+              src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
               props={{
                 network: network,
                 t: t,
@@ -120,6 +118,7 @@ export default function (props: Props) {
                 fellowOutgoingReceipts: [],
                 convertionReceipt: true,
                 className: '',
+                ownerId,
               }}
             />
           )}

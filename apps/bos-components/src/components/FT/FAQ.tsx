@@ -7,9 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token?: Token;
@@ -21,19 +23,14 @@ import {
   Token,
 } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, token, ownerId }: Props) {
   const { localFormat, dollarFormat, dollarNonCentFormat, convertToUTC } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+    VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
-    VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
-  const { tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [account, setAccount] = useState<AccountInfo>({} as AccountInfo);
   const [contract, setContract] = useState<DeploymentsInfo>(

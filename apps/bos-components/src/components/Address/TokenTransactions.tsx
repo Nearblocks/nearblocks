@@ -13,8 +13,10 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   id: string;
@@ -37,27 +39,23 @@ export default function ({
   network,
   t,
   id,
+  ownerId,
   filters,
   handleFilter,
   onFilterClear,
 }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const {
     capitalizeFirstLetter,
     formatTimestampToString,
     getTimeAgoString,
     localFormat,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { tokenAmount } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -719,7 +717,7 @@ export default function ({
         </div>
       )}
       <Widget
-        src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: tokens[currentPage],

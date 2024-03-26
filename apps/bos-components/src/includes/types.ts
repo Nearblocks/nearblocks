@@ -674,6 +674,7 @@ export type TokenInfoProps = {
   contract: string;
   amount: string;
   decimals: string;
+  ownerId: string;
   network: string;
 };
 
@@ -715,6 +716,7 @@ export type NFTImageProps = {
   alt?: string;
   reference: string;
   className?: string;
+  ownerId: string;
   network: string;
 };
 
@@ -1424,6 +1426,7 @@ export type ParseOutcomeInfo = {
 };
 
 export type TransactionReceiptInfo = {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: any;
@@ -1434,6 +1437,7 @@ export type TransactionReceiptInfo = {
 };
 
 export type ReceiptKindInfo = {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   action: any;

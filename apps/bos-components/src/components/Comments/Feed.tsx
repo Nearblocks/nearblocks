@@ -7,25 +7,18 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [path] - The path identifier passed as a string.
  * @param {number} [limit] - The maximum number of comments to display.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   path: string;
   limit: number;
 }
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
-
   const [content, setContent] = useState('');
-
-  const config = getConfig && getConfig(props.network);
 
   const path = props.path;
   const index = {
@@ -67,11 +60,11 @@ export default function (props: Props) {
     item.value.type === 'md' && (
       <div key={JSON.stringify(item)} className="">
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Comments.Comment`}
+          src={`${props.ownerId}/widget/bos-components.components.Comments.Comment`}
           props={{
             accountId: item.accountId,
             blockHeight: item.blockHeight,
-            ownerId: config.ownerId,
+            ownerId: props.ownerId,
             post: item.value.post,
           }}
         />
@@ -83,7 +76,7 @@ export default function (props: Props) {
       <div className="border-b">
         {
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Comments.InputField`}
+            src={`${props.ownerId}/widget/bos-components.components.Comments.InputField`}
             props={{
               onChange: onChange,
               composeButton: (onCompose: () => void) => (
@@ -137,7 +130,7 @@ export default function (props: Props) {
           <div className="px-3 pb-2">
             {
               <Widget
-                src={`${config.ownerId}/widget/bos-components.components.Comments.List`}
+                src={`${props.ownerId}/widget/bos-components.components.Comments.List`}
                 props={{
                   index,
                   renderItem,

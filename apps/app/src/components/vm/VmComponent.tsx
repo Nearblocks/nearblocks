@@ -32,7 +32,7 @@ export function VmComponent(props: Props) {
       onChangeHeightCalled.current = true;
     }
   }, [showLoader, onChangeHeight]);
-
+  const ownerId = process.env.NEXT_PUBLIC_ACCOUNT_ID;
   return (
     <>
       {showLoader && skeleton}
@@ -45,6 +45,7 @@ export function VmComponent(props: Props) {
               redirectMap: redirectMapStore.redirectMap,
             }}
             {...props}
+            props={{ ownerId: ownerId, ...props.props }}
           />
         </EthersProvider>
       )}

@@ -11,6 +11,7 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
   requestSignInWithWallet: (id: string) => void;
   signedIn: boolean;
   accountId: string;
+  ownerId: string;
   logOut: () => void;
 }
 
@@ -53,11 +55,19 @@ const tabs = [
 ];
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const {
+    network,
+    t,
+    id,
+    requestSignInWithWallet,
+    signedIn,
+    accountId,
+    logOut,
+    ownerId,
+  } = props;
 
   const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const {
@@ -67,21 +77,12 @@ export default function (props: Props) {
     shortenAddress,
     getConfig,
     handleRateLimit,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { encodeArgs, decodeArgs } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
 
-  const {
-    network,
-    t,
-    id,
-    requestSignInWithWallet,
-    signedIn,
-    accountId,
-    logOut,
-  } = props;
   const [loading, setLoading] = useState(false);
   const [isloading, setIsLoading] = useState(true);
   const [inventoryLoading, setInventoryLoading] = useState(false);
@@ -557,7 +558,7 @@ export default function (props: Props) {
               )}
               {
                 <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                  src={`${ownerId}/widget/bos-components.components.Shared.Buttons`}
                   props={{
                     id: id,
                     config: config,
@@ -652,6 +653,7 @@ export default function (props: Props) {
                     ft={ft}
                     id={id}
                     appUrl={config?.appUrl}
+                    ownerId={ownerId}
                   />
                 </div>
               </div>
@@ -861,7 +863,7 @@ export default function (props: Props) {
               <div className={`${pageTab === 'Transactions' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.Transactions`}
+                    src={`${ownerId}/widget/bos-components.components.Address.Transactions`}
                     props={{
                       network: network,
                       t: t,
@@ -869,6 +871,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      ownerId,
                     }}
                   />
                 }
@@ -876,7 +879,7 @@ export default function (props: Props) {
               <div className={`${pageTab === 'Token Txns' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
+                    src={`${ownerId}/widget/bos-components.components.Address.TokenTransactions`}
                     props={{
                       network: network,
                       id: id,
@@ -884,6 +887,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      ownerId,
                     }}
                   />
                 }
@@ -893,7 +897,7 @@ export default function (props: Props) {
               >
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
+                    src={`${ownerId}/widget/bos-components.components.Address.NFTTransactions`}
                     props={{
                       network: network,
                       id: id,
@@ -901,6 +905,7 @@ export default function (props: Props) {
                       filters: filters,
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
+                      ownerId,
                     }}
                   />
                 }
@@ -908,11 +913,12 @@ export default function (props: Props) {
               <div className={`${pageTab === 'Access Keys' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    src={`${ownerId}/widget/bos-components.components.Address.AccessKeys`}
                     props={{
                       network: network,
                       id: id,
                       t: t,
+                      ownerId,
                     }}
                   />
                 }
@@ -922,7 +928,7 @@ export default function (props: Props) {
                   <div className={`${pageTab === 'Contract' ? '' : 'hidden'} `}>
                     {
                       <Widget
-                        src={`${config.ownerId}/widget/bos-components.components.Contract.Overview`}
+                        src={`${ownerId}/widget/bos-components.components.Contract.Overview`}
                         props={{
                           network: network,
                           t: t,
@@ -934,6 +940,7 @@ export default function (props: Props) {
                           connected: signedIn,
                           accountId: accountId,
                           logOut: logOut,
+                          ownerId,
                         }}
                       />
                     }
@@ -945,10 +952,11 @@ export default function (props: Props) {
                   <div className="bg-white soft-shadow rounded-xl pb-1">
                     <div className="py-3">
                       <Widget
-                        src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                        src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
                         props={{
                           network: network,
                           path: `nearblocks.io/address/${id}`,
+                          ownerId,
                           limit: 10,
                         }}
                       />

@@ -6,9 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
 }
@@ -16,12 +18,9 @@ interface Props {
 import Skeleton from '@/includes/Common/Skeleton';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ t, network }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ t, network, ownerId }: Props) {
   const { getTimeAgoString, shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const {
@@ -30,7 +29,7 @@ export default function ({ t, network }: Props) {
     nanoToMilli,
     shortenAddress,
     yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);

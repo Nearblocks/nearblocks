@@ -12,9 +12,11 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string;
   id: string;
@@ -36,16 +38,14 @@ export default function ({
   tokenFilter,
   filters,
   onFilterClear,
+  ownerId,
 }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { dollarFormat, dollarNonCentFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const tabs = [
@@ -452,11 +452,12 @@ export default function ({
         <div className="py-6"></div>
         {tokenFilter && (
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.FT.TokenFilter`}
+            src={`${ownerId}/widget/bos-components.components.FT.TokenFilter`}
             props={{
               network: network,
               id: id,
               tokenFilter: tokenFilter,
+              ownerId,
             }}
           />
         )}
@@ -483,13 +484,14 @@ export default function ({
               <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Transfers`}
+                    src={`${ownerId}/widget/bos-components.components.FT.Transfers`}
                     props={{
                       network: network,
                       id: id,
                       t: t,
                       filters: filters,
                       onFilterClear: onFilterClear,
+                      ownerId,
                     }}
                   />
                 }
@@ -497,11 +499,12 @@ export default function ({
               <div className={`${pageTab === 'Holders' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Holders`}
+                    src={`${ownerId}/widget/bos-components.components.FT.Holders`}
                     props={{
                       network: network,
                       id: id,
                       token: token,
+                      ownerId,
                     }}
                   />
                 }
@@ -509,11 +512,12 @@ export default function ({
               <div className={`${pageTab === 'Info' ? '' : 'hidden'} `}>
                 {
                   <Widget
-                    src={`${config.ownerId}/widget/bos-components.components.FT.Info`}
+                    src={`${ownerId}/widget/bos-components.components.FT.Info`}
                     props={{
                       network: network,
                       id: id,
                       token: token,
+                      ownerId,
                     }}
                   />
                 }
@@ -522,11 +526,12 @@ export default function ({
                 <div className={`${pageTab === 'FAQ' ? '' : 'hidden'} `}>
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.FT.FAQ`}
+                      src={`${ownerId}/widget/bos-components.components.FT.FAQ`}
                       props={{
                         network: network,
                         id: id,
                         token: token,
+                        ownerId,
                       }}
                     />
                   }
@@ -536,11 +541,12 @@ export default function ({
                 <div className="py-3">
                   {
                     <Widget
-                      src={`${config.ownerId}/widget/bos-components.components.Comments.Feed`}
+                      src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
                       props={{
                         network: network,
                         path: `nearblocks.io/ft/${id}`,
                         limit: 10,
+                        ownerId,
                       }}
                     />
                   }

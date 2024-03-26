@@ -4,9 +4,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
  * @param {{ push: (path: string) => void }} router - An object with a `push` function for routing purposes.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   isHeader?: boolean;
@@ -18,16 +20,19 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
 import { SearchResult } from '@/includes/types';
 
-export default function SearchBar({ isHeader, t, network, router }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function SearchBar({
+  isHeader,
+  t,
+  network,
+  router,
+  ownerId,
+}: Props) {
   const { localFormat, shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { debounce, getConfig, shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);

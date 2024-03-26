@@ -9,13 +9,6 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import { TransactionReceiptInfo } from '@/includes/types';
 
 export default function (props: TransactionReceiptInfo) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
-
   const {
     network,
     t,
@@ -24,6 +17,7 @@ export default function (props: TransactionReceiptInfo) {
     expandAll,
     convertionReceipt,
     className,
+    ownerId,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -31,8 +25,6 @@ export default function (props: TransactionReceiptInfo) {
     () => setTxTypeActive((x) => !x),
     [setTxTypeActive],
   );
-
-  const config = getConfig && getConfig(network);
 
   useEffect(() => switchActiveTxType, [expandAll, switchActiveTxType]);
 
@@ -69,7 +61,7 @@ export default function (props: TransactionReceiptInfo) {
 
         {lastFellowOutgoingReceipt ? (
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+            src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
             props={{
               network: network,
               t,
@@ -78,6 +70,7 @@ export default function (props: TransactionReceiptInfo) {
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
               className: 'pb-5 !mt-0',
+              ownerId,
             }}
           />
         ) : null}
@@ -86,13 +79,14 @@ export default function (props: TransactionReceiptInfo) {
             receipt?.actions.map((action: any, index: number) => (
               <Widget
                 key={`${action.kind}_${index}`}
-                src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
+                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
                 props={{
                   network: network,
                   t,
                   action: action,
                   onClick: switchActiveTxType,
                   isTxTypeActive: isTxTypeActive,
+                  ownerId,
                 }}
               />
             ))}
@@ -100,11 +94,12 @@ export default function (props: TransactionReceiptInfo) {
         {isTxTypeActive ? (
           <div className="border-l border-black ml-2.5">
             <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
+              src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
               props={{
                 network: network,
                 t,
                 receipt: receipt,
+                ownerId,
               }}
             />
           </div>
@@ -119,7 +114,7 @@ export default function (props: TransactionReceiptInfo) {
       </div>
       {lastNonRefundNestedReceipt ? (
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+          src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
           props={{
             network: network,
             t: t,
@@ -128,6 +123,7 @@ export default function (props: TransactionReceiptInfo) {
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
             className: '!pl-0 border-transparent',
+            ownerId,
           }}
         />
       ) : null}

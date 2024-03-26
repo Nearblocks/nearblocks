@@ -14,9 +14,11 @@
  * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
@@ -32,13 +34,6 @@ interface Props {
 import { ContractInfo, ContractParseInfo, SchemaInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
-
   const {
     network,
     t,
@@ -50,10 +45,10 @@ export default function (props: Props) {
     connected,
     accountId,
     logOut,
+    ownerId,
   } = props;
-  const [pageTab, setPageTab] = useState('Contract Info');
 
-  const config = getConfig && getConfig(network);
+  const [pageTab, setPageTab] = useState('Contract Info');
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
@@ -92,12 +87,13 @@ export default function (props: Props) {
       <Tabs.Content value={tabs[0]}>
         {
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Contract.Info`}
+            src={`${ownerId}/widget/bos-components.components.Contract.Info`}
             props={{
               network: network,
               t: t,
               id: id,
               contract: contract,
+              ownerId,
             }}
           />
         }
@@ -160,7 +156,7 @@ export default function (props: Props) {
             {schema?.body?.functions?.map((func: any, index: number) => (
               <Widget
                 key={index}
-                src={`${config.ownerId}/widget/bos-components.components.Contract.ViewOrChangeAbi`}
+                src={`${ownerId}/widget/bos-components.components.Contract.ViewOrChangeAbi`}
                 props={{
                   network: network,
                   t: t,
@@ -171,6 +167,7 @@ export default function (props: Props) {
                   connected: connected,
                   accountId: accountId,
                   schema: schema,
+                  ownerId,
                 }}
               />
             ))}
@@ -185,7 +182,7 @@ export default function (props: Props) {
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <Widget
                   key={index}
-                  src={`${config.ownerId}/widget/bos-components.components.Contract.ViewOrChange`}
+                  src={`${ownerId}/widget/bos-components.components.Contract.ViewOrChange`}
                   props={{
                     network: network,
                     t: t,
@@ -195,6 +192,7 @@ export default function (props: Props) {
                     method: method,
                     connected: connected,
                     accountId: accountId,
+                    ownerId,
                   }}
                 />
               ))}

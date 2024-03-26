@@ -7,9 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {ReceiptsPropsInfo | any} [receipt] -  receipt of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: ReceiptsPropsInfo | any;
@@ -18,18 +20,15 @@ interface Props {
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+  const { receipt, network, ownerId } = props;
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const { convertToMetricPrefix } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { receipt, network } = props;
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const onTab = (index: number) => {

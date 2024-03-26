@@ -7,6 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tokenFilter] - The token filter identifier passed as a string
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -19,25 +20,21 @@ import {
 } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   tokenFilter?: string;
 }
 
-export default function ({ network, id, tokenFilter }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { dollarFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
-  );
+export default function ({ network, id, tokenFilter, ownerId }: Props) {
+  const { dollarFormat, localFormat } = VM.require(ownerId);
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const { decodeArgs, encodeArgs } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
 
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);

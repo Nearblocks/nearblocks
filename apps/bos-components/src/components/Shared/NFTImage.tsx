@@ -39,13 +39,9 @@ export default function ({
   reference,
   className,
   network,
+  ownerId,
 }: NFTImageProps) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [src, setSrc] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);

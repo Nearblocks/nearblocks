@@ -6,9 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
 }
@@ -19,16 +21,13 @@ import Clock from '@/includes/icons/Clock';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
-export default function ({ network, id }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -455,7 +454,7 @@ export default function ({ network, id }: Props) {
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

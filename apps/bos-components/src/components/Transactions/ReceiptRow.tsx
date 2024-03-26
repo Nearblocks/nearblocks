@@ -9,9 +9,11 @@
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
  * @param {ReceiptsPropsInfo} [receipt] -  receipt of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn?: TransactionInfo;
@@ -29,18 +31,16 @@ import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { network, receipt, borderFlag, t, ownerId } = props;
 
   const { convertToMetricPrefix, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { network, receipt, borderFlag, t } = props;
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
 
@@ -429,12 +429,13 @@ export default function (props: Props) {
               <div className="mx-4 border-l-4 border-l-gray-200">
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+                    src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
                     props={{
                       receipt: rcpt,
                       borderFlag: true,
                       network: network,
                       Link,
+                      ownerId,
                     }}
                   />
                 }

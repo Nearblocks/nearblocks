@@ -6,9 +6,11 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { days?: number }) => string | undefined;
 }
@@ -21,21 +23,16 @@ import {
   ChartSeriesInfo,
 } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, ownerId }: Props) {
   const { currency, dollarFormat, formatCustomDate, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { gasPrice } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
+  const { gasPrice } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);

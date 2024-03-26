@@ -7,6 +7,7 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Paginator from '@/includes/Common/Paginator';
@@ -14,21 +15,19 @@ import Skeleton from '@/includes/Common/Skeleton';
 import { Token } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token: Token;
 }
 
-export default function ({ network, id, token }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, id, token, ownerId }: Props) {
   const { localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -188,13 +187,14 @@ export default function ({ network, id, token }: Props) {
                 <a className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline">
                   {
                     <Widget
-                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                      src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                       props={{
                         base: tokenData.base_uri,
                         reference: nft.reference,
                         media: nft.media,
                         className: 'rounded max-h-full',
                         network: network,
+                        ownerId,
                       }}
                     />
                   }

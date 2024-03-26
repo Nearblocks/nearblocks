@@ -7,12 +7,14 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  ownerId: string;
 }
 
 import { AccountContractInfo } from '@/includes/types';
@@ -20,12 +22,9 @@ import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
 
-export default function ({ network, t, id }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
+export default function ({ network, t, id, ownerId }: Props) {
   const { getConfig, handleRateLimit } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -214,12 +213,13 @@ export default function ({ network, t, id }: Props) {
               keys.map((key) => (
                 <Widget
                   key={key.account_id + key.public_key}
-                  src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
+                  src={`${ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
                   props={{
                     network: network,
                     t: t,
                     accessKey: key,
                     showWhen: showWhen,
+                    ownerId,
                   }}
                 />
               ))}

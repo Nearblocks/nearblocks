@@ -10,6 +10,7 @@
  * @param {object} [method] - Object containing information about the abi contract functions.
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {object} [schema] - Object containing information about the near abi contract.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   connected: boolean;
   index: number;
   method: any;
+  ownerId: string;
   accountId: string;
   schema: any;
 }
@@ -39,18 +41,16 @@ const sortFields = (fields: FieldType[]) => {
 };
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+  const { id, index, method, connected, accountId, schema, ownerId } = props;
 
   const { capitalize, toSnakeCase } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { mapFeilds, uniqueId } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { id, index, method, connected, accountId, schema } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);

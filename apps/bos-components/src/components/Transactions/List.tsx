@@ -16,9 +16,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   currentPage: number;
@@ -38,28 +40,6 @@ import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { txnMethod } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
-  );
-
-  const {
-    localFormat,
-    getTimeAgoString,
-    formatTimestampToString,
-    capitalizeFirstLetter,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.formats`);
-
-  const {
-    getConfig,
-    handleRateLimit,
-    nanoToMilli,
-    truncateString,
-    yoctoToNear,
-  } = VM.require(`${networkAccountId}/widget/includes.Utils.libs`);
-
   const {
     network,
     currentPage,
@@ -68,7 +48,26 @@ export default function (props: Props) {
     handleFilter,
     onFilterClear,
     t,
+    ownerId,
   } = props;
+
+  const { txnMethod } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    truncateString,
+    yoctoToNear,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
@@ -677,7 +676,7 @@ export default function (props: Props) {
       )}
       {
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

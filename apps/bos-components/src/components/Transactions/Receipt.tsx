@@ -8,9 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
@@ -20,20 +22,12 @@ interface Props {
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+  const { network, rpcTxn, txn, t, ownerId } = props;
 
   const { mapRpcActionToAction } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
-  const { network, rpcTxn, txn, t } = props;
   const [receipt, setReceipt] = useState(null);
-
-  const config = getConfig && getConfig(network);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
@@ -108,12 +102,13 @@ export default function (props: Props) {
     <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
       {
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+          src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
           props={{
             txn: txn,
             receipt: receipt,
             network: network,
             t: t,
+            ownerId,
           }}
         />
       }

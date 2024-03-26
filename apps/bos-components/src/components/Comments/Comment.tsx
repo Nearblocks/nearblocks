@@ -11,9 +11,11 @@
  * @param {Object} post.image - The image object associated with the post.
  * @param {string} post.image.ipfs_cid - The IPFS CID of the image.
  * @param {string} post.image.url - The URL of the image.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   accountId: string;
   blockHeight: string;
   post: {
@@ -24,13 +26,8 @@ interface Props {
     };
   };
 }
-export default function ({ accountId, blockHeight, post }: Props) {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { timeAgo } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+export default function ({ accountId, blockHeight, post, ownerId }: Props) {
+  const { timeAgo } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const BlockHeight = blockHeight === 'now' ? 'now' : parseInt(blockHeight);
 
