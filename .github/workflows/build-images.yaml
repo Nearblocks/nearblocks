@@ -37,7 +37,7 @@ jobs:
           tags: ghcr.io/nearblocks/api:latest
           cache-from: type=registry,ref=ghcr.io/nearblocks/api:latest
           cache-to: type=inline
-          
+
       - name: Build and push (APP)
         uses: docker/build-push-action@v5
         with:
