@@ -33,7 +33,7 @@ import { sanitizeUrl } from '@braintree/sanitize-url';
 import { useEthersProviderContext } from '@/data/web3';
 import { useAuthStore } from '@/stores/auth';
 import { useVmStore } from '@/stores/vm';
-import { networkId } from '@/utils/config';
+import { networkId, bosNetworkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
 
@@ -57,7 +57,7 @@ export default function VmInitializer() {
   useEffect(() => {
     initNear &&
       initNear({
-        networkId,
+        networkId: bosNetworkId,
         walletConnectCallback: () => {},
         selector: setupWalletSelector({
           network: networkId,
