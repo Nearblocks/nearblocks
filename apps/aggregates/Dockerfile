@@ -1,8 +1,7 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:20-bookworm-slim as base
+FROM node:20-alpine as base
 
 FROM --platform=$BUILDPLATFORM base AS builder
-RUN apt update && apt install -y dumb-init
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
@@ -23,6 +22,5 @@ ENV NODE_ENV production
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
-COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
 
-CMD ["dumb-init", "node", "apps/aggregates/dist/index.js"]
+CMD ["node", "apps/aggregates/dist/index.js"]
