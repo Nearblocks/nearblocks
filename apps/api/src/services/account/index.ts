@@ -265,8 +265,7 @@ const inventory = catchAsync(
 
     const nftQuery = sql`
       SELECT
-        nft_holders.contract,
-        nft_holders.quantity,
+        nft_holders.*,
         JSON_BUILD_OBJECT(
           'name',
           meta.name,
@@ -278,7 +277,26 @@ const inventory = catchAsync(
           meta.reference
         ) AS nft_meta
       FROM
-        nft_holders
+        (
+          SELECT
+            nft_holders.contract,
+            SUM(nft_holders.quantity)
+          FROM
+            (
+              SELECT
+                contract,
+                quantity
+              FROM
+                nft_holders
+              WHERE
+                account = ${account}
+                AND quantity > 0
+            ) nft_holders
+          GROUP BY
+            nft_holders.contract
+          ORDER BY
+            SUM(nft_holders.quantity) DESC
+        ) nft_holders
         INNER JOIN LATERAL (
           SELECT
             contract,
@@ -291,9 +309,6 @@ const inventory = catchAsync(
           WHERE
             nft_meta.contract = nft_holders.contract
         ) AS meta ON TRUE
-      WHERE
-        nft_holders.account = ${account}
-        AND nft_holders.quantity > 0
     `;
 
     const inventory = await redis.cache(
