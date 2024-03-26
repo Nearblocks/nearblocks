@@ -80,7 +80,7 @@ export default function (props: Props) {
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { encodeArgs, decodeArgs } = VM.require(
-    `${props.ownerId}/widget/includes.Utils.near`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
 
   const [loading, setLoading] = useState(false);
@@ -558,7 +558,7 @@ export default function (props: Props) {
               )}
               {
                 <Widget
-                  src={`${props.ownerId}/widget/bos-components.components.Shared.Buttons`}
+                  src={`${ownerId}/widget/bos-components.components.Shared.Buttons`}
                   props={{
                     id: id,
                     config: config,
