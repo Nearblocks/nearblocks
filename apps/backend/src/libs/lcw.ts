@@ -1,12 +1,31 @@
 import { default as axios } from 'axios';
+import Big from 'big.js';
 
 import { logger } from 'nb-logger';
 
 import config from '#config';
 import { FTMarketData } from '#types/types';
 
+const getBtcPrice = async (price: number) => {
+  const resp = await axios.post(
+    'https://api.livecoinwatch.com/coins/single',
+    { code: 'BTC', currency: 'USD', meta: true },
+    {
+      headers: { 'x-api-key': config.lcwApiKey },
+      timeout: 10000,
+    },
+  );
+
+  const btcPrice = resp?.data?.rate ?? null;
+
+  if (!btcPrice) null;
+
+  return Big(price).div(Big(btcPrice)).toString();
+};
+
 const marketData = async (id: string, full = false) => {
   try {
+    let btcPrice = null;
     const price = await axios.post(
       'https://api.livecoinwatch.com/coins/single',
       { code: id, currency: 'USD', meta: true },
@@ -16,6 +35,10 @@ const marketData = async (id: string, full = false) => {
       },
     );
 
+    if (price?.data?.rate && id === 'NEAR') {
+      btcPrice = await getBtcPrice(price?.data?.rate);
+    }
+
     const data: FTMarketData = {
       change_24: price?.data?.delta?.day ?? null,
       circulating_supply: price?.data?.circulatingSupply ?? null,
@@ -24,7 +47,7 @@ const marketData = async (id: string, full = false) => {
       fully_diluted_market_cap: null,
       market_cap: price?.data?.cap ?? null,
       price: price?.data?.rate ?? null,
-      price_btc: null,
+      price_btc: btcPrice,
       price_eth: null,
       reddit: price?.data?.links?.reddit ?? null,
       telegram: price?.data?.links?.telegram ?? null,

@@ -57,9 +57,7 @@ const count = catchAsync(
       SELECT
         COUNT(contract)
       FROM
-        ft_meta
-      WHERE
-        ${search
+        ft_meta ${search
         ? sql`
             WHERE
               contract ILIKE ${search + '%'}
