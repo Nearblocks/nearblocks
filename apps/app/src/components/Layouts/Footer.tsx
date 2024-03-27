@@ -172,6 +172,24 @@ const Footer = () => {
                 NearBlocks © {currentDate.getFullYear()}
               </p>
             </div>
+            <div className="text-gray-400 text-xs flex items-center flex-wrap pb-1">
+              Price feeds aggregated by{' '}
+              <Link href="http://coingecko.com/" legacyBehavior>
+                <a
+                  className="mx-1"
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                >
+                  <Image
+                    src="/images/coingecko_logo_black.svg"
+                    alt="CoinGecko"
+                    className="inline-flex w-5 h-5"
+                    width={20}
+                    height={20}
+                  />{' '}
+                </a>
+              </Link>
+            </div>
             <div>
               <p className="text-gray-400 text-xs">{t('trademark')}</p>
             </div>

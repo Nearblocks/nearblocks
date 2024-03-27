@@ -247,7 +247,7 @@ const Header = () => {
               <Link href="/" className="" legacyBehavior>
                 <a className="flex justify-start items-center hover:no-underline">
                   <Image
-                    src="/images/nearblocksblack.svg"
+                    src="/images/nb-black-on-bos.svg"
                     className="block"
                     width="174"
                     height="40"
@@ -621,7 +621,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href="https://beta.nearblocks.io"
+                            href={process.env.NEXT_PUBLIC_MAINNET_URL}
                           >
                             Mainnet
                           </a>
@@ -629,7 +629,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href="https://beta-testnet.nearblocks.io/"
+                            href={process.env.NEXT_PUBLIC_TESTNET_URL}
                           >
                             Testnet
                           </a>
@@ -659,7 +659,7 @@ const Header = () => {
                                 ? 'text-green-500'
                                 : 'text-gray-500'
                             }`}
-                            href="https://beta.nearblocks.io"
+                            href={process.env.NEXT_PUBLIC_MAINNET_URL}
                           >
                             Mainnet
                           </a>
@@ -671,7 +671,7 @@ const Header = () => {
                                 ? 'text-green-500'
                                 : 'text-gray-500'
                             }`}
-                            href="https://beta-testnet.nearblocks.io/"
+                            href={process.env.NEXT_PUBLIC_TESTNET_URL}
                           >
                             Testnet
                           </a>

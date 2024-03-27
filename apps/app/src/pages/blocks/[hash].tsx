@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-
+import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
@@ -7,6 +7,8 @@ import { networkId } from '@/utils/config';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
+
+const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 const Block = () => {
   const router = useRouter();
@@ -36,6 +38,40 @@ const Block = () => {
   };
   return (
     <>
+      <Head>
+        <title>
+          {`${network === 'testnet' ? 'TESTNET' : ''} ${t(
+            'blocks:block.metaTitle',
+            {
+              block: hash,
+            },
+          )}`}
+        </title>
+        <meta
+          name="title"
+          content={t('blocks:block.metaTitle', { block: hash })}
+        />
+        <meta
+          name="description"
+          content={t('blocks:block.metaDescription', { block: hash })}
+        />
+        <meta
+          property="og:title"
+          content={t('blocks:block.metaTitle', { block: hash })}
+        />
+        <meta
+          property="og:description"
+          content={t('blocks:block.metaDescription', { block: hash })}
+        />
+        <meta
+          property="twitter:title"
+          content={t('blocks:block.metaTitle', { block: hash })}
+        />
+        <meta
+          property="twitter:description"
+          content={t('blocks:block.metaDescription', { block: hash })}
+        />
+      </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           src={components?.blocksDetail}

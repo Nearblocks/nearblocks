@@ -682,7 +682,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
                         'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
@@ -702,7 +702,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'pl-6 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'pl-6 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
                         'px-6 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
@@ -724,7 +724,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-2 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-2 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
                         'px-2 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
@@ -746,7 +746,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
                         'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
@@ -761,7 +761,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
                         'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },

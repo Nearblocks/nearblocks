@@ -6,8 +6,11 @@ import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
 import { useAuthStore } from '@/stores/auth';
-
+import Head from 'next/head';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+
+const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
+const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 const Address = () => {
   const router = useRouter();
@@ -48,24 +51,65 @@ const Address = () => {
   const logOut = useAuthStore((store) => store.logOut);
 
   return (
-    <div style={height} className="relative container mx-auto px-3">
-      <VmComponent
-        skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
-        defaultSkelton={<Overview />}
-        onChangeHeight={onChangeHeight}
-        src={components?.account}
-        props={{
-          id: id,
-          network: networkId,
-          t: t,
-          requestSignInWithWallet: requestSignInWithWallet,
-          signedIn: signedIn,
-          accountId:
-            account && account?.loading === false ? account?.accountId : null,
-          logOut: logOut,
-        }}
-      />
-    </div>
+    <>
+      <Head>
+        <title>
+          {`${network === 'testnet' ? 'TESTNET ' : ''}
+         ${t('address:metaTitle', { address: id })}`}
+        </title>
+        <meta name="title" content={t('address:metaTitle', { address: id })} />
+        <meta
+          name="description"
+          content={t('address:metaDescription', { address: id })}
+        />
+        <meta
+          property="og:title"
+          content={t('address:metaTitle', { address: id })}
+        />
+        <meta
+          property="og:description"
+          content={t('address:metaDescription', { address: id })}
+        />
+        <meta
+          property="twitter:title"
+          content={t('address:metaTitle', { address: id })}
+        />
+        <meta
+          property="twitter:description"
+          content={t('address:metaDescription', { address: id })}
+        />
+        <meta
+          property="og:image"
+          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
+        />
+        <meta
+          property="og:image:secure_url"
+          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
+        />
+        <meta
+          name="twitter:image:src"
+          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
+        />
+      </Head>
+      <div style={height} className="relative container mx-auto px-3">
+        <VmComponent
+          skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
+          defaultSkelton={<Overview />}
+          onChangeHeight={onChangeHeight}
+          src={components?.account}
+          props={{
+            id: id,
+            network: networkId,
+            t: t,
+            requestSignInWithWallet: requestSignInWithWallet,
+            signedIn: signedIn,
+            accountId:
+              account && account?.loading === false ? account?.accountId : null,
+            logOut: logOut,
+          }}
+        />
+      </div>
+    </>
   );
 };
 

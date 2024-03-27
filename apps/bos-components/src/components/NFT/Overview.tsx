@@ -17,6 +17,7 @@ interface Props {
 
 import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
+import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Token } from '@/includes/types';
 
@@ -184,7 +185,23 @@ export default function ({ network, id, ownerId }: Props) {
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {holders ? localFormat(holders) : ''}
+                      <div className="flex items-center">
+                        {holders ? localFormat(holders) : ''}
+                        <Tooltip.Provider>
+                          <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                              <Question className="w-4 h-4 fill-current ml-1" />
+                            </Tooltip.Trigger>
+                            <Tooltip.Content
+                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                              align="start"
+                              side="bottom"
+                            >
+                              Token holders will update soon
+                            </Tooltip.Content>
+                          </Tooltip.Root>
+                        </Tooltip.Provider>
+                      </div>
                     </div>
                   )}
                 </div>

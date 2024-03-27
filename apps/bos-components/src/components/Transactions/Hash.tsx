@@ -65,6 +65,7 @@ export default function (props: Props) {
             if (data.status === 200) {
               setTxn(resp);
               setIsLoading(false);
+              setError(false);
             } else {
               handleRateLimit(data, fetchTxn, () => setIsLoading(false));
             }

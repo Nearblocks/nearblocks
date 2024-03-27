@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import Export from '@/components/skeleton/common/Export';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -12,6 +13,8 @@ const ExportData = () => {
   const router = useRouter();
   const components = useBosComponents();
   const { address } = router.query;
+
+  const title = 'Export Transactions Data | Nearblocks';
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -46,20 +49,28 @@ const ExportData = () => {
   };
 
   return (
-    <div style={height} className="relative">
-      <VmComponent
-        src={components?.exportData}
-        skeleton={<Export className="absolute" ref={heightRef} />}
-        defaultSkelton={<Export />}
-        onChangeHeight={onChangeHeight}
-        props={{
-          network: networkId,
-          id: address,
-          onHandleDowload: onHandleDowload,
-          exportType: 'Transactions',
-        }}
-      />
-    </div>
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta property="og:title" content={title} />
+        <meta property="twitter:title" content={title} />
+      </Head>
+      <div style={height} className="relative">
+        <VmComponent
+          src={components?.exportData}
+          skeleton={<Export className="absolute" ref={heightRef} />}
+          defaultSkelton={<Export />}
+          onChangeHeight={onChangeHeight}
+          props={{
+            network: networkId,
+            id: address,
+            onHandleDowload: onHandleDowload,
+            exportType: 'Transactions',
+          }}
+        />
+      </div>
+    </>
   );
 };
 

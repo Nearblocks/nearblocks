@@ -212,7 +212,7 @@ export default function ({
                       </div>
                     ) : token?.price !== null && token?.price !== undefined ? (
                       <div className="w-full break-words flex flex-wrap text-sm">
-                        ${dollarFormat(token?.price)}
+                        ${localFormat(token?.price)}
                         {stats?.near_price && (
                           <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
                             @{' '}
@@ -370,7 +370,23 @@ export default function ({
                     </div>
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
-                      {holders ? localFormat(holders) : holders ?? ''}
+                      <div className="flex items-center">
+                        {holders ? localFormat(holders) : holders ?? ''}
+                        <Tooltip.Provider>
+                          <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                              <Question className="w-4 h-4 fill-current ml-1" />
+                            </Tooltip.Trigger>
+                            <Tooltip.Content
+                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                              align="start"
+                              side="bottom"
+                            >
+                              Token holders will update soon
+                            </Tooltip.Content>
+                          </Tooltip.Root>
+                        </Tooltip.Provider>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -95,7 +95,11 @@ export default function (props: Props) {
                         <button
                           type="submit"
                           disabled={!content}
-                          className="inline-flex justify-center p-2 text-green-500  rounded-full cursor-pointer hover:bg-neargray-800"
+                          className={`inline-flex justify-center p-2 ${
+                            !content || !context.accountId
+                              ? 'text-neargray-600'
+                              : 'text-green-500'
+                          } rounded-full cursor-pointer hover:bg-neargray-800`}
                         >
                           <svg
                             className="w-5 h-5 rotate-90 rtl:-rotate-90"
@@ -110,11 +114,13 @@ export default function (props: Props) {
                       </Tooltip.Trigger>
                       {!context.accountId && (
                         <Tooltip.Content
-                          className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
-                          align="start"
+                          className="bg-white shadow-lg border rounded-b-lg p-2 z-50"
+                          align="center"
                           side="bottom"
                         >
-                          {'Please LogIn'}
+                          <p className="text-sm text-nearblue-600">
+                            Please sign in to your wallet
+                          </p>
                         </Tooltip.Content>
                       )}
                     </Tooltip.Root>
