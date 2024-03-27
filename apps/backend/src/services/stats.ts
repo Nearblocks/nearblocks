@@ -1,14 +1,11 @@
 import { Big } from 'big.js';
 
-import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
-import config from '#config';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import lcw from '#libs/lcw';
 import near from '#libs/near';
-import { circulatingSupply } from '#libs/supply';
 
 const blockTime = async (timestamp: string) => {
   try {
@@ -39,19 +36,10 @@ const blockData = async () => {
     return {};
   }
 
-  let supply: null | string = null;
-
-  if (config.network === Network.MAINNET && block) {
-    supply = await circulatingSupply(block);
-
-    console.log({ job: 'stats', supply });
-  }
-
   const avgTime = await blockTime(block.block_timestamp);
 
   if (!avgTime) {
     return {
-      circulating_supply: supply,
       gas_price: block.gas_price,
       total_supply: block.total_supply,
     };
@@ -59,7 +47,6 @@ const blockData = async () => {
 
   return {
     avg_block_time: avgTime,
-    circulating_supply: supply,
     gas_price: block.gas_price,
     total_supply: block.total_supply,
   };

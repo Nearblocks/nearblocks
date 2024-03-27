@@ -9,11 +9,11 @@ import config from '#config';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import lcw from '#libs/lcw';
-import { circulatingSupply } from '#libs/supply';
+// import { circulatingSupply } from '#libs/supply';
 
 // The timestamp when transfers were enabled in the Mainnet
 // Tuesday, 13 October 2020 18:38:58.293
-const TRANSFERS_ENABLED = dayjs(1602614338293);
+// const TRANSFERS_ENABLED = dayjs(1602614338293);
 
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
@@ -66,19 +66,19 @@ const blockData = async (day: Dayjs) => {
     .sum({ sum: knex.raw('chunks.gas_used * blocks.gas_price') })
     .first();
 
-  let supply: null | string = null;
+  // let supply: null | string = null;
 
-  if (
-    config.network === Network.MAINNET &&
-    lastBlock &&
-    day.isSameOrAfter(TRANSFERS_ENABLED, 'day')
-  ) {
-    supply = await circulatingSupply(lastBlock);
-  }
+  // if (
+  //   config.network === Network.MAINNET &&
+  //   lastBlock &&
+  //   day.isSameOrAfter(TRANSFERS_ENABLED, 'day')
+  // ) {
+  //   supply = await circulatingSupply(lastBlock);
+  // }
 
   return {
     blocks: blocks?.count?.toString(),
-    circulating_supply: supply,
+    // circulating_supply: supply,
     gas_fee: gasFee?.sum?.toString(),
     gas_used: gasUsed?.sum?.toString(),
     total_supply: lastBlock?.total_supply,
