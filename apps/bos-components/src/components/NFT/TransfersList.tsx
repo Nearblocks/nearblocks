@@ -130,8 +130,7 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-2 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
+      tdClassName: 'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('hash') : 'HASH'}</span>,

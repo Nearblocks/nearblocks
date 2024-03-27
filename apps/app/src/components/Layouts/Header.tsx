@@ -232,7 +232,7 @@ const Header = () => {
   };
   const nearPrice = stats?.near_price ?? '';
   return (
-    <div className="bg-white soft-shadow z-[99] relative">
+    <div className="bg-white soft-shadow">
       {!status && (
         <div className="flex flex-wrap">
           <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue py-2 text-green text-sm ">
@@ -279,12 +279,10 @@ const Header = () => {
                               height={15}
                             />
                             <p className="text-sm text-gray-500 font-medium leading-6 px-1">
-                              <span>
-                                $
-                                {stats?.near_price
-                                  ? dollarFormat(stats?.near_price)
-                                  : stats?.near_price ?? ''}
-                              </span>
+                              $
+                              {stats?.near_price
+                                ? dollarFormat(stats?.near_price)
+                                : stats?.near_price ?? ''}
                             </p>
                             {stats?.change_24 > 0 ? (
                               <>
@@ -394,7 +392,7 @@ const Header = () => {
                             {t(menu.title)}
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </a>
-                          <ul className="bg-white soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
+                          <ul className="bg-white soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
                                 <ActiveLink
@@ -460,7 +458,7 @@ const Header = () => {
                         {t('header.menu.languages')}
                         <ArrowDown className="fill-current w-4 h-4 ml-2" />
                       </a>
-                      <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
+                      <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <ActiveLink href="#" locale={language.locale}>
@@ -525,7 +523,7 @@ const Header = () => {
 
                     <span className="group hidden md:flex h-full w-full relative">
                       <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 `}
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4 `}
                         href="#"
                       >
                         {user ? (
@@ -556,7 +554,7 @@ const Header = () => {
                       </a>
 
                       {user && (
-                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
+                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 px-4">
                           {/* {profile.map((menu) => (
                             <li key={menu.id}>
                               <ActiveLink href={menu.link}>
@@ -653,7 +651,7 @@ const Header = () => {
                           />
                         </div>
                       </a>
-                      <ul className="bg-white soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2">
+                      <ul className="bg-white soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                         <li>
                           <a
                             className={`block w-full hover:text-green-500 hover:no-underline py-2 px-4 text-gray-500 ${

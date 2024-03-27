@@ -213,7 +213,7 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
               href={`/token/${row?.contract}`}
               className="hover:no-underline"
             >
-              <a className=" text-green-500 hover:no-underline">
+              <a className=" text-green-500 hover:no-underline flex items-center">
                 <span className="inline-block truncate max-w-[200px] mr-1">
                   {row?.name}
                 </span>
