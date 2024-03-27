@@ -135,8 +135,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </span>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>Txn Hash</span>,

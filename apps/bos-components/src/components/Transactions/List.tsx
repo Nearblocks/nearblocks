@@ -213,8 +213,7 @@ export default function (props: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end ',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -653,18 +652,20 @@ export default function (props: Props) {
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
-            <div className="flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+            <div className="flex items-center px-6 text-sm mb-4 text-nearblue-600 lg:ml-auto">
               Filtered By:
-              <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                {filters &&
-                  Object.keys(filters).map((key) => (
-                    <span className="flex" key={key}>
-                      {capitalizeFirstLetter(key)}:{' '}
-                      <span className="inline-block truncate max-w-[120px]">
-                        <span className="font-semibold">{filters[key]}</span>
-                      </span>
+              <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                {Object.keys(filters).map((key) => (
+                  <span
+                    className="flex items-center max-sm:mb-1 truncate max-w-[120px]"
+                    key={key}
+                  >
+                    {capitalizeFirstLetter(key)}:{' '}
+                    <span className="font-semibold truncate">
+                      {filters[key]}
                     </span>
-                  ))}
+                  </span>
+                ))}
                 <CloseCircle
                   className="w-4 h-4 fill-current cursor-pointer"
                   onClick={onClear}

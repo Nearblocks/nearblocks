@@ -216,8 +216,7 @@ export default function ({
           <TxnStatus status={row.outcomes.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end ',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -659,7 +658,7 @@ export default function ({
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-3 text-sm mb-4 text-nearblue-600">
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               A total of{' '}
               {totalCount
                 ? localFormat && localFormat(totalCount.toString())
@@ -667,20 +666,22 @@ export default function ({
               transactions found
             </p>
           </div>
-          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+          <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
             {filters && Object.keys(filters).length > 0 && (
-              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
-                Filtered By:
-                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                  {filters &&
-                    Object.keys(filters).map((key) => (
-                      <span className="flex" key={key}>
-                        {capitalizeFirstLetter(key)}:{' '}
-                        <span className="inline-block truncate max-w-[120px]">
-                          <span className="font-semibold">{filters[key]}</span>
-                        </span>
+              <div className="flex  px-2 items-center text-sm text-gray-500 mb-2 lg:mb-0">
+                <span className="mr-1 lg:mr-2">Filtered By:</span>
+                <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                  {Object.keys(filters).map((key) => (
+                    <span
+                      className="flex items-center max-sm:mb-1 truncate max-w-[120px]"
+                      key={key}
+                    >
+                      {capitalizeFirstLetter(key)}:{' '}
+                      <span className="font-semibold truncate">
+                        {filters[key]}
                       </span>
-                    ))}
+                    </span>
+                  ))}
                   <CloseCircle
                     className="w-4 h-4 fill-current cursor-pointer"
                     onClick={onClear}
@@ -688,22 +689,18 @@ export default function ({
                 </span>
               </div>
             )}
-            <span className="text-xs text-nearblue-600">
-              <a
-                href={`/exportdata?address=${id}`}
-                className="hover:no-underline"
-                target="_blank"
-              >
-                <a
-                  target="_blank"
-                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-2  border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800 hover:no-underline"
+            <span className="text-xs text-nearblue-600 self-stretch lg:self-auto px-2">
+              <button className="hover:no-underline ">
+                <Link
+                  href={`/exportdata?address=${id}`}
+                  className="flex items-center text-nearblue-600 font-medium py-2 border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800"
                 >
-                  <p>CSV Export </p>
+                  <p>CSV Export</p>
                   <span className="ml-2">
                     <Download />
                   </span>
-                </a>
-              </a>
+                </Link>
+              </button>
             </span>
           </div>
         </div>
