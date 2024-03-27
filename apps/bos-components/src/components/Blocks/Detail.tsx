@@ -95,6 +95,7 @@ export default function (props: Props) {
                 transactions_agg: resp.transactions_agg,
               });
               setIsLoading(false);
+              setError(false);
             } else {
               handleRateLimit(data, fetchBlock, () => setIsLoading(false));
             }
@@ -380,7 +381,7 @@ export default function (props: Props) {
               ) : (
                 <div className="w-full md:w-3/4 break-words">
                   {gasUsed && block?.gas_price
-                    ? gasFee(gasUsed, block?.gas_price) + 'Ⓝ'
+                    ? gasFee(gasUsed, block?.gas_price) + ' Ⓝ'
                     : ''}
                 </div>
               )}

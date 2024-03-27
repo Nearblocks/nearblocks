@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/node-explorer/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -14,6 +15,9 @@ const NodeExplorer = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+
+  const title = 'NEAR Validator List | Nearblocks';
+
   const setPage = (pageNumber: number) => {
     Router.push(`/node-explorer?page=${pageNumber}`, undefined, {
       shallow: true,
@@ -46,6 +50,12 @@ const NodeExplorer = () => {
   };
   return (
     <>
+      <Head>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta property="og:title" content={title} />
+        <meta property="twitter:title" content={title} />
+      </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">

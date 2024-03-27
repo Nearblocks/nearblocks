@@ -236,14 +236,19 @@ export default function ({ network, id, token, ownerId }: Props) {
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4`}>
-          <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              token holders found
-            </p>
+        <>
+          <div className="flex w-full bg-nearblue px-5 py-4 text-green text-sm rounded-t-lg">
+            Token holders will update soon
           </div>
-        </div>
+          <div className={`flex flex-col lg:flex-row pt-4`}>
+            <div className="flex flex-col">
+              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+                A total of {localFormat && localFormat(totalCount.toString())}{' '}
+                token holders found
+              </p>
+            </div>
+          </div>
+        </>
       )}
       <Widget
         src={`${ownerId}/widget/bos-components.components.Shared.Table`}

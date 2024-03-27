@@ -97,7 +97,7 @@ export default function (props: Props) {
           y: Number(stat.txns),
           date: stat.date,
           blocks: stat.blocks,
-          addresses: stat.addresses,
+          addresses: stat.active_accounts,
         }),
         'market-cap': (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
@@ -117,9 +117,9 @@ export default function (props: Props) {
         }),
         addresses: (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
-          y: Number(stat.total_addresses),
+          y: Number(stat.active_accounts),
           date: stat.date,
-          addresses: stat.addresses,
+          addresses: stat.active_accounts,
         }),
         'txn-fee': (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
@@ -184,7 +184,7 @@ export default function (props: Props) {
           titleText = 'Near Market Capitalization Chart';
           yLabel = 'Near Market Cap (USD)';
           description =
-            'tNear Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
+            'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
           break;
         case 'txns':
           titleText = 'Near Daily Transactions Chart';
@@ -206,7 +206,7 @@ export default function (props: Props) {
           break;
         case 'addresses':
           titleText = 'Near Unique Accounts Chart';
-          yLabel = 'Near Cumulative Accounts Growth';
+          yLabel = 'Accounts per Day';
           description =
             'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.';
           break;
@@ -377,13 +377,12 @@ export default function (props: Props) {
                 case "blocks":
                     tooltipContent = \`
                       \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong>\`;
+                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong><br/>\`;
                   break;
                 case "addresses":
                     tooltipContent = \`
                       \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong>
-                      \`;
+                      Total Unique Addresses: <strong>\${dollarFormat(item.y)}</strong>\`;
                   break;
                   case "txn-fee":
                     tooltipContent = \`

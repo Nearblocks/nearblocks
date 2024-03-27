@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import Router, { useRouter } from 'next/router';
 import useTranslation from 'next-translate/useTranslation';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -6,6 +7,8 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import { networkId } from '@/utils/config';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
+
+const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 const Blocks = () => {
   const { t } = useTranslation();
@@ -46,6 +49,27 @@ const Blocks = () => {
   };
   return (
     <>
+      <Head>
+        <title>
+          {`${network === 'testnet' ? 'TESTNET' : ''} ${t(
+            'blocks:metaTitle',
+          )} `}
+        </title>
+        <meta name="title" content={t('blocks:metaTitle')} />
+        <meta name="description" content={t('blocks:metaDescription')} />
+        <meta property="og:title" content={t('blocks:metaTitle')} />
+        <meta property="og:image" content="/thumbnail/thumbnail_blocks.png" />
+        <meta property="og:description" content={t('blocks:metaDescription')} />
+        <meta property="twitter:title" content={t('blocks:metaTitle')} />
+        <meta
+          property="twitter:image"
+          content="/thumbnail/thumbnail_blocks.png"
+        />
+        <meta
+          property="twitter:description"
+          content={t('blocks:metaDescription')}
+        />
+      </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">

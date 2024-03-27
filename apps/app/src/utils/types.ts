@@ -49,3 +49,43 @@ export type BlocksInfo = {
     count: number;
   };
 };
+
+export type Token = {
+  name: string;
+  contract: string;
+  icon: string;
+  symbol: string;
+  price: string;
+  change_24: string;
+  volume_24h: string;
+  market_cap: string;
+  onchain_market_cap: string;
+  fully_diluted_market_cap: string;
+  total_supply: string;
+  circulating_supply: string;
+  description: string;
+  coingecko_id: string;
+  coinmarketcap_id: string;
+  holders: string;
+  base_uri: string;
+  reference: string;
+  tokens: string;
+  transfers: string;
+  transfers_3days: string;
+  transfers_day: string;
+  website: string;
+  meta: {
+    twitter: string;
+    facebook: string;
+    telegram: string;
+    coingecko_id: string;
+  };
+  token: string;
+  media: string;
+  asset: {
+    owner: string;
+  };
+  decimals: string;
+  title: string;
+  nft: Token;
+};

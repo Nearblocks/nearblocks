@@ -275,7 +275,9 @@ export default function ({ network, t, ownerId }: Props) {
                           {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
                             {nearBtcPrice
-                              ? '@' + localFormat(stats?.near_btc_price) + 'BTC'
+                              ? '@' +
+                                localFormat(stats?.near_btc_price) +
+                                ' BTC'
                               : ''}
                           </span>
                         </a>
@@ -323,7 +325,7 @@ export default function ({ network, t, ownerId }: Props) {
                         >
                           <a className="leading-6 text-nearblue-700 hover:no-underline">
                             {stats?.market_cap
-                              ? '$ ' + dollarFormat(stats?.market_cap ?? 0)
+                              ? '$' + dollarFormat(stats?.market_cap ?? 0)
                               : ''}
                           </a>
                         </Link>
@@ -388,7 +390,10 @@ export default function ({ network, t, ownerId }: Props) {
                 </div>
                 <div className="ml-2">
                   <p className="uppercase font-semibold text-nearblue-600 text-sm">
-                    {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}
+                    <Link href="/node-explorer" className="hover:no-underline">
+                      {' '}
+                      {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}{' '}
+                    </Link>
                   </p>
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />

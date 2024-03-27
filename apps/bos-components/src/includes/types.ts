@@ -267,6 +267,7 @@ export type ChartStat = {
   txn_fee_usd: string;
   total_addresses: string;
   addresses: string;
+  active_accounts: string;
 };
 
 export type ChartTypeInfo = {

@@ -5,14 +5,16 @@ import { useRouter } from 'next/router';
 
 interface LayoutProps {
   children: ReactNode;
+  notice?: ReactNode;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, notice }: LayoutProps) => {
   const router = useRouter();
   const className = router.pathname === '/404' ? 'bg-white' : 'bg-neargray-25';
 
   return (
     <div className={className}>
+      {notice}
       <header>
         <Header />
       </header>

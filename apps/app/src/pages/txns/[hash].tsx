@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-
+import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
@@ -7,6 +7,9 @@ import useTranslation from 'next-translate/useTranslation';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
+
+const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
+const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 const Txn = () => {
   const router = useRouter();
@@ -16,6 +19,11 @@ const Txn = () => {
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const [pageTab, setPageTab] = useState('overview');
+
+  let title = t('txns:txn.metaTitle', { txn: hash });
+  title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
+  const description = t('txns:txn.metaDescription', { txn: hash });
+  const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}`;
 
   const onHandleTab = (hashValue: string) => {
     setPageTab(hashValue);
@@ -54,6 +62,18 @@ const Txn = () => {
 
   return (
     <>
+      <Head>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta name="description" content={description} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="twitter:title" content={title} />
+        <meta property="twitter:description" content={description} />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
+      </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           src={components?.transactionsHash}
