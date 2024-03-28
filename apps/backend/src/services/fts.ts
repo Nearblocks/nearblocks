@@ -3,12 +3,12 @@ import omitBy from 'lodash/omitBy.js';
 
 import { FTMeta } from 'nb-types';
 
-// import cg from '#libs/cg';
+import cg from '#libs/cg';
 import cmc from '#libs/cmc';
 import { upsertErrorContract } from '#libs/contract';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
-import lcw from '#libs/lcw';
+// import lcw from '#libs/lcw';
 import { ftMeta, ftTotalSupply } from '#libs/near';
 import ref from '#libs/ref';
 import { tokenAmount } from '#libs/utils';
@@ -133,9 +133,8 @@ export const updateTotalSupply = async (meta: FTMeta) => {
 export const syncMarketData = async () => {
   const tokens = await knex('ft_meta')
     .where(function () {
-      this.whereNotNull('coinmarketcap_id')
-        // .orWhereNotNull('coingecko_id')
-        .orWhereNotNull('livecoinwatch_id');
+      this.whereNotNull('coinmarketcap_id').orWhereNotNull('coingecko_id');
+      // .orWhereNotNull('livecoinwatch_id');
     })
     .where('updated_at', '<', dayjs.utc().subtract(5, 'minutes').toISOString())
     .orderBy('updated_at', 'asc')
@@ -146,18 +145,18 @@ export const syncMarketData = async () => {
 
 export const updateMarketData = async (meta: FTMeta) => {
   try {
-    const [refData, lcwData, cmcData] = await Promise.all([
+    const [refData, cmcData, cgData] = await Promise.all([
       ref.marketData(meta.contract),
-      meta.livecoinwatch_id ? lcw.marketData(meta.livecoinwatch_id) : null,
+      // meta.livecoinwatch_id ? lcw.marketData(meta.livecoinwatch_id) : null,
       meta.coinmarketcap_id ? cmc.marketData(meta.coinmarketcap_id) : null,
-      // meta.coingecko_id ? cg.marketData(meta.coingecko_id) : null,
+      meta.coingecko_id ? cg.marketData(meta.coingecko_id) : null,
     ]);
 
     const marketData = {
       ...omitBy(refData, isNull),
-      ...omitBy(lcwData, isNull),
+      // ...omitBy(lcwData, isNull),
       ...omitBy(cmcData, isNull),
-      // ...omitBy(cgData, isNull),
+      ...omitBy(cgData, isNull),
       updated_at: dayjs.utc().toISOString(),
     };
 
@@ -170,9 +169,9 @@ export const updateMarketData = async (meta: FTMeta) => {
 export const searchContracts = async () => {
   const [unsearched, searched] = await Promise.all([
     knex('ft_meta')
-      // .whereNull('coingecko_id')
+      .whereNull('coingecko_id')
       .whereNull('coinmarketcap_id')
-      .whereNull('livecoinwatch_id')
+      // .whereNull('livecoinwatch_id')
       .orderByRaw('searched_at ASC NULLS FIRST')
       .limit(4),
     knex('ft_meta')
@@ -189,16 +188,16 @@ export const searchContracts = async () => {
 
 export const updateMarketSearch = async (meta: FTMeta) => {
   try {
-    const [lcwId, cmcId] = await Promise.all([
-      lcw.marketSearch(meta.contract),
+    const [cmcId, cgId] = await Promise.all([
+      // lcw.marketSearch(meta.contract),
       cmc.marketSearch(meta.contract),
-      // cg.marketSearch(meta.contract),
+      cg.marketSearch(meta.contract),
     ]);
 
     const marketData = {
-      ...(lcwId && { livecoinwatch_id: lcwId }),
+      // ...(lcwId && { livecoinwatch_id: lcwId }),
       ...(cmcId && { coinmarketcap_id: cmcId }),
-      // ...(cgId && { coingecko_id: cgId }),
+      ...(cgId && { coingecko_id: cgId }),
       searched_at: dayjs.utc().toISOString(),
       updated_at: dayjs.utc().toISOString(),
     };
