@@ -207,7 +207,11 @@ export default function (props: Props) {
 
   const [logs, actions, errorMessage] = useMemo(() => {
     if (rpcTxn) {
-      return [txnLogs(rpcTxn), txnActions(rpcTxn), txnErrorMessage(rpcTxn)];
+      return [
+        txnLogs && txnLogs(rpcTxn),
+        txnActions && txnActions(rpcTxn),
+        txnErrorMessage && txnErrorMessage(rpcTxn),
+      ];
     }
     return [[], [], undefined];
 

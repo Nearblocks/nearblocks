@@ -50,23 +50,27 @@ export default function (props: Props) {
     const receiptsMap =
       txn?.receipts_outcome &&
       txn?.receipts_outcome.reduce((mapping, receiptOutcome) => {
-        const receipt = parseReceipt(
-          txn.receipts.find(
-            (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
-          ),
-          receiptOutcome,
-          txn.transaction,
-        );
+        const receipt =
+          parseReceipt &&
+          parseReceipt(
+            txn.receipts.find(
+              (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
+            ),
+            receiptOutcome,
+            txn.transaction,
+          );
         return mapping.set(receiptOutcome.id, {
           ...receipt,
-          outcome: parseOutcomeOld(receiptOutcome),
+          outcome: parseOutcomeOld && parseOutcomeOld(receiptOutcome),
         });
       }, new Map());
 
-    const receipts = collectNestedReceiptWithOutcomeOld(
-      txn.transaction_outcome.outcome.receipt_ids[0],
-      receiptsMap,
-    );
+    const receipts =
+      collectNestedReceiptWithOutcomeOld &&
+      collectNestedReceiptWithOutcomeOld(
+        txn.transaction_outcome.outcome.receipt_ids[0],
+        receiptsMap,
+      );
 
     return receipts;
   }
