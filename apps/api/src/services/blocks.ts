@@ -149,7 +149,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
             'gas_used',
             COALESCE(SUM(gas_used), 0),
             'gas_limit',
-            COALESCE(SUM(gas_limit), 0)
+            COALESCE(SUM(gas_limit), 0),
+            'shards',
+            COUNT(included_in_block_hash)
           )
         FROM
           chunks
