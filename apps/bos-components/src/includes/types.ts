@@ -458,6 +458,7 @@ export type AccountContractInfo = {
 export type EventPropsInfo = {
   event: TransactionLog;
   network: string;
+  ownerId: string;
 };
 
 export type DepositPropsInfo = {
@@ -467,6 +468,7 @@ export type DepositPropsInfo = {
     amount: string;
   }[];
   network: string;
+  ownerId: string;
 };
 
 export type ActionPropsInfo = {
@@ -479,6 +481,7 @@ export type ActionPropsInfo = {
       deposit: string;
     };
   };
+  ownerId: string;
 };
 export type ArgsPropsInfo = {
   access_key: {

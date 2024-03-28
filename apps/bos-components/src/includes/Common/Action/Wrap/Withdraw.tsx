@@ -1,13 +1,6 @@
 import { EventPropsInfo } from '@/includes/types';
 
 const Withdraw = (props: EventPropsInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
-
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -25,8 +18,6 @@ const Withdraw = (props: EventPropsInfo) => {
     );
   };
 
-  const config = getConfig && getConfig(props.network);
-
   const log = props.event.logs?.match(/^Withdraw (\d+) NEAR from ([\S]+)/);
 
   if (log?.length !== 3) return null;
@@ -37,7 +28,7 @@ const Withdraw = (props: EventPropsInfo) => {
       <span className="font-bold px-1">Burn </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
           props={{
             contract: props.event.contract,
             amount: log[1],
