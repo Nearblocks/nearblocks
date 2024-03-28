@@ -64,8 +64,9 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
-    fetchToken();
+    if (config?.backendUrl) {
+      fetchToken();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, tid]);

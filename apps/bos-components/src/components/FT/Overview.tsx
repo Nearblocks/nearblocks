@@ -153,10 +153,12 @@ export default function ({
         )
         .catch(() => {});
     }
-    fetchStatsData();
-    fetchFTData();
-    fetchTxnsCount();
-    fetchHoldersCount();
+    if (config?.backendUrl) {
+      fetchStatsData();
+      fetchFTData();
+      fetchTxnsCount();
+      fetchHoldersCount();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);

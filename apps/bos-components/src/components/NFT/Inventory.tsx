@@ -123,8 +123,10 @@ export default function ({ network, id, token, ownerId }: Props) {
     if (!token && token === undefined) {
       fetchNFTData();
     }
-    fetchTotalToken();
-    fetchTokenData();
+    if (config?.backendUrl) {
+      fetchTotalToken();
+      fetchTokenData();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);

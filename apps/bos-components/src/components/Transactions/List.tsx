@@ -148,15 +148,15 @@ export default function (props: Props) {
         )
         .join('&');
     }
-
-    if (urlString && sorting) {
-      fetchTotalTxns(urlString);
-      fetchTxnsData(urlString, sorting, currentPage);
-    } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
-      fetchTotalTxns();
-      fetchTxnsData('', sorting, currentPage);
+    if (config?.backendUrl) {
+      if (urlString && sorting) {
+        fetchTotalTxns(urlString);
+        fetchTxnsData(urlString, sorting, currentPage);
+      } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
+        fetchTotalTxns();
+        fetchTxnsData('', sorting, currentPage);
+      }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, filters, sorting]);
 

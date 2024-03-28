@@ -264,12 +264,13 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
-
-    fetchStatsData();
-    fetchAccountData();
-    fetchContractData();
-    fetchTokenData();
-    fetchInventoryData();
+    if (config?.backendUrl) {
+      fetchStatsData();
+      fetchAccountData();
+      fetchContractData();
+      fetchTokenData();
+      fetchInventoryData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
 

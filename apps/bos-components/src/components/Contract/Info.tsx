@@ -63,8 +63,9 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
-
-    fetchContractData();
+    if (config?.backendUrl) {
+      fetchContractData();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);

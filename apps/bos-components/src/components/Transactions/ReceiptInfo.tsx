@@ -74,9 +74,9 @@ export default function (props: Props) {
           .catch(() => {});
       }
     }
-
-    fetchBlocks();
-
+    if (config?.backendUrl) {
+      fetchBlocks();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.outcome?.blockHash, config.backendUrl]);
 
@@ -85,7 +85,7 @@ export default function (props: Props) {
   if (receipt?.outcome?.status?.type === 'successValue') {
     if (receipt?.outcome?.status?.value.length === 0) {
       statusInfo = (
-        <div className="bg-gray-100 rounded-md text-3f4246 p-5 font-medium my-3">
+        <div className="bg-gray-100 rounded-md p-5 font-medium my-3">
           Empty result
         </div>
       );
@@ -112,14 +112,14 @@ export default function (props: Props) {
             readOnly
             rows={4}
             defaultValue={JSON.stringify(prettyArgs)}
-            className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
-            <div className="bg-gray-100 rounded-md p-3 font-semibold my-3">
-              <div className="bg-inherit text-inherit font-inherit text-base border-none p-0">
+            <div className="bg-gray-100 rounded-md p-5 font-semibold my-3">
+              <div className="bg-inherit text-inherit font-inherit border-none p-0">
                 <div className="max-h-52 overflow-auto">
-                  <div className="p-4 h-full w-full">{prettyArgs}</div>
+                  <div className="h-full w-full">{prettyArgs}</div>
                 </div>
               </div>
             </div>
@@ -132,7 +132,7 @@ export default function (props: Props) {
         readOnly
         rows={4}
         defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+        className="block appearance-none outline-none w-full border rounded-lg font-medium bg-gray-100 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
@@ -152,7 +152,7 @@ export default function (props: Props) {
               <Tabs.Trigger
                 key={index}
                 onClick={() => onTab(index)}
-                className={`text-nearblue-600 text-sm mx-2.5 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                className={`text-nearblue-600 text-xs leading-4 mx-2.5 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                   pageHash === hash
                     ? 'rounded-lg bg-green-600 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'

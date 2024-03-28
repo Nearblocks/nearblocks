@@ -78,9 +78,9 @@ export default function ({ network, t, ownerId }: Props) {
         })
         .catch(() => {});
     }
-
-    fetchStats();
-
+    if (config?.backendUrl) {
+      fetchStats();
+    }
     const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
@@ -108,9 +108,9 @@ export default function ({ network, t, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
-    fetchChartData();
-
+    if (config?.backendUrl) {
+      fetchChartData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);
 

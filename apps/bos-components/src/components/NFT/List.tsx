@@ -114,14 +114,14 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
         .catch(() => {})
         .finally(() => {});
     }
-
-    fetchTotalTokens();
-    fetchTokens('', sorting, currentPage);
-    if (sorting) {
+    if (config?.backendUrl) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
+      if (sorting) {
+        fetchTotalTokens();
+        fetchTokens('', sorting, currentPage);
+      }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
 

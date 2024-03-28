@@ -106,9 +106,10 @@ export default function ({ network, id, ownerId }: Props) {
         })
         .catch(() => {});
     }
-
-    fetchTotalTxns();
-    fetchTxnsData(currentPage);
+    if (config?.backendUrl) {
+      fetchTotalTxns();
+      fetchTxnsData(currentPage);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id]);
@@ -430,7 +431,7 @@ export default function ({ network, id, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'pr-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },

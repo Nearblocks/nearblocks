@@ -110,10 +110,11 @@ export default function ({ network, id, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
-    fetchNFTData();
-    fetchTxnsCount();
-    fetchHoldersCount();
+    if (config?.backendUrl) {
+      fetchNFTData();
+      fetchTxnsCount();
+      fetchHoldersCount();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);

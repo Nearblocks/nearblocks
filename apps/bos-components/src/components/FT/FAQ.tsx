@@ -166,11 +166,13 @@ export default function ({ network, id, token, ownerId }: Props) {
     if (!token && token === undefined) {
       fetchFTData();
     }
-    fetchAccountData();
-    fetchContractData();
-    fetchHoldersCount();
-    fetchTotalTxns();
-    fetchHoldersdata();
+    if (config?.backendUrl) {
+      fetchAccountData();
+      fetchContractData();
+      fetchHoldersCount();
+      fetchTotalTxns();
+      fetchHoldersdata();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, config?.backendUrl, token]);

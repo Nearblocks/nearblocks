@@ -108,9 +108,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         .catch(() => {})
         .finally(() => {});
     }
-
-    fetchTotalTokens();
-    fetchTokens(currentPage);
+    if (config?.backendUrl) {
+      fetchTotalTokens();
+      fetchTokens(currentPage);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, tid]);
