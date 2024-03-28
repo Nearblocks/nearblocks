@@ -164,7 +164,7 @@ window.addEventListener("message", (event) => {
               clickable
               onChange={uploadFile}
             >
-              {msg}
+              <p className="text-sm">{msg}</p>
             </Files>
           </div>
         </button>

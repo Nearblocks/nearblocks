@@ -194,7 +194,7 @@ export default function (props: Props) {
           </div>
         </>
       ) : (
-        <p className="px-6 py-4 text-gray-400 text-lg">No comments</p>
+        <p className="px-6 py-4 text-nearblue-700 text-xs ">No comments</p>
       )}
     </>
   );
