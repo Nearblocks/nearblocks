@@ -99,6 +99,10 @@ const languages = [
     locale: 'zh-hk',
   },
   {
+    title: 'Українська',
+    locale: 'ua',
+  },
+  {
     title: 'Русский',
     locale: 'ru',
   },
