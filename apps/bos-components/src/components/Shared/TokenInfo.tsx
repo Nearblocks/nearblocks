@@ -53,7 +53,6 @@ export default function (props: TokenInfoProps) {
               };
             }) => {
               const resp = data?.body?.result;
-              console.log('decodeArgs(resp.result)', decodeArgs(resp.result));
               setMeta(decodeArgs(resp.result));
             },
           )

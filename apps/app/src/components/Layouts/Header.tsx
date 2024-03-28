@@ -168,6 +168,7 @@ const Header = () => {
         const data: Stats = dataArray?.stats?.[0];
         if (response.status === 200) {
           setStats(data);
+          setError(false);
         }
       } catch (error) {
         setError(true);
