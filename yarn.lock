@@ -12349,9 +12349,9 @@ near-social-vm-types@^1.0.0:
     styled-components "^5.3.6"
     tweetnacl "^1.0.3"
 
-"nearblock-translations@https://github.com/Nearblocks/translations.git#267c5ebb09fb03f57421f88c706342e3219939cd":
+"nearblock-translations@https://github.com/Nearblocks/translations.git#621a8a9d93e363be0152bcc0267bc2e93eeffb45":
   version "0.1.2"
-  resolved "https://github.com/Nearblocks/translations.git#267c5ebb09fb03f57421f88c706342e3219939cd"
+  resolved "https://github.com/Nearblocks/translations.git#621a8a9d93e363be0152bcc0267bc2e93eeffb45"
 
 nearley@^2.20.1:
   version "2.20.1"
