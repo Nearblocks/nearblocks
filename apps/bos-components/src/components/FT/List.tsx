@@ -35,7 +35,7 @@ const initialPagination = {
   per_page: 50,
 };
 export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
-  const { localFormat, dollarFormat, dollarNonCentFormat, serialNumber } =
+  const { priceFormat, dollarFormat, dollarNonCentFormat, serialNumber } =
     VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { debounce, getConfig, handleRateLimit } = VM.require(
@@ -238,7 +238,7 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
           {row?.price === null ? (
             <span className="text-xs">N/A</span>
           ) : (
-            ` $${localFormat(row?.price)}`
+            `$${priceFormat(row?.price)}`
           )}
         </span>
       ),

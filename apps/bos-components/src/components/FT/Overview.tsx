@@ -374,7 +374,7 @@ export default function ({
                     <div className="w-full md:w-3/4 break-words">
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : holders ?? ''}
-                        <Tooltip.Provider>
+                        {/* <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <Question className="w-4 h-4 fill-current ml-1" />
@@ -387,7 +387,7 @@ export default function ({
                               Token holders will update soon
                             </Tooltip.Content>
                           </Tooltip.Root>
-                        </Tooltip.Provider>
+                        </Tooltip.Provider> */}
                       </div>
                     </div>
                   )}

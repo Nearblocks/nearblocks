@@ -76,6 +76,14 @@ export default function () {
     return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
   }
 
+  function priceFormat(number: string) {
+    const bigNumber = Big(number);
+    const formattedNumber = bigNumber
+      .toFixed(8)
+      .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+    return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
+  }
+
   function convertToMetricPrefix(numberStr: string) {
     const prefixes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']; // Metric prefixes
 
@@ -383,5 +391,6 @@ export default function () {
     shortenHex,
     formatNumber,
     formatDate,
+    priceFormat,
   };
 }

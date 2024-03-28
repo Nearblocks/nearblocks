@@ -34,6 +34,7 @@ export default function ({ network, id, token, ownerId }: Props) {
   );
 
   const [isLoading, setIsLoading] = useState(false);
+  const [countLoader, setCountLoader] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
@@ -75,6 +76,7 @@ export default function ({ network, id, token, ownerId }: Props) {
         .catch(() => {});
     }
     function fetchTotalHolders() {
+      setCountLoader(true);
       asyncFetch(`${config?.backendUrl}fts/${id}/holders/count`, {
         method: 'GET',
         headers: {
@@ -91,6 +93,7 @@ export default function ({ network, id, token, ownerId }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+              setCountLoader(false);
             } else {
               handleRateLimit(data, fetchTotalHolders);
             }
@@ -200,7 +203,7 @@ export default function ({ network, id, token, ownerId }: Props) {
         <>
           {' '}
           {row.amount && tokens?.decimals
-            ? tokenAmount(row.amount, tokens?.decimals, true)
+            ? localFormat(tokenAmount(row.amount, tokens?.decimals, true))
             : ''}
         </>
       ),
@@ -254,15 +257,15 @@ export default function ({ network, id, token, ownerId }: Props) {
 
   return (
     <>
-      {isLoading ? (
+      {countLoader ? (
         <div className="pl-3 max-w-sm py-5 h-[60px]">
           <Skeleton className="h-4" />
         </div>
       ) : (
         <>
-          <div className="flex w-full bg-nearblue px-5 py-4 text-green text-sm rounded-t-lg">
+          {/* <div className="flex w-full bg-nearblue px-5 py-4 text-green text-sm rounded-t-lg">
             Token holders will update soon
-          </div>
+          </div> */}
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">

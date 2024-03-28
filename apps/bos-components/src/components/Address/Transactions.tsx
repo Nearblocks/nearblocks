@@ -408,7 +408,7 @@ export default function ({
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
                     row?.predecessor_account_id === address
-                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -my-[1px] cursor-pointer text-[#033F40]'
                       : 'text-green-500 p-0.5 px-1'
                   }`}
                 >
@@ -515,7 +515,7 @@ export default function ({
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
                     row?.receiver_account_id === address
-                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -my-[1px] cursor-pointer text-[#033F40]'
                       : 'text-green-500 p-0.5 px-1'
                   }`}
                 >
