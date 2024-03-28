@@ -28,7 +28,7 @@ const Contract = () => {
         />
       </Head>
       <div className="bg-hero-pattern h-72"></div>
-      <div className=" md:px-14 flex flex-col items-start md:py-16 px-6 mt-[-300px]">
+      <div className="container mx-auto px-3 md:px-14 flex flex-col items-start md:py-16 mt-[-300px]">
         <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
           {t('Contact Nearblocks')}
         </h1>
