@@ -17,10 +17,12 @@ const Swap = (props: EventPropsInfo) => {
       </svg>
     );
   };
-
   const log = props.event.logs?.match(
     /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
   );
+  if (!Array.isArray(log)) {
+    return null;
+  }
 
   if (log?.length !== 5) return null;
 
@@ -44,7 +46,7 @@ const Swap = (props: EventPropsInfo) => {
           src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
           props={{
             network: props.network,
-            contract: log[4],
+            contract: log[4].replace(/,$/, ''),
             amount: log[3],
             ownerId: props.ownerId,
           }}

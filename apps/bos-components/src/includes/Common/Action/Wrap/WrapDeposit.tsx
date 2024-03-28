@@ -33,6 +33,7 @@ const WrapDeposit = (props: EventPropsInfo) => {
             contract: props.event.contract,
             amount: log[1],
             network: props.network,
+            ownerId: props.ownerId,
           }}
         />
       }

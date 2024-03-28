@@ -31,7 +31,6 @@ const EventLogs = (props: EventPropsInfo) => {
           ownerId={props.ownerId}
         />
       );
-
     default:
       return null;
   }
