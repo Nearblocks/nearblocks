@@ -4,7 +4,7 @@ import { MetaInfo, TokenInfoProps } from '@/includes/types';
 export default function (props: TokenInfoProps) {
   const { network, contract, amount, decimals, ownerId } = props;
 
-  const { shortenToken, shortenTokenSymbol } = VM.require(
+  const { shortenToken, shortenTokenSymbol, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
@@ -71,7 +71,7 @@ export default function (props: TokenInfoProps) {
     <>
       <span className="font-normal px-1">
         {amount
-          ? tokenAmount(amount, meta?.decimals || decimals, true)
+          ? localFormat(tokenAmount(amount, meta?.decimals || decimals, true))
           : amount ?? ''}
       </span>
       <span className="flex items-center">
