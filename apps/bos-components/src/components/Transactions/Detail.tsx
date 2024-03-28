@@ -153,7 +153,9 @@ export default function (props: Props) {
       }
     }
 
-    fetchStatsDatas();
+    if (config.backendUrl) {
+      fetchStatsDatas();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config.backendUrl]);
@@ -686,7 +688,8 @@ export default function (props: Props) {
                           For{' '}
                           <span className="pl-1 font-normal">
                             {ft?.delta_amount && ft?.ft_meta?.decimals
-                              ? tokenAmount(
+                              ? tokenAmount &&
+                                tokenAmount(
                                   absoluteValue(ft?.delta_amount),
                                   ft?.ft_meta?.decimals,
                                   true,

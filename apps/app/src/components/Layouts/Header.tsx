@@ -155,8 +155,8 @@ const Header = () => {
       try {
         const response = await fetch(
           networkId === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/stats'
-            : 'https://api3-testnet.nearblocks.io/v1/stats',
+            ? 'https://api2.nearblocks.io/v1/stats'
+            : 'https://api2-testnet.nearblocks.io/v1/stats',
           {
             method: 'GET',
             headers: {
