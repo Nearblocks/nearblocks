@@ -40,7 +40,7 @@ export default function (props: Props) {
     {
       link: '/charts/near-price',
       text: t ? t('charts:nearPrice.heading') : 'Near Daily Price (USD) Chart',
-      image: `${config?.appUrl}images/charts/near-price.svg`,
+      image: `/images/charts/near-price.svg`,
       exclude: `${network}` === 'testnet',
     },
     {
@@ -48,43 +48,43 @@ export default function (props: Props) {
       text: t
         ? t('charts:marketCap.heading')
         : 'Near Market Capitalization Chart',
-      image: `${config?.appUrl}images/charts/market-cap.svg`,
+      image: `/images/charts/market-cap.svg`,
       exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/near-supply',
       text: t ? t('charts:nearSupply.heading') : 'Near Supply Growth Chart',
-      image: `${config?.appUrl}images/charts/near-supply.svg`,
+      image: `/images/charts/near-supply.svg`,
       exclude: false,
     },
     {
       link: '/charts/txns',
       text: t ? t('charts:txns.heading') : 'Near Daily Transactions Chart',
-      image: `${config?.appUrl}images/charts/txns.svg`,
+      image: `/images/charts/txns.svg`,
       exclude: false,
     },
     {
       link: '/charts/blocks',
       text: t ? t('charts:blocks.heading') : 'New Blocks',
-      image: `${config?.appUrl}images/charts/blocks.svg`,
+      image: `/images/charts/blocks.svg`,
       exclude: false,
     },
     {
       link: '/charts/addresses',
       text: t ? t('charts:addresses.heading') : 'Near Unique Accounts Chart',
-      image: `${config?.appUrl}images/charts/addresses.svg`,
+      image: `/images/charts/addresses.svg`,
       exclude: false,
     },
     {
       link: '/charts/txn-fee',
       text: t ? t('charts:txnFee.heading') : 'Transaction Fee Chart',
-      image: `${config?.appUrl}images/charts/txn-fee.svg`,
+      image: `/images/charts/txn-fee.svg`,
       exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/txn-volume',
       text: t ? t('charts:txnVolume.heading') : 'Transaction Volume Chart',
-      image: `${config?.appUrl}images/charts/txn-volume.svg`,
+      image: `/images/charts/txn-volume.svg`,
       exclude: `${network}` === 'testnet',
     },
   ];
