@@ -76,8 +76,9 @@ export default function (props: Props) {
           setIsLoading(false);
         });
     }
-
-    fetchTxn();
+    if (config.backendUrl) {
+      fetchTxn();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, hash]);
@@ -115,9 +116,9 @@ export default function (props: Props) {
           .catch(() => {});
       }
     }
-
-    fetchTransactionStatus();
-
+    if (config?.rpcUrl) {
+      fetchTransactionStatus();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config?.rpcUrl]);
 

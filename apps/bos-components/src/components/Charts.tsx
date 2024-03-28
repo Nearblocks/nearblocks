@@ -168,8 +168,9 @@ export default function (props: Props) {
         },
       );
     }
-
-    fetchChartData();
+    if (config?.backendUrl) {
+      fetchChartData();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);

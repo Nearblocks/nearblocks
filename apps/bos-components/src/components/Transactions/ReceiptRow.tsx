@@ -80,9 +80,9 @@ export default function (props: Props) {
           .catch(() => {});
       }
     }
-
-    fetchBlocks();
-
+    if (config?.backendUrl) {
+      fetchBlocks();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.block_hash, config.backendUrl]);
 

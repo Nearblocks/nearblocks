@@ -74,8 +74,9 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
-    fetchInventoryData();
+    if (config?.backendUrl) {
+      fetchInventoryData();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, tokenFilter]);

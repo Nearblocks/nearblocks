@@ -138,10 +138,10 @@ export default function ({
         )
         .join('&');
     }
-
-    fetchTotalTxns(urlString);
-    fetchTxnsData(currentPage, urlString);
-
+    if (config?.backendUrl) {
+      fetchTotalTxns(urlString);
+      fetchTxnsData(currentPage, urlString);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, filters]);
 

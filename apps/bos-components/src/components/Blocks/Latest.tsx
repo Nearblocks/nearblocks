@@ -55,8 +55,9 @@ export default function ({ network, t, ownerId }: Props) {
         });
     }
 
-    fetchLatestBlocks();
-
+    if (config.backendUrl) {
+      fetchLatestBlocks();
+    }
     const interval = setInterval(fetchLatestBlocks, delay);
 
     return () => clearInterval(interval);

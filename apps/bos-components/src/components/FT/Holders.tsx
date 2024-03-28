@@ -133,8 +133,10 @@ export default function ({ network, id, token, ownerId }: Props) {
     if (!token && token === undefined) {
       fetchFTData();
     }
-    fetchTotalHolders();
-    fetchHoldersData(currentPage);
+    if (config?.backendUrl) {
+      fetchTotalHolders();
+      fetchHoldersData(currentPage);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);

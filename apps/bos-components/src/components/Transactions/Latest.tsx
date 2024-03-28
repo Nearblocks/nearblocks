@@ -65,7 +65,9 @@ export default function ({ t, network, ownerId }: Props) {
           setError(true);
         });
     }
-    fetchLatestTxns();
+    if (config?.backendUrl) {
+      fetchLatestTxns();
+    }
 
     const interval = setInterval(fetchLatestTxns, delay);
 

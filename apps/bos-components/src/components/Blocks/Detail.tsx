@@ -106,8 +106,9 @@ export default function (props: Props) {
           setIsLoading(false);
         });
     }
-
-    fetchBlock();
+    if (config.backendUrl) {
+      fetchBlock();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, hash]);

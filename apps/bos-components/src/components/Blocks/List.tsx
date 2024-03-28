@@ -106,9 +106,10 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
-    fetchTotalBlocks();
-    fetchBlocks(currentPage);
+    if (config?.backendUrl) {
+      fetchTotalBlocks();
+      fetchBlocks(currentPage);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);

@@ -142,10 +142,11 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
         .catch(() => {})
         .finally(() => {});
     }
-    fetchLatestBlock();
-    fetchTotalSuppy();
-    fetchValidatorData(currentPage);
-
+    if (config?.backendUrl) {
+      fetchLatestBlock();
+      fetchTotalSuppy();
+      fetchValidatorData(currentPage);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
 
