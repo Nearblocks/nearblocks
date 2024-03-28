@@ -24,7 +24,10 @@ export const getServerSideProps = async (context: any) => {
           ? `https://api3.nearblocks.io/v1/search/receipts?keyword=${receipt}`
           : `https://api3-testnet.nearblocks.io/v1/search/receipts?keyword=${receipt}`,
         {
-          headers: { Authorization: `Bearer ${process.env.API_KEY}` },
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
       );
 
