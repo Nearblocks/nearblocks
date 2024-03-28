@@ -73,27 +73,27 @@ const Overview = forwardRef(
             <div className="w-full">
               <div>
                 <div
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Transactions
                 </div>
                 <div
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Token Txns
                 </div>
                 <div
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none  hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none  hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   NFT Token Txns
                 </div>
                 <div
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Access Keys
                 </div>
                 <div
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Comments
                 </div>
