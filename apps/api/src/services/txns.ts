@@ -260,6 +260,14 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       receipt_conversion_tokens_burnt,
       (
         SELECT
+          shard_id
+        FROM
+          chunks
+        WHERE
+          chunks.chunk_hash = transactions.included_in_chunk_hash
+      ) AS shard_id,
+      (
+        SELECT
           JSON_BUILD_OBJECT('block_height', block_height)
         FROM
           blocks
