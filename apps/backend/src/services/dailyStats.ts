@@ -6,9 +6,9 @@ import { Network } from 'nb-types';
 import { msToNsTime, nsToMsTime, sleep, yoctoToNear } from 'nb-utils';
 
 import config from '#config';
+import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
-import lcw from '#libs/lcw';
 // import { circulatingSupply } from '#libs/supply';
 
 // The timestamp when transfers were enabled in the Mainnet
@@ -23,8 +23,8 @@ const marketData = async (date: Dayjs) => {
     };
   }
 
-  const start = date.valueOf();
-  const history = await lcw.marketHistory(start);
+  const start = date.format('DD-MM-YYYY');
+  const history = await cg.marketHistory(start);
 
   logger.warn({ history, start });
 
@@ -42,29 +42,31 @@ const blockData = async (day: Dayjs) => {
   const start = msToNsTime(day.clone().startOf('day').valueOf());
   const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
 
-  const blocks = await knex('blocks')
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .count()
-    .first();
-  const lastBlock = await knex('blocks')
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .orderBy('block_timestamp', 'desc')
-    .limit(1)
-    .first();
-  const gasUsed = await knex('blocks')
-    .join('chunks', 'chunks.included_in_block_hash', 'blocks.block_hash')
-    .where('blocks.block_timestamp', '>=', start)
-    .where('blocks.block_timestamp', '<', end)
-    .sum({ sum: 'chunks.gas_used' })
-    .first();
-  const gasFee = await knex('blocks')
-    .join('chunks', 'chunks.included_in_block_hash', 'blocks.block_hash')
-    .where('blocks.block_timestamp', '>=', start)
-    .where('blocks.block_timestamp', '<', end)
-    .sum({ sum: knex.raw('chunks.gas_used * blocks.gas_price') })
-    .first();
+  const [blocks, lastBlock, gasUsed, gasFee] = await Promise.all([
+    knex('blocks')
+      .where('block_timestamp', '>=', start)
+      .where('block_timestamp', '<', end)
+      .count()
+      .first(),
+    knex('blocks')
+      .where('block_timestamp', '>=', start)
+      .where('block_timestamp', '<', end)
+      .orderBy('block_timestamp', 'desc')
+      .limit(1)
+      .first(),
+    knex('blocks')
+      .join('chunks', 'chunks.included_in_block_hash', 'blocks.block_hash')
+      .where('blocks.block_timestamp', '>=', start)
+      .where('blocks.block_timestamp', '<', end)
+      .sum({ sum: 'chunks.gas_used' })
+      .first(),
+    knex('blocks')
+      .join('chunks', 'chunks.included_in_block_hash', 'blocks.block_hash')
+      .where('blocks.block_timestamp', '>=', start)
+      .where('blocks.block_timestamp', '<', end)
+      .sum({ sum: knex.raw('chunks.gas_used * blocks.gas_price') })
+      .first(),
+  ]);
 
   // let supply: null | string = null;
 
@@ -86,33 +88,37 @@ const blockData = async (day: Dayjs) => {
 };
 
 const txnData = async (start: string, end: string, price?: null | string) => {
-  const txns = await knex('transactions')
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .count()
-    .first();
-  console.log({ job: 'daily-stats', txnData: txns });
-  const volume = await knex('action_receipt_actions as ara')
-    .join('execution_outcomes as eo', 'eo.receipt_id', '=', 'ara.receipt_id')
-    .where('eo.executed_in_block_timestamp', '>=', start)
-    .where('eo.executed_in_block_timestamp', '<', end)
-    .where('ara.action_kind', 'IN', ['FUNCTION_CALL', 'TRANSFER'])
-    .where('eo.status', 'IN', ['SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID'])
-    .sum({ sum: knex.raw("CAST(ara.args->>'deposit' as NUMERIC)") })
-    .first();
-  console.log({ job: 'daily-stats', volume });
-  const tokensBurntByTxn = await knex('transactions')
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .sum('receipt_conversion_tokens_burnt')
-    .first();
-  console.log({ job: 'daily-stats', tokensBurntByTxn });
-  const tokensBurntByReceipts = await knex('execution_outcomes')
-    .where('executed_in_block_timestamp', '>=', start)
-    .where('executed_in_block_timestamp', '<', end)
-    .sum('tokens_burnt')
-    .first();
-  console.log({ job: 'daily-stats', tokensBurntByReceipts });
+  const [txns, volume, tokensBurntByTxn, tokensBurntByReceipts] =
+    await Promise.all([
+      knex('transactions')
+        .where('block_timestamp', '>=', start)
+        .where('block_timestamp', '<', end)
+        .count()
+        .first(),
+      knex('action_receipt_actions as ara')
+        .join(
+          'execution_outcomes as eo',
+          'eo.receipt_id',
+          '=',
+          'ara.receipt_id',
+        )
+        .where('eo.executed_in_block_timestamp', '>=', start)
+        .where('eo.executed_in_block_timestamp', '<', end)
+        .where('ara.action_kind', 'IN', ['FUNCTION_CALL', 'TRANSFER'])
+        .where('eo.status', 'IN', ['SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID'])
+        .sum({ sum: knex.raw("CAST(ara.args->>'deposit' as NUMERIC)") })
+        .first(),
+      knex('transactions')
+        .where('block_timestamp', '>=', start)
+        .where('block_timestamp', '<', end)
+        .sum('receipt_conversion_tokens_burnt')
+        .first(),
+      knex('execution_outcomes')
+        .where('executed_in_block_timestamp', '>=', start)
+        .where('executed_in_block_timestamp', '<', end)
+        .sum('tokens_burnt')
+        .first(),
+    ]);
 
   const volumeNear = yoctoToNear(volume?.sum || 0);
   const volumeUSD = Big(volumeNear)
@@ -138,82 +144,95 @@ const txnData = async (start: string, end: string, price?: null | string) => {
 };
 
 const addressData = async (start: string, end: string) => {
-  const newAccounts = await knex('accounts as a')
-    .join('receipts as r', 'r.receipt_id', '=', 'a.created_by_receipt_id')
-    .where('r.included_in_block_timestamp', '>=', start)
-    .where('r.included_in_block_timestamp', '<', end)
-    .count('a.created_by_receipt_id')
-    .first();
-  console.log({ job: 'daily-stats', newAccounts });
   const activeAccounts = await knex('transactions')
     .where('block_timestamp', '>=', start)
     .where('block_timestamp', '<', end)
     .countDistinct('signer_account_id')
     .first();
-  console.log({ activeAccounts, job: 'daily-stats' });
-  const deletedAccounts = await knex('accounts as a')
-    .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
-    .where('r.included_in_block_timestamp', '>=', start)
-    .where('r.included_in_block_timestamp', '<', end)
-    .count('a.deleted_by_receipt_id')
-    .first();
-  console.log({ deletedAccounts, job: 'daily-stats' });
-  const newContracts = await knex('action_receipt_actions as a')
-    .join('receipts as r', 'r.receipt_id', '=', 'a.receipt_id')
-    .where('r.included_in_block_timestamp', '>=', start)
-    .where('r.included_in_block_timestamp', '<', end)
-    .andWhere('a.action_kind', '=', 'DEPLOY_CONTRACT')
-    .countDistinct({ count: 'r.receiver_account_id' })
-    .first();
-  console.log({ job: 'daily-stats', newContracts });
-  const activeContracts = await knex('action_receipt_actions')
-    .where('receipt_included_in_block_timestamp', '>=', start)
-    .where('receipt_included_in_block_timestamp', '<', end)
-    .andWhere('action_kind', '=', 'FUNCTION_CALL')
-    .countDistinct({ count: 'receipt_receiver_account_id' })
-    .first();
-  console.log({ activeContracts, job: 'daily-stats' });
-
-  await knex.raw(
-    `
-      INSERT INTO deployed_contracts (
-        contract,
-        code_sha256,
-        receipt_id,
-        block_hash,
-        block_timestamp
-      )
-      SELECT
-        action_receipt_actions.receipt_receiver_account_id as contract,
-        action_receipt_actions.args->>'code_sha256' as code_sha256,
-        action_receipt_actions.receipt_id as receipt_id,
-        execution_outcomes.executed_in_block_hash as block_hash,
-        execution_outcomes.executed_in_block_timestamp as block_timestamp
-      FROM action_receipt_actions
-      JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
-      WHERE action_receipt_actions.action_kind = 'DEPLOY_CONTRACT'
-        AND execution_outcomes.status = 'SUCCESS_VALUE'
-        AND execution_outcomes.executed_in_block_timestamp >= ?
-        AND execution_outcomes.executed_in_block_timestamp < ?
-      ON CONFLICT (receipt_id) DO NOTHING
-    `,
-    [start, end],
-  );
-
-  const uniqueContracts = await knex('deployed_contracts')
-    .countDistinct({ count: 'code_sha256' })
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .first();
 
   return {
     active_accounts: activeAccounts?.count?.toString(),
-    active_contracts: activeContracts?.count?.toString(),
-    deleted_accounts: deletedAccounts?.count?.toString(),
-    new_accounts: newAccounts?.count?.toString(),
-    new_contracts: newContracts?.count?.toString(),
-    unique_contracts: uniqueContracts?.count?.toString(),
   };
+
+  // const [
+  //   newAccounts,
+  //   activeAccounts,
+  //   deletedAccounts,
+  //   newContracts,
+  //   activeContracts,
+  //   uniqueContracts,
+  // ] = await Promise.all([
+  //   knex('accounts as a')
+  //     .join('receipts as r', 'r.receipt_id', '=', 'a.created_by_receipt_id')
+  //     .where('r.included_in_block_timestamp', '>=', start)
+  //     .where('r.included_in_block_timestamp', '<', end)
+  //     .count('a.created_by_receipt_id')
+  //     .first(),
+  //   knex('transactions')
+  //     .where('block_timestamp', '>=', start)
+  //     .where('block_timestamp', '<', end)
+  //     .countDistinct('signer_account_id')
+  //     .first(),
+  //   knex('accounts as a')
+  //     .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
+  //     .where('r.included_in_block_timestamp', '>=', start)
+  //     .where('r.included_in_block_timestamp', '<', end)
+  //     .count('a.deleted_by_receipt_id')
+  //     .first(),
+  //   knex('action_receipt_actions as a')
+  //     .join('receipts as r', 'r.receipt_id', '=', 'a.receipt_id')
+  //     .where('r.included_in_block_timestamp', '>=', start)
+  //     .where('r.included_in_block_timestamp', '<', end)
+  //     .andWhere('a.action_kind', '=', 'DEPLOY_CONTRACT')
+  //     .countDistinct({ count: 'r.receiver_account_id' })
+  //     .first(),
+  //   knex('action_receipt_actions')
+  //     .where('receipt_included_in_block_timestamp', '>=', start)
+  //     .where('receipt_included_in_block_timestamp', '<', end)
+  //     .andWhere('action_kind', '=', 'FUNCTION_CALL')
+  //     .countDistinct({ count: 'receipt_receiver_account_id' })
+  //     .first(),
+  //   knex('deployed_contracts')
+  //     .countDistinct({ count: 'code_sha256' })
+  //     .where('block_timestamp', '>=', start)
+  //     .where('block_timestamp', '<', end)
+  //     .first(),
+  // ]);
+
+  // await knex.raw(
+  //   `
+  //     INSERT INTO deployed_contracts (
+  //       contract,
+  //       code_sha256,
+  //       receipt_id,
+  //       block_hash,
+  //       block_timestamp
+  //     )
+  //     SELECT
+  //       action_receipt_actions.receipt_receiver_account_id as contract,
+  //       action_receipt_actions.args->>'code_sha256' as code_sha256,
+  //       action_receipt_actions.receipt_id as receipt_id,
+  //       execution_outcomes.executed_in_block_hash as block_hash,
+  //       execution_outcomes.executed_in_block_timestamp as block_timestamp
+  //     FROM action_receipt_actions
+  //     JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
+  //     WHERE action_receipt_actions.action_kind = 'DEPLOY_CONTRACT'
+  //       AND execution_outcomes.status = 'SUCCESS_VALUE'
+  //       AND execution_outcomes.executed_in_block_timestamp >= ?
+  //       AND execution_outcomes.executed_in_block_timestamp < ?
+  //     ON CONFLICT (receipt_id) DO NOTHING
+  //   `,
+  //   [start, end],
+  // );
+
+  // return {
+  //   active_accounts: activeAccounts?.count?.toString(),
+  //   active_contracts: activeContracts?.count?.toString(),
+  //   deleted_accounts: deletedAccounts?.count?.toString(),
+  //   new_accounts: newAccounts?.count?.toString(),
+  //   new_contracts: newContracts?.count?.toString(),
+  //   unique_contracts: uniqueContracts?.count?.toString(),
+  // };
 };
 
 const dayStats = async (day: Dayjs) => {
@@ -225,14 +244,12 @@ const dayStats = async (day: Dayjs) => {
     const start = msToNsTime(day.clone().startOf('day').valueOf());
     const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
 
-    const block = await blockData(day.clone());
-    console.log({ afterBlock: block, job: 'daily-stats' });
     const price = await marketData(day.clone());
-    console.log({ afterPrice: price, job: 'daily-stats' });
-    const txn = await txnData(start, end, price.near_price);
-    console.log({ afterTxn: txn, job: 'daily-stats' });
-    const address = await addressData(start, end);
-    console.log({ afterAddress: address, job: 'daily-stats' });
+    const [block, txn, address] = await Promise.all([
+      blockData(day.clone()),
+      addressData(start, end),
+      txnData(start, end, price.near_price),
+    ]);
 
     const data = {
       date: day.format('YYYY-MM-DD'),
