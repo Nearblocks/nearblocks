@@ -396,8 +396,12 @@ export default function (props: Props) {
             </div>
           ) : txn ? (
             <div className="w-full md:w-3/4 break-words">
-              {getTimeAgoString(nanoToMilli(txn?.block_timestamp))} (
-              {convertToUTC(nanoToMilli(txn?.block_timestamp), true)} +UTC)
+              {`${getTimeAgoString(
+                nanoToMilli(txn?.block_timestamp),
+              )} (${convertToUTC(
+                nanoToMilli(txn?.block_timestamp),
+                true,
+              )} +UTC)`}
             </div>
           ) : (
             ''
