@@ -5,6 +5,7 @@ module.exports = {
     'id',
     'zh-cn',
     'zh-hk',
+    'ua',
     'ru',
     'es',
     'vi',
