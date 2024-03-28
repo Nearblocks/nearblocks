@@ -1,11 +1,8 @@
 import { ActionPropsInfo } from '@/includes/types';
 
 const Stake = (props: ActionPropsInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const FaRight = (props: { className: string }) => {

@@ -452,10 +452,15 @@ export default function (props: Props) {
                       className="max-h-[194px] break-words space-y-2"
                     >
                       {logs?.map((event: TransactionLog, i: number) => (
-                        <EventLogs key={i} event={event} network={network} />
+                        <EventLogs
+                          key={i}
+                          event={event}
+                          network={network}
+                          ownerId={ownerId}
+                        />
                       ))}
                       {actions?.map((action: any, i: number) => (
-                        <Actions key={i} action={action} />
+                        <Actions key={i} action={action} ownerId={ownerId} />
                       ))}
                     </div>
                   </ScrollArea.Viewport>

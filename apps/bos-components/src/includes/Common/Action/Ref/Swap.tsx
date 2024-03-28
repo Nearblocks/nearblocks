@@ -1,12 +1,6 @@
 import { EventPropsInfo } from '@/includes/types';
 
 const Swap = (props: EventPropsInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -24,8 +18,6 @@ const Swap = (props: EventPropsInfo) => {
     );
   };
 
-  const config = getConfig && getConfig(props.network);
-
   const log = props.event.logs?.match(
     /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
   );
@@ -38,14 +30,24 @@ const Swap = (props: EventPropsInfo) => {
       <span className="font-bold px-1">Swap </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ network: props.network, contract: log[2], amount: log[1] }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            network: props.network,
+            contract: log[2],
+            amount: log[1],
+            ownerId: props.ownerId,
+          }}
         />
       }
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ network: props.network, contract: log[4], amount: log[3] }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            network: props.network,
+            contract: log[4],
+            amount: log[3],
+            ownerId: props.ownerId,
+          }}
         />
       }
       <span className="font-bold text-gray px-1">

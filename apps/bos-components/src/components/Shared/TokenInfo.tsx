@@ -3,6 +3,7 @@ import { MetaInfo, TokenInfoProps } from '@/includes/types';
 
 export default function (props: TokenInfoProps) {
   const { network, contract, amount, decimals, ownerId } = props;
+
   const { shortenToken, shortenTokenSymbol } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -10,7 +11,7 @@ export default function (props: TokenInfoProps) {
   const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { decodeArgs, tokenAmount } = VM.require(
-    `${ownerId}/widget/includes.Utils.libs`,
+    `${ownerId}/widget/includes.Utils.near`,
   );
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
 
@@ -52,6 +53,7 @@ export default function (props: TokenInfoProps) {
               };
             }) => {
               const resp = data?.body?.result;
+              console.log('decodeArgs(resp.result)', decodeArgs(resp.result));
               setMeta(decodeArgs(resp.result));
             },
           )

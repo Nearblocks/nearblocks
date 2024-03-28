@@ -1,11 +1,8 @@
 import { DepositPropsInfo } from '@/includes/types';
 
 const WithdrawSucceeded = (props: DepositPropsInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig, shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
   const log = props.event?.[0];
   const FaRight = (props: { className: string }) => {
@@ -25,8 +22,6 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
     );
   };
 
-  const config = getConfig && getConfig(props.network);
-
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
@@ -35,7 +30,7 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
       <span className="font-bold px-1">Withdraw </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
           props={{
             contract: log.token_id,
             amount: log.amount,

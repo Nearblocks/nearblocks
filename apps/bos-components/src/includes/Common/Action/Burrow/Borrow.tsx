@@ -1,11 +1,8 @@
 import { DepositPropsInfo } from '@/includes/types';
 
 const Borrow = (props: DepositPropsInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
-  const { getConfig, shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const FaRight = (props: { className: string }) => {
@@ -27,8 +24,6 @@ const Borrow = (props: DepositPropsInfo) => {
 
   const log = props.event?.[0];
 
-  const config = getConfig && getConfig(props.network);
-
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
@@ -37,7 +32,7 @@ const Borrow = (props: DepositPropsInfo) => {
       <span className="font-bold px-1">Borrow </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
           props={{
             contract: log.token_id,
             amount: log.amount,
