@@ -17,7 +17,6 @@ import {
 } from '#libs/schema/kitwallet';
 import { RequestValidator } from '#types/types';
 
-const BRIDGE_TOKEN_FACTORY = 'factory.bridge.near';
 const POOLS =
   config.network === Network.MAINNET
     ? ['%.poolv1.near', '%.pool.near']
@@ -48,50 +47,16 @@ const getLikelyTokens = async (
   lastTimestamp: string,
 ) => {
   const tokens = await sql`
-    SELECT DISTINCT
-      receipt_receiver_account_id AS receiver_account_id
+    SELECT
+      contract_account_id AS receiver_account_id
     FROM
-      action_receipt_actions
+      ft_events
     WHERE
-      args -> 'args_json' ->> 'receiver_id' = ${account}
-      AND action_kind = 'FUNCTION_CALL'
-      AND args ->> 'args_json' IS NOT NULL
-      AND args ->> 'method_name' IN ('ft_transfer', 'ft_transfer_call', 'ft_mint')
-      AND receipt_included_in_block_timestamp <= ${lastTimestamp}
-      AND receipt_included_in_block_timestamp > ${timestamp}
-    UNION
-    SELECT DISTINCT
-      receipt_receiver_account_id AS receiver_account_id
-    FROM
-      (
-        SELECT
-          args -> 'args_json' ->> 'account_id' AS account_id,
-          receipt_receiver_account_id
-        FROM
-          action_receipt_actions
-        WHERE
-          action_kind = 'FUNCTION_CALL'
-          AND receipt_predecessor_account_id = ${BRIDGE_TOKEN_FACTORY}
-          AND args ->> 'method_name' = 'mint'
-          AND receipt_included_in_block_timestamp <= ${lastTimestamp}
-          AND receipt_included_in_block_timestamp > ${timestamp}
-      ) minted_with_bridge
-    WHERE
-      account_id = ${account}
-    UNION
-    SELECT DISTINCT
-      receipt_receiver_account_id AS receiver_account_id
-    FROM
-      action_receipt_actions
-    WHERE
-      receipt_predecessor_account_id = ${account}
-      AND action_kind = 'FUNCTION_CALL'
-      AND (
-        args ->> 'method_name' LIKE 'ft_%'
-        OR args ->> 'method_name' = 'storage_deposit'
-      )
-      AND receipt_included_in_block_timestamp <= ${lastTimestamp}
-      AND receipt_included_in_block_timestamp > ${timestamp}
+      affected_account_id = ${account}
+      AND block_timestamp <= ${lastTimestamp}
+      AND block_timestamp > ${timestamp}
+    GROUP BY
+      contract_account_id
   `;
 
   return tokens;
