@@ -632,11 +632,11 @@ export default function (props: Props) {
                             : ''}
                         </span>
                         <span className="text-xs">
-                          ( @
+                          (@
                           {nearPrice
                             ? '$' + dollarFormat(statsData?.near_price)
                             : ''}
-                          / Ⓝ )
+                          / Ⓝ)
                         </span>
                       </div>
                     )}

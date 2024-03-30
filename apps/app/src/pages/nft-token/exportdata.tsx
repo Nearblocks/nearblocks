@@ -68,6 +68,7 @@ const ExportData = () => {
             onHandleDowload: onHandleDowload,
             exportType: 'NFT Token Transactions',
           }}
+          loading={<Export className="absolute" ref={heightRef} />}
         />
       </div>
     </>

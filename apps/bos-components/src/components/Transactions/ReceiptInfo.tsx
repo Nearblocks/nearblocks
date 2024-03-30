@@ -168,7 +168,7 @@ export default function (props: Props) {
             <div className="flex justify-between">
               <div className="flex flex-col w-full lg:w-1/2">
                 <div className="">
-                  <h2 className="text-sm font-semibold ">Logs</h2>
+                  <h2 className="text-sm font-medium ">Logs</h2>
                   <div className="bg-gray-100 rounded-md p-5 font-medium my-3 overflow-x-auto ">
                     {receipt?.outcome?.logs?.length === 0 ? (
                       'No logs'
@@ -178,7 +178,7 @@ export default function (props: Props) {
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold ">Result</h2>
+                  <h2 className="text-sm font-medium">Result</h2>
                   {statusInfo}
                 </div>
               </div>

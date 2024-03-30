@@ -96,6 +96,13 @@ const BlocksChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'blocks'}
+                    ref={heightRef}
+                  />
+                }
               />{' '}
             </div>
           </div>

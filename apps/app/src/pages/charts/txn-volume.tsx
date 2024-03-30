@@ -103,6 +103,13 @@ const TxnVolumeChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'tn-volume'}
+                    ref={heightRef}
+                  />
+                }
               />
             </div>
           </div>

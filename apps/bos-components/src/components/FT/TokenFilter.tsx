@@ -229,7 +229,7 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                 ) : (
                   <p className="text-sm my-1">
                     {Number(filterToken?.rpcAmount)
-                      ? localFormat(filterToken?.rpcAmount)
+                      ? localFormat && localFormat(filterToken?.rpcAmount)
                       : ''}
                   </p>
                 )}

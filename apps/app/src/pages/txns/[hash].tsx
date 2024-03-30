@@ -104,6 +104,15 @@ const Txn = () => {
             <Detail txns={true} network={networkId} pageTab={pageTab} />
           }
           onChangeHeight={onChangeHeight}
+          loading={
+            <Detail
+              className="absolute"
+              txns={true}
+              ref={heightRef}
+              network={networkId}
+              pageTab={pageTab}
+            />
+          }
         />
       </div>
       <div className="py-8"></div>

@@ -110,6 +110,7 @@ const TopNFTTokens = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={<List className="absolute" ref={heightRef} />}
               />
             </div>
           </div>

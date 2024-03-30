@@ -86,6 +86,11 @@ const HomePage = () => {
                       network: networkId,
                       router,
                     }}
+                    loading={
+                      <div className="absolute  w-full ">
+                        <Skeleton className="h-12" />
+                      </div>
+                    }
                   />
                 </div>
                 <div className="text-white"></div>
@@ -100,6 +105,7 @@ const HomePage = () => {
             skeleton={<Overview className="absolute" ref={overviewRef} />}
             defaultSkelton={<Overview />}
             props={{ t: t, network: networkId }}
+            loading={<Overview className="absolute" ref={overviewRef} />}
           />
         </div>
 
@@ -119,6 +125,7 @@ const HomePage = () => {
                       skeleton={<Latest className="absolute" ref={latestRef} />}
                       defaultSkelton={<Latest />}
                       props={{ t: t, network: networkId }}
+                      loading={<Latest className="absolute" ref={latestRef} />}
                     />
                   </div>
                 </div>
@@ -134,6 +141,7 @@ const HomePage = () => {
                       defaultSkelton={<Latest />}
                       src={components?.transactionsLatest}
                       props={{ t: t, network: networkId }}
+                      loading={<Latest className="absolute" ref={latestRef} />}
                     />
                   </div>
                 </div>

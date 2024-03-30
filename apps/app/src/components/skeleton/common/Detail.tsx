@@ -23,7 +23,7 @@ const Detail = forwardRef(
         {txns === true && (
           <div className="flex">
             <div
-              className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+              className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none ${
                 pageTab === ' '
                   ? 'rounded-lg bg-green-600 text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
@@ -32,7 +32,7 @@ const Detail = forwardRef(
               {t('txn.tabs.overview')}
             </div>{' '}
             <div
-              className={`text-nearblue-600 text-xs leading-4 font-medium rounded-lg overflow-hidden flex cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+              className={`text-nearblue-600 text-xs leading-4 font-medium rounded-lg overflow-hidden flex cursor-pointer p-2 mb-3 mr-3 focus:outline-none ${
                 pageTab === 'execution'
                   ? ' bg-green-600 text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 hover:text-nearblue-600'
@@ -44,7 +44,7 @@ const Detail = forwardRef(
               )}
             </div>{' '}
             <div
-              className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+              className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none ${
                 pageTab === 'comments'
                   ? 'rounded-lg bg-green-600 text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'

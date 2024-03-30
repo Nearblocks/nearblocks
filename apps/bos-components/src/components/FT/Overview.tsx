@@ -165,7 +165,6 @@ export default function ({
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
-    onFilterClear && onFilterClear('');
   };
 
   const onToggle = () => setShowMarketCap((o) => !o);

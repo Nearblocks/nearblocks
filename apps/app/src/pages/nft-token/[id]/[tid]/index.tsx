@@ -112,6 +112,7 @@ const NFTokenInfo = () => {
             id: id,
             tid: tid,
           }}
+          loading={<Detail className="absolute" ref={heightRef} />}
         />
       </div>
     </>

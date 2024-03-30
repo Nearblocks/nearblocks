@@ -97,6 +97,13 @@ const TxnFeeChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'txn-fee'}
+                    ref={heightRef}
+                  />
+                }
               />
             </div>
           </div>

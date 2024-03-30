@@ -221,6 +221,11 @@ export default function ({ network, t, id, ownerId }: Props) {
                     showWhen: showWhen,
                     ownerId,
                   }}
+                  loading={
+                    <div className=" whitespace-nowrap text-sm text-nearblue-600 ">
+                      <Skeleton />
+                    </div>
+                  }
                 />
               ))}
           </tbody>
