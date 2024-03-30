@@ -122,7 +122,7 @@ export default function (props: TransactionReceiptInfo) {
             expandAll: expandAll,
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
-            className: '!pl-0 border-transparent',
+            className: ` !pl-0 border-transparent`,
             ownerId,
           }}
         />

@@ -109,6 +109,13 @@ const NearSupplyChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'near-supply'}
+                    ref={heightRef}
+                  />
+                }
               />
             </div>
           </div>

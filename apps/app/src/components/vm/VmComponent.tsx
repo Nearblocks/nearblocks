@@ -8,6 +8,7 @@ type Props = {
   skeleton?: JSX.Element;
   onChangeHeight?: () => void;
   defaultSkelton?: JSX.Element;
+  loading?: JSX.Element;
 };
 
 export function VmComponent(props: Props) {

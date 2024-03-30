@@ -104,6 +104,13 @@ const NearPriceChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'near-price'}
+                    ref={heightRef}
+                  />
+                }
               />{' '}
             </div>
           </div>

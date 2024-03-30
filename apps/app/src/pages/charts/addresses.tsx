@@ -103,6 +103,13 @@ const AddressesChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'addresses'}
+                    ref={heightRef}
+                  />
+                }
               />
             </div>
           </div>

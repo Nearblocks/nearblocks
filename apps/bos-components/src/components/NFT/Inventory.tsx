@@ -162,7 +162,7 @@ export default function ({ network, id, token, ownerId }: Props) {
             >
               <a
                 href="#"
-                className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden"
+                className="flex items-center justify-center m-auto overflow-hidden"
               >
                 <div className="w-40 h-40 ">
                   <Skeleton className="h-40" />
@@ -176,7 +176,8 @@ export default function ({ network, id, token, ownerId }: Props) {
               </div>
             </div>
           ))}
-        {tokens &&
+        {!isLoading &&
+          tokens &&
           tokens?.map((nft: Token) => (
             <div
               className="max-w-full border rounded p-3 mx-auto md:mx-0"

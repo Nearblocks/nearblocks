@@ -67,6 +67,7 @@ const Charts = () => {
               defaultSkelton={<Index />}
               onChangeHeight={onChangeHeight}
               props={{ poweredBy: false, network: networkId, t: t }}
+              loading={<Index className="absolute" ref={heightRef} />}
             />
           </div>
         </div>

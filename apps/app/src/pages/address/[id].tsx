@@ -107,6 +107,7 @@ const Address = () => {
               account && account?.loading === false ? account?.accountId : null,
             logOut: logOut,
           }}
+          loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />
       </div>
     </>

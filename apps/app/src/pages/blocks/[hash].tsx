@@ -80,6 +80,9 @@ const Block = () => {
             network: networkId,
             t: t,
           }}
+          loading={
+            <Detail className="absolute" ref={heightRef} network={networkId} />
+          }
           skeleton={
             <Detail className="absolute" ref={heightRef} network={networkId} />
           }

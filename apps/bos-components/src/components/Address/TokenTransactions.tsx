@@ -51,9 +51,8 @@ export default function ({
     localFormat,
   } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig, handleRateLimit, nanoToMilli, truncateString } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
 
@@ -335,7 +334,7 @@ export default function ({
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    className={` inline-block align-bottom text-green-500 whitespace-nowrap ${
                       row?.affected_account_id === address
                         ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
                         : 'text-green-500 p-0.5 px-1'
@@ -352,7 +351,7 @@ export default function ({
                         }
                         onMouseLeave={handleMouseLeave}
                       >
-                        {row?.affected_account_id}
+                        {truncateString(row?.affected_account_id, 15, '...')}
                       </a>
                     </Link>
                   </span>
@@ -451,7 +450,7 @@ export default function ({
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
                       row?.involved_account_id === address
                         ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
                         : 'text-green-500 p-0.5 px-1'
@@ -468,7 +467,7 @@ export default function ({
                         }
                         onMouseLeave={handleMouseLeave}
                       >
-                        {row.involved_account_id}
+                        {truncateString(row.involved_account_id, 15, '...')}
                       </a>
                     </Link>
                   </span>

@@ -75,6 +75,7 @@ const NodeExplorer = () => {
               setPage: setPage,
               network: networkId,
             }}
+            loading={<Index className="absolute" ref={heightRef} />}
           />
         </div>
       </div>

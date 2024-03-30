@@ -46,9 +46,8 @@ export default function (props: Props) {
     capitalizeFirstLetter,
   } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
-    `${ownerId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig, handleRateLimit, nanoToMilli, truncateString } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -234,7 +233,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-2 text-sm text-nearblue-600 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
@@ -305,7 +304,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
       header: <>Affected</>,
@@ -317,7 +316,7 @@ export default function (props: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
                       row?.affected_account_id === address
                         ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
                         : 'text-green-500 p-0.5 px-1'
@@ -334,7 +333,7 @@ export default function (props: Props) {
                         }
                         onMouseLeave={handleMouseLeave}
                       >
-                        {row?.affected_account_id}
+                        {truncateString(row?.affected_account_id, 15, '...')}
                       </a>
                     </Link>
                   </span>
@@ -353,7 +352,7 @@ export default function (props: Props) {
           )}
         </>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600  font-medium',
+      tdClassName: 'px-5 py-2 text-sm text-nearblue-600  font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
@@ -448,7 +447,7 @@ export default function (props: Props) {
                         }
                         onMouseLeave={handleMouseLeave}
                       >
-                        {row.involved_account_id}
+                        {truncateString(row.involved_account_id, 15, '...')}
                       </a>
                     </Link>
                   </span>
@@ -468,7 +467,7 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
+        'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600  font-medium',
     },
     {
       header: <>Token ID</>,
@@ -499,7 +498,7 @@ export default function (props: Props) {
         </Tooltip.Provider>
       ),
       tdClassName:
-        'px-5 py-4 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
+        'px-5 py-2 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
@@ -563,7 +562,7 @@ export default function (props: Props) {
           )
         );
       },
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-2 text-sm text-nearblue-600 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
@@ -641,7 +640,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName: 'whitespace-nowrap',
     },
   ];

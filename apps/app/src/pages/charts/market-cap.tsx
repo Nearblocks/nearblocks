@@ -102,6 +102,13 @@ const MarketCapChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'market-cap'}
+                    ref={heightRef}
+                  />
+                }
               />{' '}
             </div>
           </div>

@@ -99,6 +99,7 @@ const ToxenTxns = () => {
                   setPage: setPage,
                   network: networkId,
                 }}
+                loading={<List className="absolute" ref={heightRef} />}
               />
             </div>
           </div>

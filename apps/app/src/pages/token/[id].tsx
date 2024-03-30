@@ -154,6 +154,7 @@ const Token = () => {
             filters: filtersObject,
             onFilterClear: onFilterClear,
           }}
+          loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />
         <div className="py-8"></div>
       </div>

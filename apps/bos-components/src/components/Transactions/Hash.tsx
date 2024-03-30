@@ -149,7 +149,7 @@ export default function (props: Props) {
                 <button
                   key={index}
                   onClick={() => onTab(index)}
-                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none ${
                     pageTab === hash
                       ? 'rounded-lg bg-green-600 text-white'
                       : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
@@ -168,6 +168,9 @@ export default function (props: Props) {
                             ? t('txns:txn.tabs.execution')
                             : 'Execution Plan'}
                         </h2>
+                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-9 -mt-7 px-1 ">
+                          NEW
+                        </div>
                       </>
                     ) : (
                       <Popover.Root key={isToggle}>
@@ -182,6 +185,9 @@ export default function (props: Props) {
                               ? t('txns:txn.tabs.execution')
                               : 'Execution Plan'}
                             <ArrowDown className="h-4 w-4 fill-current ml-1" />
+                            <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-24 -mt-3 px-1 ">
+                              NEW
+                            </div>{' '}
                           </button>
                         </Popover.Trigger>
                         <Popover.Content

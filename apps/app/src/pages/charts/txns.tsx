@@ -96,6 +96,13 @@ const TxnsChart = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={
+                  <Detail
+                    className="absolute"
+                    chartTypes={'txns'}
+                    ref={heightRef}
+                  />
+                }
               />{' '}
             </div>
           </div>
