@@ -23,7 +23,6 @@ interface Props {
   pageTab: string;
 }
 
-import Skeleton from '@/includes/Common/Skeleton';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
@@ -124,19 +123,6 @@ export default function (props: Props) {
 
   return (
     <>
-      <div>
-        <div className="md:flex items-center justify-between">
-          {isLoading ? (
-            <div className="w-80 max-w-xs px-3 py-5">
-              <Skeleton className="h-7" />
-            </div>
-          ) : (
-            <h1 className="text-xl text-nearblue-600 px-2 py-5">
-              {t ? t('txns:txn.heading') : 'Transaction Details'}
-            </h1>
-          )}
-        </div>
-      </div>
       {error || (!isLoading && !txn) ? (
         <div className="text-nearblue-700 text-xs px-2 mb-4">
           {t ? t('txns:txnError') : 'Transaction Error'}

@@ -24,7 +24,7 @@ const Swap = (props: EventPropsInfo) => {
     return null;
   }
 
-  if (log?.length !== 5) return null;
+  if (log?.length === 0) return null;
 
   return (
     <div className="flex flex-wrap items-center break-all leading-7">
