@@ -473,9 +473,10 @@ export default function ({
               transactions found
             </p>
           </div>
-          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
-            {filters && Object?.keys(filters)?.length > 0 && (
-              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
+
+          {filters && Object?.keys(filters)?.length > 0 && (
+            <div className="mb-4 lg:ml-auto  px-6">
+              <div className="flex items-center  text-sm text-gray-500 lg:ml-auto">
                 Filtered By:
                 <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
                   {filters &&
@@ -493,8 +494,8 @@ export default function ({
                   />
                 </span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
       <Widget
