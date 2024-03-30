@@ -13,11 +13,13 @@ const Detail = forwardRef(
     const { t } = useTranslation('txns');
     return (
       <div ref={ref} className={`w-full z-10 ${className} pr-6`}>
-        <div className="md:flex items-center justify-between">
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-7" />
-          </div>{' '}
-        </div>
+        {!txns && (
+          <div className="md:flex items-center justify-between">
+            <div className="w-80 max-w-xs px-3 py-5">
+              <Skeleton className="h-7" />
+            </div>{' '}
+          </div>
+        )}
         {txns === true && (
           <div className="flex">
             <div
