@@ -41,7 +41,10 @@ const keys = catchAsync(async (req: RequestValidator<Keys>, res: Response) => {
         WHERE
           account_id = ${account}
         ORDER BY
-          created_by_block_height ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          CASE
+            WHEN deleted_by_block_height IS NULL THEN created_by_block_height
+            ELSE GREATEST(created_by_block_height, deleted_by_block_height)
+          END ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
           ${limit}
         OFFSET
@@ -52,7 +55,10 @@ const keys = catchAsync(async (req: RequestValidator<Keys>, res: Response) => {
       LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
       LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
     ORDER BY
-      created_by_block_height ${order === 'desc' ? sql`DESC` : sql`ASC`}
+      CASE
+        WHEN deleted_by_block_height IS NULL THEN created_by_block_height
+        ELSE GREATEST(created_by_block_height, deleted_by_block_height)
+      END ${order === 'desc' ? sql`DESC` : sql`ASC`}
   `;
 
   return res.status(200).json({ keys });

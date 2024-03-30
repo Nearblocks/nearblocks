@@ -1,5 +1,9 @@
 import { providers } from 'near-api-js';
-import { QueryResponseKind } from 'near-api-js/lib/providers/provider.js';
+import {
+  BlockId,
+  BlockReference,
+  QueryResponseKind,
+} from 'near-api-js/lib/providers/provider.js';
 
 import config from '#config';
 
@@ -44,3 +48,6 @@ export const callFunction = async <T extends QueryResponseKind>(
     method_name: method,
     request_type: 'call_function',
   });
+
+export const viewBlock = async (block: BlockId | BlockReference) =>
+  provider.block(block);

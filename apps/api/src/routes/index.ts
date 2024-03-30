@@ -13,6 +13,7 @@ import nfts from '#routes/nfts';
 import node from '#routes/node';
 import search from '#routes/search';
 import stats from '#routes/stats';
+import sync from '#routes/sync';
 import txns from '#routes/txns';
 import validators from '#routes/validators';
 
@@ -32,6 +33,7 @@ const routes = () => {
   node(app);
   search(app);
   stats(app);
+  sync(app);
   txns(app);
   validators(app);
 
