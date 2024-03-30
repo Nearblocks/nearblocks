@@ -8,7 +8,7 @@ const Overview = forwardRef(
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5">
+          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25">
             <Skeleton className="h-7" />
           </div>{' '}
         </div>

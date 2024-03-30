@@ -345,7 +345,7 @@ export default function (props: Props) {
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
-            {t ? t('txns:txn.block.text.0') : 'Block height'}
+            {t ? t('txns:txn.block.text.0') : 'Block Height'}
           </div>
           {loading ? (
             <div className="w-full md:w-3/4">
@@ -840,11 +840,10 @@ export default function (props: Props) {
                                     />
                                     {shortenToken(nft?.nft_meta?.name ?? '')}
                                     <span>
-                                      &nbsp;(
-                                      {shortenTokenSymbol(
+                                      &nbsp;
+                                      {`(${shortenTokenSymbol(
                                         nft?.nft_meta?.symbol ?? '',
-                                      )}
-                                      )
+                                      )})`}
                                     </span>
                                   </a>
                                 </Link>

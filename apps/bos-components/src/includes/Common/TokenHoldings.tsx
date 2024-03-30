@@ -54,13 +54,14 @@ const TokenHoldings = (props: Props) => {
       </select>
     );
   }
+
+  const ftAmount = props.ft?.amount ?? 0;
+
   return (
     <Select.Root>
       <Select.Trigger className="w-full h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
         <span>
-          {props.ft?.amount
-            ? '$' + dollarFormat(props.ft?.amount)
-            : '$' + (props.ft?.amount ?? '')}
+          {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-0.5">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
