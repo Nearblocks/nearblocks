@@ -338,7 +338,9 @@ export default function ({ network, id, token, ownerId }: Props) {
                     </Link>
                   )}
                   , who currently holds{' '}
-                  {tokenAmount(largestHolder?.amount, tokens?.decimals, true)}{' '}
+                  {localFormat(
+                    tokenAmount(largestHolder?.amount, tokens?.decimals, true),
+                  )}{' '}
                   {tokenTicker} of all {tokenTicker}.
                 </span>
               )}

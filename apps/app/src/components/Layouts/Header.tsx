@@ -154,7 +154,7 @@ const Header = () => {
   const user = signedIn;
 
   useEffect(() => {
-    let delay = 5000;
+    let delay = 30000;
     async function fetchStats() {
       try {
         const response = await fetch(

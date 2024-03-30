@@ -197,6 +197,8 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
     ? ft?.tokens[0]
     : ({} as TokenListInfo);
 
+  const ftAmount = ft?.amount ?? 0;
+
   return (
     <>
       {tokenFilter && (
@@ -239,7 +241,9 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                   <Skeleton className="w-40" />
                 ) : (
                   <p className="text-sm my-1 flex">
-                    ${ft?.amount ? dollarFormat(ft?.amount) : ft?.amount ?? ''}
+                    {ftAmount
+                      ? '$' + dollarFormat(ft?.amount)
+                      : ft?.amount ?? ''}
                     <span>
                       {filterToken?.ft_meta?.price && (
                         <div className="text-gray-400 ml-2">

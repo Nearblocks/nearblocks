@@ -291,10 +291,11 @@ export default function ({
                                   className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100"
                                   onClick={onToggle}
                                 >
-                                  $
                                   {showMarketCap
-                                    ? dollarNonCentFormat(token?.market_cap)
-                                    : dollarNonCentFormat(
+                                    ? '$' +
+                                      dollarNonCentFormat(token?.market_cap)
+                                    : '$' +
+                                      dollarNonCentFormat(
                                         token?.fully_diluted_market_cap,
                                       )}
                                 </p>
