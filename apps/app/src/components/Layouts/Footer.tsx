@@ -57,7 +57,7 @@ const Footer = () => {
               </div>
 
               <div className="hidden lg:!block"></div>
-              <div className="">
+              <div className="hidden lg:!block">
                 <div className="text-green-500 font-semibold text-xl mb-3">
                   &nbsp;
                 </div>

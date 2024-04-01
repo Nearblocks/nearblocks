@@ -27,7 +27,9 @@ interface Props {
 }
 
 export default function ({ network, id, tokenFilter, ownerId }: Props) {
-  const { dollarFormat, localFormat } = VM.require(ownerId);
+  const { dollarFormat, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.format`,
+  );
 
   const { getConfig, handleRateLimit } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
@@ -94,7 +96,7 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
             finality: 'final',
             account_id: contracts,
             method_name: 'ft_balance_of',
-            args_base64: encodeArgs({ account_id }),
+            args_base64: encodeArgs ? encodeArgs({ account_id }) : '',
           },
         }),
         headers: {
@@ -117,7 +119,7 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
             };
           }) => {
             const resp = data?.body?.result;
-            return decodeArgs(resp.result);
+            return decodeArgs ? decodeArgs(resp.result) : '';
           },
         )
         .catch(() => {});
@@ -228,8 +230,8 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                   <Skeleton className="w-40" />
                 ) : (
                   <p className="text-sm my-1">
-                    {Number(filterToken?.rpcAmount)
-                      ? localFormat && localFormat(filterToken?.rpcAmount)
+                    {Number(filterToken?.rpcAmount) && localFormat
+                      ? localFormat(filterToken?.rpcAmount)
                       : ''}
                   </p>
                 )}
@@ -241,9 +243,9 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                   <Skeleton className="w-40" />
                 ) : (
                   <p className="text-sm my-1 flex">
-                    {ftAmount
-                      ? '$' + dollarFormat(ft?.amount)
-                      : ft?.amount ?? ''}
+                    {ftAmount && dollarFormat
+                      ? '$' + dollarFormat(ftAmount)
+                      : ''}
                     <span>
                       {filterToken?.ft_meta?.price && (
                         <div className="text-gray-400 ml-2">

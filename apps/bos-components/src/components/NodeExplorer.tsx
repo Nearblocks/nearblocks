@@ -64,7 +64,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
 
   const config = getConfig && getConfig(network);
 
-  const TotalSupply = totalSuppy ? yoctoToNear(totalSuppy, false) : '';
+  const TotalSupply =
+    totalSuppy && yoctoToNear ? yoctoToNear(totalSuppy, false) : '';
 
   useEffect(() => {
     function fetchValidatorData(page: number) {
@@ -825,7 +826,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 <div className="w-full md:w-3/4 break-words">
                   {isLoading ? (
                     <Skeleton className="h-4 w-16 break-words" />
-                  ) : validatorFullData[currentPage]?.totalStake ? (
+                  ) : validatorFullData[currentPage]?.totalStake &&
+                    convertAmountToReadableString ? (
                     convertAmountToReadableString(
                       validatorFullData[currentPage]?.totalStake,
                       'totalStakeAmount',
@@ -843,7 +845,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                       <Skeleton className="h-4 w-16 break-words" />
                     ) : (
                       <>
-                        {validatorFullData[currentPage]?.seatPrice
+                        {validatorFullData[currentPage]?.seatPrice &&
+                        convertAmountToReadableString
                           ? convertAmountToReadableString(
                               validatorFullData[currentPage]?.seatPrice,
                               'seatPriceAmount',
@@ -864,7 +867,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <span>
-                                {TotalSupply ? formatNumber(TotalSupply) : ''}
+                                {TotalSupply && formatNumber
+                                  ? formatNumber(TotalSupply)
+                                  : ''}
                               </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content
@@ -897,7 +902,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 <div className="w-full text-green-500 md:w-3/4 break-words">
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
-                  ) : validatorFullData[currentPage]?.elapsedTime ? (
+                  ) : validatorFullData[currentPage]?.elapsedTime &&
+                    convertTimestampToTime ? (
                     convertTimestampToTime(
                       validatorFullData[currentPage]?.elapsedTime,
                     )
@@ -911,7 +917,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 <div className="w-full md:w-3/4 text-green-500 break-words">
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
-                  ) : validatorFullData[currentPage]?.totalSeconds ? (
+                  ) : validatorFullData[currentPage]?.totalSeconds &&
+                    convertTimestampToTime ? (
                     convertTimestampToTime(timeRemaining.toString())
                   ) : (
                     ''

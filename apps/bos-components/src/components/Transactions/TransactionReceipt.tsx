@@ -53,7 +53,7 @@ export default function (props: TransactionReceiptInfo) {
         {convertionReceipt ? (
           <div className="flex flex-row mb-2.5">
             <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-            <div className="text-green-500 text-sm">
+            <div className="text-green-500 text-sm overflow-auto">
               {receipt?.predecessorId}
             </div>
           </div>
@@ -109,7 +109,9 @@ export default function (props: TransactionReceiptInfo) {
             className={`absolute left-0.5 -top-5 ml-px  w-4 h-4 text-green-500`}
           />
           <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-          <div className="text-green-500 text-sm">{receipt?.receiverId}</div>
+          <div className="text-green-500 text-sm overflow-auto">
+            {receipt?.receiverId}
+          </div>
         </div>
       </div>
       {lastNonRefundNestedReceipt ? (
