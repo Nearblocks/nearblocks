@@ -17,7 +17,7 @@ if (config.dbCa) {
 const knex: Knex = createKnex({
   client: 'pg',
   connection: {
-    application_name: 'backend',
+    application_name: 'aggregates',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
     statement_timeout: 60 * 1000, // 60s

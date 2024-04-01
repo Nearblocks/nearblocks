@@ -83,26 +83,19 @@ const syncHolders = async (): Promise<boolean> => {
     await knex.transaction(async (trx) => {
       logger.info(`${TABLE}: events: ${events.length}`);
 
-      await Promise.all(
-        events.map(async (event) => {
-          return trx(TABLE)
-            .insert({
-              account: event.account,
-              contract: event.contract,
-              quantity: event.quantity,
-              token: event.token,
-            })
-            .onConflict(['contract', 'token', 'account'])
-            .merge({
-              quantity: trx.raw('?? + ?', [
-                `${TABLE}.quantity`,
-                event.quantity,
-              ]),
-            });
-        }),
-      );
+      if (events.length) {
+        await trx(TABLE)
+          .insert(events)
+          .onConflict(['contract', 'token', 'account'])
+          .merge({
+            quantity: trx.raw('?? + ?', [
+              `${TABLE}.quantity`,
+              trx.raw('excluded.quantity'),
+            ]),
+          });
+      }
 
-      await knex('settings')
+      await trx('settings')
         .insert({
           key: TABLE,
           value: { sync: end },
@@ -113,7 +106,7 @@ const syncHolders = async (): Promise<boolean> => {
 
     return false;
   } catch (error) {
-    logger.error({ syncNFTHolders: error });
+    logger.error(error, 'syncNFTHolders');
     Sentry.captureException(error);
     await sleep(5000);
 
