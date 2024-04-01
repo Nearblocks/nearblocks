@@ -1535,3 +1535,10 @@ export type SchemaInfo = {
 };
 
 export type FieldValueTypes = string | boolean | number | null;
+
+export type Status = {
+  aggregates: {
+    ft_holders: { height: number; sync: boolean; timestamp: string };
+    nft_holders: { height: number; sync: boolean; timestamp: string };
+  };
+};

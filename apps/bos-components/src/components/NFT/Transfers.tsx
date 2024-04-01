@@ -524,7 +524,6 @@ export default function ({ network, id, ownerId }: Props) {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
-  console.log('isLoading,txns[currentPage]', isLoading, txns[currentPage]);
   return (
     <>
       {countLoading ? (

@@ -47,8 +47,8 @@ export default function (props: ReceiptKindInfo) {
   return (
     <div className="py-2.5">
       <div
-        className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center text-base leading-5 cursor-pointer 
-        transition-all ease-in-out  
+        className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center leading-5 cursor-pointer 
+        transition-all ease-in-out 
         ${backgroundColorClasses[action.kind] || ''}`}
         onClick={onClick}
         role="button"
@@ -89,8 +89,8 @@ export default function (props: ReceiptKindInfo) {
               ></textarea>
             ) : (
               <div>
-                <div className="bg-gray-100 rounded-md p-3 font-semibold my-3">
-                  <div className="bg-inherit text-inherit font-inherit text-base border-none p-0">
+                <div className="bg-gray-100 rounded-md p-3 font-medium my-3">
+                  <div className="bg-inherit text-inherit font-inherit border-none p-0">
                     <div className="max-h-52 overflow-auto">
                       <div className="p-4 h-full w-full">{prettyArgs}</div>
                     </div>

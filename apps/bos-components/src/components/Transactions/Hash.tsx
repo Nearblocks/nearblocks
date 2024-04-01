@@ -62,9 +62,9 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
+              setError(false);
               setTxn(resp);
               setIsLoading(false);
-              setError(false);
             } else {
               handleRateLimit(data, fetchTxn, () => setIsLoading(false));
             }
@@ -154,7 +154,7 @@ export default function (props: Props) {
                             ? t('txns:txn.tabs.execution')
                             : 'Execution Plan'}
                         </h2>
-                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-9 -mt-7 px-1 ">
+                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-8 -mt-7 px-1 ">
                           NEW
                         </div>
                       </>

@@ -18,10 +18,10 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { HoldersPropsInfo, Token } from '@/includes/types';
+import { HoldersPropsInfo, Status, Token } from '@/includes/types';
 
 export default function ({ network, id, token, ownerId }: Props) {
-  const { localFormat, serialNumber } = VM.require(
+  const { localFormat, serialNumber, getTimeAgoString } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
@@ -36,6 +36,12 @@ export default function ({ network, id, token, ownerId }: Props) {
   const [holder, setHolder] = useState<{ [key: number]: HoldersPropsInfo[] }>(
     {},
   );
+  const [status, setStatus] = useState({
+    height: 0,
+    sync: false,
+    timestamp: '',
+  });
+
   const [tokens, setTokens] = useState<Token>({} as Token);
 
   const config = getConfig && getConfig(network);
@@ -72,7 +78,25 @@ export default function ({ network, id, token, ownerId }: Props) {
         )
         .catch(() => {});
     }
-
+    function fetchStatus() {
+      asyncFetch(`${config.backendUrl}sync/status`)
+        .then(
+          (data: {
+            body: {
+              status: Status;
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.status?.aggregates.nft_holders;
+            if (data.status === 200) {
+              setStatus(resp);
+            } else {
+              handleRateLimit(data, fetchStatus);
+            }
+          },
+        )
+        .catch(() => {});
+    }
     function fetchTotalHolders() {
       asyncFetch(`${config?.backendUrl}nfts/${id}/holders/count`, {
         method: 'GET',
@@ -136,6 +160,7 @@ export default function ({ network, id, token, ownerId }: Props) {
     if (config?.backendUrl) {
       fetchTotalHolders();
       fetchHoldersData(currentPage);
+      fetchStatus();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,9 +263,14 @@ export default function ({ network, id, token, ownerId }: Props) {
         </div>
       ) : (
         <>
-          {/* <div className="flex w-full bg-nearblue px-5 py-4 text-green text-sm rounded-t-lg">
-            Token holders will update soon
-          </div> */}
+          {status.sync && (
+            <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+              Holders count is out of sync. Last synced block is
+              <span className="font-bold mx-1">{status.height}</span>{' '}
+              {`(${getTimeAgoString(status.timestamp)})`}. Holders data will be
+              delayed.
+            </div>
+          )}
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">

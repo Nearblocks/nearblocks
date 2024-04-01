@@ -116,7 +116,7 @@ export default function (props: Props) {
           ></textarea>
         ) : (
           <div>
-            <div className="bg-gray-100 rounded-md p-5 font-semibold my-3">
+            <div className="bg-gray-100 rounded-md p-5 font-medium my-3">
               <div className="bg-inherit text-inherit font-inherit border-none p-0">
                 <div className="max-h-52 overflow-auto">
                   <div className="h-full w-full">{prettyArgs}</div>
