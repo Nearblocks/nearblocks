@@ -177,7 +177,7 @@ export default function (props: Props) {
                           </button>
                         </Popover.Trigger>
                         <Popover.Content
-                          className="bg-white w-60 shadow-lg border rounded-lg slide-down mt-4"
+                          className="bg-white w-60 shadow-lg border rounded-lg slide-down mt-4 z-50"
                           sideOffset={5}
                         >
                           <ul className="divide-y">

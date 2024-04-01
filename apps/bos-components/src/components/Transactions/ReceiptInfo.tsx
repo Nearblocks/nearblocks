@@ -137,7 +137,7 @@ export default function (props: Props) {
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
     statusInfo = (
-      <div className="bg-gray-100 rounded-md my-3 p-5 font-medium">
+      <div className="bg-gray-100 rounded-md my-3 p-5 font-medium overflow-auto">
         <pre>{receipt?.outcome?.status?.receiptId}</pre>
       </div>
     );
