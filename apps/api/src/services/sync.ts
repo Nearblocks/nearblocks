@@ -71,15 +71,40 @@ const status = catchAsync(async (_req: Request, res: Response) => {
     (item: Setting) => item.key === 'deleted-accounts',
   );
 
+  const [ftHoldersTime, nftHoldersTime] = await Promise.all([
+    ftHolders?.value?.sync
+      ? sql`
+          SELECT
+            block_timestamp
+          FROM
+            blocks
+          WHERE
+            block_height = ${ftHolders.value.sync}
+        `
+      : null,
+    nftHolders?.value?.sync
+      ? sql`
+          SELECT
+            block_timestamp
+          FROM
+            blocks
+          WHERE
+            block_height = ${nftHolders.value.sync}
+        `
+      : null,
+  ]);
+
   const status = {
     aggregates: {
       ft_holders: {
         height: ftHolders?.value?.sync,
         sync: isBlockInSync(latestBlock - ftHolders?.value?.sync),
+        timestamp: ftHoldersTime?.[0]?.block_timestamp,
       },
       nft_holders: {
         height: nftHolders?.value?.sync,
         sync: isBlockInSync(latestBlock - nftHolders?.value?.sync),
+        timestamp: nftHoldersTime?.[0]?.block_timestamp,
       },
     },
     indexers: {
