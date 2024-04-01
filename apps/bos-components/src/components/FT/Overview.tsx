@@ -29,7 +29,8 @@ import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { StatusInfo, Token } from '@/includes/types';
+import WarningIcon from '@/includes/icons/WarningIcon';
+import { Status, StatusInfo, Token } from '@/includes/types';
 
 export default function ({
   network,
@@ -40,9 +41,8 @@ export default function ({
   onFilterClear,
   ownerId,
 }: Props) {
-  const { dollarFormat, dollarNonCentFormat, localFormat } = VM.require(
-    `${ownerId}/widget/includes.Utils.formats`,
-  );
+  const { dollarFormat, dollarNonCentFormat, localFormat, getTimeAgoString } =
+    VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { getConfig, handleRateLimit } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
@@ -64,7 +64,11 @@ export default function ({
   const [holders, setHolders] = useState('');
   const [pageTab, setPageTab] = useState('Transfers');
   const [showMarketCap, setShowMarketCap] = useState(false);
-
+  const [status, setStatus] = useState({
+    height: 0,
+    sync: false,
+    timestamp: '',
+  });
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
@@ -153,11 +157,31 @@ export default function ({
         )
         .catch(() => {});
     }
+    function fetchStatus() {
+      asyncFetch(`${config.backendUrl}sync/status`)
+        .then(
+          (data: {
+            body: {
+              status: Status;
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.status?.aggregates.ft_holders;
+            if (data.status === 200) {
+              setStatus(resp);
+            } else {
+              handleRateLimit(data, fetchStatus);
+            }
+          },
+        )
+        .catch(() => {});
+    }
     if (config?.backendUrl) {
       fetchStatsData();
       fetchFTData();
       fetchTxnsCount();
       fetchHoldersCount();
+      fetchStatus();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -374,20 +398,28 @@ export default function ({
                     <div className="w-full md:w-3/4 break-words">
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : holders ?? ''}
-                        {/* <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <Question className="w-4 h-4 fill-current ml-1" />
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="bottom"
-                            >
-                              Token holders will update soon
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider> */}
+                        {status.sync && (
+                          <Tooltip.Provider>
+                            <Tooltip.Root>
+                              <Tooltip.Trigger asChild>
+                                <WarningIcon className="w-4 h-4 fill-current ml-1" />
+                              </Tooltip.Trigger>
+                              <Tooltip.Content
+                                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                                align="start"
+                                side="bottom"
+                              >
+                                Holders count is out of sync. Last synced block
+                                is
+                                <span className="font-bold mx-1">
+                                  {status.height}
+                                </span>{' '}
+                                {`(${getTimeAgoString(status.timestamp)})`}.
+                                Holders data will be delayed.
+                              </Tooltip.Content>
+                            </Tooltip.Root>
+                          </Tooltip.Provider>
+                        )}
                       </div>
                     </div>
                   )}

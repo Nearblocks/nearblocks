@@ -12,7 +12,7 @@ const Detail = forwardRef(
   ({ network, txns, className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
     const { t } = useTranslation('txns');
     return (
-      <div ref={ref} className={`w-full z-10 ${className} pr-6`}>
+      <div ref={ref} className={`w-full z-10 ${className} pr-2`}>
         {!txns && (
           <div className="md:flex items-center justify-between">
             <div className="w-80 max-w-xs px-3 py-5">
