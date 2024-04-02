@@ -25,7 +25,7 @@ import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TokenImage from '@/includes/icons/TokenImage';
-import { TransactionInfo } from '@/includes/types';
+import { Status, TransactionInfo } from '@/includes/types';
 
 export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
@@ -46,7 +46,11 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
     {},
   );
   const [address, setAddress] = useState('');
-
+  const [status, setStatus] = useState({
+    height: 0,
+    sync: true,
+  });
+  const [timestamp, setTimeStamp] = useState('');
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
@@ -107,13 +111,67 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
         .catch(() => {})
         .finally(() => {});
     }
+
+    function fetchStatus() {
+      asyncFetch(`${config.backendUrl}sync/status`)
+        .then(
+          (data: {
+            body: {
+              status: Status;
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.status?.indexers.events;
+            if (data.status === 200) {
+              setStatus(resp);
+            } else {
+              handleRateLimit(data, fetchStatus);
+            }
+          },
+        )
+        .catch(() => {});
+    }
+
     if (config?.backendUrl) {
       fetchTotalTokens();
       fetchTokens(currentPage);
+      fetchStatus();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
+  useEffect(() => {
+    function fetchTimeStamp(height: number) {
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'block',
+          params: {
+            block_id: height,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: any;
+            };
+          }) => {
+            const resp = res?.body?.result.header;
+            setTimeStamp(resp.timestamp_nanosec);
+          },
+        )
+        .catch(() => {});
+    }
+    if (config?.rpcUrl && status.height) {
+      fetchTimeStamp(status.height);
+    }
+  }, [status.height, config?.rpcUrl]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -569,14 +627,24 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
             <Skeleton className="h-4" />
           </div>
         ) : (
-          <div className={`flex flex-col lg:flex-row pt-4`}>
-            <div className="flex flex-col">
-              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-                A total of {localFormat && localFormat(totalCount.toString())}{' '}
-                transactions found
-              </p>
+          <>
+            {!status.sync && (
+              <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+                Token transfers are out of sync. Last synced block was
+                <span className="font-bold mx-1">{status.height}</span>{' '}
+                {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))})`}.
+                Token transfers data will be delayed.
+              </div>
+            )}
+            <div className={`flex flex-col lg:flex-row pt-4`}>
+              <div className="flex flex-col">
+                <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+                  A total of {localFormat && localFormat(totalCount.toString())}{' '}
+                  transactions found
+                </p>
+              </div>
             </div>
-          </div>
+          </>
         )}
         <Widget
           src={`${ownerId}/widget/bos-components.components.Shared.Table`}

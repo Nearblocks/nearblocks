@@ -179,7 +179,8 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                           className="hover:no-underline"
                         >
                           <a className="text-green hover:no-underline">
-                            {shortenAddress(token?.asset?.owner ?? '')}
+                            {shortenAddress &&
+                              shortenAddress(token?.asset?.owner ?? '')}
                           </a>
                         </Link>
                       </div>
@@ -211,7 +212,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a className="text-green hover:no-underline">
-                          {shortenAddress(id ?? '')}
+                          {shortenAddress && shortenAddress(id ?? '')}
                         </a>
                       </Link>
                     </div>

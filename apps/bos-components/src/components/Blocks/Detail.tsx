@@ -42,7 +42,7 @@ export default function (props: Props) {
   );
 
   const { network, hash, t } = props;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [price, setPrice] = useState('');
   const [error, setError] = useState(false);

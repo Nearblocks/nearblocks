@@ -559,7 +559,7 @@ const Header = () => {
                       </a>
 
                       {user && (
-                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 px-4">
+                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                           {/* {profile.map((menu) => (
                             <li key={menu.id}>
                               <ActiveLink href={menu.link}>

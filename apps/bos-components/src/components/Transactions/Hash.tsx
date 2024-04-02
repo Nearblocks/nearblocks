@@ -35,7 +35,7 @@ export default function (props: Props) {
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [txn, setTxn] = useState<TransactionInfo | null>(null);
   const [error, setError] = useState(false);
   const [isToggle, setIsToggle] = useState(false);
