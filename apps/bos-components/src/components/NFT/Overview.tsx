@@ -28,7 +28,7 @@ export default function ({ network, id, ownerId }: Props) {
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, handleRateLimit } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -41,7 +41,7 @@ export default function ({ network, id, ownerId }: Props) {
   const [pageTab, setPageTab] = useState('Transfers');
   const [status, setStatus] = useState({
     height: 0,
-    sync: false,
+    sync: true,
     timestamp: '',
   });
 
@@ -212,7 +212,7 @@ export default function ({ network, id, ownerId }: Props) {
                     <div className="w-full md:w-3/4 break-words">
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : ''}
-                        {status.sync && (
+                        {!status.sync && (
                           <Tooltip.Provider>
                             <Tooltip.Root>
                               <Tooltip.Trigger asChild>
@@ -228,8 +228,10 @@ export default function ({ network, id, ownerId }: Props) {
                                 <span className="font-bold mx-1">
                                   {status.height}
                                 </span>{' '}
-                                {`(${getTimeAgoString(status.timestamp)})`}.
-                                Holders data will be delayed.
+                                {`(${getTimeAgoString(
+                                  nanoToMilli(status.timestamp),
+                                )})`}
+                                . Holders data will be delayed.
                               </Tooltip.Content>
                             </Tooltip.Root>
                           </Tooltip.Provider>

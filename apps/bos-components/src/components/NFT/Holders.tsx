@@ -25,9 +25,8 @@ export default function ({ network, id, token, ownerId }: Props) {
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, handleRateLimit, holderPercentage } = VM.require(
-    `${ownerId}/widget/includes.Utils.libs`,
-  );
+  const { getConfig, handleRateLimit, holderPercentage, nanoToMilli } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
@@ -38,7 +37,7 @@ export default function ({ network, id, token, ownerId }: Props) {
   );
   const [status, setStatus] = useState({
     height: 0,
-    sync: false,
+    sync: true,
     timestamp: '',
   });
 
@@ -263,12 +262,12 @@ export default function ({ network, id, token, ownerId }: Props) {
         </div>
       ) : (
         <>
-          {status.sync && (
+          {!status.sync && (
             <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
               Holders count is out of sync. Last synced block is
               <span className="font-bold mx-1">{status.height}</span>{' '}
-              {`(${getTimeAgoString(status.timestamp)})`}. Holders data will be
-              delayed.
+              {`(${getTimeAgoString(nanoToMilli(status.timestamp))})`}. Holders
+              data will be delayed.
             </div>
           )}
           <div className={`flex flex-col lg:flex-row pt-4`}>

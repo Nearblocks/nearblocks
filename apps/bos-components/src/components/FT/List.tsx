@@ -329,7 +329,7 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
     },
     {
       header: (
