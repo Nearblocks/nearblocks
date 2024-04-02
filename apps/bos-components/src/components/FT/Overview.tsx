@@ -44,7 +44,7 @@ export default function ({
   const { dollarFormat, dollarNonCentFormat, localFormat, getTimeAgoString } =
     VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
-  const { getConfig, handleRateLimit } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -66,7 +66,7 @@ export default function ({
   const [showMarketCap, setShowMarketCap] = useState(false);
   const [status, setStatus] = useState({
     height: 0,
-    sync: false,
+    sync: true,
     timestamp: '',
   });
   const config = getConfig && getConfig(network);
@@ -398,7 +398,7 @@ export default function ({
                     <div className="w-full md:w-3/4 break-words">
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : holders ?? ''}
-                        {status.sync && (
+                        {!status.sync && (
                           <Tooltip.Provider>
                             <Tooltip.Root>
                               <Tooltip.Trigger asChild>
@@ -414,8 +414,10 @@ export default function ({
                                 <span className="font-bold mx-1">
                                   {status.height}
                                 </span>{' '}
-                                {`(${getTimeAgoString(status.timestamp)})`}.
-                                Holders data will be delayed.
+                                {`(${getTimeAgoString(
+                                  nanoToMilli(status.timestamp),
+                                )})`}
+                                . Holders data will be delayed.
                               </Tooltip.Content>
                             </Tooltip.Root>
                           </Tooltip.Provider>
