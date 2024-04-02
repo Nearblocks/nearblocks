@@ -1541,4 +1541,9 @@ export type Status = {
     ft_holders: { height: number; sync: boolean; timestamp: string };
     nft_holders: { height: number; sync: boolean; timestamp: string };
   };
+  indexers: {
+    balance: { height: number; sync: boolean };
+    base: { height: string; sync: boolean };
+    events: { height: number; sync: boolean };
+  };
 };

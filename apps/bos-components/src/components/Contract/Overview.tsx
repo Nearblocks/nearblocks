@@ -135,7 +135,7 @@ export default function (props: Props) {
           <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 px-2 py-2  w-fit rounded shadow">
             Contracts with Near{' '}
             <a
-              className="text-green-500 mx-1"
+              className="text-green-500 "
               target="_blank"
               href="https://github.com/near/abi"
               rel="noreferrer noopener nofollow"

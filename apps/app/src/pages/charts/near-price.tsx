@@ -45,7 +45,7 @@ const NearPriceChart = () => {
         <meta property="og:title" content={t('charts:nearPrice.metaTitle')} />
         <meta
           property="og:description"
-          content={t('nearPrice.metaDescription')}
+          content={t('charts:nearPrice.metaDescription')}
         />
         <meta
           property="twitter:title"

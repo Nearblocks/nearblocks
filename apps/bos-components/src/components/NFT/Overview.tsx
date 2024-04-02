@@ -230,8 +230,8 @@ export default function ({ network, id, ownerId }: Props) {
                                 </span>{' '}
                                 {`(${getTimeAgoString(
                                   nanoToMilli(status.timestamp),
-                                )})`}
-                                . Holders data will be delayed.
+                                )}).`}
+                                Holders data will be delayed.
                               </Tooltip.Content>
                             </Tooltip.Root>
                           </Tooltip.Provider>
