@@ -77,7 +77,7 @@ export default function (props: Props) {
   const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const config = getConfig && getConfig(network);
+  const config = getConfig ? getConfig(network) : '';
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -646,14 +646,16 @@ export default function (props: Props) {
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               {t
                 ? t('txns:listing', {
-                    count: localFormat && localFormat(totalCount.toString()),
+                    count: localFormat
+                      ? localFormat(totalCount.toString())
+                      : '',
                   })
                 : `More than > ${totalCount} transactions found`}
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
             <div className="flex items-center px-6 text-sm mb-4 text-nearblue-600 lg:ml-auto">
-              Filtered By:
+              {t ? t('txns:filter.by') : 'Filtered By:'}&nbsp;
               <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
                 {Object.keys(filters).map((key) => (
                   <span

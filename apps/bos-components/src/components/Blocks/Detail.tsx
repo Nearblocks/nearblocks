@@ -43,11 +43,11 @@ export default function (props: Props) {
 
   const { network, hash, t } = props;
   const [isLoading, setIsLoading] = useState(true);
-  const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
+  const [block, setBlock] = useState<BlocksInfo | null>(null);
   const [price, setPrice] = useState('');
   const [error, setError] = useState(false);
 
-  const config = getConfig && getConfig(network);
+  const config = getConfig ? getConfig(network) : '';
 
   const Loader = (props: { className?: string }) => {
     return (
@@ -83,19 +83,9 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.blocks?.[0];
             if (data.status === 200) {
-              setBlock({
-                author_account_id: resp.author_account_id,
-                block_hash: resp.block_hash,
-                block_height: resp.block_height,
-                block_timestamp: resp.block_timestamp,
-                chunks_agg: resp.chunks_agg,
-                gas_price: resp.gas_price,
-                prev_block_hash: resp.prev_block_hash,
-                receipts_agg: resp.receipts_agg,
-                transactions_agg: resp.transactions_agg,
-              });
-              setIsLoading(false);
               setError(false);
+              setBlock(resp);
+              setIsLoading(false);
             } else {
               handleRateLimit(data, fetchBlock, () => setIsLoading(false));
             }
@@ -115,42 +105,46 @@ export default function (props: Props) {
 
   const date = useMemo(() => {
     if (block?.block_timestamp) {
-      const timestamp = new Date(nanoToMilli(block?.block_timestamp));
-
       function fetchPriceAtDate(date: string) {
-        asyncFetch(
-          `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
-        ).then(
+        asyncFetch(`${config.backendUrl}stats/price?date=${date}`).then(
           (data: {
             body: {
-              market_data: { current_price: { usd: string } };
+              stats: { near_price: string }[];
             };
             status: number;
           }) => {
-            const resp = data?.body?.market_data?.current_price?.usd;
+            const resp = data?.body?.stats[0];
             if (data.status === 200) {
-              setPrice(resp);
+              setPrice(resp?.near_price);
             } else {
               handleRateLimit(data, () => fetchPriceAtDate(date));
             }
           },
         );
       }
+      const timestamp = new Date(nanoToMilli(block?.block_timestamp));
 
-      let dt;
       const currentDate = new Date();
-      if (currentDate > timestamp) {
-        const day = timestamp.getUTCDate();
-        const month = timestamp.getUTCMonth() + 1;
-        const year = timestamp.getUTCFullYear();
+      const currentDay = currentDate.getUTCDate();
+      const currentMonth = currentDate.getUTCMonth() + 1;
+      const currentYear = currentDate.getUTCFullYear();
 
-        dt = `${day < 10 ? '0' : ''}${day}-${
-          month < 10 ? '0' : ''
-        }${month}-${year}`;
+      const currentDt = `${currentYear}-${
+        currentMonth < 10 ? '0' : ''
+      }${currentMonth}-${currentDay < 10 ? '0' : ''}${currentDay}`;
 
-        fetchPriceAtDate(dt);
+      const day = timestamp.getUTCDate();
+      const month = timestamp.getUTCMonth() + 1;
+      const year = timestamp.getUTCFullYear();
 
-        return dt;
+      const blockDt = `${year}-${month < 10 ? '0' : ''}${month}-${
+        day < 10 ? '0' : ''
+      }${day}`;
+
+      if (currentDt > blockDt) {
+        fetchPriceAtDate(blockDt);
+
+        return blockDt;
       }
     }
     return;
@@ -163,44 +157,41 @@ export default function (props: Props) {
 
   return (
     <>
-      {error || (!isLoading && Object.keys(block).length === 0) ? (
-        <div className="text-nearblue-700 text-xs px-2 mb-4 py-5">
+      <div className="md:flex items-center justify-between">
+        {isLoading ? (
+          <div className="w-80 max-w-xs px-3 py-5">
+            <Skeleton className="h-7" />
+          </div>
+        ) : (
+          <h1 className="text-xl text-nearblue-600 px-2 py-5">
+            {t ? (
+              <>
+                {t('blocks:block.heading.0')}
+                <span key={1} className="font-semibold">
+                  {t('blocks:block.heading.1', {
+                    block: block?.block_height
+                      ? localFormat(block?.block_height)
+                      : '',
+                  })}
+                </span>
+              </>
+            ) : (
+              <>
+                Block
+                <span key={1} className="font-semibold">
+                  #{block?.block_height ? localFormat(block?.block_height) : ''}
+                </span>
+              </>
+            )}
+          </h1>
+        )}
+      </div>
+      {error || (!isLoading && !block) ? (
+        <div className="text-nearblue-700 text-xs px-2 mb-5">
           {t ? t('blocks:blockError') : 'Block Error'}
         </div>
       ) : (
         <>
-          <div className="md:flex items-center justify-between">
-            {isLoading ? (
-              <div className="w-80 max-w-xs px-3 py-5">
-                <Skeleton className="h-7" />
-              </div>
-            ) : (
-              <h1 className="text-xl text-nearblue-600 px-2 py-5">
-                {t ? (
-                  <>
-                    {t('blocks:block.heading.0')}
-                    <span key={1} className="font-semibold">
-                      {t('blocks:block.heading.1', {
-                        block: block?.block_height
-                          ? localFormat(block?.block_height)
-                          : '',
-                      })}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Block
-                    <span key={1} className="font-semibold">
-                      #
-                      {block?.block_height
-                        ? localFormat(block?.block_height)
-                        : ''}
-                    </span>
-                  </>
-                )}
-              </h1>
-            )}
-          </div>
           <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
             {network === 'testnet' && (
               <div className="flex flex-wrap p-4 text-red-500">
@@ -344,7 +335,7 @@ export default function (props: Props) {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.gasLimit') : 'Gas limit'}
+                {t ? t('blocks:block.gasLimit') : 'Gas Limit'}
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
@@ -390,7 +381,7 @@ export default function (props: Props) {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.parenthash') : 'Parent hash'}
+                {t ? t('blocks:block.parenthash') : 'Parent Hash'}
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
