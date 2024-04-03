@@ -3,7 +3,6 @@ import { Big } from 'big.js';
 import { msToNsTime } from 'nb-utils';
 
 import cg from '#libs/cg';
-import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import near from '#libs/near';
 
@@ -85,20 +84,16 @@ const networkData = async () => {
 };
 
 export const txnData = async () => {
-  const start = dayjs.utc().startOf('day').valueOf();
-
-  const [stats, txns] = await Promise.all([
-    knex('daily_stats').sum('txns').first(),
-    knex('transactions')
-      .count('block_timestamp')
-      .where('block_timestamp', '>', msToNsTime(start))
-      .first(),
-  ]);
+  const stats = await knex
+    .select(
+      knex.raw(
+        "count_estimate('SELECT transaction_hash FROM transactions') as count",
+      ),
+    )
+    .first();
 
   return {
-    total_txns: Big(stats?.sum ?? 0)
-      .add(txns?.count ?? 0)
-      .toFixed(),
+    total_txns: stats?.count ?? 0,
   };
 };
 

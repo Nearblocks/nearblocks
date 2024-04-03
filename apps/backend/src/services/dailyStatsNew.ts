@@ -9,11 +9,7 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
-// import { circulatingSupply } from '#libs/supply';
-
-// The timestamp when transfers were enabled in the Mainnet
-// Tuesday, 13 October 2020 18:38:58.293
-// const TRANSFERS_ENABLED = dayjs(1602614338293);
+import { circulatingSupply } from '#libs/supply';
 
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
@@ -62,19 +58,15 @@ const blockData = async (day: Dayjs) => {
       .first(),
   ]);
 
-  // let supply: null | string = null;
+  let supply: null | string = null;
 
-  // if (
-  //   config.network === Network.MAINNET &&
-  //   lastBlock &&
-  //   day.isSameOrAfter(TRANSFERS_ENABLED, 'day')
-  // ) {
-  //   supply = await circulatingSupply(lastBlock);
-  // }
+  if (config.network === Network.MAINNET && lastBlock) {
+    supply = await circulatingSupply(lastBlock);
+  }
 
   return {
     blocks: blocks?.count?.toString(),
-    // circulating_supply: supply,
+    circulating_supply: supply,
     gas_fee: Big(gasUsed?.sum ?? 0)
       .mul(Big(lastBlock?.gas_price ?? 0))
       .toString(),
@@ -133,101 +125,89 @@ const txnData = async (start: string, end: string, price?: null | string) => {
 };
 
 const addressData = async (start: string, end: string) => {
-  const activeAccounts = await knex('transactions')
+  const [
+    newAccounts,
+    activeAccounts,
+    deletedAccounts,
+    newContracts,
+    activeContracts,
+  ] = await Promise.all([
+    knex('accounts as a')
+      .join('receipts as r', 'r.receipt_id', '=', 'a.created_by_receipt_id')
+      .where('r.included_in_block_timestamp', '>=', start)
+      .where('r.included_in_block_timestamp', '<', end)
+      .count('a.created_by_receipt_id')
+      .first(),
+    knex('transactions')
+      .where('block_timestamp', '>=', start)
+      .where('block_timestamp', '<', end)
+      .countDistinct('signer_account_id')
+      .first(),
+    knex('accounts as a')
+      .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
+      .where('r.included_in_block_timestamp', '>=', start)
+      .where('r.included_in_block_timestamp', '<', end)
+      .count('a.deleted_by_receipt_id')
+      .first(),
+    knex('action_receipt_actions as a')
+      .join('receipts as r', 'r.receipt_id', '=', 'a.receipt_id')
+      .where('r.included_in_block_timestamp', '>=', start)
+      .where('r.included_in_block_timestamp', '<', end)
+      .andWhere('a.action_kind', '=', 'DEPLOY_CONTRACT')
+      .countDistinct({ count: 'r.receiver_account_id' })
+      .first(),
+    knex('action_receipt_actions')
+      .where('receipt_included_in_block_timestamp', '>=', start)
+      .where('receipt_included_in_block_timestamp', '<', end)
+      .andWhere('action_kind', '=', 'FUNCTION_CALL')
+      .countDistinct({ count: 'receipt_receiver_account_id' })
+      .first(),
+  ]);
+
+  await knex.raw(
+    `
+      INSERT INTO deployed_contracts (
+        contract,
+        code_sha256,
+        receipt_id,
+        block_hash,
+        block_timestamp
+      )
+      SELECT
+        action_receipt_actions.receipt_receiver_account_id as contract,
+        action_receipt_actions.args->>'code_sha256' as code_sha256,
+        action_receipt_actions.receipt_id as receipt_id,
+        execution_outcomes.executed_in_block_hash as block_hash,
+        execution_outcomes.executed_in_block_timestamp as block_timestamp
+      FROM action_receipt_actions
+      JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
+      WHERE action_receipt_actions.action_kind = 'DEPLOY_CONTRACT'
+        AND execution_outcomes.status = 'SUCCESS_VALUE'
+        AND execution_outcomes.executed_in_block_timestamp >= ?
+        AND execution_outcomes.executed_in_block_timestamp < ?
+      ON CONFLICT (receipt_id) DO NOTHING
+    `,
+    [start, end],
+  );
+
+  const uniqueContracts = await knex('deployed_contracts')
+    .countDistinct({ count: 'code_sha256' })
     .where('block_timestamp', '>=', start)
     .where('block_timestamp', '<', end)
-    .countDistinct('signer_account_id')
     .first();
 
   return {
     active_accounts: activeAccounts?.count?.toString(),
+    active_contracts: activeContracts?.count?.toString(),
+    deleted_accounts: deletedAccounts?.count?.toString(),
+    new_accounts: newAccounts?.count?.toString(),
+    new_contracts: newContracts?.count?.toString(),
+    unique_contracts: uniqueContracts?.count?.toString(),
   };
-
-  // const [
-  //   newAccounts,
-  //   activeAccounts,
-  //   deletedAccounts,
-  //   newContracts,
-  //   activeContracts,
-  //   uniqueContracts,
-  // ] = await Promise.all([
-  //   knex('accounts as a')
-  //     .join('receipts as r', 'r.receipt_id', '=', 'a.created_by_receipt_id')
-  //     .where('r.included_in_block_timestamp', '>=', start)
-  //     .where('r.included_in_block_timestamp', '<', end)
-  //     .count('a.created_by_receipt_id')
-  //     .first(),
-  //   knex('transactions')
-  //     .where('block_timestamp', '>=', start)
-  //     .where('block_timestamp', '<', end)
-  //     .countDistinct('signer_account_id')
-  //     .first(),
-  //   knex('accounts as a')
-  //     .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
-  //     .where('r.included_in_block_timestamp', '>=', start)
-  //     .where('r.included_in_block_timestamp', '<', end)
-  //     .count('a.deleted_by_receipt_id')
-  //     .first(),
-  //   knex('action_receipt_actions as a')
-  //     .join('receipts as r', 'r.receipt_id', '=', 'a.receipt_id')
-  //     .where('r.included_in_block_timestamp', '>=', start)
-  //     .where('r.included_in_block_timestamp', '<', end)
-  //     .andWhere('a.action_kind', '=', 'DEPLOY_CONTRACT')
-  //     .countDistinct({ count: 'r.receiver_account_id' })
-  //     .first(),
-  //   knex('action_receipt_actions')
-  //     .where('receipt_included_in_block_timestamp', '>=', start)
-  //     .where('receipt_included_in_block_timestamp', '<', end)
-  //     .andWhere('action_kind', '=', 'FUNCTION_CALL')
-  //     .countDistinct({ count: 'receipt_receiver_account_id' })
-  //     .first(),
-  //   knex('deployed_contracts')
-  //     .countDistinct({ count: 'code_sha256' })
-  //     .where('block_timestamp', '>=', start)
-  //     .where('block_timestamp', '<', end)
-  //     .first(),
-  // ]);
-
-  // await knex.raw(
-  //   `
-  //     INSERT INTO deployed_contracts (
-  //       contract,
-  //       code_sha256,
-  //       receipt_id,
-  //       block_hash,
-  //       block_timestamp
-  //     )
-  //     SELECT
-  //       action_receipt_actions.receipt_receiver_account_id as contract,
-  //       action_receipt_actions.args->>'code_sha256' as code_sha256,
-  //       action_receipt_actions.receipt_id as receipt_id,
-  //       execution_outcomes.executed_in_block_hash as block_hash,
-  //       execution_outcomes.executed_in_block_timestamp as block_timestamp
-  //     FROM action_receipt_actions
-  //     JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
-  //     WHERE action_receipt_actions.action_kind = 'DEPLOY_CONTRACT'
-  //       AND execution_outcomes.status = 'SUCCESS_VALUE'
-  //       AND execution_outcomes.executed_in_block_timestamp >= ?
-  //       AND execution_outcomes.executed_in_block_timestamp < ?
-  //     ON CONFLICT (receipt_id) DO NOTHING
-  //   `,
-  //   [start, end],
-  // );
-
-  // return {
-  //   active_accounts: activeAccounts?.count?.toString(),
-  //   active_contracts: activeContracts?.count?.toString(),
-  //   deleted_accounts: deletedAccounts?.count?.toString(),
-  //   new_accounts: newAccounts?.count?.toString(),
-  //   new_contracts: newContracts?.count?.toString(),
-  //   unique_contracts: uniqueContracts?.count?.toString(),
-  // };
 };
 
 const dayStats = async (day: Dayjs) => {
   if (dayjs.utc().isSameOrBefore(day)) return;
-
-  console.log({ day: day.toISOString(), job: 'daily-stats' });
 
   const start = msToNsTime(day.clone().startOf('day').valueOf());
   const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
@@ -247,7 +227,7 @@ const dayStats = async (day: Dayjs) => {
     ...address,
   };
 
-  await knex('daily_stats').insert(data);
+  await knex('daily_stats_new').insert(data);
 };
 
 export const syncStats = async () => {
@@ -257,8 +237,6 @@ export const syncStats = async () => {
     .orderBy('block_timestamp', 'desc')
     .first();
 
-  logger.info({ job: 'daily-stats', latestBlock, start: start.toISOString() });
-
   if (!latestBlock || dayjs.utc().isSameOrBefore(start, 'day')) return;
 
   const end = dayjs
@@ -267,20 +245,13 @@ export const syncStats = async () => {
     .subtract(1, 'day');
 
   const latestStat = await knex
-    .table('daily_stats')
+    .table('daily_stats_new')
     .orderBy('date', 'desc')
     .first();
 
   if (latestStat) {
     start = dayjs.utc(latestStat.date).add(1, 'day');
   }
-
-  logger.info({
-    end: end.toISOString(),
-    job: 'daily-stats',
-    latestBlock,
-    start: start.toISOString(),
-  });
 
   let diff = end.diff(start, 'day');
   diff = diff < 20 ? diff + 1 : 20;
