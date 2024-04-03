@@ -135,7 +135,7 @@ export default function (props: Props) {
                 <button
                   key={index}
                   onClick={() => onTab(index)}
-                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none ${
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
                     pageTab === hash
                       ? 'rounded-lg bg-green-600 text-white'
                       : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
@@ -143,10 +143,12 @@ export default function (props: Props) {
                   value={hash}
                 >
                   {hash === 'overview' ? (
-                    <h2>{t ? t('txns:txn.tabs.overview') : 'Overview'}</h2>
+                    <h2 className="p-2">
+                      {t ? t('txns:txn.tabs.overview') : 'Overview'}
+                    </h2>
                   ) : hash === 'execution' ? (
                     pageTab !== 'execution' ? (
-                      <>
+                      <div className="p-2">
                         <h2>
                           {isToggle
                             ? 'Enhanced Plan'
@@ -157,12 +159,12 @@ export default function (props: Props) {
                         <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-8 -mt-7 px-1 ">
                           NEW
                         </div>
-                      </>
+                      </div>
                     ) : (
                       <Popover.Root key={isToggle}>
                         <Popover.Trigger asChild>
                           <button
-                            className="flex border border-green-900/10 text-xs  rounded focus:outline-none"
+                            className="flex p-2 border border-green-900/10 text-xs  rounded focus:outline-none"
                             aria-label="Update dimensions"
                           >
                             {isToggle
@@ -177,13 +179,13 @@ export default function (props: Props) {
                           </button>
                         </Popover.Trigger>
                         <Popover.Content
-                          className="bg-white w-60 shadow-lg border rounded-lg slide-down mt-4 z-50"
+                          className="bg-white w-48 shadow-lg border rounded-lg slide-down mt-2 z-50"
                           sideOffset={5}
                         >
                           <ul className="divide-y">
                             <li
                               onClick={() => setIsToggle(false)}
-                              className={`py-2 text-nearblue-600 ${
+                              className={`py-2 text-nearblue-600 rounded-t-lg ${
                                 !isToggle ? 'bg-gray-300' : ''
                               }`}
                             >
@@ -191,7 +193,7 @@ export default function (props: Props) {
                             </li>
                             <li
                               onClick={() => setIsToggle(true)}
-                              className={`py-2 text-nearblue-600 ${
+                              className={`py-2 text-nearblue-600 rounded-b-lg ${
                                 isToggle ? 'bg-gray-300' : ''
                               }`}
                             >
@@ -202,7 +204,9 @@ export default function (props: Props) {
                       </Popover.Root>
                     )
                   ) : (
-                    <h2>{t ? t('txns:txn.tabs.comments') : 'Comments'}</h2>
+                    <h2 className="p-2">
+                      {t ? t('txns:txn.tabs.comments') : 'Comments'}
+                    </h2>
                   )}
                 </button>
               ))}
