@@ -63,9 +63,8 @@ export default function (props: Props) {
     yoctoToNear,
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
-  const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
-    `${ownerId}/widget/includes.Utils.near`,
-  );
+  const { tokenAmount, txnActions, txnErrorMessage, txnLogs, txnMethod } =
+    VM.require(`${ownerId}/widget/includes.Utils.near`);
 
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
@@ -128,7 +127,7 @@ export default function (props: Props) {
     return new Big(number).abs().toString();
   }
 
-  const config = getConfig && getConfig(network);
+  const config = getConfig ? getConfig(network) : '';
 
   useEffect(() => {
     function fetchStatsDatas() {
@@ -169,37 +168,43 @@ export default function (props: Props) {
     if (txn?.block_timestamp) {
       const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
       function fetchPriceAtDate(date: string) {
-        asyncFetch(
-          `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
-        ).then(
+        asyncFetch(`${config.backendUrl}stats/price?date=${date}`).then(
           (data: {
             body: {
-              market_data: { current_price: { usd: string } };
+              stats: { near_price: string }[];
             };
             status: number;
           }) => {
-            const resp = data?.body?.market_data?.current_price?.usd;
+            const resp = data?.body?.stats[0];
             if (data.status === 200) {
-              setPrice(resp);
+              setPrice(resp?.near_price);
             } else {
               handleRateLimit(data, () => fetchPriceAtDate(date));
             }
           },
         );
       }
-      let dt;
       const currentDate = new Date();
-      if (currentDate > timestamp) {
-        const day = timestamp.getUTCDate();
-        const month = timestamp.getUTCMonth() + 1;
-        const year = timestamp.getUTCFullYear();
-        dt = `${day < 10 ? '0' : ''}${day}-${
-          month < 10 ? '0' : ''
-        }${month}-${year}`;
+      const currentDay = currentDate.getUTCDate();
+      const currentMonth = currentDate.getUTCMonth() + 1;
+      const currentYear = currentDate.getUTCFullYear();
 
-        fetchPriceAtDate(dt);
+      const currentDt = `${currentYear}-${
+        currentMonth < 10 ? '0' : ''
+      }${currentMonth}-${currentDay < 10 ? '0' : ''}${currentDay}`;
 
-        return dt;
+      const day = timestamp.getUTCDate();
+      const month = timestamp.getUTCMonth() + 1;
+      const year = timestamp.getUTCFullYear();
+
+      const blockDt = `${year}-${month < 10 ? '0' : ''}${month}-${
+        day < 10 ? '0' : ''
+      }${day}`;
+
+      if (currentDt > blockDt) {
+        fetchPriceAtDate(blockDt);
+
+        return blockDt;
       }
     }
     return;
@@ -254,6 +259,7 @@ export default function (props: Props) {
               : '[ This is a Testnet transaction only ]'}
           </div>
         )}
+
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -283,6 +289,20 @@ export default function (props: Props) {
           ) : (
             <div className="w-full md:w-3/4 font-semibold break-words">
               {txn?.transaction_hash ? txn?.transaction_hash : ''}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            Method
+          </div>
+          {loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4 font-semibold break-words">
+              {txnMethod ? txnMethod(txn?.actions, t) : ''}
             </div>
           )}
         </div>
@@ -691,9 +711,10 @@ export default function (props: Props) {
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
-                            {ft?.delta_amount && ft?.ft_meta?.decimals
-                              ? tokenAmount &&
-                                tokenAmount(
+                            {ft?.delta_amount &&
+                            ft?.ft_meta?.decimals &&
+                            tokenAmount
+                              ? tokenAmount(
                                   absoluteValue(ft?.delta_amount),
                                   ft?.ft_meta?.decimals,
                                   true,

@@ -38,7 +38,7 @@ export default function (props: Props) {
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
 
-  const config = getConfig && getConfig(network);
+  const config = getConfig ? getConfig(network) : '';
 
   const [expandAll, setExpandAll] = useState(false);
   const expandAllReceipts = useCallback(
@@ -50,27 +50,27 @@ export default function (props: Props) {
     const receiptsMap =
       txn?.receipts_outcome &&
       txn?.receipts_outcome.reduce((mapping, receiptOutcome) => {
-        const receipt =
-          parseReceipt &&
-          parseReceipt(
-            txn.receipts.find(
-              (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
-            ),
-            receiptOutcome,
-            txn.transaction,
-          );
+        const receipt = parseReceipt
+          ? parseReceipt(
+              txn.receipts.find(
+                (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
+              ),
+              receiptOutcome,
+              txn.transaction,
+            )
+          : '';
         return mapping.set(receiptOutcome.id, {
           ...receipt,
-          outcome: parseOutcomeOld && parseOutcomeOld(receiptOutcome),
+          outcome: parseOutcomeOld ? parseOutcomeOld(receiptOutcome) : '',
         });
       }, new Map());
 
-    const receipts =
-      collectNestedReceiptWithOutcomeOld &&
-      collectNestedReceiptWithOutcomeOld(
-        txn.transaction_outcome.outcome.receipt_ids[0],
-        receiptsMap,
-      );
+    const receipts = collectNestedReceiptWithOutcomeOld
+      ? collectNestedReceiptWithOutcomeOld(
+          txn.transaction_outcome.outcome.receipt_ids[0],
+          receiptsMap,
+        )
+      : '';
 
     return receipts;
   }
@@ -84,7 +84,7 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash, config.backendUrl]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
+  const Loader = (props: { className?: string }) => {
     return (
       <div
         className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
@@ -104,12 +104,12 @@ export default function (props: Props) {
           </div>
         </div>
         <div className="p-8">
-          {!receipt ? (
+          {!receipt?.id ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
             </div>
           ) : (
             <Widget
