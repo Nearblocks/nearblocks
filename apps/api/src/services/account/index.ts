@@ -280,7 +280,7 @@ const inventory = catchAsync(
         (
           SELECT
             nft_holders.contract,
-            SUM(nft_holders.quantity)
+            SUM(nft_holders.quantity) AS quantity
           FROM
             (
               SELECT
