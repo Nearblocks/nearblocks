@@ -631,8 +631,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
             {!status.sync && (
               <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
                 Token transfers are out of sync. Last synced block was
-                <span className="font-bold mx-1">{status.height}</span>{' '}
-                {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))})`}.
+                <span className="font-bold mx-0.5">
+                  {localFormat && localFormat(status.height)}
+                </span>
+                {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))}).`}
                 Token transfers data will be delayed.
               </div>
             )}

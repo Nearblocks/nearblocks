@@ -411,8 +411,8 @@ export default function ({
                               >
                                 Holders count is out of sync. Last synced block
                                 is
-                                <span className="font-bold mx-1">
-                                  {status.height}
+                                <span className="font-bold mx-0.5">
+                                  {localFormat && localFormat(status.height)}
                                 </span>
                                 {`(${getTimeAgoString(
                                   nanoToMilli(status.timestamp),

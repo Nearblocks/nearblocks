@@ -55,29 +55,9 @@ export default function VmInitializer() {
   const setVmStore = useVmStore((store) => store.set);
   // const { requestAuthentication, saveCurrentUrl } = useSignInRedirect();
   useEffect(() => {
-    const testNearConfig = {
-      nodeUrl: 'https://rpc.testnet.near.org',
-      archivalNodeUrl: 'https://rpc.testnet.internal.near.org',
-      contractName: 'v1.social08.testnet',
-      walletUrl: 'https://wallet.testnet.near.org',
-      wrapNearAccountId: 'wrap.testnet',
-      apiUrl: 'https://discovery-api.stage.testnet.near.org',
-      enableWeb4FastRpc: false,
-    };
-
-    const mainNearConfig = {
-      nodeUrl: 'https://rpc.mainnet.near.org',
-      archivalNodeUrl: 'https://rpc.mainnet.internal.near.org',
-      contractName: 'social.near',
-      walletUrl: 'https://wallet.near.org',
-      wrapNearAccountId: 'wrap.near',
-      apiUrl: 'https://api.near.social',
-      enableWeb4FastRpc: false,
-    };
     initNear &&
       initNear({
         networkId: bosNetworkId,
-        config: networkId === 'mainnet' ? mainNearConfig : testNearConfig,
         walletConnectCallback: () => {},
         selector: setupWalletSelector({
           network: networkId,

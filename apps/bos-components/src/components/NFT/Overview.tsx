@@ -225,9 +225,9 @@ export default function ({ network, id, ownerId }: Props) {
                               >
                                 Holders count is out of sync. Last synced block
                                 is
-                                <span className="font-bold mx-1">
-                                  {status.height}
-                                </span>{' '}
+                                <span className="font-bold mx-0.5">
+                                  {localFormat && localFormat(status.height)}
+                                </span>
                                 {`(${getTimeAgoString(
                                   nanoToMilli(status.timestamp),
                                 )}).`}

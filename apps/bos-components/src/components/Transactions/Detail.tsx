@@ -419,15 +419,14 @@ export default function (props: Props) {
           ].includes(item?.action_kind),
         )) ||
         (logs.length > 0 &&
-          logs.some((item: TransactionLog) =>
-            [
-              'wrap.near',
-              'wrap.testnet',
-              'v2.ref-finance.near',
-              'contract.main.burrow.near',
-              'contract.1638481328.burrow.testnet',
-            ].includes(item?.contract),
-          ))) && (
+          logs.some((item: TransactionLog, i: number) => (
+            <EventLogs
+              key={i}
+              event={item}
+              network={network}
+              ownerId={ownerId}
+            />
+          )))) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
