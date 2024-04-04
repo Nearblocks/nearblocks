@@ -47,7 +47,7 @@ export default function ({ network, t, ownerId }: Props) {
     let delay = 15000;
 
     function fetchStats() {
-      asyncFetch(`https://api2.nearblocks.io/v1/stats`)
+      asyncFetch(`${config?.backendUrl}stats`)
         .then((data: { body: { stats: StatusInfo[] }; status: number }) => {
           const resp = data?.body?.stats?.[0];
           if (data.status === 200) {
@@ -90,7 +90,7 @@ export default function ({ network, t, ownerId }: Props) {
 
   useEffect(() => {
     function fetchChartData() {
-      asyncFetch(`https://api2.nearblocks.io/v1/charts/latest`)
+      asyncFetch(`${config?.backendUrl}charts/latest`)
         .then(
           (data: {
             body: {

@@ -206,6 +206,7 @@ export default function ({
                 <TokenImage
                   src={token?.icon}
                   alt={token?.name}
+                  appUrl={config?.appUrl}
                   className="w-7 h-7"
                 />
               </span>

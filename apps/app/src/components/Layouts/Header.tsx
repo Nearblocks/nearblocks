@@ -159,8 +159,8 @@ const Header = () => {
       try {
         const response = await fetch(
           networkId === 'mainnet'
-            ? 'https://api2.nearblocks.io/v1/stats'
-            : 'https://api2-testnet.nearblocks.io/v1/stats',
+            ? 'https://api3.nearblocks.io/v1/stats'
+            : 'https://api3-testnet.nearblocks.io/v1/stats',
           {
             method: 'GET',
             headers: {
@@ -519,7 +519,7 @@ const Header = () => {
                               onClick={onSignOut}
                               className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1"
                             >
-                              Signout
+                              Sign Out
                             </button>
                           </li>
                         </ul>
@@ -575,7 +575,7 @@ const Header = () => {
                               onClick={onSignOut}
                               className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4"
                             >
-                              Signout
+                              Sign Out
                             </button>
                           </li>
                         </ul>

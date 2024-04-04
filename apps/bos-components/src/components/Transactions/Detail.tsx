@@ -856,6 +856,7 @@ export default function (props: Props) {
                                     <TokenImage
                                       src={nft?.nft_meta?.icon}
                                       alt={nft?.nft_meta?.name}
+                                      appUrl={config?.appUrl}
                                       className="w-4 h-4 mx-1"
                                     />
                                     {shortenToken(nft?.nft_meta?.name ?? '')}

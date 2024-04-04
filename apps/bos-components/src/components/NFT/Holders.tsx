@@ -263,7 +263,7 @@ export default function ({ network, id, token, ownerId }: Props) {
       ) : (
         <>
           {!status.sync && (
-            <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+            <div className="w-full text-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
               Holders count is out of sync. Last synced block is
               <span className="font-bold mx-0.5">
                 {localFormat && localFormat(status.height)}
