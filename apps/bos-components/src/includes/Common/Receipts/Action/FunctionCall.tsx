@@ -3,11 +3,8 @@ import FaCode from '@/includes/icons/FaCode';
 import { TransactionActionInfo } from '@/includes/types';
 
 const FunctionCall = (props: TransactionActionInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const { t, args, receiver } = props;

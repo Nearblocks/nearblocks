@@ -1,11 +1,8 @@
 import FaUser from '@/includes/icons/FaUser';
 
 const CreateAccount = (props: any) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   return (

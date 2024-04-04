@@ -2,11 +2,8 @@ import FaArrowAltCircleRight from '@/includes/icons/FaArrowAltCircleRight';
 import { TransactionActionInfo } from '@/includes/types';
 
 const Transfer = (props: TransactionActionInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenAddress, yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const { t, args, receiver } = props;

@@ -63,8 +63,9 @@ export default function (props: Props) {
     yoctoToNear,
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
-  const { tokenAmount, txnActions, txnErrorMessage, txnLogs, txnMethod } =
-    VM.require(`${ownerId}/widget/includes.Utils.near`);
+  const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
 
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
@@ -289,20 +290,6 @@ export default function (props: Props) {
           ) : (
             <div className="w-full md:w-3/4 font-semibold break-words">
               {txn?.transaction_hash ? txn?.transaction_hash : ''}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-wrap p-4">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            Method
-          </div>
-          {loading ? (
-            <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xl" />
-            </div>
-          ) : (
-            <div className="w-full md:w-3/4 font-semibold break-words">
-              {txnMethod ? txnMethod(txn?.actions, t) : ''}
             </div>
           )}
         </div>

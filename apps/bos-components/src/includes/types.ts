@@ -506,6 +506,7 @@ export type TransactionActionInfo = {
   args: ArgsPropsInfo;
   receiver: string;
   t: (key: string) => string | undefined;
+  ownerId: string;
 };
 
 export type ReceiptsPropsInfo = {
@@ -672,6 +673,7 @@ export type TransActionProps = {
   };
   receiver: any;
   t: (key: string) => string | undefined;
+  ownerId: string;
 };
 
 export type TokenInfoProps = {
