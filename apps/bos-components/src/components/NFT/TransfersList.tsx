@@ -631,7 +631,7 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
         ) : (
           <>
             {!status.sync && (
-              <div className="flex w-full justify-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+              <div className="w-full text-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
                 Non-Fungible token transfers are out of sync. Last synced block
                 was
                 <span className="font-bold mx-0.5">

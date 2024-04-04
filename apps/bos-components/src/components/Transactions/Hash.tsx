@@ -149,14 +149,15 @@ export default function (props: Props) {
                   ) : hash === 'execution' ? (
                     pageTab !== 'execution' ? (
                       <div className="p-2">
-                        <h2>
+                        <h2 className="flex">
                           {isToggle
                             ? 'Enhanced Plan'
                             : t
                             ? t('txns:txn.tabs.execution')
                             : 'Execution Plan'}
+                          <ArrowDown className="h-4 w-4 fill-current ml-1" />
                         </h2>
-                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-8 -mt-7 px-1 ">
+                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-7 px-1 ">
                           NEW
                         </div>
                       </div>
@@ -164,7 +165,7 @@ export default function (props: Props) {
                       <Popover.Root key={isToggle}>
                         <Popover.Trigger asChild>
                           <button
-                            className="flex p-2 border border-green-900/10 text-xs  rounded focus:outline-none"
+                            className="flex p-2 text-xs  rounded focus:outline-none"
                             aria-label="Update dimensions"
                           >
                             {isToggle

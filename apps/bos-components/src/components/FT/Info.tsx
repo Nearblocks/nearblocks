@@ -16,6 +16,8 @@ interface Props {
   token?: Token;
 }
 
+import CoinMarketcap from '@/includes/icons/CoinMarketcap';
+import CoinGecko from '@/includes/icons/CoinGecko';
 import { Token } from '@/includes/types';
 
 export default function ({ token, id, network, ownerId }: Props) {
@@ -124,24 +126,26 @@ export default function ({ token, id, network, ownerId }: Props) {
       </div>
       <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 text-xs">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Market Data Source:</div>
-        <div className="w-full md:w-3/4 break-words">
+        <div className="w-full md:w-3/4 break-words flex">
           {tokens?.coingecko_id && (
             <a
-              className="text-green-500 mr-4"
+              className="text-green-500 mr-4 flex"
               href="https://www.coingecko.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"
             >
+              <CoinGecko className="h-4 w-4 fill-current mr-1" />
               CoinGecko
             </a>
           )}
           {tokens?.coinmarketcap_id && (
             <a
-              className="text-green-500 mr-4"
+              className="text-green-500 mr-4 flex"
               href="https://coinmarketcap.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"
             >
+              <CoinMarketcap className="h-4 w-4 fill-current mr-1" />
               Coinmarketcap
             </a>
           )}
