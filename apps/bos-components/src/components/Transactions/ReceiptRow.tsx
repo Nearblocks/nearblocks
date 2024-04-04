@@ -93,6 +93,7 @@ export default function (props: Props) {
       ></div>
     );
   };
+
   return (
     <div className="divide-solid divide-gray-200 divide-y">
       <div
@@ -337,6 +338,7 @@ export default function (props: Props) {
                     action={action}
                     receiver={receipt?.receiver_id}
                     t={t}
+                    ownerId={ownerId}
                   />
                 ))}
             </div>

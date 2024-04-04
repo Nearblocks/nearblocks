@@ -2,11 +2,8 @@ import FaKey from '@/includes/icons/FaKey';
 import { TransactionActionInfo } from '@/includes/types';
 
 const DeleteKey = (props: TransactionActionInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${props.ownerId}/widget/includes.Utils.formats`,
   );
 
   const { t, args } = props;

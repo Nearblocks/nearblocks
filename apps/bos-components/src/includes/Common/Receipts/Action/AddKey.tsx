@@ -2,15 +2,12 @@ import FaKey from '@/includes/icons/FaKey';
 import { TransactionActionInfo } from '@/includes/types';
 
 const AddKey = (props: TransactionActionInfo) => {
-  const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
-
   const { shortenAddress } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
+    `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
   const { shortenHex } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
+    `${props.ownerId}/widget/includes.Utils.formats`,
   );
 
   if (typeof props.args.access_key?.permission !== 'object') {
