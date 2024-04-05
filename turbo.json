@@ -16,7 +16,8 @@
         "NEXT_PUBLIC_TESTNET_URL",
         "BREVO_URL",
         "BREVO_API_KEY",
-        "BREVO_TO_EMAIL"
+        "BREVO_TO_EMAIL",
+        "NEXT_PUBLIC_GTM_ID"
       ]
     },
     "lint": {
