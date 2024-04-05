@@ -20,7 +20,7 @@ export const apiUrl: string =
   networkId === 'mainnet'
     ? 'https://api3.nearblocks.io/v1/'
     : 'https://api3-testnet.nearblocks.io/v1/';
-    
+
 export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
     ? process.env.NEXT_PUBLIC_MAINNET_URL
