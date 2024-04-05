@@ -15,3 +15,8 @@ export const bosNetworkId: NetworkId =
   (process.env.NEXT_PUBLIC_BOS_NETWORK as NetworkId) || 'testnet';
 
 export const network = networks[networkId];
+
+export const apiUrl: string =
+  networkId === 'mainnet'
+    ? 'https://api3.nearblocks.io/v1/'
+    : 'https://api3-testnet.nearblocks.io/v1/';

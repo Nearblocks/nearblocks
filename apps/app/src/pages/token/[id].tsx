@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { apiUrl, networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Overview from '@/components/skeleton/ft/Overview';
 import Router from 'next/router';
@@ -28,17 +28,12 @@ const Token = () => {
   useEffect(() => {
     async function fetchToken() {
       try {
-        const response = await fetch(
-          networkId === 'mainnet'
-            ? `https://api3.nearblocks.io/v1/fts/${id}`
-            : `https://api3-testnet.nearblocks.io/v1/fts/${id}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+        const response = await fetch(`${apiUrl}fts/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        );
+        });
         const dataArray = await response.json();
         const data: any = dataArray?.contracts?.[0];
         if (response.status === 200) {

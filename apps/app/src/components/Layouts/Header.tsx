@@ -11,7 +11,7 @@ import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { VmComponent } from '../vm/VmComponent';
-import { networkId } from '@/utils/config';
+import { apiUrl, networkId } from '@/utils/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
@@ -157,17 +157,12 @@ const Header = () => {
     let delay = 30000;
     async function fetchStats() {
       try {
-        const response = await fetch(
-          networkId === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/stats'
-            : 'https://api3-testnet.nearblocks.io/v1/stats',
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+        const response = await fetch(`${apiUrl}stats`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        );
+        });
         const dataArray = await response.json();
         const data: Stats = dataArray?.stats?.[0];
         if (response.status === 200) {
@@ -192,17 +187,12 @@ const Header = () => {
   useEffect(() => {
     async function fetchBlocks() {
       try {
-        const response = await fetch(
-          networkId === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/blocks/latest?limit=1'
-            : 'https://api3-testnet.nearblocks.io/v1/blocks/latest?limit=1',
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+        const response = await fetch(`${apiUrl}blocks/latest?limit=1`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        );
+        });
 
         const data = await response.json();
 
