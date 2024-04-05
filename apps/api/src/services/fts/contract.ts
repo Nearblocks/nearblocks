@@ -275,17 +275,48 @@ const holdersCount = catchAsync(
   async (req: RequestValidator<Holders>, res: Response) => {
     const contract = req.validator.data.contract;
 
-    const holders = await sql`
+    const useFormat = true;
+    const bindings = { contract };
+    const rawQuery = (options: RawQueryParams) => `
       SELECT
-        COUNT(*)
+        ${options.select}
       FROM
         ft_holders
       WHERE
-        contract = ${contract}
+        contract = :contract
         AND amount > 0
     `;
 
-    return res.status(200).json({ holders });
+    const { query, values } = keyBinder(
+      rawQuery({
+        select: 'contract',
+      }),
+      bindings,
+      useFormat,
+    );
+
+    const { rows } = await db.query(
+      `SELECT cost, rows as count FROM count_cost_estimate(${query})`,
+      values,
+    );
+
+    const cost = +rows?.[0]?.cost;
+    const count = +rows?.[0]?.count;
+
+    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
+      return res.status(200).json({ holders: rows });
+    }
+
+    const { query: countQuery, values: countValues } = keyBinder(
+      rawQuery({
+        select: 'COUNT(contract)',
+      }),
+      bindings,
+    );
+
+    const { rows: countRows } = await db.query(countQuery, countValues);
+
+    return res.status(200).json({ holders: countRows });
   },
 );
 
