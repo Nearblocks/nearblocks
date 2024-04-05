@@ -1,5 +1,5 @@
 import Layout from '@/components/Layouts';
-import { networkId } from '@/utils/config';
+import { apiUrl } from '@/utils/config';
 import { ReactElement } from 'react';
 
 const Receipt = () => null;
@@ -20,9 +20,7 @@ export const getServerSideProps = async (context: any) => {
   const fetchData = async () => {
     try {
       const resp = await fetcher(
-        networkId === 'mainnet'
-          ? `https://api3.nearblocks.io/v1/search/receipts?keyword=${receipt}`
-          : `https://api3-testnet.nearblocks.io/v1/search/receipts?keyword=${receipt}`,
+        `${apiUrl}search/receipts?keyword=${receipt}`,
         {
           method: 'GET',
           headers: {

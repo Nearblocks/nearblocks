@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
-import { networkId } from '@/utils/config';
+import { apiUrl, networkId } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
@@ -44,17 +44,12 @@ const NFTokenInfo = () => {
   useEffect(() => {
     async function fetchToken() {
       try {
-        const response = await fetch(
-          networkId === 'mainnet'
-            ? `https://api3.nearblocks.io/v1/nfts/${id}/tokens/${tid}`
-            : `https://api3-testnet.nearblocks.io/v1/nfts/${id}/tokens/${tid}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+        const response = await fetch(`${apiUrl}nfts/${id}/tokens/${tid}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        );
+        });
         const dataArray = await response.json();
         const data: any = dataArray?.tokens?.[0];
         if (response.status === 200) {
