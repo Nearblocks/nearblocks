@@ -4,7 +4,7 @@ import Layout from '@/components/Layouts';
 import List from '@/components/skeleton/common/List';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Router, { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
@@ -87,6 +87,7 @@ const TopNFTTokens = () => {
           property="twitter:image"
           content="/thumbnail/thumbnail_nft_tokens.png"
         />
+        <link rel="canonical" href={`${appUrl}/nft-tokens`} />
       </Head>
       <section>
         <div className="bg-hero-pattern h-72">

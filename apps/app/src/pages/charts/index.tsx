@@ -3,7 +3,7 @@ import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/charts/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
@@ -50,6 +50,7 @@ const Charts = () => {
           property="twitter:description"
           content={t('charts:metaDescription')}
         />
+        <link rel="canonical" href={`${appUrl}/charts`} />
       </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">

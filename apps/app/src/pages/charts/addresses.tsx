@@ -3,7 +3,7 @@ import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/charts/Detail';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
@@ -74,6 +74,7 @@ const AddressesChart = () => {
             'charts:addresses.heading',
           )}`}
         />
+        <link rel="canonical" href={`${appUrl}/charts/addresses`} />
       </Head>
       <section>
         <div className="bg-hero-pattern h-72">

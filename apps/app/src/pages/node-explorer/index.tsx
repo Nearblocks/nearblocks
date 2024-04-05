@@ -3,7 +3,7 @@ import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/node-explorer/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 
@@ -55,6 +55,7 @@ const NodeExplorer = () => {
         <meta name="title" content={title} />
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
+        <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">

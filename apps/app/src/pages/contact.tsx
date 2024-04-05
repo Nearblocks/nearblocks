@@ -4,6 +4,7 @@ import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
 import FormContact from '@/components/Layouts/FormContact';
+import { appUrl } from '@/utils/config';
 
 const Contract = () => {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const Contract = () => {
           property="twitter:image"
           content="/thumbnail/thumbnail_contact.png"
         />
+        <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
       <div className="bg-hero-pattern h-72"></div>
       <div className="container mx-auto px-3 md:px-14 flex flex-col items-start md:py-16 mt-[-300px]">

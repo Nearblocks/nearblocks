@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { apiUrl, networkId } from '@/utils/config';
+import { apiUrl, networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Overview from '@/components/skeleton/ft/Overview';
 import Router from 'next/router';
@@ -134,6 +134,7 @@ const Token = () => {
         <meta property="og:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
+        <link rel="canonical" href={`${appUrl}/token/${id}}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent

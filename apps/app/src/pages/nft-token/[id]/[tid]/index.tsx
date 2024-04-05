@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
-import { apiUrl, networkId } from '@/utils/config';
+import { apiUrl, networkId, appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
@@ -94,6 +94,7 @@ const NFTokenInfo = () => {
         <meta property="og:description" content={meta.description} />
         <meta property="twitter:title" content={meta.title} />
         <meta property="twitter:description" content={meta.description} />
+        <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
       <div style={height} className="relative container mx-auto">
         <VmComponent
