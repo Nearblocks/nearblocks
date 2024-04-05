@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
+import { appUrl } from '@/utils/config';
 
 const AdvertisePage = () => {
   const { t } = useTranslation();
@@ -32,6 +33,7 @@ const AdvertisePage = () => {
           property="twitter:image"
           content="/thumbnail/thumbnail_advertise.png"
         />
+        <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
       <div className="herobg flex flex-col items-start p-4.5 lg:!py-16 lg:!px-14">
         <p className="text-black text-sm lg:!text-base font-semibold lg:!mt-3 mt-5">

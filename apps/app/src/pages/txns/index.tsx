@@ -4,7 +4,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
 
@@ -113,6 +113,7 @@ const TransactionList = () => {
           property="twitter:description"
           content={t('txns:metaDescription')}
         />
+        <link rel="canonical" href={`${appUrl}/txns`} />
       </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">

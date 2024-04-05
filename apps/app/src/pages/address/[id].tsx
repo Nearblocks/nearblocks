@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/common/Overview';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
 import { useAuthStore } from '@/stores/auth';
@@ -90,6 +90,7 @@ const Address = () => {
           name="twitter:image:src"
           content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
         />
+        <link rel="canonical" href={`${appUrl}/address/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent

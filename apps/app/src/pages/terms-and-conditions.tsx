@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
+import { appUrl } from '@/utils/config';
 
 const TermsAndConditions = () => {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ const TermsAndConditions = () => {
           property="twitter:description"
           content={t('home:metaDescription')}
         />
+        <link rel="canonical" href={`${appUrl}/terms-and-conditions`} />
       </Head>
       <div className="bg-hero-pattern h-72"></div>
       <div className="md:px-14 flex flex-col items-start md:py-16 -mt-80 mx-2">

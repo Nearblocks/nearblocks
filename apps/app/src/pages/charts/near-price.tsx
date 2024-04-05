@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
@@ -75,6 +75,7 @@ const NearPriceChart = () => {
             'charts:nearPrice.heading',
           )}`}
         />
+        <link rel="canonical" href={`${appUrl}/charts/near-price`} />
       </Head>
       <section>
         <div className="bg-hero-pattern h-72">

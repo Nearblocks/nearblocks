@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
-import { apiUrl, networkId } from '@/utils/config';
+import { apiUrl, networkId, appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/nft/Overview';
@@ -84,6 +84,7 @@ const NFToken = () => {
         <meta property="og:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
+        <link rel="canonical" href={`${appUrl}/nft-token/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent

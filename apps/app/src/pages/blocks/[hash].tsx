@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
@@ -71,6 +71,7 @@ const Block = () => {
           property="twitter:description"
           content={t('blocks:block.metaDescription', { block: hash })}
         />
+        <link rel="canonical" href={`${appUrl}/blocks/${hash}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent

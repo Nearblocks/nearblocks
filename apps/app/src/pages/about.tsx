@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
+import { appUrl } from '@/utils/config';
 
 const AboutPage = () => {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ const AboutPage = () => {
           property="twitter:image"
           content="/thumbnail/thumbnail_about.png"
         />
+        <link rel="canonical" href={`${appUrl}/about`} />
       </Head>
       <div className="bg-hero-pattern h-72 -mb-48"></div>
       <div className="py-16 bg-white soft-shadow sm:container sm:mx-auto rounded-md my-10">

@@ -5,7 +5,7 @@ import Latest from '@/components/skeleton/home/Latest';
 import Overview from '@/components/skeleton/home/Overview';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -63,6 +63,7 @@ const HomePage = () => {
           property="twitter:description"
           content={t('home:metaDescription')}
         />
+        <link rel="canonical" href={`${appUrl}/`} />
       </Head>
       <div>
         <div className="flex items-center justify-center bg-hero-pattern">

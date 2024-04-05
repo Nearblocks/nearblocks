@@ -2,11 +2,12 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
+
 const NearSupplyChart = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
@@ -80,6 +81,7 @@ const NearSupplyChart = () => {
             'charts:nearSupply.heading',
           )}`}
         />
+        <link rel="canonical" href={`${appUrl}/charts/near-supply`} />
       </Head>
       <section>
         <div className="bg-hero-pattern h-72">

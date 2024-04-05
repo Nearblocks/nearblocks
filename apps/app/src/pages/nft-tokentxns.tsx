@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Router, { useRouter } from 'next/router';
@@ -77,6 +77,7 @@ const NftToxenTxns = () => {
           property="twitter:image"
           content="/thumbnail/thumbnail_nft_tokentxns.png"
         />
+        <link rel="canonical" href={`${appUrl}/nft-tokentxns`} />
       </Head>
       <section>
         <div className="bg-hero-pattern h-72">
