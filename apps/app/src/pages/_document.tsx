@@ -37,10 +37,6 @@ export default function Document() {
               `})(window,'dataLayer');`,
           }}
         />
-        <script
-          async
-          src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"
-        />
       </Head>
       <body className="overflow-x-hidden">
         <Main />
