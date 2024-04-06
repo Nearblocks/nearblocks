@@ -44,7 +44,7 @@ Configure the nearblocks Gateway by modifying the .env file. Customize settings 
 `NEXT_PUBLIC_TESTNET_URL=https://testnet.nearblocks.io`
 `BREVO_URL=https://api.brevo.com/v3/smtp/email`
 `BREVO_API_KEY=`
-`BREVO_TO_EMAIL=luke@nearblocks.io`
+`BREVO_TO_EMAIL=`
 `NEXT_PUBLIC_GTM_ID=GTM-P285ZPV2`
 
 ## Deployment
