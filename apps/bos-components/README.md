@@ -10,7 +10,7 @@
 
 The NearBlocks is built on BOS (Blockchain Operating System) and provides a convenient way to select and use our components.
 
-You can access all our deployed components here [https://near.social/mob.near/widget/LastWidgets?accountId=nearblocks.near](https://near.social/mob.near/widget/LastWidgets?accountId=nearblocks.near)
+You can access all our deployed components here [https://near.social/mob.near/widget/LastWidgets?accountId=nearblocksonbos.near](https://near.social/mob.near/widget/LastWidgets?accountId=nearblocksonbos.near)
 
 This document outlines the setup instructions, Continuous Integration & Delivery (CI/CD) processes, and configuration requirements for the project.
 
@@ -65,7 +65,7 @@ It is recommended to use a dedicated function-call-only access key, so you need 
 >
 > ```bash
 > # For mainnet:
-> export ACCOUNT_ID_MAINNET=nearblocks.near
+> export ACCOUNT_ID_MAINNET=nearblocksonbos.near
 > ```
 
 1.3. Add a new access key to account, explicitly adding permissions to call the set method.

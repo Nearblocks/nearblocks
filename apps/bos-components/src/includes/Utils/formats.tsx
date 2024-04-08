@@ -1,6 +1,8 @@
 export default function () {
   const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
 
   const { yoctoToNear, truncateString } = VM.require(
     `${networkAccountId}/widget/includes.Utils.libs`,

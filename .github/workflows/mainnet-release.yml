@@ -1,85 +1,85 @@
-# name: BOS Components Release
+name: BOS Components Release
 
-# on:
-#   push:
-#     branches:
-#       - main
-#     paths:
-#       - 'apps/bos-components/**'
-# jobs:
-#   deploy-mainnet:
-#     runs-on: ubuntu-latest
-#     name: Deploy widgets to social.near (mainnet)
-#     env:
-#       NETWORK: mainnet
-#       BOS_DEPLOY_ACCOUNT_ID: ${{ vars.MAINNET_DEPLOY_ACCOUNT }}
-#       BOS_SIGNER_ACCOUNT_ID: ${{ vars.MAINNET_SIGNER_ACCOUNT }}
-#       BOS_SIGNER_PUBLIC_KEY: ${{ vars.MAINNET_SIGNER_PUBLIC_KEY }}
-#       BOS_SIGNER_PRIVATE_KEY: ${{ secrets.MAINNET_SIGNER_PRIVATE_KEY }}
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/bos-components/**'
+jobs:
+  deploy-mainnet:
+    runs-on: ubuntu-latest
+    name: Deploy widgets to social.near (mainnet)
+    env:
+      NETWORK: mainnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.MAINNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.MAINNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.MAINNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.MAINNET_SIGNER_PRIVATE_KEY }}
 
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-#       - name: Install BOS Components dependencies
-#         run: cd apps/bos-components && yarn
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-components && yarn
 
-#       - name: Build project
-#         run: cd apps/bos-components &&  yarn build
+      - name: Build project
+        run: cd apps/bos-components &&  yarn build
 
-#       - name: Install near-social CLI
-#         run: |
-#           curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
 
-#       - name: Deploy components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy components
+        run: |
+          cd apps/bos-components/.bos/transpiled  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy address components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/address  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy address components
+        run: |
+          cd apps/bos-components/.bos/transpiled/address  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy blocks components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/blocks  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy blocks components
+        run: |
+          cd apps/bos-components/.bos/transpiled/blocks  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy ft components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/ft  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy ft components
+        run: |
+          cd apps/bos-components/.bos/transpiled/ft  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy nft components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/nft  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy nft components
+        run: |
+          cd apps/bos-components/.bos/transpiled/nft  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy txn components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/txn  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy txn components
+        run: |
+          cd apps/bos-components/.bos/transpiled/txn  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
 
-#       - name: Sleep for 5 seconds
-#         run: sleep 5
+      - name: Sleep for 5 seconds
+        run: sleep 5
 
-#       - name: Deploy common components
-#         run: |
-#           cd apps/bos-components/.bos/transpiled/common  &&
-#           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
+      - name: Deploy common components
+        run: |
+          cd apps/bos-components/.bos/transpiled/common  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send

@@ -1,6 +1,8 @@
 const Links = (props: any) => {
   const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
 
   const { urlHostName } = VM.require(
     `${networkAccountId}/widget/includes.Utils.libs`,
