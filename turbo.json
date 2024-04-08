@@ -13,7 +13,11 @@
         "NEXT_PUBLIC_BOS_NETWORK",
         "NEXT_PUBLIC_OG_URL",
         "NEXT_PUBLIC_MAINNET_URL",
-        "NEXT_PUBLIC_TESTNET_URL"
+        "NEXT_PUBLIC_TESTNET_URL",
+        "BREVO_URL",
+        "BREVO_API_KEY",
+        "BREVO_TO_EMAIL",
+        "NEXT_PUBLIC_GTM_ID"
       ]
     },
     "lint": {

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDown from '../Icons/ArrowDown';
 import LoadingCircular from '../common/LoadingCircular';
-import { networkId } from '@/utils/config';
 
 const FormContact = () => {
   const { t } = useTranslation();
@@ -16,23 +15,18 @@ const FormContact = () => {
     event.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(
-        networkId === 'mainnet'
-          ? 'https://nearblocks.io/api/contact'
-          : 'https://testnet.nearblocks.io/api/contact',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            subject,
-            description,
-          }),
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          description,
+        }),
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
