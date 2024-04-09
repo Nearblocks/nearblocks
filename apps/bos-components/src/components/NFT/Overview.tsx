@@ -228,9 +228,10 @@ export default function ({ network, id, ownerId }: Props) {
                                 <span className="font-bold mx-0.5">
                                   {localFormat && localFormat(status.height)}
                                 </span>
-                                {`(${getTimeAgoString(
-                                  nanoToMilli(status.timestamp),
-                                )}).`}
+                                {status?.timestamp &&
+                                  `(${getTimeAgoString(
+                                    nanoToMilli(status.timestamp),
+                                  )}).`}
                                 Holders data will be delayed.
                               </Tooltip.Content>
                             </Tooltip.Root>

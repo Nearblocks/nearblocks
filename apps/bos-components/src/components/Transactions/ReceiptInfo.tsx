@@ -85,7 +85,7 @@ export default function (props: Props) {
   if (receipt?.outcome?.status?.type === 'successValue') {
     if (receipt?.outcome?.status?.value.length === 0) {
       statusInfo = (
-        <div className="bg-gray-100 rounded-md p-5 font-medium my-3">
+        <div className="bg-gray-100 rounded-md p-5 font-medium my-3 whitespace-nowrap">
           Empty result
         </div>
       );
@@ -112,7 +112,7 @@ export default function (props: Props) {
             readOnly
             rows={4}
             defaultValue={JSON.stringify(prettyArgs)}
-            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 p-5 my-3 resize-y"
+            className="block appearance-none outline-none w-fit border font-medium rounded-lg bg-gray-100 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
@@ -132,7 +132,7 @@ export default function (props: Props) {
         readOnly
         rows={4}
         defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
-        className="block appearance-none outline-none w-full border rounded-lg font-medium bg-gray-100 p-5 my-3 resize-y"
+        className="block appearance-none outline-none w-fit border rounded-lg font-medium bg-gray-100 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
@@ -163,17 +163,17 @@ export default function (props: Props) {
               </Tabs.Trigger>
             ))}
         </Tabs.List>
-        <Tabs.Content value={hashes[0]}>
+        <Tabs.Content value={hashes[0]} className={'w-fit'}>
           <div className="flex flex-col my-4 mx-7">
             <div className="flex justify-between">
-              <div className="flex flex-col w-full lg:w-1/2">
+              <div className="flex flex-col w-fit">
                 <div className="">
                   <h2 className="text-sm font-medium ">Logs</h2>
                   <div className="bg-gray-100 rounded-md p-5 font-medium my-3 overflow-x-auto ">
                     {receipt?.outcome?.logs?.length === 0 ? (
-                      'No logs'
+                      <span className="whitespace-nowrap">No logs</span>
                     ) : (
-                      <pre>{receipt?.outcome?.logs.join('\n')}</pre>
+                      <span>{receipt?.outcome?.logs.join('\n')}</span>
                     )}
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default function (props: Props) {
             </div>
           </div>
         </Tabs.Content>
-        <Tabs.Content value={hashes[1]}>
+        <Tabs.Content value={hashes[1]} className={'w-fit'}>
           <div className="overflow-x-auto">
             <table className="my-4 mx-7 whitespace-nowrap table-auto">
               <tbody>

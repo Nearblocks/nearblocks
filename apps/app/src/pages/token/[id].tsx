@@ -24,6 +24,20 @@ const Token = () => {
   const [token, setToken] = useState<{ name: string; symbol: string } | null>(
     null,
   );
+  const [pageTab, setPageTab] = useState('Transfers');
+
+  const onHandleTab = (hashValue: string) => {
+    setPageTab(hashValue);
+    router.push(`/token/${id}?tab=${hashValue}`);
+  };
+
+  useEffect(() => {
+    const select = `${router?.query?.tab}` || 'Transfers';
+
+    if (router?.query?.tab) {
+      setPageTab(select);
+    }
+  }, [router?.query]);
 
   useEffect(() => {
     async function fetchToken() {
@@ -149,6 +163,8 @@ const Token = () => {
             tokenFilter: a,
             filters: filtersObject,
             onFilterClear: onFilterClear,
+            onHandleTab: onHandleTab,
+            pageTab: pageTab,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />

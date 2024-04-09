@@ -25,3 +25,8 @@ export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
     ? process.env.NEXT_PUBLIC_MAINNET_URL
     : process.env.NEXT_PUBLIC_TESTNET_URL;
+
+export const docsUrl: string =
+  networkId === 'mainnet'
+    ? 'https://api3.nearblocks.io/api-docs'
+    : 'https://api3-testnet.nearblocks.io/api-docs';

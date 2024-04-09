@@ -233,16 +233,16 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-2 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:type') : 'METHOD'}
@@ -304,7 +304,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
       header: <>Affected</>,
@@ -352,9 +352,9 @@ export default function (props: Props) {
           )}
         </>
       ),
-      tdClassName: 'px-5 py-2 text-sm text-nearblue-600  font-medium',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600  font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -383,7 +383,7 @@ export default function (props: Props) {
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               Involved
@@ -467,7 +467,7 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600  font-medium',
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600  font-medium',
     },
     {
       header: <>Token ID</>,
@@ -498,9 +498,9 @@ export default function (props: Props) {
         </Tooltip.Provider>
       ),
       tdClassName:
-        'px-5 py-2 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
+        'px-4 py-2 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: <>Token</>,
@@ -562,13 +562,13 @@ export default function (props: Props) {
           )
         );
       },
-      tdClassName: 'px-5 py-2 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: (
-        <div className="w-full inline-flex px-5 py-4">
+        <div className="w-full inline-flex px-4 py-4">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -640,7 +640,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName: 'whitespace-nowrap',
     },
   ];

@@ -275,7 +275,7 @@ export default function ({ network, t, ownerId }: Props) {
                           {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
                             {nearBtcPrice
-                              ? '@' +
+                              ? '@ ' +
                                 localFormat(stats?.near_btc_price) +
                                 ' BTC'
                               : ''}

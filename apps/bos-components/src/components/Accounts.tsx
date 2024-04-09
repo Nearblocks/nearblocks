@@ -552,7 +552,7 @@ export default function (props: Props) {
           </div>
         ) : (
           <div className="flex md:flex-wrap">
-            <h1 className="py-4   space-x-2 text-xl text-gray-700 leading-8 px-2">
+            <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
               Near Account: @
               {id && (
                 <span className="font-semibold text-green-500 ">{id}</span>

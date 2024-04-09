@@ -507,7 +507,7 @@ const Header = () => {
                           <li className="px-4 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1"
+                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap"
                             >
                               Sign Out
                             </button>
@@ -563,7 +563,7 @@ const Header = () => {
                           <li className="px-8 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4"
+                              className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                             >
                               Sign Out
                             </button>

@@ -320,12 +320,12 @@ export default function (props: Props) {
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
           ) : (
-            <div>
+            <div className="w-full md:w-3/4 break-words">
               {txn?.outcomes?.status !== undefined && (
                 <TxnStatus showLabel status={txn?.outcomes?.status} />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 my-2 rounded-md text-center px-2 py-1">
+                <div className="text-xs bg-orange-50 my-2 rounded-md text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}
@@ -410,6 +410,36 @@ export default function (props: Props) {
                 true,
               )} +UTC)`}
             </div>
+          ) : (
+            ''
+          )}
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                  align="start"
+                  side="bottom"
+                >
+                  The shard number in which the transaction was executed in
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+            Shard Number
+          </div>
+          {loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-sm" />
+            </div>
+          ) : txn ? (
+            <div className="w-full md:w-3/4 break-words">{txn?.shard_id}</div>
           ) : (
             ''
           )}

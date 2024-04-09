@@ -268,8 +268,9 @@ export default function ({ network, id, token, ownerId }: Props) {
               <span className="font-bold mx-0.5">
                 {localFormat && localFormat(status.height)}
               </span>
-              {`(${getTimeAgoString(nanoToMilli(status.timestamp))}).`} Holders
-              data will be delayed.
+              {status?.timestamp &&
+                `(${getTimeAgoString(nanoToMilli(status.timestamp))}).`}{' '}
+              Holders data will be delayed.
             </div>
           )}
           <div className={`flex flex-col lg:flex-row pt-4`}>

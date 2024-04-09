@@ -59,6 +59,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
   const [totalCount, setTotalCount] = useState('');
   const [expanded, setExpanded] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState(0);
   const errorMessage = 'No validator data!';
 
@@ -80,6 +81,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setTimeRemaining(data?.totalSeconds ?? 0);
+            setElapsedTime(data?.elapsedTimeData ?? 0);
             const validators = {
               validatorEpochData: data?.validatorFullData ?? [],
               currentValidators: data?.currentValidators,
@@ -163,7 +165,14 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       clearInterval(intervalId);
     };
   }, []);
-
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setElapsedTime((prevTimeRemaining) => prevTimeRemaining - 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   const handleRowClick = (rowIndex: number) => {
     const isRowExpanded = expanded.includes(rowIndex);
 
@@ -251,9 +260,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           />
         </button>
       ),
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>Status</span>,
@@ -267,9 +276,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
       ),
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>VALIDATOR</span>,
@@ -313,9 +322,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'pl-6 py-2 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>FEE</span>,
@@ -331,9 +340,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
             : 'N/A'}
         </div>
       ),
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
 
     {
@@ -349,9 +358,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>TOTAL STAKE</span>,
@@ -367,9 +376,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE %</span>,
@@ -377,9 +386,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>CUMULATIVE STAKE</span>,
@@ -403,9 +412,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE CHANGE (24H)</span>,
@@ -438,9 +447,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
   const validatorEpochData =
@@ -502,9 +511,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -549,9 +558,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -587,9 +596,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -631,9 +640,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: 'Node Agent Version / Build',
@@ -644,9 +653,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                   ],
                   data: [telemetry] || [],
@@ -684,9 +693,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     {
                       header: 'Email',
@@ -704,9 +713,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'pl-6 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-6 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     row?.description?.twitter && {
                       header: 'Twitter',
@@ -726,9 +735,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-2 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-2 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     row?.description?.discord && {
                       header: 'Discord',
@@ -748,9 +757,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     {
                       header: 'Description',
@@ -763,9 +772,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 break-words text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                   ],
                   data: [row] || [],
@@ -837,9 +846,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   )}
                 </div>
               </div>
-              <div className="flex max-md:divide-y flex-col md:flex-row ">
-                <div className="flex items-center justify-between md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Current Seat Price</div>
+              <div className="flex max-lg:divide-y flex-col lg:flex-row ">
+                <div className="flex items-center justify-between lg:w-1/2 py-4">
+                  <div className="w-full mb-2 lg:mb-0">Current Seat Price</div>
                   <div className="w-full break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
@@ -856,8 +865,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Total Supply</div>
+                <div className="flex items-center justify-between lg:w-1/2 py-4">
+                  <div className="w-full mb-2 lg:mb-0">Total Supply</div>
                   <div className="w-full break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
@@ -904,16 +913,16 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                     <Skeleton className="h-3 w-32" />
                   ) : validatorFullData[currentPage]?.elapsedTime &&
                     convertTimestampToTime ? (
-                    convertTimestampToTime(
-                      validatorFullData[currentPage]?.elapsedTime,
-                    )
+                    convertTimestampToTime(elapsedTime.toString())
                   ) : (
                     ''
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA</div>
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Next Epoch ETA
+                </div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />

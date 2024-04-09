@@ -274,7 +274,7 @@ export default function ({ network, id, token, ownerId }: Props) {
       },
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'x-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
@@ -292,8 +292,9 @@ export default function ({ network, id, token, ownerId }: Props) {
               <span className="font-bold mx-0.5">
                 {`${localFormat && localFormat(status.height)}`}
               </span>
-              {`(${getTimeAgoString(nanoToMilli(status.timestamp))}).`} Holders
-              data will be delayed.
+              {status?.timestamp &&
+                `(${getTimeAgoString(nanoToMilli(status?.timestamp))}).`}{' '}
+              Holders data will be delayed.
             </div>
           )}
           <div className={`flex flex-col lg:flex-row pt-4`}>

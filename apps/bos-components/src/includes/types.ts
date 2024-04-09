@@ -120,6 +120,7 @@ export type BlocksInfo = {
   chunks_agg: {
     gas_limit: string;
     gas_used: string;
+    shards: string;
   };
   gas_price: string;
   prev_block_hash: string;
@@ -234,6 +235,7 @@ export type TransactionInfo = {
     transaction_fee: string;
     gas_used: string;
   };
+  shard_id: string;
   receipt_conversion_gas_burnt: string;
   receipt_conversion_tokens_burnt: string;
   receiver_account_id: string;

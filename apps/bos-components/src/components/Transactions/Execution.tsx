@@ -100,10 +100,10 @@ export default function (props: Props) {
             className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-1 border border-neargray-700 px-2 rounded-md bg-whit select-none"
             onClick={expandAllReceipts}
           >
-            Expand all <span>+</span>
+            Expand All <span>+</span>
           </div>
         </div>
-        <div className="p-8">
+        <div className="p-8 overflow-auto">
           {!receipt?.id ? (
             <div className="w-full md:w-3/4">
               <Loader className="flex w-full mt-2" />
