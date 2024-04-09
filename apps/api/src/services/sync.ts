@@ -17,7 +17,7 @@ const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
 const status = catchAsync(async (_req: Request, res: Response) => {
-  const [settings, block, rpcBlock, stats] = await redis.cache(
+  const [settings, block, rpcBlock, stats, statsNew] = await redis.cache(
     'sync:settings',
     async () => {
       return await Promise.all([
@@ -43,6 +43,16 @@ const status = catchAsync(async (_req: Request, res: Response) => {
             date
           FROM
             daily_stats
+          ORDER BY
+            date DESC
+          LIMIT
+            1
+        `,
+        sql`
+          SELECT
+            date
+          FROM
+            daily_stats_new
           ORDER BY
             date DESC
           LIMIT
@@ -125,6 +135,10 @@ const status = catchAsync(async (_req: Request, res: Response) => {
       daily_stats: {
         date: stats?.[0]?.date,
         sync: isDateInSync(stats?.[0]?.date),
+      },
+      daily_stats_new: {
+        date: statsNew?.[0]?.date,
+        sync: isDateInSync(statsNew?.[0]?.date),
       },
       deleted_accounts: {
         height: deletedAccounts?.value?.sync,
