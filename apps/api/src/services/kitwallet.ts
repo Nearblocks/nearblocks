@@ -68,19 +68,7 @@ const getLikelyNfts = async (
   lastTimestamp: string,
 ) => {
   const tokens = await sql`
-    SELECT DISTINCT
-      receipt_receiver_account_id AS receiver_account_id
-    FROM
-      action_receipt_actions
-    WHERE
-      args -> 'args_json' ->> 'receiver_id' = ${account}
-      AND action_kind = 'FUNCTION_CALL'
-      AND args ->> 'args_json' IS NOT NULL
-      AND args ->> 'method_name' LIKE 'nft_%'
-      AND receipt_included_in_block_timestamp <= ${lastTimestamp}
-      AND receipt_included_in_block_timestamp > ${timestamp}
-    UNION
-    SELECT DISTINCT
+    SELECT
       contract_account_id AS receiver_account_id
     FROM
       nft_events
@@ -88,6 +76,8 @@ const getLikelyNfts = async (
       affected_account_id = ${account}
       AND block_timestamp <= ${lastTimestamp}
       AND block_timestamp > ${timestamp}
+    GROUP BY
+      contract_account_id
   `;
 
   return tokens;
