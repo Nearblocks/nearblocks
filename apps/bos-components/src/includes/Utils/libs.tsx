@@ -2,7 +2,9 @@ import { Debounce, FieldType, FieldValueTypes } from '@/includes/types';
 
 export default function () {
   const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
 
   const { localFormat, formatWithCommas } = VM.require(
     `${networkAccountId}/widget/includes.Utils.formats`,
@@ -12,7 +14,6 @@ export default function () {
     switch (network) {
       case 'mainnet':
         return {
-          ownerId: 'nearblocks.near',
           nodeUrl: 'https://rpc.mainnet.near.org',
           backendUrl: 'https://api3.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.mainnet.near.org',
@@ -20,7 +21,6 @@ export default function () {
         };
       case 'testnet':
         return {
-          ownerId: 'nearblocks.testnet',
           nodeUrl: 'https://rpc.testnet.near.org',
           backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.testnet.near.org/',

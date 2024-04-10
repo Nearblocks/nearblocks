@@ -24,7 +24,9 @@ import {
 
 export default function () {
   const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
 
   const { dollarFormat, localFormat } = VM.require(
     `${networkAccountId}/widget/includes.Utils.formats`,
