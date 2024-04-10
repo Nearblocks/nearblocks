@@ -2,7 +2,7 @@ import Layout from '@/components/Layouts';
 import Export from '@/components/skeleton/common/Export';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { appUrl, networkId } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
@@ -55,6 +55,7 @@ const ExportData = () => {
         <meta name="title" content={title} />
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
+        <link rel="canonical" href={`${appUrl}/nft-token/exportdata`} />
       </Head>
       <div style={height} className="relative">
         <VmComponent

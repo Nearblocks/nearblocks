@@ -35,8 +35,13 @@ const initialPagination = {
   per_page: 50,
 };
 export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
-  const { priceFormat, dollarFormat, dollarNonCentFormat, serialNumber } =
-    VM.require(`${ownerId}/widget/includes.Utils.formats`);
+  const {
+    priceFormat,
+    dollarFormat,
+    dollarNonCentFormat,
+    serialNumber,
+    localFormat,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
   const { debounce, getConfig, handleRateLimit } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
@@ -420,8 +425,12 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         ) : (
           <p className="pl-3">
             {t
-              ? t('token:fts.top.listing', { count: totalCount })
-              : `A total of ${totalCount} Token Contracts found`}
+              ? t('token:fts.top.listing', {
+                  count: localFormat && localFormat(totalCount),
+                })
+              : `A total of ${
+                  localFormat && localFormat(totalCount)
+                } Token Contracts found`}
           </p>
         )}
         <div className={`flex w-full h-10 sm:w-80 mr-2`}>

@@ -13,6 +13,10 @@
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {function} [onHandleTab] - Function to handle tab changes. (Optional)
+ *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
+ * @param {string} [pageTab] - The page tab being displayed. (Optional)
+ *                                 Example: If provided, tab=transfer in the url it will select the transfer tab of token details.
  */
 
 interface Props {
@@ -23,6 +27,8 @@ interface Props {
   tokenFilter?: string;
   filters?: { [key: string]: string };
   onFilterClear?: (name: string) => void;
+  onHandleTab: (value: string) => void;
+  pageTab: string;
 }
 
 import Links from '@/includes/Common/Links';
@@ -40,6 +46,8 @@ export default function ({
   filters,
   onFilterClear,
   ownerId,
+  onHandleTab,
+  pageTab,
 }: Props) {
   const { dollarFormat, dollarNonCentFormat, localFormat, getTimeAgoString } =
     VM.require(`${ownerId}/widget/includes.Utils.formats`);
@@ -62,7 +70,7 @@ export default function ({
   const [token, setToken] = useState<Token>({} as Token);
   const [transfers, setTransfers] = useState('');
   const [holders, setHolders] = useState('');
-  const [pageTab, setPageTab] = useState('Transfers');
+
   const [showMarketCap, setShowMarketCap] = useState(false);
   const [status, setStatus] = useState({
     height: 0,
@@ -188,7 +196,7 @@ export default function ({
   }, [config.backendUrl, id]);
 
   const onTab = (index: number) => {
-    setPageTab(tabs[index]);
+    onHandleTab(tabs[index]);
   };
 
   const onToggle = () => setShowMarketCap((o) => !o);
@@ -415,9 +423,10 @@ export default function ({
                                 <span className="font-bold mx-0.5">
                                   {localFormat && localFormat(status.height)}
                                 </span>
-                                {`(${getTimeAgoString(
-                                  nanoToMilli(status.timestamp),
-                                )}).`}
+                                {status?.timestamp &&
+                                  `(${getTimeAgoString(
+                                    nanoToMilli(status?.timestamp),
+                                  )}).`}
                                 Holders data will be delayed.
                               </Tooltip.Content>
                             </Tooltip.Root>

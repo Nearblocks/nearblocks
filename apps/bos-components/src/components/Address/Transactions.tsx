@@ -254,16 +254,16 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:type') : 'METHOD'}
@@ -327,7 +327,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
@@ -340,9 +340,9 @@ export default function ({
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
@@ -357,14 +357,14 @@ export default function ({
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:from') : 'FROM'}
@@ -445,7 +445,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span></span>,
@@ -471,7 +471,7 @@ export default function ({
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:to') : 'To'}
@@ -552,7 +552,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
@@ -572,13 +572,13 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
-        <div className="w-full inline-flex px-5 py-4">
+        <div className="w-full inline-flex px-4 py-4">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -650,7 +650,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName: 'whitespace-nowrap',
     },
   ];

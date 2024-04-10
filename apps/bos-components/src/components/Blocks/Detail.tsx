@@ -416,6 +416,18 @@ export default function (props: Props) {
                 )}
               </div>
             )}
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">Shard Number</div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Loader className="flex w-full max-w-lg" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {localFormat(block?.chunks_agg?.shards)}
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}

@@ -63,7 +63,9 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA:</div>
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Next Epoch ETA:
+                </div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
                   <Skeleton className="h-3 w-32" />
                 </div>

@@ -44,7 +44,7 @@ export default function (props: TransactionReceiptInfo) {
   return (
     <>
       <div
-        className={`border-l mt-2.5 ml-2.5 ${
+        className={`${
           convertionReceipt
             ? 'pl-0 border-transparent'
             : 'pl-12 border-green-500 '
@@ -53,7 +53,7 @@ export default function (props: TransactionReceiptInfo) {
         {convertionReceipt ? (
           <div className="flex flex-row mb-2.5">
             <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-            <div className="text-green-500 text-sm overflow-auto">
+            <div className="text-green-500 text-sm">
               {receipt?.predecessorId}
             </div>
           </div>
@@ -69,7 +69,7 @@ export default function (props: TransactionReceiptInfo) {
               expandAll: expandAll,
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
-              className: 'pb-5 !mt-0',
+              className: 'pb-5 !mt-0 border-l mt-2.5 ml-2.5',
               ownerId,
             }}
           />
@@ -104,14 +104,12 @@ export default function (props: TransactionReceiptInfo) {
             />
           </div>
         ) : null}
-        <div className="relative flex flex-row mt-2.5">
+        <div className="relative flex flex-row my-2.5">
           <ArrowDown
             className={`absolute left-0.5 -top-5 ml-px  w-4 h-4 text-green-500`}
           />
           <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-          <div className="text-green-500 text-sm overflow-auto">
-            {receipt?.receiverId}
-          </div>
+          <div className="text-green-500 text-sm ">{receipt?.receiverId}</div>
         </div>
       </div>
       {lastNonRefundNestedReceipt ? (
@@ -124,7 +122,7 @@ export default function (props: TransactionReceiptInfo) {
             expandAll: expandAll,
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
-            className: ` !pl-0 border-transparent`,
+            className: ` !pl-0 !border-transparent`,
             ownerId,
           }}
         />

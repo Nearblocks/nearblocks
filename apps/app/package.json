@@ -41,13 +41,14 @@
     "big.js": "6.2.1",
     "near-api-js": "2.1.3",
     "near-social-vm": "github:NearSocial/VM#2.5.5",
-    "nearblock-translations": "https://github.com/Nearblocks/translations.git#621a8a9d93e363be0152bcc0267bc2e93eeffb45",
+    "nearblock-translations": "https://github.com/Nearblocks/translations.git#8e510a9ff6485270e9a62d7fd2754ab44f2896fc",
     "next": "13.3.4",
     "next-translate": "2.6.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.46.1",
     "react-singleton-hook": "4.0.1",
+    "react-toastify": "10.0.5",
     "zustand": "4.3.7"
   },
   "devDependencies": {

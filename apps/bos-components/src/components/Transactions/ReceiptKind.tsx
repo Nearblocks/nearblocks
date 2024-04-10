@@ -68,8 +68,8 @@ export default function (props: ReceiptKindInfo) {
         ) : null}
       </div>
       {action?.kind === 'transfer' ? (
-        <div className="inline-flex">
-          <span className="text-xs">
+        <div className="inline-flex justify-center">
+          <span className="text-xs whitespace-nowrap">
             {action?.args?.deposit
               ? yoctoToNear(action?.args?.deposit, false)
               : action?.args?.deposit ?? ''}
@@ -85,7 +85,7 @@ export default function (props: ReceiptKindInfo) {
                 readOnly
                 rows={4}
                 defaultValue={JSON.stringify(prettyArgs)}
-                className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+                className="block appearance-none outline-none w-full max-md:w-fit border rounded-lg bg-gray-100 p-3 my-3 resize-y"
               ></textarea>
             ) : (
               <div>

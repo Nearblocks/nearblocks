@@ -73,7 +73,7 @@ const Footer = () => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6">
                   <li>
-                    <Link href="https://nearblocks.io/apis" legacyBehavior>
+                    <Link href="/apis" legacyBehavior>
                       <a target="_blank" rel="noreferrer nofollow noopener">
                         {t('footer.links.api')}
                       </a>
