@@ -1,7 +1,10 @@
-import { shortenAddress, yoctoToNear } from '@/includes/libs';
 import { ActionPropsInfo } from '@/includes/types';
 
 const Transfer = (props: ActionPropsInfo) => {
+  const { shortenAddress, yoctoToNear } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg

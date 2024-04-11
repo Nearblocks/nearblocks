@@ -86,7 +86,7 @@ export const syncTokens = async () => {
         .whereRaw('nft.contract_account_id = n.contract')
         .whereRaw('nft.token_id = n.token'),
     )
-    .limit(25);
+    .limit(100);
 
   await Promise.all(
     tokens.map((token) =>

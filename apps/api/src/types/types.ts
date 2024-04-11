@@ -23,6 +23,7 @@ export type Config = {
   port: number;
   redisPassword: string;
   redisSentinelName: string;
+  redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
   rpcUrl: string;

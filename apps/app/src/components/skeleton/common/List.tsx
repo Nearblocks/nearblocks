@@ -75,7 +75,7 @@ const List = forwardRef(
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {[...Array(25)].map((_, i) => (
-                  <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
+                  <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                       <Skeleton className="h-4" />
                     </td>

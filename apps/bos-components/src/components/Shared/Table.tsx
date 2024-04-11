@@ -56,7 +56,7 @@ export default function (props: Props) {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {[...Array(props.limit)].map((_, index) => (
-                <tr key={index} className=" hover:bg-blue-900/5 h-[53px]">
+                <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
                   {props.columns.map((column, colIndex) => (
                     <td key={colIndex} className={column.tdClassName}>
                       <Skeleton className="h-4" />
@@ -95,7 +95,7 @@ export default function (props: Props) {
             </thead>
             <tbody>
               {!props.isLoading && props.data === undefined && (
-                <tr className="h-[53px]">
+                <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
@@ -106,7 +106,7 @@ export default function (props: Props) {
                   <Fragment key={rowIndex}>
                     <tr
                       key={`expandRow-${rowIndex}`}
-                      className=" hover:bg-blue-900/5"
+                      className=" hover:bg-blue-900/5 h-[57px]"
                     >
                       {props.columns.map((column: column, colIndex: number) => (
                         <td
@@ -120,9 +120,11 @@ export default function (props: Props) {
                       ))}
                     </tr>
                     {row?.showWarning && (
-                      <tr className="h-[25px] hover:bg-blue-900/5">
+                      <tr
+                        key={`expandWarning-${rowIndex}`}
+                        className="h-[25px] hover:bg-blue-900/5"
+                      >
                         <td
-                          key={`expandWarning-${rowIndex}`}
                           colSpan={props.columns.length}
                           className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
                         >
@@ -149,7 +151,7 @@ export default function (props: Props) {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {!props.isLoading && props.data === undefined && (
-                <tr className="h-[53px]">
+                <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.Error}
                   </td>
@@ -160,7 +162,7 @@ export default function (props: Props) {
                   <Fragment key={rowIndex}>
                     <tr
                       key={`row-${rowIndex}`}
-                      className=" hover:bg-blue-900/5 h-[53px]"
+                      className=" hover:bg-blue-900/5 h-[57px]"
                     >
                       {props.columns.map((column: column, colIndex: number) => (
                         <td
@@ -176,7 +178,7 @@ export default function (props: Props) {
                     {row?.showWarning && (
                       <tr
                         key={`warning-${rowIndex}`}
-                        className="h-[57px] hover:bg-blue-900/5"
+                        className="h-[25px] hover:bg-blue-900/5"
                       >
                         <td
                           colSpan={props.columns.length}

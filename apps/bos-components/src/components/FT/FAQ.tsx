@@ -7,22 +7,15 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token?: Token;
 }
-
-import {
-  localFormat,
-  dollarFormat,
-  dollarNonCentFormat,
-  convertToUTC,
-} from '@/includes/formats';
-import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
-import { tokenAmount } from '@/includes/near';
 import {
   AccountInfo,
   DeploymentsInfo,
@@ -30,7 +23,15 @@ import {
   Token,
 } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, ownerId }: Props) {
+  const { localFormat, dollarFormat, dollarNonCentFormat, convertToUTC } =
+    VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
   const [account, setAccount] = useState<AccountInfo>({} as AccountInfo);
   const [contract, setContract] = useState<DeploymentsInfo>(
     {} as DeploymentsInfo,
@@ -44,7 +45,9 @@ export default function ({ network, id, token }: Props) {
 
   const name = tokens?.name;
   const tokenTicker = tokens?.symbol;
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   useEffect(() => {
     function fetchFTData() {
       asyncFetch(`${config.backendUrl}fts/${id}`)
@@ -58,6 +61,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )
@@ -75,6 +80,8 @@ export default function ({ network, id, token }: Props) {
             const accountResp = data?.body?.account?.[0];
             if (data.status === 200) {
               setAccount(accountResp);
+            } else {
+              handleRateLimit(data, fetchAccountData);
             }
           },
         )
@@ -92,6 +99,8 @@ export default function ({ network, id, token }: Props) {
             const depResp = data?.body?.deployments?.[0];
             if (data.status === 200) {
               setContract(depResp);
+            } else {
+              handleRateLimit(data, fetchContractData);
             }
           },
         )
@@ -109,6 +118,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTransfers(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalTxns);
             }
           },
         )
@@ -126,6 +137,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setLargestHolder(resp);
+            } else {
+              handleRateLimit(data, fetchHoldersdata);
             }
           },
         )
@@ -143,6 +156,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setHolders(resp?.count);
+            } else {
+              handleRateLimit(data, fetchHoldersCount);
             }
           },
         )
@@ -151,17 +166,23 @@ export default function ({ network, id, token }: Props) {
     if (!token && token === undefined) {
       fetchFTData();
     }
-    fetchAccountData();
-    fetchContractData();
-    fetchHoldersCount();
-    fetchTotalTxns();
-    fetchHoldersdata();
+    if (config?.backendUrl) {
+      fetchAccountData();
+      fetchContractData();
+      fetchHoldersCount();
+      fetchTotalTxns();
+      fetchHoldersdata();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, config?.backendUrl, token]);
+
   useEffect(() => {
     if (token) {
       setTokens(token);
     }
   }, [token]);
+
   return (
     <div itemScope itemType="http://schema.org/FAQPage">
       <div className="px-3 pb-2 text-sm divide-y divide-gray-200 space-y-2">
@@ -240,9 +261,9 @@ export default function ({ network, id, token }: Props) {
           >
             <div className="text-sm text-nearblue-600 py-2" itemProp="text">
               The{' '}
-              <a href={`/address/${id}`}>
+              <Link href={`/address/${id}`}>
                 <a className="underline">{name}</a>
-              </a>{' '}
+              </Link>{' '}
               contract was created on Near Protocol at{' '}
               {account?.created?.transaction_hash
                 ? convertToUTC(
@@ -254,17 +275,19 @@ export default function ({ network, id, token }: Props) {
                 : 'N/A'}{' '}
               by{' '}
               {contract?.receipt_predecessor_account_id && (
-                <a href={`/address/${contract.receipt_predecessor_account_id}`}>
+                <Link
+                  href={`/address/${contract.receipt_predecessor_account_id}`}
+                >
                   <a className="underline">
                     {shortenAddress(contract.receipt_predecessor_account_id)}
                   </a>
-                </a>
+                </Link>
               )}{' '}
               through this{' '}
               {contract?.transaction_hash && (
-                <a href={`/txns/${contract.transaction_hash}`}>
+                <Link href={`/txns/${contract.transaction_hash}`}>
                   <a className="underline">transaction</a>
-                </a>
+                </Link>
               )}
               . Since the creation of {name}, there has been{' '}
               {transfers ? localFormat(transfers) : 0} on-chain transfers.
@@ -308,14 +331,16 @@ export default function ({ network, id, token }: Props) {
                 <span>
                   The largest {tokenTicker} holder is currently{' '}
                   {largestHolder?.account && (
-                    <a href={`/address/${largestHolder.account}`}>
+                    <Link href={`/address/${largestHolder.account}`}>
                       <a className="underline">
                         {shortenAddress(largestHolder.account)}
                       </a>
-                    </a>
+                    </Link>
                   )}
                   , who currently holds{' '}
-                  {tokenAmount(largestHolder?.amount, tokens?.decimals, true)}{' '}
+                  {localFormat(
+                    tokenAmount(largestHolder?.amount, tokens?.decimals, true),
+                  )}{' '}
                   {tokenTicker} of all {tokenTicker}.
                 </span>
               )}

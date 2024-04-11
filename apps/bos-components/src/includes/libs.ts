@@ -1,5 +1,5 @@
 import { localFormat, formatWithCommas } from '@/includes/formats';
-import { Debounce } from './types';
+import { Debounce, FieldType, FieldValueTypes } from './types';
 
 export function convertAmountToReadableString(amount: string, type: string) {
   if (!amount) return null;
@@ -78,18 +78,16 @@ export function getConfig(network: string) {
   switch (network) {
     case 'mainnet':
       return {
-        ownerId: 'nearblocks.near',
         nodeUrl: 'https://rpc.mainnet.near.org',
         backendUrl: 'https://api3.nearblocks.io/v1/',
-        rpcUrl: 'https://archival-rpc.testnet.near.org',
+        rpcUrl: 'https://beta.rpc.mainnet.near.org',
         appUrl: 'https://nearblocks.io/',
       };
     case 'testnet':
       return {
-        ownerId: 'nearblocks.testnet',
         nodeUrl: 'https://rpc.testnet.near.org',
         backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
-        rpcUrl: 'https://archival-rpc.testnet.near.org',
+        rpcUrl: 'https://beta.rpc.testnet.near.org/',
         appUrl: 'https://testnet.nearblocks.io/',
       };
     default:
@@ -142,9 +140,15 @@ export function timeAgo(unixTimestamp: number): string {
   } else if (secondsAgo < 86400) {
     const hoursAgo: number = Math.floor(secondsAgo / 3600);
     return `${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`;
-  } else {
+  } else if (secondsAgo < 2592000) {
     const daysAgo: number = Math.floor(secondsAgo / 86400);
     return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
+  } else if (secondsAgo < 31536000) {
+    const monthsAgo: number = Math.floor(secondsAgo / 2592000);
+    return `${monthsAgo} month${monthsAgo > 1 ? 's' : ''} ago`;
+  } else {
+    const yearsAgo: number = Math.floor(secondsAgo / 31536000);
+    return `${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`;
   }
 }
 
@@ -180,4 +184,60 @@ export function isAction(type: string) {
   ];
 
   return actions.includes(type.toUpperCase());
+}
+
+export function isJson(string: string) {
+  const str = string.replace(/\\/g, '');
+
+  try {
+    JSON.parse(str);
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function uniqueId() {
+  return Math.floor(Math.random() * 1000);
+}
+export function handleRateLimit(
+  data: { status: number },
+  reFetch: () => void,
+  Loading?: () => void,
+) {
+  if (data.status === 429 || data.status === undefined) {
+    const retryCount = 4;
+    const delay = Math.pow(2, retryCount) * 1000;
+    setTimeout(() => {
+      reFetch();
+    }, delay);
+  } else {
+    if (Loading) {
+      Loading();
+    }
+  }
+}
+
+export function mapFeilds(fields: FieldType[]) {
+  const args = {};
+
+  fields.forEach((fld) => {
+    let value: string | boolean | number | null = fld.value;
+
+    if (fld.type === 'number') {
+      value = Number(value);
+    } else if (fld.type === 'boolean') {
+      value =
+        value.trim().length > 0 &&
+        !['false', '0'].includes(value.toLowerCase());
+    } else if (fld.type === 'json') {
+      value = JSON.parse(value);
+    } else if (fld.type === 'null') {
+      value = null;
+    }
+
+    (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
+  });
+
+  return args;
 }

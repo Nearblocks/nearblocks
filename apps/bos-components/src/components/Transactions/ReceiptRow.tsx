@@ -9,9 +9,11 @@
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
  * @param {ReceiptsPropsInfo} [receipt] -  receipt of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn?: TransactionInfo;
@@ -25,16 +27,24 @@ import {
   TransactionInfo,
 } from '@/includes/types';
 import Question from '@/includes/Common/Question';
-import { convertToMetricPrefix, localFormat } from '@/includes/formats';
-import { getConfig, yoctoToNear } from '@/includes/libs';
 import ReceiptStatus from '@/includes/Common/Receipts/ReceiptStatus';
 import TransactionActions from '@/includes/Common/Receipts/TransactionActions';
 
 export default function (props: Props) {
-  const { network, receipt, borderFlag, t } = props;
+  const { network, receipt, borderFlag, t, ownerId } = props;
+
+  const { convertToMetricPrefix, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchBlocks() {
@@ -61,15 +71,19 @@ export default function (props: Props) {
                   receipts_agg: resp.receipts_agg,
                   transactions_agg: resp.transactions_agg,
                 });
+                setLoading(false);
+              } else {
+                handleRateLimit(res, fetchBlocks, () => setLoading(false));
               }
             },
           )
           .catch(() => {});
       }
-      setLoading(false);
     }
-
-    fetchBlocks();
+    if (config?.backendUrl) {
+      fetchBlocks();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.block_hash, config.backendUrl]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -79,6 +93,7 @@ export default function (props: Props) {
       ></div>
     );
   };
+
   return (
     <div className="divide-solid divide-gray-200 divide-y">
       <div
@@ -106,7 +121,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.receipt.text.0') : 'Receipt'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -142,14 +157,14 @@ export default function (props: Props) {
             </div>
           ) : block?.block_height ? (
             <div className="w-full md:w-3/4 word-break">
-              <a
+              <Link
                 href={`/blocks/${receipt.block_hash}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {localFormat(block?.block_height)}
                 </a>
-              </a>
+              </Link>
             </div>
           ) : (
             ''
@@ -178,20 +193,20 @@ export default function (props: Props) {
               </Tooltip.Provider>
               {t ? t('txns:txn.receipts.from.text.0') : 'From'}
             </div>
-            {!receipt ? (
+            {!receipt || loading ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-sm" />
               </div>
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <a
+                <Link
                   href={`/address/${receipt?.predecessor_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {receipt?.predecessor_id}
                   </a>
-                </a>
+                </Link>
               </div>
             ) : (
               ''
@@ -219,20 +234,20 @@ export default function (props: Props) {
               </Tooltip.Provider>
               {t ? t('txns:txn.receipts.to.text.0') : 'To'}
             </div>
-            {!receipt ? (
+            {!receipt || loading ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-xs" />
               </div>
             ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <a
+                <Link
                   href={`/address/${receipt?.receiver_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {receipt?.receiver_id}
                   </a>
-                </a>
+                </Link>
               </div>
             ) : (
               ''
@@ -263,7 +278,7 @@ export default function (props: Props) {
               ? t('txns:txn.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
@@ -307,7 +322,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full" />
@@ -316,14 +331,16 @@ export default function (props: Props) {
             </div>
           ) : receipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {receipt?.actions?.map((action: any, i: number) => (
-                <TransactionActions
-                  key={i}
-                  action={action}
-                  receiver={receipt?.receiver_id}
-                  t={t}
-                />
-              ))}
+              {receipt &&
+                receipt?.actions?.map((action: any, i: number) => (
+                  <TransactionActions
+                    key={i}
+                    action={action}
+                    receiver={receipt?.receiver_id}
+                    t={t}
+                    ownerId={ownerId}
+                  />
+                ))}
             </div>
           ) : (
             ''
@@ -351,7 +368,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
@@ -385,7 +402,7 @@ export default function (props: Props) {
             </Tooltip.Provider>
             {t ? t('txns:txn.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt ? (
+          {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
@@ -414,11 +431,13 @@ export default function (props: Props) {
               <div className="mx-4 border-l-4 border-l-gray-200">
                 {
                   <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+                    src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
                     props={{
                       receipt: rcpt,
                       borderFlag: true,
                       network: network,
+                      Link,
+                      ownerId,
                     }}
                   />
                 }

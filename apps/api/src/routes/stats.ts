@@ -1,7 +1,9 @@
 import { Router } from 'express';
 
+import schema from '#libs/schema/stats';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import validator from '#middlewares/validator';
 import stats from '#services/stats';
 
 const route = Router();
@@ -16,6 +18,15 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get('/', stats.latest);
+
+  /**
+   * GET /v1/stats/price
+   * @summary Get near price
+   * @tags Stats
+   * @param {string} date.query - date in yyyy-mm-dd format
+   * @return 200 - success response
+   */
+  route.get('/price', validator(schema.price), stats.price);
 };
 
 export default routes;

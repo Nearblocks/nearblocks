@@ -1,5 +1,4 @@
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig } from '@/includes/libs';
 import { NFTImageProps } from '@/includes/types';
 
 const getMediaUrl = async (base: string, media: string, reference: string) => {
@@ -40,10 +39,14 @@ export default function ({
   reference,
   className,
   network,
+  ownerId,
 }: NFTImageProps) {
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [src, setSrc] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     if (media || base || reference) {

@@ -1,17 +1,26 @@
-import { shortenToken, shortenTokenSymbol } from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig } from '@/includes/libs';
-import { decodeArgs, tokenAmount } from '@/includes/near';
 import { MetaInfo, TokenInfoProps } from '@/includes/types';
 
 export default function (props: TokenInfoProps) {
-  const { network, contract, amount, decimals } = props;
+  const { network, contract, amount, decimals, ownerId } = props;
+
+  const { shortenToken, shortenTokenSymbol, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { decodeArgs, tokenAmount } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
       ></div>
     );
   };
@@ -40,7 +49,7 @@ export default function (props: TokenInfoProps) {
           .then(
             (data: {
               body: {
-                result: { result: number[] };
+                result: { result: string[] };
               };
             }) => {
               const resp = data?.body?.result;
@@ -52,21 +61,24 @@ export default function (props: TokenInfoProps) {
     }
 
     fetchMetadata(contract);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract, config?.rpcUrl]);
 
-  return !meta ? (
+  return !meta?.name ? (
     <Loader wrapperClassName="flex w-full max-w-xl" />
   ) : (
     <>
       <span className="font-normal px-1">
         {amount
-          ? tokenAmount(amount, meta?.decimals || decimals, true)
+          ? localFormat(tokenAmount(amount, meta?.decimals || decimals, true))
           : amount ?? ''}
       </span>
       <span className="flex items-center">
         <TokenImage
           src={meta?.icon}
           alt={meta?.name}
+          appUrl={config?.appUrl}
           className="w-4 h-4 mx-1"
         />
         {shortenToken(meta?.name)}

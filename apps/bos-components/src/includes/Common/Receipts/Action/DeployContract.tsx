@@ -1,8 +1,10 @@
 import FaCode from '@/includes/icons/FaCode';
-import { shortenAddress } from '@/includes/libs';
 import { TransactionActionInfo } from '@/includes/types';
 
 const DeployContract = (props: TransactionActionInfo) => {
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
   const { t, receiver } = props;
 
   return (

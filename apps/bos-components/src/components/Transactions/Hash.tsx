@@ -7,35 +7,46 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [hash] -  The Transaction identifier passed as a string.
+ * @param {function} [onHandleTab] - Function to handle tab changes. (Optional)
+ *                                    Example: onTab={onHandleTab} where onHandleTab is a function to change tab on the page.
+ * @param {string} [pageTab] - The page tab being displayed. (Optional)
+ *                                 Example: If provided, tab=overview in the url it will select the overview tab of transaction details.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   hash: string;
+  onHandleTab: (value: string) => void;
+  pageTab: string;
 }
 
-import Skeleton from '@/includes/Common/Skeleton';
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig } from '@/includes/libs';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
-const hashes = [' ', 'execution', 'comments'];
+const hashes = ['overview', 'execution', 'comments'];
 
 export default function (props: Props) {
-  const { t, network, hash } = props;
-  const [isLoading, setIsLoading] = useState(false);
-  const [txn, setTxn] = useState<TransactionInfo>({} as TransactionInfo);
+  const { t, network, hash, onHandleTab, pageTab, ownerId } = props;
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [txn, setTxn] = useState<TransactionInfo | null>(null);
   const [error, setError] = useState(false);
   const [isToggle, setIsToggle] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<RPCTransactionInfo>(
     {} as RPCTransactionInfo,
   );
-  const [pageHash, setHash] = useState(' ');
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   const onTab = (index: number) => {
-    setHash(hashes[index]);
+    onHandleTab(hashes[index]);
   };
 
   useEffect(() => {
@@ -51,9 +62,12 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
+              setError(false);
               setTxn(resp);
+              setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchTxn, () => setIsLoading(false));
             }
-            setIsLoading(false);
           },
         )
         .catch((error: Error) => {
@@ -61,8 +75,11 @@ export default function (props: Props) {
           setIsLoading(false);
         });
     }
+    if (config.backendUrl) {
+      fetchTxn();
+    }
 
-    fetchTxn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, hash]);
 
   useEffect(() => {
@@ -90,68 +107,65 @@ export default function (props: Props) {
               const resp = res?.body?.result;
               if (res.status === 200) {
                 setRpcTxn(resp);
+              } else {
+                handleRateLimit(res, fetchTransactionStatus);
               }
             },
           )
           .catch(() => {});
       }
     }
-
-    fetchTransactionStatus();
-  }, [txn, hash, config?.rpcUrl]);
+    if (config?.rpcUrl) {
+      fetchTransactionStatus();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txn, config?.rpcUrl]);
 
   return (
     <>
-      <div>
-        <div className="md:flex items-center justify-between">
-          {isLoading ? (
-            <div className="w-80 max-w-xs px-3 py-5">
-              <Skeleton className="h-7" />
-            </div>
-          ) : (
-            <h1 className="text-xl text-nearblue-600 px-2 py-5">
-              {t ? t('txns:txn.heading') : 'Transaction Details'}
-            </h1>
-          )}
-        </div>
-      </div>
       {error || (!isLoading && !txn) ? (
         <div className="text-nearblue-700 text-xs px-2 mb-4">
           {t ? t('txns:txnError') : 'Transaction Error'}
         </div>
       ) : (
-        <Tabs.Root defaultValue={pageHash}>
-          <Tabs.List>
+        <>
+          <div>
             {hashes &&
               hashes.map((hash, index) => (
-                <Tabs.Trigger
+                <button
                   key={index}
                   onClick={() => onTab(index)}
-                  className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                    pageHash === hash
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+                    pageTab === hash
                       ? 'rounded-lg bg-green-600 text-white'
                       : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
                   }`}
                   value={hash}
                 >
-                  {hash === ' ' ? (
-                    <h2>{t ? t('txns:txn.tabs.overview') : 'Overview'}</h2>
+                  {hash === 'overview' ? (
+                    <h2 className="p-2">
+                      {t ? t('txns:txn.tabs.overview') : 'Overview'}
+                    </h2>
                   ) : hash === 'execution' ? (
-                    pageHash !== 'execution' ? (
-                      <>
-                        <h2>
+                    pageTab !== 'execution' ? (
+                      <div className="p-2">
+                        <h2 className="flex">
                           {isToggle
                             ? 'Enhanced Plan'
                             : t
                             ? t('txns:txn.tabs.execution')
                             : 'Execution Plan'}
+                          <ArrowDown className="h-4 w-4 fill-current ml-1" />
                         </h2>
-                      </>
+                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-7 px-1 ">
+                          NEW
+                        </div>
+                      </div>
                     ) : (
                       <Popover.Root key={isToggle}>
                         <Popover.Trigger asChild>
                           <button
-                            className="flex border border-green-900/10 text-xs  rounded focus:outline-none"
+                            className="flex p-2 text-xs  rounded focus:outline-none"
                             aria-label="Update dimensions"
                           >
                             {isToggle
@@ -160,16 +174,19 @@ export default function (props: Props) {
                               ? t('txns:txn.tabs.execution')
                               : 'Execution Plan'}
                             <ArrowDown className="h-4 w-4 fill-current ml-1" />
+                            <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-24 -mt-3 px-1 ">
+                              NEW
+                            </div>{' '}
                           </button>
                         </Popover.Trigger>
                         <Popover.Content
-                          className="bg-white w-60 shadow-lg border rounded-lg slide-down mt-4"
+                          className="bg-white w-48 shadow-lg border rounded-lg slide-down mt-2 z-50"
                           sideOffset={5}
                         >
                           <ul className="divide-y">
                             <li
                               onClick={() => setIsToggle(false)}
-                              className={`py-2 text-nearblue-600 ${
+                              className={`py-2 text-nearblue-600 rounded-t-lg ${
                                 !isToggle ? 'bg-gray-300' : ''
                               }`}
                             >
@@ -177,7 +194,7 @@ export default function (props: Props) {
                             </li>
                             <li
                               onClick={() => setIsToggle(true)}
-                              className={`py-2 text-nearblue-600 ${
+                              className={`py-2 text-nearblue-600 rounded-b-lg ${
                                 isToggle ? 'bg-gray-300' : ''
                               }`}
                             >
@@ -188,56 +205,76 @@ export default function (props: Props) {
                       </Popover.Root>
                     )
                   ) : (
-                    <h2>{t ? t('txns:txn.tabs.comments') : 'Comments'}</h2>
+                    <h2 className="p-2">
+                      {t ? t('txns:txn.tabs.comments') : 'Comments'}
+                    </h2>
                   )}
-                </Tabs.Trigger>
+                </button>
               ))}
-          </Tabs.List>
+          </div>
           <div className="bg-white soft-shadow rounded-xl pb-1">
-            <Tabs.Content value={hashes[0]}>
+            <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
               {
                 <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Detail`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
                   props={{
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
                     network: network,
                     t: t,
+                    ownerId,
                   }}
                 />
               }
-            </Tabs.Content>
-            <Tabs.Content value={hashes[1]}>
-              {isToggle ? (
+            </div>
+            <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
+              <div className={`${isToggle ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
+                    props={{
+                      network: network,
+                      t: t,
+                      txn: txn,
+                      rpcTxn: rpcTxn,
+                      loading: isLoading,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${isToggle ? 'hidden' : ''} `}>
                 <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Execution`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
                   props={{
                     network: network,
                     t: t,
                     txn: txn,
                     rpcTxn: rpcTxn,
                     loading: isLoading,
+                    ownerId,
                   }}
                 />
-              ) : (
-                <Widget
-                  src={`${config?.ownerId}/widget/bos-components.components.Transactions.Receipt`}
-                  props={{
-                    network: network,
-                    t: t,
-                    txn: txn,
-                    rpcTxn: rpcTxn,
-                    loading: isLoading,
-                  }}
-                />
-              )}
-            </Tabs.Content>
-            <Tabs.Content value={hashes[2]}>
-              <div className="px-4 sm:px-6 py-3"></div>
-            </Tabs.Content>
+              </div>
+            </div>
+            <div className={`${pageTab === 'comments' ? '' : 'hidden'} `}>
+              <div className="py-3">
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
+                    props={{
+                      network: network,
+                      path: `nearblocks.io/txns/${hash}`,
+                      limit: 10,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+            </div>
           </div>
-        </Tabs.Root>
+        </>
       )}
     </>
   );

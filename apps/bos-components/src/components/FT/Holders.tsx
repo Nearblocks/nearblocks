@@ -7,22 +7,34 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token?: Token;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { localFormat, serialNumber } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
-import { price, tokenAmount, tokenPercentage } from '@/includes/near';
-import { HoldersPropsInfo, Token } from '@/includes/types';
+import { HoldersPropsInfo, Status, Token } from '@/includes/types';
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, ownerId }: Props) {
+  const { localFormat, serialNumber, getTimeAgoString } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { price, tokenAmount, tokenPercentage } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
+  const [countLoader, setCountLoader] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
@@ -30,9 +42,14 @@ export default function ({ network, id, token }: Props) {
     {},
   );
   const [tokens, setTokens] = useState<Token>({} as Token);
-  const config = getConfig(network);
-  const errorMessage = 'No token holders found!';
+  const [status, setStatus] = useState({
+    height: 0,
+    sync: true,
+    timestamp: '',
+  });
+  const config = getConfig && getConfig(network);
 
+  const errorMessage = 'No token holders found!';
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
@@ -54,12 +71,15 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )
         .catch(() => {});
     }
     function fetchTotalHolders() {
+      setCountLoader(true);
       asyncFetch(`${config?.backendUrl}fts/${id}/holders/count`, {
         method: 'GET',
         headers: {
@@ -76,6 +96,9 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+              setCountLoader(false);
+            } else {
+              handleRateLimit(data, fetchTotalHolders);
             }
           },
         )
@@ -100,19 +123,48 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.holders;
             if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
               setHolder((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchHoldersData(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
+    }
+    function fetchStatus() {
+      asyncFetch(`${config.backendUrl}sync/status`)
+        .then(
+          (data: {
+            body: {
+              status: Status;
+            };
+            status: number;
+          }) => {
+            const resp = data?.body?.status?.aggregates.ft_holders;
+            if (data.status === 200) {
+              setStatus(resp);
+            } else {
+              handleRateLimit(data, fetchStatus);
+            }
+          },
+        )
+        .catch(() => {});
     }
     if (!token && token === undefined) {
       fetchFTData();
     }
-    fetchTotalHolders();
-    fetchHoldersData(currentPage);
+    if (config?.backendUrl) {
+      fetchTotalHolders();
+      fetchHoldersData(currentPage);
+      fetchStatus();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);
 
   useEffect(() => {
@@ -142,14 +194,14 @@ export default function ({ network, id, token }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/address/${row.account}`}
                     className="hover:no-undeline"
                   >
                     <a className="text-green-500 font-medium hover:no-undeline">
                       {row.account}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -174,7 +226,7 @@ export default function ({ network, id, token }: Props) {
         <>
           {' '}
           {row.amount && tokens?.decimals
-            ? tokenAmount(row.amount, tokens?.decimals, true)
+            ? localFormat(tokenAmount(row.amount, tokens?.decimals, true))
             : ''}
         </>
       ),
@@ -222,27 +274,41 @@ export default function ({ network, id, token }: Props) {
       },
       tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'x-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
   return (
     <>
-      {isLoading ? (
+      {countLoader ? (
         <div className="pl-3 max-w-sm py-5 h-[60px]">
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4`}>
-          <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
-            </p>
+        <>
+          {!status.sync && (
+            <div className="w-full text-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+              Holders count is out of sync. Last synced block is
+              <span className="font-bold mx-0.5">
+                {`${localFormat && localFormat(status.height)}`}
+              </span>
+              {status?.timestamp &&
+                `(${getTimeAgoString(nanoToMilli(status?.timestamp))}).`}{' '}
+              Holders data will be delayed.
+            </div>
+          )}
+          <div className={`flex flex-col lg:flex-row pt-4`}>
+            <div className="flex flex-col">
+              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+                A total of {localFormat && localFormat(totalCount.toString())}{' '}
+                token holders found
+              </p>
+            </div>
           </div>
-        </div>
+        </>
       )}
       <Widget
-        src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: holder[currentPage],

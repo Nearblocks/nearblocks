@@ -1,10 +1,17 @@
-import { urlHostName } from '@/includes/libs';
-
 const Links = (props: any) => {
+  const networkAccountId =
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
+
+  const { urlHostName } = VM.require(
+    `${networkAccountId}/widget/includes.Utils.libs`,
+  );
+
   const { meta } = props;
-  const twitter = urlHostName(meta?.twitter);
-  const facebook = urlHostName(meta?.facebook);
-  const telegram = urlHostName(meta?.telegram);
+  const twitter = urlHostName && urlHostName(meta?.twitter);
+  const facebook = urlHostName && urlHostName(meta?.facebook);
+  const telegram = urlHostName && urlHostName(meta?.telegram);
 
   return (
     <div className="flex space-x-4">

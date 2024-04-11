@@ -7,20 +7,32 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token?: Token;
 }
 
-import { localFormat, dollarNonCentFormat } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
+import CoinMarketcap from '@/includes/icons/CoinMarketcap';
+import CoinGecko from '@/includes/icons/CoinGecko';
 import { Token } from '@/includes/types';
 
-export default function ({ token, id, network }: Props) {
+export default function ({ token, id, network, ownerId }: Props) {
+  const { localFormat, dollarNonCentFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [tokens, setTokens] = useState<Token>({} as Token);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   useEffect(() => {
     function fetchFTData() {
       asyncFetch(`${config.backendUrl}fts/${id}`)
@@ -34,6 +46,8 @@ export default function ({ token, id, network }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+            } else {
+              handleRateLimit(data, fetchFTData);
             }
           },
         )
@@ -43,6 +57,8 @@ export default function ({ token, id, network }: Props) {
     if (!token && token === undefined) {
       fetchFTData();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, token]);
 
   useEffect(() => {
@@ -110,24 +126,26 @@ export default function ({ token, id, network }: Props) {
       </div>
       <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 text-xs">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Market Data Source:</div>
-        <div className="w-full md:w-3/4 break-words">
+        <div className="w-full md:w-3/4 break-words flex">
           {tokens?.coingecko_id && (
             <a
-              className="text-green-500 mr-4"
+              className="text-green-500 mr-4 flex"
               href="https://www.coingecko.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"
             >
+              <CoinGecko className="h-4 w-4 fill-current mr-1" />
               CoinGecko
             </a>
           )}
           {tokens?.coinmarketcap_id && (
             <a
-              className="text-green-500 mr-4"
+              className="text-green-500 mr-4 flex"
               href="https://coinmarketcap.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"
             >
+              <CoinMarketcap className="h-4 w-4 fill-current mr-1" />
               Coinmarketcap
             </a>
           )}

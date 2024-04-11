@@ -1,14 +1,10 @@
 import { Big } from 'big.js';
 
-import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
-import config from '#config';
-import dayjs from '#libs/dayjs';
+import cg from '#libs/cg';
 import knex from '#libs/knex';
-import lcw from '#libs/lcw';
 import near from '#libs/near';
-import { circulatingSupply } from '#libs/supply';
 
 const blockTime = async (timestamp: string) => {
   try {
@@ -39,19 +35,10 @@ const blockData = async () => {
     return {};
   }
 
-  let supply: null | string = null;
-
-  if (config.network === Network.MAINNET && block) {
-    supply = await circulatingSupply(block);
-
-    console.log({ job: 'stats', supply });
-  }
-
   const avgTime = await blockTime(block.block_timestamp);
 
   if (!avgTime) {
     return {
-      circulating_supply: supply,
       gas_price: block.gas_price,
       total_supply: block.total_supply,
     };
@@ -59,14 +46,13 @@ const blockData = async () => {
 
   return {
     avg_block_time: avgTime,
-    circulating_supply: supply,
     gas_price: block.gas_price,
     total_supply: block.total_supply,
   };
 };
 
 const marketData = async () => {
-  const price = await lcw.marketData('NEAR', true);
+  const price = await cg.marketData('near', true);
 
   if (!price) return {};
 
@@ -98,20 +84,16 @@ const networkData = async () => {
 };
 
 export const txnData = async () => {
-  const start = dayjs.utc().startOf('day').valueOf();
-
-  const [stats, txns] = await Promise.all([
-    knex('daily_stats').sum('txns').first(),
-    knex('transactions')
-      .count('block_timestamp')
-      .where('block_timestamp', '>', msToNsTime(start))
-      .first(),
-  ]);
+  const stats = await knex
+    .select(
+      knex.raw(
+        "count_estimate('SELECT transaction_hash FROM transactions') as count",
+      ),
+    )
+    .first();
 
   return {
-    total_txns: Big(stats?.sum ?? 0)
-      .add(txns?.count ?? 0)
-      .toFixed(),
+    total_txns: stats?.count ?? 0,
   };
 };
 

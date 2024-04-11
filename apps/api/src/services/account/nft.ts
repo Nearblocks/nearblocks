@@ -78,6 +78,15 @@ const txns = catchAsync(
                   nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
             ORDER BY
               event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
@@ -85,7 +94,7 @@ const txns = catchAsync(
           ) AS tmp using(
             event_index
           )
-          LEFT JOIN LATERAL (
+          INNER JOIN LATERAL (
             SELECT
               transactions.transaction_hash,
               transactions.included_in_block_hash,
@@ -159,6 +168,15 @@ const txnsCount = catchAsync(
             nft.contract = a.contract_account_id
             AND nft.token = a.token_id
         )
+        AND EXISTS (
+          SELECT
+            1
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = a.receipt_id
+        )
     `;
     const { query, values } = keyBinder(
       rawQuery({ select: 'receipt_id' }),
@@ -209,6 +227,7 @@ const txnsExport = catchAsync(
           event_index,
           affected_account_id,
           involved_account_id,
+          delta_amount,
           cause,
           token_id,
           txn.transaction_hash,
@@ -257,6 +276,15 @@ const txnsExport = catchAsync(
                   nft.contract = a.contract_account_id
                   AND nft.token = a.token_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
               AND t.block_timestamp BETWEEN :start AND :end
             ORDER BY
               event_index ASC
@@ -265,7 +293,7 @@ const txnsExport = catchAsync(
           ) AS tmp using(
             event_index
           )
-          LEFT JOIN LATERAL (
+          INNER JOIN LATERAL (
             SELECT
               transactions.transaction_hash,
               transactions.included_in_block_hash,
@@ -307,18 +335,14 @@ const txnsExport = catchAsync(
       { account, end, start },
     );
 
-    if (query) {
-      const { rows } = await db.query(query, values);
-
-      return res.status(200).json({ txns: rows });
-    }
-
     const columns = [
       { header: 'Status', key: 'status' },
       { header: 'Txn Hash', key: 'hash' },
       { header: 'Method', key: 'method' },
-      { header: 'From', key: 'from' },
-      { header: 'To', key: 'to' },
+      { header: 'Affected', key: 'affected' },
+      { header: 'Involved', key: 'involved' },
+      { header: 'Direction', key: 'direction' },
+      { header: 'Token', key: 'involved' },
       { header: 'Token ID', key: 'id' },
       { header: 'Token', key: 'token' },
       { header: 'Contract', key: 'contract' },
@@ -330,17 +354,18 @@ const txnsExport = catchAsync(
         const status = row.outcomes.status;
 
         stringifier.write({
+          affected: row.affected_account_id || 'system',
           block: row.block.block_height,
           contract: row.nft ? row.nft.contract : '',
-          from: row.affected_account_id || 'system',
+          direction: row.delta_amount > 0 ? 'In' : 'Out',
           hash: row.transaction_hash,
           id: row.token_id,
+          involved: row.involved_account_id || 'system',
           method: row.cause,
           status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.involved_account_id || 'system',
           token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
         });
         callback();

@@ -1,6 +1,8 @@
-import { shortenAddress } from '@/includes/libs';
 import { ActionPropsInfo } from '@/includes/types';
 const CreateAccount = (props: ActionPropsInfo) => {
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
   const FaRight = (props: { className: string }) => {
     return (
       <svg

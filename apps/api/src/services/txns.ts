@@ -260,6 +260,14 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       receipt_conversion_tokens_burnt,
       (
         SELECT
+          shard_id
+        FROM
+          chunks
+        WHERE
+          chunks.chunk_hash = transactions.included_in_chunk_hash
+      ) AS shard_id,
+      (
+        SELECT
           JSON_BUILD_OBJECT('block_height', block_height)
         FROM
           blocks
@@ -350,6 +358,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
                       affected_account_id,
                       involved_account_id,
                       delta_amount,
+                      cause,
                       block_timestamp,
                       ROW_TO_JSON(wrap_ft_meta) AS ft_meta
                     FROM
@@ -381,7 +390,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
                       event_index,
                       affected_account_id,
                       involved_account_id,
+                      delta_amount,
                       token_id,
+                      cause,
                       block_timestamp,
                       ROW_TO_JSON(wrap_nft_meta) AS nft_meta,
                       ROW_TO_JSON(wrap_nft_token_meta) AS nft_token_meta

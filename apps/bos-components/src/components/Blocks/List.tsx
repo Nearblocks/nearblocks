@@ -10,21 +10,15 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  convertToMetricPrefix,
-  formatTimestampToString,
-  gasFee,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import { getConfig, nanoToMilli, shortenAddress } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (
     key: string,
@@ -34,14 +28,26 @@ interface Props {
   setPage: (page: number) => void;
 }
 
-export default function ({ currentPage, setPage, t, network }: Props) {
+export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
+  const {
+    convertToMetricPrefix,
+    formatTimestampToString,
+    gasFee,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, shortenAddress } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
   const [blocks, setBlocks] = useState<{ [key: number]: BlocksInfo[] }>({});
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
+  const [address, setAddress] = useState('');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchTotalBlocks() {
@@ -61,6 +67,8 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             const resp = data?.body?.blocks?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, fetchTotalBlocks);
             }
           },
         )
@@ -86,18 +94,34 @@ export default function ({ currentPage, setPage, t, network }: Props) {
             const resp = data?.body?.blocks;
             if (data.status === 200) {
               setBlocks((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchBlocks(page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
+    }
+    if (config?.backendUrl) {
+      fetchTotalBlocks();
+      fetchBlocks(currentPage);
     }
 
-    fetchTotalBlocks();
-    fetchBlocks(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
+
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
 
   const start = blocks[currentPage]?.[0];
   const end = blocks[currentPage]?.[blocks[currentPage]?.length - 1];
@@ -109,13 +133,16 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       key: 'block_hash',
       cell: (row: BlocksInfo) => (
         <span>
-          <a href={`/blocks/${row?.block_hash}`} className="hover:no-underline">
+          <Link
+            href={`/blocks/${row?.block_hash}`}
+            className="hover:no-underline"
+          >
             <a className="text-green-500 hover:no-underline">
               {row?.block_height
                 ? localFormat(row?.block_height)
                 : row?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:
@@ -227,14 +254,22 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       key: 'author_account_id',
       cell: (row: BlocksInfo) => (
         <span>
-          <a
+          <Link
             href={`/address/${row?.author_account_id}`}
-            className="hover:no-underline"
+            className={`hover:no-underline`}
           >
-            <a className="text-green-500 hover:no-underline">
+            <a
+              className={`text-green-500 hover:no-underline ${
+                row?.author_account_id === address
+                  ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                  : 'text-green-500 p-1'
+              }`}
+              onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
+              onMouseLeave={handleMouseLeave}
+            >
               {shortenAddress(row?.author_account_id ?? '')}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:
@@ -260,12 +295,7 @@ export default function ({ currentPage, setPage, t, network }: Props) {
       header: <span>{t ? t('blocks:block.gasLimit') : 'GAS LIMIT'}</span>,
       key: 'gas_limit',
       cell: (row: BlocksInfo) => (
-        <span>
-          {row?.chunks_agg?.gas_limit
-            ? convertToMetricPrefix(row?.chunks_agg?.gas_limit)
-            : row?.chunks_agg?.gas_limit ?? ''}
-          gas
-        </span>
+        <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
@@ -299,27 +329,29 @@ export default function ({ currentPage, setPage, t, network }: Props) {
           {t
             ? t('blocks:listing', {
                 from: start?.block_height
-                  ? localFormat(start?.block_height)
+                  ? localFormat && localFormat(start?.block_height)
                   : start?.block_height ?? '',
                 to: end?.block_height
-                  ? localFormat(end?.block_height)
+                  ? localFormat && localFormat(end?.block_height)
                   : end?.block_height ?? '',
-                count: localFormat(totalCount.toString()),
+                count: localFormat && localFormat(totalCount.toString()),
               })
             : `Block #${
                 start?.block_height
-                  ? localFormat(start?.block_height)
+                  ? localFormat && localFormat(start?.block_height)
                   : start?.block_height ?? ''
               } to ${
                 '#' + end?.block_height
-                  ? localFormat(end?.block_height)
+                  ? localFormat && localFormat(end?.block_height)
                   : end?.block_height ?? ''
-              } (Total of ${localFormat(totalCount.toString())} blocks)`}{' '}
+              } (Total of ${
+                localFormat && localFormat(totalCount.toString())
+              } blocks)`}{' '}
         </p>
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: blocks[currentPage],

@@ -8,21 +8,17 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
 }
 
-import { getConfig } from '@/includes/libs';
-import {
-  collectNestedReceiptWithOutcomeOld,
-  parseOutcomeOld,
-  parseReceipt,
-} from '@/includes/near';
 import {
   TransactionInfo,
   RPCTransactionInfo,
@@ -31,11 +27,19 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { network, rpcTxn, t } = props;
+  const { network, rpcTxn, t, ownerId } = props;
+
+  const { collectNestedReceiptWithOutcomeOld, parseOutcomeOld, parseReceipt } =
+    VM.require(`${ownerId}/widget/includes.Utils.near`);
+
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
   >(null);
-  const config = getConfig(network);
+
+  const config = getConfig ? getConfig(network) : '';
+
   const [expandAll, setExpandAll] = useState(false);
   const expandAllReceipts = useCallback(
     () => setExpandAll((x) => !x),
@@ -43,27 +47,30 @@ export default function (props: Props) {
   );
 
   function transactionReceipts(txn: RPCTransactionInfo) {
-    const receiptsMap = txn.receipts_outcome.reduce(
-      (mapping, receiptOutcome) => {
-        const receipt = parseReceipt(
-          txn.receipts.find(
-            (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
-          ),
-          receiptOutcome,
-          txn.transaction,
-        );
+    const receiptsMap =
+      txn?.receipts_outcome &&
+      txn?.receipts_outcome.reduce((mapping, receiptOutcome) => {
+        const receipt = parseReceipt
+          ? parseReceipt(
+              txn.receipts.find(
+                (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
+              ),
+              receiptOutcome,
+              txn.transaction,
+            )
+          : '';
         return mapping.set(receiptOutcome.id, {
           ...receipt,
-          outcome: parseOutcomeOld(receiptOutcome),
+          outcome: parseOutcomeOld ? parseOutcomeOld(receiptOutcome) : '',
         });
-      },
-      new Map(),
-    );
+      }, new Map());
 
-    const receipts = collectNestedReceiptWithOutcomeOld(
-      txn.transaction_outcome.outcome.receipt_ids[0],
-      receiptsMap,
-    );
+    const receipts = collectNestedReceiptWithOutcomeOld
+      ? collectNestedReceiptWithOutcomeOld(
+          txn.transaction_outcome.outcome.receipt_ids[0],
+          receiptsMap,
+        )
+      : '';
 
     return receipts;
   }
@@ -73,9 +80,11 @@ export default function (props: Props) {
       const receipt = transactionReceipts(rpcTxn);
       setReceipt(receipt);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash, config.backendUrl]);
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
+  const Loader = (props: { className?: string }) => {
     return (
       <div
         className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
@@ -91,20 +100,20 @@ export default function (props: Props) {
             className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-1 border border-neargray-700 px-2 rounded-md bg-whit select-none"
             onClick={expandAllReceipts}
           >
-            Expand all <span>+</span>
+            Expand All <span>+</span>
           </div>
         </div>
-        <div className="p-8">
-          {!receipt ? (
+        <div className="p-8 overflow-auto">
+          {!receipt?.id ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
+              <Loader className="flex w-full mt-2" />
             </div>
           ) : (
             <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+              src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
               props={{
                 network: network,
                 t: t,
@@ -113,6 +122,7 @@ export default function (props: Props) {
                 fellowOutgoingReceipts: [],
                 convertionReceipt: true,
                 className: '',
+                ownerId,
               }}
             />
           )}

@@ -13,9 +13,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   id: string;
@@ -27,37 +29,50 @@ interface Props {
 import Filter from '@/includes/Common/Filter';
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  capitalizeFirstLetter,
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
 import SortIcon from '@/includes/icons/SortIcon';
-import { getConfig, isAction, nanoToMilli, yoctoToNear } from '@/includes/libs';
-import { txnMethod } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
 export default function ({
   network,
+  ownerId,
   t,
   id,
   filters,
   handleFilter,
   onFilterClear,
 }: Props) {
+  const {
+    capitalizeFirstLetter,
+    formatTimestampToString,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const {
+    getConfig,
+    handleRateLimit,
+    isAction,
+    nanoToMilli,
+    yoctoToNear,
+    truncateString,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { txnMethod } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
+  const [address, setAddress] = useState('');
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -83,11 +98,12 @@ export default function ({
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchTxnsData(qs: string, sqs: string, page: number) {
@@ -110,12 +126,16 @@ export default function ({
             } else if (resp.length === 0) {
               setTxns({});
             }
+            setIsLoading(false);
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {
@@ -134,12 +154,18 @@ export default function ({
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
-  let filterValue: string;
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    filterValue = event.target.value;
-    // Do something with the value if needed
+  const onInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string,
+  ): void => {
+    setFilterValue((prevFilters) => ({
+      ...prevFilters,
+      [name]: event.target.value,
+    }));
   };
 
   const onFilter = (
@@ -148,15 +174,15 @@ export default function ({
   ): void => {
     e.preventDefault();
 
-    if (filterValue !== null && filterValue !== undefined) {
+    if (filterValue[name] !== undefined && filterValue[name] !== null) {
       if (name === 'type') {
-        if (isAction(filterValue)) {
-          handleFilter('action', filterValue);
+        if (isAction(filterValue[name])) {
+          handleFilter('action', filterValue[name]);
         } else {
-          handleFilter('method', filterValue);
+          handleFilter('method', filterValue[name]);
         }
       } else {
-        handleFilter(name, filterValue);
+        handleFilter(name, filterValue[name]);
       }
     }
   };
@@ -164,6 +190,10 @@ export default function ({
   const onClear = (name: string) => {
     if (onFilterClear && filters) {
       onFilterClear(name);
+      setFilterValue((prevFilters) => ({
+        ...prevFilters,
+        [name]: '',
+      }));
     }
   };
 
@@ -175,6 +205,14 @@ export default function ({
     setCurrentPage(pageNumber);
   };
 
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: <span></span>,
@@ -184,8 +222,7 @@ export default function ({
           <TxnStatus status={row.outcomes.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end ',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -196,14 +233,14 @@ export default function ({
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -217,16 +254,16 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:type') : 'METHOD'}
@@ -240,8 +277,8 @@ export default function ({
             <div className="flex flex-col">
               <input
                 name="type"
-                value={filters ? filters?.action || filters?.method : ''}
-                onChange={onInputChange}
+                value={filterValue['type']}
+                onChange={(e) => onInputChange(e, 'type')}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
               />
@@ -290,7 +327,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
@@ -303,9 +340,9 @@ export default function ({
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
@@ -320,14 +357,14 @@ export default function ({
       ),
       tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-5 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:from') : 'FROM'}
@@ -340,8 +377,8 @@ export default function ({
           >
             <input
               name="from"
-              value={filters ? filters?.from : ''}
-              onChange={onInputChange}
+              value={filterValue['from']}
+              onChange={(e) => onInputChange(e, 'from')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -374,15 +411,27 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                <span
+                  className={`align-bottom text-green-500 whitespace-nowrap ${
+                    row?.predecessor_account_id === address
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      : 'text-green-500 p-0.5 px-1'
+                  }`}
+                >
+                  <Link
                     href={`/address/${row.predecessor_account_id}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 hover:no-underline">
-                      {row.predecessor_account_id}
+                    <a
+                      className="text-green-500 hover:no-underline"
+                      onMouseOver={(e) =>
+                        onHandleMouseOver(e, row?.predecessor_account_id)
+                      }
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {truncateString(row.predecessor_account_id, 15, '...')}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -396,7 +445,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span></span>,
@@ -422,7 +471,7 @@ export default function ({
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:to') : 'To'}
@@ -435,8 +484,8 @@ export default function ({
           >
             <input
               name="to"
-              value={filters ? filters?.to : ''}
-              onChange={onInputChange}
+              value={filterValue['to']}
+              onChange={(e) => onInputChange(e, 'to')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -469,15 +518,27 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                <span
+                  className={`align-bottom text-green-500 whitespace-nowrap ${
+                    row?.receiver_account_id === address
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      : 'text-green-500 p-0.5 px-1'
+                  }`}
+                >
+                  <Link
                     href={`/address/${row.receiver_account_id}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 hover:no-underline">
-                      {row.receiver_account_id}
+                    <a
+                      className="text-green-500 hover:no-underline"
+                      onMouseOver={(e) =>
+                        onHandleMouseOver(e, row?.receiver_account_id)
+                      }
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {truncateString(row.receiver_account_id, 15, '...')}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -491,14 +552,14 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/blocks/${row.included_in_block_hash}`}
             className="hover:no-underline"
           >
@@ -507,17 +568,17 @@ export default function ({
                 ? localFormat(row.block?.block_height)
                 : ''}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
-        <div className="w-full inline-flex px-5 py-4">
+        <div className="w-full inline-flex px-4 py-4">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -589,7 +650,7 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600',
       thClassName: 'whitespace-nowrap',
     },
   ];
@@ -603,25 +664,30 @@ export default function ({
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-3 text-sm mb-4 text-nearblue-600">
-              A total of {totalCount ? localFormat(totalCount.toString()) : 0}{' '}
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
+              A total of{' '}
+              {totalCount
+                ? localFormat && localFormat(totalCount.toString())
+                : 0}{' '}
               transactions found
             </p>
           </div>
-          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+          <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
             {filters && Object.keys(filters).length > 0 && (
-              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
-                Filtered By:
-                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                  {filters &&
-                    Object.keys(filters).map((key) => (
-                      <span className="flex" key={key}>
-                        {capitalizeFirstLetter(key)}:{' '}
-                        <span className="inline-block truncate max-w-[120px]">
-                          <span className="font-semibold">{filters[key]}</span>
-                        </span>
+              <div className="flex  px-2 items-center text-sm text-gray-500 mb-2 lg:mb-0">
+                <span className="mr-1 lg:mr-2">Filtered By:</span>
+                <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                  {Object.keys(filters).map((key) => (
+                    <span
+                      className="flex items-center max-sm:mb-1 truncate max-w-[120px]"
+                      key={key}
+                    >
+                      {capitalizeFirstLetter(key)}:{' '}
+                      <span className="font-semibold truncate">
+                        {filters[key]}
                       </span>
-                    ))}
+                    </span>
+                  ))}
                   <CloseCircle
                     className="w-4 h-4 fill-current cursor-pointer"
                     onClick={onClear}
@@ -629,29 +695,25 @@ export default function ({
                 </span>
               </div>
             )}
-            <span className="text-xs text-nearblue-600">
-              <a
-                href={`/exportdata?address=${id}`}
-                className="hover:no-underline"
-                target="_blank"
-              >
-                <a
-                  target="_blank"
-                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-2  border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800 hover:no-underline"
+            <span className="text-xs text-nearblue-600 self-stretch lg:self-auto px-2">
+              <button className="hover:no-underline ">
+                <Link
+                  href={`/exportdata?address=${id}`}
+                  className="flex items-center text-nearblue-600 font-medium py-2 border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800"
                 >
-                  <p>CSV Export </p>
+                  <p>CSV Export</p>
                   <span className="ml-2">
                     <Download />
                   </span>
-                </a>
-              </a>
+                </Link>
+              </button>
             </span>
           </div>
         </div>
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

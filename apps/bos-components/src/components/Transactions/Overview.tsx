@@ -6,22 +6,16 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { days?: number }) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  currency,
-  dollarFormat,
-  formatCustomDate,
-  localFormat,
-} from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
-import { gasPrice } from '@/includes/near';
 import {
   ChartConfigType,
   StatusInfo,
@@ -29,7 +23,17 @@ import {
   ChartSeriesInfo,
 } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
+export default function ({ network, t, ownerId }: Props) {
+  const { currency, dollarFormat, formatCustomDate, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { gasPrice } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [charts, setCharts] = useState<ChartInfo[]>([]);
@@ -37,7 +41,7 @@ export default function ({ network, t }: Props) {
     {} as ChartConfigType,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 15000;
@@ -65,38 +69,49 @@ export default function ({ network, t }: Props) {
               total_txns: resp.total_txns,
               volume: resp.volume,
             });
+            if (isLoading) setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchStats, () => {
+              if (isLoading) setIsLoading(false);
+            });
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
-        });
+        .catch(() => {});
     }
-
-    fetchStats();
-
+    if (config?.backendUrl) {
+      fetchStats();
+    }
     const interval = setInterval(fetchStats, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, isLoading]);
 
   useEffect(() => {
     function fetchChartData() {
-      asyncFetch(`${config.backendUrl}charts/latest`)
+      asyncFetch(`${config?.backendUrl}charts/latest`)
         .then(
           (data: {
             body: {
               charts: { date: string; near_price: string; txns: string }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.charts;
-            setCharts(resp);
+            if (data.status === 200) {
+              setCharts(resp);
+            } else {
+              handleRateLimit(data, fetchChartData);
+            }
           },
         )
         .catch(() => {});
     }
-
-    fetchChartData();
+    if (config?.backendUrl) {
+      fetchChartData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);
 
   const chartData = useMemo(() => {
@@ -120,6 +135,8 @@ export default function ({ network, t }: Props) {
         categories: [],
       };
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [charts]);
 
   useEffect(() => {
@@ -218,7 +235,9 @@ export default function ({ network, t }: Props) {
         </body>
       </html>
     `;
-
+  const nearPrice = stats?.near_price ?? '';
+  const nearBtcPrice = stats?.near_btc_price ?? '';
+  const change24 = stats?.change_24 ?? '';
   return (
     <div className="container mx-auto px-3">
       <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
@@ -248,34 +267,38 @@ export default function ({ network, t }: Props) {
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a
+                      <Link
                         href="/charts/near-price"
-                        className="hover:no-underline"
+                        className="hover:no-underline flex items-center"
                       >
-                        <a className="leading-6 text-nearblue-600 hover:no-underline">
-                          ${dollarFormat(stats?.near_price ?? 0)}{' '}
+                        <a className="leading-6 text-nearblue-600 hover:no-underline px-1 ">
+                          {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
-                            @{localFormat(stats?.near_btc_price ?? 0)} BTC
-                          </span>{' '}
-                          {Number(stats?.change_24) > 0 ? (
-                            <span className="text-neargreen text-sm">
-                              (
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
-                          ) : (
-                            <span className="text-red-500 text-sm">
-                              (
-                              {stats?.change_24
-                                ? dollarFormat(stats?.change_24)
-                                : stats?.change_24 ?? ''}
-                              %)
-                            </span>
-                          )}
+                            {nearBtcPrice
+                              ? '@ ' +
+                                localFormat(stats?.near_btc_price) +
+                                ' BTC'
+                              : ''}
+                          </span>
                         </a>
-                      </a>
+                        {change24 && (
+                          <>
+                            {Number(stats?.change_24) > 0 ? (
+                              <span className="text-neargreen text-sm">
+                                {stats?.change_24
+                                  ? '(' + dollarFormat(stats?.change_24) + '%)'
+                                  : stats?.change_24 ?? ''}
+                              </span>
+                            ) : (
+                              <span className="text-red-500 text-sm">
+                                {change24
+                                  ? '(' + dollarFormat(change24) + '%)'
+                                  : ''}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -295,17 +318,18 @@ export default function ({ network, t }: Props) {
                     {isLoading ? (
                       <Skeleton className="my-1 h-4" />
                     ) : (
-                      <a
-                        href="/charts/market-cap"
-                        className="hover:no-underline"
-                      >
-                        <a className="leading-6 text-nearblue-700 hover:no-underline">
-                          $
-                          {stats?.market_cap
-                            ? dollarFormat(stats?.market_cap)
-                            : stats?.market_cap ?? ''}
-                        </a>
-                      </a>
+                      <>
+                        <Link
+                          href="/charts/market-cap"
+                          className="hover:no-underline"
+                        >
+                          <a className="leading-6 text-nearblue-700 hover:no-underline">
+                            {stats?.market_cap
+                              ? '$' + dollarFormat(stats?.market_cap ?? 0)
+                              : ''}
+                          </a>
+                        </Link>
+                      </>
                     )}
                   </div>
                 </div>
@@ -366,18 +390,21 @@ export default function ({ network, t }: Props) {
                 </div>
                 <div className="ml-2">
                   <p className="uppercase font-semibold text-nearblue-600 text-sm">
-                    {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}
+                    <Link href="/node-explorer" className="hover:no-underline">
+                      {' '}
+                      {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}{' '}
+                    </Link>
                   </p>
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />
                   ) : (
-                    <a href="/node-explorer" className="hover:no-underline">
+                    <Link href="/node-explorer" className="hover:no-underline">
                       <a className="leading-6 text-nearblue-700 hover:no-underline">
                         {stats?.nodes_online
                           ? localFormat(stats?.nodes_online)
                           : stats?.nodes_online ?? ''}
                       </a>
-                    </a>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -388,11 +415,13 @@ export default function ({ network, t }: Props) {
                 {isLoading ? (
                   <Skeleton className="my-1 h-4" />
                 ) : (
-                  <a href="/charts/blocks" className="hover:no-underline">
+                  <Link href="/charts/blocks" className="hover:no-underline">
                     <a className="leading-6 text-nearblue-700 hover:no-underline">
-                      {stats?.avg_block_time ?? 0} s
+                      {stats?.avg_block_time
+                        ? stats?.avg_block_time + ' s'
+                        : ''}
                     </a>
-                  </a>
+                  </Link>
                 )}
               </div>
             </div>

@@ -69,45 +69,34 @@ const Overview = forwardRef(
             </div>
           </div>
           <div className="py-6"></div>
-          <div className="block lg:flex lg:space-x-2 mb-4">
+          <div className="block lg:flex lg:space-x-2 mb-3">
             <div className="w-full">
-              <div className=" flex">
+              <div>
                 <div
-                  className={`rounded-lg bg-green-600 text-white text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Transactions
-                </div>{' '}
+                </div>
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Token Txns
-                </div>{' '}
+                </div>
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none  hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   NFT Token Txns
-                </div>{' '}
+                </div>
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
                 >
                   Access Keys
                 </div>
-                <>
-                  {' '}
-                  <div
-                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                  >
-                    Contract
-                    <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -ml-3 -mt-3 px-1 ">
-                      NEW
-                    </div>
-                  </div>
-                  <div
-                    className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
-                  >
-                    Comments
-                  </div>
-                </>
+                <div
+                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-2 focus:outline-none hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600`}
+                >
+                  Comments
+                </div>
               </div>
               <div className="relative">
                 <div

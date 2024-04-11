@@ -14,7 +14,7 @@ import {
 import config from '#config';
 import db from '#libs/knex';
 import RPC from '#libs/near';
-import { DAY, HOUR, SECOND, validator } from '#libs/utils';
+import { DAY, HOUR, MINUTE, validator } from '#libs/utils';
 import {
   CachedTimestampMap,
   ExpGenesisConfig,
@@ -35,7 +35,7 @@ export const latestBlockCheck = async (redis: Redis) => {
         height: latestBlock?.header?.height,
         timestamp: latestBlock?.header?.timestamp,
       },
-      SECOND,
+      MINUTE,
     );
   }
 };

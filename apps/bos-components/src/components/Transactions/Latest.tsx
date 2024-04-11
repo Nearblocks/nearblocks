@@ -6,29 +6,36 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { getTimeAgoString, shortenHex } from '@/includes/formats';
-import {
-  getConfig,
-  nanoToMilli,
-  shortenAddress,
-  yoctoToNear,
-} from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ t, network }: Props) {
+export default function ({ t, network, ownerId }: Props) {
+  const { getTimeAgoString, shortenHex } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    shortenAddress,
+    yoctoToNear,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [txns, setTxns] = useState<TransactionInfo[]>([]);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -46,21 +53,27 @@ export default function ({ t, network }: Props) {
             if (data.status === 200) {
               setTxns(resp);
               setError(false);
+              if (isLoading) setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchLatestTxns, () => {
+                if (isLoading) setIsLoading(false);
+              });
             }
           },
         )
         .catch(() => {
           setError(true);
-        })
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
         });
     }
-    fetchLatestTxns();
+    if (config?.backendUrl) {
+      fetchLatestTxns();
+    }
 
     const interval = setInterval(fetchLatestTxns, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, isLoading]);
 
   return (
@@ -82,7 +95,7 @@ export default function ({ t, network }: Props) {
               <div className="px-3 divide-y h-80">
                 {[...Array(5)].map((_, i) => (
                   <div
-                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3 h-16"
+                    className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
                     key={i}
                   >
                     <div className="flex items-center ">
@@ -126,7 +139,7 @@ export default function ({ t, network }: Props) {
                 {txns?.map((txn) => {
                   return (
                     <div
-                      className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-3 items-center py-3"
+                      className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
                       key={txn?.transaction_hash}
                     >
                       <div className=" flex items-center">
@@ -135,14 +148,14 @@ export default function ({ t, network }: Props) {
                         </div>
                         <div className="overflow-hidden pl-2">
                           <div className="text-green-500 text-sm  ">
-                            <a
+                            <Link
                               href={`/txns/${txn?.transaction_hash}`}
                               className="hover:no-underline"
                             >
                               <a className="text-green-500 font-medium hover:no-underline">
                                 {shortenHex(txn?.transaction_hash ?? '')}
                               </a>
-                            </a>
+                            </Link>
                           </div>
                           <div className="text-gray-400 text-xs truncate">
                             {txn?.block_timestamp
@@ -156,25 +169,25 @@ export default function ({ t, network }: Props) {
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                         <div className="whitespace-nowrap truncate">
                           {t ? t('home:txnFrom') : 'From'}{' '}
-                          <a
+                          <Link
                             href={`/address/${txn?.signer_account_id}`}
                             className="hover:no-underline"
                           >
                             <a className="text-green-500  font-medium hover:no-underline">
                               {shortenAddress(txn?.signer_account_id ?? '')}
                             </a>
-                          </a>
+                          </Link>
                         </div>
                         <div className="whitespace-nowrap truncate">
                           {t ? t('home:txnTo') : 'To'}{' '}
-                          <a
+                          <Link
                             href={`/address/${txn?.receiver_account_id}`}
                             className="hover:no-underline"
                           >
                             <a className="text-green-500 font-medium hover:no-underline">
                               {shortenAddress(txn?.receiver_account_id ?? '')}
                             </a>
-                          </a>
+                          </Link>
                         </div>
                       </div>
                       <div className="text-right order-1 md:order-2 overflow-hidden">
@@ -225,11 +238,11 @@ export default function ({ t, network }: Props) {
       )}
       {txns && txns?.length > 0 && (
         <div className="border-t px-2 py-3 text-nearblue-600">
-          <a href="/txns">
+          <Link href="/txns">
             <a className="block text-center border border-green-900/10 font-thin bg-green-500 hover:bg-green-400 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all transactions
             </a>
-          </a>
+          </Link>
         </div>
       )}
     </>

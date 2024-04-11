@@ -58,8 +58,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           receipts r
           JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
         WHERE
-          r.receipt_kind = 'ACTION'
-          AND ${from || to
+          ${from || to
       ? sql`
           r.predecessor_account_id = ${from ?? account}
           AND r.receiver_account_id = ${to ?? account}
@@ -92,7 +91,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         OFFSET
           ${offset}
       ) AS tmp using (receipt_id)
-      LEFT JOIN LATERAL (
+      INNER JOIN LATERAL (
         SELECT
           transaction_hash,
           included_in_block_hash,

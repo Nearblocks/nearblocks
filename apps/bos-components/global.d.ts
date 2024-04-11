@@ -1,6 +1,7 @@
 declare const Widget: (params: {
   src?: string;
   props?: object;
+  loading?: React.ReactNode;
 }) => React.ReactNode;
 
 declare const useState: <T>(
@@ -26,3 +27,9 @@ declare const Tabs;
 declare const Accordion;
 declare const Fragment;
 declare const useCallback;
+declare const Markdown;
+declare const InfiniteScroll;
+declare const Files;
+declare const Link;
+declare const CommitButton;
+declare const VM;

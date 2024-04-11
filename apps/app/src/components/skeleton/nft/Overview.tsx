@@ -8,7 +8,7 @@ const Overview = forwardRef(
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5">
+          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25">
             <Skeleton className="h-6" />
           </div>{' '}
         </div>
@@ -40,10 +40,10 @@ const Overview = forwardRef(
 
                   <div className="flex flex-wrap py-4 text-sm text-gray-600">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3.5 w-28" />
                     </div>
                     <div className="w-full md:w-3/4 break-words">
-                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3.5 w-40" />
                     </div>
                   </div>
                 </div>
@@ -76,10 +76,10 @@ const Overview = forwardRef(
 
                   <div className="flex flex-wrap py-4 text-sm text-gray-600">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3.5 w-28" />
                     </div>
                     <div className="w-full md:w-3/4 break-words">
-                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3.5 w-40" />
                     </div>
                   </div>
                 </div>
@@ -91,22 +91,22 @@ const Overview = forwardRef(
             <div className="w-full">
               <div className=" flex">
                 <div
-                  className={`rounded-lg bg-green-600 text-white text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none `}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
                 >
                   Transfers
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
                 >
                   Holders
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
                 >
                   Inventory
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none  `}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
                 >
                   Comments
                 </div>

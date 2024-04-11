@@ -1,4 +1,3 @@
-import { getConfig } from '@/includes/libs';
 import { EventPropsInfo } from '@/includes/types';
 
 const Swap = (props: EventPropsInfo) => {
@@ -18,12 +17,14 @@ const Swap = (props: EventPropsInfo) => {
       </svg>
     );
   };
-  const config = getConfig(props.network);
   const log = props.event.logs?.match(
     /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
   );
+  if (!Array.isArray(log)) {
+    return null;
+  }
 
-  if (log?.length !== 5) return null;
+  if (log?.length === 0) return null;
 
   return (
     <div className="flex flex-wrap items-center break-all leading-7">
@@ -31,14 +32,24 @@ const Swap = (props: EventPropsInfo) => {
       <span className="font-bold px-1">Swap </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: log[2], amount: log[1] }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            network: props.network,
+            contract: log[2],
+            amount: log[1],
+            ownerId: props.ownerId,
+          }}
         />
       }
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: log[4], amount: log[3] }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            network: props.network,
+            contract: log[4].replace(/,$/, ''),
+            amount: log[3],
+            ownerId: props.ownerId,
+          }}
         />
       }
       <span className="font-bold text-gray px-1">

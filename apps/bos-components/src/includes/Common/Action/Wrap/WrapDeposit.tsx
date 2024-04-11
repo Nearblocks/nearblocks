@@ -1,4 +1,3 @@
-import { getConfig } from '@/includes/libs';
 import { EventPropsInfo } from '@/includes/types';
 
 const WrapDeposit = (props: EventPropsInfo) => {
@@ -18,7 +17,7 @@ const WrapDeposit = (props: EventPropsInfo) => {
       </svg>
     );
   };
-  const config = getConfig(props.network);
+
   const log = props.event.logs?.match(/^Deposit (\d+) NEAR to ([\S]+)/);
 
   if (log?.length !== 3) return null;
@@ -29,8 +28,13 @@ const WrapDeposit = (props: EventPropsInfo) => {
       <span className="font-bold px-1">Mint </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: props.event.contract, amount: log[1] }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            contract: props.event.contract,
+            amount: log[1],
+            network: props.network,
+            ownerId: props.ownerId,
+          }}
         />
       }
     </div>

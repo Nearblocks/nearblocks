@@ -1,10 +1,12 @@
+import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/charts/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import Notice from '@/components/common/Notice';
 
 const Charts = () => {
   const { t } = useTranslation();
@@ -32,9 +34,27 @@ const Charts = () => {
   };
   return (
     <>
+      <Head>
+        <title>{t('charts:metaTitle')}</title>
+        <meta name="title" content={t('charts:metaTitle')} />
+        <meta name="description" content={t('charts:metaDescription')} />
+        <meta property="og:title" content={t('charts:metaTitle')} />
+        <meta property="og:image" content="/thumbnail/charts_statistics.png" />
+        <meta property="og:description" content={t('charts:metaDescription')} />
+        <meta property="twitter:title" content={t('charts:metaTitle')} />
+        <meta
+          property="twitter:image"
+          content="/thumbnail/charts_statistics.png"
+        />
+        <meta
+          property="twitter:description"
+          content={t('charts:metaDescription')}
+        />
+        <link rel="canonical" href={`${appUrl}/charts`} />
+      </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             {t('charts:heading')}
           </h1>
         </div>
@@ -48,6 +68,7 @@ const Charts = () => {
               defaultSkelton={<Index />}
               onChangeHeight={onChangeHeight}
               props={{ poweredBy: false, network: networkId, t: t }}
+              loading={<Index className="absolute" ref={heightRef} />}
             />
           </div>
         </div>
@@ -57,6 +78,8 @@ const Charts = () => {
   );
 };
 
-Charts.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+Charts.getLayout = (page: ReactElement) => (
+  <Layout notice={<Notice />}>{page}</Layout>
+);
 
 export default Charts;

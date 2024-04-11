@@ -7,27 +7,37 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {Token} [token] - The Token type passed as object
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
-import { localFormat } from '@/includes/formats';
-import { getConfig } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   token: Token;
 }
 
-export default function ({ network, id, token }: Props) {
+export default function ({ network, id, token, ownerId }: Props) {
+  const { localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<Token[]>([]);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const [tokenData, setTokenData] = useState<Token>({} as Token);
 
   const setPage = (pageNumber: number) => {
@@ -53,6 +63,8 @@ export default function ({ network, id, token }: Props) {
             if (data.status === 200) {
               setTokenData(resp);
               setIsLoading(false);
+            } else {
+              handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
           },
         )
@@ -76,6 +88,8 @@ export default function ({ network, id, token }: Props) {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, fetchTotalToken);
             }
           },
         )
@@ -99,18 +113,22 @@ export default function ({ network, id, token }: Props) {
           const resp = data?.body?.tokens;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
             setTokens(resp);
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchTokenData, () => setIsLoading(false));
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     if (!token && token === undefined) {
       fetchNFTData();
     }
-    fetchTotalToken();
-    fetchTokenData();
+    if (config?.backendUrl) {
+      fetchTotalToken();
+      fetchTokenData();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, token]);
 
   useEffect(() => {
@@ -129,7 +147,8 @@ export default function ({ network, id, token }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4 border-b`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} tokens found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              tokens found
             </p>
           </div>
         </div>
@@ -143,7 +162,7 @@ export default function ({ network, id, token }: Props) {
             >
               <a
                 href="#"
-                className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden"
+                className="flex items-center justify-center m-auto overflow-hidden"
               >
                 <div className="w-40 h-40 ">
                   <Skeleton className="h-40" />
@@ -157,51 +176,53 @@ export default function ({ network, id, token }: Props) {
               </div>
             </div>
           ))}
-        {tokens &&
+        {!isLoading &&
+          tokens &&
           tokens?.map((nft: Token) => (
             <div
               className="max-w-full border rounded p-3 mx-auto md:mx-0"
               key={nft?.contract + nft?.token}
             >
-              <a
+              <Link
                 href={`/nft-token/${nft?.contract}/${nft?.token}`}
                 className="hover:no-underline"
               >
                 <a className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline">
                   {
                     <Widget
-                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                      src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                       props={{
                         base: tokenData.base_uri,
                         reference: nft.reference,
                         media: nft.media,
                         className: 'rounded max-h-full',
                         network: network,
+                        ownerId,
                       }}
                     />
                   }
                 </a>
-              </a>
+              </Link>
               <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
                 Token ID:{' '}
-                <a
+                <Link
                   href={`/nft-token/${nft?.contract}/${nft?.token}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green hover:no-underline">{nft?.token}</a>
-                </a>
+                </Link>
               </div>
               {nft?.asset && (
                 <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
                   Owner:{' '}
-                  <a
+                  <Link
                     href={`/address/${nft?.asset?.owner}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green hover:no-underline">
                       {nft?.asset?.owner}
                     </a>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

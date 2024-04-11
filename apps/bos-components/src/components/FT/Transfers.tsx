@@ -11,10 +11,11 @@
  *                                              Example: If provided, method=batch will filter the blocks with method=batch.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
-
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string;
   id: string;
@@ -25,20 +26,32 @@ interface Props {
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  capitalizeFirstLetter,
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
-import { getConfig, nanoToMilli } from '@/includes/libs';
-import { tokenAmount } from '@/includes/near';
 import { TransactionInfo } from '@/includes/types';
 
-export default function ({ network, t, id, filters, onFilterClear }: Props) {
+export default function ({
+  network,
+  t,
+  id,
+  filters,
+  onFilterClear,
+  ownerId,
+}: Props) {
+  const {
+    capitalizeFirstLetter,
+    formatTimestampToString,
+    getTimeAgoString,
+    localFormat,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { tokenAmount } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
   const [showAge, setShowAge] = useState(true);
   const [txnLoading, setTxnLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +59,10 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
-  const config = getConfig(network);
+  const [address, setAddress] = useState('');
+
+  const config = getConfig && getConfig(network);
+
   const errorMessage = 'No transactions found!';
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -79,8 +95,10 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+              setTxnLoading(false);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
-            setTxnLoading(false);
           },
         )
         .catch(() => {})
@@ -103,12 +121,12 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
           const resp = data?.body?.txns;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
             setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            setIsLoading(false);
+          } else {
+            handleRateLimit(data, () => fetchTxnsData(page, qs));
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     let urlString = '';
@@ -120,11 +138,21 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
         )
         .join('&');
     }
-
-    fetchTotalTxns(urlString);
-    fetchTxnsData(currentPage, urlString);
+    if (config?.backendUrl) {
+      fetchTotalTxns(urlString);
+      fetchTxnsData(currentPage, urlString);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id, filters]);
 
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: '',
@@ -134,8 +162,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('hash') : 'HASH'}</span>,
@@ -146,14 +173,14 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -176,7 +203,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
       key: 'block.block_height',
       cell: (row: TransactionInfo) => (
         <>
-          <a
+          <Link
             className="hover:no-underline"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
@@ -185,7 +212,7 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </>
       ),
       tdClassName:
@@ -221,39 +248,95 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>Affected</span>,
+      header: <span>From</span>,
       key: 'affected_account_id',
-      cell: (row: TransactionInfo) => (
-        <>
-          {row?.affected_account_id ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                    <a
-                      href={`/address/${row?.affected_account_id}`}
-                      className="hover:no-underline"
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <>
+            {row?.affected_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.affected_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row?.affected_account_id}
-                      </a>
-                    </a>
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="center"
-                  side="bottom"
-                >
-                  {row?.affected_account_id}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          ) : (
-            'system'
-          )}
-        </>
-      ),
+                      <Link
+                        href={`/address/${row?.affected_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.affected_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.affected_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="center"
+                    side="bottom"
+                  >
+                    {row?.affected_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </>
+        ) : (
+          <>
+            {row?.involved_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.involved_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
+                    >
+                      <Link
+                        href={`/address/${row?.involved_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.involved_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.involved_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="center"
+                    side="bottom"
+                  >
+                    {row?.involved_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </>
+        );
+      },
       tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
@@ -266,10 +349,6 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             {t ? t('txnSelf') : 'Self'}
           </span>
-        ) : Number(row?.delta_amount) > 0 ? (
-          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white rotate-180">
-            <FaLongArrowAltRight />
-          </div>
         ) : (
           <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
             <FaLongArrowAltRight />
@@ -278,39 +357,95 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
       tdClassName: 'text-center',
     },
     {
-      header: <span>Involved</span>,
+      header: <span>To</span>,
       key: 'involved_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          {row?.involved_account_id ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                    <a
-                      href={`/address/${row?.involved_account_id}`}
-                      className="hover:no-underline"
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <span>
+            {row?.involved_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.involved_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row?.involved_account_id}
-                      </a>
-                    </a>
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="center"
-                  side="bottom"
-                >
-                  {row?.involved_account_id}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          ) : (
-            'system'
-          )}
-        </span>
-      ),
+                      <Link
+                        href={`/address/${row?.involved_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.involved_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.involved_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="center"
+                    side="bottom"
+                  >
+                    {row?.involved_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        ) : (
+          <span>
+            {row?.affected_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.affected_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
+                    >
+                      <Link
+                        href={`/address/${row?.affected_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.affected_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.affected_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="center"
+                    side="bottom"
+                  >
+                    {row?.affected_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        );
+      },
       tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
@@ -418,12 +553,14 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
-          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
-            {filters && Object?.keys(filters)?.length > 0 && (
-              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
+
+          {filters && Object?.keys(filters)?.length > 0 && (
+            <div className="mb-4 lg:ml-auto  px-6">
+              <div className="flex items-center  text-sm text-gray-500 lg:ml-auto">
                 Filtered By:
                 <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
                   {filters &&
@@ -441,12 +578,12 @@ export default function ({ network, t, id, filters, onFilterClear }: Props) {
                   />
                 </span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

@@ -7,20 +7,28 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {ReceiptsPropsInfo | any} [receipt] -  receipt of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: ReceiptsPropsInfo | any;
 }
 
-import { convertToMetricPrefix } from '@/includes/formats';
-import { getConfig, yoctoToNear } from '@/includes/libs';
 import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { receipt, network } = props;
+  const { receipt, network, ownerId } = props;
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { convertToMetricPrefix } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const onTab = (index: number) => {
@@ -29,7 +37,8 @@ export default function (props: Props) {
 
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchBlocks() {
@@ -56,15 +65,19 @@ export default function (props: Props) {
                   receipts_agg: resp.receipts_agg,
                   transactions_agg: resp.transactions_agg,
                 });
+                setLoading(false);
+              } else {
+                handleRateLimit(res, fetchBlocks, () => setLoading(false));
               }
             },
           )
           .catch(() => {});
       }
-      setLoading(false);
     }
-
-    fetchBlocks();
+    if (config?.backendUrl) {
+      fetchBlocks();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.outcome?.blockHash, config.backendUrl]);
 
   let statusInfo;
@@ -72,7 +85,7 @@ export default function (props: Props) {
   if (receipt?.outcome?.status?.type === 'successValue') {
     if (receipt?.outcome?.status?.value.length === 0) {
       statusInfo = (
-        <div className="bg-gray-100 rounded-md text-3f4246 p-5 font-medium my-3">
+        <div className="bg-gray-100 rounded-md p-5 font-medium my-3 whitespace-nowrap">
           Empty result
         </div>
       );
@@ -99,14 +112,14 @@ export default function (props: Props) {
             readOnly
             rows={4}
             defaultValue={JSON.stringify(prettyArgs)}
-            className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+            className="block appearance-none outline-none w-fit border font-medium rounded-lg bg-gray-100 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
-            <div className="bg-gray-100 rounded-md p-3 font-semibold my-3">
-              <div className="bg-inherit text-inherit font-inherit text-base border-none p-0">
+            <div className="bg-gray-100 rounded-md p-5 font-medium my-3">
+              <div className="bg-inherit text-inherit font-inherit border-none p-0">
                 <div className="max-h-52 overflow-auto">
-                  <div className="p-4 h-full w-full">{prettyArgs}</div>
+                  <div className="h-full w-full">{prettyArgs}</div>
                 </div>
               </div>
             </div>
@@ -119,12 +132,12 @@ export default function (props: Props) {
         readOnly
         rows={4}
         defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+        className="block appearance-none outline-none w-fit border rounded-lg font-medium bg-gray-100 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
     statusInfo = (
-      <div className="bg-gray-100 rounded-md my-3 p-5 font-medium">
+      <div className="bg-gray-100 rounded-md my-3 p-5 font-medium overflow-auto">
         <pre>{receipt?.outcome?.status?.receiptId}</pre>
       </div>
     );
@@ -139,7 +152,7 @@ export default function (props: Props) {
               <Tabs.Trigger
                 key={index}
                 onClick={() => onTab(index)}
-                className={`text-nearblue-600 text-sm mx-2.5 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                className={`text-nearblue-600 text-xs leading-4 mx-2.5 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                   pageHash === hash
                     ? 'rounded-lg bg-green-600 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
@@ -150,78 +163,88 @@ export default function (props: Props) {
               </Tabs.Trigger>
             ))}
         </Tabs.List>
-        <Tabs.Content value={hashes[0]}>
+        <Tabs.Content value={hashes[0]} className={'w-fit'}>
           <div className="flex flex-col my-4 mx-7">
             <div className="flex justify-between">
-              <div className="flex flex-col w-full lg:w-1/2">
+              <div className="flex flex-col w-fit">
                 <div className="">
-                  <h2 className="text-sm font-semibold ">Logs</h2>
+                  <h2 className="text-sm font-medium ">Logs</h2>
                   <div className="bg-gray-100 rounded-md p-5 font-medium my-3 overflow-x-auto ">
                     {receipt?.outcome?.logs?.length === 0 ? (
-                      'No logs'
+                      <span className="whitespace-nowrap">No logs</span>
                     ) : (
-                      <pre>{receipt?.outcome?.logs.join('\n')}</pre>
+                      <span>{receipt?.outcome?.logs.join('\n')}</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold ">Result</h2>
+                  <h2 className="text-sm font-medium">Result</h2>
                   {statusInfo}
                 </div>
               </div>
             </div>
           </div>
         </Tabs.Content>
-        <Tabs.Content value={hashes[1]}>
-          <table className="w-full my-4 mx-7">
-            <tbody>
-              <tr>
-                <td>Receipt ID</td>
-                <td>{receipt?.id}</td>
-              </tr>
-              <tr>
-                <td>Executed in Block</td>
-                <td>
-                  <a
-                    href={`/blocks/${receipt?.outcome?.blockHash}`}
-                    className="whitespace-nowrap"
-                  >{`#${block?.block_height}`}</a>
-                </td>
-              </tr>
-              <tr>
-                <td>Predecessor ID</td>
-                <td>{receipt?.predecessorId}</td>
-              </tr>
-
-              <tr>
-                <td>Receiver ID</td>
-                <td>{receipt?.receiverId}</td>
-              </tr>
-
-              <tr>
-                <td>Attached Gas</td>
-                <td>{receipt?.id}</td>
-              </tr>
-              <tr>
-                <td>Gas Burned</td>
-                <td>
-                  {!loading && receipt?.outcome?.gasBurnt
-                    ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
-                    : receipt?.outcome?.gasBurnt ?? ''}
-                  gas
-                </td>
-              </tr>
-              <tr>
-                <td>Tokens Burned</td>
-                <td>
-                  {!loading && receipt?.outcome?.tokensBurnt
-                    ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
-                    : receipt?.outcome?.tokensBurnt ?? ''}
-                  Ⓝ
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <Tabs.Content value={hashes[1]} className={'w-fit'}>
+          <div className="overflow-x-auto">
+            <table className="my-4 mx-7 whitespace-nowrap table-auto">
+              <tbody>
+                <tr>
+                  <td className="py-2 pr-4">Receipt ID</td>
+                  <td className="py-2 pl-4">{receipt?.id}</td>
+                </tr>
+                <tr>
+                  <td
+                    className={`py-2 pr-4 ${
+                      !block ? 'whitespace-normal' : 'whitespace-nowrap'
+                    }`}
+                  >
+                    Executed in Block
+                  </td>
+                  <td className="py-2 pl-4">
+                    {block && (
+                      <Link
+                        href={`/blocks/${receipt?.outcome?.blockHash}`}
+                        className="text-green-500"
+                      >
+                        #{block?.block_height}
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Predecessor ID</td>
+                  <td className="py-2 pl-4">{receipt?.predecessorId}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Receiver ID</td>
+                  <td className="py-2 pl-4">{receipt?.receiverId}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Attached Gas</td>
+                  <td className="py-2 pl-4">{receipt?.id}</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Gas Burned</td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt?.outcome?.gasBurnt
+                      ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
+                      : receipt?.outcome?.gasBurnt ?? ''}
+                    gas
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4">Tokens Burned</td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt?.outcome?.tokensBurnt
+                      ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
+                      : receipt?.outcome?.tokensBurnt ?? ''}
+                    Ⓝ
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </Tabs.Content>
       </Tabs.Root>
     </div>

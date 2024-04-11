@@ -6,28 +6,32 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   network: string;
+  ownerId: string;
   t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import {
-  convertToMetricPrefix,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
-import { getConfig, nanoToMilli } from '@/includes/libs';
 import { BlocksInfo } from '@/includes/types';
 
-export default function ({ network, t }: Props) {
+export default function ({ network, t, ownerId }: Props) {
+  const { convertToMetricPrefix, getTimeAgoString, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [blocks, setBlocks] = useState<BlocksInfo[]>([]);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     let delay = 5000;
@@ -39,21 +43,26 @@ export default function ({ network, t }: Props) {
           if (data.status === 200) {
             setBlocks(resp);
             setError(false);
+            if (isLoading) setIsLoading(false);
+          } else {
+            handleRateLimit(data, fetchLatestBlocks, () => {
+              if (isLoading) setIsLoading(false);
+            });
           }
         })
         .catch(() => {
           setError(true);
-        })
-        .finally(() => {
-          if (isLoading) setIsLoading(false);
         });
     }
 
-    fetchLatestBlocks();
-
+    if (config.backendUrl) {
+      fetchLatestBlocks();
+    }
     const interval = setInterval(fetchLatestBlocks, delay);
 
     return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, isLoading]);
 
   return (
@@ -128,7 +137,7 @@ export default function ({ network, t }: Props) {
                         </div>
                         <div className="overflow-hidden pl-2">
                           <div className="text-green-500 text-sm font-medium ">
-                            <a
+                            <Link
                               href={`/blocks/${block?.block_hash}`}
                               className="hover:no-underline"
                             >
@@ -137,7 +146,7 @@ export default function ({ network, t }: Props) {
                                   ? localFormat(block?.block_height)
                                   : block?.block_height ?? ''}
                               </a>
-                            </a>
+                            </Link>
                           </div>
                           <div className="text-nearblue-700 text-xs truncate">
                             {block?.block_timestamp
@@ -150,14 +159,14 @@ export default function ({ network, t }: Props) {
                       </div>
                       <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm whitespace-nowrap truncate">
                         {t ? t('home:blockMiner') : 'Author'}{' '}
-                        <a
+                        <Link
                           href={`/address/${block?.author_account_id}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green-500 font-medium hover:no-underline">
                             {block?.author_account_id}
                           </a>
-                        </a>
+                        </Link>
                         <div className="text-nearblue-700 text-sm ">
                           {block?.transactions_agg?.count
                             ? localFormat(block?.transactions_agg?.count)
@@ -214,11 +223,11 @@ export default function ({ network, t }: Props) {
       )}
       {blocks && blocks?.length > 0 && (
         <div className="border-t px-2 py-3 text-nearblue-600">
-          <a href="/blocks">
+          <Link href="/blocks">
             <a className="block text-center border border-green-900/10 bg-green-500 hover:bg-green-400 font-thin text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all blocks
             </a>
-          </a>
+          </Link>
         </div>
       )}
     </>

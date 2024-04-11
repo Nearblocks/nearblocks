@@ -6,7 +6,6 @@
  */
 
 import ArrowDown from '@/includes/icons/ArrowDown';
-import { getConfig } from '@/includes/libs';
 import { TransactionReceiptInfo } from '@/includes/types';
 
 export default function (props: TransactionReceiptInfo) {
@@ -18,6 +17,7 @@ export default function (props: TransactionReceiptInfo) {
     expandAll,
     convertionReceipt,
     className,
+    ownerId,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -25,7 +25,7 @@ export default function (props: TransactionReceiptInfo) {
     () => setTxTypeActive((x) => !x),
     [setTxTypeActive],
   );
-  const config = getConfig(network);
+
   useEffect(() => switchActiveTxType, [expandAll, switchActiveTxType]);
 
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);
@@ -44,7 +44,7 @@ export default function (props: TransactionReceiptInfo) {
   return (
     <>
       <div
-        className={`border-l mt-2.5 ml-2.5 ${
+        className={`${
           convertionReceipt
             ? 'pl-0 border-transparent'
             : 'pl-12 border-green-500 '
@@ -61,7 +61,7 @@ export default function (props: TransactionReceiptInfo) {
 
         {lastFellowOutgoingReceipt ? (
           <Widget
-            src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+            src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
             props={{
               network: network,
               t,
@@ -69,7 +69,8 @@ export default function (props: TransactionReceiptInfo) {
               expandAll: expandAll,
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
-              className: 'pb-5 !mt-0',
+              className: 'pb-5 !mt-0 border-l mt-2.5 ml-2.5',
+              ownerId,
             }}
           />
         ) : null}
@@ -78,13 +79,14 @@ export default function (props: TransactionReceiptInfo) {
             receipt?.actions.map((action: any, index: number) => (
               <Widget
                 key={`${action.kind}_${index}`}
-                src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
+                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
                 props={{
                   network: network,
                   t,
                   action: action,
                   onClick: switchActiveTxType,
                   isTxTypeActive: isTxTypeActive,
+                  ownerId,
                 }}
               />
             ))}
@@ -92,26 +94,27 @@ export default function (props: TransactionReceiptInfo) {
         {isTxTypeActive ? (
           <div className="border-l border-black ml-2.5">
             <Widget
-              src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
+              src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
               props={{
                 network: network,
                 t,
                 receipt: receipt,
+                ownerId,
               }}
             />
           </div>
         ) : null}
-        <div className="relative flex flex-row mt-2.5">
+        <div className="relative flex flex-row my-2.5">
           <ArrowDown
             className={`absolute left-0.5 -top-5 ml-px  w-4 h-4 text-green-500`}
           />
           <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-          <div className="text-green-500 text-sm">{receipt?.receiverId}</div>
+          <div className="text-green-500 text-sm ">{receipt?.receiverId}</div>
         </div>
       </div>
       {lastNonRefundNestedReceipt ? (
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
+          src={`${ownerId}/widget/bos-components.components.Transactions.TransactionReceipt`}
           props={{
             network: network,
             t: t,
@@ -119,7 +122,8 @@ export default function (props: TransactionReceiptInfo) {
             expandAll: expandAll,
             fellowOutgoingReceipts: nonRefundNestedReceipts,
             convertionReceipt: false,
-            className: '!pl-0 border-transparent',
+            className: ` !pl-0 !border-transparent`,
+            ownerId,
           }}
         />
       ) : null}

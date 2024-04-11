@@ -6,34 +6,42 @@
  * @interface Props
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-} from '@/includes/formats';
 import Clock from '@/includes/icons/Clock';
-import { getConfig, nanoToMilli } from '@/includes/libs';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 
-export default function ({ network, id }: Props) {
+export default function ({ network, id, ownerId }: Props) {
+  const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
+  const [countLoading, setcountLoading] = useState(false);
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
+
   const [showAge, setShowAge] = useState(true);
   const errorMessage = 'No transactions found!';
+  const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -47,6 +55,7 @@ export default function ({ network, id }: Props) {
 
   useEffect(() => {
     function fetchTotalTxns() {
+      setcountLoading(true);
       asyncFetch(`${config?.backendUrl}nfts/${id}/txns/count`, {
         method: 'GET',
         headers: {
@@ -63,6 +72,9 @@ export default function ({ network, id }: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+              setcountLoading(false);
+            } else {
+              handleRateLimit(data, fetchTotalTxns);
             }
           },
         )
@@ -85,19 +97,34 @@ export default function ({ network, id }: Props) {
         .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
           const resp = data?.body?.txns;
           if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
-            setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            setTxns((prevData) => ({ ...prevData, [page]: resp }));
+            setIsLoading(false);
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(page),
+              () => setIsLoading(false),
+            );
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
+    }
+    if (config?.backendUrl) {
+      fetchTotalTxns();
+      fetchTxnsData(currentPage);
     }
 
-    fetchTotalTxns();
-    fetchTxnsData(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, id]);
 
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: <span></span>,
@@ -107,8 +134,7 @@ export default function ({ network, id }: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 flex justify-end',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>TXN HASH</span>,
@@ -119,14 +145,14 @@ export default function ({ network, id }: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -173,39 +199,95 @@ export default function ({ network, id }: Props) {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
-      header: <span>Affected</span>,
+      header: <span>From</span>,
       key: 'affected_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          {row?.affected_account_id ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                    <a
-                      href={`/address/${row?.affected_account_id}`}
-                      className="hover:no-underline"
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <span>
+            {row?.affected_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.affected_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row?.affected_account_id}
-                      </a>
-                    </a>
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="start"
-                  side="bottom"
-                >
-                  {row?.affected_account_id}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          ) : (
-            'system'
-          )}
-        </span>
-      ),
+                      <Link
+                        href={`/address/${row?.affected_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.affected_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.affected_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="start"
+                    side="bottom"
+                  >
+                    {row?.affected_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        ) : (
+          <span>
+            {row?.involved_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.involved_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
+                    >
+                      <Link
+                        href={`/address/${row?.involved_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.involved_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.involved_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="start"
+                    side="bottom"
+                  >
+                    {row?.involved_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        );
+      },
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
@@ -219,10 +301,6 @@ export default function ({ network, id }: Props) {
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             SELF
           </span>
-        ) : Number(row?.delta_amount) > 0 ? (
-          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white rotate-180">
-            <FaLongArrowAltRight />
-          </div>
         ) : (
           <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
             <FaLongArrowAltRight />
@@ -232,39 +310,95 @@ export default function ({ network, id }: Props) {
       tdClassName: 'text-center',
     },
     {
-      header: <span>Involved</span>,
+      header: <span>To</span>,
       key: 'involved_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          {row?.involved_account_id ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                    <a
-                      href={`/address/${row?.involved_account_id}`}
-                      className="hover:no-underline"
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <span>
+            {row?.involved_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.involved_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row?.involved_account_id}
-                      </a>
-                    </a>
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="start"
-                  side="bottom"
-                >
-                  {row?.involved_account_id}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
-          ) : (
-            'system'
-          )}
-        </span>
-      ),
+                      <Link
+                        href={`/address/${row?.involved_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.involved_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.involved_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="start"
+                    side="bottom"
+                  >
+                    {row?.involved_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        ) : (
+          <span>
+            {row?.affected_account_id ? (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                        row?.affected_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-0.5 px-1'
+                      }`}
+                    >
+                      <Link
+                        href={`/address/${row?.affected_account_id}`}
+                        className="hover:no-underline"
+                      >
+                        <a
+                          className="text-green-500 hover:no-underline"
+                          onMouseOver={(e) =>
+                            onHandleMouseOver(e, row?.affected_account_id)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {row?.affected_account_id}
+                        </a>
+                      </Link>
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                    align="start"
+                    side="bottom"
+                  >
+                    {row?.affected_account_id}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            ) : (
+              'system'
+            )}
+          </span>
+        );
+      },
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
@@ -274,11 +408,13 @@ export default function ({ network, id }: Props) {
       header: <span>TOKEN ID</span>,
       key: 'token_id',
       cell: (row: TransactionInfo) => (
-        <span>
+        <>
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span>{row?.token_id}</span>
+                <div className="max-w-[110px] inline-block truncate">
+                  {row?.token_id}
+                </div>
               </Tooltip.Trigger>
               <Tooltip.Content
                 className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
@@ -289,10 +425,9 @@ export default function ({ network, id }: Props) {
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>
-        </span>
+        </>
       ),
-      tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 max-w-[110px] inline-block truncate',
+      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
@@ -373,26 +508,25 @@ export default function ({ network, id }: Props) {
       key: 'contract',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
             className="hover:no-underline"
           >
             <a className="bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded hover:no-underline">
               View NFT &gt;
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:
-        'pr-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
-
   return (
     <>
-      {isLoading ? (
+      {countLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
         </div>
@@ -400,13 +534,14 @@ export default function ({ network, id }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
         </div>
       )}
       <Widget
-        src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+        src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
           data: txns[currentPage],

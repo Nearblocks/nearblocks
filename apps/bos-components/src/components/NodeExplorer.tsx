@@ -9,27 +9,21 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
 }
 import Skeleton from '@/includes/Common/Skeleton';
-import { formatNumber, formatWithCommas } from '@/includes/formats';
-import {
-  convertAmountToReadableString,
-  convertTimestampToTime,
-  getConfig,
-  shortenAddress,
-  timeAgo,
-  yoctoToNear,
-} from '@/includes/libs';
 import { ValidatorFullData } from '@/includes/types';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { ValidatorEpochData } from 'nb-types';
 import Question from '@/includes/icons/Question';
+
 const initialValidatorFullData = {
   validatorEpochData: [],
   currentValidators: 0,
@@ -42,7 +36,21 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage }: Props) {
+export default function ({ network, currentPage, setPage, ownerId }: Props) {
+  const {
+    convertAmountToReadableString,
+    convertTimestampToTime,
+    getConfig,
+    handleRateLimit,
+    shortenAddress,
+    timeAgo,
+    yoctoToNear,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { formatNumber, formatWithCommas } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
   const [validatorFullData, setValidatorFullData] = useState<{
     [key: number]: ValidatorFullData;
   }>(initialValidatorFullData);
@@ -51,11 +59,14 @@ export default function ({ network, currentPage, setPage }: Props) {
   const [totalCount, setTotalCount] = useState('');
   const [expanded, setExpanded] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState(0);
   const errorMessage = 'No validator data!';
-  const config = getConfig(network);
 
-  const TotalSupply = totalSuppy ? yoctoToNear(totalSuppy, false) : '';
+  const config = getConfig && getConfig(network);
+
+  const TotalSupply =
+    totalSuppy && yoctoToNear ? yoctoToNear(totalSuppy, false) : '';
 
   useEffect(() => {
     function fetchValidatorData(page: number) {
@@ -70,11 +81,12 @@ export default function ({ network, currentPage, setPage }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setTimeRemaining(data?.totalSeconds ?? 0);
+            setElapsedTime(data?.elapsedTimeData ?? 0);
             const validators = {
               validatorEpochData: data?.validatorFullData ?? [],
               currentValidators: data?.currentValidators,
               totalStake: data?.totalStake ?? 0,
-              seatPrice: data?.epochStatsCheck ?? [],
+              seatPrice: data?.epochStatsCheck,
               elapsedTime: data?.elapsedTimeData ?? 0,
               totalSeconds: data?.totalSeconds ?? 0,
               epochProgress: data?.epochProgressData ?? 0,
@@ -85,14 +97,17 @@ export default function ({ network, currentPage, setPage }: Props) {
               ...prevData,
               [page]: validators || [],
             }));
+            setIsLoading(false);
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchValidatorData(page),
+              () => setIsLoading(false),
+            );
           }
           setExpanded([]);
         })
-        .catch(() => {})
-
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     function fetchTotalSuppy() {
       asyncFetch(`${config?.backendUrl}stats`, {
@@ -105,13 +120,15 @@ export default function ({ network, currentPage, setPage }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setTotalSupply(data.stats[0].total_supply || 0);
+          } else {
+            handleRateLimit(data, fetchTotalSuppy);
           }
         })
         .catch(() => {})
         .finally(() => {});
     }
     function fetchLatestBlock() {
-      asyncFetch(`${config?.backendUrl}blocks/latests?limit=1`, {
+      asyncFetch(`${config?.backendUrl}blocks/latest?limit=1`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -121,18 +138,25 @@ export default function ({ network, currentPage, setPage }: Props) {
           const data = res.body;
           if (res.status === 200) {
             setLatestBlock(data.blocks[0].block_height || 0);
+          } else {
+            handleRateLimit(data, fetchLatestBlock);
           }
         })
         .catch(() => {})
         .finally(() => {});
     }
-    fetchLatestBlock();
-    fetchTotalSuppy();
-    fetchValidatorData(currentPage);
+    if (config?.backendUrl) {
+      fetchLatestBlock();
+      fetchTotalSuppy();
+      fetchValidatorData(currentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage]);
+
   validatorFullData[currentPage]?.total
     ? setTotalCount(validatorFullData[currentPage]?.total)
     : '';
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - 1);
@@ -141,7 +165,14 @@ export default function ({ network, currentPage, setPage }: Props) {
       clearInterval(intervalId);
     };
   }, []);
-
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setElapsedTime((prevTimeRemaining) => prevTimeRemaining - 1);
+    }, 1000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   const handleRowClick = (rowIndex: number) => {
     const isRowExpanded = expanded.includes(rowIndex);
 
@@ -229,9 +260,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           />
         </button>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>Status</span>,
@@ -245,9 +276,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>VALIDATOR</span>,
@@ -257,14 +288,14 @@ export default function ({ network, currentPage, setPage }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <a
+                <Link
                   href={`/address/${row.accountId}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 hover:no-underline">
                     {shortenAddress(row.accountId)}
                   </a>
-                </a>
+                </Link>
               </Tooltip.Trigger>
               <Tooltip.Content
                 className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
@@ -291,9 +322,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'pl-6 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>FEE</span>,
@@ -309,9 +340,9 @@ export default function ({ network, currentPage, setPage }: Props) {
             : 'N/A'}
         </div>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
 
     {
@@ -327,9 +358,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
     },
     {
       header: <span>TOTAL STAKE</span>,
@@ -345,9 +376,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE %</span>,
@@ -355,9 +386,9 @@ export default function ({ network, currentPage, setPage }: Props) {
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>CUMULATIVE STAKE</span>,
@@ -381,9 +412,9 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE CHANGE (24H)</span>,
@@ -416,11 +447,15 @@ export default function ({ network, currentPage, setPage }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-6 py-4  whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
     },
   ];
+  const validatorEpochData =
+    validatorFullData[currentPage]?.validatorEpochData.length > 0
+      ? validatorFullData[currentPage]?.validatorEpochData
+      : undefined;
 
   const ExpandedRow = (row: ValidatorEpochData) => {
     const telemetry =
@@ -437,7 +472,7 @@ export default function ({ network, currentPage, setPage }: Props) {
           <td colSpan={9} className="bg-gray-50">
             {telemetry && (
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: [
                     {
@@ -476,9 +511,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -523,9 +558,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -561,9 +596,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: (
@@ -605,9 +640,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
                     },
                     {
                       header: 'Node Agent Version / Build',
@@ -618,9 +653,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                   ],
                   data: [telemetry] || [],
@@ -632,7 +667,7 @@ export default function ({ network, currentPage, setPage }: Props) {
             )}
             {row?.description ? (
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: [
                     {
@@ -658,9 +693,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     {
                       header: 'Email',
@@ -668,19 +703,19 @@ export default function ({ network, currentPage, setPage }: Props) {
                       cell: (row: ValidatorEpochData) => {
                         return (
                           <div>
-                            <a
+                            <Link
                               className="text-green-500 hover:no-underline"
                               href={`mailto:${row?.description?.email}`}
                             >
                               {row?.description?.email}{' '}
-                            </a>
+                            </Link>
                           </div>
                         );
                       },
                       tdClassName:
-                        'pl-6 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-6 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     row?.description?.twitter && {
                       header: 'Twitter',
@@ -700,9 +735,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-2 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-2 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     row?.description?.discord && {
                       header: 'Discord',
@@ -712,7 +747,7 @@ export default function ({ network, currentPage, setPage }: Props) {
                           <div>
                             <a
                               className="text-green-500 hover:no-underline"
-                              href={row?.description?.discord}
+                              href={row?.description?.discord || ''}
                               rel="noreferrer noopener"
                               target="_blank"
                             >
@@ -722,9 +757,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                     {
                       header: 'Description',
@@ -737,9 +772,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-5 pb-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 break-words text-sm text-nearblue-600 font-medium',
                       thClassName:
-                        'px-5 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
                     },
                   ],
                   data: [row] || [],
@@ -784,10 +819,12 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Current Validators
                 </div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.currentValidators ? (
+                  {isLoading ? (
                     <Skeleton className="h-4 w-16 break-words" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.currentValidators ? (
                     validatorFullData[currentPage]?.currentValidators
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
@@ -796,35 +833,40 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Total Staked
                 </div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.totalStake ? (
+                  {isLoading ? (
                     <Skeleton className="h-4 w-16 break-words" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.totalStake &&
+                    convertAmountToReadableString ? (
                     convertAmountToReadableString(
                       validatorFullData[currentPage]?.totalStake,
                       'totalStakeAmount',
                     )
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
-              <div className="flex max-md:divide-y flex-col md:flex-row ">
-                <div className="flex items-center justify-between md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Current Seat Price</div>
+              <div className="flex max-lg:divide-y flex-col lg:flex-row ">
+                <div className="flex items-center justify-between lg:w-1/2 py-4">
+                  <div className="w-full mb-2 lg:mb-0">Current Seat Price</div>
                   <div className="w-full break-words">
-                    {!validatorFullData[currentPage]?.seatPrice ? (
+                    {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
                     ) : (
                       <>
-                        {convertAmountToReadableString(
-                          validatorFullData[currentPage]?.seatPrice,
-                          'seatPriceAmount',
-                        )}
-                        Ⓝ
+                        {validatorFullData[currentPage]?.seatPrice &&
+                        convertAmountToReadableString
+                          ? convertAmountToReadableString(
+                              validatorFullData[currentPage]?.seatPrice,
+                              'seatPriceAmount',
+                            ) + ' Ⓝ'
+                          : ''}
                       </>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Total Supply</div>
+                <div className="flex items-center justify-between lg:w-1/2 py-4">
+                  <div className="w-full mb-2 lg:mb-0">Total Supply</div>
                   <div className="w-full break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-16 break-words" />
@@ -834,7 +876,9 @@ export default function ({ network, currentPage, setPage }: Props) {
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <span>
-                                {TotalSupply ? formatNumber(TotalSupply) : ''}
+                                {TotalSupply && formatNumber
+                                  ? formatNumber(TotalSupply)
+                                  : ''}
                               </span>
                             </Tooltip.Trigger>
                             <Tooltip.Content
@@ -865,46 +909,58 @@ export default function ({ network, currentPage, setPage }: Props) {
                   Epoch Elapsed Time
                 </div>
                 <div className="w-full text-green-500 md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.elapsedTime ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-32" />
+                  ) : validatorFullData[currentPage]?.elapsedTime &&
+                    convertTimestampToTime ? (
+                    convertTimestampToTime(elapsedTime.toString())
                   ) : (
-                    convertTimestampToTime(
-                      validatorFullData[currentPage]?.elapsedTime,
-                    )
+                    ''
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">ETA</div>
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Next Epoch ETA
+                </div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
-                  {!validatorFullData[currentPage]?.totalSeconds ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-32" />
-                  ) : (
+                  ) : validatorFullData[currentPage]?.totalSeconds &&
+                    convertTimestampToTime ? (
                     convertTimestampToTime(timeRemaining.toString())
+                  ) : (
+                    ''
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Progress</div>
                 <div className="w-full md:w-3/4 break-words">
-                  {!validatorFullData[currentPage]?.epochProgress ? (
+                  {isLoading ? (
                     <Skeleton className="h-3 w-full" />
                   ) : (
-                    <div className="flex space-x-4 gap-2 items-center ">
-                      <div className="bg-blue-900-15  h-2 w-full rounded-full">
-                        <div
-                          className="bg-green-500 h-2 rounded-full"
-                          style={{
-                            width: `${Big(
-                              validatorFullData[currentPage]?.epochProgress,
-                            ).toFixed(1)}%`,
-                          }}
-                        ></div>
-                      </div>
-                      {`${Big(
-                        validatorFullData[currentPage]?.epochProgress,
-                      ).toFixed(0)}%`}
-                    </div>
+                    <>
+                      {validatorFullData[currentPage]?.epochProgress ? (
+                        <div className="flex space-x-4 gap-2 items-center ">
+                          <div className="bg-blue-900-15  h-2 w-full rounded-full">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{
+                                width: `${Big(
+                                  validatorFullData[currentPage]?.epochProgress,
+                                ).toFixed(1)}%`,
+                              }}
+                            ></div>
+                          </div>
+                          {`${Big(
+                            validatorFullData[currentPage]?.epochProgress,
+                          ).toFixed(0)}%`}
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -930,10 +986,10 @@ export default function ({ network, currentPage, setPage }: Props) {
             </div>
             <div className="flex flex-col">
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: columns,
-                  data: validatorFullData[currentPage]?.validatorEpochData,
+                  data: validatorEpochData,
                   count: totalCount,
                   isLoading: isLoading,
                   renderRowSubComponent: ExpandedRow,
