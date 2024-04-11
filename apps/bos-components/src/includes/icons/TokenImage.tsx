@@ -23,7 +23,9 @@ const TokenImage = ({
   onLoad,
   onSetSrc,
 }: Props) => {
-  const placeholder = `${appUrl}images/tokenplaceholder.svg`;
+  const placeholder = appUrl
+    ? `${appUrl}images/tokenplaceholder.svg`
+    : '/images/tokenplaceholder.svg';
 
   const handleLoad = () => {
     if (onLoad) {

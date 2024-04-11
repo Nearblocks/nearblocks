@@ -9,9 +9,11 @@
  * @param {boolean} [loading] - Indicates whether data is currently loading.
  * @param {TransactionInfo} [txn] - Information related to a transaction.
  * @param {RPCTransactionInfo} [rpcTxn] - RPC data of the transaction.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   loading: boolean;
@@ -23,33 +25,10 @@ import EventLogs from '@/includes/Common/Action/index';
 import Actions from '@/includes/Common/Actions';
 import Question from '@/includes/Common/Question';
 import TxnStatus from '@/includes/Common/Status';
-import {
-  convertToMetricPrefix,
-  convertToUTC,
-  dollarFormat,
-  gasPercentage,
-  getTimeAgoString,
-  localFormat,
-  shortenToken,
-  shortenTokenSymbol,
-} from '@/includes/formats';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
-import FaCaretRight from '@/includes/icons/FaCaretRight';
+import FaRight from '@/includes/icons/FaRight';
 import TokenImage from '@/includes/icons/TokenImage';
-import {
-  fiatValue,
-  getConfig,
-  nanoToMilli,
-  shortenAddress,
-  yoctoToNear,
-} from '@/includes/libs';
-import {
-  tokenAmount,
-  txnActions,
-  txnErrorMessage,
-  txnLogs,
-} from '@/includes/near';
 import {
   AccountContractInfo,
   FtsInfo,
@@ -62,45 +41,76 @@ import {
 } from '@/includes/types';
 
 export default function (props: Props) {
-  const { loading, txn, network, t, rpcTxn } = props;
+  const { loading, txn, network, t, rpcTxn, ownerId } = props;
+
+  const {
+    convertToMetricPrefix,
+    convertToUTC,
+    dollarFormat,
+    gasPercentage,
+    getTimeAgoString,
+    localFormat,
+    shortenToken,
+    shortenTokenSymbol,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const {
+    fiatValue,
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    shortenAddress,
+    yoctoToNear,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { tokenAmount, txnActions, txnErrorMessage, txnLogs } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
+
   const [isContract, setIsContract] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
   const [price, setPrice] = useState('');
   const [more, setMore] = useState(false);
 
   const { fts, nfts } = useMemo(() => {
-    function customUniqWith(array: FtsInfo[], comparator: any) {
-      return array.filter((item, index, arr) => {
-        return arr.findIndex((el) => comparator(item, el)) === index;
-      });
-    }
-
     function tokensTransfers(receipts: InventoryInfo[]) {
       let fts: FtsInfo[] = [];
       let nfts: NftsInfo[] = [];
 
-      receipts.forEach(
-        (receipt) =>
-          receipt?.fts?.forEach((ft) => {
-            if (ft.ft_metas) fts.push(ft);
-          }),
-      );
-      receipts.forEach(
-        (receipt) =>
-          receipt?.nfts?.forEach((nft) => {
-            if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
-          }),
-      );
+      receipts &&
+        receipts.forEach(
+          (receipt) =>
+            receipt?.fts?.forEach((ft) => {
+              if (ft.ft_meta && ft.cause === 'TRANSFER') {
+                if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+              } else {
+                if (ft.ft_meta) fts.push(ft);
+              }
+            }),
+        );
+      receipts &&
+        receipts.forEach(
+          (receipt) =>
+            receipt?.nfts?.forEach((nft) => {
+              if (
+                nft.nft_meta &&
+                nft.nft_token_meta &&
+                nft.cause === 'TRANSFER'
+              ) {
+                if (
+                  nft.nft_meta &&
+                  nft.nft_token_meta &&
+                  Number(nft.delta_amount) < 0
+                )
+                  nfts.push(nft);
+              } else {
+                if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+              }
+            }),
+        );
 
       return {
-        fts: customUniqWith(fts, (a: any, b: any) => {
-          return (
-            a.emitted_at_block_timestamp === b.emitted_at_block_timestamp &&
-            a.token_new_owner_account_id === b.token_new_owner_account_id &&
-            a.token_old_owner_account_id === b.token_old_owner_account_id &&
-            a.amount === b.amount
-          );
-        }),
+        fts,
         nfts,
       };
     }
@@ -110,9 +120,15 @@ export default function (props: Props) {
     }
 
     return { fts: [], nfts: [] };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn]);
 
-  const config = getConfig(network);
+  function absoluteValue(number: string) {
+    return new Big(number).abs().toString();
+  }
+
+  const config = getConfig ? getConfig(network) : '';
 
   useEffect(() => {
     function fetchStatsDatas() {
@@ -121,13 +137,15 @@ export default function (props: Props) {
           .then(
             (res: {
               body: {
-                stats: StatusInfo;
+                stats: StatusInfo[];
               };
               status: number;
             }) => {
-              const resp = res?.body?.stats;
+              const resp = res?.body?.stats?.[0];
               if (res.status === 200) {
                 setStatsData(resp);
+              } else {
+                handleRateLimit(res, fetchStatsDatas);
               }
             },
           )
@@ -135,7 +153,11 @@ export default function (props: Props) {
       }
     }
 
-    fetchStatsDatas();
+    if (config.backendUrl) {
+      fetchStatsDatas();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config.backendUrl]);
 
   const toggleContent = () => {
@@ -147,41 +169,61 @@ export default function (props: Props) {
     if (txn?.block_timestamp) {
       const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
       function fetchPriceAtDate(date: string) {
-        asyncFetch(
-          `https://api.coingecko.com/api/v3/coins/near/history?date=${date}`,
-        ).then(
+        asyncFetch(`${config.backendUrl}stats/price?date=${date}`).then(
           (data: {
             body: {
-              market_data: { current_price: { usd: string } };
+              stats: { near_price: string }[];
             };
             status: number;
           }) => {
-            const resp = data?.body?.market_data?.current_price?.usd;
+            const resp = data?.body?.stats[0];
             if (data.status === 200) {
-              setPrice(resp);
+              setPrice(resp?.near_price);
+            } else {
+              handleRateLimit(data, () => fetchPriceAtDate(date));
             }
           },
         );
       }
-      let dt;
       const currentDate = new Date();
-      if (currentDate > timestamp) {
-        const day = timestamp.getUTCDate();
-        const month = timestamp.getUTCMonth() + 1;
-        const year = timestamp.getUTCFullYear();
-        dt = `${day < 10 ? '0' : ''}${day}-${
-          month < 10 ? '0' : ''
-        }${month}-${year}`;
-        fetchPriceAtDate(dt);
+      const currentDay = currentDate.getUTCDate();
+      const currentMonth = currentDate.getUTCMonth() + 1;
+      const currentYear = currentDate.getUTCFullYear();
+
+      const currentDt = `${currentYear}-${
+        currentMonth < 10 ? '0' : ''
+      }${currentMonth}-${currentDay < 10 ? '0' : ''}${currentDay}`;
+
+      const day = timestamp.getUTCDate();
+      const month = timestamp.getUTCMonth() + 1;
+      const year = timestamp.getUTCFullYear();
+
+      const blockDt = `${year}-${month < 10 ? '0' : ''}${month}-${
+        day < 10 ? '0' : ''
+      }${day}`;
+
+      if (currentDt > blockDt) {
+        fetchPriceAtDate(blockDt);
+
+        return blockDt;
       }
     }
+    return;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn?.block_timestamp]);
 
   const [logs, actions, errorMessage] = useMemo(() => {
     if (rpcTxn) {
-      return [txnLogs(rpcTxn), txnActions(rpcTxn), txnErrorMessage(rpcTxn)];
+      return [
+        txnLogs && txnLogs(rpcTxn),
+        txnActions && txnActions(rpcTxn),
+        txnErrorMessage && txnErrorMessage(rpcTxn),
+      ];
     }
     return [[], [], undefined];
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -199,6 +241,7 @@ export default function (props: Props) {
           body: {
             account: AccountContractInfo[];
           };
+          status: number;
         }) => {
           const resp = data?.body?.account?.[0];
           setIsContract(resp?.code_hash !== '11111111111111111111111111111111');
@@ -206,18 +249,6 @@ export default function (props: Props) {
       );
     }
   }, [txn, config.backendUrl]);
-
-  useEffect(() => {
-    // Hide txn actions row
-    if (typeof document !== 'undefined') {
-      const row = document.getElementById('action-row');
-      const column = document.getElementById('action-column');
-
-      if (row && column && !column.hasChildNodes()) {
-        row.style.display = 'none';
-      }
-    }
-  }, [logs]);
 
   return (
     <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
@@ -229,6 +260,7 @@ export default function (props: Props) {
               : '[ This is a Testnet transaction only ]'}
           </div>
         )}
+
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -288,12 +320,12 @@ export default function (props: Props) {
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
           ) : (
-            <div>
+            <div className="w-full md:w-3/4 break-words">
               {txn?.outcomes?.status !== undefined && (
                 <TxnStatus showLabel status={txn?.outcomes?.status} />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 my-2 rounded-md text-center px-2 py-1">
+                <div className="text-xs bg-orange-50 my-2 rounded-md text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}
@@ -320,15 +352,15 @@ export default function (props: Props) {
                 </Tooltip.Content>
               </Tooltip.Root>
             </Tooltip.Provider>
-            {t ? t('txns:txn.block.text.0') : 'Block height'}
+            {t ? t('txns:txn.block.text.0') : 'Block Height'}
           </div>
           {loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-14" />
             </div>
-          ) : txn?.block?.block_height ? (
+          ) : txn ? (
             <div className="w-full md:w-3/4 font-semibold break-words">
-              <a
+              <Link
                 href={`/blocks/${txn?.included_in_block_hash}`}
                 className="hover:no-underline"
               >
@@ -337,7 +369,7 @@ export default function (props: Props) {
                     ? localFormat(txn?.block?.block_height)
                     : txn?.block?.block_height ?? ''}
                 </a>
-              </a>
+              </Link>
             </div>
           ) : (
             ''
@@ -369,17 +401,69 @@ export default function (props: Props) {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
-          ) : txn?.block_timestamp ? (
+          ) : txn ? (
             <div className="w-full md:w-3/4 break-words">
-              {getTimeAgoString(nanoToMilli(txn?.block_timestamp))} (
-              {convertToUTC(nanoToMilli(txn?.block_timestamp), true)} +UTC)
+              {`${getTimeAgoString(
+                nanoToMilli(txn?.block_timestamp),
+              )} (${convertToUTC(
+                nanoToMilli(txn?.block_timestamp),
+                true,
+              )} +UTC)`}
             </div>
           ) : (
             ''
           )}
         </div>
+        <div className="flex flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip.Provider>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                  align="start"
+                  side="bottom"
+                >
+                  The shard number in which the transaction was executed in
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+            Shard Number
+          </div>
+          {loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-sm" />
+            </div>
+          ) : txn ? (
+            <div className="w-full md:w-3/4 break-words">{txn?.shard_id}</div>
+          ) : (
+            ''
+          )}
+        </div>
       </div>
-      {(actions?.length > 0 || (logs?.length > 0 && logs?.contract)) && (
+      {((actions?.length > 0 &&
+        actions.some((item: any) =>
+          [
+            'CreateAccount',
+            'DeleteAccount',
+            'DeployContract',
+            'Stake',
+            'Transfer',
+          ].includes(item?.action_kind),
+        )) ||
+        (logs.length > 0 &&
+          logs.some((item: TransactionLog, i: number) => (
+            <EventLogs
+              key={i}
+              event={item}
+              network={network}
+              ownerId={ownerId}
+            />
+          )))) && (
         <div id="action-row" className="bg-white text-sm text-nearblue-600">
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
@@ -407,25 +491,38 @@ export default function (props: Props) {
               </div>
             ) : (
               <div className="w-full md:w-3/4">
-                <ScrollArea.Root>
-                  <ScrollArea.Viewport />
-                  <div
-                    id="action-column"
-                    className="max-h-[194px] break-words space-y-2"
+                <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
+                  <ScrollArea.Viewport className="w-full h-full rounded">
+                    <div
+                      id="action-column"
+                      className="max-h-[194px] break-words space-y-2"
+                    >
+                      {logs?.map((event: TransactionLog, i: number) => (
+                        <EventLogs
+                          key={i}
+                          event={event}
+                          network={network}
+                          ownerId={ownerId}
+                        />
+                      ))}
+                      {actions?.map((action: any, i: number) => (
+                        <Actions key={i} action={action} ownerId={ownerId} />
+                      ))}
+                    </div>
+                  </ScrollArea.Viewport>
+                  <ScrollArea.Scrollbar
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    orientation="vertical"
                   >
-                    {logs?.map((event: TransactionLog, i: number) => (
-                      <EventLogs key={i} event={event} network={network} />
-                    ))}
-                    {actions?.map((action: any, i: number) => (
-                      <Actions key={i} action={action} />
-                    ))}
-                  </div>
-                  <ScrollArea.Scrollbar orientation="horizontal">
-                    <ScrollArea.Thumb />
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
-                  <ScrollArea.Scrollbar orientation="vertical">
-                    <ScrollArea.Thumb />
+                  <ScrollArea.Scrollbar
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    orientation="horizontal"
+                  >
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
+                  <ScrollArea.Corner className="bg-neargray-50" />
                 </ScrollArea.Root>
               </div>
             )}
@@ -461,14 +558,14 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-all">
-              <a
+              <Link
                 href={`/address/${txn?.signer_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {txn?.signer_account_id}
                 </a>
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -504,14 +601,14 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-all">
-              <a
+              <Link
                 href={`/address/${txn?.receiver_account_id}`}
                 className="hover:no-underline"
               >
                 <a className="text-green-500 hover:no-underline">
                   {txn?.receiver_account_id}
                 </a>
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -543,7 +640,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="relative w-full md:w-3/4">
-              <ScrollArea.Root className="w-full h-[302px] rounded overflow-hidden bg-white">
+              <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
                 <ScrollArea.Viewport className="w-full h-full rounded">
                   <div className="max-h-[302px] break-words space-y-3">
                     {fts?.map((ft: any) => (
@@ -551,135 +648,224 @@ export default function (props: Props) {
                         className="flex items-center flex-wrap break-all leading-7"
                         key={ft?.key}
                       >
-                        <FaCaretRight className="inline-flex text-gray-400 text-xs" />
-                        <div className="font-semibold text-gray px-1">
-                          From{' '}
-                          {ft?.token_old_owner_account_id ? (
-                            <a
-                              href={`/address/${ft?.token_old_owner_account_id}`}
-                              className="hover:no-underline"
-                            >
-                              <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                {shortenAddress(
-                                  ft?.token_old_owner_account_id ?? '',
-                                )}
-                              </a>
-                            </a>
-                          ) : (
-                            <span className="font-normal pl-1">system</span>
-                          )}
-                        </div>
-                        <div className="font-semibold text-gray px-1">
-                          To{' '}
-                          {ft?.token_new_owner_account_id ? (
-                            <a
-                              href={`/address/${ft?.token_new_owner_account_id}`}
-                              className="hover:no-underline"
-                            >
-                              <a className="text-green-500 font-normal pl-1">
-                                {shortenAddress(
-                                  ft?.token_new_owner_account_id ?? '',
-                                )}
-                              </a>
-                            </a>
-                          ) : (
-                            <span className="font-normal pl-1">system</span>
-                          )}
-                        </div>
+                        <FaRight className="inline-flex text-gray-400 text-xs" />
+                        {ft?.cause === 'MINT' ? (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1">
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="hover:no-underline"
+                                >
+                                  <a className="text-green-500 font-normal pl-1">
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </a>
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        )}
                         <div className="font-semibold text-gray px-1">
                           For{' '}
                           <span className="pl-1 font-normal">
-                            {ft?.amount && ft?.ft_metas?.decimals
+                            {ft?.delta_amount &&
+                            ft?.ft_meta?.decimals &&
+                            tokenAmount
                               ? tokenAmount(
-                                  ft?.amount,
-                                  ft?.ft_metas?.decimals,
+                                  absoluteValue(ft?.delta_amount),
+                                  ft?.ft_meta?.decimals,
                                   true,
                                 )
                               : ''}
                           </span>
                         </div>
-                        <a
-                          href={`/token/${ft?.ft_metas?.contract}`}
+                        <Link
+                          href={`/token/${ft?.ft_meta?.contract}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green flex items-center hover:no-underline">
                             <TokenImage
-                              src={ft?.ft_metas?.icon}
-                              alt={ft?.ft_metas?.name}
+                              src={ft?.ft_meta?.icon}
+                              alt={ft?.ft_meta?.name}
+                              appUrl={config?.appUrl}
                               className="w-4 h-4 mx-1"
                             />
-                            {shortenToken(ft?.ft_metas?.name ?? '')}
+                            {shortenToken(ft?.ft_meta?.name ?? '')}
                             <span>
                               &nbsp;(
-                              {shortenTokenSymbol(ft?.ft_metas?.symbol ?? '')})
+                              {shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})
                             </span>
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                     {nfts?.map((nft: any) => (
                       <div className="flex" key={nft?.key}>
                         <div className="flex justify-start items-start">
-                          <FaCaretRight className="inline-flex text-gray-400 text-xs mt-1" />
+                          <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
                           <div className="flex flex-wrap">
                             <div>
                               <div className="sm:flex">
-                                <div className="font-semibold text-gray px-1">
-                                  From{' '}
-                                  {nft?.token_old_owner_account_id ? (
-                                    <a
-                                      href={`/address/${nft?.token_old_owner_account_id}`}
-                                      className="hover:no-underline"
-                                    >
-                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                        {shortenAddress(
-                                          nft?.token_old_owner_account_id ?? '',
-                                        )}
-                                      </a>
-                                    </a>
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="font-semibold text-gray px-1">
-                                  To{' '}
-                                  {nft?.token_new_owner_account_id ? (
-                                    <a
-                                      href={`/address/${nft?.token_new_owner_account_id}`}
-                                      className="hover:no-underline"
-                                    >
-                                      <a className="text-green-500 font-normal pl-1 hover:no-underline">
-                                        {shortenAddress(
-                                          nft?.token_new_owner_account_id ?? '',
-                                        )}
-                                      </a>
-                                    </a>
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
+                                {nft?.cause === 'MINT' ? (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.involved_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.affected_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.affected_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="hover:no-underline"
+                                        >
+                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                            {shortenAddress(
+                                              nft?.involved_account_id ?? '',
+                                            )}
+                                          </a>
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
                               </div>
                               <div className="sm:flex mt-1">
                                 <div className="text-gray px-1">
                                   <span className="text-gray-400">For </span>
                                   <span className="pl-1 font-normal">
                                     NFT Token ID [
-                                    <a
+                                    <Link
                                       href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="hover:no-underline"
                                     >
                                       <a className="text-green hover:no-underline">
                                         {shortenToken(nft?.token_id ?? '')}
                                       </a>
-                                    </a>
+                                    </Link>
                                     ]
                                   </span>
                                 </div>
-                                <a
+                                <Link
                                   href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="hover:no-underline"
                                 >
@@ -687,29 +873,29 @@ export default function (props: Props) {
                                     <TokenImage
                                       src={nft?.nft_meta?.icon}
                                       alt={nft?.nft_meta?.name}
+                                      appUrl={config?.appUrl}
                                       className="w-4 h-4 mx-1"
                                     />
                                     {shortenToken(nft?.nft_meta?.name ?? '')}
                                     <span>
-                                      &nbsp;(
-                                      {shortenTokenSymbol(
+                                      &nbsp;
+                                      {`(${shortenTokenSymbol(
                                         nft?.nft_meta?.symbol ?? '',
-                                      )}
-                                      )
+                                      )})`}
                                     </span>
                                   </a>
-                                </a>
+                                </Link>
                               </div>
                             </div>
                             <div className="border rounded ml-2 w-11 h-11 p-1">
-                              <a
+                              <Link
                                 href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                 className="hover:no-underline"
                               >
                                 <a>
                                   {
                                     <Widget
-                                      src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                                      src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                                       props={{
                                         base: nft?.nft_meta?.base_uri,
                                         media: nft?.nft_token_meta?.media,
@@ -719,11 +905,12 @@ export default function (props: Props) {
                                         alt: nft?.nft_token_meta?.title,
                                         className: 'max-h-full rounded',
                                         network: network,
+                                        ownerId,
                                       }}
                                     />
                                   }
                                 </a>
-                              </a>
+                              </Link>
                             </div>
                           </div>
                         </div>
@@ -788,7 +975,7 @@ export default function (props: Props) {
                       Ⓝ
                       {currentPrice && network === 'mainnet'
                         ? ` ($${fiatValue(
-                            yoctoToNear(txn.actions_agg?.deposit, false),
+                            yoctoToNear(txn.actions_agg?.deposit ?? 0, false),
                             currentPrice,
                           )})`
                         : ''}
@@ -840,7 +1027,7 @@ export default function (props: Props) {
               Ⓝ
               {currentPrice && network === 'mainnet'
                 ? ` ($${fiatValue(
-                    yoctoToNear(txn.outcomes_agg?.transaction_fee, false),
+                    yoctoToNear(txn.outcomes_agg?.transaction_fee ?? 0, false),
                     currentPrice,
                   )})`
                 : ''}
@@ -892,11 +1079,11 @@ export default function (props: Props) {
             <div className="flex flex-wrap p-4">
               <Accordion.Trigger asChild onClick={toggleContent}>
                 {!more ? (
-                  <span className="text-green-500 flex items-center">
+                  <span className="text-green-500 flex items-center cursor-pointer">
                     Click to see more <ArrowDown className="fill-current" />
                   </span>
                 ) : (
-                  <span className="text-green-500 flex items-center">
+                  <span className="text-green-500 flex items-center cursor-pointer">
                     Click to see less <ArrowUp className="fill-current" />
                   </span>
                 )}
@@ -931,22 +1118,16 @@ export default function (props: Props) {
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {txn?.actions_agg?.gas_attached
-                      ? convertToMetricPrefix(txn?.actions_agg?.gas_attached)
-                      : txn?.actions_agg?.gas_attached ?? ''}
-                    gas
-                    <span className="text-gray-300 px-1">|</span>{' '}
-                    {txn?.outcomes_agg?.gas_used
-                      ? convertToMetricPrefix(txn?.outcomes_agg?.gas_used)
-                      : txn?.outcomes_agg?.gas_used ?? ''}
-                    gas (
-                    {txn?.outcomes_agg?.gas_used &&
-                    txn?.actions_agg?.gas_attached
-                      ? gasPercentage(
-                          txn?.outcomes_agg?.gas_used,
-                          txn?.actions_agg?.gas_attached,
-                        )
-                      : ''}
+                    {convertToMetricPrefix(
+                      txn?.actions_agg?.gas_attached ?? 0,
+                    ) + 'gas'}
+                    <span className="text-gray-300 px-1">|</span>
+                    {convertToMetricPrefix(txn?.outcomes_agg?.gas_used ?? 0)}gas
+                    (
+                    {gasPercentage(
+                      txn?.outcomes_agg?.gas_used ?? 0,
+                      txn?.actions_agg?.gas_attached ?? 0,
+                    )}
                     )
                   </div>
                 )}
@@ -979,12 +1160,9 @@ export default function (props: Props) {
                   <div className="w-full  text-xs items-center flex md:w-3/4 break-words">
                     <div className="bg-orange-50 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥</span>
-                      {txn.receipt_conversion_gas_burnt
-                        ? convertToMetricPrefix(
-                            txn.receipt_conversion_gas_burnt,
-                          )
-                        : txn.receipt_conversion_gas_burnt ?? ''}
-                      gas
+                      {convertToMetricPrefix(
+                        txn.receipt_conversion_gas_burnt ?? 0,
+                      ) + 'gas'}
                       <span className="text-gray-300 px-1">|</span>{' '}
                       {txn.receipt_conversion_tokens_burnt
                         ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)

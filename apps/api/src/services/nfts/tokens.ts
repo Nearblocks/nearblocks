@@ -212,6 +212,15 @@ const txns = catchAsync(
                 WHERE
                   nft.contract = a.contract_account_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
             ORDER BY
               event_index ${order === 'desc' ? 'DESC' : 'ASC'}
             LIMIT
@@ -290,6 +299,15 @@ const txnsCount = catchAsync(
               nft_meta nft
             WHERE
               nft.contract = a.contract_account_id
+          )
+          AND EXISTS (
+            SELECT
+              1
+              FROM
+                transactions
+                JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+              WHERE
+                receipts.receipt_id = a.receipt_id
           )
       `,
       { contract, event, token },

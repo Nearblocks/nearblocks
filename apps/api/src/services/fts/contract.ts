@@ -13,7 +13,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 
   const contracts = await sql`
     SELECT
-      ft_meta.contract,
+      contract,
       name,
       symbol,
       decimals,
@@ -37,16 +37,8 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap
     FROM
       ft_meta
-      LEFT JOIN LATERAL (
-        SELECT DISTINCT
-          contract
-        FROM
-          ft_contracts_daily
-        WHERE
-          contract = ft_meta.contract
-      ) list ON TRUE
     WHERE
-      ft_meta.contract = ${contract}
+      contract = ${contract}
   `;
 
   return res.status(200).json({ contracts });
@@ -115,6 +107,15 @@ const txns = catchAsync(
                   ft_meta ft
                 WHERE
                   ft.contract = a.contract_account_id
+              )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
               )
             ORDER BY
               event_index ${order === 'desc' ? 'DESC' : 'ASC'}
@@ -196,6 +197,15 @@ const txnsCount = catchAsync(
           WHERE
             ft.contract = a.contract_account_id
         )
+        AND EXISTS (
+          SELECT
+            1
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = a.receipt_id
+        )
     `;
 
     const { query, values } = keyBinder(
@@ -240,29 +250,24 @@ const holders = catchAsync(
 
     const { limit, offset } = getPagination(page, per_page);
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          account,
-          SUM(amount) AS amount
-        FROM
-          ft_holders_monthly
-        WHERE
-          contract = :contract
-        GROUP BY
-          contract,
-          account
-        ORDER BY
-          SUM(amount) ${order === 'desc' ? 'DESC' : 'ASC'}
-        LIMIT
-          :limit OFFSET :offset
-      `,
-      { contract, limit, offset },
-    );
+    const holders = await sql`
+      SELECT
+        account,
+        amount
+      FROM
+        ft_holders
+      WHERE
+        contract = ${contract}
+        AND amount > 0
+      ORDER BY
+        amount ${order === 'desc' ? sql`DESC` : sql`ASC`}
+      LIMIT
+        ${limit}
+      OFFSET
+        ${offset}
+    `;
 
-    const { rows } = await db.query(query, values);
-
-    return res.status(200).json({ holders: rows });
+    return res.status(200).json({ holders });
   },
 );
 
@@ -270,28 +275,48 @@ const holdersCount = catchAsync(
   async (req: RequestValidator<Holders>, res: Response) => {
     const contract = req.validator.data.contract;
 
+    const useFormat = true;
+    const bindings = { contract };
+    const rawQuery = (options: RawQueryParams) => `
+      SELECT
+        ${options.select}
+      FROM
+        ft_holders
+      WHERE
+        contract = :contract
+        AND amount > 0
+    `;
+
     const { query, values } = keyBinder(
-      `
-        SELECT
-          COUNT(*)
-        FROM (
-          SELECT
-            account
-          FROM
-            ft_holders_monthly
-          WHERE
-            contract = :contract
-          GROUP BY
-            contract,
-            account
-        ) s
-      `,
-      { contract },
+      rawQuery({
+        select: 'contract',
+      }),
+      bindings,
+      useFormat,
     );
 
-    const { rows } = await db.query(query, values);
+    const { rows } = await db.query(
+      `SELECT cost, rows as count FROM count_cost_estimate(${query})`,
+      values,
+    );
 
-    return res.status(200).json({ holders: rows });
+    const cost = +rows?.[0]?.cost;
+    const count = +rows?.[0]?.count;
+
+    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
+      return res.status(200).json({ holders: rows });
+    }
+
+    const { query: countQuery, values: countValues } = keyBinder(
+      rawQuery({
+        select: 'COUNT(contract)',
+      }),
+      bindings,
+    );
+
+    const { rows: countRows } = await db.query(countQuery, countValues);
+
+    return res.status(200).json({ holders: countRows });
   },
 );
 

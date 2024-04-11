@@ -7,31 +7,27 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
+ * @param {boolean} [signedIn] - Boolean indicating whether the user is currently signed in or not.
+ * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
+ * @param {Function} [logOut] - Function to log out.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  requestSignInWithWallet: (id: string) => void;
+  signedIn: boolean;
+  accountId: string;
+  ownerId: string;
+  logOut: () => void;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
-import {
-  yoctoToNear,
-  fiatValue,
-  nanoToMilli,
-  shortenAddress,
-  getConfig,
-} from '@/includes/libs';
-import {
-  dollarFormat,
-  localFormat,
-  weight,
-  convertToUTC,
-} from '@/includes/formats';
 import TokenImage from '@/includes/icons/TokenImage';
 import TokenHoldings from '@/includes/Common/TokenHoldings';
-import { encodeArgs, decodeArgs } from '@/includes/near';
 import {
   SatsInfo,
   AccountInfo,
@@ -44,6 +40,8 @@ import {
   ContractInfo,
   FtInfo,
   TokenListInfo,
+  ContractParseInfo,
+  SchemaInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 
@@ -56,8 +54,38 @@ const tabs = [
   'Comments',
 ];
 
-export default function ({ network, t, id }: Props) {
+export default function (props: Props) {
+  const {
+    network,
+    t,
+    id,
+    requestSignInWithWallet,
+    signedIn,
+    accountId,
+    logOut,
+    ownerId,
+  } = props;
+
+  const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const {
+    yoctoToNear,
+    fiatValue,
+    nanoToMilli,
+    shortenAddress,
+    getConfig,
+    handleRateLimit,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const { encodeArgs, decodeArgs } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
+
   const [loading, setLoading] = useState(false);
+  const [isloading, setIsLoading] = useState(true);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
   const [statsData, setStatsData] = useState<SatsInfo>({} as SatsInfo);
   const [pageTab, setPageTab] = useState('Transactions');
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
@@ -75,8 +103,12 @@ export default function ({ network, t, id }: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [code, setCode] = useState<ContractCodeInfo>({} as ContractCodeInfo);
   const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
+  const [schema, setSchema] = useState<SchemaInfo>({} as SchemaInfo);
+  const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
+    {} as ContractParseInfo,
+  );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
@@ -96,15 +128,22 @@ export default function ({ network, t, id }: Props) {
             body: {
               stats: SatsInfo[];
             };
+            status: number;
           }) => {
             const statsResp = data?.body?.stats?.[0];
-            setStatsData({ near_price: statsResp.near_price });
+            if (data.status === 200) {
+              setStatsData({ near_price: statsResp.near_price });
+            } else {
+              handleRateLimit(data, fetchStatsData);
+            }
           },
         )
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => {});
     }
 
     function fetchAccountData() {
+      setLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}`, {
         method: 'GET',
         headers: {
@@ -116,17 +155,23 @@ export default function ({ network, t, id }: Props) {
             body: {
               account: AccountInfo[];
             };
+            status: number;
           }) => {
             const accountResp = data?.body?.account?.[0];
-            setAccountData({
-              account_id: accountResp.account_id,
-              amount: accountResp.amount,
-              code_hash: accountResp.code_hash,
-              created: accountResp.created,
-              deleted: accountResp.deleted,
-              locked: accountResp.locked,
-              storage_usage: accountResp.storage_usage,
-            });
+            if (data.status === 200) {
+              setAccountData({
+                account_id: accountResp.account_id,
+                amount: accountResp.amount,
+                code_hash: accountResp.code_hash,
+                created: accountResp.created,
+                deleted: accountResp.deleted,
+                locked: accountResp.locked,
+                storage_usage: accountResp.storage_usage,
+              });
+              setLoading(false);
+            } else {
+              handleRateLimit(data, fetchAccountData, () => setLoading(false));
+            }
           },
         )
         .catch(() => {});
@@ -144,14 +189,14 @@ export default function ({ network, t, id }: Props) {
             body: {
               deployments: DeploymentsInfo[];
             };
+            status: number;
           }) => {
             const depResp = data?.body?.deployments?.[0];
-            setDeploymentData({
-              block_timestamp: depResp.block_timestamp,
-              receipt_predecessor_account_id:
-                depResp.receipt_predecessor_account_id,
-              transaction_hash: depResp.transaction_hash,
-            });
+            if (data.status === 200) {
+              setDeploymentData(depResp);
+            } else {
+              handleRateLimit(data, fetchContractData);
+            }
           },
         )
         .catch(() => {});
@@ -169,21 +214,27 @@ export default function ({ network, t, id }: Props) {
             body: {
               contracts: TokenInfo[];
             };
+            status: number;
           }) => {
             const tokenResp = data?.body?.contracts?.[0];
-            setTokenData({
-              name: tokenResp.name,
-              icon: tokenResp.icon,
-              symbol: tokenResp.symbol,
-              price: tokenResp.price,
-              website: tokenResp.website,
-            });
+            if (data.status === 200) {
+              setTokenData({
+                name: tokenResp.name,
+                icon: tokenResp.icon,
+                symbol: tokenResp.symbol,
+                price: tokenResp.price,
+                website: tokenResp.website,
+              });
+            } else {
+              handleRateLimit(data, fetchTokenData);
+            }
           },
         )
         .catch(() => {});
     }
 
     function fetchInventoryData() {
+      setInventoryLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}/inventory`, {
         method: 'GET',
         headers: {
@@ -195,22 +246,32 @@ export default function ({ network, t, id }: Props) {
             body: {
               inventory: InventoryInfo;
             };
+            status: number;
           }) => {
             const response = data?.body?.inventory;
-            setInventoryData({
-              fts: response.fts,
-              nfts: response.nfts,
-            });
+            if (data.status === 200) {
+              setInventoryData({
+                fts: response.fts,
+                nfts: response.nfts,
+              });
+              setInventoryLoading(false);
+            } else {
+              handleRateLimit(data, fetchInventoryData, () =>
+                setInventoryLoading(false),
+              );
+            }
           },
         )
         .catch(() => {});
     }
-
-    fetchStatsData();
-    fetchAccountData();
-    fetchContractData();
-    fetchTokenData();
-    fetchInventoryData();
+    if (config?.backendUrl) {
+      fetchStatsData();
+      fetchAccountData();
+      fetchContractData();
+      fetchTokenData();
+      fetchInventoryData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
 
   useEffect(() => {
@@ -245,7 +306,7 @@ export default function ({ network, t, id }: Props) {
         .then(
           (data: {
             body: {
-              result: { result: number[] };
+              result: { result: string[] };
             };
           }) => {
             const resp = data?.body?.result;
@@ -254,11 +315,10 @@ export default function ({ network, t, id }: Props) {
         )
         .catch(() => {});
     }
-
     function loadBalances() {
       const fts = inventoryData?.fts;
       if (!fts?.length) {
-        if (fts?.length === 0) setLoading(false);
+        if (fts?.length === 0) setIsLoading(false);
         return;
       }
 
@@ -274,8 +334,8 @@ export default function ({ network, t, id }: Props) {
             return { ...ft, amount: rslt };
           });
         }),
-      ).then((results: FtsInfo[]) => {
-        results.forEach((rslt: FtsInfo) => {
+      ).then((results: TokenListInfo[]) => {
+        results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
           const amount = rslt?.amount ?? 0;
 
@@ -283,14 +343,13 @@ export default function ({ network, t, id }: Props) {
 
           let rpcAmount = Big(0);
 
-          if (Number(amount)) {
-            rpcAmount = ftrslt?.ft_metas?.decimals
-              ? Big(amount).div(Big(10).pow(ftrslt?.ft_metas?.decimals))
+          if (amount) {
+            rpcAmount = ftrslt?.ft_meta?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt.ft_meta.decimals))
               : 0;
           }
-
-          if (ftrslt?.ft_metas?.price) {
-            sum = rpcAmount.mul(Big(ftrslt?.ft_metas?.price));
+          if (ftrslt?.ft_meta?.price) {
+            sum = rpcAmount.mul(Big(ftrslt?.ft_meta?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -334,11 +393,12 @@ export default function ({ network, t, id }: Props) {
           tokens: [...pricedTokens, ...tokens],
         });
 
-        setLoading(false);
+        setIsLoading(false);
       });
     }
 
     loadBalances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, config?.rpcUrl]);
 
   useEffect(() => {
@@ -421,19 +481,49 @@ export default function ({ network, t, id }: Props) {
     loadSchema();
   }, [id, config?.rpcUrl]);
 
-  if (code?.code_base64) {
-    const locked = (key.keys || []).every(
-      (key: {
-        access_key: {
-          nonce: string;
-          permission: string;
-        };
-        public_key: string;
-      }) => key.access_key.permission !== 'FullAccess',
-    );
+  useEffect(() => {
+    if (code?.code_base64) {
+      const locked = (key.keys || []).every(
+        (key: {
+          access_key: {
+            nonce: string;
+            permission: string;
+          };
+          public_key: string;
+        }) => key.access_key.permission !== 'FullAccess',
+      );
 
-    setContract({ ...code, locked });
-  }
+      function fetchContractInfo() {
+        asyncFetch(`${config?.backendUrl}account/${id}/contract/parse`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(
+            (res: {
+              body: {
+                contract: { contract: ContractParseInfo; schema: SchemaInfo }[];
+              };
+              status: number;
+            }) => {
+              const resp = res.body.contract;
+              if (res.status === 200 && resp && resp.length > 0) {
+                const [{ contract, schema }] = resp;
+                setContractInfo(contract);
+                setSchema(schema);
+              }
+            },
+          )
+          .catch(() => {});
+      }
+
+      fetchContractInfo();
+
+      setContract({ ...code, locked });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, key, config?.backendUrl, id]);
 
   const handleFilter = (name: string, value: string) => {
     const updatedFilters = { ...filters, [name]: value };
@@ -451,6 +541,8 @@ export default function ({ network, t, id }: Props) {
     }
   };
 
+  const balance = accountData?.amount ?? '';
+  const nearPrice = statsData?.near_price ?? '';
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4 ">
@@ -459,21 +551,23 @@ export default function ({ network, t, id }: Props) {
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="py-4 flex items-center justify-between break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
-            Near Account: @&nbsp;{' '}
-            {id && (
-              <span className="font-semibold text-green-500 ">{'  ' + id}</span>
-            )}
-            {
-              <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.Buttons`}
-                props={{
-                  id: id,
-                  config: config,
-                }}
-              />
-            }
-          </h1>
+          <div className="flex md:flex-wrap">
+            <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+              Near Account: @
+              {id && (
+                <span className="font-semibold text-green-500 ">{id}</span>
+              )}
+              {
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Shared.Buttons`}
+                  props={{
+                    id: id,
+                    config: config,
+                  }}
+                />
+              }
+            </h1>
+          </div>
         )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -510,40 +604,44 @@ export default function ({ network, t, id }: Props) {
                   <Skeleton className="h-4 w-32" />
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {accountData?.amount
-                      ? yoctoToNear(accountData?.amount, true)
-                      : accountData?.amount ?? ''}{' '}
-                    Ⓝ
+                    {balance
+                      ? yoctoToNear(accountData?.amount, true) + ' Ⓝ'
+                      : ''}
                   </div>
                 )}
               </div>
-              {network === 'mainnet' && statsData?.near_price && (
-                <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                    {t ? t('address:value') : 'Value:'}
-                  </div>
-                  {loading ? (
-                    <Skeleton className="h-4 w-32" />
-                  ) : (
-                    <div className="w-full md:w-3/4 break-words">
-                      {accountData?.amount && statsData?.near_price
-                        ? '$' +
-                          fiatValue(
-                            yoctoToNear(accountData?.amount, false),
-                            statsData?.near_price,
-                          )
-                        : ''}{' '}
-                      <span className="text-xs">
-                        (@ $
-                        {statsData?.near_price
-                          ? dollarFormat(statsData?.near_price)
-                          : statsData?.near_price ?? ''}{' '}
-                        / Ⓝ)
-                      </span>
+              {network === 'mainnet' &&
+                accountData?.amount &&
+                statsData?.near_price && (
+                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                      {t ? t('address:value') : 'Value:'}
                     </div>
-                  )}
-                </div>
-              )}
+                    {loading ? (
+                      <Skeleton className="h-4 w-32" />
+                    ) : (
+                      <div className="w-full md:w-3/4 break-words flex items-center">
+                        <span className="px-1">
+                          {accountData?.amount && statsData?.near_price
+                            ? '$' +
+                              fiatValue(
+                                yoctoToNear(accountData?.amount, false),
+                                statsData?.near_price,
+                              ) +
+                              ' '
+                            : ''}
+                        </span>
+                        <span className="text-xs">
+                          (@
+                          {nearPrice
+                            ? '$' + dollarFormat(statsData?.near_price)
+                            : ''}
+                          / Ⓝ)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens:'}
@@ -551,10 +649,12 @@ export default function ({ network, t, id }: Props) {
                 <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
                     data={inventoryData}
-                    loading={loading}
+                    loading={isloading}
+                    inventoryLoading={inventoryLoading}
                     ft={ft}
                     id={id}
                     appUrl={config?.appUrl}
+                    ownerId={ownerId}
                   />
                 </div>
               </div>
@@ -634,7 +734,7 @@ export default function ({ network, t, id }: Props) {
                     </div>
                   )}
                 </div>
-                {contract?.hash ? (
+                {contract?.hash && !loading ? (
                   <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                     <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
                     <div className="w-full break-words xl:mt-0 mt-2">
@@ -651,7 +751,7 @@ export default function ({ network, t, id }: Props) {
                     Contract Creator:
                   </div>
                   <div className="w-full md:w-3/4 break-words">
-                    <a
+                    <Link
                       href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                       className="hover:no-underline"
                     >
@@ -660,16 +760,16 @@ export default function ({ network, t, id }: Props) {
                           deploymentData.receipt_predecessor_account_id ?? '',
                         )}
                       </a>
-                    </a>
+                    </Link>
                     {' at txn  '}
-                    <a
+                    <Link
                       href={`/txns/${deploymentData.transaction_hash}`}
                       className="hover:no-underline"
                     >
                       <a className="text-green-500 hover:no-underline">
                         {shortenAddress(deploymentData.transaction_hash ?? '')}
                       </a>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
@@ -686,7 +786,10 @@ export default function ({ network, t, id }: Props) {
                         appUrl={config.appUrl}
                         className="w-4 h-4 mr-2"
                       />
-                      <a href={`/token/${id}`} className="hover:no-underline">
+                      <Link
+                        href={`/token/${id}`}
+                        className="hover:no-underline"
+                      >
                         <a className="flex text-green-500 hover:no-underline">
                           <span className="inline-block truncate max-w-[110px] mr-1">
                             {tokenData.name}
@@ -697,7 +800,7 @@ export default function ({ network, t, id }: Props) {
                           </span>
                           )
                         </a>
-                      </a>
+                      </Link>
                       {tokenData.price && (
                         <div className="text-nearblue-600 ml-1">
                           (@ ${localFormat(tokenData.price)})
@@ -714,107 +817,156 @@ export default function ({ network, t, id }: Props) {
       <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
-          <Tabs.Root defaultValue={pageTab}>
-            <Tabs.List>
-              {tabs &&
-                tabs.map((tab, index) => (
-                  <Tabs.Trigger
-                    key={index}
-                    onClick={() => {
-                      onTab(index);
-                    }}
-                    className={`text-nearblue-600 text-sm font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
-                      pageTab === tab
-                        ? 'rounded-lg bg-green-600 text-white'
-                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
-                    }`}
-                    value={tab}
-                  >
-                    {tab === 'Transactions' ? (
-                      <h2>{t ? t('address:txns') : tab}</h2>
-                    ) : tab === 'Token Txns' ? (
-                      <h2>{t ? t('address:tokenTxns') : tab}</h2>
-                    ) : tab === 'Contract' ? (
-                      <div className="flex h-full">
-                        <h2>{tab}</h2>
-                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
-                          NEW
-                        </div>
-                      </div>
-                    ) : tab === 'Comments' ? (
-                      <h2>{t ? t('address:comments') : tab}</h2>
-                    ) : (
-                      <h2>{tab}</h2>
-                    )}
-                  </Tabs.Trigger>
-                ))}
-            </Tabs.List>
+          <>
             <div>
-              <Tabs.Content value={tabs[0]}>
-                {
-                  <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.Transactions`}
-                    props={{
-                      network: network,
-                      t: t,
-                      id: id,
-                      filters: filters,
-                      handleFilter: handleFilter,
-                      onFilterClear: onFilterClear,
-                    }}
-                  />
-                }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[1]}>
-                {
-                  <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.TokenTransactions`}
-                    props={{
-                      network: network,
-                      id: id,
-                      t: t,
-                      filters: filters,
-                      handleFilter: handleFilter,
-                      onFilterClear: onFilterClear,
-                    }}
-                  />
-                }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[2]}>
-                {
-                  <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.NFTTransactions`}
-                    props={{
-                      network: network,
-                      id: id,
-                      t: t,
-                      filters: filters,
-                      handleFilter: handleFilter,
-                      onFilterClear: onFilterClear,
-                    }}
-                  />
-                }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[3]}>
-                {
-                  <Widget
-                    src={`${config?.ownerId}/widget/bos-components.components.Address.AccessKeys`}
-                    props={{
-                      network: network,
-                      id: id,
-                      t: t,
-                    }}
-                  />
-                }
-              </Tabs.Content>
-              <Tabs.Content value={tabs[4]}>
-                <div className="px-4 sm:px-6 py-3"></div>
-              </Tabs.Content>
-              <Tabs.Content value={tabs[5]}>
-                <div className="px-4 sm:px-6 py-3"></div>
-              </Tabs.Content>
+              {tabs &&
+                tabs.map((tab, index) => {
+                  if (
+                    tab === 'Contract' &&
+                    !(contractInfo?.methodNames?.length > 0)
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        onTab(index);
+                      }}
+                      className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                        pageTab === tab
+                          ? 'rounded-lg bg-green-600 text-white'
+                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                      }`}
+                      value={tab}
+                    >
+                      {tab === 'Transactions' ? (
+                        <h2>{t ? t('address:txns') : tab}</h2>
+                      ) : tab === 'Token Txns' ? (
+                        <h2>{t ? t('address:tokenTxns') : tab}</h2>
+                      ) : tab === 'Contract' ? (
+                        <div className="flex h-full">
+                          <h2>{tab}</h2>
+                          <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
+                            NEW
+                          </div>
+                        </div>
+                      ) : tab === 'Comments' ? (
+                        <h2>{t ? t('address:comments') : tab}</h2>
+                      ) : (
+                        <h2>{tab}</h2>
+                      )}
+                    </button>
+                  );
+                })}
             </div>
-          </Tabs.Root>
+            <div>
+              <div className={`${pageTab === 'Transactions' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Address.Transactions`}
+                    props={{
+                      network: network,
+                      t: t,
+                      id: id,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Token Txns' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Address.TokenTransactions`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+              <div
+                className={`${pageTab === 'NFT Token Txns' ? '' : 'hidden'} `}
+              >
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Address.NFTTransactions`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      filters: filters,
+                      handleFilter: handleFilter,
+                      onFilterClear: onFilterClear,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+              <div className={`${pageTab === 'Access Keys' ? '' : 'hidden'} `}>
+                {
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Address.AccessKeys`}
+                    props={{
+                      network: network,
+                      id: id,
+                      t: t,
+                      ownerId,
+                    }}
+                  />
+                }
+              </div>
+              {contractInfo && contractInfo?.methodNames?.length > 0 && (
+                <>
+                  <div className={`${pageTab === 'Contract' ? '' : 'hidden'} `}>
+                    {
+                      <Widget
+                        src={`${ownerId}/widget/bos-components.components.Contract.Overview`}
+                        props={{
+                          network: network,
+                          t: t,
+                          id: id,
+                          contract: contract,
+                          schema: schema,
+                          contractInfo: contractInfo,
+                          requestSignInWithWallet: requestSignInWithWallet,
+                          connected: signedIn,
+                          accountId: accountId,
+                          logOut: logOut,
+                          ownerId,
+                        }}
+                      />
+                    }
+                  </div>
+                </>
+              )}
+              <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
+                {
+                  <div className="bg-white soft-shadow rounded-xl pb-1">
+                    <div className="py-3">
+                      <Widget
+                        src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
+                        props={{
+                          network: network,
+                          path: `nearblocks.io/address/${id}`,
+                          ownerId,
+                          limit: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </>
         </div>
       </div>
     </>

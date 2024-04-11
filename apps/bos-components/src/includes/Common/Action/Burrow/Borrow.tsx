@@ -1,7 +1,10 @@
-import { getConfig, shortenAddress } from '@/includes/libs';
 import { DepositPropsInfo } from '@/includes/types';
 
 const Borrow = (props: DepositPropsInfo) => {
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -20,7 +23,7 @@ const Borrow = (props: DepositPropsInfo) => {
   };
 
   const log = props.event?.[0];
-  const config = getConfig(props.network);
+
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
@@ -29,8 +32,12 @@ const Borrow = (props: DepositPropsInfo) => {
       <span className="font-bold px-1">Borrow </span>
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
-          props={{ contract: log.token_id, amount: log.amount, decimals: 18 }}
+          src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
+          props={{
+            contract: log.token_id,
+            amount: log.amount,
+            networK: props.network,
+          }}
         />
       }
       <span className="font-bold text-gray px-1">

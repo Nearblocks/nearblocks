@@ -16,9 +16,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   currentPage: number;
@@ -28,19 +30,6 @@ interface Props {
   onFilterClear: (name: string) => void;
 }
 
-import {
-  localFormat,
-  getTimeAgoString,
-  formatTimestampToString,
-  capitalizeFirstLetter,
-} from '@/includes/formats';
-import { txnMethod } from '@/includes/near';
-import {
-  getConfig,
-  nanoToMilli,
-  truncateString,
-  yoctoToNear,
-} from '@/includes/libs';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
@@ -59,15 +48,36 @@ export default function (props: Props) {
     handleFilter,
     onFilterClear,
     t,
+    ownerId,
   } = props;
+
+  const { txnMethod } = VM.require(`${ownerId}/widget/includes.Utils.near`);
+
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const {
+    getConfig,
+    handleRateLimit,
+    nanoToMilli,
+    truncateString,
+    yoctoToNear,
+  } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [sorting, setSorting] = useState('desc');
+  const [address, setAddress] = useState('');
+  const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const config = getConfig(network);
+  const config = getConfig ? getConfig(network) : '';
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -90,6 +100,8 @@ export default function (props: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
@@ -114,13 +126,18 @@ export default function (props: Props) {
           if (data.status === 200) {
             if (Array.isArray(resp) && resp.length > 0) {
               setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
             }
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {
@@ -131,20 +148,26 @@ export default function (props: Props) {
         )
         .join('&');
     }
-
-    if (urlString && sorting) {
-      fetchTotalTxns(urlString);
-      fetchTxnsData(urlString, sorting, currentPage);
-    } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
-      fetchTotalTxns();
-      fetchTxnsData('', sorting, currentPage);
+    if (config?.backendUrl) {
+      if (urlString && sorting) {
+        fetchTotalTxns(urlString);
+        fetchTxnsData(urlString, sorting, currentPage);
+      } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
+        fetchTotalTxns();
+        fetchTxnsData('', sorting, currentPage);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, filters, sorting]);
 
-  let filterValue: string;
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    filterValue = event.target.value;
-    // Do something with the value if needed
+  const onInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string,
+  ): void => {
+    setFilterValue((prevFilters) => ({
+      ...prevFilters,
+      [name]: event.target.value,
+    }));
   };
 
   const onFilter = (
@@ -153,19 +176,32 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    if (filterValue !== null && filterValue !== undefined) {
-      handleFilter(name, filterValue);
+    if (filterValue[name] !== undefined && filterValue[name] !== null) {
+      handleFilter(name, filterValue[name]);
     }
   };
 
   const onClear = (name: string) => {
     if (onFilterClear && filters) {
       onFilterClear(name);
+      setFilterValue((prevFilters) => ({
+        ...prevFilters,
+        [name]: '',
+      }));
     }
   };
 
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
   };
 
   const columns = [
@@ -177,8 +213,7 @@ export default function (props: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-end ',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -189,14 +224,14 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -232,9 +267,9 @@ export default function (props: Props) {
           >
             <div className="flex flex-col">
               <input
-                name="type"
-                value={filters ? filters?.method : ''}
-                onChange={onInputChange}
+                name="method"
+                value={filterValue['method']}
+                onChange={(e) => onInputChange(e, 'method')}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-nearblue-600 text-xs"
               />
@@ -333,8 +368,8 @@ export default function (props: Props) {
           >
             <input
               name="from"
-              value={filters ? filters?.from : ''}
-              onChange={onInputChange}
+              value={filterValue['from']}
+              onChange={(e) => onInputChange(e, 'from')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -367,15 +402,27 @@ export default function (props: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                <span
+                  className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    row?.signer_account_id === address
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      : 'text-green-500 p-0.5 px-1'
+                  }`}
+                >
+                  <Link
                     href={`/address/${row?.signer_account_id}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 hover:no-underline">
+                    <a
+                      className={` hover:no-underline `}
+                      onMouseOver={(e) =>
+                        onHandleMouseOver(e, row?.signer_account_id)
+                      }
+                      onMouseLeave={handleMouseLeave}
+                    >
                       {row?.signer_account_id}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -418,8 +465,8 @@ export default function (props: Props) {
           >
             <input
               name="to"
-              value={filters ? filters?.to : ''}
-              onChange={onInputChange}
+              value={filterValue['to']}
+              onChange={(e) => onInputChange(e, 'to')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -453,14 +500,24 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span>
-                  <a
+                  <Link
                     href={`/address/${row?.receiver_account_id}`}
                     className="hover:no-underline whitespace-nowrap"
                   >
-                    <a className="text-green-500 hover:no-underline">
+                    <a
+                      className={`text-green-500 hover:no-underline ${
+                        row?.receiver_account_id === address
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          : 'text-green-500 p-1'
+                      }`}
+                      onMouseOver={(e) =>
+                        onHandleMouseOver(e, row?.receiver_account_id)
+                      }
+                      onMouseLeave={handleMouseLeave}
+                    >
                       {truncateString(row?.receiver_account_id, 17, '...')}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -481,7 +538,7 @@ export default function (props: Props) {
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
-          <a
+          <Link
             href={`/blocks/${row?.included_in_block_hash}`}
             className="hover:no-underline"
           >
@@ -490,7 +547,7 @@ export default function (props: Props) {
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
             </a>
-          </a>
+          </Link>
         </span>
       ),
       tdClassName:
@@ -589,24 +646,28 @@ export default function (props: Props) {
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600">
               {t
                 ? t('txns:listing', {
-                    count: localFormat(totalCount.toString()),
+                    count: localFormat
+                      ? localFormat(totalCount.toString())
+                      : '',
                   })
                 : `More than > ${totalCount} transactions found`}
             </p>
           </div>
           {filters && Object.keys(filters).length > 0 && (
-            <div className="flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
-              Filtered By:
-              <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                {filters &&
-                  Object.keys(filters).map((key) => (
-                    <span className="flex" key={key}>
-                      {capitalizeFirstLetter(key)}:{' '}
-                      <span className="inline-block truncate max-w-[120px]">
-                        <span className="font-semibold">{filters[key]}</span>
-                      </span>
+            <div className="flex items-center px-6 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+              {t ? t('txns:filter.by') : 'Filtered By:'}&nbsp;
+              <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                {Object.keys(filters).map((key) => (
+                  <span
+                    className="flex items-center max-sm:mb-1 truncate max-w-[120px]"
+                    key={key}
+                  >
+                    {capitalizeFirstLetter(key)}:{' '}
+                    <span className="font-semibold truncate">
+                      {filters[key]}
                     </span>
-                  ))}
+                  </span>
+                ))}
                 <CloseCircle
                   className="w-4 h-4 fill-current cursor-pointer"
                   onClick={onClear}
@@ -618,7 +679,7 @@ export default function (props: Props) {
       )}
       {
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

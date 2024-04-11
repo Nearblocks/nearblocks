@@ -1,7 +1,10 @@
 import FaUser from '@/includes/icons/FaUser';
-import { shortenAddress } from '@/includes/libs';
 
 const CreateAccount = (props: any) => {
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
+
   return (
     <div className="py-1">
       <FaUser className="inline-flex text-emerald-400 mr-1" />{' '}

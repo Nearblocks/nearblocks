@@ -15,58 +15,49 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
 
   const tokens = await sql`
-    SELECT DISTINCT
-      nft_contracts_daily.contract,
+    WITH
+      day_transfers AS (
+        SELECT
+          contract_account_id,
+          COUNT(*) AS transfers_count
+        FROM
+          nft_events
+        WHERE
+          block_timestamp > EXTRACT(
+            epoch
+            FROM
+              NOW() - '1 day'::INTERVAL
+          ) * 1000 * 1000 * 1000
+        GROUP BY
+          contract_account_id
+      )
+    SELECT
+      nft_meta.contract,
       nft_meta.name,
       nft_meta.symbol,
       nft_meta.icon,
       nft_meta.base_uri,
       nft_meta.reference,
-      tokens.count AS tokens,
-      day.count AS transfers_day,
-      holders.count AS holders
-    FROM
-      nft_contracts_daily
-      JOIN nft_meta ON nft_meta.contract = nft_contracts_daily.contract
-      LEFT JOIN LATERAL (
+      (
         SELECT
           COUNT(contract)
         FROM
           nft_token_meta
         WHERE
-          contract = nft_contracts_daily.contract
-      ) tokens ON TRUE
-      LEFT JOIN LATERAL (
+          contract = nft_meta.contract
+      ) AS tokens,
+      (
         SELECT
-          COUNT(contract_account_id)
+          COUNT(DISTINCT account)
         FROM
-          nft_events
+          nft_holders
         WHERE
-          block_timestamp > CAST(
-            EXTRACT(
-              epoch
-              FROM
-                NOW() - '1 day'::INTERVAL
-            ) AS BIGINT
-          ) * 1000 * 1000 * 1000
-          AND contract_account_id = nft_contracts_daily.contract
-      ) day ON TRUE
-      LEFT JOIN LATERAL (
-        SELECT
-          COUNT(*)
-        FROM
-          (
-            SELECT
-              account
-            FROM
-              nft_holders_daily
-            WHERE
-              contract = nft_contracts_daily.contract
-            GROUP BY
-              contract,
-              account
-          ) s
-      ) holders ON TRUE
+          contract = nft_meta.contract
+      ) AS holders,
+      COALESCE(transfers_count, 0) AS transfers_day
+    FROM
+      nft_meta
+      LEFT JOIN day_transfers ON nft_meta.contract = day_transfers.contract_account_id
     WHERE
       ${search
       ? sql`
@@ -92,16 +83,15 @@ const count = catchAsync(
 
     const tokens = await sql`
       SELECT
-        COUNT(DISTINCT nft_contracts_daily.contract)
+        COUNT(contract)
       FROM
-        nft_contracts_daily
-        JOIN nft_meta ON nft_meta.contract = nft_contracts_daily.contract
+        nft_meta
       WHERE
         ${search
         ? sql`
-            nft_meta.contract ILIKE ${search + '%'}
-            OR nft_meta.symbol ILIKE ${search + '%'}
-            OR nft_meta.name ILIKE ${search + '%'}
+            contract ILIKE ${search + '%'}
+            OR symbol ILIKE ${search + '%'}
+            OR name ILIKE ${search + '%'}
           `
         : true}
     `;
@@ -166,6 +156,15 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               WHERE
                 nft.contract = a.contract_account_id
                 AND nft.token = a.token_id
+            )
+            AND EXISTS (
+              SELECT
+                1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
             )
           ORDER BY
             event_index DESC

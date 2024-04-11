@@ -26,19 +26,34 @@ const BurrowContract = (props: EventPropsInfo) => {
     switch (parsedEvent.event) {
       case 'deposit_to_reserve':
         return (
-          <DepositToReserve event={parsedEvent.data} network={props.network} />
+          <DepositToReserve
+            event={parsedEvent.data}
+            network={props.network}
+            ownerId={props.ownerId}
+          />
         );
       case 'deposit':
-        return <Deposit event={parsedEvent.data} network={props.network} />;
+        return (
+          <Deposit
+            event={parsedEvent.data}
+            network={props.network}
+            ownerId={props.ownerId}
+          />
+        );
       case 'withdraw_succeeded':
         return (
-          <WithdrawSucceeded event={parsedEvent.data} network={props.network} />
+          <WithdrawSucceeded
+            event={parsedEvent.data}
+            network={props.network}
+            ownerId={props.ownerId}
+          />
         );
       case 'increase_collateral':
         return (
           <IncreaseCollateral
             event={parsedEvent.data}
             network={props.network}
+            ownerId={props.ownerId}
           />
         );
       case 'decrease_collateral':
@@ -46,12 +61,25 @@ const BurrowContract = (props: EventPropsInfo) => {
           <DescreaseCollateral
             event={parsedEvent.data}
             network={props.network}
+            ownerId={props.ownerId}
           />
         );
       case 'borrow':
-        return <Borrow event={parsedEvent.data} network={props.network} />;
+        return (
+          <Borrow
+            event={parsedEvent.data}
+            network={props.network}
+            ownerId={props.ownerId}
+          />
+        );
       case 'repay':
-        return <Repay event={parsedEvent.data} network={props.network} />;
+        return (
+          <Repay
+            event={parsedEvent.data}
+            network={props.network}
+            ownerId={props.ownerId}
+          />
+        );
       default:
         return null;
     }

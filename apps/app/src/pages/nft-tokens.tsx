@@ -1,11 +1,15 @@
+import Head from 'next/head';
+
 import Layout from '@/components/Layouts';
 import List from '@/components/skeleton/common/List';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Router, { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
+
+const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 const TopNFTTokens = () => {
   const router = useRouter();
@@ -45,10 +49,50 @@ const TopNFTTokens = () => {
   };
   return (
     <>
+      <Head>
+        <title>
+          {`${
+            network === 'testnet' ? 'TESTNET' : ''
+          } Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks`}
+        </title>
+        <meta
+          name="title"
+          content="Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks"
+        />
+        <meta
+          name="description"
+          content="The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks"
+        />
+        <meta
+          property="og:title"
+          content="Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks"
+        />
+        <meta
+          property="og:description"
+          content="The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks"
+        />
+        <meta
+          property="twitter:title"
+          content="Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks"
+        />
+        <meta
+          property="twitter:description"
+          content="The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks"
+        />
+        <meta
+          property="og:image"
+          content="/thumbnail/thumbnail_nft_tokens.png"
+        />
+        <meta
+          property="twitter:image"
+          content="/thumbnail/thumbnail_nft_tokens.png"
+        />
+        <link rel="canonical" href={`${appUrl}/nft-tokens`} />
+      </Head>
       <section>
         <div className="bg-hero-pattern h-72">
           <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
+            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
               Non-Fungible Token Tracker (NEP-171)
             </h1>
           </div>
@@ -67,6 +111,7 @@ const TopNFTTokens = () => {
                   network: networkId,
                   t: t,
                 }}
+                loading={<List className="absolute" ref={heightRef} />}
               />
             </div>
           </div>

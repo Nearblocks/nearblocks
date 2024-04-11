@@ -8,13 +8,14 @@ type Props = {
   skeleton?: JSX.Element;
   onChangeHeight?: () => void;
   defaultSkelton?: JSX.Element;
+  loading?: JSX.Element;
 };
 
 export function VmComponent(props: Props) {
   const { skeleton, onChangeHeight, defaultSkelton } = props;
   const onChangeHeightCalled = useRef(false);
 
-  const { EthersProvider, Widget } = useVmStore();
+  const { EthersProvider, ethersContext, Widget } = useVmStore();
   const redirectMapStore = useBosLoaderStore();
   const [showLoader, setShowLoader] = useState(true);
   const [Loader, setLoader] = useState(true);
@@ -22,7 +23,7 @@ export function VmComponent(props: Props) {
     setLoader(!EthersProvider || !redirectMapStore.hasResolved);
     const timer = setTimeout(() => {
       setShowLoader(!EthersProvider || !redirectMapStore.hasResolved);
-    }, 250);
+    }, 350);
 
     return () => clearTimeout(timer);
   }, [EthersProvider, redirectMapStore.hasResolved]);
@@ -32,19 +33,22 @@ export function VmComponent(props: Props) {
       onChangeHeightCalled.current = true;
     }
   }, [showLoader, onChangeHeight]);
-
+  const ownerId = process.env.NEXT_PUBLIC_ACCOUNT_ID;
   return (
     <>
       {showLoader && skeleton}
       {Loader ? (
         defaultSkelton
       ) : (
-        <Widget
-          config={{
-            redirectMap: redirectMapStore.redirectMap,
-          }}
-          {...props}
-        />
+        <EthersProvider value={ethersContext}>
+          <Widget
+            config={{
+              redirectMap: redirectMapStore.redirectMap,
+            }}
+            {...props}
+            props={{ ownerId: ownerId, ...props.props }}
+          />
+        </EthersProvider>
       )}
     </>
   );

@@ -30,11 +30,10 @@ export function encodeArgs(args: object) {
   return Buffer.from(JSON.stringify(args)).toString('base64');
 }
 
-export function decodeArgs(args: number[]) {
+export function decodeArgs(args: string[]) {
   if (!args || typeof args === 'undefined') return {};
 
-  const encodedString = Buffer.from(args).toString('base64');
-  return JSON.parse(Buffer.from(encodedString, 'base64').toString());
+  return JSON.parse(Buffer.from(args, 'base64').toString());
 }
 
 export function txnMethod(
@@ -96,7 +95,7 @@ export function mapRpcActionToAction(action: string | ActionType) {
   }
 
   if (typeof action === 'object') {
-    const kind = Object.keys(action)[0];
+    const kind = action && Object.keys(action)[0];
 
     return {
       action_kind: kind,
@@ -108,7 +107,7 @@ export function mapRpcActionToAction(action: string | ActionType) {
 }
 
 function valueFromObj(obj: Obj): string | undefined {
-  const keys = Object.keys(obj);
+  const keys = obj && Object.keys(obj);
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -192,29 +191,6 @@ export function txnErrorMessage(txn: RPCTransactionInfo) {
   }
 
   return null;
-}
-
-export function formatLine(line: string, offset: number, format: string) {
-  let result = `${offset.toString(16).padStart(8, '0')}  `;
-
-  const hexValues = line.match(/[0-9a-fA-F]{2}/g) || [];
-
-  hexValues.forEach((byte: string, index: number) => {
-    if (index > 0 && index % 4 === 0) {
-      result += ' ';
-    }
-    result += byte.toUpperCase().padEnd(2, ' ') + ' ';
-  });
-
-  if (format === 'twos') {
-    result = result.replace(/(.{4})/g, '$1 ');
-  } else if (format === 'default') {
-    result += ` ${String.fromCharCode(
-      ...hexValues.map((b: string) => parseInt(b, 16)),
-    )}`;
-  }
-
-  return result.trimEnd();
 }
 
 export function collectNestedReceiptWithOutcomeOld(

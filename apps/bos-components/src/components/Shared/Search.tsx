@@ -3,26 +3,44 @@
  * @param {string}  [network] - The network data to show, either mainnet or testnet.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {boolean} [isHeader] - If the component is part of a header, apply alternate styles.
+ * @param {{ push: (path: string) => void }} router - An object with a `push` function for routing purposes.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   isHeader?: boolean;
+  router: { push: (path: string) => void };
 }
 
 import SearchIcon from '@/includes/icons/SearchIcon';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
-import { localFormat, shortenHex } from '@/includes/formats';
-import { debounce, getConfig, shortenAddress } from '@/includes/libs';
 import { SearchResult } from '@/includes/types';
 
-export default function SearchBar({ isHeader, t, network }: Props) {
+export default function SearchBar({
+  isHeader,
+  t,
+  network,
+  router,
+  ownerId,
+}: Props) {
+  const { localFormat, shortenHex } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { debounce, getConfig, shortenAddress } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
   const [keyword, setKeyword] = useState('');
+  const [query, setQuery] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
-  const config = getConfig(network);
+  const [isResultsVisible, setIsResultsVisible] = useState(false);
+
+  const config = getConfig && getConfig(network);
 
   // Determine whether to show search results
   const showResults =
@@ -30,21 +48,55 @@ export default function SearchBar({ isHeader, t, network }: Props) {
     (result?.txns && result.txns.length > 0) ||
     (result?.accounts && result.accounts.length > 0) ||
     (result?.receipts && result.receipts.length > 0);
+  const showSearchResults = () => {
+    setIsResultsVisible(true);
+  };
 
+  const hideSearchResults = () => {
+    setIsResultsVisible(false);
+  };
   // Debounced keyword update
   const debouncedSetKeyword = useMemo(
-    () => debounce(500, (value: string) => setKeyword(value)),
+    () => debounce && debounce(500, (value: string) => setKeyword(value)),
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
+  const redirect = (route: any) => {
+    switch (route?.type) {
+      case 'block':
+        return router.push(`/blocks/${route?.path}`);
+      case 'txn':
+        return router.push(`/txns/${route?.path}`);
+      case 'receipt':
+        return router.push(`/txns/${route?.path}`);
+      case 'address':
+        return router.push(`/address/${route?.path}`);
+      default:
+        return;
+    }
+  };
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
-    debouncedSetKeyword(newNextValue);
+    setQuery(newNextValue);
+    debouncedSetKeyword && debouncedSetKeyword(newNextValue);
+    showSearchResults();
   };
 
+  const onSubmit = () => {
+    if (filter && query && config.backendUrl) {
+      search(query, filter, true, config.backendUrl).then((data: any) => {
+        hideSearchResults();
+        redirect(data);
+      });
+    }
+  };
+  const onSelect = () => {
+    hideSearchResults();
+  };
   useEffect(() => {
-    // Fetch data when keyword or filter changes
     const fetchData = (keyword: string, filter: string) => {
       if (filter && keyword) {
         search(keyword, filter, false, config.backendUrl).then((data: any) => {
@@ -52,7 +104,11 @@ export default function SearchBar({ isHeader, t, network }: Props) {
         });
       }
     };
-    fetchData(keyword, filter);
+    if (config.backendUrl) {
+      fetchData(keyword, filter);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword, filter, config.backendUrl]);
   // Handle filter change
   const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) =>
@@ -94,8 +150,13 @@ export default function SearchBar({ isHeader, t, network }: Props) {
               }
               className="search bg-white w-full h-full text-sm px-4 py-3 outline-none border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
               onChange={handleChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  onSubmit();
+                }
+              }}
             />
-            {showResults && (
+            {isResultsVisible && showResults && (
               <div className="z-50 relative">
                 <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border">
                   {result?.accounts && result.accounts.length > 0 && (
@@ -104,15 +165,18 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                         {t ? t('common:search.list.address') : 'Account'}
                       </h3>
                       {result.accounts.map((address) => (
-                        <a
+                        <Link
                           href={`/address/${address.account_id}`}
                           className="hover:no-underline"
                           key={address.account_id}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenAddress(address.account_id)}
                           </div>
-                        </a>
+                        </Link>
                       ))}
                     </>
                   )}
@@ -122,15 +186,18 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                         {t ? t('common:search.list.txns') : 'Txns'}
                       </h3>
                       {result.txns.map((txn) => (
-                        <a
+                        <Link
                           className="hover:no-underline"
                           href={`/txns/${txn.transaction_hash}`}
                           key={txn.transaction_hash}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenHex(txn.transaction_hash)}
                           </div>
-                        </a>
+                        </Link>
                       ))}
                     </>
                   )}
@@ -140,15 +207,18 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                         Receipts
                       </h3>
                       {result.receipts.map((receipt) => (
-                        <a
+                        <Link
                           href={`/txns/${receipt.originated_from_transaction_hash}`}
                           className="hover:no-underline"
                           key={receipt.receipt_id}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             {shortenHex(receipt.receipt_id)}
                           </div>
-                        </a>
+                        </Link>
                       ))}
                     </>
                   )}
@@ -158,12 +228,15 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                         {t ? t('common:search.list.blocks') : 'Blocks'}
                       </h3>
                       {result.blocks.map((block) => (
-                        <a
+                        <Link
                           href={`/blocks/${block.block_hash}`}
                           className="hover:no-underline"
                           key={block.block_hash}
                         >
-                          <div className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate">
+                          <div
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            onClick={onSelect}
+                          >
                             #
                             {block.block_height
                               ? localFormat(block.block_height)
@@ -171,7 +244,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
                             (0x
                             {shortenHex(block.block_hash)})
                           </div>
-                        </a>
+                        </Link>
                       ))}
                     </>
                   )}
@@ -181,6 +254,7 @@ export default function SearchBar({ isHeader, t, network }: Props) {
           </div>
           <button
             type="button"
+            onClick={() => onSubmit()}
             className={`${
               isHeader ? 'bg-blue-900/[0.05]' : 'bg-gray-100'
             } rounded-r-lg px-5 outline-none focus:outline-none border`}

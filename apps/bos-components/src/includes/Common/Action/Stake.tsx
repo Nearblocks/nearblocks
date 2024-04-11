@@ -1,7 +1,10 @@
-import { yoctoToNear } from '@/includes/libs';
 import { ActionPropsInfo } from '@/includes/types';
 
 const Stake = (props: ActionPropsInfo) => {
+  const { yoctoToNear } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
+
   const FaRight = (props: { className: string }) => {
     return (
       <svg

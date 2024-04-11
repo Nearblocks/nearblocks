@@ -13,9 +13,11 @@
  *                                    Example: handleFilter={handlePageFilter} where handlePageFilter is a function to filter the page.
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                   Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string }) => string;
   id: string;
@@ -24,13 +26,6 @@ interface Props {
   onFilterClear: (name: string) => void;
 }
 
-import {
-  localFormat,
-  getTimeAgoString,
-  formatTimestampToString,
-  capitalizeFirstLetter,
-} from '@/includes/formats';
-import { getConfig, nanoToMilli } from '@/includes/libs';
 import TxnStatus from '@/includes/Common/Status';
 import Filter from '@/includes/Common/Filter';
 import { TransactionInfo } from '@/includes/types';
@@ -42,17 +37,30 @@ import TokenImage from '@/includes/icons/TokenImage';
 import Download from '@/includes/icons/Download';
 
 export default function (props: Props) {
-  const { network, t, id, filters, handleFilter, onFilterClear } = props;
+  const { network, t, id, filters, handleFilter, onFilterClear, ownerId } =
+    props;
+  const {
+    localFormat,
+    getTimeAgoString,
+    formatTimestampToString,
+    capitalizeFirstLetter,
+  } = VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, truncateString } =
+    VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
   const [showAge, setShowAge] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [address, setAddress] = useState('');
+  const [filterValue, setFilterValue] = useState<Record<string, string>>({});
 
   const [sorting, setSorting] = useState('desc');
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const setPage = (pageNumber: number) => {
@@ -81,11 +89,12 @@ export default function (props: Props) {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count ?? 0);
+            } else {
+              handleRateLimit(data, () => fetchTotalTxns(qs));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {});
+        .catch(() => {});
     }
 
     function fetchTxnsData(qs: string, sqs: string, page: number) {
@@ -108,12 +117,16 @@ export default function (props: Props) {
             } else if (resp.length === 0) {
               setTxns({});
             }
+            setIsLoading(false);
+          } else {
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(qs, sorting, page),
+              () => setIsLoading(false),
+            );
           }
         })
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     let urlString = '';
     if (filters && Object.keys(filters).length > 0) {
@@ -132,11 +145,18 @@ export default function (props: Props) {
       fetchTotalTxns();
       fetchTxnsData('', sorting, currentPage);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, filters, sorting]);
 
-  let filterValue: string;
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    filterValue = event.target.value;
+  const onInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string,
+  ): void => {
+    setFilterValue((prevFilters) => ({
+      ...prevFilters,
+      [name]: event.target.value,
+    }));
   };
 
   const onFilter = (
@@ -145,14 +165,18 @@ export default function (props: Props) {
   ): void => {
     e.preventDefault();
 
-    if (filterValue !== null && filterValue !== undefined) {
-      handleFilter(name, filterValue);
+    if (filterValue[name] !== undefined && filterValue[name] !== null) {
+      handleFilter(name, filterValue[name]);
     }
   };
 
   const onClear = (name: string) => {
     if (onFilterClear && filters) {
       onFilterClear(name);
+      setFilterValue((prevFilters) => ({
+        ...prevFilters,
+        [name]: '',
+      }));
     }
   };
 
@@ -160,6 +184,14 @@ export default function (props: Props) {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
   };
 
+  const onHandleMouseOver = (e: any, id: string) => {
+    e.preventDefault();
+
+    setAddress(id);
+  };
+  const handleMouseLeave = () => {
+    setAddress('');
+  };
   const columns = [
     {
       header: '',
@@ -169,8 +201,7 @@ export default function (props: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600   flex justify-end',
+      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
     },
     {
       header: <>{t ? t('txns:hash') : 'TXN HASH'}</>,
@@ -181,14 +212,14 @@ export default function (props: Props) {
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                  <a
+                  <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
                     <a className="text-green-500 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
-                  </a>
+                  </Link>
                 </span>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -202,16 +233,16 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               {t ? t('txns:type') : 'METHOD'}
@@ -225,8 +256,8 @@ export default function (props: Props) {
             <div className="flex flex-col">
               <input
                 name="event"
-                value={filters ? filters?.event : ''}
-                onChange={onInputChange}
+                value={filterValue['event']}
+                onChange={(e) => onInputChange(e, 'event')}
                 placeholder="Search by method"
                 className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
               />
@@ -242,7 +273,7 @@ export default function (props: Props) {
                 <button
                   name="type"
                   type="button"
-                  onClick={() => onClear('method')}
+                  onClick={() => onClear('event')}
                   className="flex-1 rounded bg-gray-300 text-xs h-7"
                 >
                   {t ? t('txns:filter.clear') : 'Clear'}
@@ -273,7 +304,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
     },
     {
       header: <>Affected</>,
@@ -284,15 +315,27 @@ export default function (props: Props) {
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
-                    <a
+                  <span
+                    className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      row?.affected_account_id === address
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        : 'text-green-500 p-0.5 px-1'
+                    }`}
+                  >
+                    <Link
                       href={`/address/${row?.affected_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row?.affected_account_id}
+                      <a
+                        className="text-green-500 hover:no-underline"
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.affected_account_id)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        {truncateString(row?.affected_account_id, 15, '...')}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -309,9 +352,9 @@ export default function (props: Props) {
           )}
         </>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600  font-medium',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600  font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -340,7 +383,7 @@ export default function (props: Props) {
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-6 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               Involved
@@ -353,8 +396,8 @@ export default function (props: Props) {
           >
             <input
               name="involved"
-              value={filters ? filters?.involved : ''}
-              onChange={onInputChange}
+              value={filterValue['involved']}
+              onChange={(e) => onInputChange(e, 'involved')}
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
@@ -389,14 +432,24 @@ export default function (props: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span>
-                    <a
+                    <Link
                       href={`/address/${row.involved_account_id}`}
-                      className="hover:no-underline"
+                      className="hover:no-underline truncate inline-block"
                     >
-                      <a className="text-green-500 hover:no-underline">
-                        {row.involved_account_id}
+                      <a
+                        className={`text-green-500 hover:no-underline ${
+                          row?.involved_account_id === address
+                            ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                            : 'text-green-500 p-1'
+                        }`}
+                        onMouseOver={(e) =>
+                          onHandleMouseOver(e, row?.involved_account_id)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        {truncateString(row.involved_account_id, 15, '...')}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -414,7 +467,7 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600  font-medium',
     },
     {
       header: <>Token ID</>,
@@ -424,14 +477,14 @@ export default function (props: Props) {
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
               <span>
-                <a
+                <Link
                   href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 font-medium hover:no-underline">
                     {row?.token_id}
                   </a>
-                </a>
+                </Link>
               </span>
             </Tooltip.Trigger>
             <Tooltip.Content
@@ -445,9 +498,9 @@ export default function (props: Props) {
         </Tooltip.Provider>
       ),
       tdClassName:
-        'px-5 py-4 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
+        'px-4 py-2 text-sm text-nearblue-600  max-w-[110px] inline-block truncate',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: <>Token</>,
@@ -468,14 +521,14 @@ export default function (props: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <div className="text-sm text-nearblue-600  max-w-[110px] inline-block truncate whitespace-nowrap">
-                      <a
+                      <Link
                         href={`/nft-token/${row?.nft?.contract}`}
                         className="hover:no-underline"
                       >
                         <a className="text-green-500 font-medium hover:no-underline">
                           {row?.nft?.name}
                         </a>
-                      </a>
+                      </Link>
                     </div>
                   </Tooltip.Trigger>
                   <Tooltip.Content
@@ -509,13 +562,13 @@ export default function (props: Props) {
           )
         );
       },
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
     },
     {
       header: (
-        <div className="w-full inline-flex px-5 py-4">
+        <div className="w-full inline-flex px-4 py-4">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -587,7 +640,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
       thClassName: 'whitespace-nowrap',
     },
   ];
@@ -602,23 +655,26 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
-              A total of {localFormat(totalCount.toString())} transactions found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              transactions found
             </p>
           </div>
-          <div className=" flex items-center px-2 text-sm mb-4 text-nearblue-600 lg:ml-auto">
+          <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
             {filters && Object.keys(filters).length > 0 && (
-              <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto">
-                Filtered By:
-                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
-                  {filters &&
-                    Object.keys(filters).map((key) => (
-                      <span className="flex" key={key}>
-                        {capitalizeFirstLetter(key)}:{' '}
-                        <span className="inline-block truncate max-w-[120px]">
-                          <span className="font-semibold">{filters[key]}</span>
-                        </span>
+              <div className="flex  px-2 items-center text-sm text-gray-500 mb-2 lg:mb-0">
+                <span className="mr-1 lg:mr-2">Filtered By:</span>
+                <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                  {Object.keys(filters).map((key) => (
+                    <span
+                      className="flex items-center max-sm:mb-1 truncate max-w-[120px]"
+                      key={key}
+                    >
+                      {capitalizeFirstLetter(key)}:{' '}
+                      <span className="font-semibold truncate">
+                        {filters[key]}
                       </span>
-                    ))}
+                    </span>
+                  ))}
                   <CloseCircle
                     className="w-4 h-4 fill-current cursor-pointer"
                     onClick={onClear}
@@ -626,28 +682,25 @@ export default function (props: Props) {
                 </span>
               </div>
             )}
-            <span className="text-xs text-nearblue-600">
-              <a
-                href="/nft-token/exportdata/address/id"
-                className="hover:no-underline"
-              >
-                <a
-                  target="_blank"
-                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-2  border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800 hover:no-underline"
+            <span className="text-xs text-nearblue-600 self-stretch lg:self-auto px-2">
+              <button className="hover:no-underline ">
+                <Link
+                  href={`/nft-token/exportdata?address=${id}`}
+                  className="flex items-center text-nearblue-600 font-medium py-2 border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800"
                 >
-                  <p>CSV Export </p>
+                  <p>CSV Export</p>
                   <span className="ml-2">
                     <Download />
                   </span>
-                </a>
-              </a>
+                </Link>
+              </button>
             </span>
           </div>
         </div>
       )}
       {
         <Widget
-          src={`${config.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: txns[currentPage],

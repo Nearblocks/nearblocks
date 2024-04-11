@@ -7,21 +7,26 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id?: string;
+  ownerId: string;
 }
 
 import { AccountContractInfo } from '@/includes/types';
-import { getConfig } from '@/includes/libs';
 import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
 
-export default function ({ network, t, id }: Props) {
+export default function ({ network, t, id, ownerId }: Props) {
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [isLoading, setIsLoading] = useState(false);
   const [showWhen, setShowWhen] = useState(true);
   const [sorting, setSorting] = useState('desc');
@@ -31,7 +36,7 @@ export default function ({ network, t, id }: Props) {
   const initialPage = 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -58,42 +63,52 @@ export default function ({ network, t, id }: Props) {
             body: {
               keys: AccountContractInfo[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.keys;
-            Setkeys(resp);
+            if (data.status === 200) {
+              Setkeys(resp);
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchAccountData(),
+                () => setIsLoading(false),
+              );
+            }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
 
     function fetchCountData() {
-      setIsLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}/keys/count`)
         .then(
           (data: {
             body: {
               keys: { count: number }[];
             };
+            status: number;
           }) => {
             const resp = data?.body?.keys?.[0]?.count || 0;
-            setCount(resp);
+            if (data.status === 200) {
+              setCount(resp);
+            } else {
+              handleRateLimit(data, fetchCountData);
+            }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => {});
     }
     fetchAccountData();
     fetchCountData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, currentPage, sorting]);
 
   return (
     <>
-      <div className="overflow-x-auto ">
+      <div className="bg-white soft-shadow rounded-xl overflow-x-auto ">
         <table className="min-w-full divide-y border-t">
           <thead className="bg-gray-100">
             <tr>
@@ -198,25 +213,31 @@ export default function ({ network, t, id }: Props) {
               keys.map((key) => (
                 <Widget
                   key={key.account_id + key.public_key}
-                  src={`${config.ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
+                  src={`${ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
                   props={{
                     network: network,
                     t: t,
                     accessKey: key,
                     showWhen: showWhen,
+                    ownerId,
                   }}
+                  loading={
+                    <div className=" whitespace-nowrap text-sm text-nearblue-600 ">
+                      <Skeleton />
+                    </div>
+                  }
                 />
               ))}
           </tbody>
         </table>
+        <Paginator
+          count={count}
+          page={currentPage}
+          limit={25}
+          pageLimit={200}
+          setPage={setPage}
+        />
       </div>
-      <Paginator
-        count={count}
-        page={currentPage}
-        limit={25}
-        pageLimit={200}
-        setPage={setPage}
-      />
     </>
   );
 }

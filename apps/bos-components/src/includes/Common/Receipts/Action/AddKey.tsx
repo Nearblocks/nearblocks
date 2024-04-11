@@ -1,9 +1,15 @@
-import { shortenHex } from '@/includes/formats';
 import FaKey from '@/includes/icons/FaKey';
-import { shortenAddress } from '@/includes/libs';
 import { TransactionActionInfo } from '@/includes/types';
 
 const AddKey = (props: TransactionActionInfo) => {
+  const { shortenAddress } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { shortenHex } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.formats`,
+  );
+
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">

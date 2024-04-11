@@ -7,13 +7,11 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tokenFilter] - The token filter identifier passed as a string
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { dollarFormat, localFormat } from '@/includes/formats';
 import FaAddressBook from '@/includes/icons/FaAddressBook';
-import { getConfig } from '@/includes/libs';
-import { decodeArgs, encodeArgs } from '@/includes/near';
 import {
   FtInfo,
   FtsInfo,
@@ -22,19 +20,32 @@ import {
 } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   id: string;
   tokenFilter?: string;
 }
 
-export default function ({ network, id, tokenFilter }: Props) {
+export default function ({ network, id, tokenFilter, ownerId }: Props) {
+  const { dollarFormat, localFormat } = VM.require(
+    `${ownerId}/widget/includes.Utils.format`,
+  );
+
+  const { getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
+  const { decodeArgs, encodeArgs } = VM.require(
+    `${ownerId}/widget/includes.Utils.near`,
+  );
+
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [inventoryData, setInventoryData] = useState<InventoryInfo>(
     {} as InventoryInfo,
   );
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchInventoryData() {
@@ -55,13 +66,21 @@ export default function ({ network, id, tokenFilter }: Props) {
             const response = data?.body?.inventory;
             if (data.status === 200) {
               setInventoryData(response);
+              setInventoryLoading(false);
+            } else {
+              handleRateLimit(data, fetchInventoryData, () =>
+                setInventoryLoading(false),
+              );
             }
-            setInventoryLoading(false);
           },
         )
         .catch(() => {});
     }
-    fetchInventoryData();
+    if (config?.backendUrl) {
+      fetchInventoryData();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, tokenFilter]);
 
   useEffect(() => {
@@ -77,7 +96,7 @@ export default function ({ network, id, tokenFilter }: Props) {
             finality: 'final',
             account_id: contracts,
             method_name: 'ft_balance_of',
-            args_base64: encodeArgs({ account_id }),
+            args_base64: encodeArgs ? encodeArgs({ account_id }) : '',
           },
         }),
         headers: {
@@ -96,11 +115,11 @@ export default function ({ network, id, tokenFilter }: Props) {
         .then(
           (data: {
             body: {
-              result: { result: number[] };
+              result: { result: string[] };
             };
           }) => {
             const resp = data?.body?.result;
-            return decodeArgs(resp.result);
+            return decodeArgs ? decodeArgs(resp.result) : '';
           },
         )
         .catch(() => {});
@@ -129,8 +148,8 @@ export default function ({ network, id, tokenFilter }: Props) {
             return { ...ft, amount: rslt };
           });
         }),
-      ).then((results: FtsInfo[]) => {
-        results.forEach((rslt: FtsInfo) => {
+      ).then((results: TokenListInfo[]) => {
+        results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
           const amount = rslt?.amount;
 
@@ -139,13 +158,13 @@ export default function ({ network, id, tokenFilter }: Props) {
           let rpcAmount = Big(0);
 
           if (amount) {
-            rpcAmount = ftrslt.ft_metas?.decimals
-              ? Big(amount).div(Big(10).pow(ftrslt.ft_metas?.decimals))
+            rpcAmount = ftrslt.ft_meta?.decimals
+              ? Big(amount).div(Big(10).pow(ftrslt.ft_meta?.decimals))
               : 0;
           }
 
-          if (ftrslt.ft_metas?.price) {
-            sum = rpcAmount.mul(Big(ftrslt.ft_metas?.price));
+          if (ftrslt.ft_meta?.price) {
+            sum = rpcAmount.mul(Big(ftrslt.ft_meta?.price));
             total = total.add(sum);
 
             return pricedTokens.push({
@@ -172,16 +191,20 @@ export default function ({ network, id, tokenFilter }: Props) {
     }
 
     loadBalances();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, tokenFilter, config?.rpcUrl]);
 
   const filterToken: TokenListInfo = ft?.tokens?.length
     ? ft?.tokens[0]
     : ({} as TokenListInfo);
 
+  const ftAmount = ft?.amount ?? 0;
+
   return (
     <>
       {tokenFilter && (
-        <div className="py-2">
+        <div className="py-2 mb-4">
           <div className="bg-white soft-shadow rounded-xl  px-2 py-3">
             <div className="grid md:grid-cols-3 grid-cols-1 divide-y md:divide-y-0 md:divide-x">
               <div className="px-4 md:py-0 py-2">
@@ -192,12 +215,12 @@ export default function ({ network, id, tokenFilter }: Props) {
                   </h5>
                 </div>
                 <h5 className="text-sm my-1 font-bold text-green-500 truncate md:max-w-[200px] lg:max-w-[310px] xl:max-w-full max-w-full inline-block">
-                  <a
+                  <Link
                     href={`/address/${tokenFilter}`}
                     className="hover:no-underline"
                   >
                     <a className="hover:no-underline">{tokenFilter}</a>
-                  </a>
+                  </Link>
                 </h5>
               </div>
               <div className="px-4 md:py-0 py-2">
@@ -207,7 +230,7 @@ export default function ({ network, id, tokenFilter }: Props) {
                   <Skeleton className="w-40" />
                 ) : (
                   <p className="text-sm my-1">
-                    {Number(filterToken?.rpcAmount)
+                    {Number(filterToken?.rpcAmount) && localFormat
                       ? localFormat(filterToken?.rpcAmount)
                       : ''}
                   </p>
@@ -220,11 +243,13 @@ export default function ({ network, id, tokenFilter }: Props) {
                   <Skeleton className="w-40" />
                 ) : (
                   <p className="text-sm my-1 flex">
-                    ${ft?.amount ? dollarFormat(ft?.amount) : ft?.amount ?? ''}
+                    {ftAmount && dollarFormat
+                      ? '$' + dollarFormat(ftAmount)
+                      : ''}
                     <span>
-                      {filterToken?.ft_metas?.price && (
+                      {filterToken?.ft_meta?.price && (
                         <div className="text-gray-400 ml-2">
-                          @{filterToken?.ft_metas?.price}
+                          @{filterToken?.ft_meta?.price}
                         </div>
                       )}
                     </span>

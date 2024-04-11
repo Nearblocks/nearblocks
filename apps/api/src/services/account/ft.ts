@@ -82,6 +82,15 @@ const txns = catchAsync(
               WHERE
                 ft.contract = a.contract_account_id
             )
+            AND EXISTS (
+              SELECT
+                1
+              FROM
+                transactions
+                JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+              WHERE
+                receipts.receipt_id = a.receipt_id
+            )
           ORDER BY
             event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
           LIMIT
@@ -89,7 +98,7 @@ const txns = catchAsync(
           OFFSET
             ${offset}
         ) AS tmp using (event_index)
-        LEFT JOIN LATERAL (
+        INNER JOIN LATERAL (
           SELECT
             transactions.transaction_hash,
             transactions.included_in_block_hash,
@@ -158,6 +167,15 @@ const txnsCount = catchAsync(
           WHERE
             ft.contract = a.contract_account_id
         )
+        AND EXISTS (
+          SELECT
+            1
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = a.receipt_id
+        )
     `;
 
     const { query, values } = keyBinder(
@@ -171,9 +189,10 @@ const txnsCount = catchAsync(
       values,
     );
 
+    const cost = +rows?.[0]?.cost;
     const count = +rows?.[0]?.count;
 
-    if (count > config.maxQueryRows) {
+    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
       return res.status(200).json({ txns: rows });
     }
 
@@ -255,6 +274,15 @@ const txnsExport = catchAsync(
                 WHERE
                   ft.contract = a.contract_account_id
               )
+              AND EXISTS (
+                SELECT
+                  1
+                FROM
+                  transactions
+                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                WHERE
+                  receipts.receipt_id = a.receipt_id
+              )
               AND t.block_timestamp BETWEEN :start AND :end
             ORDER BY
               event_index ASC
@@ -263,7 +291,7 @@ const txnsExport = catchAsync(
           ) AS tmp using(
             event_index
           )
-          LEFT JOIN LATERAL (
+          INNER JOIN LATERAL (
             SELECT
               transactions.transaction_hash,
               transactions.included_in_block_hash,
@@ -309,8 +337,9 @@ const txnsExport = catchAsync(
       { header: 'Status', key: 'status' },
       { header: 'Txn Hash', key: 'hash' },
       { header: 'Method', key: 'method' },
-      { header: 'From', key: 'from' },
-      { header: 'To', key: 'to' },
+      { header: 'Affected', key: 'affected' },
+      { header: 'Involved', key: 'involved' },
+      { header: 'Direction', key: 'direction' },
       { header: 'Quantity', key: 'quantity' },
       { header: 'Token', key: 'token' },
       { header: 'Contract', key: 'contract' },
@@ -322,10 +351,12 @@ const txnsExport = catchAsync(
         const status = row.outcomes.status;
 
         stringifier.write({
+          affected: row.affected_account_id || 'system',
           block: row.block.block_height,
           contract: row.ft ? row.ft.contract : '',
-          from: row.affected_account_id || 'system',
+          direction: row.delta_amount > 0 ? 'In' : 'Out',
           hash: row.transaction_hash,
+          involved: row.involved_account_id || 'system',
           method: row.cause,
           quantity: row.ft
             ? tokenAmount(row.delta_amount, row.ft.decimals)
@@ -334,7 +365,6 @@ const txnsExport = catchAsync(
           timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
             'YYYY-MM-DD HH:mm:ss',
           ),
-          to: row.involved_account_id || 'system',
           token: row.ft ? `${row.ft.name} (${row.ft.symbol})` : '',
         });
         callback();

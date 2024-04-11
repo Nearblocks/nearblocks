@@ -8,9 +8,11 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {AccountContractInfo} [accessKey] - Key-value pairs for Accesskey info
  * @param {boolean} [showWhen] - Controls whether to show the date and time in UTC format or as a time ago string.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
   accessKey: AccountContractInfo;
@@ -18,18 +20,18 @@ interface Props {
 }
 
 import { AccessInfo, AccountContractInfo } from '@/includes/types';
-import { getConfig } from '@/includes/libs';
-import { nanoToMilli, yoctoToNear } from '@/includes/libs';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  capitalizeWords,
-} from '@/includes/formats';
 
-export default function ({ network, t, accessKey, showWhen }: Props) {
+export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
+  const { formatTimestampToString, getTimeAgoString, capitalizeWords } =
+    VM.require(`${ownerId}/widget/includes.Utils.formats`);
+
+  const { getConfig, handleRateLimit, nanoToMilli, yoctoToNear } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
 
-  const config = getConfig(network);
+  const config = getConfig && getConfig(network);
 
   const createdTime = accessKey.created?.block_timestamp
     ? nanoToMilli(accessKey.created?.block_timestamp)
@@ -125,10 +127,13 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
           'Content-Type': 'application/json',
         },
       })
-        .then((data: { body: { result: AccessInfo } }) => {
+        .then((data: { body: { result: AccessInfo }; status: number }) => {
           const resp = data?.body?.result;
-
-          setKeyInfo(resp);
+          if (data.status === 200) {
+            setKeyInfo(resp);
+          } else {
+            handleRateLimit(data, () => tokenInfo(view_access_key, account_id));
+          }
         })
         .catch(() => {});
     }
@@ -136,6 +141,8 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
     if (accessKey.public_key && accessKey.permission_kind === 'FUNCTION_CALL') {
       tokenInfo(accessKey.account_id, accessKey.public_key);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.rpcUrl, accessKey]);
 
   return (
@@ -147,11 +154,11 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 font-medium whitespace-nowrap">
-                    <a href={`/txns/${txn?.transaction_hash}`}>
+                    <Link href={`/txns/${txn?.transaction_hash}`}>
                       <a className="text-green-500">
                         {txn?.transaction_hash && txn?.transaction_hash}
                       </a>
-                    </a>
+                    </Link>
                   </span>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -215,7 +222,8 @@ export default function ({ network, t, accessKey, showWhen }: Props) {
           )}
         </td>
         <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
-          {Object.keys(keyInfo).length !== 0 &&
+          {keyInfo &&
+            Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
             'Ⓝ ' +
               yoctoToNear(

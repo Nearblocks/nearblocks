@@ -5,7 +5,6 @@
  * Description: Details of Transaction Receipt Kind on Near Protocol.
  */
 
-import { getConfig, yoctoToNear } from '@/includes/libs';
 import { ReceiptKindInfo } from '@/includes/types';
 
 const backgroundColorClasses: Record<string, string> = {
@@ -21,9 +20,9 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 export default function (props: ReceiptKindInfo) {
-  const { network, t, action, onClick, isTxTypeActive } = props;
+  const { network, t, action, onClick, isTxTypeActive, ownerId } = props;
 
-  const config = getConfig(network);
+  const { yoctoToNear } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const args = action.args.args;
   const decodedArgs = args ? Buffer.from(args, 'base64') : null;
@@ -44,17 +43,23 @@ export default function (props: ReceiptKindInfo) {
       .map((byte: any) => byte.toString(16).padStart(2, '0'))
       .join('');
   }
+
   return (
     <div className="py-2.5">
       <div
-        className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center text-base leading-5 cursor-pointer 
-        transition-all ease-in-out  
+        className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center leading-5 cursor-pointer 
+        transition-all ease-in-out 
         ${backgroundColorClasses[action.kind] || ''}`}
         onClick={onClick}
         role="button"
         tabIndex={0}
       >
-        {action?.kind !== 'functionCall' && t(`txns:${action?.kind}`)}
+        {action?.kind !== 'functionCall' &&
+          action?.kind !== 'delegateAction' &&
+          t(`txns:${action?.kind}`)}
+        {action?.kind === 'delegateAction' ? (
+          <div className="inline-flex text-sm">{`Delegate action`}</div>
+        ) : null}
         {action?.kind === 'functionCall' ? (
           <div className="inline-flex text-sm">{`'${action?.args?.methodName}'`}</div>
         ) : null}
@@ -63,8 +68,8 @@ export default function (props: ReceiptKindInfo) {
         ) : null}
       </div>
       {action?.kind === 'transfer' ? (
-        <div className="inline-flex">
-          <span className="text-xs">
+        <div className="inline-flex justify-center">
+          <span className="text-xs whitespace-nowrap">
             {action?.args?.deposit
               ? yoctoToNear(action?.args?.deposit, false)
               : action?.args?.deposit ?? ''}
@@ -80,12 +85,12 @@ export default function (props: ReceiptKindInfo) {
                 readOnly
                 rows={4}
                 defaultValue={JSON.stringify(prettyArgs)}
-                className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+                className="block appearance-none outline-none w-full max-md:w-fit border rounded-lg bg-gray-100 p-3 my-3 resize-y"
               ></textarea>
             ) : (
               <div>
-                <div className="bg-gray-100 rounded-md p-3 font-semibold my-3">
-                  <div className="bg-inherit text-inherit font-inherit text-base border-none p-0">
+                <div className="bg-gray-100 rounded-md p-3 font-medium my-3">
+                  <div className="bg-inherit text-inherit font-inherit border-none p-0">
                     <div className="max-h-52 overflow-auto">
                       <div className="p-4 h-full w-full">{prettyArgs}</div>
                     </div>
@@ -96,7 +101,11 @@ export default function (props: ReceiptKindInfo) {
           </div>
         ) : action?.kind === 'delegateAction' ? (
           <div className="py-2 ml-6">
-            {action?.args?.senderId}
+            <span className="font-semibold">
+              {action?.args?.senderId
+                ? `Actions delegated for ${action?.args?.senderId}:`
+                : ''}
+            </span>
             {[...action.args.actions]
               .sort(
                 (actionA, actionB) =>
@@ -105,12 +114,13 @@ export default function (props: ReceiptKindInfo) {
               .map((subaction) => (
                 <Widget
                   key={subaction.delegateIndex}
-                  src={`${config.ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptKind`}
                   props={{
                     network: network,
                     t: t,
-                    action: action,
+                    action: subaction,
                     isTxTypeActive: true,
+                    ownerId,
                   }}
                 />
               ))}

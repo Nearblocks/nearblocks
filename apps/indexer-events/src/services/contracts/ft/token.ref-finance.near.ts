@@ -34,7 +34,7 @@ const contract: EventContract = async ({
   if (events.length) {
     events = setEventIndex(
       shardId,
-      blockHeader.timestamp,
+      blockHeader.timestampNanosec,
       EVENT_TYPE,
       EVENT_STANDARD,
       events,

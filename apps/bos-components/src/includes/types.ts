@@ -40,20 +40,31 @@ export type MetaInfo = {
   price: string;
   reference: string;
   symbol: string;
+  contract: string;
 };
 
 export type FtsInfo = {
-  amount: string;
+  affected_account_id: string;
+  block_timestamp: string;
+  delta_amount: string;
+  ft_meta: MetaInfo;
+  event_index: string;
+  involved_account_id: string;
   contract: string;
-  ft_metas: MetaInfo;
+  cause: string;
 };
 
 export type NftsInfo = {
-  amount: string;
-  contract: string;
+  affected_account_id: string;
+  block_timestamp: string;
+  delta_amount: string;
   nft_meta: MetaInfo;
   quantity: string;
   nft_token_meta: string;
+  event_index: string;
+  involved_account_id: string;
+  contract: string;
+  cause: string;
 };
 
 export type InventoryInfo = {
@@ -91,7 +102,7 @@ export type ContractInfo = {
 export type TokenListInfo = {
   amount: string;
   contract: string;
-  ft_metas: MetaInfo;
+  ft_meta: MetaInfo;
   rpcAmount: string;
   amountUsd: string;
 };
@@ -109,6 +120,7 @@ export type BlocksInfo = {
   chunks_agg: {
     gas_limit: string;
     gas_used: string;
+    shards: string;
   };
   gas_price: string;
   prev_block_hash: string;
@@ -223,6 +235,7 @@ export type TransactionInfo = {
     transaction_fee: string;
     gas_used: string;
   };
+  shard_id: string;
   receipt_conversion_gas_burnt: string;
   receipt_conversion_tokens_burnt: string;
   receiver_account_id: string;
@@ -256,6 +269,7 @@ export type ChartStat = {
   txn_fee_usd: string;
   total_addresses: string;
   addresses: string;
+  active_accounts: string;
 };
 
 export type ChartTypeInfo = {
@@ -410,7 +424,7 @@ export type RPCTransactionInfo = {
 };
 
 export type TransactionLog = {
-  contract: string | undefined;
+  contract: string;
   logs: string;
 };
 
@@ -446,6 +460,7 @@ export type AccountContractInfo = {
 export type EventPropsInfo = {
   event: TransactionLog;
   network: string;
+  ownerId: string;
 };
 
 export type DepositPropsInfo = {
@@ -455,6 +470,7 @@ export type DepositPropsInfo = {
     amount: string;
   }[];
   network: string;
+  ownerId: string;
 };
 
 export type ActionPropsInfo = {
@@ -467,6 +483,7 @@ export type ActionPropsInfo = {
       deposit: string;
     };
   };
+  ownerId: string;
 };
 export type ArgsPropsInfo = {
   access_key: {
@@ -491,6 +508,7 @@ export type TransactionActionInfo = {
   args: ArgsPropsInfo;
   receiver: string;
   t: (key: string) => string | undefined;
+  ownerId: string;
 };
 
 export type ReceiptsPropsInfo = {
@@ -657,12 +675,14 @@ export type TransActionProps = {
   };
   receiver: any;
   t: (key: string) => string | undefined;
+  ownerId: string;
 };
 
 export type TokenInfoProps = {
   contract: string;
   amount: string;
   decimals: string;
+  ownerId: string;
   network: string;
 };
 
@@ -704,6 +724,7 @@ export type NFTImageProps = {
   alt?: string;
   reference: string;
   className?: string;
+  ownerId: string;
   network: string;
 };
 
@@ -1382,7 +1403,7 @@ export type ParseOutcomeInfo = {
     gas_burnt: string;
     logs: [];
     metadata: {
-      gas_profile: GasProfileInfo[]; // Make sure GasProfileInfo is correctly imported or defined
+      gas_profile: GasProfileInfo[];
       version: string;
     };
     outgoing_receipts: {
@@ -1393,7 +1414,7 @@ export type ParseOutcomeInfo = {
           deposit: string;
         };
       }[];
-      outcome: OutcomePropsInfo; // Adjust the type to OutcomePropsInfo
+      outcome: OutcomePropsInfo;
     };
     receipt_ids: string[];
     status: {
@@ -1413,6 +1434,7 @@ export type ParseOutcomeInfo = {
 };
 
 export type TransactionReceiptInfo = {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   receipt: any;
@@ -1423,9 +1445,109 @@ export type TransactionReceiptInfo = {
 };
 
 export type ReceiptKindInfo = {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   action: any;
   onClick?: any;
   isTxTypeActive: boolean;
+};
+export type CommentItem = {
+  accountId: string;
+  blockHeight: number;
+  value: {
+    post: {
+      image?: {
+        ipfs_cid: string;
+      };
+      text?: string;
+    };
+  };
+  type: string;
+};
+export type CommentContent = {
+  type: string;
+  text?: string;
+  image?:
+    | {
+        cid?: string;
+        url?: string;
+      }
+    | undefined;
+};
+
+export type ContractParseInfo = {
+  byMethod: {
+    [methodName: string]: [];
+  };
+  methodNames: [];
+  probableInterfaces: [];
+};
+
+export type FieldType = {
+  id: number;
+  name: string;
+  type: string;
+  value: string;
+  placeholder: string;
+};
+
+export type SchemaInfo = {
+  schema_version: string;
+  metadata: {
+    name: string;
+    version: string;
+    build: {
+      compiler: string;
+      builder: string;
+    };
+  };
+  body: {
+    functions: {
+      name: string;
+      kind: string;
+      params: {
+        serialization_type: string;
+        args: [
+          {
+            name: string;
+            type_schema: {
+              $ref: string;
+            };
+          },
+        ];
+      };
+      result: {
+        serialization_type: string;
+        type_schema: {
+          type: [];
+        };
+      };
+    }[];
+    root_schema: {
+      $schema: string;
+      title: String;
+      type: string;
+      definitions: {
+        AccountId: {
+          description: string;
+          type: string;
+        };
+      };
+    };
+  };
+};
+
+export type FieldValueTypes = string | boolean | number | null;
+
+export type Status = {
+  aggregates: {
+    ft_holders: { height: number; sync: boolean; timestamp: string };
+    nft_holders: { height: number; sync: boolean; timestamp: string };
+  };
+  indexers: {
+    balance: { height: number; sync: boolean };
+    base: { height: string; sync: boolean };
+    events: { height: number; sync: boolean };
+  };
 };

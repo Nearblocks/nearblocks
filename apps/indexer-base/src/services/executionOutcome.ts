@@ -54,27 +54,35 @@ export const storeChunkExecutionOutcomes = async (
     outcomeReceipts.push(...executionOutcomeReceipts);
   });
 
+  const promises = [];
+
   if (outcomes.length) {
-    await retry(async () => {
-      await knex('execution_outcomes')
-        .insert(outcomes)
-        .onConflict(['receipt_id'])
-        .ignore();
-    });
+    promises.push(
+      retry(async () => {
+        await knex('execution_outcomes')
+          .insert(outcomes)
+          .onConflict(['receipt_id'])
+          .ignore();
+      }),
+    );
   }
 
   if (outcomeReceipts.length) {
-    await retry(async () => {
-      await knex('execution_outcome_receipts')
-        .insert(outcomeReceipts)
-        .onConflict([
-          'executed_receipt_id',
-          'index_in_execution_outcome',
-          'produced_receipt_id',
-        ])
-        .ignore();
-    });
+    promises.push(
+      retry(async () => {
+        await knex('execution_outcome_receipts')
+          .insert(outcomeReceipts)
+          .onConflict([
+            'executed_receipt_id',
+            'index_in_execution_outcome',
+            'produced_receipt_id',
+          ])
+          .ignore();
+      }),
+    );
   }
+
+  await Promise.all(promises);
 };
 
 const getExecutionOutcomeData = (

@@ -10,16 +10,16 @@
  *                                 Example: If provided, currentPage=3 will display the third page of blocks.
  * @param {function} [setPage] - A function used to set the current page. (Optional)
  *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   currentPage: number;
   setPage: (page: number) => void;
 }
 
-import { localFormat, serialNumber } from '@/includes/formats';
-import { debounce, getConfig } from '@/includes/libs';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
@@ -34,14 +34,23 @@ const initialPagination = {
   per_page: 50,
 };
 
-export default function ({ network, currentPage, setPage, t }: Props) {
+export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
+  const { localFormat, serialNumber } = VM.require(
+    `${ownerId}/widget/includes.Utils.formats`,
+  );
+
+  const { debounce, getConfig, handleRateLimit } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [tokens, setTokens] = useState<{ [key: number]: Token[] }>({});
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchTotalTokens(qs?: string) {
@@ -62,6 +71,8 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             const resp = data?.body?.tokens?.[0];
             if (data.status === 200) {
               setTotalCount(resp?.count);
+            } else {
+              handleRateLimit(data, () => fetchTotalTokens(qs));
             }
           },
         )
@@ -90,21 +101,28 @@ export default function ({ network, currentPage, setPage, t }: Props) {
             const resp = data?.body?.tokens;
             if (data.status === 200) {
               setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTokens(qs, sorting, page),
+                () => setIsLoading(false),
+              );
             }
           },
         )
         .catch(() => {})
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => {});
     }
-
-    fetchTotalTokens();
-    fetchTokens('', sorting, currentPage);
-    if (sorting) {
+    if (config?.backendUrl) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
+      if (sorting) {
+        fetchTotalTokens();
+        fetchTokens('', sorting, currentPage);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
 
   const onOrder = (sortKey: string) => {
@@ -145,7 +163,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
               appUrl={config?.appUrl}
               className="w-5 h-5 mr-2"
             />
-            <a
+            <Link
               href={`/nft-token/${row?.contract}`}
               className="hover:no-underline"
             >
@@ -157,7 +175,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                   {row?.symbol}
                 </span>
               </a>
-            </a>
+            </Link>
           </div>
         </>
       ),
@@ -218,23 +236,28 @@ export default function ({ network, currentPage, setPage, t }: Props) {
   ];
 
   const debouncedSearch = useMemo(() => {
-    return debounce(500, (value: string) => {
-      if (!value || value?.trim() === '') {
-        setSearchResults([]);
-        return;
-      }
-      asyncFetch(`${config?.backendUrl}nfts?search=${value}&per_page=5`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((data: { body: { tokens: Token[] } }) => {
-          const resp = data?.body?.tokens;
-          setSearchResults(resp);
+    return (
+      debounce &&
+      debounce(500, (value: string) => {
+        if (!value || value?.trim() === '') {
+          setSearchResults([]);
+          return;
+        }
+        asyncFetch(`${config?.backendUrl}nfts?search=${value}&per_page=5`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch(() => {});
-    });
+          .then((data: { body: { tokens: Token[] } }) => {
+            const resp = data?.body?.tokens;
+            setSearchResults(resp);
+          })
+          .catch(() => {});
+      })
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,11 +270,13 @@ export default function ({ network, currentPage, setPage, t }: Props) {
       <div className=" bg-white border soft-shadow rounded-xl pb-1 ">
         <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
           {isLoading ? (
-            <Skeleton className="max-w-lg pl-3" />
+            <div className="max-w-lg pl-3 w-full py-3.5 ">
+              <Skeleton className=" h-4" />
+            </div>
           ) : (
             <p className="pl-3">
-              A total of {localFormat(totalCount.toString())} NEP-171 Token
-              Contracts found
+              A total of {localFormat && localFormat(totalCount.toString())}{' '}
+              NEP-171 Token Contracts found
             </p>
           )}
           <div className={`flex w-full h-10 sm:w-80 mr-2`}>
@@ -273,7 +298,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                         key={token?.contract}
                         className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <a href={`/token/${token?.contract}`}>
+                        <Link href={`/token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage
@@ -290,7 +315,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
                               </span>
                             </p>
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     ))}
                   </div>
@@ -300,7 +325,7 @@ export default function ({ network, currentPage, setPage, t }: Props) {
           </div>
         </div>
         <Widget
-          src={`${config?.ownerId}/widget/bos-components.components.Shared.Table`}
+          src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
             data: tokens[currentPage],

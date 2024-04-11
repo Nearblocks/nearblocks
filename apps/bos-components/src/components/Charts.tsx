@@ -8,22 +8,25 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [chartTypes] - Type of chart to be shown, available options are (price, blocks, txns etc)
  * @param {boolean} [poweredBy] - Powered by attribution
-
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 interface Props {
   chartTypes: string;
   poweredBy?: boolean;
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
-import { getConfig, yoctoToNear } from '@/includes/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
-  const { t } = props;
+  const { t, ownerId, network, chartTypes, poweredBy } = props;
+  const { getConfig, handleRateLimit, yoctoToNear } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
   const [data, setData] = useState<ChartStat[]>([]);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
@@ -31,58 +34,58 @@ export default function (props: Props) {
     description: '',
   });
 
-  const config = getConfig(props?.network);
+  const config = getConfig && getConfig(network);
 
   const charts = [
     {
       link: '/charts/near-price',
       text: t ? t('charts:nearPrice.heading') : 'Near Daily Price (USD) Chart',
-      image: `${config?.appUrl}images/charts/near-price.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      image: `/images/charts/near-price.svg`,
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/market-cap',
       text: t
         ? t('charts:marketCap.heading')
         : 'Near Market Capitalization Chart',
-      image: `${config?.appUrl}images/charts/market-cap.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      image: `/images/charts/market-cap.svg`,
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/near-supply',
       text: t ? t('charts:nearSupply.heading') : 'Near Supply Growth Chart',
-      image: `${config?.appUrl}images/charts/near-supply.svg`,
+      image: `/images/charts/near-supply.svg`,
       exclude: false,
     },
     {
       link: '/charts/txns',
       text: t ? t('charts:txns.heading') : 'Near Daily Transactions Chart',
-      image: `${config?.appUrl}images/charts/txns.svg`,
+      image: `/images/charts/txns.svg`,
       exclude: false,
     },
     {
       link: '/charts/blocks',
-      text: t ? t('charts:blocks.heading') : 'Near Block Count',
-      image: `${config?.appUrl}images/charts/blocks.svg`,
+      text: t ? t('charts:blocks.heading') : 'New Blocks',
+      image: `/images/charts/blocks.svg`,
       exclude: false,
     },
     {
       link: '/charts/addresses',
       text: t ? t('charts:addresses.heading') : 'Near Unique Accounts Chart',
-      image: `${config?.appUrl}images/charts/addresses.svg`,
+      image: `/images/charts/addresses.svg`,
       exclude: false,
     },
     {
       link: '/charts/txn-fee',
       text: t ? t('charts:txnFee.heading') : 'Transaction Fee Chart',
-      image: `${config?.appUrl}images/charts/txn-fee.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      image: `/images/charts/txn-fee.svg`,
+      exclude: `${network}` === 'testnet',
     },
     {
       link: '/charts/txn-volume',
       text: t ? t('charts:txnVolume.heading') : 'Transaction Volume Chart',
-      image: `${config?.appUrl}images/charts/txn-volume.svg`,
-      exclude: `${props?.network}` === 'testnet',
+      image: `/images/charts/txn-volume.svg`,
+      exclude: `${network}` === 'testnet',
     },
   ];
 
@@ -94,7 +97,7 @@ export default function (props: Props) {
           y: Number(stat.txns),
           date: stat.date,
           blocks: stat.blocks,
-          addresses: stat.addresses,
+          addresses: stat.active_accounts,
         }),
         'market-cap': (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
@@ -114,9 +117,9 @@ export default function (props: Props) {
         }),
         addresses: (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
-          y: Number(stat.total_addresses),
+          y: Number(stat.active_accounts),
           date: stat.date,
-          addresses: stat.addresses,
+          addresses: stat.active_accounts,
         }),
         'txn-fee': (stat: ChartStat) => ({
           x: new Date(stat.date).valueOf(),
@@ -138,7 +141,7 @@ export default function (props: Props) {
       };
 
       const mappingFunction =
-        chartTypeMappings[props.chartTypes as keyof typeof chartTypeMappings];
+        chartTypeMappings[chartTypes as keyof typeof chartTypeMappings];
       if (mappingFunction) {
         return data.map(mappingFunction);
       } else {
@@ -147,20 +150,29 @@ export default function (props: Props) {
     } catch (error) {
       return [];
     }
-  }, [data, props.chartTypes]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, chartTypes]);
 
   useEffect(() => {
     function fetchChartData() {
       asyncFetch(`${config.backendUrl}charts`).then(
-        (res: { body: { charts: ChartStat[] } }) => {
-          if (res?.body) {
-            setData(res.body?.charts as ChartStat[]);
+        (res: { body: { charts: ChartStat[] }; status: number }) => {
+          if (res.status === 200) {
+            if (res?.body) {
+              setData(res.body?.charts as ChartStat[]);
+            }
+          } else {
+            handleRateLimit(res, fetchChartData);
           }
         },
       );
     }
+    if (config?.backendUrl) {
+      fetchChartData();
+    }
 
-    fetchChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl]);
 
   useEffect(() => {
@@ -168,12 +180,12 @@ export default function (props: Props) {
       let titleText = '';
       let yLabel = '';
       let description = '';
-      switch (props.chartTypes) {
+      switch (chartTypes) {
         case 'market-cap':
           titleText = 'Near Market Capitalization Chart';
           yLabel = 'Near Market Cap (USD)';
           description =
-            'tNear Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
+            'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
           break;
         case 'txns':
           titleText = 'Near Daily Transactions Chart';
@@ -188,14 +200,14 @@ export default function (props: Props) {
             'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
           break;
         case 'blocks':
-          titleText = 'Near Block Count';
+          titleText = 'New Blocks';
           yLabel = 'Blocks per Day';
           description =
-            'Near Block Count Chart shows the historical number of blocks produced daily on Near blockchain.';
+            'New Blocks Chart shows the historical number of blocks produced daily on Near blockchain.';
           break;
         case 'addresses':
           titleText = 'Near Unique Accounts Chart';
-          yLabel = 'Near Cumulative Accounts Growth';
+          yLabel = 'Accounts per Day';
           description =
             'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.';
           break;
@@ -305,7 +317,9 @@ export default function (props: Props) {
     };
 
     fetchData();
-  }, [chartData, props.chartTypes]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartData, chartTypes]);
 
   const iframeSrc = `
   <html>
@@ -318,7 +332,7 @@ export default function (props: Props) {
     <body>
       <div id="chart-container" style="width: 100%; height: 100%;"></div>
       ${
-        props.poweredBy
+        poweredBy
           ? '<p style="text-align: center; color: #000; font-size: 0.75rem; padding-top: 1rem; padding-bottom: 1rem; font-family: sans-serif;">Powered by <a href="https://beta.nearblocks.io/?utm_source=bos_widget&utm_medium=Charts" target="_blank" style="font-weight: 600; font-family: sans-serif; color: #000; text-decoration: none;">NearBlocks</a></p>'
           : ''
       }
@@ -339,7 +353,7 @@ export default function (props: Props) {
 
             let tooltipContent = "";
 
-            switch ("${props.chartTypes}") {
+            switch ("${chartTypes}") {
               case "market-cap":
                 tooltipContent = \`
                   \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
@@ -364,13 +378,12 @@ export default function (props: Props) {
                 case "blocks":
                     tooltipContent = \`
                       \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong>\`;
+                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong><br/>\`;
                   break;
                 case "addresses":
                     tooltipContent = \`
                       \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Blocks: <strong>\${dollarFormat(item.y)}</strong>
-                      \`;
+                      Total Unique Addresses: <strong>\${dollarFormat(item.y)}</strong>\`;
                   break;
                   case "txn-fee":
                     tooltipContent = \`
@@ -411,7 +424,7 @@ export default function (props: Props) {
 
   return (
     <div>
-      {props.chartTypes && (
+      {chartTypes && (
         <>
           <div
             className="block bg-white border soft-shadow rounded-xl overflow-hidden mb-10"
@@ -448,21 +461,21 @@ export default function (props: Props) {
                 key={index}
                 className="block bg-white border soft-shadow rounded-xl overflow-hidden"
               >
-                <a
+                <Link
                   href={chart?.link}
                   className="block leading-7 p-3 text-sm text-nearblue-600 border-b truncate"
                 >
                   <h2>{chart?.text}</h2>
-                </a>
+                </Link>
                 <div className="pl-2 pr-4 py-6">
-                  <a href={chart?.link}>
+                  <Link href={chart?.link}>
                     <img
                       src={chart?.image}
                       alt={chart?.text}
                       width={600}
                       height={550}
                     />
-                  </a>
+                  </Link>
                 </div>
               </div>
             ),

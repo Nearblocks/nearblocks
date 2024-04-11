@@ -8,6 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} [tid] - The nf token identifier passed as a string
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -15,21 +16,26 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { getConfig, shortenAddress } from '@/includes/libs';
 import { Token } from '@/includes/types';
 
 interface Props {
+  ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
 }
 
-export default function ({ network, t, id, tid }: Props) {
+export default function ({ network, t, id, tid, ownerId }: Props) {
+  const { getConfig, handleRateLimit, shortenAddress } = VM.require(
+    `${ownerId}/widget/includes.Utils.libs`,
+  );
+
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [token, setToken] = useState<Token>({} as Token);
   const [loading, setLoading] = useState(false);
-  const config = getConfig(network);
+
+  const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchToken() {
@@ -50,16 +56,19 @@ export default function ({ network, t, id, tid }: Props) {
             const resp = res?.body?.tokens?.[0];
             if (res.status === 200) {
               setToken(resp);
+              setLoading(false);
+            } else {
+              handleRateLimit(res, fetchToken, () => setLoading(false));
             }
           },
         )
-        .catch(() => {})
-        .finally(() => {
-          setLoading(false);
-        });
+        .catch(() => {});
+    }
+    if (config?.backendUrl) {
+      fetchToken();
     }
 
-    fetchToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id, tid]);
 
   const toggleItem = (index: number) => {
@@ -77,13 +86,14 @@ export default function ({ network, t, id, tid }: Props) {
           <div className="bg-white border rounded-xl soft-shadow p-3 aspect-square">
             {
               <Widget
-                src={`${config?.ownerId}/widget/bos-components.components.Shared.NFTImage`}
+                src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
                 props={{
                   base: token?.nft?.base_uri,
                   media: token?.media,
                   reference: token?.reference,
                   className: 'rounded max-h-full',
                   network: network,
+                  ownerId,
                 }}
               />
             }
@@ -99,7 +109,7 @@ export default function ({ network, t, id, tid }: Props) {
               token?.title || token?.token
             )}
           </h1>
-          <a href={`/nft-token/${id}`} className="hover:no-underline">
+          <Link href={`/nft-token/${id}`} className="hover:no-underline">
             <a className="break-all text-green leading-6 text-sm hover:no-underline">
               {loading ? (
                 <div className="w-60 max-w-xs py-2">
@@ -119,7 +129,7 @@ export default function ({ network, t, id, tid }: Props) {
                 </>
               )}
             </a>
-          </a>
+          </Link>
           <Accordion.Root
             type="multiple"
             className="bg-white border rounded-xl  soft-shadow mt-4"
@@ -164,14 +174,15 @@ export default function ({ network, t, id, tid }: Props) {
                         Owner:
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
-                        <a
+                        <Link
                           href={`/address/${token?.asset?.owner}`}
                           className="hover:no-underline"
                         >
                           <a className="text-green hover:no-underline">
-                            {shortenAddress(token?.asset?.owner ?? '')}
+                            {shortenAddress &&
+                              shortenAddress(token?.asset?.owner ?? '')}
                           </a>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -196,11 +207,14 @@ export default function ({ network, t, id, tid }: Props) {
                       Contract Address:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
-                      <a href={`/address/${id}`} className="hover:no-underline">
+                      <Link
+                        href={`/address/${id}`}
+                        className="hover:no-underline"
+                      >
                         <a className="text-green hover:no-underline">
-                          {shortenAddress(id ?? '')}
+                          {shortenAddress && shortenAddress(id ?? '')}
                         </a>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                   <div className="flex p-4">
@@ -277,12 +291,13 @@ export default function ({ network, t, id, tid }: Props) {
           <div className="bg-white soft-shadow rounded-xl pb-1">
             {
               <Widget
-                src={`${config.ownerId}/widget/bos-components.components.NFT.TokenTransfers`}
+                src={`${ownerId}/widget/bos-components.components.NFT.TokenTransfers`}
                 props={{
                   network: network,
                   t: t,
                   id: id,
                   tid: tid,
+                  ownerId,
                 }}
               />
             }

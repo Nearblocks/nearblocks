@@ -1,0 +1,11 @@
+version: '3.6'
+services:
+  aggregates:
+    container_name: mainnet-aggregates
+    build:
+      context: .
+      dockerfile: ./apps/aggregates/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: mainnet.aggregates.env

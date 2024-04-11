@@ -1,8 +1,11 @@
-import { shortenHex } from '@/includes/formats';
 import FaKey from '@/includes/icons/FaKey';
 import { TransactionActionInfo } from '@/includes/types';
 
 const DeleteKey = (props: TransactionActionInfo) => {
+  const { shortenHex } = VM.require(
+    `${props.ownerId}/widget/includes.Utils.formats`,
+  );
+
   const { t, args } = props;
 
   return (

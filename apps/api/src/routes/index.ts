@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import account from '#routes/account';
+import analytics from '#routes/analytics';
 import blocks from '#routes/blocks';
 import charts from '#routes/charts';
 import exports from '#routes/exports';
@@ -12,6 +13,7 @@ import nfts from '#routes/nfts';
 import node from '#routes/node';
 import search from '#routes/search';
 import stats from '#routes/stats';
+import sync from '#routes/sync';
 import txns from '#routes/txns';
 import validators from '#routes/validators';
 
@@ -19,6 +21,7 @@ const routes = () => {
   const app = Router();
 
   account(app);
+  analytics(app);
   blocks(app);
   charts(app);
   exports(app);
@@ -30,6 +33,7 @@ const routes = () => {
   node(app);
   search(app);
   stats(app);
+  sync(app);
   txns(app);
   validators(app);
 

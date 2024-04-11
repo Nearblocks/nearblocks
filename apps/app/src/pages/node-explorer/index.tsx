@@ -1,8 +1,9 @@
+import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import Index from '@/components/skeleton/node-explorer/Index';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId } from '@/utils/config';
+import { networkId, appUrl } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 
@@ -14,6 +15,9 @@ const NodeExplorer = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+
+  const title = 'NEAR Validator List | Nearblocks';
+
   const setPage = (pageNumber: number) => {
     Router.push(`/node-explorer?page=${pageNumber}`, undefined, {
       shallow: true,
@@ -46,9 +50,16 @@ const NodeExplorer = () => {
   };
   return (
     <>
+      <Head>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta property="og:title" content={title} />
+        <meta property="twitter:title" content={title} />
+        <link rel="canonical" href={`${appUrl}/node-explorer`} />
+      </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:sm:text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             NEAR Protocol Validator Explorer
           </h1>
         </div>
@@ -65,6 +76,7 @@ const NodeExplorer = () => {
               setPage: setPage,
               network: networkId,
             }}
+            loading={<Index className="absolute" ref={heightRef} />}
           />
         </div>
       </div>

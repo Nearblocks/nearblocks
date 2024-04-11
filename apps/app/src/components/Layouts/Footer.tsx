@@ -57,7 +57,7 @@ const Footer = () => {
               </div>
 
               <div className="hidden lg:!block"></div>
-              <div className="">
+              <div className="hidden lg:!block">
                 <div className="text-green-500 font-semibold text-xl mb-3">
                   &nbsp;
                 </div>
@@ -73,12 +73,9 @@ const Footer = () => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6">
                   <li>
-                    <Link href="https://nearblocks.io/apis" legacyBehavior>
+                    <Link href="/apis" legacyBehavior>
                       <a target="_blank" rel="noreferrer nofollow noopener">
                         {t('footer.links.api')}
-                        <span className="mx-2 px-1 py-0.5 font-semibold animate-pulse text-white bg-brightgreen rounded text-tiny">
-                          New
-                        </span>
                       </a>
                     </Link>
                   </li>
@@ -90,20 +87,6 @@ const Footer = () => {
                         rel="noreferrer nofollow noopener"
                       >
                         Near Token Bulksender
-                        <span>
-                          <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
-                        </span>
-                      </a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="https://nkyc.io" legacyBehavior>
-                      <a
-                        className="flex"
-                        target="_blank"
-                        rel="noreferrer nofollow noopener"
-                      >
-                        Near KYC Platform
                         <span>
                           <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
                         </span>
@@ -130,6 +113,11 @@ const Footer = () => {
                   <li>
                     <Link href="/charts" legacyBehavior>
                       <a>{t('footer.links.charts')}</a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/node-explorer" legacyBehavior>
+                      <a>{t('footer.links.nearValidator')}</a>
                     </Link>
                   </li>
                 </ul>
@@ -183,6 +171,24 @@ const Footer = () => {
               <p className="text-green-500 text-xs pb-1 pt-6 text-center ">
                 NearBlocks © {currentDate.getFullYear()}
               </p>
+            </div>
+            <div className="text-gray-400 text-xs flex items-center flex-wrap pb-1">
+              Price feeds aggregated by{' '}
+              <Link href="http://coingecko.com/" legacyBehavior>
+                <a
+                  className="mx-1"
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                >
+                  <Image
+                    src="/images/coingecko_logo_black.svg"
+                    alt="CoinGecko"
+                    className="inline-flex w-5 h-5"
+                    width={20}
+                    height={20}
+                  />{' '}
+                </a>
+              </Link>
             </div>
             <div>
               <p className="text-gray-400 text-xs">{t('trademark')}</p>
