@@ -1,13 +1,13 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
 FROM node:20-alpine as base
 
-FROM --platform=$BUILDPLATFORM base AS builder
+FROM base AS builder
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
 RUN turbo prune explorer-selector --docker
 
-FROM --platform=$BUILDPLATFORM base AS installer
+FROM base AS installer
 WORKDIR /app
 ARG NEXT_PUBLIC_NETWORK_ID
 ARG NEXT_PUBLIC_BOS_NETWORK
