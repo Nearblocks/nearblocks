@@ -24,7 +24,7 @@ const TermsAndConditions = () => {
       </Head>
       <div className="bg-hero-pattern h-72"></div>
       <div className="md:px-14 flex flex-col items-start md:py-16 -mt-80 mx-2">
-        <h1 className="mb-2 pt-8 sm:text-2xl text-center text-xl text-white">
+        <h1 className="mb-2 pt-8 sm:!text-2xl text-center text-xl text-white">
           {t('Terms of Service')}
         </h1>
         <div className="text-base text-neargray-600 pt-12 pb-16 px-6 w-full bg-white lg:mt-8 flex flex-col gap-6 rounded-md">

@@ -69,7 +69,7 @@ const Blocks = () => {
           property="twitter:description"
           content={t('blocks:metaDescription')}
         />
-        <link rel="canonical" href={`${appUrl}/blocks}`} />
+        <link rel="canonical" href={`${appUrl}/blocks`} />
       </Head>
       <div className="bg-hero-pattern h-72">
         <div className="container mx-auto px-3">
