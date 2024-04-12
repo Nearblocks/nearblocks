@@ -33,4 +33,39 @@ const latest = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json({ charts });
 });
 
-export default { latest, list };
+const tps = catchAsync(async (_req: Request, res: Response) => {
+  const charts = await sql`
+    SELECT
+      date,
+      JSON_AGG(JSON_BUILD_OBJECT('shard', shard, 'txns', txns)) AS data
+    FROM
+      (
+        SELECT
+          chunks.shard_id AS shard,
+          COUNT(*) AS txns,
+          block_timestamp / 1000000000 AS date
+        FROM
+          transactions
+          JOIN chunks ON chunks.chunk_hash = transactions.included_in_chunk_hash
+        WHERE
+          block_timestamp >= (
+            EXTRACT(
+              EPOCH
+              FROM
+                NOW() - INTERVAL '6 hours'
+            ) * 1000000000
+          )::BIGINT
+        GROUP BY
+          chunks.shard_id,
+          block_timestamp / 1000000000
+      ) AS subquery
+    GROUP BY
+      date
+    ORDER BY
+      date;
+  `;
+
+  return res.status(200).json({ charts });
+});
+
+export default { latest, list, tps };
