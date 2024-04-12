@@ -103,3 +103,14 @@ jobs:
           tags: ghcr.io/nearblocks/aggregates:latest
           cache-from: type=registry,ref=ghcr.io/nearblocks/aggregates:latest
           cache-to: type=inline
+
+      - name: Build and push (EXPLORER SELECTOR)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/explorer-selector/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/nearblocks/explorer-selector:latest
+          cache-from: type=registry,ref=ghcr.io/nearblocks/explorer-selector:latest
+          cache-to: type=inline
