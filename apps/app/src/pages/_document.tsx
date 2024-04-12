@@ -37,6 +37,8 @@ export default function Document() {
               `})(window,'dataLayer');`,
           }}
         />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/__ENV.js" />
       </Head>
       <body className="overflow-x-hidden">
         <Main />

@@ -7911,7 +7911,7 @@ ccount@^2.0.0:
   resolved "https://registry.yarnpkg.com/ccount/-/ccount-2.0.1.tgz#17a3bf82302e0870d6da43a01311a8bc02a3ecf5"
   integrity sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==
 
-"chalk@4.1 - 4.1.2", chalk@^4.0.0, chalk@^4.1.0:
+"chalk@4.1 - 4.1.2", chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
   integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
@@ -12372,6 +12372,13 @@ negotiator@0.6.3:
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
+
+next-runtime-env@1.x:
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/next-runtime-env/-/next-runtime-env-1.7.4.tgz#83b1e93b2fa626e00a952de0ad390085cf132880"
+  integrity sha512-fUmvNxscQt5B1yrHoAtmQC/VFqbHATbsHgwpz9KJO0sBgjfEzITqkOK5b+YDhekiGdQoaznTGyQsp4ty5VabUA==
+  dependencies:
+    chalk "^4.1.2"
 
 next-tick@1, next-tick@^1.1.0:
   version "1.1.0"
