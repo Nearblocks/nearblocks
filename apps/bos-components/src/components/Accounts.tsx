@@ -685,7 +685,9 @@ export default function (props: Props) {
                   )}
                 </div>
                 <div className="flex ml-4  xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
-                  <div className="w-full mb-2 md:mb-0">Storage Used:</div>
+                  <div className="w-full mb-2 md:mb-0">
+                    {t ? t('address:storageUsed') : 'Storage Used'}:
+                  </div>
                   {loading ? (
                     <div className="w-full break-words">
                       <Skeleton className="h-4 w-28" />
@@ -853,6 +855,10 @@ export default function (props: Props) {
                         </div>
                       ) : tab === 'Comments' ? (
                         <h2>{t ? t('address:comments') : tab}</h2>
+                      ) : tab === 'NFT Token Txns' ? (
+                        <h2>{t ? t('address:nftTokenTxns') : tab}</h2>
+                      ) : tab === 'Access Keys' ? (
+                        <h2>{t ? t('address:accessKeys') : tab}</h2>
                       ) : (
                         <h2>{tab}</h2>
                       )}

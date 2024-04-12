@@ -79,13 +79,12 @@ export default function (props: ReceiptKindInfo) {
       ) : null}
       {isTxTypeActive ? (
         action?.kind === 'functionCall' ? (
-          <div className="py-2 ml-6">
+          <div className="py-2">
             {prettyArgs && typeof prettyArgs === 'object' ? (
               <textarea
                 readOnly
-                rows={4}
                 defaultValue={JSON.stringify(prettyArgs)}
-                className="block appearance-none outline-none w-full max-md:w-fit border rounded-lg bg-gray-100 p-3 my-3 resize-y"
+                className="block appearance-none outline-none w-full max-md:w-fit border rounded-lg bg-gray-100 p-5 my-3 resize-y"
               ></textarea>
             ) : (
               <div>

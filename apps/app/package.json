@@ -41,7 +41,7 @@
     "big.js": "6.2.1",
     "near-api-js": "2.1.3",
     "near-social-vm": "github:NearSocial/VM#2.5.5",
-    "nearblock-translations": "https://github.com/Nearblocks/translations.git#8e510a9ff6485270e9a62d7fd2754ab44f2896fc",
+    "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",
     "next": "13.3.4",
     "next-translate": "2.6.2",
     "react": "18.2.0",

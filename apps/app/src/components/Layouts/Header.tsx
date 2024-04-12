@@ -44,7 +44,7 @@ const menus = [
       },
       {
         id: 5,
-        title: 'Node Explorer',
+        title: 'header.menu.nodeExplorer',
         link: '/node-explorer',
       },
     ],
@@ -55,22 +55,22 @@ const menus = [
     submenu: [
       {
         id: 1,
-        title: 'Top Tokens',
+        title: 'header.menu.toptoken',
         link: '/tokens',
       },
       {
         id: 2,
-        title: 'Token Transfers',
+        title: 'header.menu.viewTokenTrasfers',
         link: '/tokentxns',
       },
       {
         id: 3,
-        title: 'Top NFT Tokens',
+        title: 'header.menu.topnft',
         link: '/nft-tokens',
       },
       {
         id: 4,
-        title: 'NFT Token Transfers',
+        title: 'header.menu.viewNftTrasfers',
         link: '/nft-tokentxns',
       },
     ],
