@@ -23,19 +23,34 @@ import {
 } from '@/includes/types';
 
 export default function () {
-  const networkAccountId =
-    context.networkId === 'mainnet'
-      ? 'nearblocksonbos.near'
-      : 'nearblocks.testnet';
+  function localFormat(number: string) {
+    const bigNumber = Big(number);
+    const formattedNumber = bigNumber
+      .toFixed(5)
+      .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+    return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
+  }
+  function dollarFormat(number: string) {
+    const bigNumber = new Big(number);
 
-  const { dollarFormat, localFormat } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
-  );
+    // Format to two decimal places without thousands separator
+    const formattedNumber = bigNumber.toFixed(2);
 
-  const { yoctoToNear } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.libs`,
-  );
+    // Add comma as a thousands separator
+    const parts = formattedNumber.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+    const dollarFormattedNumber = `${parts.join('.')}`;
+
+    return dollarFormattedNumber;
+  }
+  function yoctoToNear(yocto: string, format: boolean) {
+    const YOCTO_PER_NEAR = Big(10).pow(24).toString();
+
+    const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
+
+    return format ? localFormat(near) : near;
+  }
   function gasPrice(yacto: string) {
     const near = Big(yoctoToNear(yacto, false)).mul(Big(10).pow(12)).toString();
 

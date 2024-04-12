@@ -65,7 +65,7 @@ const FormContact = () => {
           required
         />
         <p className="font-semibold text-base">{t('Subject')}</p>
-        <label className="relative hidden md:flex">
+        <label className="relative md:flex">
           <select
             onChange={(e) => setSubject(e.target.value)}
             className="px-3 py-1.5 bg-white border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"

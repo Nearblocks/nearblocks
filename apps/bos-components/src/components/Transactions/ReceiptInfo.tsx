@@ -152,7 +152,9 @@ export default function (props: Props) {
               <Tabs.Trigger
                 key={index}
                 onClick={() => onTab(index)}
-                className={`text-nearblue-600 text-xs leading-4 mx-2.5 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                className={`text-nearblue-600 text-xs leading-4 ${
+                  hash === 'output' ? 'ml-7' : 'ml-2.5'
+                } font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                   pageHash === hash
                     ? 'rounded-lg bg-green-600 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'

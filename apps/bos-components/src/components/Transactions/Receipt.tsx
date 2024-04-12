@@ -20,7 +20,6 @@ interface Props {
 }
 
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
-
 export default function (props: Props) {
   const { network, rpcTxn, txn, t, ownerId } = props;
 
@@ -29,6 +28,16 @@ export default function (props: Props) {
   );
   const [receipt, setReceipt] = useState(null);
 
+  const FaHourglassStart = (props: any) => {
+    return (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" {...props}>
+        <path
+          d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM288 437v11H96V437c0-25.5 10.1-49.9 28.1-67.9L192 301.3l67.9 67.9c18 18 28.1 42.4 28.1 67.9z"
+          fill="#FFEB3B"
+        />
+      </svg>
+    );
+  };
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
       txn?.transaction?.actions &&
@@ -98,9 +107,22 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
+  const txnsPending = txn?.outcomes?.status === null;
   return (
-    <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
-      {
+    <div className=" text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+      {txnsPending ? (
+        <div className="flex justify-center text-base p-24">
+          <div className="text-center">
+            <div className="inline-flex items-center text-base rounded bg-yellow-50 text-yellow-500 animate-spin  my-2">
+              <FaHourglassStart className="w-5" />
+            </div>
+
+            <h1 className="text-xl text-nearblue-600">
+              This transaction is pending confirmation.
+            </h1>
+          </div>
+        </div>
+      ) : (
         <Widget
           src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
           props={{
@@ -111,7 +133,7 @@ export default function (props: Props) {
             ownerId,
           }}
         />
-      }
+      )}
     </div>
   );
 }

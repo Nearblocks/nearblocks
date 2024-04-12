@@ -1,14 +1,16 @@
 import { Debounce, FieldType, FieldValueTypes } from '@/includes/types';
 
 export default function () {
-  const networkAccountId =
-    context.networkId === 'mainnet'
-      ? 'nearblocksonbos.near'
-      : 'nearblocks.testnet';
-
-  const { localFormat, formatWithCommas } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
-  );
+  function formatWithCommas(number: string) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function localFormat(number: string) {
+    const bigNumber = Big(number);
+    const formattedNumber = bigNumber
+      .toFixed(5)
+      .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+    return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
+  }
 
   function getConfig(network: string) {
     switch (network) {
