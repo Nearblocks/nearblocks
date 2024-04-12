@@ -4,14 +4,11 @@ services:
     build:
       context: .
       dockerfile: ./apps/explorer-selector/Dockerfile
-      args:
-        NEXT_PUBLIC_NETWORK_ID: mainnet
-        NEXT_PUBLIC_BOS_NETWORK: mainnet
-        NEXT_PUBLIC_ACCOUNT_ID: nearblocksonbos.near
     restart: always
     ports:
       - '127.0.0.1:3004:3000'
     environment:
-      NEXT_PUBLIC_NETWORK_ID: mainnet
-      NEXT_PUBLIC_BOS_NETWORK: mainnet
-      NEXT_PUBLIC_ACCOUNT_ID: nearblocksonbos.near
+      PORT: 3000
+      NEXT_PUBLIC_NETWORK_ID: ${NEXT_PUBLIC_NETWORK_ID}
+      NEXT_PUBLIC_BOS_NETWORK: ${NEXT_PUBLIC_BOS_NETWORK}
+      NEXT_PUBLIC_ACCOUNT_ID: ${NEXT_PUBLIC_ACCOUNT_ID}

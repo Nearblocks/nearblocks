@@ -16,6 +16,8 @@ export default function Document() {
         />
         <link rel="icon" href="/favicon.ico" />
         <link rel="manifest" href="/site.webmanifest" />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/__ENV.js" />
       </Head>
       <body>
         <Main />

@@ -4,20 +4,18 @@ services:
     build:
       context: .
       dockerfile: ./apps/app/Dockerfile
-      args:
-        NEXT_PUBLIC_NETWORK_ID: testnet
-        NEXT_PUBLIC_BOS_NETWORK: testnet
-        NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
-        NEXT_PUBLIC_OG_URL: https://meta.nearblocks.io/api
-        NEXT_PUBLIC_MAINNET_URL: https://nearblocks.io
-        NEXT_PUBLIC_TESTNET_URL: https://testnet.nearblocks.io
     restart: always
     ports:
       - '127.0.0.1:3006:3000'
     environment:
-      NEXT_PUBLIC_NETWORK_ID: testnet
-      NEXT_PUBLIC_BOS_NETWORK: testnet
-      NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
-      NEXT_PUBLIC_OG_URL: https://meta.nearblocks.io/api
-      NEXT_PUBLIC_MAINNET_URL: https://nearblocks.io
-      NEXT_PUBLIC_TESTNET_URL: https://testnet.nearblocks.io
+      PORT: 3000
+      NEXT_PUBLIC_NETWORK_ID: ${NEXT_PUBLIC_NETWORK_ID}
+      NEXT_PUBLIC_BOS_NETWORK: ${NEXT_PUBLIC_BOS_NETWORK}
+      NEXT_PUBLIC_ACCOUNT_ID: ${NEXT_PUBLIC_ACCOUNT_ID}
+      NEXT_PUBLIC_OG_URL: ${NEXT_PUBLIC_OG_URL}
+      NEXT_PUBLIC_MAINNET_URL: ${NEXT_PUBLIC_MAINNET_URL}
+      NEXT_PUBLIC_TESTNET_URL: ${NEXT_PUBLIC_TESTNET_URL}
+      BREVO_URL: ${BREVO_URL}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_TO_EMAIL: ${BREVO_TO_EMAIL}
+      NEXT_PUBLIC_GTM_ID: ${NEXT_PUBLIC_GTM_ID}
