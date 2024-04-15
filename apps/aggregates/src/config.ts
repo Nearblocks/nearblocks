@@ -10,6 +10,7 @@ const env = cleanEnv(process.env, {
   FT_HOLDERS_TABLE: str({ default: '' }),
   NFT_HOLDERS_TABLE: str({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
+  TPS_TABLE: str({ default: '' }),
 });
 
 const config: Config = {
@@ -20,6 +21,7 @@ const config: Config = {
   ftHoldersTable: env.FT_HOLDERS_TABLE,
   nftHoldersTable: env.NFT_HOLDERS_TABLE,
   sentryDsn: env.SENTRY_DSN,
+  tpsTable: env.TPS_TABLE,
 };
 
 export default config;

@@ -1,8 +1,9 @@
 import isNull from 'lodash/isNull.js';
 import omitBy from 'lodash/omitBy.js';
 
-import { FTMeta } from 'nb-types';
+import { FTMeta, Network } from 'nb-types';
 
+import config from '#config';
 import cg from '#libs/cg';
 import cmc from '#libs/cmc';
 import { upsertErrorContract } from '#libs/contract';
@@ -131,6 +132,10 @@ export const updateTotalSupply = async (meta: FTMeta) => {
 };
 
 export const syncMarketData = async () => {
+  if (config.network === Network.TESTNET) {
+    return;
+  }
+
   const tokens = await knex('ft_meta')
     .where(function () {
       this.whereNotNull('coinmarketcap_id').orWhereNotNull('coingecko_id');
@@ -167,6 +172,10 @@ export const updateMarketData = async (meta: FTMeta) => {
 };
 
 export const searchContracts = async () => {
+  if (config.network === Network.TESTNET) {
+    return;
+  }
+
   const [unsearched, searched] = await Promise.all([
     knex('ft_meta')
       .whereNull('coingecko_id')

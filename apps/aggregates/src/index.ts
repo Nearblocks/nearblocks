@@ -4,10 +4,11 @@ import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncFTHolders } from '#services/ft';
 import { syncNFTHolders } from '#services/nft';
+import { syncTPS } from '#services/tps';
 
 (async () => {
   try {
-    await Promise.all([syncFTHolders(), syncNFTHolders()]);
+    await Promise.all([syncFTHolders(), syncNFTHolders(), syncTPS()]);
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);
