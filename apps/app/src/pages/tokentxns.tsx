@@ -7,8 +7,9 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const ToxenTxns = () => {
   const router = useRouter();

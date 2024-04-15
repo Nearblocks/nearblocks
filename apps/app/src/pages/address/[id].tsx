@@ -8,9 +8,10 @@ import Layout from '@/components/Layouts';
 import { useAuthStore } from '@/stores/auth';
 import Head from 'next/head';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Address = () => {
   const router = useRouter();

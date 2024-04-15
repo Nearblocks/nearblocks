@@ -8,8 +8,9 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/nft/Detail';
 import { Token } from '@/utils/types';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const NFTokenInfo = () => {
   const router = useRouter();

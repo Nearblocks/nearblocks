@@ -8,8 +8,9 @@ import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Router, { useRouter } from 'next/router';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const TopNFTTokens = () => {
   const router = useRouter();

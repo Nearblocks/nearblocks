@@ -7,7 +7,9 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const TxnVolumeChart = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
@@ -57,20 +59,20 @@ const TxnVolumeChart = () => {
         />
         <meta
           property="og:image"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
+          content={`${ogUrl}/thumbnail/chart?title=${t(
             'charts:txnVolume.heading',
           )}
           `}
         />
         <meta
           property="og:image:secure_url"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
+          content={`${ogUrl}/thumbnail/chart?title=${t(
             'charts:txnVolume.heading',
           )}`}
         />
         <meta
           name="twitter:image:src"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
+          content={`${ogUrl}/thumbnail/chart?title=${t(
             'charts:txnVolume.heading',
           )}`}
         />

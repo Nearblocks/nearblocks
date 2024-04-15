@@ -1,4 +1,5 @@
 import type { Network, NetworkId } from './types';
+import { env } from 'next-runtime-env';
 
 export const networks: Record<NetworkId, Network> = {
   mainnet: {
@@ -10,5 +11,5 @@ export const networks: Record<NetworkId, Network> = {
 };
 
 export const networkId: NetworkId =
-  (process.env.NEXT_PUBLIC_BOS_NETWORK as NetworkId) || 'testnet';
+  (env('NEXT_PUBLIC_BOS_NETWORK') as NetworkId) || 'testnet';
 export const network = networks[networkId];
