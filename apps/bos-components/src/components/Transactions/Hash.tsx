@@ -23,7 +23,9 @@ interface Props {
   pageTab: string;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import ArrowDown from '@/includes/icons/ArrowDown';
+import FileSlash from '@/includes/icons/FileSlash';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
 const hashes = ['overview', 'execution', 'comments'];
@@ -124,8 +126,14 @@ export default function (props: Props) {
   return (
     <>
       {error || (!isLoading && !txn) ? (
-        <div className="text-nearblue-700 text-xs px-2 mb-4">
-          {t ? t('txns:txnError') : 'Transaction Error'}
+        <div className="bg-white soft-shadow rounded-xl pb-1">
+          <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+            <ErrorMessage
+              icons={<FileSlash />}
+              message="Sorry, We are unable to locate this TxnHash"
+              mutedText={hash}
+            />
+          </div>
         </div>
       ) : (
         <>

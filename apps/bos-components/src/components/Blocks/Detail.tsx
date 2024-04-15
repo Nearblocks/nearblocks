@@ -20,7 +20,9 @@ interface Props {
   ) => string | undefined;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Skeleton from '@/includes/Common/Skeleton';
+import FileSlash from '@/includes/icons/FileSlash';
 import { BlocksInfo } from '@/includes/types';
 
 export default function (props: Props) {
@@ -188,7 +190,15 @@ export default function (props: Props) {
       </div>
       {error || (!isLoading && !block) ? (
         <div className="text-nearblue-700 text-xs px-2 mb-5">
-          {t ? t('blocks:blockError') : 'Block Error'}
+          <div className="bg-white soft-shadow rounded-xl pb-1">
+            <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+              <ErrorMessage
+                icons={<FileSlash />}
+                message="Sorry, We are unable to locate this BlockHash"
+                mutedText={hash}
+              />
+            </div>
+          </div>
         </div>
       ) : (
         <>

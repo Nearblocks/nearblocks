@@ -20,6 +20,8 @@ import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 export default function ({ network, id, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
@@ -40,7 +42,6 @@ export default function ({ network, id, ownerId }: Props) {
   const config = getConfig && getConfig(network);
 
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = 'No transactions found!';
   const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -534,8 +535,10 @@ export default function ({ network, id, ownerId }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              transactions found
+              {Object.keys(txns).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                } transactions found`}
             </p>
           </div>
         </div>
@@ -552,7 +555,13 @@ export default function ({ network, id, ownerId }: Props) {
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message="There are no matching entries"
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>

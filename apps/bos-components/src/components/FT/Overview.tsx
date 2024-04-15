@@ -200,6 +200,7 @@ export default function ({
   };
 
   const onToggle = () => setShowMarketCap((o) => !o);
+
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
@@ -208,22 +209,20 @@ export default function ({
             <Skeleton className="h-7" />
           </div>
         ) : (
-          token && (
-            <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 py-4 px-2">
-              <span className="inline-flex align-middle h-7 w-7">
-                <TokenImage
-                  src={token?.icon}
-                  alt={token?.name}
-                  appUrl={config?.appUrl}
-                  className="w-7 h-7"
-                />
-              </span>
-              <span className="inline-flex align-middle ">Token: </span>
-              <span className="inline-flex align-middle font-semibold">
-                {token?.name}
-              </span>
-            </h1>
-          )
+          <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 py-4 px-2">
+            <span className="inline-flex align-middle h-7 w-7">
+              <TokenImage
+                src={token?.icon}
+                alt={token?.name}
+                appUrl={config?.appUrl}
+                className="w-7 h-7"
+              />
+            </span>
+            <span className="inline-flex align-middle ">Token: </span>
+            <span className="inline-flex align-middle font-semibold">
+              {token?.name}
+            </span>
+          </h1>
         )}
       </div>
       <div>

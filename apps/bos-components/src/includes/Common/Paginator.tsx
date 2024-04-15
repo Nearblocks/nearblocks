@@ -10,7 +10,7 @@ interface PaginatorProps {
 
 const Paginator = (props: PaginatorProps) => {
   let pages: number;
-  if (props.count) {
+  if (props.count > 0) {
     pages = Math.ceil(props.count / props.limit);
   } else {
     pages = 1;

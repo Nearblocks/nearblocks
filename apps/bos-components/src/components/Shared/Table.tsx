@@ -36,7 +36,7 @@ interface Props {
   renderRowSubComponent: (row: any, rowIndex?: number) => React.ReactNode;
   expanded: number[];
   isExpanded: false;
-  Error: string;
+  Error: string | any;
 }
 
 export default function (props: Props) {
@@ -199,7 +199,7 @@ export default function (props: Props) {
           </table>
         </div>
       )}
-      {props.isPagination ? (
+      {props.isPagination && props.data !== undefined ? (
         <Paginator
           count={props.count}
           page={props.page}

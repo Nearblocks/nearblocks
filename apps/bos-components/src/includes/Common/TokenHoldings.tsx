@@ -97,9 +97,8 @@ const TokenHoldings = (props: Props) => {
                                 <div className="flex mr-1">
                                   <img
                                     src={
-                                      token?.ft_meta?.icon || props.appUrl
-                                        ? `${props.appUrl}images/tokenplaceholder.svg`
-                                        : '/images/tokenplaceholder.svg'
+                                      token?.ft_meta?.icon ??
+                                      '/images/tokenplaceholder.svg'
                                     }
                                     alt={token.ft_meta?.name}
                                     className="w-4 h-4"
@@ -163,9 +162,8 @@ const TokenHoldings = (props: Props) => {
                                 <div className="flex mr-1">
                                   <img
                                     src={
-                                      nft?.nft_meta?.icon || props.appUrl
-                                        ? `${props.appUrl}images/tokenplaceholder.svg`
-                                        : `/images/tokenplaceholder.svg`
+                                      nft?.nft_meta?.icon ??
+                                      `/images/tokenplaceholder.svg`
                                     }
                                     alt={nft?.nft_meta?.name}
                                     className="w-4 h-4"
