@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
@@ -24,6 +25,7 @@ const HomePage = () => {
   const latestRef = useRef<HTMLDivElement>(null);
   const [overviewHeight, setOverviewHeight] = useState({});
   const [latestHeight, setLatestHeight] = useState({});
+  const { theme } = useTheme();
 
   useEffect(() => {
     const updateOuterDivHeight = () => {
@@ -132,11 +134,11 @@ const HomePage = () => {
       </Head>
       <div>
         <ToastContainer />
-        <div className="flex items-center justify-center bg-hero-pattern">
+        <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
           <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
             <div className="flex flex-col lg:flex-row pb-5">
               <div className="relative lg:w-3/5  flex-col">
-                <h1 className="text-white text-2xl pb-3 flex flex-col">
+                <h1 className="text-white dark:text-nearblue-600 text-2xl pb-3 flex flex-col">
                   {t('home:heroTitle')}
                 </h1>
                 <div className="h-12">
@@ -171,7 +173,7 @@ const HomePage = () => {
             src={components?.transactionsOverview}
             skeleton={<Overview className="absolute" ref={overviewRef} />}
             defaultSkelton={<Overview />}
-            props={{ t: t, network: networkId }}
+            props={{ t: t, network: networkId, theme: theme }}
             loading={<Overview className="absolute" ref={overviewRef} />}
           />
         </div>
@@ -181,8 +183,8 @@ const HomePage = () => {
           <div className="container mx-auto px-3  z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="h-full w-full">
-                <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
-                  <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+                <div className=" bg-white soft-shadow dark:bg-black-600  rounded-xl overflow-hidden mb-6 md:mb-10">
+                  <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 text-sm font-semibold">
                     {t('home:latestBlocks')}
                   </h2>
 
@@ -198,8 +200,8 @@ const HomePage = () => {
                 </div>
               </div>
               <div className="h-full  w-full">
-                <div className=" bg-white soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
-                  <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+                <div className=" bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
+                  <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 text-sm font-semibold">
                     {t('home:latestTxns')}
                   </h2>
                   <div style={latestHeight} className="relative">

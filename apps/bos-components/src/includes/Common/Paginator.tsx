@@ -34,7 +34,7 @@ const Paginator = (props: PaginatorProps) => {
   const onLast = () => props.setPage(pages);
 
   return (
-    <div className="bg-white px-2 py-3 flex items-center justify-between border-t md:px-4">
+    <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4">
       <div className="flex-1 flex items-center justify-between">
         <div></div>
 
@@ -51,7 +51,7 @@ const Paginator = (props: PaginatorProps) => {
                 props.page <= 1
                   ? 'text-gray-500'
                   : 'text-green-400 hover:bg-green-400 hover:text-white'
-              } bg-gray-100`}
+              } bg-gray-100 dark:bg-black-200`}
             >
               First
             </button>
@@ -70,7 +70,7 @@ const Paginator = (props: PaginatorProps) => {
             <button
               type="button"
               disabled
-              className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500 rounded-md  bg-gray-100"
+              className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500 rounded-md  bg-gray-100 dark:bg-black-200"
             >
               Page {props.page} of {pages}
             </button>
@@ -82,7 +82,7 @@ const Paginator = (props: PaginatorProps) => {
                 props.page >= pages
                   ? 'text-gray-500'
                   : 'text-green-400 hover:text-white hover:bg-green-400'
-              }  bg-gray-100`}
+              }  bg-gray-100 dark:bg-black-200`}
             >
               <FaChevronRight />
             </button>
@@ -94,7 +94,7 @@ const Paginator = (props: PaginatorProps) => {
                 props.page >= pages
                   ? 'text-gray-500'
                   : 'text-green-400 hover:text-white hover:bg-green-400'
-              }  bg-gray-100 `}
+              }  bg-gray-100 dark:bg-black-200`}
             >
               Last
             </button>

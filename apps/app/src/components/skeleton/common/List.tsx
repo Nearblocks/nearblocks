@@ -10,7 +10,7 @@ const List = forwardRef(
       <div className={`w-full z-10 ${className}`}>
         <div
           ref={ref}
-          className={`bg-white border soft-shadow ${
+          className={`bg-white  dark:bg-black-600 dark:border-black-200 border soft-shadow ${
             !showRounded ? 'rounded-xl' : ''
           } overflow-hidden`}
         >
@@ -20,8 +20,8 @@ const List = forwardRef(
             </div>
           </div>
           <div className="overflow-x-auto ">
-            <table className="min-w-full divide-y border-t">
-              <thead className="bg-gray-100 h-[51px]">
+            <table className="min-w-full divide-y dark:border-black-200 dark:divide-black-200 border-t">
+              <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                 <tr>
                   <th
                     scope="col"
@@ -73,7 +73,7 @@ const List = forwardRef(
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
                 {[...Array(25)].map((_, i) => (
                   <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
@@ -105,7 +105,7 @@ const List = forwardRef(
               </tbody>
             </table>
           </div>
-          <div className="bg-white px-2 py-3 flex items-center justify-between border-t md:px-4">
+          <div className="bg-white dark:bg-black-600 dark:border-black-200 px-2 py-3 flex items-center justify-between border-t md:px-4">
             <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div></div>
               <Skeleton className="w-64 h-4" />

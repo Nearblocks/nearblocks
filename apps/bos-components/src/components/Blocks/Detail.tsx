@@ -54,7 +54,7 @@ export default function (props: Props) {
   const Loader = (props: { className?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-4 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 dark:bg-black-200 h-4 rounded shadow-sm animate-pulse ${props.className}`}
       ></div>
     );
   };
@@ -66,7 +66,7 @@ export default function (props: Props) {
 
   const LinkWrapper = (props: Props) => (
     <Link href={props.href} className="hover:no-underline">
-      <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
+      <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 dark:text-green-250 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
         {props.children}
       </a>
     </Link>
@@ -165,7 +165,7 @@ export default function (props: Props) {
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="text-xl text-nearblue-600 px-2 py-5">
+          <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
             {t ? (
               <>
                 {t('blocks:block.heading.0')}
@@ -202,7 +202,7 @@ export default function (props: Props) {
         </div>
       ) : (
         <>
-          <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
+          <div className="bg-white text-sm text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:divide-black-200 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
             {network === 'testnet' && (
               <div className="flex flex-wrap p-4 text-red-500">
                 {t
@@ -322,7 +322,7 @@ export default function (props: Props) {
                     href={`/address/${block?.author_account_id}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 hover:no-underline">
                       {block?.author_account_id}
                     </a>
                   </Link>
@@ -403,7 +403,7 @@ export default function (props: Props) {
                     href={`/blocks/${block?.prev_block_hash}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 hover:no-underline">
                       {block?.prev_block_hash}
                     </a>
                   </Link>

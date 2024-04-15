@@ -109,7 +109,7 @@ export default function (props: Props) {
 
   const txnsPending = txn?.outcomes?.status === null;
   return (
-    <div className=" text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+    <div className=" text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
       {txnsPending ? (
         <div className="flex justify-center text-base p-24">
           <div className="text-center">

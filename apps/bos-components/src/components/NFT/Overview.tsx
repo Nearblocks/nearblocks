@@ -155,7 +155,7 @@ export default function ({ network, id, ownerId }: Props) {
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-nearblue-600 leading-8 py-4 px-2">
+          <h1 className="break-all space-x-2 text-xl text-nearblue-600 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 src={token?.icon}
@@ -174,12 +174,12 @@ export default function ({ network, id, ownerId }: Props) {
       <div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-xl">
-              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+            <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 Overview
               </h2>
 
-              <div className="px-3 divide-y text-sm text-nearblue-600">
+              <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex flex-wrap py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Total Supply:
@@ -245,11 +245,11 @@ export default function ({ network, id, ownerId }: Props) {
             </div>
           </div>
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+            <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 Profile Summary
               </h2>
-              <div className="px-3 divide-y text-sm text-nearblue-600">
+              <div className="px-3 divide-y  dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
                   {isLoading ? (
@@ -257,12 +257,12 @@ export default function ({ network, id, ownerId }: Props) {
                       <Skeleton className="h-4 w-32" />
                     </div>
                   ) : (
-                    <div className="w-full text-green-500 md:w-3/4 break-words">
+                    <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
                         href={`/address/${token?.contract}`}
                         className="hover:no-underline"
                       >
-                        <a className="text-green-500 hover:no-underline">
+                        <a className="text-green-500 dark:text-green-250 hover:no-underline">
                           {token?.contract}
                         </a>
                       </Link>
@@ -273,7 +273,7 @@ export default function ({ network, id, ownerId }: Props) {
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Official Site:
                   </div>
-                  <div className="w-full md:w-3/4 text-green-500 break-words">
+                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
@@ -312,10 +312,10 @@ export default function ({ network, id, ownerId }: Props) {
                   <button
                     key={index}
                     onClick={() => onTab(index)}
-                    className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                    className={`  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                       pageTab === tab
-                        ? 'rounded-lg bg-green-600 text-white'
-                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                        ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10'
                     }`}
                     value={tab}
                   >
@@ -323,7 +323,7 @@ export default function ({ network, id, ownerId }: Props) {
                   </button>
                 ))}
             </div>
-            <div className="bg-white soft-shadow rounded-xl pb-1">
+            <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
               <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
                 {
                   <Widget

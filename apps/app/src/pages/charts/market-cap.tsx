@@ -8,6 +8,7 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const MarketCapChart = () => {
@@ -15,6 +16,7 @@ const MarketCapChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -78,7 +80,7 @@ const MarketCapChart = () => {
         <link rel="canonical" href={`${appUrl}/charts/market-cap`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
             <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
               {t('charts:marketCap.heading')}
@@ -104,6 +106,7 @@ const MarketCapChart = () => {
                   poweredBy: false,
                   network: networkId,
                   t: t,
+                  theme: theme,
                 }}
                 loading={
                   <Detail

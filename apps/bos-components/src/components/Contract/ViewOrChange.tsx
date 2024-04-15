@@ -233,7 +233,7 @@ export default function (props: Props) {
       key={index}
     >
       <Accordion.Header>
-        <Accordion.Trigger className="bg-gray-50 border rounded flex items-center justify-between px-4 py-2 w-full">
+        <Accordion.Trigger className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full">
           <span>
             <span className="text-gray-400">{index + 1}.</span>{' '}
             {toSnakeCase(method ?? '')}
@@ -241,7 +241,7 @@ export default function (props: Props) {
           <ArrowRight className="contract-icon fill-gray-600" />
         </Accordion.Trigger>
       </Accordion.Header>
-      <Accordion.Content className="border p-4 rounded slide-up slide-down">
+      <Accordion.Content className="border dark:border-black-200 p-4 rounded slide-up slide-down">
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center">
             Arguments
@@ -264,7 +264,7 @@ export default function (props: Props) {
           </div>
           <button
             onClick={onAdd}
-            className="mx-3 px-3 mr-1 bg-green py-1 text-xs font-medium rounded-md text-white"
+            className="mx-3 px-3 mr-1 bg-green dark:bg-green-250 dark:text-black py-1 text-xs font-medium rounded-md text-white"
           >
             Add
           </button>
@@ -272,7 +272,7 @@ export default function (props: Props) {
             type="submit"
             onClick={(e) => onDetect(e)}
             disabled={loading}
-            className="flex ml-2 mr-1 bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex ml-2 mr-1 bg-green-500 dark:bg-green-250 dark:text-black hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
           >
             Auto detect
             <Tooltip.Provider>
@@ -303,13 +303,13 @@ export default function (props: Props) {
                 value={field.name}
                 onChange={(e) => onChange(e, 'name', field.id)}
                 placeholder="Argument name"
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-3 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none"
               />
               <select
                 name="type"
                 value={field.type}
                 onChange={(e) => onChange(e, 'type', field.id)}
-                className="col-span-2 bg-white block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-2 bg-white block border  dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none"
               >
                 <option value="" disabled>
                   Type
@@ -325,7 +325,7 @@ export default function (props: Props) {
                 value={field.value}
                 onChange={(e) => onChange(e, 'value', field.id)}
                 placeholder={field.placeholder || 'Argument value'}
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-4 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none"
               />
             </div>
             <button
@@ -366,7 +366,7 @@ export default function (props: Props) {
                 value={options.attachedDeposit}
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none"
               />
             </label>
             <label>
@@ -376,7 +376,7 @@ export default function (props: Props) {
                 value={options.gas}
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none"
               />
             </label>
           </div>
@@ -387,7 +387,7 @@ export default function (props: Props) {
               type="submit"
               onClick={(e) => onRead(e)}
               disabled={loading}
-              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              className="bg-green-500 dark:bg-green-250 hover:bg-green-400 text-white dark:text-black text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
             >
               Query
             </button>
@@ -418,7 +418,7 @@ export default function (props: Props) {
             type="submit"
             onClick={(e) => onWrite(e)}
             disabled={loading || !connected}
-            className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-green-500 hover:bg-green-400 text-white dark:text-black text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
           >
             Write
           </button>

@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
+import { ThemeProvider } from 'next-themes';
 import '../../public/common.css';
 
 import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
@@ -29,7 +30,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       />
       <VmInitializer />
 
-      {getLayout(<Component {...pageProps} />)}
+      <ThemeProvider attribute="class">
+        {getLayout(<Component {...pageProps} />)}
+      </ThemeProvider>
     </>
   );
 }

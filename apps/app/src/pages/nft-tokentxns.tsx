@@ -81,9 +81,9 @@ const NftToxenTxns = () => {
         <link rel="canonical" href={`${appUrl}/nft-tokentxns`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10">
               {t ? t('token:nfts.heading') : 'Non-Fungible Token Transfers'}
             </h1>
           </div>

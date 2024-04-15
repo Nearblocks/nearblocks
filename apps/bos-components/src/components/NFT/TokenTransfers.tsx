@@ -135,7 +135,8 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </span>
       ),
-      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <span>Txn Hash</span>,
@@ -145,12 +146,12 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250">
                   <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 font-medium hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
                   </Link>
@@ -167,9 +168,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>{t ? t('method') : 'METHOD'}</span>,
@@ -179,7 +181,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">{row?.cause}</span>
                 </span>
               </Tooltip.Trigger>
@@ -194,9 +196,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>From</span>,
@@ -209,10 +212,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.affected_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -220,7 +223,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -251,10 +254,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.involved_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -262,7 +265,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -288,9 +291,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </span>
         );
       },
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span></span>,
@@ -319,10 +323,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.involved_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -330,7 +334,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -361,10 +365,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.affected_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -372,7 +376,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -399,9 +403,9 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>BLOCK</span>,
@@ -412,7 +416,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
             href={`/blocks/${row?.included_in_block_hash}`}
             className="hover:no-underline"
           >
-            <a className="text-green-500 hover:no-underline">
+            <a className="text-green-500 dark:text-green-250 hover:no-underline">
               {row?.block?.block_height
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
@@ -421,9 +425,9 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider h-[57px]',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider h-[57px]',
     },
     {
       header: (
@@ -434,12 +438,12 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <button
                   type="button"
                   onClick={toggleShowAge}
-                  className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row"
+                  className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
                 >
                   {showAge ? (
                     <>
                       AGE
-                      <Clock className="text-green-500 ml-2" />
+                      <Clock className="text-green-500 dark:text-green-250 ml-2" />
                     </>
                   ) : (
                     'DATE TIME (UTC)'
@@ -494,7 +498,8 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
   ];
 
@@ -515,7 +520,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
               A total of {localFormat && localFormat(totalCount.toString())}{' '}
               transactions found
             </p>

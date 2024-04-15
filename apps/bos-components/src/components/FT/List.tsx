@@ -198,9 +198,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>{t ? t('token:fts.top.token') : 'TOKEN'}</span>,
@@ -218,7 +218,7 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
               href={`/token/${row?.contract}`}
               className="hover:no-underline"
             >
-              <a className=" text-green-500 hover:no-underline flex items-center">
+              <a className=" text-green-500 dark:text-green-250 hover:no-underline flex items-center">
                 <span className="inline-block truncate max-w-[200px] mr-1">
                   {row?.name}
                 </span>
@@ -231,9 +231,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 w-80  align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-80  align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>{t ? t('token:fts.top.price') : 'PRICE'}</span>,
@@ -248,9 +248,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: (
@@ -276,9 +276,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>{t ? t('token:fts.top.volume') : 'VOLUME'} (24H)</span>,
@@ -293,9 +293,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: (
@@ -332,9 +332,9 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
     },
     {
       header: (
@@ -343,10 +343,10 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
           <button
             type="button"
             onClick={() => onOrder('onchain_market_cap')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 focus:outline-none flex flex-row"
+            className="w-full px-6 py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
           >
             {sorting?.sort === 'onchain_market_cap' && (
-              <div className="text-nearblue-600 font-semibold">
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
                 <SortIcon order={sorting?.order} />
               </div>
             )}
@@ -387,7 +387,7 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
     },
     // {
     //   header: (
@@ -416,8 +416,8 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
   ];
 
   return (
-    <div className=" bg-white border soft-shadow rounded-xl pb-1 ">
-      <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
+    <div className=" bg-white  dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl pb-1 ">
+      <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 dark:text-neargray-10 px-3 py-2">
         {isLoading ? (
           <div className="max-w-lg w-full pl-3">
             <Skeleton className="h-4" />
@@ -440,13 +440,13 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
                 name="search"
                 autoComplete="off"
                 placeholder="Search"
-                className="search ml-2 pl-8 token-search bg-white w-full h-full text-sm py-2 outline-none border rounded-xl"
+                className="search ml-2 pl-8 token-search bg-white dark:bg-black-600 dark:border-black-200 w-full h-full text-sm py-2 outline-none border rounded-xl"
                 onChange={onChange}
               />
             </label>
             {searchResults?.length > 0 && (
               <div className="z-50 relative">
-                <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
+                <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white dark:bg-black-600 py-2 shadow">
                   {searchResults.map((token) => (
                     <div
                       key={token?.contract}

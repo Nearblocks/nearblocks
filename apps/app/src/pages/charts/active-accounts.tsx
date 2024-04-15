@@ -3,6 +3,7 @@ import Detail from '@/components/skeleton/charts/Detail';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId } from '@/utils/config';
+import { useTheme } from 'next-themes';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 
@@ -11,6 +12,7 @@ const ActiveAccountsChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -32,7 +34,7 @@ const ActiveAccountsChart = () => {
   };
   return (
     <section>
-      <div className="bg-hero-pattern h-72">
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
           <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
             {t('charts:addresses.heading')}
@@ -58,6 +60,7 @@ const ActiveAccountsChart = () => {
                 poweredBy: false,
                 network: networkId,
                 t: t,
+                theme: theme,
               }}
               loading={
                 <Detail

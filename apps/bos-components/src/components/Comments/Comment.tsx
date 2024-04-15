@@ -94,7 +94,7 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
   };
   return (
     <>
-      <div className="py-4 border-b px-8">
+      <div className="py-4 border-b dark:border-black-200  px-8">
         <div className="flex justify-start text-center">
           <img
             className="rounded-full w-12 h-12"
@@ -102,10 +102,13 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
             alt=""
           />
           <div className="flex justify-start ml-2 bottom-0 top-0">
-            <p className="font-semibold">{name} </p>
-            <p className="text-gray-600 font-thin ml-0.5"> {title}</p>
+            <p className="font-semibold dark:text-neargray-10">{name} </p>
+            <p className="text-gray-600  dark:text-neargray-10 font-thin ml-0.5">
+              {' '}
+              {title}
+            </p>
           </div>
-          <p className="text-gray-600 flex align-middle">
+          <p className="text-gray-600 dark:text-neargray-10 flex align-middle">
             {blockHeight === 'now' ? (
               'now'
             ) : (
@@ -115,7 +118,7 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
         </div>
         <div className="mb-2">
           <div className="container">
-            <div className="ml-12 top-0">
+            <div className="ml-12 top-0  dark:text-neargray-10">
               <Markdown text={post.text} onPath={renderPath} />
             </div>
             {post.image && (

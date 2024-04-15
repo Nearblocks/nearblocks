@@ -96,13 +96,13 @@ export default function (props: Props) {
   const Loader = (props: { className?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
       ></div>
     );
   };
   const txnsPending = txn?.outcomes?.status === null;
   return (
-    <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+    <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200  divide-solid divide-gray-200 divide-y">
       {txnsPending ? (
         <div className="flex justify-center text-base p-24">
           <div className="text-center">
@@ -110,16 +110,16 @@ export default function (props: Props) {
               <FaHourglassStart className="w-5" />
             </div>
 
-            <h1 className="text-xl text-nearblue-600">
+            <h1 className="text-xl text-nearblue-600 dark:text-neargray-10">
               This transaction is pending confirmation.
             </h1>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col w-full mx-auto divide-y">
+        <div className="flex flex-col w-full mx-auto divide-y dark:divide-black-200">
           <div className="flex justify-end w-full p-4 items-center">
             <div
-              className="cursor-pointer mx-1 flex items-center text-nearblue-600 font-medium py-1 border border-neargray-700 px-2 rounded-md bg-whit select-none"
+              className="cursor-pointer mx-1 flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-1 border border-neargray-700 dark:border-black-200 px-2 rounded-md bg-whit select-none"
               onClick={expandAllReceipts}
             >
               Expand All <span className="ml-1.5">+</span>

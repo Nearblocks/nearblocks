@@ -7,12 +7,15 @@ import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
+import { useTheme } from 'next-themes';
 
 const Charts = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
+
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -52,7 +55,7 @@ const Charts = () => {
         />
         <link rel="canonical" href={`${appUrl}/charts`} />
       </Head>
-      <div className="bg-hero-pattern h-72">
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             {t('charts:heading')}
@@ -67,7 +70,12 @@ const Charts = () => {
               skeleton={<Index className="absolute" ref={heightRef} />}
               defaultSkelton={<Index />}
               onChangeHeight={onChangeHeight}
-              props={{ poweredBy: false, network: networkId, t: t }}
+              props={{
+                poweredBy: false,
+                network: networkId,
+                t: t,
+                theme: theme,
+              }}
               loading={<Index className="absolute" ref={heightRef} />}
             />
           </div>

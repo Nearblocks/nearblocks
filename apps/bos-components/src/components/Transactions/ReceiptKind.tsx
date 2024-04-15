@@ -8,15 +8,15 @@
 import { ReceiptKindInfo } from '@/includes/types';
 
 const backgroundColorClasses: Record<string, string> = {
-  transfer: 'bg-green-50',
-  stake: 'bg-cyan-50',
-  deployContract: 'bg-orange-50',
-  addKey: 'bg-indigo-50',
-  deleteKey: 'bg-red-50',
-  functionCall: 'bg-blue-50',
+  transfer: 'bg-green-50 dark:bg-green-200',
+  stake: 'bg-cyan-50 dark:bg-cyan-200',
+  deployContract: 'bg-orange-50 dark:bg-orange-200',
+  addKey: 'bg-indigo-50 dark:bg-indigo-200',
+  deleteKey: 'bg-red-50 dark:bg-red-200',
+  functionCall: 'bg-blue-50 dark:bg-black-200',
   createAccount: 'bg-fuchsia-100',
-  deleteAccount: 'bg-red-50',
-  delegateAction: 'bg-blue-50',
+  deleteAccount: 'bg-red-50 dark:bg-red-200',
+  delegateAction: 'bg-blue-50 dark:bg-black-200',
 };
 
 export default function (props: ReceiptKindInfo) {
@@ -84,11 +84,11 @@ export default function (props: ReceiptKindInfo) {
               <textarea
                 readOnly
                 defaultValue={JSON.stringify(prettyArgs)}
-                className="block appearance-none outline-none w-full max-md:w-fit border rounded-lg bg-gray-100 p-5 my-3 resize-y"
+                className="block appearance-none outline-none w-full max-md:w-fit border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-5 my-3 resize-y"
               ></textarea>
             ) : (
               <div>
-                <div className="bg-gray-100 rounded-md p-3 font-medium my-3">
+                <div className="bg-gray-100 dark:bg-black-200 rounded-md p-3 font-medium my-3">
                   <div className="bg-inherit text-inherit font-inherit border-none p-0">
                     <div className="max-h-52 overflow-auto">
                       <div className="p-4 h-full w-full">{prettyArgs}</div>

@@ -12389,6 +12389,11 @@ next-runtime-env@1.x:
   integrity sha512-fUmvNxscQt5B1yrHoAtmQC/VFqbHATbsHgwpz9KJO0sBgjfEzITqkOK5b+YDhekiGdQoaznTGyQsp4ty5VabUA==
   dependencies:
     chalk "^4.1.2"
+    
+next-themes@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/next-themes/-/next-themes-0.3.0.tgz#b4d2a866137a67d42564b07f3a3e720e2ff3871a"
+  integrity sha512-/QHIrsYpd6Kfk7xakK4svpDI5mmXP0gfvCoJdGpZQ2TOrQZmsW0QxjaiLn8wbIKjtm4BTSqLoix4lxYYOnLJ/w==
 
 next-tick@1, next-tick@^1.1.0:
   version "1.1.0"

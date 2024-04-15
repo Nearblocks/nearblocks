@@ -216,7 +216,8 @@ export default function ({
           <TxnStatus status={row.outcomes.status} showLabel={false} />
         </>
       ),
-      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <>{t ? t('txns:hash') : 'TXN HASH'}</>,
@@ -226,12 +227,12 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
                   <Link
                     href={`/txns/${row.transaction_hash}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 font-medium hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
                       {row.transaction_hash}
                     </a>
                   </Link>
@@ -248,9 +249,9 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
@@ -259,7 +260,7 @@ export default function ({
           <Popover.Root>
             <Popover.Trigger
               asChild
-              className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+              className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
             >
               <button className="IconButton" aria-label="Update dimensions">
                 {t ? t('txns:type') : 'METHOD'}
@@ -267,7 +268,7 @@ export default function ({
               </button>
             </Popover.Trigger>
             <Popover.Content
-              className="z-50 bg-white shadow-lg border rounded-b-lg p-2"
+              className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2"
               sideOffset={5}
             >
               <div className="flex flex-col">
@@ -276,13 +277,13 @@ export default function ({
                   value={filterValue['event']}
                   onChange={(e) => onInputChange(e, 'event')}
                   placeholder="Search by method"
-                  className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
+                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 />
                 <div className="flex">
                   <button
                     type="submit"
                     onClick={(e) => onFilter(e, 'event')}
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 dark:text-black h-7 text-white text-xs mr-2"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('txns:filter.filter') : 'Filter'}
@@ -291,7 +292,7 @@ export default function ({
                     name="type"
                     type="button"
                     onClick={() => onClear('event')}
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7 "
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
@@ -307,7 +308,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-nearblue-600  rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">{row?.cause}</span>
                 </span>
               </Tooltip.Trigger>
@@ -322,7 +323,8 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <>Affected</>,
@@ -334,10 +336,10 @@ export default function ({
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={` inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    className={` inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                       row?.affected_account_id === address
                         ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                        : 'text-green-500 p-0.5 px-1'
+                        : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                     }`}
                   >
                     <Link
@@ -345,7 +347,7 @@ export default function ({
                       className="hover:no-underline"
                     >
                       <a
-                        className="text-green-500 hover:no-underline"
+                        className="text-green-500 dark:text-green-250 hover:no-underline"
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.affected_account_id)
                         }
@@ -370,9 +372,10 @@ export default function ({
           )}
         </span>
       ),
-      tdClassName: 'px-4 py-4 text-sm text-nearblue-600  font-medium',
+      tdClassName:
+        'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -401,7 +404,7 @@ export default function ({
         <Popover.Root>
           <Popover.Trigger
             asChild
-            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none"
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
           >
             <button className="IconButton" aria-label="Update dimensions">
               Involved
@@ -409,7 +412,7 @@ export default function ({
             </button>
           </Popover.Trigger>
           <Popover.Content
-            className="bg-white shadow-lg border rounded-b-lg p-2"
+            className="bg-white dark:bg-black-600  shadow-lg border dark:border-black-200 rounded-b-lg p-2"
             sideOffset={5}
           >
             <input
@@ -419,13 +422,13 @@ export default function ({
               placeholder={
                 t ? t('txns:filter.placeholder') : 'Search by address e.g. Ⓝ..'
               }
-              className="border rounded h-8 mb-2 px-2 text-nearblue-600  text-xs"
+              className="border rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
             />
             <div className="flex">
               <button
                 type="submit"
                 onClick={(e) => onFilter(e, 'involved')}
-                className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 dark:text-black h-7 text-white text-xs mr-2"
               >
                 <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                 {t ? t('txns:filter.filter') : 'Filter'}
@@ -434,7 +437,7 @@ export default function ({
                 name="involved"
                 type="button"
                 onClick={() => onClear('involved')}
-                className="flex-1 rounded bg-gray-300 text-xs h-7"
+                className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
               >
                 {t ? t('txns:filter.clear') : 'Clear'}
               </button>
@@ -450,10 +453,10 @@ export default function ({
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={`inline-block align-bottom text-green-500 whitespace-nowrap ${
+                    className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                       row?.involved_account_id === address
-                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                        : 'text-green-500 p-0.5 px-1'
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border  border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                     }`}
                   >
                     <Link
@@ -461,7 +464,7 @@ export default function ({
                       className="hover:no-underline"
                     >
                       <a
-                        className="text-green-500 hover:no-underline"
+                        className="text-green-500 dark:text-green-250 hover:no-underline"
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.involved_account_id)
                         }
@@ -486,7 +489,8 @@ export default function ({
           )}
         </span>
       ),
-      tdClassName: 'px-4 py-4 text-sm text-nearblue-600  font-medium',
+      tdClassName:
+        'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10  font-medium',
     },
     {
       header: <>Quantity</>,
@@ -512,9 +516,9 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600  font-medium',
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10  font-medium',
       thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <>Token</>,
@@ -534,12 +538,12 @@ export default function ({
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <div className="text-sm text-nearblue-600  max-w-[110px] inline-block truncate whitespace-nowrap">
+                    <div className="text-sm text-nearblue-600 dark:text-neargray-10  max-w-[110px] inline-block truncate whitespace-nowrap">
                       <Link
                         href={`/token/${row?.ft?.contract}`}
                         className="hover:no-underline"
                       >
-                        <a className="text-green-500 font-medium hover:no-underline">
+                        <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
                           {row?.ft?.name}
                         </a>
                       </Link>
@@ -576,9 +580,10 @@ export default function ({
           )
         );
       },
-      tdClassName: 'px-4 py-4 text-sm text-nearblue-600  font-medium',
+      tdClassName:
+        'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: (
@@ -589,7 +594,7 @@ export default function ({
                 <button
                   type="button"
                   onClick={toggleShowAge}
-                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 focus:outline-none whitespace-nowrap"
+                  className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 dark:text-green-250 focus:outline-none whitespace-nowrap"
                 >
                   {showAge
                     ? t
@@ -598,7 +603,9 @@ export default function ({
                     : t
                     ? t('txns:ageDT')
                     : 'DATE TIME (UTC)'}
-                  {showAge && <Clock className="text-green-500 ml-2" />}
+                  {showAge && (
+                    <Clock className="text-green-500 dark:text-green-250 ml-2" />
+                  )}
                 </button>
               </Tooltip.Trigger>
               <Tooltip.Content
@@ -613,7 +620,7 @@ export default function ({
             </Tooltip.Root>
           </Tooltip.Provider>
           <button type="button" onClick={onOrder} className="px-2">
-            <div className="text-nearblue-600  font-semibold">
+            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
               <SortIcon order={sorting} />
             </div>
           </button>
@@ -654,13 +661,14 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName: 'whitespace-nowrap',
     },
   ];
 
   return (
-    <div className="bg-white soft-shadow rounded-xl pb-1">
+    <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
       {isLoading ? (
         <div className="pl-6 max-w-lg w-full py-5 ">
           <Skeleton className="h-4" />
@@ -668,12 +676,12 @@ export default function ({
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 ">
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
               A total of {localFormat && localFormat(totalCount.toString())}{' '}
               transactions found
             </p>
           </div>
-          <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
+          <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
             {filters && Object.keys(filters).length > 0 && (
               <div className="flex  px-2 items-center text-sm text-gray-500 mb-2 lg:mb-0">
                 <span className="mr-1 lg:mr-2">Filtered By:</span>
@@ -696,11 +704,11 @@ export default function ({
                 </span>
               </div>
             )}
-            <span className="text-xs text-nearblue-600 self-stretch lg:self-auto px-2">
+            <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
               <button className="hover:no-underline ">
                 <Link
                   href={`/token/exportdata?address=${id}`}
-                  className="flex items-center text-nearblue-600 font-medium py-2 border border-neargray-700 px-4 rounded-md bg-white hover:bg-neargray-800"
+                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
                 >
                   <p>CSV Export</p>
                   <span className="ml-2">

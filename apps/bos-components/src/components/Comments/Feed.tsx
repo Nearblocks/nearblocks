@@ -73,7 +73,7 @@ export default function (props: Props) {
 
   return (
     <>
-      <div className="border-b">
+      <div className="border-b  dark:border-black-200">
         {
           <Widget
             src={`${props.ownerId}/widget/bos-components.components.Comments.InputField`}
@@ -131,7 +131,7 @@ export default function (props: Props) {
           />
         }
       </div>
-      <ScrollArea.Root className="w-full rounded overflow-hidden bg-white">
+      <ScrollArea.Root className="w-full rounded overflow-hidden bg-white dark:bg-black">
         <ScrollArea.Viewport className="w-full max-h-screen rounded">
           <div className="px-3 pb-2">
             {

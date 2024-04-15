@@ -126,8 +126,8 @@ export default function (props: Props) {
   return (
     <>
       {error || (!isLoading && !txn) ? (
-        <div className="bg-white soft-shadow rounded-xl pb-1">
-          <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
+        <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+          <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 divide-y">
             <ErrorMessage
               icons={<FileSlash />}
               message="Sorry, We are unable to locate this TxnHash"
@@ -143,10 +143,10 @@ export default function (props: Props) {
                 <button
                   key={index}
                   onClick={() => onTab(index)}
-                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+                  className={`text-nearblue-600  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
                     pageTab === hash
-                      ? 'rounded-lg bg-green-600 text-white'
-                      : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                      ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
+                      : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-600  rounded-lg hover:text-nearblue-600'
                   }`}
                   value={hash}
                 >
@@ -188,22 +188,22 @@ export default function (props: Props) {
                           </button>
                         </Popover.Trigger>
                         <Popover.Content
-                          className="bg-white w-48 shadow-lg border rounded-lg slide-down mt-2 z-50"
+                          className="bg-white dark:bg-black-600 dark:border-black-200 w-48 shadow-lg border rounded-lg slide-down mt-2 z-50"
                           sideOffset={5}
                         >
-                          <ul className="divide-y">
+                          <ul className="divide-y dark:divide-black-200">
                             <li
                               onClick={() => setIsToggle(false)}
-                              className={`py-2 text-nearblue-600 rounded-t-lg ${
-                                !isToggle ? 'bg-gray-300' : ''
+                              className={`py-2 text-nearblue-600 dark:text-neargray-10 rounded-t-lg ${
+                                !isToggle ? 'bg-gray-300 dark:bg-black-200' : ''
                               }`}
                             >
                               {t('txns:txn.tabs.execution') || 'Execution Plan'}
                             </li>
                             <li
                               onClick={() => setIsToggle(true)}
-                              className={`py-2 text-nearblue-600 rounded-b-lg ${
-                                isToggle ? 'bg-gray-300' : ''
+                              className={`py-2 text-nearblue-600 dark:text-neargray-10 rounded-b-lg ${
+                                isToggle ? 'bg-gray-300 dark:bg-black-200' : ''
                               }`}
                             >
                               Enhanced Plan
@@ -220,7 +220,7 @@ export default function (props: Props) {
                 </button>
               ))}
           </div>
-          <div className="bg-white soft-shadow rounded-xl pb-1">
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
               {
                 <Widget

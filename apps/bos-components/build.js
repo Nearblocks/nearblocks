@@ -1,10 +1,6 @@
 import fs from 'fs';
-import fsp from 'fs/promises';
 import replaceInFiles from 'replace-in-files';
-
-const basePath = '.bos/transpiled';
 const transpiledPathPrefix = '.bos/transpiled/src/bos-components';
-
 async function build() {
   const processComponentImports = (filePath, processedFiles = new Set()) => {
     if (processedFiles.has(filePath)) {
@@ -12,37 +8,30 @@ async function build() {
       return '';
     }
     processedFiles.add(filePath);
-
     try {
       const content = fs.readFileSync(filePath, 'utf8');
       let updatedContent = content;
-
       // Regular expression to match the import statement
       const importRegex = /import\s+(\w+)\s+from\s+'@\/includes\/([^']*)';/;
-
       while (true) {
         const match = updatedContent.match(importRegex);
         if (!match) {
           break;
         }
-
         const [fullMatch, componentName, componentPath] = match;
         const absolutePath = `${transpiledPathPrefix}/../includes/${componentPath}.jsx`;
         const importedContent = processComponentImports(
           absolutePath,
           processedFiles,
         );
-
         updatedContent = updatedContent.replace(fullMatch, importedContent);
       }
-
       return updatedContent.replace(/export\s+default\s+(.*?);/, '').trim();
     } catch (error) {
       console.error('Error in processImports:', error);
       return '';
     }
   };
-
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],
     from: /export\s+default\s+function[^(]*\((.*)/gms,
@@ -50,7 +39,6 @@ async function build() {
       return `function MainComponent(${rest}\nreturn MainComponent(props, context);`;
     },
   });
-
   await new Promise((resolve) => {
     fs.rename(
       `${transpiledPathPrefix}/includes`,
@@ -60,7 +48,6 @@ async function build() {
       },
     );
   });
-
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],
     from: /import\s+(\w+)\s+from\s+'@\/includes\/([^']*)';/gm,
@@ -75,7 +62,6 @@ async function build() {
       return `/* INCLUDE COMPONENT: "includes/${componentPath}.jsx" */\n${importedComponentContent}/* END_INCLUDE COMPONENT: "includes/${componentPath}.jsx" */`;
     },
   });
-
   const processFileImports = (fileContent, importedFileContent) => {
     try {
       const functionCalls = fileContent
@@ -124,14 +110,12 @@ async function build() {
           });
         }
       }
-
       return fileContent;
     } catch (error) {
       console.error('Error in processImports:', error);
       return '';
     }
   };
-
   await replaceInFiles({
     files: [`${transpiledPathPrefix}/**/*.jsx`],
     from: /import\s+{[^}]*}\s+from\s+'@\/includes\/([^']*)';/gm,
@@ -153,12 +137,10 @@ async function build() {
       // loops through each function name to extract function content
       extractedNames.forEach(function (name, index) {
         const functionName = `${name.trim()}`;
-
         const regex = new RegExp(
           `function\\s+${functionName}\\s*\\([^)]*\\)\\s*{([^]*)}`,
           's',
         );
-
         const match = importedFileContent.match(regex);
         if (match) {
           contentImport = match[0] + '\n';
@@ -169,34 +151,18 @@ async function build() {
       return `/* INCLUDE: "includes/${importPath}.jsx" */\n${fileImported}/* END_INCLUDE: "includes/${importPath}.jsx" */`;
     },
   });
-
   const packageJson = JSON.parse(
     fs.readFileSync(new URL('./package.json', import.meta.url)),
   );
-  const newPath = `${basePath}/common/src/${packageJson.name}`;
-
-  await fsp.rename(transpiledPathPrefix, newPath);
-  await fsp.rename(
-    `${newPath}/components/Address`,
-    `${basePath}/address/src/bos-components/components/Address`,
-  );
-  await fsp.rename(
-    `${newPath}/components/Blocks`,
-    `${basePath}/blocks/src/bos-components/components/Blocks`,
-  );
-  await fsp.rename(
-    `${newPath}/components/FT`,
-    `${basePath}/ft/src/bos-components/components/FT`,
-  );
-  await fsp.rename(
-    `${newPath}/components/NFT`,
-    `${basePath}/nft/src/bos-components/components/NFT`,
-  );
-  await fsp.rename(
-    `${newPath}/components/Transactions`,
-    `${basePath}/txn/src/bos-components/components/Transactions`,
-  );
-
+  await new Promise((resolve) => {
+    fs.rename(
+      transpiledPathPrefix,
+      `${transpiledPathPrefix}/../${packageJson.name}`,
+      () => {
+        resolve();
+      },
+    );
+  });
   console.log('DONE');
 }
 build();

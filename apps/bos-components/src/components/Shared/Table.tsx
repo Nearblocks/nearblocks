@@ -44,8 +44,8 @@ export default function (props: Props) {
     return (
       <>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y border-t">
-            <thead className="bg-gray-100 h-[51px]">
+          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
                 {props.columns.map((column, index) => (
                   <th key={index} scope="col" className={column.thClassName}>
@@ -54,7 +54,7 @@ export default function (props: Props) {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
               {[...Array(props.limit)].map((_, index) => (
                 <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
                   {props.columns.map((column, colIndex) => (
@@ -82,8 +82,12 @@ export default function (props: Props) {
   return (
     <>
       {props.isExpanded ? (
-        <div className={`bg-gray-50 overflow-x-auto`}>
-          <table className={'min-w-full divide-y border-separate '}>
+        <div className={`bg-gray-50 dark:bg-black-200 overflow-x-auto`}>
+          <table
+            className={
+              'min-w-full divide-y dark:divide-black-200 dark:border-black border-separate '
+            }
+          >
             <thead>
               <tr>
                 {props?.columns.map((column: column, index: number) => (
@@ -139,8 +143,8 @@ export default function (props: Props) {
         </div>
       ) : (
         <div className="overflow-x-auto ">
-          <table className="min-w-full divide-y border-t">
-            <thead className="bg-gray-100 h-[51px]">
+          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
                 {props?.columns.map((column: column, index: number) => (
                   <th key={index} scope="col" className={column.thClassName}>
@@ -149,7 +153,7 @@ export default function (props: Props) {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
               {!props.isLoading && props.data === undefined && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">

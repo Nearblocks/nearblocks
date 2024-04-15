@@ -36,6 +36,11 @@ pre[class*='language-']>code {
     border: 1px solid rgba(233, 236, 239, 1)
 }
 
+.dark .soft-shadow {
+    box-shadow: 0px 8px 19.200000762939453px 0px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(31, 34, 40, 1)    
+}
+
 .image-shadow {
     box-shadow: 0 1.6px 5.4px rgba(0, 0, 0, 0.054),
         0 4.4px 14.9px rgba(0, 0, 0, 0.069), 0 10.6px 35.9px rgba(0, 0, 0, 0.079),
@@ -76,6 +81,18 @@ pre[class*='language-']>code {
     border-bottom: .7rem solid transparent;
     border-left: .7rem solid #fff
 }
+
+.dark .u-label--badge-in:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: "";
+    border-top: .7rem solid transparent;
+    border-bottom: .7rem solid transparent;
+    border-left: .7rem solid #0D0D0D
+}
+
+
 
 #token-search {
     position: relative;

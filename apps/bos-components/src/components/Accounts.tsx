@@ -555,7 +555,9 @@ export default function (props: Props) {
             <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
               Near Account: @
               {id && (
-                <span className="font-semibold text-green-500 ">{id}</span>
+                <span className="font-semibold text-green-500 dark:text-green-250">
+                  {id}
+                </span>
               )}
               {
                 <Widget
@@ -572,13 +574,13 @@ export default function (props: Props) {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-xl">
-            <div className="flex justify-between border-b p-3 text-nearblue-600">
+          <div className="h-full bg-white soft-shadow rounded-xl dark:bg-black-600">
+            <div className="flex justify-between border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10">
               <h2 className="leading-6 text-sm font-semibold">
                 {t ? t('address:overview') : 'Overview'}
               </h2>
               {tokenData?.name && (
-                <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
+                <div className="flex items-center text-xs bg-gray-100 dark:bg-black-200 dark:text-neargray-10 rounded-md px-2 py-1">
                   <div className="truncate max-w-[110px]">
                     {tokenData?.name}
                   </div>
@@ -595,7 +597,7 @@ export default function (props: Props) {
                 </div>
               )}
             </div>
-            <div className="px-3 divide-y text-sm text-nearblue-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex flex-wrap py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:balance') : 'Balance'}:
@@ -613,7 +615,7 @@ export default function (props: Props) {
               {network === 'mainnet' &&
                 accountData?.amount &&
                 statsData?.near_price && (
-                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">
                       {t ? t('address:value') : 'Value:'}
                     </div>
@@ -642,7 +644,7 @@ export default function (props: Props) {
                     )}
                   </div>
                 )}
-              <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+              <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens:'}
                 </div>
@@ -662,11 +664,11 @@ export default function (props: Props) {
           </div>
         </div>
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-            <h2 className="leading-6 border-b p-3 text-nearblue-600 text-sm font-semibold">
+          <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+            <h2 className="leading-6 border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
               {t ? t('address:moreInfo') : 'Account information'}
             </h2>
-            <div className="px-3 divide-y text-sm text-nearblue-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex justify-between">
                 <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
@@ -804,7 +806,7 @@ export default function (props: Props) {
                         </a>
                       </Link>
                       {tokenData.price && (
-                        <div className="text-nearblue-600 ml-1">
+                        <div className="text-nearblue-600 dark:text-neargray-10 ml-1">
                           (@ ${localFormat(tokenData.price)})
                         </div>
                       )}
@@ -835,10 +837,10 @@ export default function (props: Props) {
                       onClick={() => {
                         onTab(index);
                       }}
-                      className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                      className={`  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                         pageTab === tab
-                          ? 'rounded-lg bg-green-600 text-white'
-                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                          ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white dark:text-black'
+                          : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10'
                       }`}
                       value={tab}
                     >
@@ -849,7 +851,7 @@ export default function (props: Props) {
                       ) : tab === 'Contract' ? (
                         <div className="flex h-full">
                           <h2>{tab}</h2>
-                          <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
+                          <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
                             NEW
                           </div>
                         </div>
@@ -956,7 +958,7 @@ export default function (props: Props) {
               )}
               <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
                 {
-                  <div className="bg-white soft-shadow rounded-xl pb-1">
+                  <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                     <div className="py-3">
                       <Widget
                         src={`${ownerId}/widget/bos-components.components.Comments.Feed`}

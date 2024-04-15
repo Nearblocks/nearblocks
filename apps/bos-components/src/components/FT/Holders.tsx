@@ -181,9 +181,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         <span>{serialNumber(index, currentPage, 25)}</span>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 w-[50px]',
+        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-[50px]',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[50]',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[50]',
     },
     {
       header: 'Address',
@@ -198,7 +198,7 @@ export default function ({ network, id, token, ownerId }: Props) {
                     href={`/address/${row.account}`}
                     className="hover:no-undeline"
                   >
-                    <a className="text-green-500 font-medium hover:no-undeline">
+                    <a className="text-green-500 dark:text-green-250 font-medium hover:no-undeline">
                       {row.account}
                     </a>
                   </Link>
@@ -215,9 +215,9 @@ export default function ({ network, id, token, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Quantity',
@@ -230,9 +230,10 @@ export default function ({ network, id, token, ownerId }: Props) {
             : ''}
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Percentage',
@@ -248,7 +249,7 @@ export default function ({ network, id, token, ownerId }: Props) {
               <div className="h-0.5 mt-1 w-full bg-gray-100">
                 <div
                   style={{ width: `${percentage}%` }}
-                  className="h-0.5 bg-green-500"
+                  className="h-0.5 bg-green-500 dark:bg-green-250"
                 />
               </div>
             )}
@@ -256,9 +257,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Value',
@@ -272,9 +273,10 @@ export default function ({ network, id, token, ownerId }: Props) {
           </span>
         );
       },
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
@@ -287,7 +289,7 @@ export default function ({ network, id, token, ownerId }: Props) {
       ) : (
         <>
           {!status.sync && (
-            <div className="w-full text-center bg-nearblue rounded-t-xl px-5 py-4 text-green text-sm">
+            <div className="w-full text-center bg-nearblue rounded-t-xl px-5 py-4 text-green dark:text-green-250 text-sm">
               Holders count is out of sync. Last synced block is
               <span className="font-bold mx-0.5">
                 {`${localFormat && localFormat(status.height)}`}
@@ -299,7 +301,7 @@ export default function ({ network, id, token, ownerId }: Props) {
           )}
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
-              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                 A total of {localFormat && localFormat(totalCount.toString())}{' '}
                 token holders found
               </p>
