@@ -1,4 +1,5 @@
 import type { Network, NetworkId } from './types';
+import { env } from 'next-runtime-env';
 
 export const networks: Record<NetworkId, Network> = {
   mainnet: {
@@ -10,9 +11,9 @@ export const networks: Record<NetworkId, Network> = {
 };
 
 export const networkId: NetworkId =
-  (process.env.NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
+  (env('NEXT_PUBLIC_NETWORK_ID') as NetworkId) || 'testnet';
 export const bosNetworkId: NetworkId =
-  (process.env.NEXT_PUBLIC_BOS_NETWORK as NetworkId) || 'testnet';
+  (env('NEXT_PUBLIC_BOS_NETWORK') as NetworkId) || 'testnet';
 
 export const network = networks[networkId];
 
@@ -22,9 +23,9 @@ export const apiUrl: string =
     : 'https://api3-testnet.nearblocks.io/v1/';
 
 export const appUrl =
-  process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
-    ? process.env.NEXT_PUBLIC_MAINNET_URL
-    : process.env.NEXT_PUBLIC_TESTNET_URL;
+  env('NEXT_PUBLIC_NETWORK_ID') === 'mainnet'
+    ? env('NEXT_PUBLIC_MAINNET_URL')
+    : env('NEXT_PUBLIC_TESTNET_URL');
 
 export const docsUrl: string =
   networkId === 'mainnet'

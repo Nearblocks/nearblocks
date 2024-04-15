@@ -9,9 +9,10 @@ import Router from 'next/router';
 
 import Layout from '@/components/Layouts';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Token = () => {
   const router = useRouter();

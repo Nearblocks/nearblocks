@@ -1,4 +1,5 @@
 import type { NetworkId } from '@/utils/types';
+import { env } from 'next-runtime-env';
 type NetworkComponents = {
   nodeExplorer: string;
   sponsoredText: string;
@@ -21,27 +22,29 @@ type NetworkComponents = {
   charts: string;
   exportData: string;
 };
+const accountId = env('NEXT_PUBLIC_ACCOUNT_ID');
+
 const ComponentUrl = {
-  nodeExplorer: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NodeExplorer`,
-  sponsoredText: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.SponsoredText`,
-  account: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Accounts`,
-  blocksList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Blocks.List`,
-  blocksLatest: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Blocks.Latest`,
-  blocksDetail: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Blocks.Detail`,
-  transactionsList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.List`,
-  transactionsLatest: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Latest`,
-  transactionsOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Overview`,
-  transactionsHash: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Transactions.Hash`,
-  search: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Shared.Search`,
-  ftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.List`,
-  ftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.TransfersList`,
-  ftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.FT.Overview`,
-  nftList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.List`,
-  nftOverview: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.Overview`,
-  nftTransfersList: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.TransfersList`,
-  nftDetail: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.NFT.Detail`,
-  charts: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.Charts`,
-  exportData: `${process.env.NEXT_PUBLIC_ACCOUNT_ID}/widget/bos-components.components.ExportData`,
+  nodeExplorer: `${accountId}/widget/bos-components.components.NodeExplorer`,
+  sponsoredText: `${accountId}/widget/bos-components.components.Shared.SponsoredText`,
+  account: `${accountId}/widget/bos-components.components.Accounts`,
+  blocksList: `${accountId}/widget/bos-components.components.Blocks.List`,
+  blocksLatest: `${accountId}/widget/bos-components.components.Blocks.Latest`,
+  blocksDetail: `${accountId}/widget/bos-components.components.Blocks.Detail`,
+  transactionsList: `${accountId}/widget/bos-components.components.Transactions.List`,
+  transactionsLatest: `${accountId}/widget/bos-components.components.Transactions.Latest`,
+  transactionsOverview: `${accountId}/widget/bos-components.components.Transactions.Overview`,
+  transactionsHash: `${accountId}/widget/bos-components.components.Transactions.Hash`,
+  search: `${accountId}/widget/bos-components.components.Shared.Search`,
+  ftList: `${accountId}/widget/bos-components.components.FT.List`,
+  ftTransfersList: `${accountId}/widget/bos-components.components.FT.TransfersList`,
+  ftOverview: `${accountId}/widget/bos-components.components.FT.Overview`,
+  nftList: `${accountId}/widget/bos-components.components.NFT.List`,
+  nftOverview: `${accountId}/widget/bos-components.components.NFT.Overview`,
+  nftTransfersList: `${accountId}/widget/bos-components.components.NFT.TransfersList`,
+  nftDetail: `${accountId}/widget/bos-components.components.NFT.Detail`,
+  charts: `${accountId}/widget/bos-components.components.Charts`,
+  exportData: `${accountId}/widget/bos-components.components.ExportData`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,

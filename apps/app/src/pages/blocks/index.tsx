@@ -7,8 +7,9 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import { networkId, appUrl } from '@/utils/config';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const Blocks = () => {
   const { t } = useTranslation();

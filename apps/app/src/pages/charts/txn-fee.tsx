@@ -7,7 +7,9 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const TxnFeeChart = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
@@ -51,20 +53,18 @@ const TxnFeeChart = () => {
         />
         <meta
           property="og:image"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
-            'charts:txnFee.heading',
-          )}
+          content={`${ogUrl}/thumbnail/chart?title=${t('charts:txnFee.heading')}
         `}
         />
         <meta
           property="og:image:secure_url"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
+          content={`${ogUrl}/thumbnail/chart?title=${t(
             'charts:txnFee.heading',
           )}`}
         />
         <meta
           name="twitter:image:src"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
+          content={`${ogUrl}/thumbnail/chart?title=${t(
             'charts:txnFee.heading',
           )}`}
         />

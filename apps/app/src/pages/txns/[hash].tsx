@@ -7,9 +7,10 @@ import useTranslation from 'next-translate/useTranslation';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Txn = () => {
   const router = useRouter();

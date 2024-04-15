@@ -1,6 +1,7 @@
 import { useBosLoaderStore } from '@/stores/bos-loader';
 import { useVmStore } from '@/stores/vm';
 import { useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
 
 type Props = {
   src: string;
@@ -33,7 +34,7 @@ export function VmComponent(props: Props) {
       onChangeHeightCalled.current = true;
     }
   }, [showLoader, onChangeHeight]);
-  const ownerId = process.env.NEXT_PUBLIC_ACCOUNT_ID;
+  const ownerId = env('NEXT_PUBLIC_ACCOUNT_ID');
   return (
     <>
       {showLoader && skeleton}

@@ -15,6 +15,7 @@ import { apiUrl, networkId } from '@/utils/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
+import { env } from 'next-runtime-env';
 
 const menus = [
   {
@@ -616,7 +617,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href={process.env.NEXT_PUBLIC_MAINNET_URL}
+                            href={env('NEXT_PUBLIC_MAINNET_URL')}
                           >
                             Mainnet
                           </a>
@@ -624,7 +625,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
-                            href={process.env.NEXT_PUBLIC_TESTNET_URL}
+                            href={env('NEXT_PUBLIC_TESTNET_URL')}
                           >
                             Testnet
                           </a>
@@ -654,7 +655,7 @@ const Header = () => {
                                 ? 'text-green-500'
                                 : 'text-gray-500'
                             }`}
-                            href={process.env.NEXT_PUBLIC_MAINNET_URL}
+                            href={env('NEXT_PUBLIC_MAINNET_URL')}
                           >
                             Mainnet
                           </a>
@@ -666,7 +667,7 @@ const Header = () => {
                                 ? 'text-green-500'
                                 : 'text-gray-500'
                             }`}
-                            href={process.env.NEXT_PUBLIC_TESTNET_URL}
+                            href={env('NEXT_PUBLIC_TESTNET_URL')}
                           >
                             Testnet
                           </a>

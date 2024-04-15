@@ -7,10 +7,10 @@ import Overview from '@/components/skeleton/nft/Overview';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { Token } from '@/utils/types';
+import { env } from 'next-runtime-env';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const NFToken = () => {
   const router = useRouter();
   const { id } = router.query;

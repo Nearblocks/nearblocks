@@ -16,3 +16,4 @@ yarn-debug.log*
 yarn-error.log*
 
 README.md
+public/__ENV.js

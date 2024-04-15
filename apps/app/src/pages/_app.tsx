@@ -6,7 +6,7 @@ import '../../public/common.css';
 import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 import type { NextPageWithLayout } from '@/utils/types';
 import Script from 'next/script';
-
+import { env } from 'next-runtime-env';
 const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
   ssr: false,
 });
@@ -23,7 +23,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtm.js?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+        src={`https://www.googletagmanager.com/gtm.js?id=${env(
+          'NEXT_PUBLIC_GTM_ID',
+        )}`}
       />
       <VmInitializer />
 
