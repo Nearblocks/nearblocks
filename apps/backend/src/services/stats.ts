@@ -1,7 +1,9 @@
 import { Big } from 'big.js';
 
+import { Network } from 'nb-types';
 import { msToNsTime } from 'nb-utils';
 
+import config from '#config';
 import cg from '#libs/cg';
 import knex from '#libs/knex';
 import near from '#libs/near';
@@ -52,6 +54,10 @@ const blockData = async () => {
 };
 
 const marketData = async () => {
+  if (config.network === Network.TESTNET) {
+    return {};
+  }
+
   const price = await cg.marketData('near', true);
 
   if (!price) return {};
@@ -84,16 +90,20 @@ const networkData = async () => {
 };
 
 export const txnData = async () => {
-  const stats = await knex
-    .select(
-      knex.raw(
-        "count_estimate('SELECT transaction_hash FROM transactions') as count",
-      ),
-    )
-    .first();
+  const [stats, tps] = await Promise.all([
+    knex
+      .select(
+        knex.raw(
+          "count_estimate('SELECT transaction_hash FROM transactions') as count",
+        ),
+      )
+      .first(),
+    knex('tps').orderBy('date', 'desc').first(),
+  ]);
 
   return {
     total_txns: stats?.count ?? 0,
+    tps: tps?.txns ?? 0,
   };
 };
 

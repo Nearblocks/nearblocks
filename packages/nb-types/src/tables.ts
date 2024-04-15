@@ -31,6 +31,7 @@ export interface TTables {
   receipts: Receipt;
   settings: Setting;
   stats: Stats;
+  tps: TPS;
   transactions: Transaction;
 }
 
@@ -299,6 +300,12 @@ export type Stats = {
   total_supply: null | string;
   total_txns: null | string;
   volume: null | string;
+};
+
+export type TPS = {
+  date: string;
+  shards: JsonValue;
+  txns: number;
 };
 
 export type Transaction = {
