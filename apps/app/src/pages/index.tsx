@@ -5,10 +5,14 @@ import Latest from '@/components/skeleton/home/Latest';
 import Overview from '@/components/skeleton/home/Overview';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
+import { networkId, appUrl, apiUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
+import { search } from '@/utils/search';
+import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
@@ -44,6 +48,56 @@ const HomePage = () => {
 
   const { t } = useTranslation();
 
+  const SearchToast = () => {
+    if (network === 'testnet') {
+      return (
+        <div>
+          No results. Try on{' '}
+          <Link href={env('NEXT_PUBLIC_MAINNET_URL') || ''} legacyBehavior>
+            <a className="text-green-500">Mainnet</a>
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        No results. Try on{' '}
+        <Link href={env('NEXT_PUBLIC_TESTNET_URL') || ''} legacyBehavior>
+          <a className="text-green-500">Testnet</a>
+        </Link>
+      </div>
+    );
+  };
+
+  const { query }: any = router.query;
+  const q = query?.replace(/[\s,]/g, '');
+
+  useEffect(() => {
+    const redirect = (route: any) => {
+      switch (route?.type) {
+        case 'block':
+          return router.push(`/blocks/${route?.path}`);
+        case 'txn':
+        case 'receipt':
+          return router.push(`/txns/${route?.path}`);
+        case 'address':
+          return router.push(`/address/${route?.path}`);
+        default:
+          return toast.error(SearchToast);
+      }
+    };
+    const fetchData = () => {
+      if (q) {
+        search(q, 'all', true, apiUrl).then((data: any) => {
+          redirect(data);
+        });
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, apiUrl]);
+
   return (
     <>
       <Head>
@@ -65,8 +119,19 @@ const HomePage = () => {
           content={t('home:metaDescription')}
         />
         <link rel="canonical" href={`${appUrl}/`} />
+        <link
+          rel="search"
+          type="application/opensearchdescription+xml"
+          href={
+            network === 'testnet'
+              ? '/opensearch_testnet.xml'
+              : '/opensearch_mainnet.xml'
+          }
+          title="nearblocks"
+        />
       </Head>
       <div>
+        <ToastContainer />
         <div className="flex items-center justify-center bg-hero-pattern">
           <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
             <div className="flex flex-col lg:flex-row pb-5">

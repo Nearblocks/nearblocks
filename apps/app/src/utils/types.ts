@@ -89,3 +89,18 @@ export type Token = {
   title: string;
   nft: Token;
 };
+
+export type SearchResult = {
+  accounts?: Array<{ account_id: string }>;
+  txns?: Array<{ transaction_hash: string }>;
+  receipts?: Array<{
+    receipt_id: string;
+    originated_from_transaction_hash: string;
+  }>;
+  blocks?: Array<{ block_hash: string; block_height: string }>;
+};
+
+export type SearchRoute = {
+  type?: string;
+  path?: string;
+};
