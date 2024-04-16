@@ -261,7 +261,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                   <div className="items-center flex justify-left mr-3 ">
                     <img
-                      src={`${'http://localhost:3002/'}images/${
+                      src={`${config.appUrl}images/${
                         theme === 'dark'
                           ? 'near price_dark.svg'
                           : 'near price.svg'
@@ -316,7 +316,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                   <div className="items-center flex justify-left mr-3 ">
                     <img
-                      src={`${'http://localhost:3002/'}images/${
+                      src={`${config.appUrl}images/${
                         theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                       }`}
                       alt={t ? t('home:marketCap') : 'marketCap'}
@@ -354,7 +354,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <img
-                    src={`${'http://localhost:3002/'}images/${
+                    src={`${config.appUrl}images/${
                       theme === 'dark'
                         ? 'transactions_dark.svg'
                         : 'transactions.svg'
@@ -399,7 +399,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <img
-                    src={`${'http://localhost:3002/'}images/${
+                    src={`${config.appUrl}images/${
                       theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
                     }`}
                     alt={t ? t('home:activeValidator') : 'activeValidator'}
