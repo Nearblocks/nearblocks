@@ -94,17 +94,19 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
     );
   };
   return (
-    <>
-      <div className="py-4 border-b px-8">
-        <div className="flex max-sm:!flex-col justify-start text-center w-fit">
+    <div className="flex py-4 border-b px-4">
+      <div className="w-max pr-2">
+        <img
+          className="rounded-full w-10 h-10"
+          src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
+          alt=""
+        />
+      </div>
+      <div className="max-sm:!w-min w-fit">
+        <div className="flex max-sm:!flex-col justify-start text-center">
           <div className="flex relative">
-            <img
-              className="rounded-full w-10 h-10"
-              src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
-              alt=""
-            />
             <div className="flex justify-start ml-2">
-              <p className="font-semibold">{name}</p>
+              <p className="font-semibold mr-1">{name}</p>
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
@@ -125,7 +127,7 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
               </Tooltip.Provider>
             </div>
           </div>
-          <p className="text-gray-600 max-sm:!ml-10 mb-3 flex align-middle">
+          <p className="text-gray-600 flex align-middle">
             {blockHeight === 'now' ? (
               'now'
             ) : (
@@ -133,31 +135,30 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
             )}
           </p>
         </div>
-        <div>
-          <div className="container">
-            <div className="ml-12 top-0">
-              <Markdown text={post.text} onPath={renderPath} />
-            </div>
-            {post.image && (
-              <div className="w-full flex justify-center text-center">
-                <img
-                  className="rounded-lg md:max-w-lg"
-                  src={toUrl(imageUrl)}
-                  loading="lazy"
-                  alt="attached image"
-                  onError={() => {
-                    if (imageUrl !== fallbackUrl) {
-                      State.update({
-                        imageUrl: fallbackUrl,
-                      });
-                    }
-                  }}
-                />
-              </div>
-            )}
+
+        <div className="container">
+          <div className="top-0 ml-2">
+            <Markdown text={post.text} onPath={renderPath} />
           </div>
+          {post.image && (
+            <div className="w-full flex justify-center text-center">
+              <img
+                className="rounded-lg md:max-w-lg"
+                src={toUrl(imageUrl)}
+                loading="lazy"
+                alt="attached image"
+                onError={() => {
+                  if (imageUrl !== fallbackUrl) {
+                    State.update({
+                      imageUrl: fallbackUrl,
+                    });
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
