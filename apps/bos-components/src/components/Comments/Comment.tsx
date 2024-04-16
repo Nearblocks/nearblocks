@@ -55,7 +55,8 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
             return 'unknown';
           }
           const timeMs = parseFloat(res.body);
-          return setTime(timeAgo(timeMs / 1000));
+          const timeInSeconds = Math.floor(timeMs / 1000);
+          return setTime(timeAgo(timeInSeconds));
         });
       } catch (error) {
         console.error('Error fetching time:', error);
@@ -95,25 +96,44 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
   return (
     <>
       <div className="py-4 border-b px-8">
-        <div className="flex justify-start text-center">
-          <img
-            className="rounded-full w-12 h-12"
-            src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
-            alt=""
-          />
-          <div className="flex justify-start ml-2 bottom-0 top-0">
-            <p className="font-semibold">{name} </p>
-            <p className="text-gray-600 font-thin ml-0.5"> {title}</p>
+        <div className="flex max-sm:!flex-col justify-start text-center w-fit">
+          <div className="flex relative">
+            <img
+              className="rounded-full w-10 h-10"
+              src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
+              alt=""
+            />
+            <div className="flex justify-start ml-2">
+              <p className="font-semibold">{name}</p>
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <span className="inline-block truncate max-w-[150px] text-gray-600 font-thin">
+                      {title}
+                    </span>
+                  </Tooltip.Trigger>
+                  {!context.accountId && (
+                    <Tooltip.Content
+                      className="h-auto absolute max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                      align="start"
+                      side="bottom"
+                    >
+                      {title}
+                    </Tooltip.Content>
+                  )}
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            </div>
           </div>
-          <p className="text-gray-600 flex align-middle">
+          <p className="text-gray-600 max-sm:!ml-10 mb-3 flex align-middle">
             {blockHeight === 'now' ? (
               'now'
             ) : (
-              <p className="text-muted">. {time}</p>
+              <span className="text-muted ml-2">{time}</span>
             )}
           </p>
         </div>
-        <div className="mb-2">
+        <div>
           <div className="container">
             <div className="ml-12 top-0">
               <Markdown text={post.text} onPath={renderPath} />
