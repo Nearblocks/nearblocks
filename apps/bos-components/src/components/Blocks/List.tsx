@@ -227,9 +227,16 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
       key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
-          {row?.transactions_agg?.count
-            ? localFormat(row?.transactions_agg?.count)
-            : row?.transactions_agg?.count ?? ''}
+          <Link
+            href={`/txns?block=${row?.block_hash}`}
+            className="hover:no-underline"
+          >
+            <a className="text-green-500 hover:no-underline font-medium">
+              {row?.transactions_agg?.count
+                ? localFormat(row?.transactions_agg?.count)
+                : row?.transactions_agg?.count ?? ''}
+            </a>
+          </Link>
         </span>
       ),
       tdClassName:
@@ -331,29 +338,31 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <p className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
-          {t
-            ? t('blocks:listing', {
-                from: start?.block_height
-                  ? localFormat && localFormat(start?.block_height)
-                  : start?.block_height ?? '',
-                to: end?.block_height
-                  ? localFormat && localFormat(end?.block_height)
-                  : end?.block_height ?? '',
-                count: localFormat && localFormat(totalCount.toString()),
-              })
-            : `Block #${
-                start?.block_height
-                  ? localFormat && localFormat(start?.block_height)
-                  : start?.block_height ?? ''
-              } to ${
-                '#' + end?.block_height
-                  ? localFormat && localFormat(end?.block_height)
-                  : end?.block_height ?? ''
-              } (Total of ${
-                localFormat && localFormat(totalCount.toString())
-              } blocks)`}{' '}
-        </p>
+        <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
+          <p className="sm:w-full w-65">
+            {t
+              ? t('blocks:listing', {
+                  from: start?.block_height
+                    ? localFormat && localFormat(start?.block_height)
+                    : start?.block_height ?? '',
+                  to: end?.block_height
+                    ? localFormat && localFormat(end?.block_height)
+                    : end?.block_height ?? '',
+                  count: localFormat && localFormat(totalCount.toString()),
+                })
+              : `Block #${
+                  start?.block_height
+                    ? localFormat && localFormat(start?.block_height)
+                    : start?.block_height ?? ''
+                } to ${
+                  '#' + end?.block_height
+                    ? localFormat && localFormat(end?.block_height)
+                    : end?.block_height ?? ''
+                } (Total of ${
+                  localFormat && localFormat(totalCount.toString())
+                } blocks)`}{' '}
+          </p>
+        </div>
       )}
       {
         <Widget
