@@ -55,8 +55,7 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
             return 'unknown';
           }
           const timeMs = parseFloat(res.body);
-          const timeInSeconds = Math.floor(timeMs / 1000);
-          return setTime(timeAgo(timeInSeconds));
+          return setTime(timeAgo(timeMs / 1000));
         });
       } catch (error) {
         console.error('Error fetching time:', error);
@@ -94,71 +93,51 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
     );
   };
   return (
-    <div className="flex py-4 border-b px-4">
-      <div className="w-max pr-2">
-        <img
-          className="rounded-full w-10 h-10"
-          src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
-          alt=""
-        />
-      </div>
-      <div className="max-sm:!w-min w-fit">
-        <div className="flex max-sm:!flex-col justify-start text-center">
-          <div className="flex relative">
-            <div className="flex justify-start ml-2">
-              <p className="font-semibold mr-1">{name}</p>
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <span className="inline-block truncate max-w-[150px] text-gray-600 font-thin">
-                      {title}
-                    </span>
-                  </Tooltip.Trigger>
-                  {!context.accountId && (
-                    <Tooltip.Content
-                      className="h-auto absolute max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      align="start"
-                      side="bottom"
-                    >
-                      {title}
-                    </Tooltip.Content>
-                  )}
-                </Tooltip.Root>
-              </Tooltip.Provider>
-            </div>
+    <>
+      <div className="py-4 border-b px-8">
+        <div className="flex justify-start text-center">
+          <img
+            className="rounded-full w-12 h-12"
+            src={`https://i.near.social/magic/${'large'}/https://near.social/magic/img/account/${accountId}`}
+            alt=""
+          />
+          <div className="flex justify-start ml-2 bottom-0 top-0">
+            <p className="font-semibold">{name} </p>
+            <p className="text-gray-600 font-thin ml-0.5"> {title}</p>
           </div>
           <p className="text-gray-600 flex align-middle">
             {blockHeight === 'now' ? (
               'now'
             ) : (
-              <span className="text-muted ml-2">{time}</span>
+              <p className="text-muted">. {time}</p>
             )}
           </p>
         </div>
-
-        <div className="container">
-          <div className="top-0 ml-2">
-            <Markdown text={post.text} onPath={renderPath} />
-          </div>
-          {post.image && (
-            <div className="w-full flex justify-center text-center">
-              <img
-                className="rounded-lg md:max-w-lg"
-                src={toUrl(imageUrl)}
-                loading="lazy"
-                alt="attached image"
-                onError={() => {
-                  if (imageUrl !== fallbackUrl) {
-                    State.update({
-                      imageUrl: fallbackUrl,
-                    });
-                  }
-                }}
-              />
+        <div className="mb-2">
+          <div className="container">
+            <div className="ml-12 top-0">
+              <Markdown text={post.text} onPath={renderPath} />
             </div>
-          )}
+            {post.image && (
+              <div className="w-full flex justify-center text-center">
+                <img
+                  className="rounded-lg md:max-w-lg"
+                  src={toUrl(imageUrl)}
+                  loading="lazy"
+                  alt="attached image"
+                  onError={() => {
+                    if (imageUrl !== fallbackUrl) {
+                      State.update({
+                        imageUrl: fallbackUrl,
+                      });
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
