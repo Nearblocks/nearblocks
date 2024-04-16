@@ -1,10 +1,11 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import dayjs from '#libs/dayjs';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import { Count, Item, Latest, List } from '#libs/schema/txns';
-import { getPagination } from '#libs/utils';
+import { getPagination, msToNsTime } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const EXPIRY = 5; // 5 sec
@@ -18,6 +19,24 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
+  const afterDate = req.validator.data.after_date;
+  const beforeDate = req.validator.data.before_date;
+  let afterTimestamp = null;
+  let beforeTimestamp = null;
+
+  if (afterDate) {
+    afterTimestamp = msToNsTime(
+      dayjs(afterDate, 'YYYY-MM-DD', true)
+        .add(1, 'day')
+        .startOf('day')
+        .valueOf(),
+    );
+  }
+  if (beforeDate) {
+    beforeTimestamp = msToNsTime(
+      dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+  }
 
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
@@ -103,6 +122,12 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           ${block ? sql`included_in_block_hash = ${block}` : true}
           AND ${from ? sql`signer_account_id = ${from}` : true}
           AND ${to ? sql`receiver_account_id = ${to}` : true}
+          AND ${afterTimestamp
+      ? sql`block_timestamp >= ${afterTimestamp}`
+      : true}
+          AND ${beforeTimestamp
+      ? sql`block_timestamp < ${beforeTimestamp}`
+      : true}
           AND ${action || method
       ? sql`
           EXISTS (
@@ -147,8 +172,34 @@ const count = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp = null;
+    let beforeTimestamp = null;
 
-    if (!block && !from && !to && !action && !method) {
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
+
+    if (
+      !block &&
+      !from &&
+      !to &&
+      !action &&
+      !method &&
+      !afterTimestamp &&
+      !beforeTimestamp
+    ) {
       const txns = await sql`
         SELECT
           count_estimate ('SELECT
@@ -169,6 +220,10 @@ const count = catchAsync(
         ${block ? sql`included_in_block_hash = ${block}` : true}
         AND ${from ? sql`signer_account_id = ${from}` : true}
         AND ${to ? sql`receiver_account_id = ${to}` : true}
+        AND ${afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true}
+        AND ${beforeTimestamp
+        ? sql`block_timestamp < ${beforeTimestamp}`
+        : true}
         AND ${action || method
         ? sql`
             EXISTS (

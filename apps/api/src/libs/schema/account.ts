@@ -46,6 +46,20 @@ const keysCount = z.object({
 const txns = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -57,6 +71,20 @@ const txns = z.object({
 const txnsCount = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   from: z.string().optional(),
   method: z.string().optional(),
   to: z.string().optional(),
@@ -74,6 +102,20 @@ const txnsExport = z.object({
 
 const ftTxns = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -83,6 +125,20 @@ const ftTxns = z.object({
 
 const ftTxnsCount = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
 });
@@ -99,6 +155,20 @@ const ftTxnsExport = z.object({
 
 const nftTxns = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -108,6 +178,20 @@ const nftTxns = z.object({
 
 const nftTxnsCount = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
 });

@@ -21,6 +21,24 @@ const txns = catchAsync(
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp = null;
+    let beforeTimestamp = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     const { limit, offset } = getPagination(page, per_page);
     const { query, values } = keyBinder(
@@ -69,6 +87,12 @@ const txns = catchAsync(
               affected_account_id = :account
               AND ${involved ? `involved_account_id = :involved` : true}
               AND ${event ? `cause = :event` : true}
+              AND ${
+                afterTimestamp ? `block_timestamp >= :afterTimestamp` : true
+              }
+              AND ${
+                beforeTimestamp ? `block_timestamp < :beforeTimestamp` : true
+              }
               AND EXISTS (
                 SELECT
                   1
@@ -133,7 +157,15 @@ const txns = catchAsync(
         ORDER BY
           event_index ${order === 'desc' ? 'DESC' : 'ASC'}
       `,
-      { account, event, involved, limit, offset },
+      {
+        account,
+        afterTimestamp,
+        beforeTimestamp,
+        event,
+        involved,
+        limit,
+        offset,
+      },
     );
 
     const { rows } = await db.query(query, values);
@@ -147,9 +179,33 @@ const txnsCount = catchAsync(
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
     const event = req.validator.data.event;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     const useFormat = true;
-    const bindings = { account, event, involved };
+    const bindings = {
+      account,
+      afterTimestamp,
+      beforeTimestamp,
+      event,
+      involved,
+    };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -159,6 +215,8 @@ const txnsCount = catchAsync(
         affected_account_id = :account
         AND ${involved ? `involved_account_id = :involved` : true}
         AND ${event ? `cause = :event` : true}
+        AND ${afterTimestamp ? `block_timestamp >= :afterTimestamp` : true}
+        AND ${beforeTimestamp ? `block_timestamp < :beforeTimestamp` : true}
         AND EXISTS (
           SELECT
             1

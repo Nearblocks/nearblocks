@@ -30,6 +30,24 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
+  const afterDate = req.validator.data.after_date;
+  const beforeDate = req.validator.data.before_date;
+  let afterTimestamp = null;
+  let beforeTimestamp = null;
+
+  if (afterDate) {
+    afterTimestamp = msToNsTime(
+      dayjs(afterDate, 'YYYY-MM-DD', true)
+        .add(1, 'day')
+        .startOf('day')
+        .valueOf(),
+    );
+  }
+  if (beforeDate) {
+    beforeTimestamp = msToNsTime(
+      dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+  }
 
   if (from && to && from !== account && to !== account) {
     return res.status(200).json({ txns: [] });
@@ -69,6 +87,12 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             OR r.receiver_account_id = ${account}
           )
         `}
+          AND ${afterTimestamp
+      ? sql`t.block_timestamp >= ${afterTimestamp}`
+      : true}
+          AND ${beforeTimestamp
+      ? sql`t.block_timestamp < ${beforeTimestamp}`
+      : true}
           AND ${action || method
       ? sql`
           EXISTS (
@@ -181,13 +205,39 @@ const txnsCount = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
     }
 
     const useFormat = true;
-    const bindings = { account, action, from, method, to };
+    const bindings = {
+      account,
+      action,
+      afterDate,
+      beforeDate,
+      from,
+      method,
+      to,
+    };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -209,6 +259,8 @@ const txnsCount = catchAsync(
               )
             `
         }
+        AND ${afterTimestamp ? `t.block_timestamp >= :afterTimestamp` : true}
+        AND ${beforeTimestamp ? `t.block_timestamp < :beforeTimestamp` : true}
         AND ${
           action || method
             ? `EXISTS (
