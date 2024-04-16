@@ -688,22 +688,10 @@ const Header = () => {
 
               <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
                 <li>
-                  <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
-                    <Image
-                      src="/images/pipe.svg"
-                      width="2"
-                      height="31"
-                      layout="fixed"
-                      alt="NearBlocks"
-                    />
-                  </span>
-                </li>
-
-                <li>
                   <>
                     <span className="group  flex w-full relative h-full">
                       <a
-                        className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-3 mr-3`}
+                        className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-1 mr-3`}
                         href="#"
                       >
                         <div
