@@ -5,10 +5,10 @@
   "license": "Business Source License 1.1",
   "type": "module",
   "scripts": {
-    "build:css": "postcss src/public/styles.css -o ../app/public/common.css",
+    "build:css": "postcss src/public/styles.css -o ../app/public/common.css && postcss src/public/styles.css -o ../explorer-selector/public/common.css",
     "start:testnet": "BOS_URL=https://test.near.org/$ACCOUNT/widget/bos-components.components.ExplorerSelector && open $BOS_URL && echo \"Preview at: $BOS_URL\"",
     "dev": "yarn build:css & yarn start:testnet && bos-loader $ACCOUNT --path .bos/transpiled/src",
-    "build": "yarn build:css & rimraf .bos/transpiled && mkdir -p .bos/transpiled/src && sucrase ./src -d .bos/transpiled/src/bos-components --transforms typescript,jsx --jsx-runtime preserve --disable-es-transforms --out-extension jsx && node ./build.js",
+    "build": "yarn build:css & rimraf .bos/transpiled && mkdir -p .bos/transpiled/src && mkdir -p .bos/transpiled/common/src && mkdir -p .bos/transpiled/address/src/bos-components/components/Address && mkdir -p .bos/transpiled/blocks/src/bos-components/components/Blocks && mkdir -p .bos/transpiled/ft/src/bos-components/components/FT && mkdir -p .bos/transpiled/nft/src/bos-components/components/NFT && mkdir -p .bos/transpiled/txn/src/bos-components/components/Transactions && sucrase ./src -d .bos/transpiled/src/bos-components --transforms typescript,jsx --jsx-runtime preserve --disable-es-transforms --out-extension jsx && node ./build.js",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"
   },
