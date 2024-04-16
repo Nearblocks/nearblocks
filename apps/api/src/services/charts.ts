@@ -50,7 +50,7 @@ const tps = catchAsync(async (_req: Request, res: Response) => {
         )
       )::BIGINT
     ORDER BY
-      date;
+      date DESC;
   `;
 
   return res.status(200).json({ charts });

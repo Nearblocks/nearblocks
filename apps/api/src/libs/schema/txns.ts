@@ -1,9 +1,24 @@
 import { z } from 'zod';
 
+import dayjs from '#libs/dayjs';
 import { ActionKind } from '#types/enums';
 
 const list = z.object({
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   block: z.string().optional(),
   from: z.string().optional(),
   method: z.string().optional(),
@@ -15,6 +30,20 @@ const list = z.object({
 
 const count = z.object({
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   block: z.string().optional(),
   from: z.string().optional(),
   method: z.string().optional(),

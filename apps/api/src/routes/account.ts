@@ -125,6 +125,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
@@ -141,6 +143,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
@@ -152,6 +156,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
@@ -166,6 +172,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get(
@@ -181,6 +189,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {number} page.query - json:{"minimum": 1, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
@@ -195,6 +205,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get(
