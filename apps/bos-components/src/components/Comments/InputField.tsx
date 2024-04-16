@@ -113,7 +113,7 @@ window.addEventListener("message", (event) => {
 </script>
 `;
   return (
-    <div className="flex flex-col sm:!flex-row px-6 py-2">
+    <div className="flex flex-col sm:!flex-row px-3 py-2">
       <div className="sm:order-last flex items-center w-full">
         {markdownEditor ? (
           <>
@@ -127,7 +127,7 @@ window.addEventListener("message", (event) => {
         ) : (
           <textarea
             key="textarea"
-            className="block sm:!mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
+            className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
             value={text || ''}
             onInput={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
               onChange(event.target.value)
@@ -138,7 +138,7 @@ window.addEventListener("message", (event) => {
 
         <div>{props.composeButton && props.composeButton(onCompose)}</div>
       </div>
-      <div className="sm:order-first flex items-center max-sm:mt-3">
+      <div className="sm:order-first flex items-center max-sm:mt-3 max-sm:ml-4">
         <button
           type="button"
           className="whitespace-nowrap inline-flex justify-center p-2 text-nearblue-600 rounded-lg cursor-pointer hover:bg-neargray-800 bg-neargray-700 hover:text-nearblue-600"
