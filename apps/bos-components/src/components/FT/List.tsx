@@ -324,7 +324,8 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
       key: 'market_cap',
       cell: (row: Token) => (
         <span>
-          {row?.market_cap === null ? (
+          {row?.market_cap === null ||
+          dollarNonCentFormat(row?.market_cap) === '0' ? (
             <span className="text-xs">N/A</span>
           ) : (
             `$${dollarNonCentFormat(row?.market_cap)}`
