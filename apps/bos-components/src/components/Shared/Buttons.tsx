@@ -32,7 +32,7 @@ export default function (props: Props) {
                 onClick={onCopyClick}
                 className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
               >
-                <CopyIcon className="fill-current -z-50 text-green-500 group-hover:text-white h-4 w-4" />
+                <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
               </button>
             </Tooltip.Trigger>
             <Tooltip.Content
@@ -51,7 +51,7 @@ export default function (props: Props) {
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <QRCodeIcon className="fill-current text-green-500 group-hover:text-white h-4 w-4" />
+                    <QRCodeIcon className="fill-current text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"

@@ -8,13 +8,13 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
     <div ref={ref} className={`w-full z-10 ${props.className}`}>
       <div className="flex flex-col md:flex-row gap-4 ">
         <div className=" w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+          <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
             <div>
-              <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
+              <h2 className=" flex justify-between border-b dark:border-black-200 p-3 text-gray-600 text-sm font-semibold">
                 <span>Staking Overview</span>
               </h2>
             </div>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
               <div className="flex  py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Current Validators
@@ -49,11 +49,11 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
           </div>
         </div>
         <div className=" w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-            <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+          <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+            <h2 className="border-b dark:border-black-200 p-3 text-gray-600 text-sm font-semibold">
               Epoch Information
             </h2>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Epoch Elapsed Time:
@@ -83,7 +83,7 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
       <div className="py-5"></div>
       <div className="relative w-full mb-10">
         <div
-          className={`bg-white border soft-shadow rounded-xl overflow-hidden`}
+          className={`bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden`}
         >
           <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 px-3 py-2">
             <div className="max-w-lg pl-3 w-full py-3.5 ">
@@ -91,8 +91,8 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </div>
           </div>
           <div className="overflow-x-auto ">
-            <table className="min-w-full divide-y border-t">
-              <thead className="bg-gray-100 h-[51px]">
+            <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+              <thead className="bg-gray-100 dark:bg-black-200 h-[51px]">
                 <tr>
                   <th
                     scope="col"
@@ -144,7 +144,7 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
                 {[...Array(25)].map((_, i) => (
                   <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">

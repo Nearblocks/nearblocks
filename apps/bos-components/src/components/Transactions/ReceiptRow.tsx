@@ -89,15 +89,19 @@ export default function (props: Props) {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
       ></div>
     );
   };
 
   return (
-    <div className="divide-solid divide-gray-200 divide-y">
+    <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div
-        className={borderFlag ? '' : 'border-l-4 border-green-400 ml-8 my-2'}
+        className={
+          borderFlag
+            ? ''
+            : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
+        }
       >
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -161,7 +165,7 @@ export default function (props: Props) {
                 href={`/blocks/${receipt.block_hash}`}
                 className="hover:no-underline"
               >
-                <a className="text-green-500 hover:no-underline">
+                <a className="text-green-500 dark:text-green-250 hover:no-underline">
                   {localFormat(block?.block_height)}
                 </a>
               </Link>
@@ -203,7 +207,7 @@ export default function (props: Props) {
                   href={`/address/${receipt?.predecessor_id}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 hover:no-underline">
+                  <a className="text-green-500 dark:text-green-250 hover:no-underline">
                     {receipt?.predecessor_id}
                   </a>
                 </Link>
@@ -244,7 +248,7 @@ export default function (props: Props) {
                   href={`/address/${receipt?.receiver_id}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 hover:no-underline">
+                  <a className="text-green-500 dark:text-green-250 hover:no-underline">
                     {receipt?.receiver_id}
                   </a>
                 </Link>
@@ -284,7 +288,7 @@ export default function (props: Props) {
             </div>
           ) : receipt?.outcome?.gas_burnt ? (
             <div className="w-full items-center text-xs flex md:w-3/4 break-words">
-              <div className="bg-orange-50 rounded-md px-2 py-1">
+              <div className="bg-orange-50  dark:bg-black-200 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
                 {receipt?.outcome?.gas_burnt
                   ? convertToMetricPrefix(receipt?.outcome?.gas_burnt) + 'gas'
@@ -415,7 +419,7 @@ export default function (props: Props) {
                   readOnly
                   rows={4}
                   defaultValue={receipt?.outcome?.logs?.join('\n')}
-                  className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 mt-3 resize-y"
+                  className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
                 ></textarea>
               ) : (
                 'No Logs'

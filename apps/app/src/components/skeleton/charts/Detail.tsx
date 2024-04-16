@@ -56,10 +56,10 @@ const Index = forwardRef(
       <div ref={ref} className={`w-full z-10 ${className}`}>
         {chartTypes && (
           <div
-            className="block bg-white border soft-shadow rounded-xl overflow-hidden mb-10"
+            className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden mb-10"
             style={{ height: 580 }}
           >
-            <div className="leading-7 px-4 text-sm py-4 text-nearblue-600 border-b">
+            <div className="leading-7 px-4 text-sm py-4 text-nearblue-600 border-b dark:border-black-200">
               <div className="max-w-xs py-1">
                 <Skeleton className="h-4 w-full" />
               </div>
@@ -74,11 +74,11 @@ const Index = forwardRef(
             <>
               {chart.exclude === false && (
                 <div
-                  className="block bg-white border soft-shadow rounded-xl overflow-hidden"
+                  className="block bg-white border dark:bg-black-600 dark:border-black-200 soft-shadow rounded-xl overflow-hidden"
                   key={chart.link}
                 >
                   <div>
-                    <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b truncate">
+                    <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b  dark:border-black-200 truncate">
                       <h2>{t(chart.text)}</h2>
                     </a>
                   </div>

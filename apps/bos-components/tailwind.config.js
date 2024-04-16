@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{tsx,jsx,ts}'],
+  darkMode: 'class',
   theme: {
     extend: {
-      darkMode: 'class',
       fontFamily: {
         sans: "'Manrope', sans-serif",
       },
@@ -22,7 +22,13 @@ module.exports = {
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
-        black: '#1B1B1B',
+        black: {
+          DEFAULT: '#1B1B1B',
+          200: '#1F2228',
+          500: '#171717',
+          300: '#121212',
+          600: '#0D0D0D',
+        },
         white: '#fff',
         blue: '#21325b',
         theme: '#000c00',
@@ -41,6 +47,7 @@ module.exports = {
         },
         neargray: {
           DEFAULT: '#676767',
+          10: '#e0e0e0',
           25: '#FAFAFA',
           50: '#8E8E8E',
           600: '#676767',
@@ -63,6 +70,7 @@ module.exports = {
           DEFAULT: '#0d494a',
           100: '#357172',
           200: '#2b6768',
+          250: '#31766A',
           300: '#215d5e',
           400: '#175354',
           500: '#0d494a',

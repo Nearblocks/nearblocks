@@ -38,7 +38,7 @@ const TokenHoldings = (props: Props) => {
   const Loading = (props: { className: string }) => {
     return (
       <div
-        className={`bg-gray-200 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 dark:bg-black-200 rounded shadow-sm animate-pulse ${props.className}`}
       ></div>
     );
   };
@@ -49,7 +49,7 @@ const TokenHoldings = (props: Props) => {
 
   if (!props.ft?.tokens?.length && !nfts?.length) {
     return (
-      <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white border">
+      <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>
       </select>
     );
@@ -59,7 +59,7 @@ const TokenHoldings = (props: Props) => {
 
   return (
     <Select.Root>
-      <Select.Trigger className="w-full h-8 text-sm px-2 rounded border outline-none flex items-center justify-between cursor-pointer">
+      <Select.Trigger className="w-full h-8 text-sm px-2 rounded border dark:border-black-200 outline-none flex items-center justify-between cursor-pointer">
         <span>
           {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
           <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-0.5">
@@ -73,25 +73,25 @@ const TokenHoldings = (props: Props) => {
         sideOffset={5}
         className="SelectContent"
       >
-        <ScrollArea.Root className="overflow-hidden rounded-b-xl soft-shadow bg-white">
-          <ScrollArea.Viewport className="border z-50 pb-2">
+        <ScrollArea.Root className="overflow-hidden rounded-b-xl soft-shadow bg-white dark:bg-black">
+          <ScrollArea.Viewport className="border dark:border-black-200 z-50 pb-2">
             <div className="max-h-60">
               {props.ft?.tokens?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 font-semibold px-3 py-2">
+                  <div className="bg-gray-50 dark:bg-black-200 font-semibold px-3 py-2">
                     Tokens{' '}
                     <span className="font-normal">
                       ({props.ft?.tokens?.length})
                     </span>
                   </div>
-                  <div className="text-gray-600 text-xs divide-y outline-none">
+                  <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
                     {props.ft?.tokens?.map((token, index) => (
                       <div key={token?.contract}>
                         <Link
                           href={`/token/${token?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
-                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
+                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline">
                             <div key={index}>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
@@ -145,18 +145,18 @@ const TokenHoldings = (props: Props) => {
               )}
               {nfts?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 font-semibold px-3 py-2">
+                  <div className="bg-gray-50 dark:bg-black-200 font-semibold px-3 py-2">
                     NFT Tokens{' '}
                     <span className="font-normal">({nfts?.length})</span>
                   </div>
-                  <div className="text-gray-600 text-xs divide-y outline-none">
+                  <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y divide-black-200 outline-none">
                     {nfts.map((nft) => (
                       <div key={nft?.contract}>
                         <Link
                           href={`/nft-token/${nft?.contract}?a=${props.id}`}
                           className="hover:no-underline"
                         >
-                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 truncate hover:no-underline">
+                          <a className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline">
                             <div>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
@@ -196,7 +196,7 @@ const TokenHoldings = (props: Props) => {
             </div>
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar
-            className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            className="flex select-none touch-none p-0.5 bg-neargray-25 dark:bg-black-600 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 dark:hover:bg-black-200 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
             orientation="vertical"
           >
             <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />

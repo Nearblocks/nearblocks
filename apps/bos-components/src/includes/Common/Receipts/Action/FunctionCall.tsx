@@ -35,7 +35,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
       <span className="font-bold">{args?.method_name}</span>{' '}
       {t ? t('txns:txn.actions.functionCall.1') : 'in contract'}
       <a href={`/address/${receiver}`} className="hover:no-underline">
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(receiver)}
         </a>
       </a>
@@ -43,7 +43,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         readOnly
         rows={4}
         defaultValue={displayArgs(args?.args_base64 || args?.args)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 p-3 mt-3 resize-y"
+        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
       ></textarea>
     </div>
   );

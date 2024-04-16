@@ -170,7 +170,8 @@ export default function ({
           <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
-      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <span>{t ? t('hash') : 'HASH'}</span>,
@@ -180,12 +181,12 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
                   <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 font-medium hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
                   </Link>
@@ -202,9 +203,9 @@ export default function ({
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>BLOCK</span>,
@@ -215,7 +216,7 @@ export default function ({
             className="hover:no-underline"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
-            <a className="text-green-500 font-medium hover:no-underline">
+            <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
               {row?.block?.block_height
                 ? localFormat(row?.block?.block_height)
                 : row?.block?.block_height ?? ''}
@@ -224,9 +225,9 @@ export default function ({
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('type') : 'TYPE'}</span>,
@@ -236,7 +237,7 @@ export default function ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
                   <span className="block truncate">{row?.cause}</span>
                 </span>
               </Tooltip.Trigger>
@@ -251,9 +252,10 @@ export default function ({
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>From</span>,
@@ -266,10 +268,10 @@ export default function ({
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.affected_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -277,7 +279,7 @@ export default function ({
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -308,10 +310,10 @@ export default function ({
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.involved_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -319,7 +321,7 @@ export default function ({
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -345,9 +347,10 @@ export default function ({
           </>
         );
       },
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName:
+        'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: '',
@@ -375,10 +378,10 @@ export default function ({
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.involved_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -386,7 +389,7 @@ export default function ({
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -417,10 +420,10 @@ export default function ({
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                         row?.affected_account_id === address
                           ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                       }`}
                     >
                       <Link
@@ -428,7 +431,7 @@ export default function ({
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -454,9 +457,10 @@ export default function ({
           </span>
         );
       },
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 font-medium',
+      tdClassName:
+        'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>Quantity</span>,
@@ -474,9 +478,10 @@ export default function ({
             : ''}
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
@@ -487,12 +492,12 @@ export default function ({
                 <button
                   type="button"
                   onClick={toggleShowAge}
-                  className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row whitespace-nowrap"
+                  className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row whitespace-nowrap"
                 >
                   {showAge ? (
                     <>
                       {t ? t('token:fts.age') : 'AGE'}
-                      <Clock className="text-green-500 ml-2" />
+                      <Clock className="text-green-500 dark:text-green-250 ml-2" />
                     </>
                   ) : (
                     <> {t ? t('token:fts.ageDT') : 'DATE TIME (UTC)'}</>
@@ -547,7 +552,8 @@ export default function ({
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
   ];
 
@@ -560,7 +566,7 @@ export default function ({
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
               {Object.keys(txns).length > 0 &&
                 `A total of ${
                   localFormat && localFormat(totalCount.toString())
@@ -572,7 +578,7 @@ export default function ({
             <div className="mb-4 lg:ml-auto  px-6">
               <div className="flex items-center  text-sm text-gray-500 lg:ml-auto">
                 Filtered By:
-                <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
+                <span className="flex items-center bg-gray-100 dark:bg-black-200 rounded-full px-3 py-1 ml-1 space-x-2">
                   {filters &&
                     Object?.keys(filters)?.map((key) => (
                       <span className="flex" key={key}>

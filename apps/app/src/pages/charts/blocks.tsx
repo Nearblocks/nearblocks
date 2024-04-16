@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import { useTheme } from 'next-themes';
+
 import Layout from '@/components/Layouts';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
@@ -15,6 +17,8 @@ const BlocksChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
+
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -98,6 +102,7 @@ const BlocksChart = () => {
                   poweredBy: false,
                   network: networkId,
                   t: t,
+                  theme: theme,
                 }}
                 loading={
                   <Detail

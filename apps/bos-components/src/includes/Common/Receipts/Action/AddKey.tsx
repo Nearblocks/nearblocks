@@ -59,7 +59,7 @@ const AddKey = (props: TransactionActionInfo) => {
         href={`/address/${props.args.access_key.permission.FunctionCall.receiver_id}`}
         className="hover:no-underline"
       >
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(
             props.args.access_key.permission.FunctionCall.receiver_id,
           )}

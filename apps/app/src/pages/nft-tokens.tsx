@@ -91,9 +91,9 @@ const TopNFTTokens = () => {
         <link rel="canonical" href={`${appUrl}/nft-tokens`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10">
               Non-Fungible Token Tracker (NEP-171)
             </h1>
           </div>

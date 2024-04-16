@@ -29,12 +29,12 @@ const Contract = () => {
         />
         <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
-      <div className="bg-hero-pattern h-72"></div>
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
       <div className="container mx-auto px-3 md:px-14 flex flex-col items-start md:py-16 mt-[-300px]">
         <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
           {t('Contact Nearblocks')}
         </h1>
-        <div className="text-neargray-600 sm:grid sm:grid-cols-11 pt-12 pb-8 gap-6 pl-8 pr-14 w-full soft-shadow sm:divide-x rounded-lg bg-white lg:mt-8 mt-4">
+        <div className="text-neargray-600 dark:text-neargray-10 sm:grid sm:grid-cols-11 pt-12 pb-8 gap-6 pl-8 pr-14 w-full soft-shadow sm:divide-x rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">
           <div className="col-span-5">
             <p className="text-lg text-black font-medium">
               {t(`Drop us a message, but please be aware that:`)}

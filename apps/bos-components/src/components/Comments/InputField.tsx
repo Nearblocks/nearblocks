@@ -127,7 +127,7 @@ window.addEventListener("message", (event) => {
         ) : (
           <textarea
             key="textarea"
-            className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
+            className="block mx-4 p-2.5 w-full text-sm text-gray-900 dark:text-neargray-10 bg-white dark:bg-black-600 dark:border-black-200 rounded-lg border border-gray-300  dark:placeholder-gray-400"
             value={text || ''}
             onInput={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
               onChange(event.target.value)
@@ -141,7 +141,7 @@ window.addEventListener("message", (event) => {
       <div className="sm:order-first flex items-center max-sm:mt-3 max-sm:ml-4">
         <button
           type="button"
-          className="whitespace-nowrap inline-flex justify-center p-2 text-nearblue-600 rounded-lg cursor-pointer hover:bg-neargray-800 bg-neargray-700 hover:text-nearblue-600"
+          className="whitespace-nowrap inline-flex justify-center p-2 text-nearblue-600 dark:text-neargray-10  rounded-lg cursor-pointer  bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600"
         >
           <div className="inline-block">
             {img?.cid && (
@@ -171,7 +171,7 @@ window.addEventListener("message", (event) => {
 
         <button
           type="button"
-          className="ml-2 p-2 text-nearblue-600 rounded-lg cursor-pointer hover:bg-neargray-800 bg-neargray-700 hover:text-nearblue-600"
+          className="ml-2 p-2 text-nearblue-600 dark:text-neargray-10 rounded-lg cursor-pointer hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600"
           onClick={() => setMarkdownEditor((prevState) => !prevState)}
         >
           <svg

@@ -71,18 +71,18 @@ export default function ({ token, id, network, ownerId }: Props) {
     <div className="px-3 pt-2 pb-5 text-sm text-gray">
       {tokens?.description && (
         <>
-          <h3 className="text-nearblue-600 text-sm font-semibold py-2 underline">
+          <h3 className="text-nearblue-600  dark:text-neargray-10 text-sm font-semibold py-2 underline">
             Overview
           </h3>
-          <p className="text-sm py-2 text-nearblue-600">
+          <p className="text-sm py-2 text-nearblue-600 dark:text-neargray-10">
             {tokens?.description}
           </p>
         </>
       )}
-      <h3 className="text-nearblue-600 text-sm font-semibold py-2 underline">
+      <h3 className="text-nearblue-600  dark:text-neargray-10 text-sm font-semibold py-2 underline">
         Market
       </h3>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Volume (24H):</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.volume_24h !== null && tokens?.volume_24h !== undefined ? (
@@ -92,7 +92,7 @@ export default function ({ token, id, network, ownerId }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating MC:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.market_cap !== null && tokens?.market_cap !== undefined ? (
@@ -102,7 +102,7 @@ export default function ({ token, id, network, ownerId }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">On-chain MC:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.onchain_market_cap !== null &&
@@ -113,7 +113,7 @@ export default function ({ token, id, network, ownerId }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600">
+      <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating Supply:</div>
         <div className="w-full md:w-3/4 break-words">
           {tokens?.circulating_supply !== null &&
@@ -124,12 +124,12 @@ export default function ({ token, id, network, ownerId }: Props) {
           )}
         </div>
       </div>
-      <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 text-xs">
+      <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 dark:text-neargray-10 text-xs">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Market Data Source:</div>
         <div className="w-full md:w-3/4 break-words flex">
           {tokens?.coingecko_id && (
             <a
-              className="text-green-500 mr-4 flex"
+              className="text-green-500 dark:text-green-250 mr-4 flex"
               href="https://www.coingecko.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"
@@ -140,7 +140,7 @@ export default function ({ token, id, network, ownerId }: Props) {
           )}
           {tokens?.coinmarketcap_id && (
             <a
-              className="text-green-500 mr-4 flex"
+              className="text-green-500 dark:text-green-250 mr-4 flex"
               href="https://coinmarketcap.com/"
               target="_blank"
               rel="noreferrer nofollow noopener"

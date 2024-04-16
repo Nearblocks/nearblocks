@@ -77,14 +77,14 @@ export default function (props: Props) {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
       ></div>
     );
   };
 
   return (
-    <div className="w-full border-t">
-      <div className="h-full bg-white text-sm text-gray-500 ">
+    <div className="w-full border-t dark:border-black-200">
+      <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip.Provider>
@@ -146,7 +146,7 @@ export default function (props: Props) {
                   href={`/txns/${action.transaction_hash}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 hover:no-underline">
+                  <a className="text-green-500 dark:text-green-250 hover:no-underline">
                     {action.transaction_hash}
                   </a>
                 </Link>

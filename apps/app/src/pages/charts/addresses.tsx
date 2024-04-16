@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import { useTheme } from 'next-themes';
+
 import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/charts/Detail';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -15,6 +17,7 @@ const AddressesChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -105,6 +108,7 @@ const AddressesChart = () => {
                   poweredBy: false,
                   network: networkId,
                   t: t,
+                  theme: theme,
                 }}
                 loading={
                   <Detail

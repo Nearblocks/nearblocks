@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useAuthStore } from '@/stores/auth';
+import { useTheme } from 'next-themes';
+
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
 import ArrowDown from '../Icons/ArrowDown';
@@ -145,6 +147,7 @@ const Header = () => {
   const [stats, setStats] = useState<Stats>({} as Stats);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [isLoading, setIsLoading] = useState(true);
+  const { theme, setTheme } = useTheme();
   const [error, setError] = useState(false);
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -223,15 +226,16 @@ const Header = () => {
 
   const showSearch = router.pathname !== '/';
   const userLoading = false;
+
   const onSignOut = () => {
     logOut();
   };
   const nearPrice = stats?.near_price ?? '';
   return (
-    <div className="bg-white soft-shadow">
+    <div className="dark:bg-black-600 soft-shadow">
       {!status && (
         <div className="flex flex-wrap">
-          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue py-2 text-green text-sm ">
+          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
             {t('outofSync')}
           </div>
         </div>
@@ -243,7 +247,11 @@ const Header = () => {
               <Link href="/" className="" legacyBehavior>
                 <a className="flex justify-start items-center hover:no-underline">
                   <Image
-                    src="/images/nb-black-on-bos.svg"
+                    src={
+                      theme === 'dark'
+                        ? '/images/nb-black-on-bos_dark.svg'
+                        : '/images/nb-black-on-bos.svg'
+                    }
                     className="block"
                     width="174"
                     height="40"
@@ -344,7 +352,7 @@ const Header = () => {
                 open ? 'flex ' : 'hidden'
               }`}
             >
-              <ul className="w-full  md:flex justify-end text-gray-500 py-0 md:py-0">
+              <ul className="w-full  md:flex justify-end text-gray-500 dark:text-neargray-100 py-0 md:py-0">
                 {menus.map((menu) => (
                   <li key={menu.id}>
                     {menu.submenu?.length ? (
@@ -352,7 +360,7 @@ const Header = () => {
                         <Collapse
                           trigger={({ show, onClick }) => (
                             <a
-                              className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4"
+                              className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                               href="#"
                               onClick={onClick}
                             >
@@ -365,12 +373,12 @@ const Header = () => {
                             </a>
                           )}
                         >
-                          <ul className="border-l-2 border-green-500 md:!hidden ml-4">
+                          <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
                                 <ActiveLink href={submenu.link}>
                                   <a
-                                    className="block w-full hover:text-green-500 py-2 px-4"
+                                    className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                                     onClick={() => setOpen(false)}
                                   >
                                     {t(submenu.title)}
@@ -382,20 +390,20 @@ const Header = () => {
                         </Collapse>
                         <span className="group hidden md:flex h-full w-full relative">
                           <a
-                            className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
+                            className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4`}
                             href="#"
                           >
                             {t(menu.title)}
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </a>
-                          <ul className="bg-white soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                          <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
                                 <ActiveLink
                                   href={submenu.link}
-                                  activeClassName="text-green-500"
+                                  activeClassName="text-green-500 dark:text-green-250"
                                 >
-                                  <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4">
+                                  <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
                                     {t(submenu.title)}
                                   </a>
                                 </ActiveLink>
@@ -407,9 +415,9 @@ const Header = () => {
                     ) : (
                       <ActiveLink
                         href={menu.link || ''}
-                        activeClassName="text-green-500"
+                        activeClassName="text-green-500 dark:text-green-250"
                       >
-                        <a className="flex items-center w-full h-full hover:text-green-500 py-2 px-4">
+                        <a className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                           {t(menu.title)}
                         </a>
                       </ActiveLink>
@@ -421,7 +429,7 @@ const Header = () => {
                     <Collapse
                       trigger={({ show, onClick }) => (
                         <a
-                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4"
+                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           href="#"
                           onClick={onClick}
                         >
@@ -434,11 +442,11 @@ const Header = () => {
                         </a>
                       )}
                     >
-                      <ul className="border-l-2 border-green-500 md:!hidden ml-4">
+                      <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <ActiveLink href="#" locale={language.locale}>
-                              <a className="block w-full hover:text-green-500 py-2 px-4">
+                              <a className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                                 {language.title}
                               </a>
                             </ActiveLink>
@@ -448,17 +456,17 @@ const Header = () => {
                     </Collapse>
                     <span className="group hidden md:flex h-full w-full relative">
                       <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4`}
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4`}
                         href="#"
                       >
                         {t('header.menu.languages')}
                         <ArrowDown className="fill-current w-4 h-4 ml-2" />
                       </a>
-                      <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                      <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <ActiveLink href="#" locale={language.locale}>
-                              <a className="block w-full hover:text-green-500 whitespace-nowrap py-2 px-4">
+                              <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
                                 {language.title}
                               </a>
                             </ActiveLink>
@@ -473,7 +481,7 @@ const Header = () => {
                     <Collapse
                       trigger={({ show, onClick }) => (
                         <a
-                          className="flex md:!hidden items-center justify-between w-full hover:text-green-500 py-2 px-4"
+                          className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           href="#"
                           onClick={onClick}
                         >
@@ -519,7 +527,7 @@ const Header = () => {
 
                     <span className="group hidden md:flex h-full w-full relative">
                       <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4 `}
+                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
                         href="#"
                       >
                         {user ? (
@@ -578,7 +586,7 @@ const Header = () => {
 
               <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
                 <li>
-                  <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 py-2 px-4">
+                  <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                     <Image
                       src="/images/pipe.svg"
                       width="2"
@@ -594,7 +602,7 @@ const Header = () => {
                     <Collapse
                       trigger={({ show, onClick }) => (
                         <a
-                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 py-2 px-4 hover:no-underline"
+                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline"
                           href="#"
                           onClick={onClick}
                         >
@@ -635,10 +643,10 @@ const Header = () => {
 
                     <span className="group hidden md:flex w-full relative h-full">
                       <a
-                        className={`hidden md:flex  items-center justify-center w-full hover:text-green-500 hover:no-underline py-2 px-0 mr-3`}
+                        className={`hidden md:flex  items-center justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-0 mr-3`}
                         href="#"
                       >
-                        <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 rounded">
+                        <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded">
                           <Image
                             src="/images/near.svg"
                             width="14"
@@ -647,7 +655,7 @@ const Header = () => {
                           />
                         </div>
                       </a>
-                      <ul className="bg-white soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                         <li>
                           <a
                             className={`block w-full hover:text-green-500 hover:no-underline py-2 px-4 text-gray-500 ${
@@ -662,7 +670,7 @@ const Header = () => {
                         </li>
                         <li>
                           <a
-                            className={`block w-full hover:text-green-500 py-2 px-4 hover:no-underline ${
+                            className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline ${
                               networkId === 'testnet'
                                 ? 'text-green-500'
                                 : 'text-gray-500'
@@ -673,6 +681,35 @@ const Header = () => {
                           </a>
                         </li>
                       </ul>
+                    </span>
+                  </>
+                </li>
+              </ul>
+
+              <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
+                <li>
+                  <>
+                    <span className="group  flex w-full relative h-full">
+                      <a
+                        className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-1 mr-3`}
+                        href="#"
+                      >
+                        <div
+                          className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded"
+                          onClick={() =>
+                            setTheme(theme === 'light' ? 'dark' : 'light')
+                          }
+                        >
+                          <Image
+                            src={`/images/${
+                              theme === 'dark' ? 'moon.svg' : 'sun.svg'
+                            }`}
+                            width="14"
+                            height="14"
+                            alt="NearBlocks"
+                          />
+                        </div>
+                      </a>
                     </span>
                   </>
                 </li>

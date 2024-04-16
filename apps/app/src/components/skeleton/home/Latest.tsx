@@ -8,10 +8,10 @@ const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
     <>
       <div
         ref={ref}
-        className={`bg-white rounded-b-xl overflow-hidden w-full z-10 ${className}`}
+        className={`bg-white dark:bg-black-600 rounded-b-xl overflow-hidden w-full z-10 ${className}`}
       >
         <div className="relative">
-          <div className="px-3 divide-y h-80">
+          <div className="px-3 dark:divide-black-200 divide-y h-80">
             {[...Array(5)].map((_, i) => (
               <div
                 className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
@@ -53,7 +53,7 @@ const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
             ))}
           </div>
         </div>
-        <div className="border-t px-2 py-3 text-nearblue-600">
+        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Skeleton className="h-10" />
         </div>
       </div>

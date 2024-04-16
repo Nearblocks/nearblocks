@@ -231,8 +231,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
         };
       case 'idle':
         return {
-          textColor: 'text-gray-600',
-          bgColor: 'bg-gray-300 text-gray-600',
+          textColor: 'text-gray-600 dark:text-neargray-10',
+          bgColor: 'bg-gray-300 text-gray-600 dark:text-neargray-10',
         };
       case 'newcomer':
         return {
@@ -256,13 +256,16 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       cell: (row: ValidatorEpochData) => (
         <button onClick={() => handleRowClick(row.index || 0)}>
           <ArrowDown
-            className={`${row.isExpanded ? 'rotate-180' : 'rotate-0'}`}
+            className={`${
+              row.isExpanded ? 'rotate-180' : 'rotate-0'
+            } dark:text-neargray-10`}
           />
         </button>
       ),
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>Status</span>,
@@ -276,9 +279,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
       ),
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>VALIDATOR</span>,
@@ -292,7 +296,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   href={`/address/${row.accountId}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green-500 hover:no-underline">
+                  <a className="text-green-500 dark:text-green-250 hover:no-underline">
                     {shortenAddress(row.accountId)}
                   </a>
                 </Link>
@@ -322,9 +326,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </Tooltip.Provider>
         </>
       ),
-      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 ',
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>FEE</span>,
@@ -340,9 +344,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
             : 'N/A'}
         </div>
       ),
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
 
     {
@@ -358,9 +363,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>TOTAL STAKE</span>,
@@ -376,9 +382,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           Ⓝ
         </span>
       ),
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE %</span>,
@@ -386,9 +393,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>CUMULATIVE STAKE</span>,
@@ -396,7 +404,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       cell: (row: ValidatorEpochData) => {
         return (
           <div>
-            <div className="relative w-50 h-7 soft-shadow rounded-xl overflow-hidden bg-gray-300">
+            <div className="relative w-50 h-7 soft-shadow rounded-xl overflow-hidden bg-gray-300 dark:bg-black-200">
               <div
                 className="absolute top-0 left-0 right-0 bottom-0 h-full bg-green-500 text-center flex items-center justify-center"
                 style={{
@@ -412,9 +420,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>STAKE CHANGE (24H)</span>,
@@ -447,9 +456,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         );
       },
-      tdClassName: 'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
   ];
   const validatorEpochData =
@@ -511,9 +521,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
                     },
                     {
                       header: (
@@ -558,9 +568,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
                     },
                     {
                       header: (
@@ -596,9 +606,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
                     },
                     {
                       header: (
@@ -623,7 +633,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                               <a
                                 href="https://github.com/near/nearcore"
                                 target="_blank"
-                                className="text-green-500 hover:no-underline"
+                                className="text-green-500 dark:text-green-250 hover:no-underline"
                               >
                                 the official implementation.
                               </a>
@@ -640,9 +650,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
                     },
                     {
                       header: 'Node Agent Version / Build',
@@ -653,9 +663,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                   ],
                   data: [telemetry] || [],
@@ -677,7 +687,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         return (
                           <div>
                             <a
-                              className="text-green-500 hover:no-underline"
+                              className="text-green-500 dark:text-green-250 hover:no-underline"
                               href={
                                 row?.description?.url?.startsWith('http')
                                   ? row?.description?.url
@@ -693,9 +703,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                     {
                       header: 'Email',
@@ -704,7 +714,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         return (
                           <div>
                             <Link
-                              className="text-green-500 hover:no-underline"
+                              className="text-green-500 dark:text-green-250 hover:no-underline"
                               href={`mailto:${row?.description?.email}`}
                             >
                               {row?.description?.email}{' '}
@@ -713,9 +723,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                     row?.description?.twitter && {
                       header: 'Twitter',
@@ -724,7 +734,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         return (
                           <div>
                             <a
-                              className="text-green-500 hover:no-underline"
+                              className="text-green-500 dark:text-green-250 hover:no-underline"
                               href={`https://twitter.com/${row?.description?.twitter}`}
                               rel="noreferrer noopener"
                               target="_blank"
@@ -735,9 +745,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                     row?.description?.discord && {
                       header: 'Discord',
@@ -746,7 +756,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         return (
                           <div>
                             <a
-                              className="text-green-500 hover:no-underline"
+                              className="text-green-500 dark:text-green-250 hover:no-underline"
                               href={row?.description?.discord || ''}
                               rel="noreferrer noopener"
                               target="_blank"
@@ -757,9 +767,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                     {
                       header: 'Description',
@@ -772,9 +782,9 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         );
                       },
                       tdClassName:
-                        'px-4 break-words text-sm text-nearblue-600 font-medium',
+                        'px-4 break-words text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
                       thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
                   ],
                   data: [row] || [],
@@ -784,11 +794,11 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 }}
               />
             ) : (
-              <div className="flex justify-center text-sm text-nearblue-600 font-medium py-4 ">
+              <div className="flex justify-center text-sm text-nearblue-600 dark:text-neargray-10 font-medium py-4 ">
                 If you are node owner feel free to fill all&nbsp;
                 <a
                   href="https://github.com/zavodil/near-pool-details#description"
-                  className="text-green-500 hover:no-underline"
+                  className="text-green-500 dark:text-green-250 hover:no-underline"
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -807,13 +817,13 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
     <div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
+          <div className="h-full bg-white  dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
             <div>
-              <h2 className=" flex justify-between border-b p-3 text-gray-600 text-sm font-semibold">
+              <h2 className=" flex justify-between border-b dark:border-black-200 p-3 text-gray-600 dark:text-neargray-10 text-sm font-semibold">
                 <span>Staking Overview</span>
               </h2>
             </div>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Current Validators
@@ -846,7 +856,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   )}
                 </div>
               </div>
-              <div className="flex max-lg:divide-y flex-col lg:flex-row ">
+              <div className="flex max-lg:divide-y max-lg:dark:divide-black-200 flex-col lg:flex-row ">
                 <div className="flex items-center justify-between lg:w-1/2 py-4">
                   <div className="w-full mb-2 lg:mb-0">Current Seat Price</div>
                   <div className="w-full break-words">
@@ -899,16 +909,16 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
           </div>
         </div>
         <div className="w-full md:w-1/2">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-            <h2 className="border-b p-3 text-gray-600 text-sm font-semibold">
+          <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+            <h2 className="border-b dark:border-black-200 p-3 text-gray-600 dark:text-neargray-10 text-sm font-semibold">
               Epoch Information
             </h2>
-            <div className="px-3 divide-y text-sm text-gray-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Epoch Elapsed Time
                 </div>
-                <div className="w-full text-green-500 md:w-3/4 break-words">
+                <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
                   ) : validatorFullData[currentPage]?.elapsedTime &&
@@ -923,7 +933,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Next Epoch ETA
                 </div>
-                <div className="w-full md:w-3/4 text-green-500 break-words">
+                <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
                   ) : validatorFullData[currentPage]?.totalSeconds &&
@@ -945,7 +955,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                         <div className="flex space-x-4 gap-2 items-center ">
                           <div className="bg-blue-900-15  h-2 w-full rounded-full">
                             <div
-                              className="bg-green-500 h-2 rounded-full"
+                              className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
                               style={{
                                 width: `${Big(
                                   validatorFullData[currentPage]?.epochProgress,
@@ -970,15 +980,15 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       </div>
       <div className="py-5"></div>
       <div className="w-full mb-10">
-        <div className="bg-white soft-shadow rounded-xl pb-1">
+        <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
           <div className="flex flex-col pt-4">
             <div className="flex flex-col">
               {isLoading ? (
-                <div className="leading-7 max-w-lg w-full pl-3 py-1.5 text-sm mb-4 text-nearblue-600">
+                <div className="leading-7 max-w-lg w-full pl-3 py-1.5 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   <Skeleton className=" h-4 break-words" />
                 </div>
               ) : (
-                <div className="leading-7 pl-3 px-3 text-sm mb-4 text-nearblue-600">
+                <div className="leading-7 pl-3 px-3 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   {validatorFullData[currentPage]?.total || 0}
                   Validators found
                 </div>

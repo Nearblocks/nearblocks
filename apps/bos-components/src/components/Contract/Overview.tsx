@@ -59,7 +59,9 @@ export default function (props: Props) {
   return (
     <Tabs.Root
       defaultValue={pageTab}
-      className={'bg-white soft-shadow rounded-xl pb-1 px-4 py-3'}
+      className={
+        'bg-white dark:bg-black-600  soft-shadow rounded-xl pb-1 px-4 py-3'
+      }
     >
       <Tabs.List>
         {tabs &&
@@ -69,8 +71,10 @@ export default function (props: Props) {
               onClick={() => {
                 onTab(index);
               }}
-              className={`px-2 mr-1 md:px-3 border py-2 mb-3 text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none ${
-                pageTab === tab ? 'text-green-500 border-green-500' : ''
+              className={`px-2 mr-1 md:px-3 border dark:border-black-200 py-2 mb-3 text-xs font-medium rounded-md text-gray-500 dark:text-neargray-10 hover:text-green-500 dark:hover:text-green-250 dark:hover:border-green-250 hover:border-green-500 cursor-pointer outline-none ${
+                pageTab === tab
+                  ? 'text-green-500 dark:text-green-250 border-green-500 dark:border-green-250'
+                  : ''
               }`}
               value={tab}
             >
@@ -99,7 +103,7 @@ export default function (props: Props) {
         }
       </Tabs.Content>
       <Tabs.Content value={tabs[1]}>
-        <div className="border-t p-4">
+        <div className="border-t dark:border-black-200 p-4">
           {connected ? (
             <Tooltip.Provider>
               <Tooltip.Root>
@@ -132,7 +136,7 @@ export default function (props: Props) {
           )}
         </div>
         {!schema && (
-          <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 px-2 py-2  w-fit rounded shadow">
+          <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
             Contracts with Near{' '}
             <a
               className="text-green-500 "
@@ -150,7 +154,7 @@ export default function (props: Props) {
         {schema?.body?.functions.length > 0 ? (
           <Accordion.Root
             type="multiple"
-            className="contract-accordian text-gray-600 px-4 pt-4 border-t w-full"
+            className="contract-accordian text-gray-600 dark:text-neargray-10 px-4 pt-4 border-t dark:border-black-200 w-full"
             collapsible
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
@@ -176,7 +180,7 @@ export default function (props: Props) {
           contractInfo?.methodNames?.length > 0 && (
             <Accordion.Root
               type="multiple"
-              className="contract-accordian text-gray-600 px-4 pt-4 border-t w-full"
+              className="contract-accordian text-gray-600 dark:text-neargray-10  px-4 pt-4 border-t dark:border-black-200 w-full"
               collapsible
             >
               {contractInfo?.methodNames?.map((method: any, index: number) => (

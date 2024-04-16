@@ -36,10 +36,10 @@ const AdvertisePage = () => {
         <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
       <div className="herobg flex flex-col items-start p-4.5 lg:!py-16 lg:!px-14">
-        <p className="text-black text-sm lg:!text-base font-semibold lg:!mt-3 mt-5">
+        <p className="text-black text-sm lg:!text-base font-semibold lg:!mt-3 mt-5 dark:text-white">
           {t('Advertise on nearblocks.io')}
         </p>
-        <h1 className="text-black text-lg lg:!text-2xl font-medium mt-3">
+        <h1 className="text-black text-lg lg:!text-2xl font-medium mt-3 dark:text-white">
           {t(
             'Reach a targeted Near Audience with a variety of Advertising options',
           )}
@@ -49,13 +49,13 @@ const AdvertisePage = () => {
             {t('Contact Us')}
           </a>
         </Link>
-        <div className="text-neargray-600 pt-12 pb-16 px-6 w-full soft-shadow divide-y rounded-lg bg-white mt-8">
+        <div className="text-neargray-600 pt-12 pb-16 px-6 w-full soft-shadow divide-y dark:divide-black-200 rounded-lg bg-white dark:bg-black-600 dark:text-neargray-10 mt-8">
           <div className="pb-3">
-            <h2 className="text-base lg:!text-2xl text-black font-medium">
+            <h2 className="text-base lg:!text-2xl text-black font-medium dark:text-white">
               {t('Why nearblocks.io ?')}
             </h2>
             <div className="py-8">
-              <ul className="list-disc ml-5 text-xs lg:!text-base text-neargray-600 font-normal">
+              <ul className="list-disc ml-5 text-xs lg:!text-base text-neargray-600 dark:text-neargray-10 font-normal">
                 <li>
                   {t(`NearBlocks is the leading Block Explorer, Search, API and
                   Analytics Platform for the Near Protocol Blockchain.`)}
@@ -73,16 +73,16 @@ const AdvertisePage = () => {
             </div>
           </div>
           <div>
-            <h2 className="text-base lg:!text-2xl text-black font-medium mt-8">
+            <h2 className="text-base lg:!text-2xl text-black dark:text-white font-medium mt-8">
               {t('Advertising formats')}
             </h2>
-            <p className="mt-3 text-xs lg:!text-base text-neargray-600 font-normal">
+            <p className="mt-3 text-xs lg:!text-base text-neargray-600 dark:text-neargray-10 font-normal">
               {t(`Get your message in front of millions blockchain enthusiasts. Our
               sponsored contents are designed to be cohesive with the site’s
               user experience.`)}
             </p>
             <div className="mt-8 grid lg:!grid-cols-9 grid-cols-1 lg:!gap-8">
-              <div className="col-span-1 lg:!col-span-5 text-neargray-600">
+              <div className="col-span-1 lg:!col-span-5 text-neargray-600 dark:text-neargray-10">
                 <h3 className="font-semibold text-base lg:!text-lg">
                   {t('Home Page Banner Ad Sponsorship')}
                 </h3>
@@ -129,7 +129,7 @@ const AdvertisePage = () => {
               </div>
             </div>
             <div className="mt-8 grid lg:!grid-cols-9 grid-cols-1 lg:!gap-8">
-              <div className="col-span-1 lg:!col-span-5 text-neargray-600">
+              <div className="col-span-1 lg:!col-span-5 text-neargray-600 dark:text-neargray-10">
                 <h3 className="font-semibold text-base lg:!text-lg">
                   {t('Header Text Ad Sponsorship')}
                 </h3>
@@ -176,7 +176,7 @@ const AdvertisePage = () => {
               </div>
             </div>
             <div className="mt-8 grid lg:!grid-cols-9 grid-cols-1 lg:!gap-8">
-              <div className="col-span-1 lg:!col-span-5 text-neargray-600">
+              <div className="col-span-1 lg:!col-span-5 text-neargray-600 dark:text-neargray-10">
                 <h3 className="font-semibold text-base lg:!text-lg ">
                   {t('Banner Ad Sponsorship')}
                 </h3>
@@ -223,7 +223,7 @@ const AdvertisePage = () => {
               </div>
             </div>
             <div className="mt-8 grid lg:!grid-cols-9 grid-cols-1 lg:!gap-8">
-              <div className="col-span-1 lg:!col-span-5 text-neargray-600">
+              <div className="col-span-1 lg:!col-span-5 text-neargray-600 dark:text-neargray-10">
                 <h3 className="font-semibold text-base lg:!text-lg">
                   {t('Button Ad Sponsorship')}
                 </h3>

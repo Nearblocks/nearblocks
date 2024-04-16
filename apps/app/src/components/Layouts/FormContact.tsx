@@ -48,7 +48,7 @@ const FormContact = () => {
           id="name"
           placeholder="Enter name..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200   border border-{#E5E7EB} rounded outline-blue text-base"
           onChange={(e) => setName(e.target.value)}
           value={name}
           required
@@ -59,7 +59,7 @@ const FormContact = () => {
           type="email"
           placeholder="Enter email..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -68,7 +68,7 @@ const FormContact = () => {
         <label className="relative md:flex">
           <select
             onChange={(e) => setSubject(e.target.value)}
-            className="px-3 py-1.5 bg-white border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
+            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
           >
             <option selected disabled={true}>
               Select subject
@@ -87,7 +87,7 @@ const FormContact = () => {
           id="message"
           placeholder="Max characters (300 words)"
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
           maxLength={300}
           rows={5}
           onChange={(e) => setDescription(e.target.value)}
@@ -96,7 +96,7 @@ const FormContact = () => {
         />
         <button
           type="submit"
-          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded w-fit"
+          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-black  hover:bg-green-400 rounded w-fit"
         >
           {loading ? <LoadingCircular /> : t('Send Message')}
         </button>

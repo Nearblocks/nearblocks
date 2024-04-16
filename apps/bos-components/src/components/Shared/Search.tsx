@@ -121,8 +121,10 @@ export default function SearchBar({
           <label className="relative hidden md:flex">
             <select
               className={`h-full block text-sm text-nearblue-600 ${
-                isHeader ? 'bg-blue-900/[0.05]' : 'bg-gray-100'
-              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border`}
+                isHeader
+                  ? 'bg-blue-900/[0.05] dark:bg-black'
+                  : 'bg-gray-100 dark:bg-black-500'
+              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border  dark:border-black-200	`}
               value={filter}
               onChange={onFilter}
             >
@@ -148,7 +150,7 @@ export default function SearchBar({
                   ? t('common:search.placeholder')
                   : 'Search by Account ID / Txn Hash / Block'
               }
-              className="search bg-white w-full h-full text-sm px-4 py-3 outline-none border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+              className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
               onChange={handleChange}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -157,8 +159,8 @@ export default function SearchBar({
               }}
             />
             {isResultsVisible && showResults && (
-              <div className="z-50 relative">
-                <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border">
+              <div className="z-50 relative dark:bg-black">
+                <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border dark:bg-black">
                   {result?.accounts && result.accounts.length > 0 && (
                     <>
                       <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 rounded">
@@ -256,10 +258,12 @@ export default function SearchBar({
             type="button"
             onClick={() => onSubmit()}
             className={`${
-              isHeader ? 'bg-blue-900/[0.05]' : 'bg-gray-100'
-            } rounded-r-lg px-5 outline-none focus:outline-none border`}
+              isHeader
+                ? 'bg-blue-900/[0.05] dark:bg-black-600'
+                : 'bg-gray-100 dark:bg-black-500'
+            } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
           >
-            <SearchIcon className="text-gray-700 fill-current " />
+            <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
           </button>
         </div>
       </div>

@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  darkMode: 'class',
   theme: {
     extend: {
-      darkMode: 'class',
       fontFamily: {
         sans: "'Manrope', sans-serif",
       },
@@ -22,7 +22,13 @@ module.exports = {
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
-        black: '#1B1B1B',
+        black: {
+          DEFAULT: '#1B1B1B',
+          200: '#1F2228',
+          300: '#121212',
+          500: '#171717',
+          600: '#0d0d0d',
+        },
         white: '#fff',
         blue: '#21325b',
         theme: '#000c00',
@@ -41,8 +47,10 @@ module.exports = {
         },
         neargray: {
           DEFAULT: '#676767',
+          10: '#f3f3f3',
           25: '#FAFAFA',
           50: '#8E8E8E',
+          100: '#C5CDD5',
           600: '#676767',
           700: '#E9ECEF',
           800: '#DEE2E6',
@@ -61,11 +69,14 @@ module.exports = {
         },
         green: {
           DEFAULT: '#0d494a',
+
           100: '#357172',
           200: '#2b6768',
+          250: '#31766A',
           300: '#215d5e',
           400: '#175354',
           500: '#0d494a',
+
           600: '#033f40',
           700: '#003536',
           800: '#002b2c',
@@ -82,8 +93,11 @@ module.exports = {
       backgroundColor: {
         'blue-900-15': 'rgba(76 ,189 ,187  ,0.15)',
       },
+      // backgroundColor: ['dark'],
+      // textColor: ['dark'],
       backgroundImage: (theme) => ({
         'hero-pattern': "url('/images/wavey_fingerprint.png')",
+        'hero-pattern-dark': "url('/images/wavey_fingerprint_dark.png')",
       }),
     },
   },

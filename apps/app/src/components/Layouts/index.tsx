@@ -10,7 +10,10 @@ interface LayoutProps {
 
 const Layout = ({ children, notice }: LayoutProps) => {
   const router = useRouter();
-  const className = router.pathname === '/404' ? 'bg-white' : 'bg-neargray-25';
+  const className =
+    router.pathname === '/404'
+      ? 'bg-white dark:bg-black-300'
+      : 'bg-neargray-25 dark:bg-black-300	';
 
   return (
     <div className={className}>

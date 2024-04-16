@@ -22,12 +22,12 @@ const TermsAndConditions = () => {
         />
         <link rel="canonical" href={`${appUrl}/terms-and-conditions`} />
       </Head>
-      <div className="bg-hero-pattern h-72"></div>
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
       <div className="md:px-14 flex flex-col items-start md:py-16 -mt-80 mx-2">
         <h1 className="mb-2 pt-8 sm:!text-2xl text-center text-xl text-white">
           {t('Terms of Service')}
         </h1>
-        <div className="text-base text-neargray-600 pt-12 pb-16 px-6 w-full bg-white lg:mt-8 flex flex-col gap-6 rounded-md">
+        <div className="text-base text-neargray-600 dark:text-neargray-10 pt-12 pb-16 px-6 w-full bg-white dark:bg-black-600 lg:mt-8 flex flex-col gap-6 rounded-md">
           <p>PLEASE READ THESE TERMS OF SERVICE CAREFULLY.</p>
 
           <p>
