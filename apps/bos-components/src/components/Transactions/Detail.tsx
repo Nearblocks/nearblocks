@@ -751,8 +751,9 @@ export default function (props: Props) {
                             />
                             {shortenToken(ft?.ft_meta?.name ?? '')}
                             <span>
-                              &nbsp;(
-                              {shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})
+                              {`(${shortenTokenSymbol(
+                                ft?.ft_meta?.symbol ?? '',
+                              )})`}
                             </span>
                           </a>
                         </Link>
@@ -1123,12 +1124,10 @@ export default function (props: Props) {
                     ) + 'gas'}
                     <span className="text-gray-300 px-1">|</span>
                     {convertToMetricPrefix(txn?.outcomes_agg?.gas_used ?? 0)}gas
-                    (
-                    {gasPercentage(
+                    {`(${gasPercentage(
                       txn?.outcomes_agg?.gas_used ?? 0,
                       txn?.actions_agg?.gas_attached ?? 0,
-                    )}
-                    )
+                    )})`}
                   </div>
                 )}
               </div>
