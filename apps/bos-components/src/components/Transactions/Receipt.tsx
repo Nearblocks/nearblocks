@@ -113,11 +113,11 @@ export default function (props: Props) {
       {txnsPending ? (
         <div className="flex justify-center text-base p-24">
           <div className="text-center">
-            <div className="inline-flex items-center text-base rounded bg-yellow-50 text-yellow-500 animate-spin  my-2">
+            <div className="inline-flex items-center text-base rounded bg-yellow-50 dark:bg-black-200 text-yellow-500 animate-spin  my-2">
               <FaHourglassStart className="w-5" />
             </div>
 
-            <h1 className="text-xl text-nearblue-600">
+            <h1 className="text-xl text-nearblue-600 dark:text-neargray-10">
               This transaction is pending confirmation.
             </h1>
           </div>

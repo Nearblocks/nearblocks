@@ -205,16 +205,16 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
     <>
       {tokenFilter && (
         <div className="py-2 mb-4">
-          <div className="bg-white soft-shadow rounded-xl  px-2 py-3">
-            <div className="grid md:grid-cols-3 grid-cols-1 divide-y md:divide-y-0 md:divide-x">
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl  px-2 py-3">
+            <div className="grid md:grid-cols-3 grid-cols-1 divide-y md:divide-y-0 dark:divide-black-200 md:divide-x">
               <div className="px-4 md:py-0 py-2">
                 <div className="flex items-center">
                   <FaAddressBook />
-                  <h5 className="text-xs my-1 font-bold ml-1 ">
+                  <h5 className="text-xs my-1 font-bold ml-1 dark:text-neargray-10">
                     FILTERED BY TOKEN HOLDER
                   </h5>
                 </div>
-                <h5 className="text-sm my-1 font-bold text-green-500 truncate md:max-w-[200px] lg:max-w-[310px] xl:max-w-full max-w-full inline-block">
+                <h5 className="text-sm my-1 font-bold text-green-500 dark:text-green-250 truncate md:max-w-[200px] lg:max-w-[310px] xl:max-w-full max-w-full inline-block">
                   <Link
                     href={`/address/${tokenFilter}`}
                     className="hover:no-underline"
@@ -224,7 +224,9 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                 </h5>
               </div>
               <div className="px-4 md:py-0 py-2">
-                <p className="text-xs my-1 text-nearblue-600">BALANCE</p>
+                <p className="text-xs my-1 text-nearblue-600 dark:text-neargray-10">
+                  BALANCE
+                </p>
 
                 {inventoryLoading ? (
                   <Skeleton className="w-40" />
@@ -237,7 +239,9 @@ export default function ({ network, id, tokenFilter, ownerId }: Props) {
                 )}
               </div>
               <div className="px-4 md:py-0 py-2">
-                <p className="text-xs my-1 text-nearblue-600">VALUE</p>
+                <p className="text-xs my-1 text-nearblue-600 dark:text-neargray-10">
+                  VALUE
+                </p>
 
                 {inventoryLoading ? (
                   <Skeleton className="w-40" />

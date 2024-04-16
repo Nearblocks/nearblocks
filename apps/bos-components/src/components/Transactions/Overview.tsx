@@ -272,7 +272,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 text-sm ">
+                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
                       {t ? t('home:nearPrice') : 'NEAR PRICE'}
                     </p>
                     {isLoading ? (
@@ -282,7 +282,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                         href="/charts/near-price"
                         className="hover:no-underline flex items-center"
                       >
-                        <a className="leading-6 text-nearblue-600 hover:no-underline px-1 ">
+                        <a className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline px-1 ">
                           {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
                             {nearBtcPrice
@@ -325,7 +325,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                       {t ? t('home:marketCap') : ' MARKET CAP'}
                     </p>
                     {isLoading ? (
@@ -365,7 +365,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t ? t('home:transactions') : 'TRANSACTIONS'}
                   </p>
                   {isLoading ? (
@@ -380,7 +380,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {' '}
                   {t ? t('home:gasPrice') : 'GAS PRICE'}
                 </p>
@@ -408,7 +408,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     <Link href="/node-explorer" className="hover:no-underline">
                       {' '}
                       {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}{' '}
@@ -428,7 +428,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {t ? t('home:avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
                 {isLoading ? (
@@ -436,9 +436,10 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 ) : (
                   <Link href="/charts/blocks" className="hover:no-underline">
                     <a className="leading-6 text-nearblue-700 hover:no-underline">
-                      {stats?.avg_block_time
-                        ? stats?.avg_block_time + ' s'
-                        : ''}
+                      {(stats?.avg_block_time
+                        ? stats?.avg_block_time
+                        : ''
+                      ).replace(/\.?0+$/, '') + ' s'}
                     </a>
                   </Link>
                 )}
@@ -447,7 +448,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
             <div className="flex-1 py-5 lg:px-0">
-              <p className="uppercase font-semibold text-nearblue-600 text-sm">
+              <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                 {' '}
                 {t
                   ? t('home:transactionHistory', { days: 14 })

@@ -39,7 +39,7 @@ const FormContact = () => {
 
   return (
     <form onSubmit={submitForm}>
-      <p className="text-lg text-black font-medium sm:mt-0 mt-10">
+      <p className="text-lg text-black dark:text-neargray-10 font-medium sm:mt-0 mt-10">
         {t(`Contact Form:`)}
       </p>
       <div className="mt-10 flex flex-col gap-4">

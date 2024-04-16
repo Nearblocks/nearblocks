@@ -122,9 +122,9 @@ export default function SearchBar({
             <select
               className={`h-full block text-sm text-nearblue-600 ${
                 isHeader
-                  ? 'bg-blue-900/[0.05] dark:bg-black'
-                  : 'bg-gray-100 dark:bg-black-500'
-              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border  dark:border-black-200	`}
+                  ? 'bg-blue-900/[0.05] dark:bg-black dark:text-neargray-10'
+                  : 'bg-gray-100 dark:bg-black-500 dark:text-neargray-10'
+              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border  dark:border-black-200 dark:text-neargray-10	`}
               value={filter}
               onChange={onFilter}
             >
@@ -141,7 +141,7 @@ export default function SearchBar({
                 {t ? t('common:search.filters.addresses') : 'Addresses'}
               </option>
             </select>
-            <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 pointer-events-none" />
+            <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
           </label>
           <div className="flex-grow">
             <input

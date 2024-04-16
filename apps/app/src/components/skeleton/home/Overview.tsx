@@ -28,7 +28,7 @@ const Overview = forwardRef(
                     <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                       <div className="items-center flex justify-left mr-3 ">
                         <Image
-                          src={`https://nearblocks.io/images/${
+                          src={`/images/${
                             theme === 'dark'
                               ? 'near price_dark.svg'
                               : 'near price.svg'
@@ -50,7 +50,7 @@ const Overview = forwardRef(
                     <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                       <div className="items-center flex justify-left mr-3 ">
                         <Image
-                          src={`https://nearblocks.io/images/${
+                          src={`/images/${
                             theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                           }`}
                           alt={t('marketCap')}
@@ -75,7 +75,7 @@ const Overview = forwardRef(
                   <div className="flex flex-row ">
                     <div className="items-center flex justify-left mr-3 ">
                       <Image
-                        src={`https://nearblocks.io/images/${
+                        src={`/images/${
                           theme === 'dark'
                             ? 'transactions_dark.svg'
                             : 'transactions.svg'
@@ -109,7 +109,7 @@ const Overview = forwardRef(
                   <div className="flex flex-row ">
                     <div className="items-center flex justify-left mr-3 ">
                       <Image
-                        src={`https://nearblocks.io/images/${
+                        src={`/images/${
                           theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
                         }`}
                         alt={t('activeValidator')}

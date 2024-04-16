@@ -276,13 +276,17 @@ const Header = () => {
                         {nearPrice ? (
                           <div className="ml-12 px-1 py-1 bg-blue-900/[0.05] rounded-lg flex justify-center items-center">
                             <Image
-                              src="/images/neargrey.svg"
+                              src={
+                                theme === 'dark'
+                                  ? '/images/neargrey_dark.svg'
+                                  : '/images/neargrey.svg'
+                              }
                               alt="NearBlock"
                               className="inline-flex w-5 h-5"
                               width={15}
                               height={15}
                             />
-                            <p className="text-sm text-gray-500 font-medium leading-6 px-1">
+                            <p className="text-sm text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1">
                               $
                               {stats?.near_price
                                 ? dollarFormat(stats?.near_price)
@@ -321,7 +325,19 @@ const Header = () => {
               className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4"
               onClick={() => setOpen((o) => !o)}
             >
-              <Menu />
+              <div
+                className="py-2 px-3 h-7 w-[35px] bg-gray-100 dark:bg-black-200 rounded mx-2 flex items-center"
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              >
+                <Image
+                  src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
+                  width="14"
+                  height="14"
+                  alt="NearBlocks"
+                />
+              </div>
+
+              <Menu className="dark:text-neargray-10" />
             </button>
           </div>
           <div className="flex flex-col flex-grow w-full md:!w-auto mb-2 md:mb-0">
@@ -558,7 +574,7 @@ const Header = () => {
                       </a>
 
                       {user && (
-                        <ul className="bg-white soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
+                        <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                           {/* {profile.map((menu) => (
                             <li key={menu.id}>
                               <ActiveLink href={menu.link}>
@@ -572,7 +588,7 @@ const Header = () => {
                           <li className="px-8 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
+                              className="bg-green-200/70 dark:bg-green-250 dark:text-black rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                             >
                               Sign Out
                             </button>
@@ -611,7 +627,7 @@ const Header = () => {
                             width="14"
                             height="14"
                             alt="NearBlocks"
-                            className="fixed"
+                            className="fixed dark:filter dark:invert"
                           />
                           <ArrowDown
                             className={`fill-current transition-transform w-5 h-5 ${
@@ -624,7 +640,7 @@ const Header = () => {
                       <ul className="border-l-2 border-green-500 md:hidden ml-4">
                         <li>
                           <a
-                            className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
+                            className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
                             href={env('NEXT_PUBLIC_MAINNET_URL')}
                           >
                             Mainnet
@@ -632,7 +648,7 @@ const Header = () => {
                         </li>
                         <li>
                           <a
-                            className="block w-full hover:text-green-500  py-2 px-4 hover:no-underline"
+                            className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
                             href={env('NEXT_PUBLIC_TESTNET_URL')}
                           >
                             Testnet
@@ -652,6 +668,7 @@ const Header = () => {
                             width="14"
                             height="14"
                             alt="NearBlocks"
+                            className="dark:filter dark:invert"
                           />
                         </div>
                       </a>
@@ -661,7 +678,7 @@ const Header = () => {
                             className={`block w-full hover:text-green-500 hover:no-underline py-2 px-4 text-gray-500 ${
                               networkId === 'mainnet'
                                 ? 'text-green-500'
-                                : 'text-gray-500'
+                                : 'text-gray-500 dark:text-neargray-10'
                             }`}
                             href={env('NEXT_PUBLIC_MAINNET_URL')}
                           >
@@ -673,7 +690,7 @@ const Header = () => {
                             className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline ${
                               networkId === 'testnet'
                                 ? 'text-green-500'
-                                : 'text-gray-500'
+                                : 'text-gray-500 dark:text-neargray-10'
                             }`}
                             href={env('NEXT_PUBLIC_TESTNET_URL')}
                           >
@@ -686,13 +703,12 @@ const Header = () => {
                 </li>
               </ul>
 
-              <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
+              <ul className="hidden md:flex justify-end text-gray-500 pb-4 md:pb-0">
                 <li>
                   <>
                     <span className="group  flex w-full relative h-full">
-                      <a
+                      <span
                         className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-1 mr-3`}
-                        href="#"
                       >
                         <div
                           className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded"
@@ -709,7 +725,7 @@ const Header = () => {
                             alt="NearBlocks"
                           />
                         </div>
-                      </a>
+                      </span>
                     </span>
                   </>
                 </li>
