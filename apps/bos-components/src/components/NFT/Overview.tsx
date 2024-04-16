@@ -150,7 +150,7 @@ export default function ({ network, id, ownerId }: Props) {
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
-        {!token ? (
+        {isLoading ? (
           <div className="w-80 max-w-xs px-3 py-5">
             <Skeleton className="h-7" />
           </div>

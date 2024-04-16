@@ -24,10 +24,12 @@ interface Props {
   onFilterClear?: (name: string) => void;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
+import FaInbox from '@/includes/icons/FaInbox';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import { TransactionInfo } from '@/includes/types';
 
@@ -62,8 +64,6 @@ export default function ({
   const [address, setAddress] = useState('');
 
   const config = getConfig && getConfig(network);
-
-  const errorMessage = 'No transactions found!';
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -119,11 +119,17 @@ export default function ({
       )
         .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
           const resp = data?.body?.txns;
-          if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
-            setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+          if (data.status === 200 && Array.isArray(resp)) {
+            if (resp.length > 0) {
+              setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+            }
             setIsLoading(false);
           } else {
-            handleRateLimit(data, () => fetchTxnsData(page, qs));
+            handleRateLimit(
+              data,
+              () => fetchTxnsData(page, qs),
+              () => setIsLoading(false),
+            );
           }
         })
         .catch(() => {});
@@ -150,9 +156,11 @@ export default function ({
 
     setAddress(id);
   };
+
   const handleMouseLeave = () => {
     setAddress('');
   };
+
   const columns = [
     {
       header: '',
@@ -553,8 +561,10 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              transactions found
+              {Object.keys(txns).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                } transactions found`}
             </p>
           </div>
 
@@ -594,7 +604,13 @@ export default function ({
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message="There are no matching entries"
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>
