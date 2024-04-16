@@ -96,7 +96,6 @@ const ApiPlan = () => {
   const plans = get(data, 'plans') || null;
 
   const currentPlan = 0;
-  console.log(data);
   const scrollToPlans = () => {
     const element = document.getElementById('plans');
     if (element) {
@@ -169,9 +168,11 @@ const ApiPlan = () => {
               </div>
             )}
 
-            <p className="text-green-400 text-sm">NEARBLOCKS API</p>
+            <p className="text-green-400 text-sm dark:text-green-250 ">
+              NEARBLOCKS API
+            </p>
             <div className="w-full sm:block flex sm:!justify-start justify-center ">
-              <h1 className="mb-4 pt-4 text-3xl text-black lg:w-1/2 md:w-3/4 sm:w-1/3 w-3/4">
+              <h1 className="mb-4 pt-4 text-3xl text-black dark:text-neargray-10 lg:w-1/2 md:w-3/4 sm:w-1/3 w-3/4">
                 Build Precise & Reliable Apps with NearBlocks APIs
               </h1>
             </div>
@@ -184,20 +185,20 @@ const ApiPlan = () => {
               </button>
               <Link href={docsUrl} legacyBehavior>
                 <a
-                  className="flex text-sm text-green-400 cursor-pointer mx-4 font-medium"
+                  className="flex text-sm text-green-400 dark:text-green-250 cursor-pointer mx-4 font-medium"
                   target="_blank"
                   rel="noreferrer nofollow noopener"
                 >
                   API Documentation
                   <span>
-                    <Arrow className="-rotate-45 -mt-0 h-4 w-4" />
+                    <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
                   </span>
                 </a>
               </Link>
             </div>
           </div>
           <div className="text-center justify-center items-center pt-10 pb-4">
-            <h2 className="text-2xl my-2 text-center px-14">
+            <h2 className="text-2xl my-2 text-center px-14 dark:text-neargray-10">
               Choose a plan that&apos;s right for you.
             </h2>
             <p className="text-gray-500 my-2 text-lg font-thin">
@@ -207,7 +208,9 @@ const ApiPlan = () => {
             <div className="my-4 flex justify-center items-center font-thin">
               <p
                 className={`${
-                  !interval ? 'text-black' : 'text-gray-500'
+                  !interval
+                    ? 'text-black dark:text-neargray-10'
+                    : 'text-gray-500'
                 } text-sm mx-2`}
               >
                 Monthly{' '}
@@ -220,22 +223,27 @@ const ApiPlan = () => {
               </span>
               <p
                 className={`${
-                  interval ? 'text-black' : 'text-gray-400'
+                  interval
+                    ? 'text-black dark:text-neargray-10'
+                    : 'text-gray-400'
                 } text-sm`}
               >
-                Annually <span className="text-green-400">(Save 10%)</span>
+                Annually{' '}
+                <span className="text-green-400 dark:text-green-250">
+                  (Save 10%)
+                </span>
               </p>
             </div>
           </div>
           <div
             id="plans"
-            className="flex justify-center sm:px-10 2xl:px-20 -mx-10 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6"
+            className="flex justify-center sm:px-10 2xl:px-20 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6"
           >
             {plans?.length > 0 &&
               plans.map((item: any, index: any) => (
                 <div
                   key={item.id}
-                  className={`bg-white rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
+                  className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
                     index === 2 && 'border-2 border-neargreen-200'
                   }`}
                 >
@@ -245,10 +253,12 @@ const ApiPlan = () => {
                     </div>
                   )}
                   <div className="border-b border-b-gray-200 py-2">
-                    <h3 className="uppercase py-2 text-sm">{item.title}</h3>
+                    <h3 className="uppercase py-2 text-sm dark:text-neargray-10">
+                      {item.title}
+                    </h3>
                     <h1 className="py-2 text-4xl">
                       {!interval ? (
-                        <p>
+                        <p className="dark:text-neargray-10">
                           ${localFormat(String(item.price_monthly / 100))}
                           {item?.price_monthly !== 0 &&
                             item.price_annually !== 0 && (
@@ -256,7 +266,7 @@ const ApiPlan = () => {
                             )}
                         </p>
                       ) : (
-                        <p>
+                        <p className="dark:text-neargray-10">
                           {item?.price_monthly === 0 &&
                           item.price_annually === 0 ? (
                             <span>$0</span>
@@ -269,7 +279,7 @@ const ApiPlan = () => {
                         </p>
                       )}
                     </h1>
-                    <p className="py-2 text-gray-500 text-xs ">
+                    <p className="py-2 text-gray-500 text-xs">
                       {item?.price_monthly === 0 &&
                       item.price_annually === 0 ? (
                         <span>* Attribution required</span>
@@ -295,7 +305,7 @@ const ApiPlan = () => {
                       {}
                     </p>
                   </div>
-                  <div className="py-2 font-thin">
+                  <div className="py-2 font-thin dark:text-neargray-10">
                     <h3 className="py-2 text-sm">
                       {item?.id === 1
                         ? '6'
@@ -327,7 +337,9 @@ const ApiPlan = () => {
                       //   else onGetStarted(item);
                       // }}
                       className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={updating || currentPlan === item?.price_monthly}
+                      disabled={
+                        !updating || currentPlan === item?.price_monthly
+                      }
                     >
                       {currentPlan
                         ? currentPlan === item?.price_monthly
@@ -341,9 +353,14 @@ const ApiPlan = () => {
                 </div>
               ))}
           </div>
-          <div className="py-10 lg:px-32 px-5">
+          <div className="sm:px-10 2xl:px-20 ">
+            <div className="text-center border-b-2 border-nearblue dark:border-black-200 dark:bg-black-200 bg-nearblue py-2 text-green dark:text-green-250 text-sm ">
+              Sign up is temporary suspended
+            </div>
+          </div>
+          <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
             <div className="flex justify-center">
-              <h2 className="text-center px-5 border-t py-10 text-2xl text-black">
+              <h2 className="text-center px-5 border-t py-10 text-2xl text-black dark:text-neargray-10">
                 Frequently Asked Questions
               </h2>
             </div>
@@ -402,7 +419,7 @@ const ApiPlan = () => {
             </div>
           </div>
           <div className="flex sm:flex-row flex-col items-center  justify-center my-5">
-            <p className="text-xl text-black  text-center mx-4 my-6">
+            <p className="text-xl text-black dark:text-neargray-10 text-center mx-4 my-6">
               Detailed documentation to get started.{' '}
             </p>
             <Link href={docsUrl} legacyBehavior>
@@ -412,7 +429,7 @@ const ApiPlan = () => {
             </Link>
           </div>
         </div>
-        <div className="bg-white flex justify-center my-4">
+        <div className="bg-white flex justify-center my-4 dark:bg-black-200 dark:text-neargray-10">
           <form className="my-10 md:w-1/2 w-full mx-4" onSubmit={submitForm}>
             <h2 className="text-2xl text-center py-2">
               Contact us for any inquiries
@@ -457,7 +474,7 @@ const ApiPlan = () => {
               <textarea
                 id="message"
                 autoComplete="off"
-                className="px-3 py-1.5 bg-white border w-full border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+                className="px-3 py-1.5 border w-full border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
                 maxLength={300}
                 rows={5}
                 required

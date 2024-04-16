@@ -72,7 +72,7 @@ export default function ({
     <span className="w-full h-full flex items-center justify-center relative">
       {loading && (
         <span className="absolute inset-0 bg-white">
-          <span className="absolute inset-0 animate-pulse bg-gray-300 rounded" />
+          <span className="absolute inset-0 animate-pulse bg-gray-300 dark:bg-black-200 rounded" />
         </span>
       )}
       <TokenImage

@@ -146,7 +146,7 @@ export default function (props: Props) {
                   className={`text-nearblue-600  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
                     pageTab === hash
                       ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
-                      : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-600  rounded-lg hover:text-nearblue-600'
+                      : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
                   }`}
                   value={hash}
                 >

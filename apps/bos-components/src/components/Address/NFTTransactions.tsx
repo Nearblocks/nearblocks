@@ -320,7 +320,7 @@ export default function (props: Props) {
                   <span
                     className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                       row?.affected_account_id === address
-                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
                         : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                     }`}
                   >
@@ -442,7 +442,7 @@ export default function (props: Props) {
                       <a
                         className={`text-green-500 dark:text-green-250 hover:no-underline ${
                           row?.involved_account_id === address
-                            ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                            ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
                             : 'text-green-500  dark:text-green-250 p-1'
                         }`}
                         onMouseOver={(e) =>
@@ -667,9 +667,9 @@ export default function (props: Props) {
           </div>
           <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
             {filters && Object.keys(filters).length > 0 && (
-              <div className="flex  px-2 items-center text-sm text-gray-500 mb-2 lg:mb-0">
+              <div className="flex  px-2 items-center text-sm text-gray-500 dark:text-neargray-10 mb-2 lg:mb-0">
                 <span className="mr-1 lg:mr-2">Filtered By:</span>
-                <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+                <span className="flex flex-wrap items-center justify-center bg-gray-100 dark:bg-black-200 rounded-full px-3 py-1 space-x-2">
                   {Object.keys(filters).map((key) => (
                     <span
                       className="flex items-center max-sm:mb-1 truncate max-w-[120px]"

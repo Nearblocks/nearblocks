@@ -109,7 +109,7 @@ export default function ({ network, t, id, ownerId }: Props) {
   return (
     <>
       <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-x-auto ">
-        <table className="min-w-full divide-y divide-black-200 border-black-200 border-t">
+        <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
           <thead className="bg-gray-100 dark:bg-black-300">
             <tr>
               <th

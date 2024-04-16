@@ -2,9 +2,7 @@ import Link from 'next/link';
 import Image from 'next/legacy/image';
 import useTranslation from 'next-translate/useTranslation';
 import { useTheme } from 'next-themes';
-
 import Arrow from '../Icons/Arrow';
-
 const Footer = () => {
   const { t } = useTranslation('common');
   const { theme } = useTheme();
@@ -40,7 +38,11 @@ const Footer = () => {
                     rel="noreferrer nofollow noopener"
                   >
                     <Image
-                      src="/images/twitter_icon.svg"
+                      src={
+                        theme === 'dark'
+                          ? '/images/twitter_icon_black.svg'
+                          : '/images/twitter_icon.svg'
+                      }
                       width={24}
                       height={24}
                       alt="Twitter"
@@ -53,7 +55,11 @@ const Footer = () => {
                     rel="noreferrer nofollow noopener"
                   >
                     <Image
-                      src="/images/github_icon.svg"
+                      src={
+                        theme === 'dark'
+                          ? '/images/github_icon_black.svg'
+                          : '/images/github_icon.svg'
+                      }
                       width={24}
                       height={24}
                       alt="Github"
@@ -61,7 +67,6 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
-
               <div className="hidden lg:!block"></div>
               <div className="hidden lg:!block">
                 <div className="text-green-500 font-semibold text-xl mb-3">
@@ -80,9 +85,7 @@ const Footer = () => {
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/apis" legacyBehavior>
-                      <a target="_blank" rel="noreferrer nofollow noopener">
-                        {t('footer.links.api')}
-                      </a>
+                      <a>{t('footer.links.api')}</a>
                     </Link>
                   </li>
                   <li>
@@ -205,5 +208,4 @@ const Footer = () => {
     </footer>
   );
 };
-
 export default Footer;

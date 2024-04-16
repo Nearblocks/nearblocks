@@ -138,7 +138,7 @@ const HomePage = () => {
           <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
             <div className="flex flex-col lg:flex-row pb-5">
               <div className="relative lg:w-3/5  flex-col">
-                <h1 className="text-white dark:text-nearblue-600 text-2xl pb-3 flex flex-col">
+                <h1 className="text-white dark:text-neargray-10 text-2xl pb-3 flex flex-col">
                   {t('home:heroTitle')}
                 </h1>
                 <div className="h-12">

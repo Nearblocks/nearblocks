@@ -23,6 +23,7 @@ interface Props {
   accountId: string;
   ownerId: string;
   logOut: () => void;
+  theme: string;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -64,6 +65,7 @@ export default function (props: Props) {
     accountId,
     logOut,
     ownerId,
+    theme,
   } = props;
 
   const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
@@ -552,7 +554,7 @@ export default function (props: Props) {
           </div>
         ) : (
           <div className="flex md:flex-wrap">
-            <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
+            <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10">
               Near Account: @
               {id && (
                 <span className="font-semibold text-green-500 dark:text-green-250">
@@ -565,6 +567,7 @@ export default function (props: Props) {
                   props={{
                     id: id,
                     config: config,
+                    theme: theme,
                   }}
                 />
               }

@@ -231,7 +231,7 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
             href={`/txns?block=${row?.block_hash}`}
             className="hover:no-underline"
           >
-            <a className="text-green-500 hover:no-underline font-medium">
+            <a className="text-green-500 dark:text-green-250  hover:no-underline font-medium">
               {row?.transactions_agg?.count
                 ? localFormat(row?.transactions_agg?.count)
                 : row?.transactions_agg?.count ?? ''}
@@ -271,7 +271,7 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
             <a
               className={`text-green-500 dark:text-green-250 hover:no-underline ${
                 row?.author_account_id === address
-                  ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                  ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 p-1'
               }`}
               onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}

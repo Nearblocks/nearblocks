@@ -36,7 +36,7 @@ const Contract = () => {
         </h1>
         <div className="text-neargray-600 dark:text-neargray-10 sm:grid sm:grid-cols-11 pt-12 pb-8 gap-6 pl-8 pr-14 w-full soft-shadow sm:divide-x rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">
           <div className="col-span-5">
-            <p className="text-lg text-black font-medium">
+            <p className="text-lg text-black font-medium dark:text-neargray-10">
               {t(`Drop us a message, but please be aware that:`)}
             </p>
             <div className="mt-10 flex flex-col gap-8">

@@ -6,7 +6,7 @@ const SwitchButton = ({ selected, onChange }: any) => {
       className={`${
         selected
           ? 'w-[35px] h-[19px] bg-teal-800 cursor-pointer select-none rounded-[30px] px-0.5 relative'
-          : 'w-[35px] h-[19px] bg-gray-200 cursor-pointer select-none rounded-[30px] px-0.5 relative'
+          : 'w-[35px] h-[19px] bg-gray-200 dark:bg-black-200 cursor-pointer select-none rounded-[30px] px-0.5 relative'
       } relative`}
       onClick={onChange}
     >

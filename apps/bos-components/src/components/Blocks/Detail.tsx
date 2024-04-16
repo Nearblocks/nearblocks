@@ -66,7 +66,7 @@ export default function (props: Props) {
 
   const LinkWrapper = (props: Props) => (
     <Link href={props.href} className="hover:no-underline">
-      <a className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 text-green-500 dark:text-green-250 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
+      <a className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 text-green-500 dark:text-green-250 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline">
         {props.children}
       </a>
     </Link>

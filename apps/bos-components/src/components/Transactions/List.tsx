@@ -409,7 +409,7 @@ export default function (props: Props) {
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
                     row?.signer_account_id === address
-                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
+                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
                       : 'text-green-500 dark:text-green-250 p-0.5 px-1'
                   }`}
                 >
@@ -512,7 +512,7 @@ export default function (props: Props) {
                     <a
                       className={`text-green-500 dark:text-green-250 hover:no-underline ${
                         row?.receiver_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
+                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
                           : 'text-green-500 dark:text-green-250 p-1'
                       }`}
                       onMouseOver={(e) =>
@@ -664,8 +664,8 @@ export default function (props: Props) {
           </div>
           {filters && Object.keys(filters).length > 0 && (
             <div className="flex items-center px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:ml-auto">
-              {t ? t('txns:filter.by') : 'Filtered By:'}&nbsp;
-              <span className="flex flex-wrap items-center justify-center bg-gray-100 rounded-full px-3 py-1 space-x-2">
+              {t ? `${t('txns:filter.by')}:` : 'Filtered By:'}&nbsp;
+              <span className="flex flex-wrap items-center justify-center bg-gray-100 dark:bg-black-200 rounded-full px-3 py-1 space-x-2">
                 {Object.keys(filters).map((key) => (
                   <span
                     className="flex items-center max-sm:mb-1 truncate max-w-[120px]"

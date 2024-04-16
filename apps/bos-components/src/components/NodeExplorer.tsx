@@ -212,7 +212,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       case 'active':
         return {
           textColor: 'text-emerald-500',
-          bgColor: 'bg-emerald-50 text-emerald-500',
+          bgColor:
+            'bg-emerald-50 dark:text-green-250 dark:bg-black-200 text-emerald-500',
         };
       case 'joining':
         return {
@@ -479,7 +480,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
     return (
       <>
         <tr>
-          <td colSpan={9} className="bg-gray-50">
+          <td colSpan={9} className="bg-gray-50 dark:bg-black-200">
             {telemetry && (
               <Widget
                 src={`${ownerId}/widget/bos-components.components.Shared.Table`}
