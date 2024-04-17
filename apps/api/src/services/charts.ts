@@ -46,7 +46,7 @@ const tps = catchAsync(async (_req: Request, res: Response) => {
         EXTRACT(
           EPOCH
           FROM
-            NOW() - INTERVAL '1 day'
+            NOW() - INTERVAL '6 hours'
         )
       )::BIGINT
     ORDER BY

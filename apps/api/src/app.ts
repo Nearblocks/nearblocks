@@ -2,11 +2,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import cors from 'cors';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import passport from 'passport';
 import qs from 'query-string';
 
+import logger from '#libs/logger';
 import sentry from '#libs/sentry';
 import swagger from '#libs/swagger';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
@@ -40,8 +41,10 @@ app.use((_req: Request, res: Response) => {
 
 app.use(sentry.Handlers.errorHandler());
 
-app.use((err: Error, _req: Request, res: Response) => {
-  res.status(500).json({ message: err.message });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  logger.error(err);
+  res.status(500).json({ message: 'Server Error' });
 });
 
 export default app;
