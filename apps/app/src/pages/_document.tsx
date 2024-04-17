@@ -40,7 +40,7 @@ export default function Document() {
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/__ENV.js" />
       </Head>
-      <body className="overflow-x-hidden  dark:bg-gray-900">
+      <body className="overflow-x-hidden   dark:bg-black-300">
         <Main />
         <NextScript />
       </body>

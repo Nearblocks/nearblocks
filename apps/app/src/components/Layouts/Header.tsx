@@ -326,12 +326,9 @@ const Header = () => {
                   </div>
                 ))}
             </div>
-            <button
-              className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4"
-              onClick={() => setOpen((o) => !o)}
-            >
-              <div
-                className="py-2 px-3 h-7 w-[35px] bg-gray-100 dark:bg-black-200 rounded mx-2 flex items-center"
+            <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
+              <button
+                className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-2 flex items-center justify-center"
                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
               >
                 <Image
@@ -340,10 +337,15 @@ const Header = () => {
                   height="14"
                   alt="NearBlocks"
                 />
-              </div>
+              </button>
 
-              <Menu className="dark:text-neargray-10" />
-            </button>
+              <button
+                className="flex md:!hidden items-center justify-center"
+                onClick={() => setOpen((o) => !o)}
+              >
+                <Menu className="dark:text-neargray-10" />
+              </button>
+            </div>
           </div>
           <div className="flex flex-col flex-grow w-full md:!w-auto mb-2 md:mb-0">
             {showSearch && (
@@ -717,7 +719,7 @@ const Header = () => {
                         className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-1 mr-3`}
                       >
                         <div
-                          className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded"
+                          className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer"
                           onClick={() =>
                             setTheme(theme === 'light' ? 'dark' : 'light')
                           }

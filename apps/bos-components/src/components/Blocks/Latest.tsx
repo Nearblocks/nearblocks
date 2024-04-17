@@ -224,7 +224,7 @@ export default function ({ network, t, ownerId }: Props) {
       {blocks && blocks?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Link href="/blocks">
-            <a className="block  dark:text-black text-center border border-green-900/10 bg-green-500 dark:bg-green-250 hover:bg-green-400 font-thin text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
+            <a className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all blocks
             </a>
           </Link>

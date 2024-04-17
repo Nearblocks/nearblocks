@@ -11,10 +11,12 @@ const ErrorMessage = ({ icons, message, mutedText }: Props) => {
           {icons}
         </span>
       </div>
+
       <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
         {message}
       </h3>
-      <p className="mb-0 py-4 font-bold">{mutedText}</p>
+
+      <p className="mb-0 py-4 font-bold break-words px-2">{mutedText}</p>
     </div>
   );
 };

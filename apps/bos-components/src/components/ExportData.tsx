@@ -213,7 +213,7 @@ export default function ({
                 onClick={onDownload}
                 className={`items-center cursor-pointer ${
                   loading && 'animate-pulse cursor-not-allowed'
-                }  text-center bg-green-500 dark:bg-green-250 dark:text-black hover:shadow-lg  text-white text-xs py-2 rounded w-20 focus:outline-none`}
+                }  text-center bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:shadow-lg  text-white text-xs py-2 rounded w-20 focus:outline-none`}
               >
                 Generate
               </div>

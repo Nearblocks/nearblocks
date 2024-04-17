@@ -149,6 +149,7 @@ export type StatusInfo = {
   total_supply: string;
   total_txns: string;
   volume: string;
+  tps: string;
 };
 
 export type ChartSeriesInfo = {

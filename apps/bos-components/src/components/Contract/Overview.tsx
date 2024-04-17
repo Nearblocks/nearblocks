@@ -112,7 +112,7 @@ export default function (props: Props) {
                     className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
                     onClick={logOut}
                   >
-                    <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white" />
+                    <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white dark:bg-black-600 dark:text-neargray-10" />
                     Connected
                   </button>
                 </Tooltip.Trigger>
@@ -130,7 +130,7 @@ export default function (props: Props) {
               className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
               onClick={requestSignInWithWallet}
             >
-              <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white animate-pulse" />
+              <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white dark:bg-black-600 dark:text-neargray-10 animate-pulse" />
               Connect to Contract
             </button>
           )}
@@ -139,7 +139,7 @@ export default function (props: Props) {
           <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
             Contracts with Near{' '}
             <a
-              className="text-green-500 "
+              className="text-green-500 dark:text-green-250"
               target="_blank"
               href="https://github.com/near/abi"
               rel="noreferrer noopener nofollow"
