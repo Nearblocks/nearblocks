@@ -15,7 +15,7 @@ const routes = (app: Router) => {
    * GET /v1/blocks
    * @summary Get blocks by pagination
    * @tags Blocks
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @return 200 - success response
    */

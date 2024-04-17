@@ -35,7 +35,7 @@ const tokens = z.object({
 const keys = z.object({
   account: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().optional().default(1),
+  page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -63,7 +63,7 @@ const txns = z.object({
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().optional().default(1),
+  page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
   to: z.string().optional(),
 });
@@ -120,7 +120,7 @@ const ftTxns = z.object({
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().optional().default(1),
+  page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
@@ -174,7 +174,7 @@ const nftTxns = z.object({
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().optional().default(1),
+  page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
