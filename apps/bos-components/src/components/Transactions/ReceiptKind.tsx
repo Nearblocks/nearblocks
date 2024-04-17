@@ -9,13 +9,13 @@ import { ReceiptKindInfo } from '@/includes/types';
 
 const backgroundColorClasses: Record<string, string> = {
   transfer: 'bg-green-50 dark:bg-green-200',
-  stake: 'bg-cyan-50 dark:bg-cyan-200',
-  deployContract: 'bg-orange-50 dark:bg-orange-200',
-  addKey: 'bg-indigo-50 dark:bg-indigo-200',
-  deleteKey: 'bg-red-50 dark:bg-red-200',
+  stake: 'bg-cyan-50 dark:bg-cyan-900',
+  deployContract: 'bg-orange-50 dark:bg-orange-900',
+  addKey: 'bg-indigo-50 dark:bg-indigo-900',
+  deleteKey: 'bg-red-50 dark:bg-red-900',
   functionCall: 'bg-blue-50 dark:bg-black-200',
-  createAccount: 'bg-fuchsia-100',
-  deleteAccount: 'bg-red-50 dark:bg-red-200',
+  createAccount: 'bg-fuchsia-100 dark:bg-fuchsia-900',
+  deleteAccount: 'bg-red-50 dark:bg-red-900',
   delegateAction: 'bg-blue-50 dark:bg-black-200',
 };
 

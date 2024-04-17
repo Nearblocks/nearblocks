@@ -25,7 +25,7 @@ const Detail = forwardRef(
             <div
               className={`text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
                 pageTab === ' '
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
+                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
               }`}
             >
@@ -34,7 +34,7 @@ const Detail = forwardRef(
             <div
               className={`text-xs leading-4 font-medium rounded-lg overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
                 pageTab === 'execution'
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
+                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
               }`}
             >
@@ -47,7 +47,7 @@ const Detail = forwardRef(
             <div
               className={`text-nearblue-600  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
                 pageTab === 'comments'
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
+                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
                   : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
               }`}
             >

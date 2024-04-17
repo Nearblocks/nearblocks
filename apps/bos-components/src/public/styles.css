@@ -59,6 +59,10 @@ pre[class*='language-']>code {
     color: #003536;
 }
 
+.dark .footer-links a:hover {
+    color: #31766A;
+}
+
 .u-label--badge-in {
     position: relative;
     letter-spacing: .8px;

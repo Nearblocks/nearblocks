@@ -239,7 +239,7 @@ export default function ({ t, network, ownerId }: Props) {
       {txns && txns?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Link href="/txns">
-            <a className="block text-center dark:text-black  border border-green-900/10 font-thin bg-green-500 dark:bg-green-250 hover:bg-green-400 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
+            <a className="block text-center dark:text-white  border border-green-900/10 font-thin dark:font-normal bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all transactions
             </a>
           </Link>

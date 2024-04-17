@@ -32,7 +32,7 @@ const Links = (props: any) => {
                 <img
                   width="16"
                   height="16"
-                  className="w-4 h-4"
+                  className="w-4 h-4 dark:invert dark:filter"
                   src="/images/twitter_icon.svg"
                   alt="Twitter"
                 />

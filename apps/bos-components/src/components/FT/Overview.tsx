@@ -534,8 +534,8 @@ export default function ({
                     onClick={() => onTab(index)}
                     className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                       pageTab === tab
-                        ? 'rounded-lg bg-green-600 dark:bg-green-250 dark:text-black text-white'
-                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 dark:text-neargray-25 dark:bg-black-200'
+                        ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 dark:text-white dark:hover:text-neargray-25  dark:bg-black-200'
                     }`}
                     value={tab}
                   >

@@ -69,7 +69,7 @@ const Footer = () => {
               </div>
               <div className="hidden lg:!block"></div>
               <div className="hidden lg:!block">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   &nbsp;
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
@@ -79,7 +79,7 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   Tools
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
@@ -105,7 +105,7 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   {t('footer.links.explore')}
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200 ">
@@ -132,7 +132,7 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   {t('footer.links.company')}
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
@@ -177,7 +177,7 @@ const Footer = () => {
               </div>
             </div>
             <div className="flex justify-between border-t border-gray-200 dark:border-black-200">
-              <p className="text-green-500 text-xs pb-1 pt-6 text-center ">
+              <p className="text-green-500 dark:text-green-250 text-xs pb-1 pt-6 text-center ">
                 NearBlocks © {currentDate.getFullYear()}
               </p>
             </div>
@@ -185,7 +185,7 @@ const Footer = () => {
               Price feeds aggregated by{' '}
               <Link href="http://coingecko.com/" legacyBehavior>
                 <a
-                  className="mx-1"
+                  className="mx-1  flex items-center"
                   target="_blank"
                   rel="noreferrer nofollow noopener"
                 >
