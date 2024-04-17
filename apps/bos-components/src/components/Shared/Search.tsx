@@ -152,7 +152,7 @@ export default function SearchBar({
 
   return (
     <>
-      {showToast && <ToastMessage content={SearchToast} />}
+      {showToast && <ToastMessage content={<SearchToast />} />}
       <div className="flex flex-grow">
         <div className={`flex w-full ${isHeader ? 'h-11' : 'h-12'}`}>
           <label className="relative hidden md:flex">

@@ -1,6 +1,6 @@
 interface Props {
   id?: string;
-  content: () => React.JSX.Element;
+  content: JSX.Element;
 }
 
 const ToastMessage = (props: Props) => {
@@ -12,7 +12,7 @@ const ToastMessage = (props: Props) => {
         open={open}
         onOpenChange={setOpen}
       >
-        {props.content()}
+        {props.content}
         <Toast.Action className="" asChild altText="Goto schedule to undo">
           <button className="inline-flex h-fit w-fit items-center justify-center rounded-md font-medium text-red-500 focus:ring-red-500 focus:ring-offset-red-200 focus:ring-2 focus:outline-none focus:ring-offset-2 transition ease-in-out duration-150 text-xs lg:text-sm">
             x
