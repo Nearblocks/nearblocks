@@ -116,13 +116,18 @@ export default function (props: Props) {
 
     try {
       const args = mapFeilds(fields) ?? {};
-      const res: { transaction_outcome: { id: string } } | null | any =
-        Near.view(id, toSnakeCase(method), args);
-      if (res !== null) {
-        setError(null);
-        setTxn(res?.transaction_outcome?.id);
-        setResult(JSON.stringify(res, null, 2));
-      }
+      Near.asyncView(id, toSnakeCase(method), args)
+        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
+          setError(null);
+          setTxn(resp?.transaction_outcome?.id);
+          setResult(JSON.stringify(resp, null, 2));
+        })
+        .catch((error: any) => {
+          console.log(error);
+          setTxn(null);
+          setError(error?.message);
+          setResult(null);
+        });
     } catch (error: any) {
       setTxn(null);
       setError(error);
@@ -143,12 +148,9 @@ export default function (props: Props) {
       const args = mapFeilds(fields) ?? {};
       const res: { transaction_outcome: { id: string } } | null | any =
         Near.call(id, toSnakeCase(method), args);
-
-      if (res !== null) {
-        setError(null);
-        setTxn(res?.transaction_outcome?.id);
-        setResult(JSON.stringify(res, null, 2));
-      }
+      setError(null);
+      setTxn(res?.transaction_outcome?.id);
+      setResult(JSON.stringify(res, null, 2));
     } catch (error: any) {
       setTxn(null);
       setError(error);
