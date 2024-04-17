@@ -26,6 +26,7 @@ const txns = catchAsync(
     const involved = req.validator.data.involved;
     const event = req.validator.data.event;
     const page = req.validator.data.page;
+    const cursor = req.validator.data.cursor;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
     const afterDate = req.validator.data.after_date;
@@ -90,8 +91,9 @@ const txns = catchAsync(
             ft_events a
           WHERE
             affected_account_id = ${account}
-            AND ${involved ? sql` involved_account_id = ${involved}` : true}
-            AND ${event ? sql` cause = ${event}` : true}
+            AND ${involved ? sql`involved_account_id = ${involved}` : true}
+            AND ${event ? sql`cause = ${event}` : true}
+            AND ${cursor ? sql`event_index < ${cursor.replace('n', '')}` : true}
             AND ${afterTimestamp
         ? sql`block_timestamp >= ${afterTimestamp}`
         : true}
@@ -120,7 +122,7 @@ const txns = catchAsync(
           LIMIT
             ${limit}
           OFFSET
-            ${offset}
+            ${cursor ? 0 : offset}
         ) AS tmp using (event_index)
         INNER JOIN LATERAL (
           SELECT
@@ -162,7 +164,10 @@ const txns = catchAsync(
         event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
     `;
 
-    return res.status(200).json({ txns });
+    let nextCursor = txns?.[txns?.length - 1]?.event_index;
+    nextCursor = nextCursor ? `${nextCursor}n` : undefined;
+
+    return res.status(200).json({ cursor: nextCursor, txns });
   },
 );
 
