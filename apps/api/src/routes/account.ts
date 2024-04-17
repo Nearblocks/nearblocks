@@ -100,7 +100,7 @@ const routes = (app: Router) => {
    * @summary Get access keys by pagination
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -127,7 +127,7 @@ const routes = (app: Router) => {
    * @param {string} method.query - function call method
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -158,8 +158,8 @@ const routes = (app: Router) => {
    * @param {string} event.query - event kind
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -192,8 +192,8 @@ const routes = (app: Router) => {
    * @param {string} event.query - event kind
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
