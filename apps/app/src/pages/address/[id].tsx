@@ -10,6 +10,7 @@ import Head from 'next/head';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
+import Skeleton from '@/components/skeleton/common/Skeleton';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -96,6 +97,33 @@ const Address = () => {
         <link rel="canonical" href={`${appUrl}/address/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
+        <div className="flex items-center justify-between flex-wrap pt-4 ">
+          {!id ? (
+            <div className="w-80 max-w-xs px-3 py-5">
+              <Skeleton className="h-7" />
+            </div>
+          ) : (
+            <div className="flex md:flex-wrap">
+              <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10">
+                Near Account: @
+                {id && (
+                  <span className="font-semibold text-green-500 dark:text-green-250">
+                    {id}
+                  </span>
+                )}
+                {
+                  <VmComponent
+                    src={components?.buttons}
+                    props={{
+                      id: id,
+                      theme: theme,
+                    }}
+                  />
+                }
+              </h1>
+            </div>
+          )}
+        </div>
         <VmComponent
           skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
           defaultSkelton={<Overview />}

@@ -7,11 +7,6 @@ const Overview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
-        <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-6" />
-          </div>{' '}
-        </div>
         <div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="w-full">

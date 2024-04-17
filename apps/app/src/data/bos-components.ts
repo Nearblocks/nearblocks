@@ -21,6 +21,7 @@ type NetworkComponents = {
   nftDetail: string;
   charts: string;
   exportData: string;
+  buttons: string;
 };
 const accountId = env('NEXT_PUBLIC_ACCOUNT_ID');
 
@@ -45,6 +46,7 @@ const ComponentUrl = {
   nftDetail: `${accountId}/widget/bos-components.components.NFT.Detail`,
   charts: `${accountId}/widget/bos-components.components.Charts`,
   exportData: `${accountId}/widget/bos-components.components.ExportData`,
+  buttons: `${accountId}/widget/bos-components.components.Shared.Buttons`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,

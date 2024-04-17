@@ -31,7 +31,7 @@ export default function (props: Props) {
               <button
                 type="button"
                 onClick={onCopyClick}
-                className="bg-green-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
+                className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
               >
                 <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
               </button>
@@ -48,7 +48,7 @@ export default function (props: Props) {
         </Tooltip.Provider>
         <Dialog.Root>
           <Dialog.Trigger asChild>
-            <button className="bg-green-500 items-center bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7">
+            <button className="bg-green-500 dark:bg-black-200 items-center bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7">
               <Tooltip.Provider>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>

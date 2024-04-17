@@ -19,6 +19,11 @@ import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import { env } from 'next-runtime-env';
 
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const networkUrl =
+  network === 'mainnet'
+    ? env('NEXT_PUBLIC_TESTNET_URL')
+    : env('NEXT_PUBLIC_MAINNET_URL');
 const menus = [
   {
     id: 1,
@@ -358,6 +363,7 @@ const Header = () => {
                       t: t,
                       network: networkId,
                       router,
+                      networkUrl,
                     }}
                   />
                 </div>

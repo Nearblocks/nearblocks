@@ -17,7 +17,10 @@ import { env } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
-
+const networkUrl =
+  network === 'mainnet'
+    ? env('NEXT_PUBLIC_TESTNET_URL')
+    : env('NEXT_PUBLIC_MAINNET_URL');
 const HomePage = () => {
   const components = useBosComponents();
   const router = useRouter();
@@ -154,6 +157,7 @@ const HomePage = () => {
                       t: t,
                       network: networkId,
                       router,
+                      networkUrl,
                     }}
                     loading={
                       <div className="absolute  w-full ">
