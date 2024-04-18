@@ -213,37 +213,41 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
         return {
           textColor: 'text-emerald-500',
           bgColor:
-            'bg-emerald-50 dark:text-green-250 dark:bg-black-200 text-emerald-500',
+            'bg-emerald-50 dark:dark:bg-emerald-500/[0.25] text-emerald-500 ',
         };
       case 'joining':
         return {
           textColor: 'text-yellow-500',
-          bgColor: 'bg-yellow-50 text-yellow-500',
+          bgColor: 'bg-yellow-50 dark:bg-yellow-500/[0.25]  text-yellow-500',
         };
       case 'leaving':
         return {
           textColor: 'text-red-500',
-          bgColor: 'bg-red-50 text-red-500',
+          bgColor: 'bg-red-50 text-red-500 dark:bg-red-500/[0.25]',
         };
       case 'proposal':
         return {
           textColor: 'text-teal-900',
-          bgColor: 'bg-teal-300 text-teal-900',
+          bgColor:
+            'bg-teal-300 dark:bg-teal-500/[0.25] dark:text-teal-500 text-teal-900',
         };
       case 'idle':
         return {
-          textColor: 'text-gray-600 dark:text-neargray-10',
-          bgColor: 'bg-gray-300 text-gray-600 dark:text-neargray-10',
+          textColor: 'text-gray-600',
+          bgColor:
+            'bg-gray-300 text-gray-600 dark:bg-gray-500/[0.25] dark:text-gray-400',
         };
       case 'newcomer':
         return {
           textColor: 'text-orange-500',
-          bgColor: 'bg-orange-500 text-white',
+          bgColor:
+            'bg-orange-500 text-white dark:bg-orange-500/[0.25] dark:text-orange-300',
         };
       case 'onHold':
         return {
           textColor: 'text-blue-500',
-          bgColor: 'bg-blue-500 text-white',
+          bgColor:
+            'bg-blue-500 dark:bg-blue-500/[0.25] dark:text-blue-400 text-white',
         };
       default:
         return {};
@@ -281,7 +285,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
         </div>
       ),
       tdClassName:
-        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-2 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -480,7 +484,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
     return (
       <>
         <tr>
-          <td colSpan={9} className="bg-gray-50 dark:bg-black-200">
+          <td colSpan={9} className="bg-gray-50 dark:bg-black-600">
             {telemetry && (
               <Widget
                 src={`${ownerId}/widget/bos-components.components.Shared.Table`}

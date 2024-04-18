@@ -240,7 +240,7 @@ const Header = () => {
     <div className="dark:bg-black-600 soft-shadow">
       {!status && (
         <div className="flex flex-wrap">
-          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
+          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
             {t('outofSync')}
           </div>
         </div>
@@ -328,7 +328,7 @@ const Header = () => {
             </div>
             <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
               <button
-                className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-2 flex items-center justify-center"
+                className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
               >
                 <Image
@@ -540,7 +540,7 @@ const Header = () => {
                           <li className="px-4 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap"
+                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
                             >
                               Sign Out
                             </button>
@@ -583,20 +583,10 @@ const Header = () => {
 
                       {user && (
                         <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
-                          {/* {profile.map((menu) => (
-                            <li key={menu.id}>
-                              <ActiveLink href={menu.link}>
-                                <a className="block w-full hover:hover:text-green-500  py-2 px-4">
-                                  {menu.title}
-                                </a>
-                              </ActiveLink>
-                            </li>
-                          ))} */}
-                          {/* <li className="border-t my-3"></li> */}
                           <li className="px-8 pb-1">
                             <button
                               onClick={onSignOut}
-                              className="bg-green-200/70 dark:bg-green-250 dark:text-black rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
+                              className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                             >
                               Sign Out
                             </button>
@@ -645,7 +635,7 @@ const Header = () => {
                         </a>
                       )}
                     >
-                      <ul className="border-l-2 border-green-500 md:hidden ml-4">
+                      <ul className="border-l-2 border-green-500 dark:text-green-250 md:hidden ml-4">
                         <li>
                           <a
                             className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
@@ -683,9 +673,9 @@ const Header = () => {
                       <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                         <li>
                           <a
-                            className={`block w-full hover:text-green-500 hover:no-underline py-2 px-4 text-gray-500 ${
+                            className={`block w-full hover:text-green-500 dark:text-green-250 hover:no-underline py-2 px-4 text-gray-500 ${
                               networkId === 'mainnet'
-                                ? 'text-green-500'
+                                ? 'text-green-500 dark:text-green-250'
                                 : 'text-gray-500 dark:text-neargray-10'
                             }`}
                             href={env('NEXT_PUBLIC_MAINNET_URL')}
@@ -697,7 +687,7 @@ const Header = () => {
                           <a
                             className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline ${
                               networkId === 'testnet'
-                                ? 'text-green-500'
+                                ? 'text-green-500 dark:text-green-250'
                                 : 'text-gray-500 dark:text-neargray-10'
                             }`}
                             href={env('NEXT_PUBLIC_TESTNET_URL')}

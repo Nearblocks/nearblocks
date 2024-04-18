@@ -176,7 +176,7 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
               </tbody>
             </table>
           </div>
-          <div className="bg-white px-2 py-3 flex items-center justify-between border-t md:px-4">
+          <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between dark:border-black-200 border-t md:px-4">
             <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div></div>
               <Skeleton className="w-64 h-4" />

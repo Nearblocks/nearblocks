@@ -396,7 +396,7 @@ export default function ({ network, t, ownerId, theme }: Props) {
                               align="start"
                               side="bottom"
                             >
-                              Transaction per Seconds
+                              Transactions per second
                             </Tooltip.Content>
                           </Tooltip.Root>
                         </Tooltip.Provider>

@@ -82,7 +82,7 @@ export default function (props: Props) {
   return (
     <>
       {props.isExpanded ? (
-        <div className={`bg-gray-50 dark:bg-black-200 overflow-x-auto`}>
+        <div className={`bg-gray-50 dark:bg-black-600 overflow-x-auto`}>
           <table
             className={
               'min-w-full divide-y dark:divide-black-200 dark:border-black border-separate '
@@ -108,10 +108,7 @@ export default function (props: Props) {
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
-                    <tr
-                      key={`expandRow-${rowIndex}`}
-                      className=" hover:bg-blue-900/5 h-[57px]"
-                    >
+                    <tr key={`expandRow-${rowIndex}`} className="h-[57px]">
                       {props.columns.map((column: column, colIndex: number) => (
                         <td
                           key={`expandCol-${colIndex}`}

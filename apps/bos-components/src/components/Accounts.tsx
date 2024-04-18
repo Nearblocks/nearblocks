@@ -732,7 +732,7 @@ export default function (props: Props) {
                       href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a className="text-green-500 dark:text-green-250 hover:no-underline">
                         {shortenAddress(
                           deploymentData.receipt_predecessor_account_id ?? '',
                         )}
@@ -743,7 +743,7 @@ export default function (props: Props) {
                       href={`/txns/${deploymentData.transaction_hash}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a className="text-green-500 dark:text-green-250 hover:no-underline">
                         {shortenAddress(deploymentData.transaction_hash ?? '')}
                       </a>
                     </Link>
@@ -767,7 +767,7 @@ export default function (props: Props) {
                         href={`/token/${id}`}
                         className="hover:no-underline"
                       >
-                        <a className="flex text-green-500 hover:no-underline">
+                        <a className="flex text-green-500 dark:text-green-250 hover:no-underline">
                           <span className="inline-block truncate max-w-[110px] mr-1">
                             {tokenData.name}
                           </span>
