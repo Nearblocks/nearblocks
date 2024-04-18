@@ -37,6 +37,7 @@ const routes = (app: Router) => {
    * GET /v1/fts/txns
    * @summary Get token txns by pagination
    * @tags FTs
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @return 200 - success response
@@ -65,6 +66,7 @@ const routes = (app: Router) => {
    * @summary Get token txns by pagination
    * @tags FTs
    * @param {string} contract.path.required - contract id
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @return 200 - success response

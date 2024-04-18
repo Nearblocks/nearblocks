@@ -25,8 +25,8 @@ const txns = catchAsync(
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
     const event = req.validator.data.event;
+    const cursor = req.validator.data.cursor?.replace('n', '');
     const page = req.validator.data.page;
-    const cursor = req.validator.data.cursor;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
     const afterDate = req.validator.data.after_date;
@@ -93,7 +93,9 @@ const txns = catchAsync(
             affected_account_id = ${account}
             AND ${involved ? sql`involved_account_id = ${involved}` : true}
             AND ${event ? sql`cause = ${event}` : true}
-            AND ${cursor ? sql`event_index < ${cursor.replace('n', '')}` : true}
+            AND ${cursor
+        ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+        : true}
             AND ${afterTimestamp
         ? sql`block_timestamp >= ${afterTimestamp}`
         : true}
