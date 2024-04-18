@@ -11,6 +11,10 @@ if (config.redisUrl) {
     host: url.hostname,
     port: +url.port,
   };
+
+  if (url.password) {
+    options.password = url.password;
+  }
 }
 
 if (config.redisSentinelName) {
