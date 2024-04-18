@@ -96,7 +96,7 @@ const FormContact = () => {
         />
         <button
           type="submit"
-          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-black  hover:bg-green-400 rounded w-fit"
+          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
         >
           {loading ? <LoadingCircular /> : t('Send Message')}
         </button>

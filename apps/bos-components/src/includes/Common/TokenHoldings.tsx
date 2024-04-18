@@ -62,7 +62,7 @@ const TokenHoldings = (props: Props) => {
       <Select.Trigger className="w-full h-8 text-sm px-2 rounded border dark:border-black-200 outline-none flex items-center justify-between cursor-pointer">
         <span>
           {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
-          <span className="bg-green-500 text-xs text-white rounded ml-2 px-1 p-0.5">
+          <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
         </span>

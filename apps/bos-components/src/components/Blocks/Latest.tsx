@@ -157,13 +157,15 @@ export default function ({ network, t, ownerId }: Props) {
                           </div>
                         </div>
                       </div>
-                      <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 dark:text-white text-sm whitespace-nowrap truncate">
-                        {t ? t('home:blockMiner') : 'Author'}{' '}
+                      <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1  text-sm whitespace-nowrap dark:text-green-250 truncate">
+                        <span className="dark:text-white">
+                          {t ? t('home:blockMiner') : 'Author'}
+                        </span>
                         <Link
                           href={`/address/${block?.author_account_id}`}
                           className="hover:no-underline"
                         >
-                          <a className="text-green-500  dark:text-green-250 font-medium hover:no-underline">
+                          <a className="text-green-500  dark:text-green-250 font-medium hover:no-underline ">
                             {block?.author_account_id}
                           </a>
                         </Link>
@@ -224,7 +226,7 @@ export default function ({ network, t, ownerId }: Props) {
       {blocks && blocks?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Link href="/blocks">
-            <a className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
+            <a className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white dark:text-sm text-xs py-3 rounded w-full focus:outline-none hover:no-underline">
               View all blocks
             </a>
           </Link>

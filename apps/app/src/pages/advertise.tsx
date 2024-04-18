@@ -35,7 +35,7 @@ const AdvertisePage = () => {
         />
         <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
-      <div className="herobg flex flex-col items-start p-4.5 lg:!py-16 lg:!px-14">
+      <div className="container mx-auto herobg flex flex-col items-start p-4.5 lg:!py-16 px-6">
         <p className="text-black text-sm lg:!text-base font-semibold lg:!mt-3 mt-5 dark:text-white">
           {t('Advertise on nearblocks.io')}
         </p>

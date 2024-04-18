@@ -105,10 +105,10 @@ const Address = () => {
           ) : (
             <div className="flex md:flex-wrap">
               <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10">
-                Near Account: @
+                Near Account:&nbsp;
                 {id && (
-                  <span className="font-semibold text-green-500 dark:text-green-250">
-                    {id}
+                  <span className="text-green-500 dark:text-green-250">
+                    @<span className="font-semibold">{id}</span>
                   </span>
                 )}
                 {

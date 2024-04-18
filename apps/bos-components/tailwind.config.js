@@ -39,10 +39,12 @@ module.exports = {
         neargreen: {
           DEFAULT: '#35C154',
           200: '#338E7B',
+          300: '#00a186',
         },
         nearblue: {
           DEFAULT: '#F1F9FF',
           600: '#4b5563',
+          650: '#adb5bd',
           700: '#9CA3AF',
         },
         neargray: {
@@ -51,6 +53,7 @@ module.exports = {
           25: '#FAFAFA',
           50: '#8E8E8E',
           600: '#676767',
+          650: '#bbbbbb',
           700: '#E9ECEF',
           800: '#DEE2E6',
         },
@@ -78,6 +81,9 @@ module.exports = {
           700: '#003536',
           800: '#002b2c',
           900: '#002122',
+        },
+        nearyellow: {
+          400: '#cc9a06',
         },
         brightgreen: {
           DEFAULT: '#36C054',

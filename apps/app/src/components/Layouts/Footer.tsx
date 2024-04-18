@@ -18,12 +18,12 @@ const Footer = () => {
                   <Image
                     src={
                       theme === 'dark'
-                        ? '/images/nearblocksblack_dark.svg'
-                        : '/images/nearblocksblack.svg'
+                        ? '/images/nb-black-on-bos_dark.svg'
+                        : '/images/nb-black-on-bos.svg'
                     }
-                    className="block py-3 mr-2"
-                    width="234"
-                    height="54"
+                    className="block"
+                    width="174"
+                    height="40"
                     alt="NearBlocks"
                     layout="fixed"
                   />
@@ -139,23 +139,6 @@ const Footer = () => {
                   <li>
                     <Link href="/about" legacyBehavior>
                       <a>{t('footer.links.about')}</a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="https://careers.near.org/companies/invoker-labs"
-                      legacyBehavior
-                    >
-                      <a
-                        className="flex"
-                        target="_blank"
-                        rel="noreferrer nofollow noopener"
-                      >
-                        Careers
-                        <span>
-                          <Arrow className="-rotate-45 -mt-0 h-4 w-4" />
-                        </span>
-                      </a>
                     </Link>
                   </li>
                   <li>
