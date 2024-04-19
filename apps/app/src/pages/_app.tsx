@@ -1,21 +1,21 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
-import { ThemeProvider } from 'next-themes';
 import '../../public/common.css';
 
 import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 import type { NextPageWithLayout } from '@/utils/types';
 import Script from 'next/script';
 import { env } from 'next-runtime-env';
+import { Providers } from '@/components/Providers';
+
 const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
   ssr: false,
 });
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
+  Component: NextPageWithLayout & { theme: string };
 };
-
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   useBosLoaderInitializer();
 
@@ -30,9 +30,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       />
       <VmInitializer />
 
-      <ThemeProvider attribute="class">
-        {getLayout(<Component {...pageProps} />)}
-      </ThemeProvider>
+      <Providers>{getLayout(<Component {...pageProps} />)}</Providers>
     </>
   );
 }
