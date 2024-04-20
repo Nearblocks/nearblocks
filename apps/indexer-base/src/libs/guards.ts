@@ -44,3 +44,8 @@ export const isDeleteAccountAction = (
   action: types.Action,
 ): action is types.DeleteAccountAction =>
   (action as types.DeleteAccountAction).DeleteAccount !== undefined;
+
+export const isDelegateAction = (
+  action: types.Action,
+): action is types.DelegateAction =>
+  (action as types.DelegateAction).Delegate !== undefined;

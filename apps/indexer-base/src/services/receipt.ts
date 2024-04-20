@@ -10,6 +10,7 @@ import {
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
@@ -68,7 +69,38 @@ const storeChunkReceipts = async (
         );
       });
 
-      receipt.receipt.Action.actions.forEach((action, actionIndex) => {
+      let actionIndex = 0;
+      receipt.receipt.Action.actions.forEach((action) => {
+        if (isDelegateAction(action)) {
+          receiptActionsData.push(
+            getActionReceiptActionData(
+              blockTimestamp,
+              receiptOrDataId,
+              actionIndex,
+              action,
+              receipt.predecessorId,
+              receipt.receiverId,
+            ),
+          );
+          actionIndex += 1;
+
+          action.Delegate.delegateAction.actions.forEach((action) => {
+            receiptActionsData.push(
+              getActionReceiptActionData(
+                blockTimestamp,
+                receiptOrDataId,
+                actionIndex,
+                action,
+                receipt.predecessorId,
+                receipt.receiverId,
+              ),
+            );
+            actionIndex += 1;
+          });
+
+          return;
+        }
+
         receiptActionsData.push(
           getActionReceiptActionData(
             blockTimestamp,
@@ -79,6 +111,7 @@ const storeChunkReceipts = async (
             receipt.receiverId,
           ),
         );
+        actionIndex += 1;
       });
     }
 
