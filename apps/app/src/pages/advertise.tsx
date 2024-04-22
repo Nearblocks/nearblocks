@@ -5,9 +5,12 @@ import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const AdvertisePage = () => {
   const { t } = useTranslation();
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Advertise&brand=near`;
 
   return (
     <Fragment>
@@ -25,14 +28,8 @@ const AdvertisePage = () => {
           property="twitter:description"
           content={t('home:metaDescription')}
         />
-        <meta
-          property="og:image"
-          content="/thumbnail/thumbnail_advertise.png"
-        />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_advertise.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
       <div className="container mx-auto herobg flex flex-col items-start p-4.5 lg:!py-16 px-6">

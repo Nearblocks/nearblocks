@@ -69,7 +69,7 @@ const Token = () => {
   const description = token
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}`;
+  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}&brand=near`;
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);

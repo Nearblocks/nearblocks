@@ -3,9 +3,14 @@ import { Fragment, ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const AboutPage = () => {
   const { t } = useTranslation();
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('about:heading'),
+  )}&brand=near`;
 
   return (
     <Fragment>
@@ -20,11 +25,8 @@ const AboutPage = () => {
           property="twitter:description"
           content={t('home:metaDescription')}
         />
-        <meta property="og:image" content="/thumbnail/thumbnail_about.png" />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_about.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/about`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72 -mb-48"></div>

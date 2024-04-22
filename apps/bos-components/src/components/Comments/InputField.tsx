@@ -127,7 +127,7 @@ window.addEventListener("message", (event) => {
         ) : (
           <textarea
             key="textarea"
-            className="block sm:!mx-4 p-2.5 w-full text-sm text-gray-900 dark:text-neargray-10 bg-white dark:bg-black-600 dark:border-black-200 rounded-lg border border-gray-300  dark:placeholder-gray-400"
+            className="block sm:!mx-4 p-2.5 w-full outline-none text-sm text-gray-900 dark:text-neargray-10 bg-white dark:bg-black-600 dark:border-black-200 rounded-lg border border-gray-300  dark:placeholder-gray-400"
             value={text || ''}
             onInput={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
               onChange(event.target.value)

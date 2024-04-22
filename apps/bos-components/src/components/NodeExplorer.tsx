@@ -685,7 +685,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 src={`${ownerId}/widget/bos-components.components.Shared.Table`}
                 props={{
                   columns: [
-                    {
+                    row?.description?.url && {
                       header: 'Web',
                       key: 'web',
                       cell: (row: ValidatorEpochData) => {
@@ -712,7 +712,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                       thClassName:
                         'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
-                    {
+                    row?.description?.email && {
                       header: 'Email',
                       key: 'email',
                       cell: (row: ValidatorEpochData) => {
@@ -776,7 +776,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                       thClassName:
                         'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
                     },
-                    {
+                    row?.description?.description && {
                       header: 'Description',
                       key: 'description',
                       cell: (row: ValidatorEpochData) => {

@@ -38,6 +38,10 @@ const TxnVolumeChart = () => {
     setHeight({});
   };
 
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:txnVolume.heading'),
+  )}&brand=near`;
+
   return (
     <>
       <Head>
@@ -60,25 +64,9 @@ const TxnVolumeChart = () => {
           property="twitter:description"
           content={t('charts:txnVolume.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:txnVolume.heading',
-          )}
-          `}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:txnVolume.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:txnVolume.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/txn-volume`} />
       </Head>
       <section>

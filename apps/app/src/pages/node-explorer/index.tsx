@@ -6,7 +6,9 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId, appUrl } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const NodeExplorer = () => {
   const router = useRouter();
   const components = useBosComponents();
@@ -48,6 +50,7 @@ const NodeExplorer = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20Validator%20Explorer&brand=near`;
   return (
     <>
       <Head>
@@ -55,6 +58,8 @@ const NodeExplorer = () => {
         <meta name="title" content={title} />
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">

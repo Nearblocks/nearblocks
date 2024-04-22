@@ -36,7 +36,9 @@ const MarketCapChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
-
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:marketCap.heading'),
+  )}&brand=near`;
   return (
     <>
       <Head>
@@ -59,24 +61,9 @@ const MarketCapChart = () => {
           property="twitter:description"
           content={t('charts:marketCap.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/market-cap`} />
       </Head>
       <section>

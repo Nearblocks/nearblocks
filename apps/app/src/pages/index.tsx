@@ -17,6 +17,7 @@ import { env } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const networkUrl =
   network === 'mainnet'
     ? env('NEXT_PUBLIC_TESTNET_URL')
@@ -102,7 +103,7 @@ const HomePage = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, apiUrl]);
-
+  const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
   return (
     <>
       <Head>
@@ -111,14 +112,11 @@ const HomePage = () => {
         </title>
         <meta name="title" content={t('home:metaTitle')} />
         <meta name="description" content={t('home:metaDescription')} />
-        <meta property="og:image" content="/thumbnail/thumbnail_homepage.png" />
+        <meta property="og:image" content={thumbnail} />
         <meta property="og:title" content={t('home:metaTitle')} />
         <meta property="og:description" content={t('home:metaDescription')} />
         <meta property="twitter:title" content={t('home:metaTitle')} />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_homepage.png"
-        />
+        <meta property="twitter:image" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('home:metaDescription')}
