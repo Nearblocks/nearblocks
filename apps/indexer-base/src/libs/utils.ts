@@ -15,6 +15,7 @@ import {
 import {
   isAccessKeyFunctionCallPermission,
   isAddKeyAction,
+  isDelegateAction,
   isDeleteAccountAction,
   isDeleteKeyAction,
   isDeployContractAction,
@@ -55,7 +56,10 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
   let kind = ActionKind.UNKNOWN;
   let args = {};
 
-  if (action === 'CreateAccount') {
+  if (
+    action === 'CreateAccount' ||
+    (action && Object.keys(action)?.[0] === 'CreateAccount')
+  ) {
     kind = ActionKind.CREATE_ACCOUNT;
   }
 
@@ -142,6 +146,19 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
     args = {
       beneficiary_id: action.DeleteAccount.beneficiaryId,
     };
+  }
+
+  if (isDelegateAction(action)) {
+    const delegateAction = action.Delegate.delegateAction;
+    args = {
+      max_block_height: delegateAction.maxBlockHeight,
+      nonce: delegateAction.nonce,
+      public_key: delegateAction.publicKey,
+      receiver_id: delegateAction.receiverId,
+      sender_id: delegateAction.senderId,
+      signature: action.signature,
+    };
+    kind = ActionKind.DELEGATE_ACTION;
   }
 
   return {
