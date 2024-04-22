@@ -53,7 +53,7 @@ const Address = () => {
   const signedIn = useAuthStore((store) => store.signedIn);
   const account = useAuthStore((store) => store.account);
   const logOut = useAuthStore((store) => store.logOut);
-
+  const thumbnail = `${ogUrl}/thumbnail/account?address=${id}&network=${network}&brand=near`;
   return (
     <>
       <Head>
@@ -82,18 +82,9 @@ const Address = () => {
           property="twitter:description"
           content={t('address:metaDescription', { address: id })}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/address/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">

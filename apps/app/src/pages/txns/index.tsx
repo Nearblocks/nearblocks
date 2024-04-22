@@ -10,6 +10,7 @@ import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const TransactionList = () => {
   const { t } = useTranslation();
@@ -99,6 +100,7 @@ const TransactionList = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20Protocol%20Transactions&brand=near`;
   return (
     <>
       <Head>
@@ -114,6 +116,8 @@ const TransactionList = () => {
           property="twitter:description"
           content={t('txns:metaDescription')}
         />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/txns`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">

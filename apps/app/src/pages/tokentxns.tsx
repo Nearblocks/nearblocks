@@ -10,6 +10,7 @@ import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const ToxenTxns = () => {
   const router = useRouter();
@@ -47,6 +48,7 @@ const ToxenTxns = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20NEP-141%20Token%20Transfers&brand=near`;
 
   return (
     <>
@@ -68,14 +70,8 @@ const ToxenTxns = () => {
           property="twitter:description"
           content={t('token:fts.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content="/thumbnail/thumbnail_tokentxns.png"
-        />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_tokentxns.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/tokentxns`} />
       </Head>
       <section>

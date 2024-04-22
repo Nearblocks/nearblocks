@@ -8,13 +8,16 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
 import { useTheme } from 'next-themes';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const Charts = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const { theme } = useTheme();
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Charts%20%26%20Statistics&brand=near`;
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -42,13 +45,10 @@ const Charts = () => {
         <meta name="title" content={t('charts:metaTitle')} />
         <meta name="description" content={t('charts:metaDescription')} />
         <meta property="og:title" content={t('charts:metaTitle')} />
-        <meta property="og:image" content="/thumbnail/charts_statistics.png" />
+        <meta property="og:image" content={thumbnail} />
         <meta property="og:description" content={t('charts:metaDescription')} />
         <meta property="twitter:title" content={t('charts:metaTitle')} />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/charts_statistics.png"
-        />
+        <meta property="twitter:image" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('charts:metaDescription')}

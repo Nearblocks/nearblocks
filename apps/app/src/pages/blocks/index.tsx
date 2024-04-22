@@ -9,6 +9,7 @@ import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const Blocks = () => {
@@ -48,6 +49,8 @@ const Blocks = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20Protocol%20Blocks&brand=near`;
+
   return (
     <>
       <Head>
@@ -59,13 +62,10 @@ const Blocks = () => {
         <meta name="title" content={t('blocks:metaTitle')} />
         <meta name="description" content={t('blocks:metaDescription')} />
         <meta property="og:title" content={t('blocks:metaTitle')} />
-        <meta property="og:image" content="/thumbnail/thumbnail_blocks.png" />
         <meta property="og:description" content={t('blocks:metaDescription')} />
         <meta property="twitter:title" content={t('blocks:metaTitle')} />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_blocks.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('blocks:metaDescription')}

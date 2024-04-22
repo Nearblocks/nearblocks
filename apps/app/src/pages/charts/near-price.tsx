@@ -36,6 +36,7 @@ const NearPriceChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Daily%20Price%20(USD)%20Chart&brand=near`;
 
   return (
     <>
@@ -60,25 +61,9 @@ const NearPriceChart = () => {
           content={t('charts:nearPrice.metaDescription')}
         />
 
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearPrice.heading',
-          )}
-          `}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearPrice.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearPrice.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/near-price`} />
       </Head>
       <section>
