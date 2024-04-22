@@ -26,7 +26,7 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
 
   return (
     <div className="flex flex-wrap items-center break-all leading-7">
-      <FaRight className="inline-flex text-gray-400 text-xs" />
+      <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">Increase Collateral </span>
       {
         <Widget
@@ -41,7 +41,7 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
       <span className="font-bold text-gray px-1">
         From{' '}
         <a href={`/address/${log.account_id}`} className="hover:no-underline">
-          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
             {shortenAddress(log.account_id)}
           </a>
         </a>
@@ -52,7 +52,7 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
           href="/address/contract.main.burrow.near"
           className="hover:no-underline"
         >
-          <a className="text-green-500 font-normal hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal hover:no-underline">
             Burrow
           </a>
         </a>

@@ -156,7 +156,7 @@ export default function (props: Props) {
                   hash === 'output' ? 'ml-7' : 'ml-2.5'
                 } font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                   pageHash === hash
-                    ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white dark:text-black'
+                    ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
                 }`}
                 value={hash}
@@ -165,17 +165,26 @@ export default function (props: Props) {
               </Tabs.Trigger>
             ))}
         </Tabs.List>
-        <Tabs.Content value={hashes[0]} className={'w-fit'}>
+        <Tabs.Content value={hashes[0]} className={'w-full'}>
           <div className="flex flex-col my-4 mx-7">
             <div className="flex justify-between">
-              <div className="flex flex-col w-fit">
+              <div className="flex flex-col w-full md:w-3/4">
                 <div className="">
                   <h2 className="text-sm font-medium ">Logs</h2>
-                  <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 overflow-x-auto ">
-                    {receipt?.outcome?.logs?.length === 0 ? (
-                      <span className="whitespace-nowrap">No logs</span>
+                  <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  my-3 overflow-x-auto ">
+                    {receipt?.outcome?.logs?.length > 0 ? (
+                      <div className="w-full  break-words  space-y-4">
+                        <textarea
+                          readOnly
+                          rows={4}
+                          defaultValue={receipt?.outcome?.logs.join('\n')}
+                          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5  resize-y"
+                        ></textarea>
+                      </div>
                     ) : (
-                      <span>{receipt?.outcome?.logs.join('\n')}</span>
+                      <div className="w-full  break-words p-5 font-medium space-y-4">
+                        No Logs
+                      </div>
                     )}
                   </div>
                 </div>

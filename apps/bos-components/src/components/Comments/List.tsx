@@ -189,7 +189,7 @@ export default function (props: Props) {
       {renderedItems.length > 0 ? (
         <>
           {renderedItems}
-          <div className="inline-flex justify-center p-2 text-green-500 rounded-full cursor-pointer">
+          <div className="inline-flex justify-center p-2 text-green-500 dark:text-green-250 rounded-full cursor-pointer">
             {fetchMore}
           </div>
         </>

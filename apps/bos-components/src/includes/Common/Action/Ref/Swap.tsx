@@ -55,7 +55,7 @@ const Swap = (props: EventPropsInfo) => {
       <span className="font-bold text-gray px-1">
         On{' '}
         <a href="/address/v2.ref-finance.near" className="hover:no-underline">
-          <a className="text-green-500 font-normal hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal hover:no-underline">
             Ref Finance
           </a>
         </a>

@@ -14,7 +14,7 @@ const Earn = (props: Props) => {
       target="_blank"
       rel="noopener noreferrer nofollow"
     >
-      <span className="flex items-center text-green-500 text-sm mb-2">
+      <span className="flex items-center text-green-500 dark:text-green-250 text-sm mb-2">
         <img
           alt="Stader Labs"
           width={15}

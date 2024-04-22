@@ -6,6 +6,7 @@
  */
 
 import { ReceiptKindInfo } from '@/includes/types';
+import { hexy } from '@/includes/hexy';
 
 const backgroundColorClasses: Record<string, string> = {
   transfer: 'bg-green-50 dark:bg-green-200',
@@ -25,6 +26,7 @@ export default function (props: ReceiptKindInfo) {
   const { yoctoToNear } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const args = action.args.args;
+
   const decodedArgs = args ? Buffer.from(args, 'base64') : null;
 
   let prettyArgs: object | string;
@@ -42,6 +44,25 @@ export default function (props: ReceiptKindInfo) {
     prettyArgs = Array.from(decodedArgs || [])
       .map((byte: any) => byte.toString(16).padStart(2, '0'))
       .join('');
+  }
+
+  function displayArgs(args: any) {
+    if (!args || typeof args === 'undefined') return 'The arguments are empty';
+
+    let pretty = '';
+    const decoded = Buffer.from(args, 'base64');
+    try {
+      const parsed = JSON.parse(decoded.toString());
+      if (parsed) {
+        pretty = JSON.stringify(parsed, null, 2);
+      } else {
+        pretty = hexy(decoded, { format: 'twos' });
+      }
+    } catch {
+      pretty = hexy(decoded, { format: 'twos' });
+    }
+
+    return pretty;
   }
 
   return (
@@ -83,7 +104,8 @@ export default function (props: ReceiptKindInfo) {
             {prettyArgs && typeof prettyArgs === 'object' ? (
               <textarea
                 readOnly
-                defaultValue={JSON.stringify(prettyArgs)}
+                rows={4}
+                defaultValue={displayArgs(args?.args_base64 || args)}
                 className="block appearance-none outline-none w-full max-md:w-fit border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-5 my-3 resize-y"
               ></textarea>
             ) : (
