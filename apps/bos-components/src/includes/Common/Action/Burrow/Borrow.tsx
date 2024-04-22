@@ -36,7 +36,8 @@ const Borrow = (props: DepositPropsInfo) => {
           props={{
             contract: log.token_id,
             amount: log.amount,
-            networK: props.network,
+            ownerId: props.ownerId,
+            network: props.network,
           }}
         />
       }
