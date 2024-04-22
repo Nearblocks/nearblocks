@@ -28,14 +28,15 @@ const DescreaseCollateral = (props: DepositPropsInfo) => {
   return (
     <div className="flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
-      <span className="font-bold px-1">Descrease Collateral </span>
+      <span className="font-bold px-1">Decrease Collateral </span>
       {
         <Widget
           src={`${props.ownerId}/widget/bos-components.components.Shared.TokenInfo`}
           props={{
             contract: log.token_id,
             amount: log.amount,
-            networK: props.network,
+            ownerId: props.ownerId,
+            network: props.network,
           }}
         />
       }

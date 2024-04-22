@@ -34,6 +34,7 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
           props={{
             contract: log.token_id,
             amount: log.amount,
+            ownerId: props.ownerId,
             network: props.network,
           }}
         />
