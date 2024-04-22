@@ -23,13 +23,17 @@ if (config.redisSentinelName) {
   if (urls.length) {
     options = {
       name: config.redisSentinelName,
-      password: config.redisPassword,
       sentinels: urls.map((u) => {
         const url = new URL(u);
 
         return { host: url.hostname, port: +url.port };
       }),
     };
+
+    if (config.redisPassword) {
+      options.password = config.redisPassword;
+      options.sentinelPassword = config.redisPassword;
+    }
   }
 }
 
