@@ -208,6 +208,49 @@ const nftTxnsExport = z.object({
   }),
 });
 
+const stakeTxns = z.object({
+  account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  page: z.number().positive().max(200).optional().default(1),
+  per_page: z.number().positive().max(25).optional().default(25),
+  to: z.string().optional(),
+});
+
+const stakeTxnsCount = z.object({
+  account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
 export type Item = z.infer<typeof item>;
 export type Contract = z.infer<typeof contract>;
 export type Deployments = z.infer<typeof deployments>;
@@ -226,6 +269,8 @@ export type FtTxnsExport = z.infer<typeof ftTxnsExport>;
 export type NftTxns = z.infer<typeof nftTxns>;
 export type NftTxnsCount = z.infer<typeof nftTxnsCount>;
 export type NftTxnsExport = z.infer<typeof nftTxnsExport>;
+export type StakeTxns = z.infer<typeof stakeTxns>;
+export type StakeTxnsCount = z.infer<typeof stakeTxnsCount>;
 
 export default {
   action,
@@ -242,6 +287,8 @@ export default {
   nftTxnsCount,
   nftTxnsExport,
   parse,
+  stakeTxns,
+  stakeTxnsCount,
   tokens,
   txns,
   txnsCount,

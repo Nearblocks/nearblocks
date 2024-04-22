@@ -88,5 +88,6 @@ export type ValidationError = {
 export type RawQueryParams = {
   action?: string;
   method?: string;
+  methods?: string[];
   select: string;
 };

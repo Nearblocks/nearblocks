@@ -8,6 +8,7 @@ import ft from '#services/account/ft';
 import account from '#services/account/index';
 import key from '#services/account/key';
 import nft from '#services/account/nft';
+import stake from '#services/account/stake';
 import txn from '#services/account/txn';
 
 const route = Router();
@@ -215,6 +216,39 @@ const routes = (app: Router) => {
     '/:account/nft-txns/count',
     validator(schema.nftTxnsCount),
     nft.txnsCount,
+  );
+
+  /**
+   * GET /v1/account/{account}/stake-txns
+   * @summary Get account stake txns by pagination
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:account/stake-txns', validator(schema.stakeTxns), stake.txns);
+
+  /**
+   * GET /v1/account/{account}/stake-txns/count
+   * @summary Get account stake txns count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/stake-txns/count',
+    validator(schema.stakeTxnsCount),
+    stake.txnsCount,
   );
 };
 
