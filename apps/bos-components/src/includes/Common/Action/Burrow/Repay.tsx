@@ -36,6 +36,7 @@ const Repay = (props: DepositPropsInfo) => {
             amount: log.amount,
             ownerId: props.ownerId,
             network: props.network,
+            decimals: 18,
           }}
         />
       }
