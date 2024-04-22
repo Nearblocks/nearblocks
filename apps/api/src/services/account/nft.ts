@@ -56,6 +56,7 @@ const txns = catchAsync(
         txn.block_timestamp,
         txn.block,
         txn.outcomes,
+        txn.outcomes_agg,
         (
           SELECT
             JSON_BUILD_OBJECT(
@@ -151,7 +152,19 @@ const txns = catchAsync(
                 execution_outcomes
               WHERE
                 execution_outcomes.receipt_id = transactions.converted_into_receipt_id
-            ) AS outcomes
+            ) AS outcomes,
+            (
+              SELECT
+                JSON_BUILD_OBJECT(
+                  'transaction_fee',
+                  COALESCE(receipt_conversion_tokens_burnt, 0) + COALESCE(SUM(tokens_burnt), 0)
+                )
+              FROM
+                execution_outcomes
+                JOIN receipts ON receipts.receipt_id = execution_outcomes.receipt_id
+              WHERE
+                receipts.originated_from_transaction_hash = transactions.transaction_hash
+            ) AS outcomes_agg
           FROM
             transactions
             JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
