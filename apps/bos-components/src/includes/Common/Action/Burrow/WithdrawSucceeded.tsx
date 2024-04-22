@@ -41,7 +41,7 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
       <span className="font-bold text-gray px-1">
         To{' '}
         <a href={`/address/${log.account_id}`} className="hover:no-underline">
-          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
             {shortenAddress(log.account_id)}
           </a>
         </a>

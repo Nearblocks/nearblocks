@@ -34,7 +34,7 @@ const Store = (props: Props) => {
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
-            <span className="flex items-center text-green-500 text-sm mb-2">
+            <span className="flex items-center text-green-500 dark:text-green-250 text-sm mb-2">
               <img
                 alt="1inch - #1 DeFi aggregator"
                 width={20}
@@ -45,7 +45,9 @@ const Store = (props: Props) => {
               <h3 className="ml-2"> {sponsore.title}</h3>
             </span>
           </a>
-          <p className="text-xs text-gray-500">{sponsore.description}</p>
+          <p className="text-xs text-gray-500 dark:text-neargray-10">
+            {sponsore.description}
+          </p>
         </div>
       ))}
     </div>
