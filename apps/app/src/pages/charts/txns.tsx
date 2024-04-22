@@ -37,6 +37,10 @@ const TxnsChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:txns.heading'),
+  )}&brand=near`;
+
   return (
     <>
       <Head>
@@ -53,19 +57,9 @@ const TxnsChart = () => {
           property="twitter:description"
           content={t('charts:txns.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t('charts:txns.heading')}
-          `}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t('charts:txns.heading')}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t('charts:txns.heading')}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/txns`} />
       </Head>
       <section>

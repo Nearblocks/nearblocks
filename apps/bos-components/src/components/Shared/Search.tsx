@@ -35,11 +35,10 @@ export default function SearchBar({
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { debounce, getConfig, shortenAddress } = VM.require(
+  const { getConfig, shortenAddress } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
-  const [query, setQuery] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
@@ -59,13 +58,7 @@ export default function SearchBar({
   const hideSearchResults = () => {
     setIsResultsVisible(false);
   };
-  // Debounced keyword update
-  const debouncedSetKeyword = useMemo(
-    () => debounce && debounce(500, (value: string) => setKeyword(value)),
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
   const SearchToast = () => {
     return (
       <div className="flex items-center">
@@ -111,14 +104,13 @@ export default function SearchBar({
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
-    setQuery(newNextValue);
-    debouncedSetKeyword && debouncedSetKeyword(newNextValue);
+    setKeyword(newNextValue);
     showSearchResults();
   };
 
   const onSubmit = () => {
-    if (filter && query && config.backendUrl) {
-      search(query, filter, true, config.backendUrl).then((data: any) => {
+    if (filter && keyword && config.backendUrl) {
+      search(keyword, filter, true, config.backendUrl).then((data: any) => {
         hideSearchResults();
         const redirectPath = redirect(data);
         if (redirectPath) {
@@ -149,7 +141,6 @@ export default function SearchBar({
   // Handle filter change
   const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) =>
     setFilter(event.target.value);
-
   return (
     <>
       {showToast && <ToastMessage content={<SearchToast />} />}

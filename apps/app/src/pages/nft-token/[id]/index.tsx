@@ -57,7 +57,7 @@ const NFToken = () => {
   const description = token
     ? `All you need to know about the ${token.name} NFT Collection : Statistics, total supply, number of holders, latest transactions & meta-data.`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}`;
+  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}&brand=near`;
 
   useEffect(() => {
     updateOuterDivHeight();

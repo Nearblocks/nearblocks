@@ -32,6 +32,9 @@ module.exports = {
     'rgx:^/nft-tokentxns': ['token', 'txns'],
     'rgx:^/nft-tokens': ['token', 'txns'],
     'rgx:^/kb': ['kb'],
+    'rgx:^/about': ['about'],
+    'rgx:^/terms-and-conditions': ['terms'],
+    'rgx:^/contact': ['contact'],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`nearblock-translations/${lang}/${ns}.json`).then((m) => m.default),

@@ -11,7 +11,7 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
-
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const TopNFTTokens = () => {
   const router = useRouter();
   const components = useBosComponents();
@@ -48,6 +48,8 @@ const TopNFTTokens = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20NEP-171%20Tokens&brand=near`;
+
   return (
     <>
       <Head>
@@ -80,14 +82,8 @@ const TopNFTTokens = () => {
           property="twitter:description"
           content="The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks"
         />
-        <meta
-          property="og:image"
-          content="/thumbnail/thumbnail_nft_tokens.png"
-        />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_nft_tokens.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-tokens`} />
       </Head>
       <section>

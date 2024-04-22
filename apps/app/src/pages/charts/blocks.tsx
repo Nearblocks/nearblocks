@@ -38,7 +38,9 @@ const BlocksChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
-
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:blocks.heading'),
+  )}&brand=near`;
   return (
     <>
       <Head>
@@ -55,24 +57,9 @@ const BlocksChart = () => {
           property="twitter:description"
           content={t('charts:blocks.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:blocks.heading',
-          )}`}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:blocks.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:blocks.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/blocks`} />
       </Head>
       <section>

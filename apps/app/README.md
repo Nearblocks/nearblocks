@@ -39,7 +39,7 @@ Configure the nearblocks Gateway by modifying the .env file. Customize settings 
 `NEXT_PUBLIC_NETWORK_ID=mainnet`
 `NEXT_PUBLIC_ACCOUNT_ID=nearblocksonbos.near`
 `NEXT_PUBLIC_BOS_NETWORK=mainnet`
-`NEXT_PUBLIC_OG_URL=https://meta.nearblocks.io/api`
+`NEXT_PUBLIC_OG_URL=https://meta.exploreblocks.io/api`
 `NEXT_PUBLIC_MAINNET_URL=https://nearblocks.io`
 `NEXT_PUBLIC_TESTNET_URL=https://testnet.nearblocks.io`
 `BREVO_URL=https://api.brevo.com/v3/smtp/email`

@@ -39,6 +39,10 @@ const NearSupplyChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:nearSupply.heading'),
+  )}&brand=near`;
+
   return (
     <>
       <Head>
@@ -66,25 +70,9 @@ const NearSupplyChart = () => {
           content={t('charts:nearSupply.metaDescription')}
         />
 
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearSupply.heading',
-          )}
-        `}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearSupply.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/chart?title=${t(
-            'charts:nearSupply.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/near-supply`} />
       </Head>
       <section>
