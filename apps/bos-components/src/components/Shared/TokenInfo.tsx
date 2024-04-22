@@ -71,7 +71,7 @@ export default function (props: TokenInfoProps) {
     <>
       <span className="font-normal px-1">
         {amount
-          ? localFormat(tokenAmount(amount, meta?.decimals || decimals, true))
+          ? localFormat(tokenAmount(amount, decimals || meta?.decimals, true))
           : amount ?? ''}
       </span>
       <span className="flex items-center">
