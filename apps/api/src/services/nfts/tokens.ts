@@ -97,6 +97,7 @@ const item = catchAsync(
         tm.copies,
         tm.extra,
         tm.reference,
+        tm.reference_hash,
         JSON_BUILD_OBJECT(
           'contract',
           meta.contract,
