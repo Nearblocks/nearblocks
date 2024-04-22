@@ -63,6 +63,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
       tr.included_in_block_hash,
       tr.block_timestamp,
       tr.block,
+      tr.receipt_conversion_tokens_burnt,
       tr.actions,
       tr.actions_agg,
       tr.outcomes,
@@ -121,6 +122,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           included_in_block_hash,
           block_timestamp,
           index_in_chunk,
+          receipt_conversion_tokens_burnt,
           (
             SELECT
               JSON_BUILD_OBJECT('block_height', block_height)
@@ -136,11 +138,14 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
                   'action',
                   action_receipt_actions.action_kind,
                   'method',
-                  action_receipt_actions.args ->> 'method_name'
+                  action_receipt_actions.args ->> 'method_name',
+                  'fee',
+                  COALESCE(execution_outcomes.tokens_burnt, 0)
                 )
               )
             FROM
               action_receipt_actions
+              JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
             WHERE
               action_receipt_actions.receipt_id = receipts.receipt_id
           ) AS actions,
