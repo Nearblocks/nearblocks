@@ -35,6 +35,8 @@ import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
 import TokenImage from '@/includes/icons/TokenImage';
 import Download from '@/includes/icons/Download';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 export default function (props: Props) {
   const { network, t, id, filters, handleFilter, onFilterClear, ownerId } =
@@ -318,10 +320,10 @@ export default function (props: Props) {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <span
-                    className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                    className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                       row?.affected_account_id === address
-                        ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                        : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                        ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                        : 'text-green-500 dark:text-green-250 border-transparent'
                     }`}
                   >
                     <Link
@@ -437,13 +439,13 @@ export default function (props: Props) {
                   <span>
                     <Link
                       href={`/address/${row.involved_account_id}`}
-                      className="hover:no-underline truncate inline-block"
+                      className="hover:no-underline"
                     >
                       <a
-                        className={`text-green-500 dark:text-green-250 hover:no-underline ${
+                        className={`text-green-500 dark:text-green-250 hover:no-underline p-0.5 px-1 border rounded-md whitespace-nowrap ${
                           row?.involved_account_id === address
-                            ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
-                            : 'text-green-500  dark:text-green-250 p-1'
+                            ? ' bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                            : 'text-green-500 dark:text-green-250 hover:no-underline border-transparent'
                         }`}
                         onMouseOver={(e) =>
                           onHandleMouseOver(e, row?.involved_account_id)
@@ -471,6 +473,8 @@ export default function (props: Props) {
       ),
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600  font-medium dark:text-neargray-10',
+      thClassName:
+        'text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <>Token ID</>,
@@ -501,9 +505,9 @@ export default function (props: Props) {
         </Tooltip.Provider>
       ),
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10  max-w-[110px] inline-block truncate',
+        'px-4 py-3 items-center my-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <>Token</>,
@@ -661,8 +665,11 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              transactions found
+              {Object.keys(txns).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              transactions found`}
             </p>
           </div>
           <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
@@ -689,17 +696,19 @@ export default function (props: Props) {
               </div>
             )}
             <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-              <button className="hover:no-underline ">
-                <Link
-                  href={`/nft-token/exportdata?address=${id}`}
-                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800"
-                >
-                  <p>CSV Export</p>
-                  <span className="ml-2">
-                    <Download />
-                  </span>
-                </Link>
-              </button>
+              {Object.keys(txns).length > 0 && (
+                <button className="hover:no-underline ">
+                  <Link
+                    href={`/nft-token/exportdata?address=${id}`}
+                    className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800"
+                  >
+                    <p>CSV Export</p>
+                    <span className="ml-2">
+                      <Download />
+                    </span>
+                  </Link>
+                </button>
+              )}
             </span>
           </div>
         </div>
@@ -717,7 +726,13 @@ export default function (props: Props) {
             limit: 25,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       }

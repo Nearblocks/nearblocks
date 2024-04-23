@@ -20,6 +20,8 @@ import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 interface Props {
   ownerId: string;
@@ -93,7 +95,11 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           }) => {
             const resp = data?.body?.txns;
             if (data.status === 200) {
-              setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
+              } else if (resp.length === 0) {
+                setTxns({});
+              }
               setIsLoading(false);
             } else {
               handleRateLimit(
@@ -212,10 +218,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -254,10 +260,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md  ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -323,10 +329,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 p-0.5 px-1 border rounded-md whitespace-nowrap ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -365,10 +371,10 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`inline-block align-bottom text-green-500 dark:text-green-250 border rounded-md p-0.5 px-1 whitespace-nowrap ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -521,8 +527,11 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              transactions found
+              {Object.keys(txns).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              transactions found`}
             </p>
           </div>
         </div>
@@ -539,7 +548,13 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage}
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>

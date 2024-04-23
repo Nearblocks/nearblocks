@@ -17,7 +17,9 @@ interface Props {
   token?: Token;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Skeleton from '@/includes/Common/Skeleton';
+import FaInbox from '@/includes/icons/FaInbox';
 import { HoldersPropsInfo, Status, Token } from '@/includes/types';
 
 export default function ({ network, id, token, ownerId }: Props) {
@@ -57,7 +59,6 @@ export default function ({ network, id, token, ownerId }: Props) {
 
   useEffect(() => {
     function fetchNFTData() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}nfts/${id}`)
         .then(
           (data: {
@@ -69,7 +70,6 @@ export default function ({ network, id, token, ownerId }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
-              setIsLoading(false);
             } else {
               handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
@@ -112,7 +112,6 @@ export default function ({ network, id, token, ownerId }: Props) {
           }) => {
             const resp = data?.body?.holders?.[0];
             if (data.status === 200) {
-              setTotalCount(0);
               setTotalCount(resp?.count);
             } else {
               handleRateLimit(data, fetchTotalHolders);
@@ -278,8 +277,11 @@ export default function ({ network, id, token, ownerId }: Props) {
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                A total of {localFormat && localFormat(totalCount.toString())}{' '}
-                token holders found
+                {Object.keys(holder).length > 0 &&
+                  `A total of ${
+                    localFormat && localFormat(totalCount.toString())
+                  }${' '}
+                token holders found`}
               </p>
             </div>
           </div>
@@ -297,7 +299,13 @@ export default function ({ network, id, token, ownerId }: Props) {
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage}
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>

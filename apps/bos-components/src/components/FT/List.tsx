@@ -26,6 +26,8 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import SortIcon from '@/includes/icons/SortIcon';
 import Question from '@/includes/icons/Question';
 import Skeleton from '@/includes/Common/Skeleton';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 const initialSorting: Sorting = {
   sort: 'onchain_market_cap',
@@ -425,13 +427,16 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
           </div>
         ) : (
           <p className="pl-3">
-            {t
-              ? t('token:fts.top.listing', {
-                  count: localFormat && localFormat(totalCount),
-                })
-              : `A total of ${
-                  localFormat && localFormat(totalCount)
-                } Token Contracts found`}
+            {Object.keys(tokens).length > 0 &&
+              `${
+                t
+                  ? t('token:fts.top.listing', {
+                      count: localFormat && localFormat(totalCount),
+                    })
+                  : `A total of ${
+                      localFormat && localFormat(totalCount)
+                    } Token Contracts found`
+              }`}
           </p>
         )}
         <div className={`flex w-full h-10 sm:w-80 mr-2`}>
@@ -494,7 +499,13 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
           limit: 50,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage || ''}
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </div>

@@ -13,8 +13,10 @@
  * @param {string} ownerId - The identifier of the owner of the component.
  */
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Skeleton from '@/includes/Common/Skeleton';
 import Clock from '@/includes/icons/Clock';
+import FaInbox from '@/includes/icons/FaInbox';
 import { BlocksInfo } from '@/includes/types';
 
 interface Props {
@@ -274,10 +276,10 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
             className={`hover:no-underline`}
           >
             <a
-              className={`text-green-500 dark:text-green-250 hover:no-underline ${
+              className={`text-green-500 dark:text-green-250 hover:no-underline p-1 border rounded-md ${
                 row?.author_account_id === address
-                  ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-1 -m-[1px] cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 p-1'
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
               }`}
               onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
               onMouseLeave={handleMouseLeave}
@@ -344,29 +346,31 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
         </div>
       ) : (
         <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
-          <p className="sm:w-full w-65">
-            {t
-              ? t('blocks:listing', {
-                  from: start?.block_height
-                    ? localFormat && localFormat(start?.block_height)
-                    : start?.block_height ?? '',
-                  to: end?.block_height
-                    ? localFormat && localFormat(end?.block_height)
-                    : end?.block_height ?? '',
-                  count: localFormat && localFormat(totalCount.toString()),
-                })
-              : `Block #${
-                  start?.block_height
-                    ? localFormat && localFormat(start?.block_height)
-                    : start?.block_height ?? ''
-                } to ${
-                  '#' + end?.block_height
-                    ? localFormat && localFormat(end?.block_height)
-                    : end?.block_height ?? ''
-                } (Total of ${
-                  localFormat && localFormat(totalCount.toString())
-                } blocks)`}{' '}
-          </p>
+          {Object.keys(blocks).length > 0 && (
+            <p className="sm:w-full w-65">
+              {t
+                ? t('blocks:listing', {
+                    from: start?.block_height
+                      ? localFormat && localFormat(start?.block_height)
+                      : start?.block_height ?? '',
+                    to: end?.block_height
+                      ? localFormat && localFormat(end?.block_height)
+                      : end?.block_height ?? '',
+                    count: localFormat && localFormat(totalCount.toString()),
+                  })
+                : `Block #${
+                    start?.block_height
+                      ? localFormat && localFormat(start?.block_height)
+                      : start?.block_height ?? ''
+                  } to ${
+                    '#' + end?.block_height
+                      ? localFormat && localFormat(end?.block_height)
+                      : end?.block_height ?? ''
+                  } (Total of ${
+                    localFormat && localFormat(totalCount.toString())
+                  } blocks)`}{' '}
+            </p>
+          )}
         </div>
       )}
       {
@@ -382,7 +386,13 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
             limit: 25,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage || ''}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       }

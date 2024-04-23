@@ -40,8 +40,10 @@ const Detail = forwardRef(
             >
               <span className="flex">
                 {t('txn.tabs.execution')}
-
                 <ArrowDown className="h-4 w-4 fill-current ml-1" />
+                <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-24 -mt-3 px-1 ">
+                  NEW
+                </div>
               </span>
             </div>{' '}
             <div

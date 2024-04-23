@@ -7,12 +7,14 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
   ownerId: string;
   network: string;
   id: string;
+  t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -23,7 +25,7 @@ import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import ErrorMessage from '@/includes/Common/ErrorMessage';
 import FaInbox from '@/includes/icons/FaInbox';
 
-export default function ({ network, id, ownerId }: Props) {
+export default function ({ network, id, ownerId, t }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -38,6 +40,7 @@ export default function ({ network, id, ownerId }: Props) {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
   const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
 
   const config = getConfig && getConfig(network);
 
@@ -210,10 +213,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -252,10 +255,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -321,10 +324,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -363,10 +366,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -560,7 +563,7 @@ export default function ({ network, id, ownerId }: Props) {
           Error: (
             <ErrorMessage
               icons={<FaInbox />}
-              message="There are no matching entries"
+              message={errorMessage || ''}
               mutedText="Please try again later"
             />
           ),

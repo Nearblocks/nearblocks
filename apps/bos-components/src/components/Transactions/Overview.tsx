@@ -389,7 +389,9 @@ export default function ({ network, t, ownerId, theme }: Props) {
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
-                              <div>({stats?.tps ? stats?.tps : ''} TPS)</div>
+                              <div>
+                                {stats?.tps ? `(${stats?.tps} TPS)` : ''}
+                              </div>
                             </Tooltip.Trigger>
                             <Tooltip.Content
                               className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
@@ -462,10 +464,11 @@ export default function ({ network, t, ownerId, theme }: Props) {
                 ) : (
                   <Link href="/charts/blocks" className="hover:no-underline">
                     <a className="leading-6 text-nearblue-700 hover:no-underline">
-                      {(stats?.avg_block_time
-                        ? stats?.avg_block_time
-                        : ''
-                      ).replace(/\.?0+$/, '') + ' s'}
+                      {stats?.avg_block_time
+                        ? `${
+                            (stats?.avg_block_time).replace(/\.?0+$/, '') + ' s'
+                          }`
+                        : ''}
                     </a>
                   </Link>
                 )}

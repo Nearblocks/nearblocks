@@ -24,6 +24,8 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 import SortIcon from '@/includes/icons/SortIcon';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 const initialSorting: Sorting = {
   sort: 'txns_day',
@@ -117,10 +119,6 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
     if (config?.backendUrl) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
-      if (sorting) {
-        fetchTotalTokens();
-        fetchTokens('', sorting, currentPage);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
@@ -275,8 +273,11 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
             </div>
           ) : (
             <p className="pl-3">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              NEP-171 Token Contracts found
+              {Object.keys(tokens).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              NEP-171 Token Contracts found`}
             </p>
           )}
           <div className={`flex w-full h-10 sm:w-80 mr-2`}>
@@ -336,7 +337,13 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
             limit: initialPagination.per_page,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage || ''}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       </div>

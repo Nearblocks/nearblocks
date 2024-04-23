@@ -238,10 +238,11 @@ export default function (props: Props) {
                 <tr>
                   <td className="py-2 pr-4">Gas Burned</td>
                   <td className="py-2 pl-4">
-                    {!loading && receipt?.outcome?.gasBurnt
-                      ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
-                      : receipt?.outcome?.gasBurnt ?? ''}
-                    gas
+                    {`${
+                      !loading && receipt?.outcome?.gasBurnt
+                        ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
+                        : receipt?.outcome?.gasBurnt ?? ''
+                    }gas`}
                   </td>
                 </tr>
                 <tr>

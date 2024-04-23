@@ -71,6 +71,7 @@ export default function (props: Props) {
           <Paginator
             count={props.count}
             page={props.page}
+            isLoading={props.isLoading}
             limit={props.limit}
             pageLimit={props.pageLimit}
             setPage={props.setPage}
@@ -203,6 +204,7 @@ export default function (props: Props) {
       {props.isPagination && props.data !== undefined ? (
         <Paginator
           count={props.count}
+          isLoading={props.isLoading}
           page={props.page}
           limit={props.limit}
           pageLimit={props.pageLimit}

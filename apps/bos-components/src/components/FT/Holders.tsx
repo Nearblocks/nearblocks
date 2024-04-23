@@ -17,7 +17,9 @@ interface Props {
   token?: Token;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Skeleton from '@/includes/Common/Skeleton';
+import FaInbox from '@/includes/icons/FaInbox';
 import { HoldersPropsInfo, Status, Token } from '@/includes/types';
 
 export default function ({ network, id, token, ownerId }: Props) {
@@ -181,9 +183,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         <span>{serialNumber(index, currentPage, 25)}</span>
       ),
       tdClassName:
-        'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-[50px]',
+        'pl-4 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-[50px]',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[50]',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[50]',
     },
     {
       header: 'Address',
@@ -215,9 +217,9 @@ export default function ({ network, id, token, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
+      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Quantity',
@@ -231,9 +233,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Percentage',
@@ -257,9 +259,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: 'Value',
@@ -274,9 +276,9 @@ export default function ({ network, id, token, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
   ];
 
@@ -302,8 +304,11 @@ export default function ({ network, id, token, ownerId }: Props) {
           <div className={`flex flex-col lg:flex-row pt-4`}>
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                A total of {localFormat && localFormat(totalCount.toString())}{' '}
-                token holders found
+                {Object.keys(holder).length > 0 &&
+                  `A total of ${
+                    localFormat && localFormat(totalCount.toString())
+                  }${' '}
+                token holders found`}
               </p>
             </div>
           </div>
@@ -321,7 +326,13 @@ export default function ({ network, id, token, ownerId }: Props) {
           limit: 25,
           pageLimit: 200,
           setPage: setPage,
-          Error: errorMessage,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage}
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>
