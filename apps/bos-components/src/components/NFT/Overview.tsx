@@ -7,12 +7,14 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
   ownerId: string;
   network: string;
   id: string;
+  t: (key: string) => string | undefined;
 }
 
 import Links from '@/includes/Common/Links';
@@ -23,7 +25,7 @@ import { Status, Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
-export default function ({ network, id, ownerId }: Props) {
+export default function ({ network, id, ownerId, t }: Props) {
   const { localFormat, getTimeAgoString } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -331,6 +333,7 @@ export default function ({ network, id, ownerId }: Props) {
                     props={{
                       network: network,
                       id: id,
+                      t: t,
                       ownerId,
                     }}
                   />

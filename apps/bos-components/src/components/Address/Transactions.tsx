@@ -26,12 +26,14 @@ interface Props {
   onFilterClear: (name: string) => void;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Filter from '@/includes/Common/Filter';
 import Skeleton from '@/includes/Common/Skeleton';
 import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import CloseCircle from '@/includes/icons/CloseCircle';
 import Download from '@/includes/icons/Download';
+import FaInbox from '@/includes/icons/FaInbox';
 import SortIcon from '@/includes/icons/SortIcon';
 import { TransactionInfo } from '@/includes/types';
 
@@ -416,10 +418,10 @@ export default function ({
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span
-                  className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                  className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                     row?.predecessor_account_id === address
-                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                      : 'text-green-500 dark:text-green-250 border-transparent'
                   }`}
                 >
                   <Link
@@ -524,10 +526,10 @@ export default function ({
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <span
-                  className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                  className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                     row?.receiver_account_id === address
-                      ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                      : 'text-green-500 dark:text-green-250 border-transparent'
                   }`}
                 >
                   <Link
@@ -674,11 +676,14 @@ export default function ({
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              A total of{' '}
-              {totalCount
-                ? localFormat && localFormat(totalCount.toString())
-                : 0}{' '}
-              transactions found
+              {Object.keys(txns).length > 0 &&
+                `A total of${' '}
+              ${
+                totalCount
+                  ? localFormat && localFormat(totalCount.toString())
+                  : 0
+              }${' '}
+              transactions found`}
             </p>
           </div>
           <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
@@ -705,17 +710,19 @@ export default function ({
               </div>
             )}
             <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-              <button className="hover:no-underline ">
-                <Link
-                  href={`/exportdata?address=${id}`}
-                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
-                >
-                  <p>CSV Export</p>
-                  <span className="ml-2">
-                    <Download />
-                  </span>
-                </Link>
-              </button>
+              {Object.keys(txns).length > 0 && (
+                <button className="hover:no-underline ">
+                  <Link
+                    href={`/exportdata?address=${id}`}
+                    className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                  >
+                    <p>CSV Export</p>
+                    <span className="ml-2">
+                      <Download />
+                    </span>
+                  </Link>
+                </button>
+              )}
             </span>
           </div>
         </div>
@@ -733,7 +740,13 @@ export default function ({
             limit: 25,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       }

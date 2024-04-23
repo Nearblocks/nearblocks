@@ -21,6 +21,8 @@ import { AccountContractInfo } from '@/includes/types';
 import SortIcon from '@/includes/icons/SortIcon';
 import Skeleton from '@/includes/Common/Skeleton';
 import Paginator from '@/includes/Common/Paginator';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 export default function ({ network, t, id, ownerId }: Props) {
   const { getConfig, handleRateLimit } = VM.require(
@@ -108,7 +110,7 @@ export default function ({ network, t, id, ownerId }: Props) {
 
   return (
     <>
-      <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-x-auto ">
+      <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl relative overflow-x-auto ">
         <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
           <thead className="bg-gray-100 dark:bg-black-300">
             <tr>
@@ -155,7 +157,7 @@ export default function ({ network, t, id, ownerId }: Props) {
                 Action
               </th>
               <th scope="col" className="text-left">
-                <div className="w-full inline-flex px-5 py-4">
+                <div className="w-full inline-flex px-4 py-4">
                   <button
                     type="button"
                     onClick={toggleShowWhen}
@@ -176,40 +178,48 @@ export default function ({ network, t, id, ownerId }: Props) {
             {isLoading &&
               [...Array(25)].map((_, i) => (
                 <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
+                  <td className="pl-6 pr-28 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                    <Skeleton className="w-full h-4" />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
+                  <td className="pl-6 pr-28 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                    <Skeleton className="w-full h-4" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-tiny ">
-                    <Skeleton />
+                    <Skeleton className="w-8 h-4" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
+                    <Skeleton className="w-full h-4" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
+                    <Skeleton className="w-full h-4" />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton />
+                    <Skeleton className="w-full h-4" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                    <Skeleton className="w-full h-4" />
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                    <Skeleton className="w-full h-4" />
                   </td>
                 </tr>
               ))}
-            {!isLoading && keys.length === 0 && (
+            {!isLoading && keys?.length === 0 && (
               <tr className="h-[57px]">
                 <td
                   colSpan={100}
-                  className="px-6 py-4 text-nearblue-700 dark:text-neargray-10 text-xs"
+                  className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
                 >
-                  No access keys
+                  <ErrorMessage
+                    icons={<FaInbox />}
+                    message="No access keys"
+                    mutedText="Please try again later"
+                  />
                 </td>
               </tr>
             )}
-            {keys &&
+            {!isLoading &&
+              keys &&
               keys.map((key) => (
                 <Widget
                   key={key.account_id + key.public_key}
@@ -222,22 +232,48 @@ export default function ({ network, t, id, ownerId }: Props) {
                     ownerId,
                   }}
                   loading={
-                    <div className=" whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                      <Skeleton />
-                    </div>
+                    <tr className="hover:bg-blue-900/5 h-[57px]">
+                      <td className="pl-4 pr-28 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="pl-6 pr-28 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-tiny">
+                        <Skeleton className="w-8 h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                        <Skeleton className="w-full h-4" />
+                      </td>
+                    </tr>
                   }
                 />
               ))}
           </tbody>
         </table>
+      </div>
+      {keys.length > 0 && (
         <Paginator
           count={count}
+          isLoading={isLoading}
           page={currentPage}
           limit={25}
           pageLimit={200}
           setPage={setPage}
         />
-      </div>
+      )}
     </>
   );
 }

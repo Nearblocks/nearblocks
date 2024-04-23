@@ -26,6 +26,8 @@ import Clock from '@/includes/icons/Clock';
 import TokenImage from '@/includes/icons/TokenImage';
 import { Status, TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
@@ -262,10 +264,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -304,10 +306,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -373,10 +375,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -415,10 +417,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 dark:text-green-250 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -650,8 +652,11 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
             <div className={`flex flex-col lg:flex-row pt-4`}>
               <div className="flex flex-col">
                 <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  A total of {localFormat && localFormat(totalCount.toString())}{' '}
-                  transactions found
+                  {Object.keys(tokens).length > 0 &&
+                    `A total of ${
+                      localFormat && localFormat(totalCount.toString())
+                    }${' '}
+                  transactions found`}
                 </p>
               </div>
             </div>
@@ -669,7 +674,13 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
             limit: 25,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       </div>

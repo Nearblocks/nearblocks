@@ -23,6 +23,8 @@ import { ValidatorFullData } from '@/includes/types';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { ValidatorEpochData } from 'nb-types';
 import Question from '@/includes/icons/Question';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 const initialValidatorFullData = {
   validatorEpochData: [],
@@ -994,8 +996,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 </div>
               ) : (
                 <div className="leading-7 pl-3 px-3 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {validatorFullData[currentPage]?.total || 0}
-                  Validators found
+                  {validatorEpochData &&
+                    validatorEpochData.length > 0 &&
+                    `${validatorFullData[currentPage]?.total || 0}${' '}
+                  Validators found`}
                 </div>
               )}
             </div>
@@ -1014,7 +1018,13 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   limit: 25,
                   pageLimit: 999,
                   setPage: setPage,
-                  Error: errorMessage,
+                  Error: (
+                    <ErrorMessage
+                      icons={<FaInbox />}
+                      message={errorMessage}
+                      mutedText="Please try again later"
+                    />
+                  ),
                 }}
               />
             </div>

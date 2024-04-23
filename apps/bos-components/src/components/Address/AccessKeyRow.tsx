@@ -52,56 +52,54 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
       case 'CREATE_ACCOUNT':
       case 'CreateAccount':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {t('createAccount')}
           </div>
         );
       case 'DEPLOY_CONTRACT':
       case 'DeployContract':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {t('deployContract')}
           </div>
         );
       case 'TRANSFER':
       case 'Transfer':
         return (
-          <div className="bg-emerald-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-emerald-50 py-1 flex items-center text-xs">
             {t('transfer')}
           </div>
         );
       case 'STAKE':
       case 'Stake':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
-            {t('stake')}
-          </div>
+          <div className="py-1 flex items-center text-xs">{t('stake')}</div>
         );
       case 'ADD_KEY':
       case 'AddKey':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             Acces Key Created
           </div>
         );
       case 'DELETE_KEY':
       case 'DeleteKey':
         return (
-          <div className="bg-red-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-red-50 py-1 flex items-center text-xs">
             Acces Key Deleted
           </div>
         );
       case 'DELETE_ACCOUNT':
       case 'DeleteAccount':
         return (
-          <div className="bg-red-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-red-50 py-1 flex items-center text-xs">
             {t('deleteAccount')}
           </div>
         );
 
       default:
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {capitalizeWords(method)}
           </div>
         );
@@ -190,7 +188,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </Tooltip.Root>
           </Tooltip.Provider>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10  flex justify-start">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
           {accessKey.permission_kind === 'FUNCTION_CALL' ? (
             <div className="bg-blue-900/10 rounded px-4 h-6 flex items-center justify-center text-center text-xs">
               Limited
@@ -201,12 +199,12 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10  flex justify-start ">
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
               {keyInfo?.permission?.FunctionCall?.method_names.length > 0

@@ -10,8 +10,10 @@
  * @param {string} ownerId - The identifier of the owner of the component.
  */
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
+import FaInbox from '@/includes/icons/FaInbox';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -50,7 +52,6 @@ export default function ({ network, id, token, ownerId }: Props) {
 
   useEffect(() => {
     function fetchNFTData() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}nfts/${id}`)
         .then(
           (data: {
@@ -62,7 +63,6 @@ export default function ({ network, id, token, ownerId }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokenData(resp);
-              setIsLoading(false);
             } else {
               handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
@@ -149,10 +149,22 @@ export default function ({ network, id, token, ownerId }: Props) {
         >
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              tokens found
+              {tokens.length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              tokens found`}
             </p>
           </div>
+        </div>
+      )}
+      {!isLoading && tokens.length === 0 && (
+        <div className="px-6 py-4 text-gray-400 text-xs">
+          <ErrorMessage
+            icons={<FaInbox />}
+            message="There are no matching entries"
+            mutedText="Please try again later"
+          />
         </div>
       )}
       <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
@@ -232,13 +244,16 @@ export default function ({ network, id, token, ownerId }: Props) {
             </div>
           ))}
       </div>
-      <Paginator
-        count={totalCount}
-        page={currentPage}
-        setPage={setPage}
-        limit={24}
-        pageLimit={200}
-      />
+      {tokens.length > 0 && (
+        <Paginator
+          count={totalCount}
+          page={currentPage}
+          isLoading={isLoading}
+          setPage={setPage}
+          limit={24}
+          pageLimit={200}
+        />
+      )}
     </>
   );
 }

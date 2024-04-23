@@ -31,8 +31,10 @@ interface Props {
   pageTab: string;
 }
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
+import FaInbox from '@/includes/icons/FaInbox';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
 import WarningIcon from '@/includes/icons/WarningIcon';
@@ -92,7 +94,7 @@ export default function ({
           }) => {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
-              setToken(resp);
+              setToken(resp || {});
               setIsLoading(false);
             } else {
               handleRateLimit(data, fetchFTData, () => setIsLoading(false));
@@ -585,9 +587,9 @@ export default function ({
                   />
                 }
               </div>
-              {token && (
-                <div className={`${pageTab === 'FAQ' ? '' : 'hidden'} `}>
-                  {
+              <div className={`${pageTab === 'FAQ' ? '' : 'hidden'} `}>
+                {!isLoading &&
+                  (Object.keys(token).length > 0 ? (
                     <Widget
                       src={`${ownerId}/widget/bos-components.components.FT.FAQ`}
                       props={{
@@ -597,9 +599,16 @@ export default function ({
                         ownerId,
                       }}
                     />
-                  }
-                </div>
-              )}{' '}
+                  ) : (
+                    <div className="px-6 py-4 dark:text-gray-400 text-nearblue-700 text-xs">
+                      <ErrorMessage
+                        icons={<FaInbox />}
+                        message="There are no matching entries"
+                        mutedText="Please try again later"
+                      />
+                    </div>
+                  ))}
+              </div>{' '}
               <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
                 <div className="py-3">
                   {

@@ -4,6 +4,7 @@ import { apiUrl, networkId, appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/nft/Overview';
+import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { Token } from '@/utils/types';
@@ -15,6 +16,7 @@ const NFToken = () => {
   const router = useRouter();
   const { id } = router.query;
   const components = useBosComponents();
+  const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const [token, setToken] = useState<Token | null>(null);
@@ -95,6 +97,7 @@ const NFToken = () => {
           props={{
             id: id,
             network: networkId,
+            t: t,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />{' '}
