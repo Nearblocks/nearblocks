@@ -35,7 +35,7 @@ export default function SearchBar({
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, shortenAddress } = VM.require(
+  const { debounce, getConfig, shortenAddress } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
@@ -101,9 +101,32 @@ export default function SearchBar({
         return null;
     }
   };
+
+  const fetchData = useCallback(
+    (keyword: string, filter: string) => {
+      if (filter && keyword && config.backendUrl) {
+        search(keyword, filter, false, config.backendUrl).then((data: any) => {
+          setResult(data || {});
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [config.backendUrl, filter],
+  );
+  const debouncedSetKeyword = useCallback(
+    debounce
+      ? debounce(500, (value: string) => {
+          fetchData(value, filter);
+        })
+      : (value: string) => fetchData(value, filter),
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fetchData],
+  );
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
+    debouncedSetKeyword(newNextValue);
     setKeyword(newNextValue);
     showSearchResults();
   };
@@ -124,23 +147,14 @@ export default function SearchBar({
   const onSelect = () => {
     hideSearchResults();
   };
-  useEffect(() => {
-    const fetchData = (keyword: string, filter: string) => {
-      if (filter && keyword) {
-        search(keyword, filter, false, config.backendUrl).then((data: any) => {
-          setResult(data || {});
-        });
-      }
-    };
-    if (config.backendUrl) {
-      fetchData(keyword, filter);
-    }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyword, filter, config.backendUrl]);
   // Handle filter change
-  const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) =>
+  const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilter(event.target.value);
+    if (keyword && config.backendUrl) {
+      fetchData(keyword, event.target.value);
+    }
+  };
   return (
     <>
       {showToast && <ToastMessage content={<SearchToast />} />}
