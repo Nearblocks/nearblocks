@@ -77,7 +77,8 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           receipts r
           JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
         WHERE
-          ${from || to
+          r.receipt_kind = 'ACTION'
+          AND ${from || to
       ? sql`
           r.predecessor_account_id = ${from ?? account}
           AND r.receiver_account_id = ${to ?? account}
@@ -139,6 +140,11 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
                   action_receipt_actions.action_kind,
                   'method',
                   action_receipt_actions.args ->> 'method_name',
+                  'deposit',
+                  COALESCE(
+                    (action_receipt_actions.args ->> 'deposit')::NUMERIC,
+                    0
+                  ),
                   'fee',
                   COALESCE(execution_outcomes.tokens_burnt, 0)
                 )
