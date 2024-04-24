@@ -251,6 +251,46 @@ const stakeTxnsCount = z.object({
   to: z.string().optional(),
 });
 
+const activities = z.object({
+  account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  cursor: z.string().length(36).optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  page: z.number().positive().max(200).optional().default(1),
+  per_page: z.number().positive().max(25).optional().default(25),
+});
+
+const activitiesCount = z.object({
+  account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+});
+
 export type Item = z.infer<typeof item>;
 export type Contract = z.infer<typeof contract>;
 export type Deployments = z.infer<typeof deployments>;
@@ -271,9 +311,13 @@ export type NftTxnsCount = z.infer<typeof nftTxnsCount>;
 export type NftTxnsExport = z.infer<typeof nftTxnsExport>;
 export type StakeTxns = z.infer<typeof stakeTxns>;
 export type StakeTxnsCount = z.infer<typeof stakeTxnsCount>;
+export type Activities = z.infer<typeof activities>;
+export type ActivitiesCount = z.infer<typeof activitiesCount>;
 
 export default {
   action,
+  activities,
+  activitiesCount,
   contract,
   deployments,
   ftTxns,
