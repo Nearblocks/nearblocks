@@ -179,7 +179,7 @@ const ApiPlan = () => {
             <div className="flex items-center sm:!justify-start justify-center my-5">
               <button
                 onClick={scrollToPlans}
-                className="text-sm text-white font-thin px-4 py-3  bg-green-500 rounded w-fit"
+                className="text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
               >
                 API Pricing Plans
               </button>
@@ -336,7 +336,7 @@ const ApiPlan = () => {
                       //     onConfirmOpen(item);
                       //   else onGetStarted(item);
                       // }}
-                      className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={
                         !updating || currentPlan === item?.price_monthly
                       }
@@ -423,7 +423,7 @@ const ApiPlan = () => {
               Detailed documentation to get started.{' '}
             </p>
             <Link href={docsUrl} legacyBehavior>
-              <button className="text-sm text-white font-thin px-8 mx-2 py-3  bg-green-500 rounded w-fit">
+              <button className="text-sm text-white font-thin px-8 mx-2 py-3 dark:bg-green-250 bg-green-500 rounded w-fit">
                 View API Documentation
               </button>
             </Link>
@@ -484,7 +484,7 @@ const ApiPlan = () => {
             </div>
             <div className="w-full text-center my-2">
               <button
-                className="text-sm text-white my-2 text-center font-thin px-7 py-3 bg-green-500 rounded"
+                className="text-sm text-white my-2 text-center font-thin px-7 py-3 dark:bg-green-250 bg-green-500 rounded"
                 disabled={loading}
               >
                 {loading ? <LoadingCircular /> : 'Send message'}

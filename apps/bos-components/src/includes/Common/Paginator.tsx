@@ -35,7 +35,7 @@ const Paginator = (props: PaginatorProps) => {
   const onLast = () => props.setPage(pages);
 
   return (
-    <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4">
+    <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4 rounded-b-xl">
       <div className="flex-1 flex items-center justify-between">
         <div></div>
 

@@ -146,7 +146,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
   return (
     <>
       <tr key={accessKey.public_key} className="hover:bg-blue-900/5">
-        <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip.Provider>
               <Tooltip.Root>
@@ -171,7 +171,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             'Genesis'
           )}
         </td>
-        <td className="pl-6 pr-2 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
+        <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
@@ -188,7 +188,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </Tooltip.Root>
           </Tooltip.Provider>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
           {accessKey.permission_kind === 'FUNCTION_CALL' ? (
             <div className="bg-blue-900/10 rounded px-4 h-6 flex items-center justify-center text-center text-xs">
               Limited
@@ -199,12 +199,12 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
               {keyInfo?.permission?.FunctionCall?.method_names.length > 0
@@ -219,7 +219,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
@@ -229,10 +229,10 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
                 true,
               )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {action}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.block_timestamp ? (
             <Tooltip.Provider>
               <Tooltip.Root>
