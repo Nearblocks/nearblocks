@@ -416,19 +416,22 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       key: 'stake',
       cell: (row: ValidatorEpochData) => (
         <span>
-          {formatWithCommas(
-            Number(
-              yoctoToNear &&
-                yoctoToNear(
-                  row.currentEpoch?.stake ??
-                    row.nextEpoch?.stake ??
-                    row.afterNextEpoch?.stake ??
-                    `${row.contractStake}`,
-                  false,
-                ),
-            ).toFixed(0),
-          )}
-          Ⓝ
+          {(row.currentEpoch?.stake ??
+            row.nextEpoch?.stake ??
+            row.afterNextEpoch?.stake ??
+            `${row.contractStake}`) &&
+            formatWithCommas(
+              Number(
+                yoctoToNear &&
+                  yoctoToNear(
+                    row.currentEpoch?.stake ??
+                      row.nextEpoch?.stake ??
+                      row.afterNextEpoch?.stake ??
+                      `${row.contractStake}`,
+                    false,
+                  ),
+              ).toFixed(0),
+            ) + '  Ⓝ'}
         </span>
       ),
       tdClassName:
@@ -562,10 +565,10 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                       cell: () => {
                         return (
                           <div>
-                            {productivityRatio * 100 == 100
-                              ? 100
-                              : (productivityRatio * 100).toFixed(3)}
-                            %
+                            {!isNaN(productivityRatio) &&
+                              (productivityRatio * 100 == 100
+                                ? 100
+                                : (productivityRatio * 100).toFixed(3)) + '%'}
                           </div>
                         );
                       },
@@ -1097,6 +1100,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
                   ) : validatorFullData[currentPage]?.elapsedTime &&
+                    elapsedTime &&
                     convertTimestampToTime ? (
                     convertTimestampToTime(elapsedTime.toString())
                   ) : (
@@ -1112,6 +1116,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                   {isLoading ? (
                     <Skeleton className="h-3 w-32" />
                   ) : validatorFullData[currentPage]?.totalSeconds &&
+                    timeRemaining &&
                     convertTimestampToTime ? (
                     convertTimestampToTime(timeRemaining.toString())
                   ) : (
@@ -1132,15 +1137,23 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                             <div
                               className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
                               style={{
-                                width: `${Big(
-                                  validatorFullData[currentPage]?.epochProgress,
-                                ).toFixed(1)}%`,
+                                width: `${
+                                  validatorFullData[currentPage]
+                                    ?.epochProgress &&
+                                  Big(
+                                    validatorFullData[currentPage]
+                                      ?.epochProgress,
+                                  ).toFixed(1)
+                                }%`,
                               }}
                             ></div>
                           </div>
-                          {`${Big(
-                            validatorFullData[currentPage]?.epochProgress,
-                          ).toFixed(0)}%`}
+                          {`${
+                            validatorFullData[currentPage]?.epochProgress &&
+                            Big(
+                              validatorFullData[currentPage]?.epochProgress,
+                            ).toFixed(0)
+                          }%`}
                         </div>
                       ) : (
                         ''
