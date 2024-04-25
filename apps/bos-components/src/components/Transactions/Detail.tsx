@@ -862,7 +862,7 @@ export default function (props: Props) {
                                       href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="hover:no-underline"
                                     >
-                                      <a className="text-green hover:no-underline">
+                                      <a className="text-green hover:no-underline dark:text-green-250">
                                         {shortenToken(nft?.token_id ?? '')}
                                       </a>
                                     </Link>
@@ -873,7 +873,7 @@ export default function (props: Props) {
                                   href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green flex items-center hover:no-underline">
+                                  <a className="text-green flex items-center hover:no-underline dark:text-green-250">
                                     <TokenImage
                                       src={nft?.nft_meta?.icon}
                                       alt={nft?.nft_meta?.name}
