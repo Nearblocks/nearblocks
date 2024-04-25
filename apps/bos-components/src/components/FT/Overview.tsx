@@ -211,7 +211,7 @@ export default function ({
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 px-2">
+          <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 src={token?.icon}
@@ -220,7 +220,7 @@ export default function ({
                 className="w-7 h-7"
               />
             </span>
-            <span className="inline-flex align-middle ">Token: </span>
+            <span className="inline-flex align-middle mx-1">Token:</span>
             <span className="inline-flex align-middle font-semibold">
               {token?.name}
             </span>

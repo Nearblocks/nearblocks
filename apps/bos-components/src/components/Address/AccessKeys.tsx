@@ -110,170 +110,172 @@ export default function ({ network, t, id, ownerId }: Props) {
 
   return (
     <>
-      <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl relative overflow-x-auto ">
-        <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
-          <thead className="bg-gray-100 dark:bg-black-300">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Txn Hash
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Public key
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Access
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Contract
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Method
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Allowance
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider"
-              >
-                Action
-              </th>
-              <th scope="col" className="text-left">
-                <div className="w-full inline-flex px-4 py-4">
-                  <button
-                    type="button"
-                    onClick={toggleShowWhen}
-                    className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 dark:text-neargray-10 focus:outline-none"
+      <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl">
+        <div className="relative overflow-x-auto rounded-xl">
+          <table className="min-w-full divide-y rounded-xl dark:divide-black-200 dark:border-black-200">
+            <thead className="bg-gray-100 dark:bg-black-300">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Txn Hash
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Public key
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Access
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Contract
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Method
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Allowance
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                >
+                  Action
+                </th>
+                <th scope="col" className="text-left whitespace-nowrap">
+                  <div className="w-full inline-flex px-4 py-4">
+                    <button
+                      type="button"
+                      onClick={toggleShowWhen}
+                      className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 dark:text-neargray-10 focus:outline-none"
+                    >
+                      {showWhen ? 'When' : 'Date Time (UTC)'}
+                    </button>
+                    <button type="button" onClick={onOrder} className="px-2">
+                      <div className="text-nearblue-600  dark:text-neargray-10 font-semibold">
+                        <SortIcon order={sorting} />
+                      </div>
+                    </button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
+              {isLoading &&
+                [...Array(25)].map((_, i) => (
+                  <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-tiny ">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                      <Skeleton className="w-full h-4" />
+                    </td>
+                  </tr>
+                ))}
+              {!isLoading && keys?.length === 0 && (
+                <tr className="h-[57px]">
+                  <td
+                    colSpan={100}
+                    className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
                   >
-                    {showWhen ? 'When' : 'Date Time (UTC)'}
-                  </button>
-                  <button type="button" onClick={onOrder} className="px-2">
-                    <div className="text-nearblue-600  dark:text-neargray-10 font-semibold">
-                      <SortIcon order={sorting} />
-                    </div>
-                  </button>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-            {isLoading &&
-              [...Array(25)].map((_, i) => (
-                <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
-                  <td className="pl-6 pr-28 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="pl-6 pr-28 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-tiny ">
-                    <Skeleton className="w-8 h-4" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                    <Skeleton className="w-full h-4" />
+                    <ErrorMessage
+                      icons={<FaInbox />}
+                      message="No access keys"
+                      mutedText="Please try again later"
+                    />
                   </td>
                 </tr>
-              ))}
-            {!isLoading && keys?.length === 0 && (
-              <tr className="h-[57px]">
-                <td
-                  colSpan={100}
-                  className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
-                >
-                  <ErrorMessage
-                    icons={<FaInbox />}
-                    message="No access keys"
-                    mutedText="Please try again later"
+              )}
+              {!isLoading &&
+                keys &&
+                keys.map((key) => (
+                  <Widget
+                    key={key.account_id + key.public_key}
+                    src={`${ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
+                    props={{
+                      network: network,
+                      t: t,
+                      accessKey: key,
+                      showWhen: showWhen,
+                      ownerId,
+                    }}
+                    loading={
+                      <tr className="hover:bg-blue-900/5 h-[57px]">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-tiny">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                      </tr>
+                    }
                   />
-                </td>
-              </tr>
-            )}
-            {!isLoading &&
-              keys &&
-              keys.map((key) => (
-                <Widget
-                  key={key.account_id + key.public_key}
-                  src={`${ownerId}/widget/bos-components.components.Address.AccessKeyRow`}
-                  props={{
-                    network: network,
-                    t: t,
-                    accessKey: key,
-                    showWhen: showWhen,
-                    ownerId,
-                  }}
-                  loading={
-                    <tr className="hover:bg-blue-900/5 h-[57px]">
-                      <td className="pl-4 pr-28 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="pl-6 pr-28 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-tiny">
-                        <Skeleton className="w-8 h-4" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                    </tr>
-                  }
-                />
-              ))}
-          </tbody>
-        </table>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        {keys.length > 0 && (
+          <Paginator
+            count={count}
+            isLoading={isLoading}
+            page={currentPage}
+            limit={25}
+            pageLimit={200}
+            setPage={setPage}
+          />
+        )}
       </div>
-      {keys.length > 0 && (
-        <Paginator
-          count={count}
-          isLoading={isLoading}
-          page={currentPage}
-          limit={25}
-          pageLimit={200}
-          setPage={setPage}
-        />
-      )}
     </>
   );
 }
