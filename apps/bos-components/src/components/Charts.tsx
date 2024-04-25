@@ -96,6 +96,13 @@ export default function (props: Props) {
       image_dark: `/images/charts/txn-volume_dark.svg`,
       exclude: `${network}` === 'testnet',
     },
+    {
+      link: '/charts/tps',
+      text: 'Near Transactions per Second Chart',
+      image: `/images/charts/tps.svg`,
+      image_dark: `/images/charts/tps_dark.svg`,
+      exclude: false,
+    },
   ];
 
   const chartData = useMemo(() => {
