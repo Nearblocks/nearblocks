@@ -271,6 +271,9 @@ export type ChartStat = {
   total_addresses: string;
   addresses: string;
   active_accounts: string;
+  new_contracts: string;
+  active_contracts: string;
+  unique_contracts: string;
 };
 
 export type ChartTypeInfo = {

@@ -96,6 +96,31 @@ export default function (props: Props) {
       image_dark: `/images/charts/txn-volume_dark.svg`,
       exclude: `${network}` === 'testnet',
     },
+    {
+      link: '/charts/active-contracts',
+      text: t
+        ? t('Near Active Contracts Chart')
+        : 'Near Active Contracts Chart',
+      image: `/images/charts/active-contracts.svg`,
+      image_dark: `/images/charts/active-contracts_dark.svg`,
+      exclude: `${network}` === 'testnet',
+    },
+    {
+      link: '/charts/new-contracts',
+      text: t ? t('Near New Contracts Chart') : 'Near New Contracts Chart',
+      image: `/images/charts/new-contracts.svg`,
+      image_dark: `/images/charts/new-contracts_dark.svg`,
+      exclude: `${network}` === 'testnet',
+    },
+    {
+      link: '/charts/unique-contracts',
+      text: t
+        ? t('Near Unique Contracts Chart')
+        : 'Near Unique Contracts Chart',
+      image: `/images/charts/unique-contracts.svg`,
+      image_dark: `/images/charts/unique-contracts_dark.svg`,
+      exclude: `${network}` === 'testnet',
+    },
   ];
 
   const chartData = useMemo(() => {
@@ -147,8 +172,22 @@ export default function (props: Props) {
           y: Number(stat.near_price),
           date: stat.date,
         }),
+        'active-contracts': (stat: ChartStat) => ({
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.active_contracts),
+          date: stat.date,
+        }),
+        'new-contracts': (stat: ChartStat) => ({
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.new_contracts),
+          date: stat.date,
+        }),
+        'unique-contracts': (stat: ChartStat) => ({
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.unique_contracts),
+          date: stat.date,
+        }),
       };
-
       const mappingFunction =
         chartTypeMappings[chartTypes as keyof typeof chartTypeMappings];
       if (mappingFunction) {
@@ -237,6 +276,24 @@ export default function (props: Props) {
           yLabel = 'Near Price (USD)';
           description =
             'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
+          break;
+        case 'active-contracts':
+          titleText = 'Near Active Contracts Chart';
+          yLabel = 'Contracts per Day';
+          description =
+            'Near Active Contracts Chart shows the daily number of active contracts on the Near blockchain.';
+          break;
+        case 'new-contracts':
+          titleText = 'Near New Contracts Chart';
+          yLabel = 'Contracts per Day';
+          description =
+            'Near blockchain New Contracts Chart shows the daily number of new contracts on the Near blockchain.';
+          break;
+        case 'unique-contracts':
+          titleText = 'Near Unique Contracts Chart';
+          yLabel = 'Contracts per Day';
+          description =
+            'Near blockchain Unique Contracts Chart shows the daily number of Unique contracts on the Near blockchain.';
           break;
         default:
       }
@@ -442,6 +499,24 @@ export default function (props: Props) {
                       Near Price: <strong>$\${dollarFormat(item.y)}</strong>
                       \`;
                   break;
+                case "active-contracts":
+                  tooltipContent = \`
+                  \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
+                  Active Contracts: <strong>$\{item.y}</strong>
+                  \`;
+                break;
+                case "new-contracts":
+                  tooltipContent = \`
+                  \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
+                  New Contracts: <strong>$\{item.y}</strong>
+                  \`;
+                break;
+                case "unique-contracts":
+                  tooltipContent = \`
+                  \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
+                  New Contracts: <strong>$\{item.y}</strong>
+                  \`;
+                break;
               default:
                 // Handle other cases or set a default tooltip content
                 tooltipContent = \`
@@ -449,7 +524,6 @@ export default function (props: Props) {
                   \${item.y}
                 \`;
             }
-
             return tooltipContent;
           }
         };

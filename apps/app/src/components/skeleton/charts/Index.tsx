@@ -55,6 +55,24 @@ const charts = [
     image: '/images/charts/txn-volume.svg',
     exclude: networkId === 'testnet',
   },
+  {
+    link: '/charts/active-contracts',
+    text: 'Near Active Contracts Chart',
+    image: '/images/charts/active-contracts_dark.svg',
+    exclude: networkId === 'testnet',
+  },
+  {
+    link: '/charts/new-contracts',
+    text: 'Near New Contracts Chart',
+    image: '/images/charts/new-contracts_dark.svg',
+    exclude: networkId === 'testnet',
+  },
+  {
+    link: '/charts/unique-contracts',
+    text: 'Near Unique Contracts Chart',
+    image: '/images/charts/unique-contracts_dark.svg',
+    exclude: networkId === 'testnet',
+  },
 ];
 const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   const { t } = useTranslation('charts');
