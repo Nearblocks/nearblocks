@@ -130,7 +130,7 @@ export default function ({ token, id, network, ownerId }: Props) {
           {tokens?.coingecko_id && (
             <a
               className="text-green-500 dark:text-green-250 mr-4 flex"
-              href="https://www.coingecko.com/"
+              href="https://www.coingecko.com?utm_campaign=api_partnership&utm_source=nearblocks&utm_medium=referral"
               target="_blank"
               rel="noreferrer nofollow noopener"
             >
