@@ -253,42 +253,12 @@ const stakeTxnsCount = z.object({
 
 const activities = z.object({
   account: z.string(),
-  after_date: z
-    .string()
-    .optional()
-    .refine(
-      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
-      { message: 'Invalid date' },
-    ),
-  before_date: z
-    .string()
-    .optional()
-    .refine(
-      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
-      { message: 'Invalid date' },
-    ),
   cursor: z.string().length(36).optional(),
-  order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
 const activitiesCount = z.object({
   account: z.string(),
-  after_date: z
-    .string()
-    .optional()
-    .refine(
-      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
-      { message: 'Invalid date' },
-    ),
-  before_date: z
-    .string()
-    .optional()
-    .refine(
-      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
-      { message: 'Invalid date' },
-    ),
 });
 
 export type Item = z.infer<typeof item>;
