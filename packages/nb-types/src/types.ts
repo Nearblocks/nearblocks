@@ -105,10 +105,14 @@ export type ValidatorTelemetry = {
 
 export type ValidatorDescription = {
   country?: string;
-  countryCode?: string;
+  country_code?: string;
   description?: string;
   discord?: string;
   email?: string;
+  github?: string;
+  logo?: string;
+  name?: string;
+  telegram?: string;
   twitter?: string;
   url?: string;
 };
