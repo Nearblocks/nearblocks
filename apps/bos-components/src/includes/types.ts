@@ -1552,3 +1552,9 @@ export type Status = {
     events: { height: number; sync: boolean };
   };
 };
+
+export type chartDataInfo = {
+  date: string;
+  txns: string;
+  shards: { txns: string; shard: string }[];
+};

@@ -55,6 +55,12 @@ const charts = [
     image: '/images/charts/txn-volume.svg',
     exclude: networkId === 'testnet',
   },
+  {
+    link: '/charts/tps',
+    text: 'Near Transactions per Second Chart',
+    image: '/images/charts/tps.svg',
+    exclude: false,
+  },
 ];
 const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   const { t } = useTranslation('charts');
