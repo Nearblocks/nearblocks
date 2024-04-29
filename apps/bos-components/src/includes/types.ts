@@ -480,8 +480,7 @@ export type ActionPropsInfo = {
     to: string;
     action_kind: string;
     args: {
-      stake: string;
-      deposit: string;
+      [key: string]: string;
     };
   };
   ownerId: string;

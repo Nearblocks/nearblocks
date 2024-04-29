@@ -160,6 +160,8 @@ export default function () {
       const from = receipt?.predecessor_id;
       const to = receipt?.receiver_id;
 
+      if (from === 'system') continue;
+
       if (Array.isArray(receipt?.receipt)) {
         const actions = receipt.receipt;
 
@@ -179,10 +181,7 @@ export default function () {
       }
     }
 
-    return txActions.filter(
-      (action) =>
-        action.action_kind !== 'FunctionCall' && action.from !== 'system',
-    );
+    return txActions;
   }
 
   function valueFromObj(obj: Obj): string | undefined {
