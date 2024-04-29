@@ -445,25 +445,7 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {((actions?.length > 0 &&
-        actions.some((item: any) =>
-          [
-            'CreateAccount',
-            'DeleteAccount',
-            'DeployContract',
-            'Stake',
-            'Transfer',
-          ].includes(item?.action_kind),
-        )) ||
-        (logs.length > 0 &&
-          logs.some((item: TransactionLog, i: number) => (
-            <EventLogs
-              key={i}
-              event={item}
-              network={network}
-              ownerId={ownerId}
-            />
-          )))) && (
+      {(actions?.length > 0 || logs?.length > 0) && (
         <div
           id="action-row"
           className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"

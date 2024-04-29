@@ -141,3 +141,7 @@ a {
 .errorContainer {
   width: 100%;
 }
+
+#action-row:not(#action-row:has(.action)) {
+  display: none;
+}

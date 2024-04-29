@@ -1,7 +1,7 @@
 import { ActionPropsInfo } from '@/includes/types';
 
-const Transfer = (props: ActionPropsInfo) => {
-  const { shortenAddress, yoctoToNear } = VM.require(
+const FunctionCall = (props: ActionPropsInfo) => {
+  const { shortenAddress } = VM.require(
     `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -25,13 +25,30 @@ const Transfer = (props: ActionPropsInfo) => {
     <div className="action flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">
-        Transfer{' '}
+        Call{' '}
         <span className="font-normal pl-1">
-          {yoctoToNear(props.action.args.deposit, true)} Ⓝ
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[240px] inline-flex truncate">
+                  <span className="block truncate">
+                    {props.action.args.method_name}
+                  </span>
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Content
+                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                align="center"
+                side="bottom"
+              >
+                {props.action.args.method_name}
+              </Tooltip.Content>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </span>
       </span>
       <span className="font-bold text-gray px-1">
-        From{' '}
+        By{' '}
         <a
           href={`/address/${props.action.from}`}
           className="hover:no-underline"
@@ -42,7 +59,7 @@ const Transfer = (props: ActionPropsInfo) => {
         </a>
       </span>
       <span className="font-bold text-gray px-1">
-        To{' '}
+        On{' '}
         <a href={`/address/${props.action.to}`} className="hover:no-underline">
           <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
             {shortenAddress(props.action.to)}
@@ -53,4 +70,4 @@ const Transfer = (props: ActionPropsInfo) => {
   );
 };
 
-export default Transfer;
+export default FunctionCall;
