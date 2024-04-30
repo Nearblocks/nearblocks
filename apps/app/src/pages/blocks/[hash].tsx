@@ -11,15 +11,25 @@ import { env } from 'next-runtime-env';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
-
-const Block = () => {
+const fetcher = async (url: string, options: any) => {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {}
+};
+const Block = ({ fallbackData }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
   const { hash } = router.query;
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const [blockHeight, setBlockHeight] = useState(0);
+  const [blockHeight, setBlockHeight] = useState(
+    fallbackData.blocks[0].block_height,
+  );
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -39,10 +49,11 @@ const Block = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}blocks/${hash}`, {
+        const response = await fetcher(`${apiUrl}blocks/${hash}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -123,6 +134,25 @@ const Block = () => {
   );
 };
 
+export const getServerSideProps = async (context: any) => {
+  const {
+    query: { hash },
+  } = context;
+  let fallbackData = null;
+
+  try {
+    fallbackData = await fetcher(`${apiUrl}blocks/${hash}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    //
+  }
+
+  return { props: { fallbackData } };
+};
 Block.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default Block;

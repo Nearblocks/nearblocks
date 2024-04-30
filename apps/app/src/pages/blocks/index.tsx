@@ -67,7 +67,8 @@ const Blocks = () => {
         <meta property="og:description" content={t('blocks:metaDescription')} />
         <meta property="twitter:title" content={t('blocks:metaTitle')} />
         <meta property="og:image" content={thumbnail} />
-        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('blocks:metaDescription')}

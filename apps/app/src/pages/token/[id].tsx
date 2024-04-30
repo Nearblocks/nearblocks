@@ -13,8 +13,16 @@ import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-
-const Token = () => {
+const fetcher = async (url: string, options: any) => {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {}
+};
+const Token = ({ fallbackData }: any) => {
   const router = useRouter();
   const { id, a } = router.query;
   const components = useBosComponents();
@@ -23,7 +31,7 @@ const Token = () => {
   const [height, setHeight] = useState({});
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [token, setToken] = useState<{ name: string; symbol: string } | null>(
-    null,
+    fallbackData?.contracts?.[0],
   );
   const [pageTab, setPageTab] = useState('Transfers');
 
@@ -69,7 +77,9 @@ const Token = () => {
   const description = token
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/thumbnail/token?token=${
+    token?.name && encodeURI(token?.name)
+  }&network=${network}&brand=near`;
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -174,7 +184,25 @@ const Token = () => {
     </>
   );
 };
+export const getServerSideProps = async (context: any) => {
+  const {
+    query: { id },
+  } = context;
+  let fallbackData = null;
 
+  try {
+    fallbackData = await fetcher(`${apiUrl}fts/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    //
+  }
+
+  return { props: { fallbackData } };
+};
 Token.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default Token;

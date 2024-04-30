@@ -12,14 +12,26 @@ import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-const NFToken = () => {
+
+const fetcher = async (url: string, options: any) => {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {}
+};
+const NFToken = ({ fallbackData }: any) => {
   const router = useRouter();
   const { id } = router.query;
   const components = useBosComponents();
   const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const [token, setToken] = useState<Token | null>(null);
+  const [token, setToken] = useState<Token | null>(
+    fallbackData?.contracts?.[0],
+  );
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -59,7 +71,9 @@ const NFToken = () => {
   const description = token
     ? `All you need to know about the ${token.name} NFT Collection : Statistics, total supply, number of holders, latest transactions & meta-data.`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/thumbnail/nft?token=${
+    token?.name && encodeURI(token?.name)
+  }&network=${network}&brand=near`;
 
   useEffect(() => {
     updateOuterDivHeight();
@@ -106,7 +120,25 @@ const NFToken = () => {
     </>
   );
 };
+export const getServerSideProps = async (context: any) => {
+  const {
+    query: { id },
+  } = context;
+  let fallbackData = null;
 
+  try {
+    fallbackData = await fetcher(`${apiUrl}nfts/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    //
+  }
+
+  return { props: { fallbackData } };
+};
 NFToken.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 
 export default NFToken;

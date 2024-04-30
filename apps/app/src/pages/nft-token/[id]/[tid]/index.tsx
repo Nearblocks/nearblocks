@@ -10,16 +10,26 @@ import Detail from '@/components/skeleton/nft/Detail';
 import { Token } from '@/utils/types';
 import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
-const NFTokenInfo = () => {
+const fetcher = async (url: string, options: any) => {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {}
+};
+const NFTokenInfo = ({ fallbackData }: any) => {
   const router = useRouter();
   const { id, tid } = router.query;
   const components = useBosComponents();
   const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const [token, setToken] = useState<Token | null>(null);
+  const [token, setToken] = useState<Token | null>(fallbackData?.tokens?.[0]);
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -84,6 +94,10 @@ const NFTokenInfo = () => {
       description: description,
     };
   }, [token]);
+  const thumbnail = `${ogUrl}/thumbnail/nft?token=${
+    (token?.title || token?.token) &&
+    encodeURIComponent(token.title || token.token)
+  }&network=${network}&brand=near`;
 
   return (
     <>
@@ -95,6 +109,9 @@ const NFTokenInfo = () => {
         <meta property="og:description" content={meta.description} />
         <meta property="twitter:title" content={meta.title} />
         <meta property="twitter:description" content={meta.description} />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
       <div style={height} className="relative container mx-auto">
@@ -114,6 +131,25 @@ const NFTokenInfo = () => {
       </div>
     </>
   );
+};
+export const getServerSideProps = async (context: any) => {
+  const {
+    query: { id, tid },
+  } = context;
+  let fallbackData = null;
+
+  try {
+    fallbackData = await fetcher(`${apiUrl}nfts/${id}/tokens/${tid}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    //
+  }
+
+  return { props: { fallbackData } };
 };
 NFTokenInfo.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
 export default NFTokenInfo;

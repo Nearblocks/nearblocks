@@ -29,7 +29,8 @@ const AdvertisePage = () => {
           content={t('home:metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
       <div className="container mx-auto herobg flex flex-col items-start p-4.5 lg:!py-16 px-6">

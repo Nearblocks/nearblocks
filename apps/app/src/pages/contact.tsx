@@ -28,7 +28,8 @@ const Contract = () => {
           content={t('home:metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
