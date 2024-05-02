@@ -38,7 +38,10 @@ const changes = catchAsync(
     `;
 
     let nextCursor = activities?.[activities?.length - 1]?.event_index;
-    nextCursor = nextCursor ? `${nextCursor}n` : undefined;
+    nextCursor =
+      activities?.length === per_page && nextCursor
+        ? `${nextCursor}n`
+        : undefined;
 
     return res.status(200).json({ activities, cursor: nextCursor });
   },
