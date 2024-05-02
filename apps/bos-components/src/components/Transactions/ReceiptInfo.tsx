@@ -17,7 +17,13 @@ interface Props {
   receipt: ReceiptsPropsInfo | any;
 }
 
-import { BlocksInfo, ReceiptsPropsInfo } from '@/includes/types';
+import Question from '@/includes/Common/Question';
+import {
+  Action,
+  BlocksInfo,
+  FunctionCallActionView,
+  ReceiptsPropsInfo,
+} from '@/includes/types';
 
 export default function (props: Props) {
   const { receipt, network, ownerId } = props;
@@ -25,7 +31,7 @@ export default function (props: Props) {
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { convertToMetricPrefix } = VM.require(
+  const { convertToMetricPrefix, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
@@ -143,8 +149,52 @@ export default function (props: Props) {
     );
   }
 
+  const getDeposit = (actions: Action[]): string =>
+    actions
+      .map((action) => ('deposit' in action.args ? action.args.deposit : '0'))
+      .reduce(
+        (acc, deposit) =>
+          Big(acc || '0')
+            .plus(deposit)
+            .toString(),
+        '0',
+      );
+
+  const getGasAttached = (actions: Action[]): string => {
+    const gasAttached = actions
+      .map((action) => action.args)
+      .filter(
+        (args): args is FunctionCallActionView['FunctionCall'] => 'gas' in args,
+      );
+
+    if (gasAttached.length === 0) {
+      return '0';
+    }
+
+    return gasAttached.reduce(
+      (acc, args) =>
+        Big(acc || '0')
+          .plus(args.gas)
+          .toString(),
+      '0',
+    );
+  };
+
+  const getRefund = (receipts: any[]): string =>
+    receipts
+      .filter(
+        (receipt) => 'outcome' in receipt && receipt.predecessorId === 'system',
+      )
+      .reduce(
+        (acc, receipt) =>
+          Big(acc || '0')
+            .plus(getDeposit(receipt.actions))
+            .toString(),
+        '0',
+      );
+
   return (
-    <div className="pb-5 flex flex-col ">
+    <div className="flex flex-col ">
       <Tabs.Root defaultValue={'output'}>
         <Tabs.List>
           {hashes &&
@@ -153,8 +203,8 @@ export default function (props: Props) {
                 key={index}
                 onClick={() => onTab(index)}
                 className={`text-nearblue-600 text-xs leading-4 ${
-                  hash === 'output' ? 'ml-7' : 'ml-2.5'
-                } font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                  hash === 'output' ? 'ml-6' : 'ml-3'
+                } font-medium overflow-hidden inline-block cursor-pointer p-2 focus:outline-none ${
                   pageHash === hash
                     ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
@@ -166,51 +216,117 @@ export default function (props: Props) {
             ))}
         </Tabs.List>
         <Tabs.Content value={hashes[0]} className={'w-full'}>
-          <div className="flex flex-col my-4 mx-7">
-            <div className="flex justify-between">
-              <div className="flex flex-col w-full md:w-3/4">
-                <div className="">
-                  <h2 className="text-sm font-medium ">Logs</h2>
-                  <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  my-3 overflow-x-auto ">
-                    {receipt?.outcome?.logs?.length > 0 ? (
-                      <div className="w-full  break-words  space-y-4">
-                        <textarea
-                          readOnly
-                          rows={4}
-                          defaultValue={receipt?.outcome?.logs.join('\n')}
-                          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5  resize-y"
-                        ></textarea>
+          <div className="flex flex-col my-4 ml-6">
+            <div className="">
+              <h2 className="flex items-center text-sm font-medium">
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
-                    ) : (
-                      <div className="w-full  break-words p-5 font-medium space-y-4">
-                        No Logs
-                      </div>
-                    )}
+                    </Tooltip.Trigger>
+                    <Tooltip.Content
+                      className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      align="start"
+                      side="bottom"
+                    >
+                      Logs included in the receipt
+                    </Tooltip.Content>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+                Logs
+              </h2>
+              <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
+                {receipt?.outcome?.logs?.length > 0 ? (
+                  <div className="w-full  break-words  space-y-4">
+                    <textarea
+                      readOnly
+                      rows={4}
+                      defaultValue={receipt?.outcome?.logs.join('\n')}
+                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 resize-y"
+                    ></textarea>
                   </div>
-                </div>
-                <div>
-                  <h2 className="text-sm font-medium">Result</h2>
-                  {statusInfo}
-                </div>
+                ) : (
+                  <div className="w-full  break-words p-5 font-medium space-y-4">
+                    No Logs
+                  </div>
+                )}
               </div>
+            </div>
+            <div className="mt-4">
+              <h2 className="flex items-center text-sm font-medium">
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content
+                      className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      align="start"
+                      side="bottom"
+                    >
+                      The result of the receipt execution
+                    </Tooltip.Content>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+                Result
+              </h2>
+              {statusInfo}
             </div>
           </div>
         </Tabs.Content>
         <Tabs.Content value={hashes[1]} className={'w-fit'}>
           <div className="overflow-x-auto">
-            <table className="my-4 mx-7 whitespace-nowrap table-auto">
+            <table className="my-4 mx-6 whitespace-nowrap table-auto">
               <tbody>
                 <tr>
-                  <td className="py-2 pr-4">Receipt ID</td>
-                  <td className="py-2 pl-4">{receipt?.id}</td>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Unique identifier (hash) of this receipt.
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Receipt
+                  </td>
+                  <td className="font-semibold py-2 pl-4">{receipt?.id}</td>
                 </tr>
                 <tr>
                   <td
-                    className={`py-2 pr-4 ${
+                    className={`flex items-center py-2 pr-4 ${
                       !block ? 'whitespace-normal' : 'whitespace-nowrap'
                     }`}
                   >
-                    Executed in Block
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Block height
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Block
                   </td>
                   <td className="py-2 pl-4">
                     {block && (
@@ -218,39 +334,181 @@ export default function (props: Props) {
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                         className="text-green-500 dark:text-green-250"
                       >
-                        #{block?.block_height}
+                        {!loading && localFormat(block?.block_height)}
                       </Link>
                     )}
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-2 pr-4">Predecessor ID</td>
-                  <td className="py-2 pl-4">{receipt?.predecessorId}</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4">Receiver ID</td>
-                  <td className="py-2 pl-4">{receipt?.receiverId}</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4">Attached Gas</td>
-                  <td className="py-2 pl-4">{receipt?.id}</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4">Gas Burned</td>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          The account which issued the receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    From
+                  </td>
                   <td className="py-2 pl-4">
-                    {`${
-                      !loading && receipt?.outcome?.gasBurnt
-                        ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
-                        : receipt?.outcome?.gasBurnt ?? ''
-                    }gas`}
+                    <Link
+                      href={`/address/${receipt?.predecessorId}`}
+                      className="text-green-500 dark:text-green-250 hover:no-underline"
+                    >
+                      {receipt?.predecessorId}
+                    </Link>
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-2 pr-4">Tokens Burned</td>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          The destination account of the receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    To
+                  </td>
                   <td className="py-2 pl-4">
-                    {!loading && receipt?.outcome?.tokensBurnt
-                      ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
-                      : receipt?.outcome?.tokensBurnt ?? ''}
+                    <Link
+                      href={`/address/${receipt?.receiverId}`}
+                      className="text-green-500 dark:text-green-250 hover:no-underline"
+                    >
+                      {receipt?.receiverId}
+                    </Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Maximum amount of gas allocated for the Receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Gas Limit
+                  </td>
+                  <td className="py-2 pl-4">{`${
+                    !loading &&
+                    convertToMetricPrefix(getGasAttached(receipt?.actions))
+                  }gas`}</td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Burnt Gas by Receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Burnt Gas
+                  </td>
+                  <td className="text-xs py-2 pl-4">
+                    <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
+                      <span className="text-xs mr-2">🔥 </span>
+                      {`${
+                        !loading && receipt?.outcome?.gasBurnt
+                          ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
+                          : receipt?.outcome?.gasBurnt ?? ''
+                      }gas`}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Burnt Tokens by Receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Burnt Tokens
+                  </td>
+                  <td className="text-xs py-2 pl-4">
+                    <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
+                      <span className="text-xs mr-2">🔥 </span>
+                      {!loading && receipt?.outcome?.tokensBurnt
+                        ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
+                        : receipt?.outcome?.tokensBurnt ?? ''}
+                      Ⓝ
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          align="start"
+                          side="bottom"
+                        >
+                          Refund from the receipt
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
+                    Refund
+                  </td>
+                  <td className="py-2 pl-4">
+                    {!loading &&
+                      yoctoToNear(
+                        getRefund(receipt?.outcome?.nestedReceipts) || '0',
+                        true,
+                      )}
                     Ⓝ
                   </td>
                 </tr>

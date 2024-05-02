@@ -47,7 +47,7 @@ export default function (props: TransactionReceiptInfo) {
         className={`${
           convertionReceipt
             ? 'pl-0 border-transparent'
-            : 'pl-12 border-green-500 dark:border-green-250'
+            : 'pl-4 md:pl-8 border-green-500 dark:border-green-250'
         } ${className} `}
       >
         {convertionReceipt ? (
@@ -69,12 +69,12 @@ export default function (props: TransactionReceiptInfo) {
               expandAll: expandAll,
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
-              className: 'pb-5 !mt-0 border-l mt-2.5 ml-2.5',
+              className: 'pb-4 !mt-0 border-l mt-2.5 ml-2.5',
               ownerId,
             }}
           />
         ) : null}
-        <div className="flex flex-col relative border-l border-green-500 dark:border-green-250  py-2 pl-7 ml-2.5">
+        <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
           {receipt?.actions &&
             receipt?.actions.map((action: any, index: number) => (
               <Widget

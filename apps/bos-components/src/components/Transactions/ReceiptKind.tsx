@@ -66,7 +66,7 @@ export default function (props: ReceiptKindInfo) {
   }
 
   return (
-    <div className="py-2.5">
+    <div className="pb-3">
       <div
         className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center leading-5 cursor-pointer 
         transition-all ease-in-out 
@@ -79,7 +79,7 @@ export default function (props: ReceiptKindInfo) {
           action?.kind !== 'delegateAction' &&
           t(`txns:${action?.kind}`)}
         {action?.kind === 'delegateAction' ? (
-          <div className="inline-flex text-sm">{`Delegate action`}</div>
+          <div className="inline-flex text-sm">{`Delegate`}</div>
         ) : null}
         {action?.kind === 'functionCall' ? (
           <div className="inline-flex text-sm">{`'${action?.args?.methodName}'`}</div>
@@ -100,20 +100,20 @@ export default function (props: ReceiptKindInfo) {
       ) : null}
       {isTxTypeActive ? (
         action?.kind === 'functionCall' ? (
-          <div className="py-2">
+          <div className="py-3">
             {prettyArgs && typeof prettyArgs === 'object' ? (
               <textarea
                 readOnly
                 rows={4}
                 defaultValue={displayArgs(args?.args_base64 || args)}
-                className="block appearance-none outline-none w-full max-md:w-fit border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-5 my-3 resize-y"
+                className="block appearance-none outline-none w-full border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-3 resize-y"
               ></textarea>
             ) : (
               <div>
-                <div className="bg-gray-100 dark:bg-black-200 rounded-md p-3 font-medium my-3">
+                <div className="bg-gray-100 dark:bg-black-200 rounded-md p-3 font-medium">
                   <div className="bg-inherit text-inherit font-inherit border-none p-0">
                     <div className="max-h-52 overflow-auto">
-                      <div className="p-4 h-full w-full">{prettyArgs}</div>
+                      <div className="p-3 h-full w-full">{prettyArgs}</div>
                     </div>
                   </div>
                 </div>
@@ -121,12 +121,7 @@ export default function (props: ReceiptKindInfo) {
             )}
           </div>
         ) : action?.kind === 'delegateAction' ? (
-          <div className="py-2">
-            <span className="font-semibold">
-              {action?.args?.senderId
-                ? `Actions delegated for ${action?.args?.senderId}:`
-                : ''}
-            </span>
+          <div className="py-3">
             {[...action.args.actions]
               .sort(
                 (actionA, actionB) =>

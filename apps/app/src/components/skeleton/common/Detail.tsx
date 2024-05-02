@@ -1,7 +1,6 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
 import useTranslation from 'next-translate/useTranslation';
-import ArrowDown from '@/components/Icons/ArrowDown';
 interface Props {
   network: string;
   txns?: boolean;
@@ -11,50 +10,46 @@ interface Props {
 const Detail = forwardRef(
   ({ network, txns, className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
     const { t } = useTranslation('txns');
+
+    const buttonStyles = (hash: string) =>
+      `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+        pageTab === hash
+          ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+          : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
+      }`;
+
     return (
       <div ref={ref} className={`w-full z-10 ${className} pr-2`}>
         {!txns && (
           <div className="md:flex items-center justify-between">
             <div className="w-80 max-w-xs px-3 py-5">
               <Skeleton className="h-7" />
-            </div>{' '}
+            </div>
           </div>
         )}
         {txns === true && (
           <div>
-            <div
-              className={`text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
-                pageTab === ' '
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
-                  : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
-              }`}
-            >
-              {t('txn.tabs.overview')}
-            </div>{' '}
-            <div
-              className={`text-xs leading-4 font-medium rounded-lg overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
-                pageTab === 'execution'
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
-                  : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
-              }`}
-            >
-              <span className="flex">
-                {t('txn.tabs.execution')}
-                <ArrowDown className="h-4 w-4 fill-current ml-1" />
-                <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-24 -mt-3 px-1 ">
-                  NEW
-                </div>
-              </span>
-            </div>{' '}
-            <div
-              className={`text-nearblue-600  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-2 mr-3 focus:outline-none ${
-                pageTab === 'comments'
-                  ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
-                  : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 dark:text-neargray-10'
-              }`}
-            >
-              {t('txn.tabs.comments')}
-            </div>{' '}
+            <div className={buttonStyles('overview')}>
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.overview') : 'Overview'}
+              </h2>
+            </div>
+            <div className={buttonStyles('execution')}>
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
+              </h2>
+            </div>
+            <div className={buttonStyles('enhanced')}>
+              <h2 className="p-2">{'Enhanced Plan'}</h2>
+              <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
+                NEW
+              </div>
+            </div>
+            <div className={buttonStyles('comments')}>
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.comments') : 'Comments'}
+              </h2>
+            </div>
           </div>
         )}
         <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 divide-solid dark:divide-black-200  divide-gray-200 divide-y soft-shadow rounded-xl mr-4">
