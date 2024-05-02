@@ -125,7 +125,7 @@ export default function (props: Props) {
               Expand All <span className="ml-1.5">+</span>
             </div>
           </div>
-          <div className="p-8 overflow-auto">
+          <div className="p-4 md:px-8 overflow-auto">
             {!receipt?.id ? (
               <div className="w-full md:w-3/4">
                 <Loader className="flex w-full mt-2" />

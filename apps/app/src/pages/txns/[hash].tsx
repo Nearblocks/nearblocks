@@ -19,7 +19,7 @@ const Txn = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const [pageTab, setPageTab] = useState('overview');
+  const pageTab = `${router?.query?.tab || 'overview'}`;
 
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
@@ -27,17 +27,8 @@ const Txn = () => {
   const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
 
   const onHandleTab = (hashValue: string) => {
-    setPageTab(hashValue);
     router.push(`/txns/${hash}?tab=${hashValue}`);
   };
-
-  useEffect(() => {
-    const select = `${router?.query?.tab}` || 'overview';
-
-    if (router?.query?.tab) {
-      setPageTab(select);
-    }
-  }, [router?.query]);
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
