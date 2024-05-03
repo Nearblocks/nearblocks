@@ -36,26 +36,21 @@ export default function ({ network, id, ownerId, t }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [countLoading, setcountLoading] = useState(false);
-  const initialPage = 1;
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
-  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
+  const [txns, setTxns] = useState<TransactionInfo[] | undefined>(undefined);
   const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
 
   const config = getConfig && getConfig(network);
+
+  const apiUrl = `${config?.backendUrl}nfts/${id}/txns?`;
+
+  const [url, setUrl] = useState(apiUrl);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
 
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const setPage = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  useEffect(() => {
-    setCurrentPage(currentPage);
-  }, [currentPage]);
 
   useEffect(() => {
     function fetchTotalTxns() {
@@ -86,40 +81,48 @@ export default function ({ network, id, ownerId, t }: Props) {
         .finally(() => {});
     }
 
-    function fetchTxnsData(page: number) {
+    function fetchTxnsData() {
       setIsLoading(true);
 
-      asyncFetch(
-        `${config?.backendUrl}nfts/${id}/txns?order=desc&page=${page}&per_page=25`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${url}order=desc&per_page=25`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-        .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
-          const resp = data?.body?.txns;
-          if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
-            setTxns((prevData) => ({ ...prevData, [page]: resp }));
-            setIsLoading(false);
-          } else {
-            handleRateLimit(
-              data,
-              () => fetchTxnsData(page),
-              () => setIsLoading(false),
-            );
-          }
-        })
+      })
+        .then(
+          (data: {
+            body: { txns: TransactionInfo[]; cursor: string | undefined };
+            status: number;
+          }) => {
+            const resp = data?.body?.txns;
+            let cursor = data?.body?.cursor;
+            if (data.status === 200) {
+              setCursor(cursor);
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTxns(resp);
+              } else if (resp.length === 0) {
+                setTxns(undefined);
+              }
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTxnsData(),
+                () => setIsLoading(false),
+              );
+            }
+          },
+        )
         .catch(() => {});
     }
     if (config?.backendUrl) {
       fetchTotalTxns();
-      fetchTxnsData(currentPage);
+      fetchTxnsData();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config?.backendUrl, currentPage, id]);
+  }, [config?.backendUrl, id, url]);
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -170,7 +173,7 @@ export default function ({ network, id, ownerId, t }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -198,7 +201,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -293,7 +296,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -404,7 +407,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -432,7 +435,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         </>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
@@ -506,7 +509,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName: 'inline-flex',
     },
     {
@@ -525,7 +528,7 @@ export default function ({ network, id, ownerId, t }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
@@ -540,7 +543,8 @@ export default function ({ network, id, ownerId, t }: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              {Object.keys(txns).length > 0 &&
+              {txns &&
+                txns.length > 0 &&
                 `A total of ${
                   localFormat && localFormat(totalCount.toString())
                 } transactions found`}
@@ -552,14 +556,15 @@ export default function ({ network, id, ownerId, t }: Props) {
         src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
-          data: txns[currentPage],
+          data: txns,
           isLoading: isLoading,
-          isPagination: true,
           count: totalCount,
-          page: currentPage,
           limit: 25,
-          pageLimit: 200,
-          setPage: setPage,
+          cursorPagination: true,
+          cursor: cursor,
+          apiUrl: apiUrl,
+          setUrl: setUrl,
+          ownerId: ownerId,
           Error: (
             <ErrorMessage
               icons={<FaInbox />}

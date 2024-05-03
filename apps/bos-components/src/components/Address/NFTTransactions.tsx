@@ -53,9 +53,8 @@ export default function (props: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
+  const [txns, setTxns] = useState<TransactionInfo[] | undefined>(undefined);
   const [showAge, setShowAge] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   const [address, setAddress] = useState('');
   const [filterValue, setFilterValue] = useState<Record<string, string>>({});
 
@@ -64,10 +63,12 @@ export default function (props: Props) {
 
   const config = getConfig && getConfig(network);
 
+  const apiUrl = `${config?.backendUrl}account/${id}/nft-txns?`;
+
+  const [url, setUrl] = useState(apiUrl);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+
   const toggleShowAge = () => setShowAge((s) => !s);
-  const setPage = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
 
   useEffect(() => {
     function fetchTotalTxns(qs?: string) {
@@ -99,35 +100,39 @@ export default function (props: Props) {
         .catch(() => {});
     }
 
-    function fetchTxnsData(qs: string, sqs: string, page: number) {
+    function fetchTxnsData(qs: string, sqs: string) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
-      asyncFetch(
-        `${config?.backendUrl}account/${id}/nft-txns?${queryParams}order=${sqs}&page=${page}&per_page=25`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${url}${queryParams}order=${sqs}&per_page=25`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-        .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
-          const resp = data?.body?.txns;
-          if (data.status === 200) {
-            if (Array.isArray(resp) && resp.length > 0) {
-              setTxns((prevData) => ({ ...prevData, [page]: resp || [] }));
-            } else if (resp.length === 0) {
-              setTxns({});
+      })
+        .then(
+          (data: {
+            body: { txns: TransactionInfo[]; cursor: string | undefined };
+            status: number;
+          }) => {
+            const resp = data?.body?.txns;
+            let cursor = data?.body?.cursor;
+            if (data.status === 200) {
+              setCursor(cursor);
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTxns(resp);
+              } else if (resp.length === 0) {
+                setTxns(undefined);
+              }
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTxnsData(qs, sorting),
+                () => setIsLoading(false),
+              );
             }
-            setIsLoading(false);
-          } else {
-            handleRateLimit(
-              data,
-              () => fetchTxnsData(qs, sorting, page),
-              () => setIsLoading(false),
-            );
-          }
-        })
+          },
+        )
         .catch(() => {});
     }
     let urlString = '';
@@ -142,14 +147,14 @@ export default function (props: Props) {
 
     if (urlString && sorting) {
       fetchTotalTxns(urlString);
-      fetchTxnsData(urlString, sorting, currentPage);
+      fetchTxnsData(urlString, sorting);
     } else if (sorting && (!filters || Object.keys(filters).length === 0)) {
       fetchTotalTxns();
-      fetchTxnsData('', sorting, currentPage);
+      fetchTxnsData('', sorting);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config?.backendUrl, id, currentPage, filters, sorting]);
+  }, [config?.backendUrl, id, filters, sorting, url]);
 
   const onInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -194,6 +199,7 @@ export default function (props: Props) {
   const handleMouseLeave = () => {
     setAddress('');
   };
+
   const columns = [
     {
       header: '',
@@ -665,7 +671,8 @@ export default function (props: Props) {
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
             <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              {Object.keys(txns).length > 0 &&
+              {txns &&
+                txns.length > 0 &&
                 `A total of ${
                   localFormat && localFormat(totalCount.toString())
                 }${' '}
@@ -696,7 +703,7 @@ export default function (props: Props) {
               </div>
             )}
             <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-              {Object.keys(txns).length > 0 && (
+              {txns && txns.length > 0 && (
                 <button className="hover:no-underline ">
                   <Link
                     href={`/nft-token/exportdata?address=${id}`}
@@ -718,14 +725,15 @@ export default function (props: Props) {
           src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: txns[currentPage],
+            data: txns,
             isLoading: isLoading,
-            isPagination: true,
             count: totalCount,
-            page: currentPage,
             limit: 25,
-            pageLimit: 200,
-            setPage: setPage,
+            cursorPagination: true,
+            cursor: cursor,
+            apiUrl: apiUrl,
+            setUrl: setUrl,
+            ownerId: ownerId,
             Error: (
               <ErrorMessage
                 icons={<FaInbox />}
