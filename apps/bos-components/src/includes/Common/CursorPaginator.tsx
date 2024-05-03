@@ -49,10 +49,10 @@ const CursorPaginator = (props: PaginatorProps) => {
           >
             <button
               type="button"
-              disabled={disabled || props.isLoading || !props.cursor}
+              disabled={disabled || props.isLoading}
               onClick={onFirst}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
-                disabled || props.isLoading || !props.cursor
+                disabled || props.isLoading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
