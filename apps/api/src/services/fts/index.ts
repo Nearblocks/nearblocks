@@ -182,7 +182,8 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   `;
 
   let nextCursor = txns?.[txns?.length - 1]?.event_index;
-  nextCursor = nextCursor ? `${nextCursor}n` : undefined;
+  nextCursor =
+    txns?.length === per_page && nextCursor ? `${nextCursor}n` : undefined;
 
   return res.status(200).json({ cursor: nextCursor, txns });
 });
