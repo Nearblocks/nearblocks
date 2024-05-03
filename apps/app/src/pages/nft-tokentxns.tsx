@@ -4,7 +4,6 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
@@ -13,24 +12,11 @@ const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const NftToxenTxns = () => {
-  const router = useRouter();
   const components = useBosComponents();
-  const { page } = router.query;
   const { t } = useTranslation();
-  const initialPage = page ? Number(page) : 1;
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const setPage = (pageNumber: number) => {
-    Router.push(`/nft-tokentxns?page=${pageNumber}`, undefined, {
-      shallow: true,
-    });
-    setCurrentPage(pageNumber);
-  };
 
-  useEffect(() => {
-    setCurrentPage(page ? Number(page) : 1);
-  }, [page]);
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -95,8 +81,6 @@ const NftToxenTxns = () => {
                 onChangeHeight={onChangeHeight}
                 props={{
                   t: t,
-                  currentPage: currentPage,
-                  setPage: setPage,
                   network: networkId,
                 }}
                 loading={<List className="absolute" ref={heightRef} />}

@@ -1,3 +1,4 @@
+import CursorPaginator from '@/includes/Common/CursorPaginator';
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
 /**
@@ -14,6 +15,11 @@ import Skeleton from '@/includes/Common/Skeleton';
  * @param {function} renderRowSubComponent - A function is used to render a sub-component for each row in the table.
  * @param {Array} expanded - An array of numbers representing the indices of rows that are expanded.
  * @param {boolean} isExpanded -  Flag for compact table display.
+ * @param {boolean} cursorPagination - Indicates if cursor pagination is enabled for the table
+ * @param {string} cursor - Cursor to be set when pagination is applied.
+ * @param {string} apiUrl - URL used for attaching cursor during pagination.
+ * @param {function} setUrl - A function used to set the URL on the current table.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface column {
   header: string;
@@ -37,6 +43,11 @@ interface Props {
   expanded: number[];
   isExpanded: false;
   Error: string | any;
+  cursorPagination: boolean;
+  cursor: string;
+  apiUrl: string;
+  setUrl: (url: string) => void;
+  ownerId: string;
 }
 
 export default function (props: Props) {
@@ -75,6 +86,17 @@ export default function (props: Props) {
             limit={props.limit}
             pageLimit={props.pageLimit}
             setPage={props.setPage}
+          />
+        ) : null}
+        {props.cursorPagination ? (
+          <CursorPaginator
+            apiUrl={props.apiUrl}
+            count={props.count}
+            limit={props.limit}
+            setUrl={props.setUrl}
+            cursor={props.cursor}
+            isLoading={props.isLoading}
+            ownerId={props.ownerId}
           />
         ) : null}
       </>
@@ -201,7 +223,7 @@ export default function (props: Props) {
           </table>
         </div>
       )}
-      {props.isPagination && props.data !== undefined ? (
+      {props.isPagination && props.data ? (
         <Paginator
           count={props.count}
           isLoading={props.isLoading}
@@ -209,6 +231,17 @@ export default function (props: Props) {
           limit={props.limit}
           pageLimit={props.pageLimit}
           setPage={props.setPage}
+        />
+      ) : null}
+      {props.cursorPagination && props.data ? (
+        <CursorPaginator
+          apiUrl={props.apiUrl}
+          count={props.count}
+          limit={props.limit}
+          setUrl={props.setUrl}
+          cursor={props.cursor}
+          isLoading={props.isLoading}
+          ownerId={props.ownerId}
         />
       ) : null}
     </>

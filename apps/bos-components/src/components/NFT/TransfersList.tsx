@@ -6,18 +6,12 @@
  * @interface Props
  * @param {string}  [network] - The network data to show, either mainnet or testnet.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
- * @param {number} [currentPage] - The current page number being displayed. (Optional)
- *                                 Example: If provided, currentPage=3 will display the third page of blocks.
- * @param {function} [setPage] - A function used to set the current page. (Optional)
- *                               Example: setPage={handlePageChange} where handlePageChange is a function to update the page.
  * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface Props {
   ownerId: string;
   network: string;
   t: (key: string, options?: { count?: string | undefined }) => string;
-  currentPage: number;
-  setPage: (page: number) => void;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -29,7 +23,7 @@ import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
 import ErrorMessage from '@/includes/Common/ErrorMessage';
 import FaInbox from '@/includes/icons/FaInbox';
 
-export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
+export default function ({ network, t, ownerId }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -41,8 +35,8 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
   const [totalCount, setTotalCount] = useState(0);
   const [showAge, setShowAge] = useState(true);
   const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
-  const [tokens, setTokens] = useState<{ [key: number]: TransactionInfo[] }>(
-    {},
+  const [tokens, setTokens] = useState<TransactionInfo[] | undefined>(
+    undefined,
   );
   const [address, setAddress] = useState('');
   const [status, setStatus] = useState({
@@ -51,6 +45,10 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
   });
   const [timestamp, setTimeStamp] = useState('');
   const config = getConfig && getConfig(network);
+  const apiUrl = `${config?.backendUrl}nfts/txns?`;
+
+  const [url, setUrl] = useState(apiUrl);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -87,9 +85,9 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
         .finally(() => {});
     }
 
-    function fetchTokens(page: number) {
+    function fetchTokens() {
       setIsLoading(true);
-      asyncFetch(`${config?.backendUrl}nfts/txns?page=${page}&per_page=25`, {
+      asyncFetch(`${url}per_page=25`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -99,17 +97,24 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
           (data: {
             body: {
               txns: TransactionInfo[];
+              cursor: string | undefined;
             };
             status: number;
           }) => {
             const resp = data?.body?.txns;
+            let cursor = data?.body?.cursor;
             if (data.status === 200) {
-              setTokens((prevData) => ({ ...prevData, [page]: resp || [] }));
+              setCursor(cursor);
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTokens(resp);
+              } else if (resp.length === 0) {
+                setTokens(undefined);
+              }
               setIsLoading(false);
             } else {
               handleRateLimit(
                 data,
-                () => fetchTokens(page),
+                () => fetchTokens(),
                 () => setIsLoading(false),
               );
             }
@@ -139,12 +144,12 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
     }
     if (config?.backendUrl) {
       fetchTotalTokens();
-      fetchTokens(currentPage);
+      fetchTokens();
       fetchStatus();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config?.backendUrl, currentPage]);
+  }, [config?.backendUrl, url]);
   useEffect(() => {
     function fetchTimeStamp(height: number) {
       asyncFetch(`${config?.rpcUrl}`, {
@@ -629,6 +634,8 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
     },
   ];
 
+  console.log('tokens:', tokens);
+
   return (
     <>
       <div className="bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl pb-1">
@@ -652,7 +659,8 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
             <div className={`flex flex-col lg:flex-row pt-4`}>
               <div className="flex flex-col">
                 <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {Object.keys(tokens).length > 0 &&
+                  {tokens &&
+                    tokens.length > 0 &&
                     `A total of ${
                       localFormat && localFormat(totalCount.toString())
                     }${' '}
@@ -666,14 +674,15 @@ export default function ({ network, t, currentPage, setPage, ownerId }: Props) {
           src={`${ownerId}/widget/bos-components.components.Shared.Table`}
           props={{
             columns: columns,
-            data: tokens[currentPage],
+            data: tokens,
             isLoading: isLoading,
-            isPagination: true,
             count: totalCount,
-            page: currentPage,
             limit: 25,
-            pageLimit: 200,
-            setPage: setPage,
+            cursorPagination: true,
+            cursor: cursor,
+            apiUrl: apiUrl,
+            setUrl: setUrl,
+            ownerId: ownerId,
             Error: (
               <ErrorMessage
                 icons={<FaInbox />}
