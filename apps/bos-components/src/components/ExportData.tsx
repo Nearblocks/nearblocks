@@ -64,7 +64,7 @@ export default function ({
     switch (exportType) {
       case 'Transactions':
         url = `account/${id}/txns/export?start=${startDate}&end=${endDate}`;
-        text = 'Transactions';
+        text = 'Receipts';
         file = `${id}_transactions_${startDate}_${endDate}.csv`;
         break;
       case 'Token Transactions':
@@ -153,6 +153,11 @@ export default function ({
           <p className="text-center">
             The information you requested can be downloaded from this page.
           </p>
+          {exportInfo.tittle === 'Receipts' && (
+            <p className="text-center">
+              In CSV Export you will get all the receipts of the transactions.
+            </p>
+          )}
           <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-md shadow-md w-full px-4 py-4 my-10">
             <p className="text-nearblue-600 dark:text-neargray-10 my-3 mx-2">
               Export the earliest 5000 records starting from
