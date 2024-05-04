@@ -43,7 +43,8 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
 
   const config = getConfig && getConfig(network);
 
-  const apiUrl = `${config?.backendUrl}nfts/${id}/tokens/${tid}/txns?`;
+  const apiUrl = `nfts/${id}/tokens/${tid}/txns?`;
+
   const [url, setUrl] = useState(apiUrl);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
 
@@ -76,7 +77,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
 
     function fetchTokens() {
       setIsLoading(true);
-      asyncFetch(`${url}per_page=25`, {
+      asyncFetch(`${config?.backendUrl}${url}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

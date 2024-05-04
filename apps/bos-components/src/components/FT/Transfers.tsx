@@ -64,7 +64,7 @@ export default function ({
 
   const config = getConfig && getConfig(network);
 
-  const apiUrl = `${config?.backendUrl}fts/${id}/txns?`;
+  const apiUrl = `fts/${id}/txns?`;
 
   const [url, setUrl] = useState(apiUrl);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -102,9 +102,9 @@ export default function ({
     }
 
     function fetchTxnsData(qs: string) {
-      const queryParams = qs ? qs + '&' : '';
+      const queryParams = qs ? qs : '';
       setIsLoading(true);
-      asyncFetch(`${url}${queryParams}per_page=25`, {
+      asyncFetch(`${config?.backendUrl}${url}${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
