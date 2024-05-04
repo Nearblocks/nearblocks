@@ -43,3 +43,4 @@ declare const Link;
 declare const CommitButton;
 declare const VM;
 declare const Toast;
+declare const Switch;
