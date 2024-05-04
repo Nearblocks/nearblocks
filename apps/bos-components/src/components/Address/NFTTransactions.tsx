@@ -63,7 +63,7 @@ export default function (props: Props) {
 
   const config = getConfig && getConfig(network);
 
-  const apiUrl = `${config?.backendUrl}account/${id}/nft-txns?`;
+  const apiUrl = `account/${id}/nft-txns?`;
 
   const [url, setUrl] = useState(apiUrl);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
@@ -103,7 +103,7 @@ export default function (props: Props) {
     function fetchTxnsData(qs: string, sqs: string) {
       setIsLoading(true);
       const queryParams = qs ? qs + '&' : '';
-      asyncFetch(`${url}${queryParams}order=${sqs}&per_page=25`, {
+      asyncFetch(`${config?.backendUrl}${url}${queryParams}order=${sqs}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -495,7 +495,7 @@ export default function (props: Props) {
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
-                    {row?.token_id}
+                    {truncateString(row?.token_id, 15, '...')}
                   </a>
                 </Link>
               </span>

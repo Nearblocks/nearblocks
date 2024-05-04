@@ -19,10 +19,7 @@ const CursorPaginator = (props: PaginatorProps) => {
   function constructURL(params: string | undefined) {
     let url = props.apiUrl;
     if (params) {
-      const urlObj = new URL(url);
-      urlObj.searchParams.append('cursor', '');
-      urlObj.searchParams.set('cursor', params);
-      return urlObj.toString() + '&';
+      return `${url}cursor=${params}&`;
     }
     return url;
   }
