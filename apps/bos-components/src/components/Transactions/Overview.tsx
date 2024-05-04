@@ -390,7 +390,12 @@ export default function ({ network, t, ownerId, theme }: Props) {
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>
                               <div>
-                                {stats?.tps ? `(${stats?.tps} TPS)` : ''}
+                                <Link
+                                  href="/charts/tps"
+                                  className="hover:no-underline"
+                                >
+                                  {stats?.tps ? `(${stats?.tps} TPS)` : ''}
+                                </Link>
                               </div>
                             </Tooltip.Trigger>
                             <Tooltip.Content

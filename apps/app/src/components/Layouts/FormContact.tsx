@@ -29,6 +29,11 @@ const FormContact = () => {
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
+      } else {
+        setName('');
+        setEmail('');
+        setDescription('');
+        setSubject('');
       }
     } catch (err) {
       console.log(err);
@@ -69,10 +74,9 @@ const FormContact = () => {
           <select
             onChange={(e) => setSubject(e.target.value)}
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
+            value={subject}
           >
-            <option selected disabled={true}>
-              Select subject
-            </option>
+            <option value="">Select subject</option>
             <option value="Advertising">Advertising</option>
             <option value="Partnership / Press">Partnership / Press </option>
             <option value="Feature Request">Feature Request</option>
@@ -91,12 +95,13 @@ const FormContact = () => {
           maxLength={300}
           rows={5}
           onChange={(e) => setDescription(e.target.value)}
-          defaultValue={description}
+          value={description}
           required
         />
         <button
           type="submit"
           className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
+          disabled={loading}
         >
           {loading ? <LoadingCircular /> : t('Send Message')}
         </button>
