@@ -167,7 +167,7 @@ const Footer = () => {
             <div className="text-gray-400 text-xs flex items-center flex-wrap pb-1">
               Price feeds aggregated by{' '}
               <Link
-                href="http://coingecko.com?utm_campaign=api_partnership&utm_source=nearblocks&utm_medium=referral"
+                href="http://coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
                 legacyBehavior
               >
                 <a

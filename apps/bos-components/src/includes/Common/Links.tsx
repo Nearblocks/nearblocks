@@ -117,7 +117,7 @@ const Links = (props: any) => {
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
               <a
-                href={`https://www.coingecko.com/en/coins/${meta.coingecko_id}?utm_campaign=api_partnership&utm_source=nearblocks&utm_medium=referral`}
+                href={`https://www.coingecko.com/en/coins/${meta.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 className="flex"
