@@ -17,6 +17,7 @@ interface Props {
   network: string;
   currentPage: number;
   setPage: (page: number) => void;
+  theme: string;
 }
 import Skeleton from '@/includes/Common/Skeleton';
 import { ValidatorFullData } from '@/includes/types';
@@ -38,7 +39,13 @@ const initialValidatorFullData = {
   total: 0,
 };
 
-export default function ({ network, currentPage, setPage, ownerId }: Props) {
+export default function ({
+  network,
+  currentPage,
+  setPage,
+  ownerId,
+  theme,
+}: Props) {
   const {
     convertAmountToReadableString,
     convertTimestampToTime,
@@ -301,7 +308,7 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
             </Tooltip.Root>
           </Tooltip.Provider>
         ) : (
-          <div className="w-5 h-5 bg-gray-300 text-black flex items-center justify-center text-xs dark:bg-black-200 dark:text-white">
+          <div className="w-4 h-4 bg-gray-300 text-black flex items-center justify-center text-xs dark:bg-black-200 dark:text-white">
             ?
           </div>
         ),
@@ -528,455 +535,417 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
       ? (progress.blocks.produced + progress.chunks.produced) /
         (progress.blocks.total + progress.chunks.total)
       : 0;
+    const socialMedia =
+      row?.description?.twitter ||
+      row?.description?.discord ||
+      row?.description?.github ||
+      row?.description?.telegram;
+
     return (
       <>
-        <tr>
-          <td colSpan={100} className="bg-gray-50 dark:bg-black-600 pl-4">
-            {telemetry && (
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Shared.Table`}
-                props={{
-                  columns: [
-                    {
-                      header: (
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <div className="flex uppercase">
-                                <div>Uptime</div>
-                                <div>
-                                  <Question className="w-4 h-4 fill-current ml-1" />
-                                </div>
-                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="top"
-                            >
-                              {
-                                'Uptime is estimated by the ratio of the number of produced blocks to the number of expected blocks. '
-                              }
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
-                      ),
-                      key: 'uptime',
-                      cell: () => {
-                        return (
+        <tr className="border-none">
+          {telemetry && (
+            <>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 pl-8 py-2"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <div className="flex uppercase">
+                          <div>Uptime</div>
                           <div>
-                            {!isNaN(productivityRatio) &&
-                              (productivityRatio * 100 == 100
-                                ? 100
-                                : (productivityRatio * 100).toFixed(3)) + '%'}
+                            <Question className="w-4 h-4 fill-current ml-1" />
                           </div>
-                        );
-                      },
-                      tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                      thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
-                    },
-                    {
-                      header: (
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <div className="flex uppercase">
-                                <div>Latest block</div>
-                                <div>
-                                  <Question className="w-4 h-4 fill-current ml-1" />
-                                </div>
-                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="top"
-                            >
-                              {
-                                'The block height the validation node reported in the most recent telemetry heartbeat.'
-                              }
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
-                      ),
-                      key: 'latest_block',
-                      cell: () => {
-                        return (
-                          <div
-                            className={
-                              Math.abs(telemetry.lastHeight - latestBlock) >
-                              1000
-                                ? 'text-danger'
-                                : Math.abs(telemetry.lastHeight - latestBlock) >
-                                  50
-                                ? 'text-warning'
-                                : undefined
-                            }
-                          >
-                            {telemetry?.lastHeight}
-                          </div>
-                        );
-                      },
-                      tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                      thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
-                    },
-                    {
-                      header: (
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <div className="flex uppercase">
-                                <div>Latest Telemetry Update</div>
-                                <div>
-                                  <Question className="w-4 h-4 fill-current ml-1" />
-                                </div>
-                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="top"
-                            >
-                              {
-                                'Telemetry is a regular notification coming from the nodes which includes generic information like the latest known block height, and the version of NEAR Protocol agent (nearcore).'
-                              }
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
-                      ),
-                      key: 'telemetry',
-                      cell: () => {
-                        return (
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                        align="start"
+                        side="top"
+                      >
+                        {
+                          'Uptime is estimated by the ratio of the number of produced blocks to the number of expected blocks. '
+                        }
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                </div>
+                <div className="flex flex-wrap text-xs text-left font-bold text-nearblue-600 dark:text-neargray-10 tracking-wider">
+                  {!isNaN(productivityRatio)
+                    ? `${
+                        productivityRatio * 100 == 100
+                          ? 100
+                          : (productivityRatio * 100).toFixed(3)
+                      }%`
+                    : '-'}
+                </div>
+              </td>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 px-4 py-2"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <div className="flex uppercase whitespace-nowrap">
+                          <div>Latest block</div>
                           <div>
-                            {telemetry?.lastSeen &&
-                              timeAgo(telemetry?.lastSeen)}
+                            <Question className="w-4 h-4 fill-current ml-1" />
                           </div>
-                        );
-                      },
-                      tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                      thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
-                    },
-                    {
-                      header: (
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <div className="flex uppercase">
-                                <div>Node Agent Name</div>
-                                <div>
-                                  <Question className="w-4 h-4 fill-current ml-1" />
-                                </div>
-                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="top"
-                            >
-                              {
-                                'NEAR Protocol could have multiple implementations, so agent is the name of that implementation, where "near-rs" is.'
-                              }
-                              <a
-                                href="https://github.com/near/nearcore"
-                                target="_blank"
-                                className="text-green-250 hover:no-underline"
-                              >
-                                the official implementation.
-                              </a>
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
-                      ),
-                      key: 'agent_name',
-                      cell: () => {
-                        return (
-                          <span className="rounded bg-gray-300 dark:bg-black-200 px-1">
-                            {telemetry?.agentName}{' '}
-                          </span>
-                        );
-                      },
-                      tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                      thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
-                    },
-                    {
-                      header: 'Node Agent Version / Build',
-                      key: 'agent_version',
-                      cell: () => {
-                        return (
-                          <span className="rounded bg-gray-300 dark:bg-black-200 px-1">{`${telemetry?.agentVersion}/${telemetry?.agentBuild}`}</span>
-                        );
-                      },
-                      tdClassName:
-                        'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                      thClassName:
-                        'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                    },
-                  ],
-                  data: [telemetry] || [],
-                  isLoading: false,
-                  isPagination: false,
-                  isExpanded: true,
-                }}
-              />
-            )}
-            {row?.description ? (
-              <>
-                <Widget
-                  src={`${ownerId}/widget/bos-components.components.Shared.Table`}
-                  props={{
-                    columns: [
-                      {
-                        header: 'Name',
-                        key: 'name',
-                        cell: (row: ValidatorEpochData) => {
-                          return (
-                            <div>
-                              <a className="hover:no-underline flex">
-                                {row?.description?.logo &&
-                                  row?.description?.logo?.startsWith(
-                                    'http',
-                                  ) && (
-                                    <span className="mr-1 flex justify-center">
-                                      <img
-                                        src={row?.description?.logo}
-                                        alt={row?.description?.name}
-                                        width={20}
-                                        height={20}
-                                      />
-                                    </span>
-                                  )}
-                                {row?.description?.name
-                                  ? row?.description?.name
-                                  : '-'}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.url && {
-                        header: 'Web',
-                        key: 'web',
-                        cell: (row: ValidatorEpochData) => {
-                          return (
-                            <div>
-                              <a
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={
-                                  row?.description?.url?.startsWith('http')
-                                    ? row?.description?.url
-                                    : `http://${row?.description?.url}`
-                                }
-                                rel="noreferrer noopener"
-                                target="_blank"
-                              >
-                                {' '}
-                                {row?.description?.url}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.email && {
-                        header: 'Email',
-                        key: 'email',
-                        cell: (row: ValidatorEpochData) => {
-                          return (
-                            <div>
-                              <Link
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={`mailto:${row?.description?.email}`}
-                              >
-                                {row?.description?.email}{' '}
-                              </Link>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.twitter && {
-                        header: 'X',
-                        key: 'twitter',
-                        cell: (row: ValidatorEpochData) => {
-                          const url = row?.description?.twitter?.includes(
-                            'http',
-                          )
-                            ? row?.description?.twitter
-                            : `https://twitter.com/${row?.description?.twitter}`;
-                          return (
-                            <div>
-                              <a
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={url}
-                                rel="noreferrer noopener"
-                                target="_blank"
-                              >
-                                {row?.description?.twitter}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.discord && {
-                        header: 'Discord',
-                        key: 'discord',
-                        cell: (row: ValidatorEpochData) => {
-                          const url = row?.description?.discord?.includes(
-                            'http',
-                          )
-                            ? row?.description?.discord
-                            : `https://discord.com/invite/${row?.description?.discord}`;
-                          return (
-                            <div>
-                              <a
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={url}
-                                rel="noreferrer noopener"
-                                target="_blank"
-                              >
-                                {row?.description?.discord}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.github && {
-                        header: 'GitHub',
-                        key: 'github',
-                        cell: (row: ValidatorEpochData) => {
-                          const url = row?.description?.github?.includes('http')
-                            ? row?.description?.github
-                            : `https://github.com/${row?.description?.github}`;
-                          return (
-                            <div>
-                              <a
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={url}
-                                rel="noreferrer noopener"
-                                target="_blank"
-                              >
-                                {row?.description?.github}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.telegram && {
-                        header: 'Telegram',
-                        key: 'telegram',
-                        cell: (row: ValidatorEpochData) => {
-                          const url =
-                            row?.description?.telegram?.startsWith('http') ||
-                            row?.description?.telegram?.startsWith('https')
-                              ? row?.description?.telegram
-                              : `https://t.me/${row?.description?.telegram}`;
-                          return (
-                            <div>
-                              <a
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                                href={url}
-                                rel="noreferrer noopener"
-                                target="_blank"
-                              >
-                                {row?.description?.telegram}
-                              </a>
-                            </div>
-                          );
-                        },
-                        tdClassName:
-                          'px-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                        thClassName:
-                          'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                      },
-                      row?.description?.description &&
-                        row?.description?.description.length <= 100 && {
-                          header: 'Description',
-                          key: 'description',
-                          cell: (row: ValidatorEpochData) => {
-                            return (
-                              <div className="text-gray-400 w-full">
-                                <small>{row?.description?.description}</small>
-                              </div>
-                            );
-                          },
-                          tdClassName:
-                            'px-4 break-words text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                          thClassName:
-                            'px-4 pt-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                        },
-                    ],
-                    data: [row] || [],
-                    isLoading: false,
-                    isPagination: false,
-                    isExpanded: true,
-                  }}
-                />
-                {row?.description?.description &&
-                  row?.description?.description.length > 100 && (
-                    <Widget
-                      src={`${ownerId}/widget/bos-components.components.Shared.Table`}
-                      props={{
-                        columns: [
-                          row?.description?.description && {
-                            header: 'Description',
-                            key: 'description',
-                            cell: (row: ValidatorEpochData) => {
-                              return (
-                                <div className="text-gray-400 w-full">
-                                  <small>{row?.description?.description}</small>
-                                </div>
-                              );
-                            },
-                            tdClassName:
-                              'px-4 break-words text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
-                            thClassName:
-                              'px-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-                          },
-                        ],
-                        data: [row] || [],
-                        isLoading: false,
-                        isPagination: false,
-                        isExpanded: true,
-                      }}
-                    />
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                        align="start"
+                        side="top"
+                      >
+                        {
+                          'The block height the validation node reported in the most recent telemetry heartbeat.'
+                        }
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                </div>
+                <div
+                  className={`flex flex-wrap text-xs text-left font-bold  tracking-wider  ${
+                    Math.abs(telemetry.lastHeight - latestBlock) > 1000
+                      ? 'text-red-500 dark:text-red-500'
+                      : Math.abs(telemetry.lastHeight - latestBlock) > 50
+                      ? 'text-yellow-500 dark:text-yellow-500'
+                      : 'text-black dark:text-white '
+                  }`}
+                >
+                  {telemetry?.lastHeight ? telemetry?.lastHeight : '-'}
+                </div>
+              </td>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 px-4 py-2"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <div className="flex uppercase whitespace-nowrap">
+                          <div>Latest Telemetry Update</div>
+                          <div>
+                            <Question className="w-4 h-4 fill-current ml-1" />
+                          </div>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                        align="start"
+                        side="top"
+                      >
+                        {
+                          'Telemetry is a regular notification coming from the nodes which includes generic information like the latest known block height, and the version of NEAR Protocol agent (nearcore).'
+                        }
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                </div>
+                <div
+                  className={`flex flex-wrap text-xs text-left font-bold text-black dark:text-white tracking-wider`}
+                >
+                  {telemetry?.lastSeen ? timeAgo(telemetry?.lastSeen) : '-'}
+                </div>
+              </td>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 px-4 py-2"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <div className="flex uppercase whitespace-nowrap">
+                          <div>Node Agent Name</div>
+                          <div>
+                            <Question className="w-4 h-4 fill-current ml-1" />
+                          </div>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                        align="start"
+                        side="top"
+                      >
+                        {
+                          'NEAR Protocol could have multiple implementations, so agent is the name of that implementation, where "near-rs" is.'
+                        }
+                        <a
+                          href="https://github.com/near/nearcore"
+                          target="_blank"
+                          className="text-green-250 hover:no-underline"
+                        >
+                          the official implementation.
+                        </a>
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                </div>
+                <div
+                  className={`flex flex-wrap text-xs text-left  text-nearblue-600 dark:text-neargray-10 tracking-wider`}
+                >
+                  {telemetry?.agentName ? (
+                    <span className="rounded bg-gray-300 dark:bg-black-200 px-1">
+                      {telemetry?.agentName}
+                    </span>
+                  ) : (
+                    '-'
                   )}
-              </>
-            ) : (
+                </div>
+              </td>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 px-4 py-2"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider uppercase whitespace-nowrap py-2">
+                  Node Agent Version / Build
+                </div>
+                <div
+                  className={`flex flex-wrap text-xs text-left  text-nearblue-600 dark:text-neargray-10 tracking-wider`}
+                >
+                  {telemetry?.agentVersion || telemetry?.agentBuild ? (
+                    <span className="rounded bg-gray-300 dark:bg-black-200 px-1">
+                      {telemetry?.agentVersion}/${telemetry?.agentBuild}
+                    </span>
+                  ) : (
+                    '-'
+                  )}
+                </div>
+              </td>
+            </>
+          )}
+        </tr>
+        <tr className="border-none">
+          {row?.description && (
+            <>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 pl-8 pt-2 pb-4 align-top max-w-[180px]"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex uppercase">Name</div>
+                </div>
+                <div className="text-xs text-left font-bold text-nearblue-600 dark:text-neargray-10 tracking-wider">
+                  <div className="flex items-center">
+                    {row?.description?.name ? (
+                      <>
+                        {row?.description?.logo &&
+                          row?.description?.logo?.startsWith('http') && (
+                            <span className="mr-1 flex justify-center">
+                              <img
+                                src={row?.description?.logo}
+                                alt={row?.description?.name}
+                                width={20}
+                                height={20}
+                              />
+                            </span>
+                          )}
+                        {row?.description?.name}
+                      </>
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                </div>
+              </td>
+              <td
+                colSpan={2}
+                className="bg-gray-50 dark:bg-black-600 px-4 pt-2 pb-4 align-top"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex uppercase whitespace-nowrap">
+                    Social Media
+                  </div>
+                </div>
+                <div className="flex flex-wrap text-xs text-left font-bold text-nearblue-600 dark:text-neargray-10 tracking-wider">
+                  {socialMedia ? (
+                    <>
+                      {row?.description?.url && (
+                        <a
+                          className="text-green-500 dark:text-green-250 underline mr-2"
+                          href={
+                            row?.description?.url &&
+                            row?.description?.url?.startsWith('http')
+                              ? row?.description?.url
+                              : `http://${row?.description?.url}`
+                          }
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/web_icon_black.svg'
+                                : '/images/web_icon.svg'
+                            }
+                            alt="Web"
+                          />
+                        </a>
+                      )}
+                      {row?.description?.email && (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline mr-2"
+                          href={`mailto:${row?.description?.email}`}
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/email_icon_black.svg'
+                                : '/images/email_icon.svg'
+                            }
+                            alt="Email"
+                          />
+                        </a>
+                      )}
+                      {row?.description?.twitter && (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline mr-2"
+                          href={
+                            row?.description?.twitter &&
+                            row?.description?.twitter?.includes('http')
+                              ? row?.description?.twitter
+                              : `https://twitter.com/${row?.description?.twitter}`
+                          }
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/twitter_icon_black.svg'
+                                : '/images/twitter_icon.svg'
+                            }
+                            alt="Twitter"
+                          />
+                        </a>
+                      )}
+                      {row?.description?.discord && (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline mr-2"
+                          href={
+                            row?.description?.discord &&
+                            row?.description?.discord?.includes('http')
+                              ? row?.description?.discord
+                              : `https://discord.com/invite/${row?.description?.discord}`
+                          }
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/discord_icon_black.svg'
+                                : '/images/discord_icon.svg'
+                            }
+                            alt="Discord"
+                          />
+                        </a>
+                      )}
+                      {row?.description?.github && (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline mr-2"
+                          href={
+                            row?.description?.github &&
+                            row?.description?.github?.includes('http')
+                              ? row?.description?.github
+                              : `https://github.com/${row?.description?.github}`
+                          }
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/github_icon_black.svg'
+                                : '/images/github_icon.svg'
+                            }
+                            alt="Github"
+                          />
+                        </a>
+                      )}
+                      {row?.description?.telegram && (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline mr-2"
+                          href={
+                            row?.description?.telegram &&
+                            (row?.description?.telegram?.startsWith('http') ||
+                              row?.description?.telegram?.startsWith('https'))
+                              ? row?.description?.telegram
+                              : `https://t.me/${row?.description?.telegram}`
+                          }
+                          rel="noreferrer noopener"
+                          target="_blank"
+                        >
+                          <img
+                            width="16"
+                            height="16"
+                            className="w-5 h-5"
+                            src={
+                              theme === 'dark'
+                                ? '/images/telegram_black.svg'
+                                : '/images/telegram.svg'
+                            }
+                            alt="Telegram"
+                          />
+                        </a>
+                      )}
+                    </>
+                  ) : (
+                    '-'
+                  )}
+                </div>
+              </td>
+              <td
+                colSpan={6}
+                className="bg-gray-50 dark:bg-black-600 px-4 pt-2 pb-4 align-top"
+              >
+                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex uppercase">Description</div>
+                </div>
+                <div className="flex flex-wrap text-xs text-left font-bold text-nearblue-600 dark:text-neargray-10 tracking-wider">
+                  <div className="w-full">
+                    <>
+                      {row?.description?.description
+                        ? row?.description?.description
+                        : '-'}
+                    </>
+                  </div>
+                </div>
+              </td>
+            </>
+          )}
+          {!row?.description && (
+            <td colSpan={10} className="bg-gray-50 dark:bg-black-600 px-8">
               <div className="flex justify-center text-sm text-nearblue-600 dark:text-neargray-10 font-medium py-4 ">
                 If you are node owner feel free to fill all&nbsp;
                 <a
                   href="https://github.com/zavodil/near-pool-details#description"
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
+                  className="text-green-500 dark:text-green-250 underline"
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -984,8 +953,8 @@ export default function ({ network, currentPage, setPage, ownerId }: Props) {
                 </a>
                 &nbsp;to promote your own node!
               </div>
-            )}
-          </td>
+            </td>
+          )}
         </tr>
       </>
     );
