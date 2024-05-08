@@ -24,6 +24,7 @@ interface Props {
   };
   appUrl?: string;
   ownerId: string;
+  spamTokens?: string[];
 }
 
 const TokenHoldings = (props: Props) => {
@@ -54,9 +55,19 @@ const TokenHoldings = (props: Props) => {
       </select>
     );
   }
-
   const ftAmount = props.ft?.amount ?? 0;
 
+  function isTokenSpam(tokenName: string) {
+    if (props.spamTokens) {
+      for (const spamToken of props.spamTokens) {
+        const cleanedToken = spamToken.replace(/^\*/, '');
+        if (tokenName.endsWith(cleanedToken)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   return (
     <Select.Root>
       <Select.Trigger className="w-full h-8 text-sm px-2 rounded border dark:border-black-200 outline-none flex items-center justify-between cursor-pointer">
@@ -121,20 +132,25 @@ const TokenHoldings = (props: Props) => {
                                   : token?.rpcAmount ?? ''}
                               </div>
                             </div>
-                            {token?.ft_meta?.price && (
-                              <div className="text-right">
-                                <div>
-                                  {token?.amountUsd
-                                    ? '$' + dollarFormat(token?.amountUsd)
-                                    : '$' + (token.amountUsd ?? '')}
+
+                            {!isTokenSpam(token?.contract) ? (
+                              token?.ft_meta?.price && (
+                                <div className="text-right">
+                                  <div>
+                                    {token?.amountUsd
+                                      ? '$' + dollarFormat(token?.amountUsd)
+                                      : '$' + (token.amountUsd ?? '')}
+                                  </div>
+                                  <div className="text-gray-400">
+                                    {token?.ft_meta?.price
+                                      ? '@' +
+                                        Big(token?.ft_meta?.price).toString()
+                                      : '@' + (token?.ft_meta?.price ?? '')}
+                                  </div>
                                 </div>
-                                <div className="text-gray-400">
-                                  {token?.ft_meta?.price
-                                    ? '@' +
-                                      Big(token?.ft_meta?.price).toString()
-                                    : '@' + (token?.ft_meta?.price ?? '')}
-                                </div>
-                              </div>
+                              )
+                            ) : (
+                              <div className="text-gray-400">[Spam]</div>
                             )}
                           </a>
                         </Link>
@@ -186,6 +202,9 @@ const TokenHoldings = (props: Props) => {
                                   : nft?.quantity ?? ''}
                               </div>
                             </div>
+                            {isTokenSpam(nft?.contract) && (
+                              <div className="text-gray-400">[Spam]</div>
+                            )}
                           </a>
                         </Link>
                       </div>

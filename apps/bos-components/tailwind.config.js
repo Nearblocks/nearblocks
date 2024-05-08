@@ -85,6 +85,11 @@ module.exports = {
         nearyellow: {
           400: '#cc9a06',
         },
+        nearred: {
+          300: '#ea868f',
+          400: '#842029',
+          500: '#2c0b0e',
+        },
         brightgreen: {
           DEFAULT: '#36C054',
         },

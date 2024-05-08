@@ -42,6 +42,7 @@ import {
   TokenListInfo,
   ContractParseInfo,
   SchemaInfo,
+  SpamToken,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 
@@ -108,6 +109,7 @@ export default function (props: Props) {
   const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
     {} as ContractParseInfo,
   );
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
 
   const config = getConfig && getConfig(network);
 
@@ -290,6 +292,20 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
+    function fetchSpamToken() {
+      asyncFetch(
+        `https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json`,
+      )
+        .then((data: { body: any; status: number }) => {
+          const resp = JSON.parse(data?.body);
+          if (data.status === 200) {
+            setSpamTokens(resp);
+          } else {
+            handleRateLimit(data, fetchSpamToken);
+          }
+        })
+        .catch(() => {});
+    }
     if (config?.backendUrl) {
       fetchStatsData();
       fetchAccountData();
@@ -297,6 +313,7 @@ export default function (props: Props) {
       fetchTokenData();
       fetchNftTokenData();
       fetchInventoryData();
+      fetchSpamToken();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
@@ -657,6 +674,7 @@ export default function (props: Props) {
                     id={id}
                     appUrl={config?.appUrl}
                     ownerId={ownerId}
+                    spamTokens={spamTokens.blacklist}
                   />
                 </div>
               </div>
