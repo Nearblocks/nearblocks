@@ -48,6 +48,7 @@ export default function (props: Props) {
   };
 
   useEffect(() => {
+    let delay = 1000;
     function fetchTxn() {
       setIsLoading(true);
       asyncFetch(`${config.backendUrl}txns/${hash}`)
@@ -60,6 +61,10 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
+              if (resp?.outcomes?.status === null) {
+                setTimeout(fetchTxn, delay);
+                delay = 15000;
+              }
               setError(false);
               setTxn(resp);
               setIsLoading(false);
