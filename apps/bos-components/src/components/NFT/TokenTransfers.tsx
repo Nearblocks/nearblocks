@@ -142,7 +142,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <span>Txn Hash</span>,
@@ -175,7 +175,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -203,7 +203,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -298,7 +298,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -409,7 +409,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -431,7 +431,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider h-[57px]',
     },
@@ -505,7 +505,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
   ];
 
