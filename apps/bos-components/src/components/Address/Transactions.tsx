@@ -681,14 +681,15 @@ export default function ({
 
   const filterTxns = showAllRows
     ? txns[currentPage]
-    : txns[currentPage] !== undefined &&
-      uniqueIds.map((id: string) => {
+    : txns[currentPage] !== undefined
+    ? uniqueIds.map((id: string) => {
         const filteredTransactions = txns[currentPage].filter(
           (transaction) => transaction.transaction_hash === id,
         );
         const lastRow = filteredTransactions[filteredTransactions.length - 1];
         return lastRow;
-      });
+      })
+    : txns[currentPage];
 
   return (
     <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">

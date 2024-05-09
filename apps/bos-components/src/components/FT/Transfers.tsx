@@ -363,7 +363,7 @@ export default function ({
       cell: (row: TransactionInfo) =>
         row?.involved_account_id === row?.affected_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
-            {t ? t('txnSelf') : 'Self'}
+            {t ? t('txns:txnSelf') : 'Self'}
           </span>
         ) : (
           <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
