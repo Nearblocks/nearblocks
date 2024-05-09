@@ -21,7 +21,7 @@ import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
 import TokenImage from '@/includes/icons/TokenImage';
 import WarningIcon from '@/includes/icons/WarningIcon';
-import { Status, Token } from '@/includes/types';
+import { SpamToken, Status, Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
@@ -30,7 +30,7 @@ export default function ({ network, id, ownerId, t }: Props) {
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -46,7 +46,11 @@ export default function ({ network, id, ownerId, t }: Props) {
     sync: true,
     timestamp: '',
   });
-
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
+  const [isVisible, setIsVisible] = useState(true);
+  const handleClose = () => {
+    setIsVisible(false);
+  };
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
@@ -135,6 +139,15 @@ export default function ({ network, id, ownerId, t }: Props) {
         )
         .catch(() => {});
     }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
+
     if (config?.backendUrl) {
       fetchNFTData();
       fetchTxnsCount();
@@ -144,7 +157,16 @@ export default function ({ network, id, ownerId, t }: Props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);
-
+  function isTokenSpam(tokenName: string) {
+    if (spamTokens)
+      for (const spamToken of spamTokens.blacklist) {
+        const cleanedToken = spamToken.replace(/^\*/, '');
+        if (tokenName.endsWith(cleanedToken)) {
+          return true;
+        }
+      }
+    return false;
+  }
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
   };
@@ -173,6 +195,32 @@ export default function ({ network, id, ownerId, t }: Props) {
           </h1>
         )}
       </div>
+      {isTokenSpam(token?.contract || id) && isVisible && (
+        <>
+          <div className="w-full flex justify-between text-left border dark:bg-nearyred-500  dark:border-nearyred-400 dark:text-nearyred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+            <p className="items-center">
+              <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
+              This token is reported to have been spammed to many users. Please
+              exercise caution when interacting with it. Click
+              <a
+                href="https://github.com/Nearblocks/spam-token-list"
+                className="underline mx-0.5"
+                target="_blank"
+              >
+                here
+              </a>
+              for more info.
+            </p>
+            <span
+              className="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer"
+              onClick={handleClose}
+            >
+              X
+            </span>
+          </div>
+          <div className="py-2"></div>
+        </>
+      )}
       <div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">

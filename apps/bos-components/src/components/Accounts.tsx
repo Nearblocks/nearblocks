@@ -42,6 +42,7 @@ import {
   TokenListInfo,
   ContractParseInfo,
   SchemaInfo,
+  SpamToken,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 
@@ -77,6 +78,7 @@ export default function (props: Props) {
     shortenAddress,
     getConfig,
     handleRateLimit,
+    fetchData,
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { encodeArgs, decodeArgs } = VM.require(
@@ -108,6 +110,7 @@ export default function (props: Props) {
   const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
     {} as ContractParseInfo,
   );
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
 
   const config = getConfig && getConfig(network);
 
@@ -290,6 +293,14 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
     if (config?.backendUrl) {
       fetchStatsData();
       fetchAccountData();
@@ -657,6 +668,7 @@ export default function (props: Props) {
                     id={id}
                     appUrl={config?.appUrl}
                     ownerId={ownerId}
+                    spamTokens={spamTokens.blacklist}
                   />
                 </div>
               </div>

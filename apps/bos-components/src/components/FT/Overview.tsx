@@ -38,7 +38,7 @@ import FaInbox from '@/includes/icons/FaInbox';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
 import WarningIcon from '@/includes/icons/WarningIcon';
-import { Status, StatusInfo, Token } from '@/includes/types';
+import { SpamToken, Status, StatusInfo, Token } from '@/includes/types';
 
 export default function ({
   network,
@@ -54,7 +54,7 @@ export default function ({
   const { dollarFormat, dollarNonCentFormat, localFormat, getTimeAgoString } =
     VM.require(`${ownerId}/widget/includes.Utils.formats`);
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -70,9 +70,10 @@ export default function ({
   const [holderLoading, setHolderLoading] = useState(false);
   const [stats, setStats] = useState<StatusInfo>({} as StatusInfo);
   const [token, setToken] = useState<Token>({} as Token);
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
   const [transfers, setTransfers] = useState('');
   const [holders, setHolders] = useState('');
-
+  const [isVisible, setIsVisible] = useState(true);
   const [showMarketCap, setShowMarketCap] = useState(false);
   const [status, setStatus] = useState({
     height: 0,
@@ -80,7 +81,6 @@ export default function ({
     timestamp: '',
   });
   const config = getConfig && getConfig(network);
-
   useEffect(() => {
     function fetchFTData() {
       setIsLoading(true);
@@ -186,6 +186,15 @@ export default function ({
         )
         .catch(() => {});
     }
+
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
     if (config?.backendUrl) {
       fetchStatsData();
       fetchFTData();
@@ -193,10 +202,22 @@ export default function ({
       fetchHoldersCount();
       fetchStatus();
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);
 
+  function isTokenSpam(tokenName: string) {
+    if (spamTokens)
+      for (const spamToken of spamTokens.blacklist) {
+        const cleanedToken = spamToken.replace(/^\*/, '');
+        if (tokenName.endsWith(cleanedToken)) {
+          return true;
+        }
+      }
+    return false;
+  }
+  const handleClose = () => {
+    setIsVisible(false);
+  };
   const onTab = (index: number) => {
     onHandleTab(tabs[index]);
   };
@@ -228,6 +249,32 @@ export default function ({
         )}
       </div>
       <div>
+        {isTokenSpam(token.contract || id) && isVisible && (
+          <>
+            <div className="w-full flex justify-between text-left border dark:bg-nearyred-500  dark:border-nearyred-400 dark:text-nearyred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+              <p className="items-center">
+                <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
+                This token is reported to have been spammed to many users.
+                Please exercise caution when interacting with it. Click
+                <a
+                  href="https://github.com/Nearblocks/spam-token-list"
+                  className="underline mx-0.5"
+                  target="_blank"
+                >
+                  here
+                </a>
+                for more info.
+              </p>
+              <span
+                className="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer"
+                onClick={handleClose}
+              >
+                X
+              </span>
+            </div>
+            <div className="py-2"></div>
+          </>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
           <div className="w-full">
             <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
@@ -442,7 +489,7 @@ export default function ({
           </div>
           <div className="w-full">
             <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
-              <h2 className="border dark:border-black-200 -b p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 Profile Summary
               </h2>
               <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">

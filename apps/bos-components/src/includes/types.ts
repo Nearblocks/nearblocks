@@ -1557,3 +1557,6 @@ export type chartDataInfo = {
   txns: string;
   shards: { txns: string; shard: string }[];
 };
+export type SpamToken = {
+  blacklist: string[];
+};
