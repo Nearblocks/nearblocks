@@ -92,7 +92,25 @@ export default function () {
       }
     }
   }
-
+  function fetchData(
+    url: string,
+    callback: (data: any) => void,
+    options?: any,
+  ) {
+    asyncFetch(url, options)
+      .then((data: { body: any; status: number }) => {
+        const resp = data?.body;
+        if (data.status === 200) {
+          callback(resp);
+        } else {
+          handleRateLimit(data, () => fetchData(url, callback, options));
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error fetching data:', error);
+        throw error;
+      });
+  }
   function yoctoToNear(yocto: string, format: boolean) {
     const YOCTO_PER_NEAR = Big(10).pow(24).toString();
 
@@ -291,5 +309,6 @@ export default function () {
     convertAmountToReadableString,
     convertTimestampToTime,
     mapFeilds,
+    fetchData,
   };
 }

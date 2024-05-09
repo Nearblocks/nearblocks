@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function ({ network, t, id, tid, ownerId }: Props) {
-  const { getConfig, handleRateLimit, shortenAddress } = VM.require(
+  const { getConfig, handleRateLimit, shortenAddress, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -67,24 +67,17 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         )
         .catch(() => {});
     }
-    function fetchSpamToken() {
-      asyncFetch(
-        `https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json`,
-      )
-        .then((data: { body: any; status: number }) => {
-          const resp = JSON.parse(data?.body);
-          if (data.status === 200) {
-            setSpamTokens(resp);
-          } else {
-            handleRateLimit(data, fetchSpamToken);
-          }
-        })
-        .catch(() => {});
-    }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
 
     if (config?.backendUrl) {
       fetchToken();
-      fetchSpamToken();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,6 +108,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
     <>
       {isTokenSpam(token.contract || id) && isVisible && (
         <>
+          <div className="py-2"></div>
           <div className="w-full flex justify-between text-left border dark:bg-nearyred-500  dark:border-nearyred-400 dark:text-nearyred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
             <p className="items-center">
               <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
@@ -136,7 +130,6 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
               X
             </span>
           </div>
-          <div className="py-2"></div>
         </>
       )}
       <div className="grid md:grid-cols-12 pt-4 mb-2">

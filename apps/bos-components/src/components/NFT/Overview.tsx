@@ -30,7 +30,7 @@ export default function ({ network, id, ownerId, t }: Props) {
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -139,25 +139,19 @@ export default function ({ network, id, ownerId, t }: Props) {
         )
         .catch(() => {});
     }
-    function fetchSpamToken() {
-      asyncFetch(
-        `https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json`,
-      )
-        .then((data: { body: any; status: number }) => {
-          const resp = JSON.parse(data?.body);
-          if (data.status === 200) {
-            setSpamTokens(resp);
-          } else {
-            handleRateLimit(data, fetchSpamToken);
-          }
-        })
-        .catch(() => {});
-    }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
+
     if (config?.backendUrl) {
       fetchNFTData();
       fetchTxnsCount();
       fetchHoldersCount();
-      fetchSpamToken();
       fetchStatus();
     }
 

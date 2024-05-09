@@ -78,6 +78,7 @@ export default function (props: Props) {
     shortenAddress,
     getConfig,
     handleRateLimit,
+    fetchData,
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { encodeArgs, decodeArgs } = VM.require(
@@ -292,20 +293,14 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
-    function fetchSpamToken() {
-      asyncFetch(
-        `https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json`,
-      )
-        .then((data: { body: any; status: number }) => {
-          const resp = JSON.parse(data?.body);
-          if (data.status === 200) {
-            setSpamTokens(resp);
-          } else {
-            handleRateLimit(data, fetchSpamToken);
-          }
-        })
-        .catch(() => {});
-    }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
     if (config?.backendUrl) {
       fetchStatsData();
       fetchAccountData();
@@ -313,7 +308,6 @@ export default function (props: Props) {
       fetchTokenData();
       fetchNftTokenData();
       fetchInventoryData();
-      fetchSpamToken();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, id]);
