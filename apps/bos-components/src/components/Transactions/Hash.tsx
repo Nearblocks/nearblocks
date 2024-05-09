@@ -170,6 +170,12 @@ export default function (props: Props) {
               <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
                 NEW
               </div>
+            </button>{' '}
+            <button
+              onClick={() => onTab('summary')}
+              className={buttonStyles('summary')}
+            >
+              <h2 className="p-2">Receipt Summary</h2>
             </button>
             <button
               onClick={() => onTab('comments')}
@@ -194,6 +200,7 @@ export default function (props: Props) {
                 }}
               />
             </div>
+
             <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
               <Widget
                 src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
@@ -210,6 +217,19 @@ export default function (props: Props) {
             <div className={`${pageTab === 'enhanced' ? '' : 'hidden'} `}>
               <Widget
                 src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
+                props={{
+                  network: network,
+                  t: t,
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  ownerId,
+                }}
+              />
+            </div>
+            <div className={`${pageTab === 'summary' ? '' : 'hidden'} `}>
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptSummary`}
                 props={{
                   network: network,
                   t: t,
