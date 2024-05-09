@@ -144,10 +144,10 @@ export default function (props: Props) {
         receipt &&
         receipt?.actions?.map((action: any, i: number) => (
           <tr key={action.args?.method_name + i}>
-            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
+            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               {formatActionKind(action.action_kind)}
             </td>
-            <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
+            <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               {action.args?.method_name}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
@@ -203,7 +203,7 @@ export default function (props: Props) {
                   : ''}
               </span>
             </td>
-            <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">{`${
+            <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">{`${
               !loading &&
               convertToMetricPrefix(getGasAttached(receipt?.actions))
             }gas`}</td>
