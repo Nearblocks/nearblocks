@@ -12,7 +12,7 @@ const Detail = forwardRef(
     const { t } = useTranslation('txns');
 
     const buttonStyles = (hash: string) =>
-      `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+      `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3.5 focus:outline-none ${
         pageTab === hash
           ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
           : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
@@ -44,6 +44,9 @@ const Detail = forwardRef(
               <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
                 NEW
               </div>
+            </div>
+            <div className={buttonStyles('summary')}>
+              <h2 className="p-2">Receipt Summary</h2>
             </div>
             <div className={buttonStyles('comments')}>
               <h2 className="p-2">
