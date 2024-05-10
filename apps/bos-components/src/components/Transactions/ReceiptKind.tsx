@@ -121,7 +121,7 @@ export default function (props: ReceiptKindInfo) {
             )}
           </div>
         ) : action?.kind === 'delegateAction' ? (
-          <div className="py-3">
+          <div className="pt-2">
             {[...action.args.actions]
               .sort(
                 (actionA, actionB) =>

@@ -495,6 +495,21 @@ export type ArgsPropsInfo = {
       };
     };
   };
+  delegate_action: {
+    actions: {
+      FunctionCall: {
+        method_name: string;
+        args: string;
+        deposit: string;
+        gas: string;
+      };
+    }[];
+    max_block_height: string;
+    nonce: string;
+    public_key: string;
+    receiver_id: string;
+    sender_id: string;
+  };
   public_key: string;
   beneficiary_id: string;
   method_name: string;

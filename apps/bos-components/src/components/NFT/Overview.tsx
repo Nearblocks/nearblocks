@@ -197,7 +197,7 @@ export default function ({ network, id, ownerId, t }: Props) {
       </div>
       {isTokenSpam(token?.contract || id) && isVisible && (
         <>
-          <div className="w-full flex justify-between text-left border dark:bg-nearyred-500  dark:border-nearyred-400 dark:text-nearyred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+          <div className="w-full flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
             <p className="items-center">
               <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
               This token is reported to have been spammed to many users. Please
