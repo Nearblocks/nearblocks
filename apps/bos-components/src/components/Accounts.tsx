@@ -37,14 +37,15 @@ import {
   FtsInfo,
   ContractCodeInfo,
   AccessKeyInfo,
-  ContractInfo,
   FtInfo,
   TokenListInfo,
   ContractParseInfo,
   SchemaInfo,
   SpamToken,
+  AccountDataInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
+import WarningIcon from '@/includes/icons/WarningIcon';
 
 const tabs = [
   'Transactions',
@@ -102,14 +103,15 @@ export default function (props: Props) {
   const [inventoryData, setInventoryData] = useState<InventoryInfo>(
     {} as InventoryInfo,
   );
-  const [contract, setContract] = useState<ContractInfo>({} as ContractInfo);
+  const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
-  const [code, setCode] = useState<ContractCodeInfo>({} as ContractCodeInfo);
-  const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isContractLoading, setIsContractLoading] = useState(false);
   const [schema, setSchema] = useState<SchemaInfo>({} as SchemaInfo);
   const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
     {} as ContractParseInfo,
   );
+  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
   const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
 
   const config = getConfig && getConfig(network);
@@ -118,6 +120,164 @@ export default function (props: Props) {
     setPageTab(tabs[index]);
     onFilterClear('');
   };
+
+  useEffect(() => {
+    function contractCode(address: string) {
+      setIsContractLoading(true);
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_code',
+            finality: 'final',
+            account_id: address,
+            prefix_base64: '',
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: ContractCodeInfo;
+              error?: any;
+            };
+            status: number;
+          }) => {
+            const resp = res?.body?.result;
+            if (res.status === 200 && resp) {
+              if (resp?.code_base64) {
+                setContract({
+                  block_hash: resp.block_hash,
+                  block_height: resp.block_height,
+                  code_base64: resp.code_base64,
+                  hash: resp.hash,
+                });
+                asyncFetch(
+                  `${config?.backendUrl}account/${id}/contract/parse`,
+                  {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  },
+                )
+                  .then(
+                    (res: {
+                      body: {
+                        contract: {
+                          contract: ContractParseInfo;
+                          schema: SchemaInfo;
+                        }[];
+                      };
+                      status: number;
+                    }) => {
+                      const resp = res.body.contract;
+                      if (res.status === 200 && resp && resp.length > 0) {
+                        const [{ contract, schema }] = resp;
+                        setContractInfo(contract);
+                        setSchema(schema);
+                      }
+                    },
+                  )
+                  .catch(() => {});
+              }
+              setIsContractLoading(false);
+            } else if (res?.status === 200 && res?.body?.error) {
+              setIsContractLoading(false);
+            }
+          },
+        )
+        .catch(() => {
+          setIsContractLoading(false);
+        });
+    }
+
+    function viewAccessKeys(address: string) {
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_access_key_list',
+            finality: 'final',
+            account_id: address,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: AccessKeyInfo;
+            };
+            status: number;
+          }) => {
+            const resp = res?.body?.result;
+            if (res.status === 200 && resp) {
+              const locked = (resp.keys || []).every(
+                (key: {
+                  access_key: {
+                    nonce: string;
+                    permission: string;
+                  };
+                  public_key: string;
+                }) => key.access_key.permission !== 'FullAccess',
+              );
+              setIsLocked(locked);
+            }
+          },
+        )
+        .catch(() => {});
+    }
+
+    function viewAccount(address: string) {
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_account',
+            finality: 'final',
+            account_id: address,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: AccountDataInfo;
+            };
+          }) => {
+            const resp = res?.body?.result;
+            setAccountView(resp);
+          },
+        )
+        .catch(() => {});
+    }
+
+    function loadSchema() {
+      if (!id) return;
+
+      Promise.all([contractCode(id), viewAccessKeys(id), viewAccount(id)]);
+    }
+
+    loadSchema();
+  }, [id, config?.rpcUrl, config?.backendUrl]);
 
   useEffect(() => {
     function fetchStatsData() {
@@ -439,130 +599,6 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, config?.rpcUrl]);
 
-  useEffect(() => {
-    function contractCode(address: string) {
-      asyncFetch(`${config?.rpcUrl}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 'dontcare',
-          method: 'query',
-          params: {
-            request_type: 'view_code',
-            finality: 'final',
-            account_id: address,
-            prefix_base64: '',
-          },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(
-          (res: {
-            body: {
-              result: ContractCodeInfo;
-            };
-          }) => {
-            const resp = res?.body?.result;
-            setCode({
-              block_hash: resp.block_hash,
-              block_height: resp.block_height,
-              code_base64: resp.code_base64,
-              hash: resp.hash,
-            });
-          },
-        )
-        .catch(() => {});
-    }
-
-    function viewAccessKeys(address: string) {
-      asyncFetch(`${config?.rpcUrl}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 'dontcare',
-          method: 'query',
-          params: {
-            request_type: 'view_access_key_list',
-            finality: 'final',
-            account_id: address,
-          },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(
-          (res: {
-            body: {
-              result: AccessKeyInfo;
-            };
-          }) => {
-            const resp = res?.body?.result;
-            setKey({
-              block_hash: resp.block_hash,
-              block_height: resp.block_height,
-              keys: resp?.keys,
-              hash: resp?.hash,
-            });
-          },
-        )
-        .catch(() => {});
-    }
-
-    function loadSchema() {
-      if (!id) return;
-
-      Promise.all([contractCode(id), viewAccessKeys(id)]);
-    }
-    loadSchema();
-  }, [id, config?.rpcUrl]);
-
-  useEffect(() => {
-    if (code?.code_base64) {
-      const locked = (key.keys || []).every(
-        (key: {
-          access_key: {
-            nonce: string;
-            permission: string;
-          };
-          public_key: string;
-        }) => key.access_key.permission !== 'FullAccess',
-      );
-
-      function fetchContractInfo() {
-        asyncFetch(`${config?.backendUrl}account/${id}/contract/parse`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(
-            (res: {
-              body: {
-                contract: { contract: ContractParseInfo; schema: SchemaInfo }[];
-              };
-              status: number;
-            }) => {
-              const resp = res.body.contract;
-              if (res.status === 200 && resp && resp.length > 0) {
-                const [{ contract, schema }] = resp;
-                setContractInfo(contract);
-                setSchema(schema);
-              }
-            },
-          )
-          .catch(() => {});
-      }
-
-      fetchContractInfo();
-
-      setContract({ ...code, locked });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, key, config?.backendUrl, id]);
-
   const handleFilter = (name: string, value: string) => {
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
@@ -581,8 +617,52 @@ export default function (props: Props) {
 
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
+
   return (
     <>
+      {accountData?.deleted?.transaction_hash && (
+        <>
+          <div className="block lg:flex lg:space-x-2">
+            <div className="w-full ">
+              <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+                <p className="mb-0 items-center break-words">
+                  <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+                  {`This account was deleted on ${
+                    accountData?.deleted?.transaction_hash
+                      ? convertToUTC(
+                          nanoToMilli(accountData.deleted.block_timestamp),
+                          false,
+                        )
+                      : ''
+                  }`}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="py-2"></div>
+        </>
+      )}
+      {accountView !== null &&
+        accountView?.block_hash !== undefined &&
+        isLocked &&
+        accountData &&
+        accountData?.deleted?.transaction_hash === null &&
+        contract === null &&
+        !isContractLoading && (
+          <>
+            <div className="block lg:flex lg:space-x-2">
+              <div className="w-full ">
+                <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+                  <p className="mb-0 items-center">
+                    <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+                    This account has no full access keys
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="py-2"></div>
+          </>
+        )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="w-full">
           <div className="h-full bg-white soft-shadow rounded-xl dark:bg-black-600">
@@ -750,11 +830,11 @@ export default function (props: Props) {
                     </div>
                   )}
                 </div>
-                {contract?.hash && !loading ? (
+                {contract && contract?.hash && !loading ? (
                   <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                     <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {contract?.locked ? 'Yes' : 'No'}
+                      {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
                     </div>
                   </div>
                 ) : (
@@ -987,6 +1067,7 @@ export default function (props: Props) {
                           t: t,
                           id: id,
                           contract: contract,
+                          isLocked: isLocked,
                           schema: schema,
                           contractInfo: contractInfo,
                           requestSignInWithWallet: requestSignInWithWallet,

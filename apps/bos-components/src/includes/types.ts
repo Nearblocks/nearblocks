@@ -1557,6 +1557,16 @@ export type chartDataInfo = {
   txns: string;
   shards: { txns: string; shard: string }[];
 };
+
+export type AccountDataInfo = {
+  amount: string;
+  locked: string;
+  code_hash: string;
+  storage_usage: string;
+  storage_paid_at: string;
+  block_height: string;
+  block_hash: string;
+};
 export type SpamToken = {
   blacklist: string[];
 };
