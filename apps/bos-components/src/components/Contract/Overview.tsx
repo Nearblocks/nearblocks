@@ -8,6 +8,7 @@
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  * @param {string} [id] - The account identifier passed as a string.
  * @param {ContractInfo} [contract] - Information about the user's contract.
+ * @param {boolean} [isLocked] - Boolean indicating whether the account or contract with full access key or not.
  * @param {any} [schema] - The schema data for the component.
  * @param {ContractParseInfo} [contractInfo] - Additional parsed information about the contract.
  * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
@@ -22,7 +23,8 @@ interface Props {
   network: string;
   t: (key: string) => string | undefined;
   id: string;
-  contract: ContractInfo;
+  contract: ContractCodeInfo;
+  isLocked: boolean;
   schema: SchemaInfo;
   contractInfo: ContractParseInfo;
   requestSignInWithWallet: () => void;
@@ -31,7 +33,11 @@ interface Props {
   logOut: () => void;
 }
 
-import { ContractInfo, ContractParseInfo, SchemaInfo } from '@/includes/types';
+import {
+  ContractCodeInfo,
+  ContractParseInfo,
+  SchemaInfo,
+} from '@/includes/types';
 
 export default function (props: Props) {
   const {
@@ -39,6 +45,7 @@ export default function (props: Props) {
     t,
     id,
     contract,
+    isLocked,
     schema,
     contractInfo,
     requestSignInWithWallet,
@@ -97,6 +104,7 @@ export default function (props: Props) {
               t: t,
               id: id,
               contract: contract,
+              isLocked: isLocked,
               ownerId,
             }}
           />
