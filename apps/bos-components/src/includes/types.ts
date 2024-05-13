@@ -1585,3 +1585,10 @@ export type AccountDataInfo = {
 export type SpamToken = {
   blacklist: string[];
 };
+
+export type GuessableTypeString =
+  | 'null'
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'json';
