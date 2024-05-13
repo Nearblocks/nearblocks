@@ -1,4 +1,4 @@
-import { Debounce, FieldType, FieldValueTypes } from '@/includes/types';
+import { Debounce, FieldType, GuessableTypeString } from '@/includes/types';
 
 export default function () {
   function formatWithCommas(number: string) {
@@ -270,29 +270,34 @@ export default function () {
       100,
     );
   }
-  function mapFeilds(fields: FieldType[]) {
-    const args = {};
 
-    fields.forEach((fld) => {
-      let value: string | boolean | number | null = fld.value;
+  const strToType = (str: string, type: GuessableTypeString): unknown => {
+    switch (type) {
+      case 'json':
+        return JSON.parse(str);
+      case 'number':
+        return Number(str);
+      case 'boolean':
+        return (
+          str.trim().length > 0 && !['false', '0'].includes(str.toLowerCase())
+        );
+      case 'null':
+        return null;
+      default:
+        return str + '';
+    }
+  };
 
-      if (fld.type === 'number') {
-        value = Number(value);
-      } else if (fld.type === 'boolean') {
-        value =
-          value.trim().length > 0 &&
-          !['false', '0'].includes(value.toLowerCase());
-      } else if (fld.type === 'json') {
-        value = JSON.parse(value);
-      } else if (fld.type === 'null') {
-        value = null;
-      }
+  const mapFeilds = (fields: FieldType[]) => {
+    const args: any = {};
 
-      (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
+    fields.forEach((fld: FieldType) => {
+      args[fld.name] = strToType(fld.value, fld.type as GuessableTypeString);
     });
 
     return args;
-  }
+  };
+
   return {
     getConfig,
     handleRateLimit,
