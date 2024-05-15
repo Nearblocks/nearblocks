@@ -224,22 +224,19 @@ export default function (props: Props) {
           <div className="flex flex-col my-4 ml-6">
             <div className="">
               <h2 className="flex items-center text-sm font-medium">
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <div>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </div>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content
-                      className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      align="start"
-                      side="bottom"
-                    >
+                <OverlayTrigger
+                  placement="bottom-start"
+                  delay={{ show: 500, hide: 0 }}
+                  overlay={
+                    <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                       Logs included in the receipt
-                    </Tooltip.Content>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
+                    </Tooltip>
+                  }
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </OverlayTrigger>
                 Logs
               </h2>
               <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
@@ -261,22 +258,19 @@ export default function (props: Props) {
             </div>
             <div className="mt-4">
               <h2 className="flex items-center text-sm font-medium">
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <div>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </div>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content
-                      className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      align="start"
-                      side="bottom"
-                    >
+                <OverlayTrigger
+                  placement="bottom-start"
+                  delay={{ show: 500, hide: 0 }}
+                  overlay={
+                    <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                       The result of the receipt execution
-                    </Tooltip.Content>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
+                    </Tooltip>
+                  }
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </OverlayTrigger>
                 Result
               </h2>
               {statusInfo}
@@ -289,22 +283,19 @@ export default function (props: Props) {
               <tbody>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Unique identifier (hash) of this receipt.
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Receipt
                   </td>
                   <td className="font-semibold py-2 pl-4">{receipt?.id}</td>
@@ -315,22 +306,19 @@ export default function (props: Props) {
                       !block ? 'whitespace-normal' : 'whitespace-nowrap'
                     }`}
                   >
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Block height
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Block
                   </td>
                   <td className="py-2 pl-4">
@@ -346,22 +334,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           The account which issued the receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     From
                   </td>
                   <td className="py-2 pl-4">
@@ -375,22 +360,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           The destination account of the receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     To
                   </td>
                   <td className="py-2 pl-4">
@@ -404,22 +386,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Maximum amount of gas allocated for the Receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Gas Limit
                   </td>
                   <td className="py-2 pl-4">{`${
@@ -429,22 +408,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Fees Pre-charged on Receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Pre-charged Fee
                   </td>
                   <td className="py-2 pl-4">{`${
@@ -453,22 +429,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Burnt Gas by Receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Burnt Gas
                   </td>
                   <td className="text-xs py-2 pl-4">
@@ -484,22 +457,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Burnt Tokens by Receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Burnt Tokens
                   </td>
                   <td className="text-xs py-2 pl-4">
@@ -514,22 +484,19 @@ export default function (props: Props) {
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
-                    <Tooltip.Provider>
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <div>
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                          className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          align="start"
-                          side="bottom"
-                        >
+                    <OverlayTrigger
+                      placement="bottom-start"
+                      delay={{ show: 500, hide: 0 }}
+                      overlay={
+                        <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                           Refund from the receipt
-                        </Tooltip.Content>
-                      </Tooltip.Root>
-                    </Tooltip.Provider>
+                        </Tooltip>
+                      }
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </OverlayTrigger>
                     Refund
                   </td>
                   <td className="py-2 pl-4">

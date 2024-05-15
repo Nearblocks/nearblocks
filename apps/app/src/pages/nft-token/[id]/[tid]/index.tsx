@@ -97,7 +97,7 @@ const NFTokenInfo = () => {
         <meta property="twitter:description" content={meta.description} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
-      <div style={height} className="relative container mx-auto">
+      <div style={height} className="relative container mx-auto px-3">
         <VmComponent
           skeleton={<Detail className="absolute" ref={heightRef} />}
           defaultSkelton={<Detail />}

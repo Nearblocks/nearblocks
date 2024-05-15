@@ -247,22 +247,19 @@ export default function (props: Props) {
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center">
             Arguments
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                   Specify an arguments schema.
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </div>
           <button
             onClick={onAdd}
@@ -277,24 +274,21 @@ export default function (props: Props) {
             className="flex ml-2 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
           >
             Auto detect
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-[10rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                   Scan the blockchain to find successful method calls and copy
                   the parameter schema. Auto-detect might not work on every
                   method.
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </button>
         </div>
         {fields.map((field: FieldType) => (
@@ -341,22 +335,19 @@ export default function (props: Props) {
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center">
             Options
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                   Optional arguments for write operations.
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </div>
         </div>
         <div className="slide-down disclosure">
@@ -397,23 +388,20 @@ export default function (props: Props) {
           {!hideQuery && (
             <div className="flex items-center mx-4 text-gray-400">
               OR{' '}
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <span>
-                      <Question className="w-4 h-4 fill-current ml-1" />
-                    </span>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                    align="start"
-                    side="bottom"
-                  >
+              <OverlayTrigger
+                placement="bottom-start"
+                delay={{ show: 500, hide: 0 }}
+                overlay={
+                  <Tooltip className="fixed h-auto max-w-[12rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                     We cant differentiate read/write methods for this contract,
                     so you should choose the appropriate action
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+                  </Tooltip>
+                }
+              >
+                <span>
+                  <Question className="w-4 h-4 fill-current ml-1" />
+                </span>
+              </OverlayTrigger>
             </div>
           )}
           <button

@@ -164,53 +164,63 @@ export default function ({
             </p>
 
             <div className="lg:flex justify-between items-center text-center">
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
-                      <input
-                        type="date"
-                        name="startdate"
-                        id="startdate"
-                        className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
-                        defaultValue={initial?.start}
-                        onChange={handleStartDateChange}
-                      />
-                    </div>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                    align="start"
-                    side="bottom"
-                  >
+              <OverlayTrigger
+                placement="bottom-start"
+                delay={{ show: 500, hide: 0 }}
+                popperConfig={{
+                  modifiers: {
+                    name: 'offset',
+                    options: {
+                      offset: [17, 0],
+                    },
+                  },
+                }}
+                overlay={
+                  <Tooltip className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 fixed">
                     Select Start Date
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+                  </Tooltip>
+                }
+              >
+                <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
+                  <input
+                    type="date"
+                    name="startdate"
+                    id="startdate"
+                    className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
+                    defaultValue={initial?.start}
+                    onChange={handleStartDateChange}
+                  />
+                </div>
+              </OverlayTrigger>
               <p className="text-center">To</p>
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
-                      <input
-                        type="date"
-                        name="enddate"
-                        id="enddate"
-                        className="border flex items-center  border-gray-300 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
-                        defaultValue={initial?.end}
-                        onChange={handleEndDateChange}
-                      />
-                    </div>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                    align="start"
-                    side="bottom"
-                  >
+              <OverlayTrigger
+                placement="bottom-start"
+                delay={{ show: 500, hide: 0 }}
+                popperConfig={{
+                  modifiers: {
+                    name: 'offset',
+                    options: {
+                      offset: [17, 0],
+                    },
+                  },
+                }}
+                overlay={
+                  <Tooltip className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 fixed">
                     Select End Date
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+                  </Tooltip>
+                }
+              >
+                <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
+                  <input
+                    type="date"
+                    name="enddate"
+                    id="enddate"
+                    className="border flex items-center  border-gray-300 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
+                    defaultValue={initial?.end}
+                    onChange={handleEndDateChange}
+                  />
+                </div>
+              </OverlayTrigger>
             </div>
             <div className="w-full flex justify-center my-4"></div>
             <div className="w-full flex justify-center my-4">

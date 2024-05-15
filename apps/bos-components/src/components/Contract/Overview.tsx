@@ -113,26 +113,23 @@ export default function (props: Props) {
       <Tabs.Content value={tabs[1]}>
         <div className="border-t dark:border-black-200 p-4">
           {connected ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <button
-                    className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                    onClick={logOut}
-                  >
-                    <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white dark:bg-black-600 dark:text-neargray-10" />
-                    Connected
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
-                  Connect to Contract
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
+                  Connected to Contract
+                </Tooltip>
+              }
+            >
+              <button
+                className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
+                onClick={logOut}
+              >
+                <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white dark:bg-black-600 dark:text-neargray-10" />
+                Connected
+              </button>
+            </OverlayTrigger>
           ) : (
             <button
               className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"

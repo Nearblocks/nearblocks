@@ -297,30 +297,27 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs whitespace-nowrap font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: (
         <span className="flex">
           <span className="uppercase whitespace-nowrap">Circulating MC</span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span>
-                  <Question className="w-4 h-4 fill-current ml-1" />
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 "
-                align="start"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom-start"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                 {
                   'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
                 }
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span>
+              <Question className="w-4 h-4 fill-current ml-1" />
+            </span>
+          </OverlayTrigger>
         </span>
       ),
       key: 'market_cap',
@@ -354,24 +351,21 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
               </div>
             )}
             <span className="uppercase whitespace-nowrap">On-Chain MC</span>
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className=" h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                   {
                     "Calculated by multiplying the token's Total Supply on Near with the current market price per token"
                   }
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </button>
         </span>
       ),

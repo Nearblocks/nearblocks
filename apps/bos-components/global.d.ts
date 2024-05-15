@@ -44,3 +44,4 @@ declare const CommitButton;
 declare const VM;
 declare const Toast;
 declare const Switch;
+declare const OverlayTrigger;

@@ -89,42 +89,41 @@ export default function (props: Props) {
                     onCompose();
                   }}
                 >
-                  <Tooltip.Provider>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger asChild>
-                        <button
-                          type="submit"
-                          disabled={!content}
-                          className={`inline-flex justify-center p-2 ${
-                            !content || !context.accountId
-                              ? 'text-neargray-600'
-                              : 'text-green-500'
-                          } rounded-full cursor-pointer hover:bg-neargray-800`}
-                        >
-                          <svg
-                            className="w-5 h-5 rotate-90 rtl:-rotate-90"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="currentColor"
-                            viewBox="0 0 18 20"
-                          >
-                            <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
-                          </svg>
-                        </button>
-                      </Tooltip.Trigger>
-                      {!context.accountId && (
-                        <Tooltip.Content
-                          className="bg-white shadow-lg border rounded-b-lg p-2 z-50"
-                          align="center"
-                          side="bottom"
-                        >
+                  <OverlayTrigger
+                    placement="bottom"
+                    delay={{ show: 500, hide: 0 }}
+                    overlay={
+                      !context.accountId ? (
+                        <Tooltip className="fixed bg-white shadow-lg border rounded-b-lg p-2 z-50">
                           <p className="text-sm text-nearblue-600">
                             Please sign in to your wallet
                           </p>
-                        </Tooltip.Content>
-                      )}
-                    </Tooltip.Root>
-                  </Tooltip.Provider>
+                        </Tooltip>
+                      ) : (
+                        <></>
+                      )
+                    }
+                  >
+                    <button
+                      type="submit"
+                      disabled={!content}
+                      className={`inline-flex justify-center p-2 ${
+                        !content || !context.accountId
+                          ? 'text-neargray-600'
+                          : 'text-green-500'
+                      } rounded-full cursor-pointer hover:bg-neargray-800`}
+                    >
+                      <svg
+                        className="w-5 h-5 rotate-90 rtl:-rotate-90"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        viewBox="0 0 18 20"
+                      >
+                        <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z" />
+                      </svg>
+                    </button>
+                  </OverlayTrigger>
                 </CommitButton>
               ),
             }}

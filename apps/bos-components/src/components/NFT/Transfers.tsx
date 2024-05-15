@@ -175,29 +175,26 @@ export default function ({ network, id, ownerId, t }: Props) {
       ),
       tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-5 py-4 whitespace-nowrap text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>METHOD</span>,
       key: 'cause',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                  <span className="block truncate">{row?.cause}</span>
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="center"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {row?.cause}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+              <span className="block truncate">{row?.cause}</span>
+            </span>
+          </OverlayTrigger>
         </span>
       ),
       tdClassName:
@@ -416,22 +413,19 @@ export default function ({ network, id, ownerId, t }: Props) {
       key: 'token_id',
       cell: (row: TransactionInfo) => (
         <>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <div className="max-w-[110px] inline-block truncate">
-                  {row?.token_id}
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom-start"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {row?.token_id}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <div className="max-w-[110px] inline-block truncate">
+              {row?.token_id}
+            </div>
+          </OverlayTrigger>
         </>
       ),
       tdClassName:
@@ -442,60 +436,42 @@ export default function ({ network, id, ownerId, t }: Props) {
     {
       header: (
         <>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button
-                  type="button"
-                  onClick={toggleShowAge}
-                  className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row whitespace-nowrap"
-                >
-                  {showAge ? (
-                    <>
-                      {'AGE'}
-                      <Clock className="text-green-500 dark:text-green-250 ml-2" />
-                    </>
-                  ) : (
-                    <> {'DATE TIME (UTC)'}</>
-                  )}
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="center"
-                side="top"
-              >
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {showAge
                   ? 'Click to show Datetime Format'
                   : 'Click to show Age Format'}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <button
+              type="button"
+              onClick={toggleShowAge}
+              className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row whitespace-nowrap"
+            >
+              {showAge ? (
+                <>
+                  {'AGE'}
+                  <Clock className="text-green-500 dark:text-green-250 ml-2" />
+                </>
+              ) : (
+                <> {'DATE TIME (UTC)'}</>
+              )}
+            </button>
+          </OverlayTrigger>
         </>
       ),
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span>
-                  {!showAge
-                    ? row?.block_timestamp
-                      ? formatTimestampToString(
-                          nanoToMilli(row?.block_timestamp),
-                        )
-                      : ''
-                    : row?.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                    : ''}
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom-start"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {showAge
                   ? row?.block_timestamp
                     ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
@@ -503,9 +479,19 @@ export default function ({ network, id, ownerId, t }: Props) {
                   : row?.block_timestamp
                   ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                   : ''}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span>
+              {!showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''}
+            </span>
+          </OverlayTrigger>
         </span>
       ),
       tdClassName:

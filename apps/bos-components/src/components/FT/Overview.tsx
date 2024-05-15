@@ -333,22 +333,19 @@ export default function ({
                           : 'FULLY DILUTED MARKET CAP'}
                       </span>
                       <span>
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <Question className="w-4 h-4 fill-current ml-1" />
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className="h-auto max-w-xs bg-black  bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                              align="start"
-                              side="bottom"
-                            >
+                        <OverlayTrigger
+                          placement="bottom-start"
+                          delay={{ show: 500, hide: 0 }}
+                          overlay={
+                            <Tooltip className="fixed h-auto max-w-xs bg-black  bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                               {
                                 'Calculated by multiplying the tokens Total Supply on Near with the current market price per token.'
                               }
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
+                            </Tooltip>
+                          }
+                        >
+                          <Question className="w-4 h-4 fill-current ml-1" />
+                        </OverlayTrigger>
                       </span>
                     </div>
                     {isLoading ? (
@@ -364,33 +361,29 @@ export default function ({
                         token?.fully_diluted_market_cap !== undefined &&
                         token?.market_cap !== null &&
                         token?.market_cap !== undefined ? (
-                          <Tooltip.Provider>
-                            <Tooltip.Root>
-                              <Tooltip.Trigger asChild>
-                                <p
-                                  className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200"
-                                  onClick={onToggle}
-                                >
-                                  {showMarketCap
-                                    ? '$' +
-                                      dollarNonCentFormat(token?.market_cap)
-                                    : '$' +
-                                      dollarNonCentFormat(
-                                        token?.fully_diluted_market_cap,
-                                      )}
-                                </p>
-                              </Tooltip.Trigger>
-                              <Tooltip.Content
-                                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                                align="start"
-                                side="bottom"
-                              >
+                          <OverlayTrigger
+                            placement="bottom-start"
+                            delay={{ show: 500, hide: 0 }}
+                            overlay={
+                              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                                 {showMarketCap
                                   ? 'Click to switch back'
                                   : 'Click to switch'}
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          </Tooltip.Provider>
+                              </Tooltip>
+                            }
+                          >
+                            <p
+                              className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200"
+                              onClick={onToggle}
+                            >
+                              {showMarketCap
+                                ? '$' + dollarNonCentFormat(token?.market_cap)
+                                : '$' +
+                                  dollarNonCentFormat(
+                                    token?.fully_diluted_market_cap,
+                                  )}
+                            </p>
+                          </OverlayTrigger>
                         ) : (
                           <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200">
                             {'$' +
@@ -456,16 +449,11 @@ export default function ({
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : holders ?? ''}
                         {!status.sync && (
-                          <Tooltip.Provider>
-                            <Tooltip.Root>
-                              <Tooltip.Trigger asChild>
-                                <WarningIcon className="w-4 h-4 fill-current ml-1" />
-                              </Tooltip.Trigger>
-                              <Tooltip.Content
-                                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                                align="start"
-                                side="bottom"
-                              >
+                          <OverlayTrigger
+                            placement="bottom-start"
+                            delay={{ show: 500, hide: 0 }}
+                            overlay={
+                              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                                 Holders count is out of sync. Last synced block
                                 is
                                 <span className="font-bold mx-0.5">
@@ -476,9 +464,11 @@ export default function ({
                                     nanoToMilli(status?.timestamp),
                                   )}).`}
                                 Holders data will be delayed.
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          </Tooltip.Provider>
+                              </Tooltip>
+                            }
+                          >
+                            <WarningIcon className="w-4 h-4 fill-current ml-1" />
+                          </OverlayTrigger>
                         )}
                       </div>
                     </div>
