@@ -214,6 +214,8 @@ const Header = () => {
     }
 
     fetchBlocks();
+    const interval = setInterval(fetchBlocks, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const status = useMemo(() => {

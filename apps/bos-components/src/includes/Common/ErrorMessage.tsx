@@ -16,7 +16,7 @@ const ErrorMessage = ({ icons, message, mutedText }: Props) => {
         {message}
       </h3>
 
-      <p className="mb-0 py-4 font-bold break-words px-2">{mutedText}</p>
+      <p className="mb-0 py-1 font-bold break-words px-2">{mutedText}</p>
     </div>
   );
 };

@@ -263,16 +263,11 @@ export default function ({ network, id, ownerId, t }: Props) {
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : ''}
                         {!status.sync && (
-                          <Tooltip.Provider>
-                            <Tooltip.Root>
-                              <Tooltip.Trigger asChild>
-                                <WarningIcon className="w-4 h-4 fill-current ml-1" />
-                              </Tooltip.Trigger>
-                              <Tooltip.Content
-                                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                                align="start"
-                                side="bottom"
-                              >
+                          <OverlayTrigger
+                            placement="bottom-start"
+                            delay={{ show: 500, hide: 0 }}
+                            overlay={
+                              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                                 Holders count is out of sync. Last synced block
                                 is
                                 <span className="font-bold mx-0.5">
@@ -283,9 +278,11 @@ export default function ({ network, id, ownerId, t }: Props) {
                                     nanoToMilli(status.timestamp),
                                   )}).`}
                                 Holders data will be delayed.
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          </Tooltip.Provider>
+                              </Tooltip>
+                            }
+                          >
+                            <WarningIcon className="w-4 h-4 fill-current ml-1" />
+                          </OverlayTrigger>
                         )}
                       </div>
                     </div>

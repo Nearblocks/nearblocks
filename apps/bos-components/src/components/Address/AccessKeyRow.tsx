@@ -172,21 +172,27 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
           )}
         </td>
         <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom ">
-                  {accessKey.public_key}
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                sideOffset={5}
-              >
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 500, hide: 0 }}
+            popperConfig={{
+              modifiers: {
+                name: 'offset',
+                options: {
+                  offset: [0, 5],
+                },
+              },
+            }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words">
                 {accessKey.public_key}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span className="truncate max-w-[120px] inline-block align-bottom ">
+              {accessKey.public_key}
+            </span>
+          </OverlayTrigger>
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
           {accessKey.permission_kind === 'FUNCTION_CALL' ? (
@@ -234,25 +240,19 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.block_timestamp ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    {showWhen
-                      ? txn?.block_timestamp
-                        ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                        : ''
-                      : txn?.block_timestamp
-                      ? formatTimestampToString(
-                          nanoToMilli(txn?.block_timestamp),
-                        )
-                      : ''}
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                  sideOffset={5}
-                >
+            <OverlayTrigger
+              placement="top"
+              delay={{ show: 500, hide: 0 }}
+              popperConfig={{
+                modifiers: {
+                  name: 'offset',
+                  options: {
+                    offset: [0, 5],
+                  },
+                },
+              }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2">
                   {!showWhen
                     ? txn?.block_timestamp
                       ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
@@ -260,9 +260,19 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
                     : txn?.block_timestamp
                     ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
                     : ''}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                {showWhen
+                  ? txn?.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
+                    : ''
+                  : txn?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
+                  : ''}
+              </span>
+            </OverlayTrigger>
           ) : (
             'Genesis'
           )}
