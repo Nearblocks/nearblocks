@@ -39,12 +39,22 @@ const FunctionCall = (props: TransactionActionInfo) => {
           {shortenAddress(receiver)}
         </a>
       </a>
-      <textarea
-        readOnly
-        rows={4}
-        defaultValue={displayArgs(args?.args_base64 || args?.args)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
-      ></textarea>
+      {args?.method_name === 'rlp_execute' ? (
+        <Widget
+          src={`${props.ownerId}/widget/includes.Common.Receipts.RlpTransaction`}
+          props={{
+            ownerId: props.ownerId,
+            pretty: args.args_base64 || args.args,
+          }}
+        />
+      ) : (
+        <textarea
+          readOnly
+          rows={4}
+          defaultValue={displayArgs(args.args_base64 || args.args)}
+          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+        ></textarea>
+      )}
     </div>
   );
 };
