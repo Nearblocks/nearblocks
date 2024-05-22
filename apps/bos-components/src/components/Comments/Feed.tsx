@@ -8,6 +8,7 @@
  * @param {string} [path] - The path identifier passed as a string.
  * @param {number} [limit] - The maximum number of comments to display.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
  */
 
 interface Props {
@@ -15,9 +16,11 @@ interface Props {
   network: string;
   path: string;
   limit: number;
+  requestSignInWithWallet: () => void;
 }
 
 export default function (props: Props) {
+  const { requestSignInWithWallet } = props;
   const [content, setContent] = useState('');
 
   const path = props.path;
@@ -74,7 +77,25 @@ export default function (props: Props) {
   return (
     <>
       <div className="border-b  dark:border-black-200">
-        {
+        {!context.accountId ? (
+          <>
+            <div className="w-full p-6 mx-auto m-2">
+              <div className="flex items-center justify-center h-40 bg-gray-100 border-2 border-gray-300 rounded-md dark:bg-black-600">
+                <p className="text-center text-gray-600 dark:text-neargray-10">
+                  You must be
+                  <a
+                    href="#"
+                    className="text-green-500 dark:text-green-250 underline"
+                    onClick={requestSignInWithWallet}
+                  >
+                    logged in
+                  </a>
+                  to post a comment
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
           <Widget
             src={`${props.ownerId}/widget/bos-components.components.Comments.InputField`}
             props={{
@@ -128,7 +149,7 @@ export default function (props: Props) {
               ),
             }}
           />
-        }
+        )}
       </div>
       <ScrollArea.Root className="w-full rounded overflow-hidden bg-white dark:bg-black-600">
         <ScrollArea.Viewport className="w-full max-h-screen rounded">

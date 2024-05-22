@@ -8,6 +8,7 @@ import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
+import { useAuthStore } from '@/stores/auth';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -52,6 +53,10 @@ const Txn = () => {
     setHeight({});
   };
 
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
   return (
     <>
       <Head>
@@ -82,6 +87,7 @@ const Txn = () => {
             network: networkId,
             t: t,
             onHandleTab: onHandleTab,
+            requestSignInWithWallet,
             pageTab: pageTab,
           }}
           skeleton={

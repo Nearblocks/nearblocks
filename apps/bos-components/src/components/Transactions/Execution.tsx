@@ -113,7 +113,12 @@ export default function (props: Props) {
               className="cursor-pointer mx-1 flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-1 border border-neargray-700 dark:border-black-200 px-2 rounded-md bg-whit select-none"
               onClick={expandAllReceipts}
             >
-              Expand All <span className="ml-1.5">+</span>
+              <span>
+                <span className="mr-1.5">
+                  {expandAll ? 'Collapse All' : 'Expand All'}
+                </span>
+                {expandAll ? '-' : '+'}
+              </span>
             </div>
           </div>
           <div className="p-4 md:px-8 overflow-auto">

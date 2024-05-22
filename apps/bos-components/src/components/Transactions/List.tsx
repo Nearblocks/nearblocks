@@ -216,7 +216,7 @@ export default function (props: Props) {
         </>
       ),
       tdClassName:
-        'pl-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'pl-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
@@ -248,7 +248,7 @@ export default function (props: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
+      tdClassName: 'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -319,7 +319,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
@@ -333,7 +333,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
@@ -349,7 +349,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -440,7 +440,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
     },
     {
       header: <span></span>,
@@ -536,7 +536,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
@@ -556,7 +556,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
@@ -629,7 +629,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName: 'inline-flex whitespace-nowrap',
     },
   ];

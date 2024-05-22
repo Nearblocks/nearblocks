@@ -8,6 +8,7 @@
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} ownerId - The identifier of the owner of the component.
  * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
  */
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
   network: string;
   id: string;
   t: (key: string) => string | undefined;
+  requestSignInWithWallet: () => void;
 }
 
 import Links from '@/includes/Common/Links';
@@ -25,7 +27,13 @@ import { SpamToken, Status, Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
-export default function ({ network, id, ownerId, t }: Props) {
+export default function ({
+  network,
+  id,
+  ownerId,
+  t,
+  requestSignInWithWallet,
+}: Props) {
   const { localFormat, getTimeAgoString } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -418,6 +426,7 @@ export default function ({ network, id, ownerId, t }: Props) {
                         path: `nearblocks.io/nft/${id}`,
                         limit: 10,
                         ownerId,
+                        requestSignInWithWallet,
                       }}
                     />
                   }

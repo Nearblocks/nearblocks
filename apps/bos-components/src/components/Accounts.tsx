@@ -12,6 +12,8 @@
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} handleToggle - Function to toggle between showing all and unique receipts.
+ * @param {boolean} showAllReceipts - Boolean indicating whether to show all receipts or not.
  */
 
 interface Props {
@@ -23,6 +25,8 @@ interface Props {
   accountId: string;
   ownerId: string;
   logOut: () => void;
+  handleToggle: () => void;
+  showAllReceipts: boolean;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -66,6 +70,8 @@ export default function (props: Props) {
     accountId,
     logOut,
     ownerId,
+    handleToggle,
+    showAllReceipts,
   } = props;
 
   const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
@@ -620,28 +626,30 @@ export default function (props: Props) {
 
   return (
     <>
-      {accountData?.deleted?.transaction_hash && (
-        <>
-          <div className="block lg:flex lg:space-x-2">
-            <div className="w-full ">
-              <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
-                <p className="mb-0 items-center break-words">
-                  <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
-                  {`This account was deleted on ${
-                    accountData?.deleted?.transaction_hash
-                      ? convertToUTC(
-                          nanoToMilli(accountData.deleted.block_timestamp),
-                          false,
-                        )
-                      : ''
-                  }`}
-                </p>
+      {accountView !== null &&
+        accountView?.block_hash === undefined &&
+        accountData?.deleted?.transaction_hash && (
+          <>
+            <div className="block lg:flex lg:space-x-2">
+              <div className="w-full ">
+                <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+                  <p className="mb-0 items-center break-words">
+                    <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+                    {`This account was deleted on ${
+                      accountData?.deleted?.transaction_hash
+                        ? convertToUTC(
+                            nanoToMilli(accountData.deleted.block_timestamp),
+                            false,
+                          )
+                        : ''
+                    }`}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="py-2"></div>
-        </>
-      )}
+            <div className="py-2"></div>
+          </>
+        )}
       {accountView !== null &&
         accountView?.block_hash !== undefined &&
         isLocked &&
@@ -1005,6 +1013,8 @@ export default function (props: Props) {
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
                       ownerId,
+                      handleToggle,
+                      showAllReceipts,
                     }}
                   />
                 }
@@ -1092,6 +1102,7 @@ export default function (props: Props) {
                           path: `nearblocks.io/address/${id}`,
                           ownerId,
                           limit: 10,
+                          requestSignInWithWallet,
                         }}
                       />
                     </div>

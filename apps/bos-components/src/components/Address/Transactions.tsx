@@ -14,6 +14,8 @@
  * @param {function} [onFilterClear] - Function to clear a specific or all filters. (Optional)
  *                                     Example: onFilterClear={handleClearFilter} where handleClearFilter is a function to clear the applied filters.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} handleToggle - Function to toggle between showing all and unique receipts.
+ * @param {boolean} showAllReceipts - Boolean indicating whether to show all receipts or not.
  */
 
 interface Props {
@@ -24,6 +26,8 @@ interface Props {
   filters: { [key: string]: string };
   handleFilter: (name: string, value: string) => void;
   onFilterClear: (name: string) => void;
+  handleToggle: () => void;
+  showAllReceipts: boolean;
 }
 
 import ErrorMessage from '@/includes/Common/ErrorMessage';
@@ -46,6 +50,8 @@ export default function ({
   filters,
   handleFilter,
   onFilterClear,
+  handleToggle,
+  showAllReceipts,
 }: Props) {
   const {
     capitalizeFirstLetter,
@@ -74,7 +80,6 @@ export default function ({
   const [filterValue, setFilterValue] = useState<Record<string, string>>({});
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
   const [address, setAddress] = useState('');
-  const [showAllRows, setShowAllRows] = useState(false);
 
   const config = getConfig && getConfig(network);
 
@@ -201,17 +206,12 @@ export default function ({
     }
   };
 
-  const handleToggle = () => {
-    setShowAllRows((prevState) => !prevState);
-  };
-
   const onOrder = () => {
     setSorting((state) => (state === 'asc' ? 'desc' : 'asc'));
   };
 
   const setPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    setShowAllRows(false);
   };
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -668,7 +668,7 @@ export default function ({
     ),
   ];
 
-  const filterTxns = showAllRows
+  const filterTxns = showAllReceipts
     ? txns[currentPage]
     : txns[currentPage] !== undefined
     ? uniqueIds.map((id: string) => {
@@ -759,6 +759,7 @@ export default function ({
                       '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
                     }}
                     onCheckedChange={handleToggle}
+                    checked={showAllReceipts}
                   >
                     <Switch.Thumb className="block w-[10px] h-[10px] bg-neargray-10 dark:bg-neargray-10 rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[13px]" />
                   </Switch.Root>

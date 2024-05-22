@@ -10,6 +10,7 @@ import Router from 'next/router';
 import Layout from '@/components/Layouts';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
+import { useAuthStore } from '@/stores/auth';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -136,6 +137,10 @@ const Token = () => {
     setHeight({});
   };
 
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
   return (
     <>
       <Head>
@@ -166,6 +171,7 @@ const Token = () => {
             onFilterClear: onFilterClear,
             onHandleTab: onHandleTab,
             pageTab: pageTab,
+            requestSignInWithWallet,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />
