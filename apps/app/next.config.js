@@ -29,6 +29,11 @@ const nextConfig = nextTranslate({
         destination: '/txns/:slug',
         permanent: true,
       },
+      {
+        source: '/tx/:slug',
+        destination: '/txns/:slug',
+        permanent: true,
+      },
     ];
   },
 });
