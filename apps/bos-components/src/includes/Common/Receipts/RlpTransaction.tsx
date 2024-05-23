@@ -17,7 +17,7 @@ export default function ({ pretty }: Props) {
     const data = ethers.utils.parseTransaction(input);
 
     data.value = data.value.toString();
-    data.gasPrice = data.gasPrice.toString();
+    data.gasPrice = data.gasPrice.toNumber();
     data.gasLimit = data.gasLimit.toNumber();
 
     parsed.tx_bytes_b64 = data;
