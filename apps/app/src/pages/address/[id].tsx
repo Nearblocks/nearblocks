@@ -23,6 +23,20 @@ const Address = () => {
   const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const [showAllReceipts, setShowAllReceipts] = useState(false);
+  useEffect(() => {
+    const allReceipts = localStorage.getItem('showAllReceipts');
+    if (allReceipts === null) {
+      localStorage.setItem('showAllReceipts', 'false');
+    } else {
+      setShowAllReceipts(allReceipts === 'true');
+    }
+  }, []);
+  const handleToggle = () => {
+    const allReceipts = !showAllReceipts;
+    localStorage.setItem('showAllReceipts', allReceipts.toString());
+    setShowAllReceipts(allReceipts);
+  };
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -130,6 +144,8 @@ const Address = () => {
               account && account?.loading === false ? account?.accountId : null,
             logOut: logOut,
             theme: theme,
+            handleToggle,
+            showAllReceipts,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />

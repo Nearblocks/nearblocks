@@ -138,6 +138,8 @@ export default function (props: Props) {
     );
   };
 
+  let gasAttached = getGasAttached(receipt?.actions);
+
   return (
     <>
       {!loading &&
@@ -204,8 +206,9 @@ export default function (props: Props) {
               </span>
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">{`${
-              !loading &&
-              convertToMetricPrefix(getGasAttached(receipt?.actions))
+              !loading && gasAttached !== '0'
+                ? convertToMetricPrefix(gasAttached)
+                : '0 '
             }gas`}</td>
           </tr>
         ))}
