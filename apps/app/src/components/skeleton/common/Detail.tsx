@@ -45,6 +45,9 @@ const Detail = forwardRef(
                 NEW
               </div>
             </div>
+            <div className={buttonStyles('tree')}>
+              <h2 className="p-2">Tree Plan</h2>
+            </div>
             <div className={buttonStyles('summary')}>
               <h2 className="p-2">Receipt Summary</h2>
             </div>
