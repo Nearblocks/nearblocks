@@ -36,7 +36,7 @@ import { useVmStore } from '@/stores/vm';
 import { networkId, bosNetworkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
-
+import { useTheme } from 'next-themes';
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
   const [signedAccountId, setSignedAccountId] = useState(null);
@@ -53,7 +53,7 @@ export default function VmInitializer() {
   const accountId = account.accountId;
   const setAuthStore = useAuthStore((state) => state.set);
   const setVmStore = useVmStore((store) => store.set);
-  // const { requestAuthentication, saveCurrentUrl } = useSignInRedirect();
+  const { theme } = useTheme();
   useEffect(() => {
     initNear &&
       initNear({
@@ -93,9 +93,14 @@ export default function VmInitializer() {
       return;
     }
     near.selector.then((selector: any) => {
-      setWalletModal(setupModal(selector, { contractId: '' }));
+      setWalletModal(
+        setupModal(selector, {
+          contractId: '',
+          theme: theme === 'light' ? 'light' : 'dark',
+        }),
+      );
     });
-  }, [near]);
+  }, [near, theme]);
 
   const requestSignInWithWallet = useCallback(() => {
     walletModal?.show();

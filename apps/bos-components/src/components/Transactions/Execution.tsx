@@ -20,6 +20,7 @@ interface Props {
 }
 
 import FaHourglassStart from '@/includes/icons/FaHourglassStart';
+import Spinner from '@/includes/icons/Spinner';
 import {
   TransactionInfo,
   RPCTransactionInfo,
@@ -84,14 +85,15 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash, config.backendUrl]);
 
-  const Loader = (props: { className?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
-      ></div>
-    );
-  };
+  // const Loader = (props: { className?: string }) => {
+  //   return (
+  //     <div
+  //       className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+  //     ></div>
+  //   );
+  // };
   const txnsPending = txn?.outcomes?.status === null;
+  console.log({ receipt });
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200  divide-solid divide-gray-200 divide-y">
       {txnsPending ? (
@@ -123,11 +125,8 @@ export default function (props: Props) {
           </div>
           <div className="p-4 md:px-8 overflow-auto">
             {!receipt?.id ? (
-              <div className="w-full md:w-3/4">
-                <Loader className="flex w-full mt-2" />
-                <Loader className="flex w-full mt-2" />
-                <Loader className="flex w-full mt-2" />
-                <Loader className="flex w-full mt-2" />
+              <div className="w-full h-[50vh] flex justify-center items-center">
+                <Spinner className="w-9 h-9 text-gray-100 animate-spin dark:text-black-200 fill-green-500 dark:fill-green-250" />
               </div>
             ) : (
               <Widget

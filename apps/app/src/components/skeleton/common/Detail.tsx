@@ -1,6 +1,7 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
 import useTranslation from 'next-translate/useTranslation';
+import Spinner from './Spinner';
 interface Props {
   network: string;
   txns?: boolean;
@@ -66,152 +67,9 @@ const Detail = forwardRef(
               </div>
             </div>
           )}
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
+          <div className="w-full h-[50vh] flex justify-center items-center">
+            <Spinner className="w-9 h-9 text-gray-100 animate-spin dark:text-black-200 fill-green-500 dark:fill-green-250" />
           </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap p-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
-              <div className="max-w-lg w-36 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-
-            <div className="w-full md:w-3/4">
-              <div className="w-1/2 py-0.5">
-                <Skeleton className="h-4" />
-              </div>
-            </div>
-          </div>
-          {network === 'mainnet' && (
-            <div className="flex flex-wrap p-4">
-              <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                <div className="max-w-lg w-36 py-0.5">
-                  <Skeleton className="h-4" />
-                </div>
-              </div>
-
-              <div className="w-full md:w-3/4">
-                <div className="w-1/2 py-0.5">
-                  <Skeleton className="h-4" />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );

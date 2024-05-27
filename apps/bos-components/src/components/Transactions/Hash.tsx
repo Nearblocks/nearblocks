@@ -24,12 +24,11 @@ interface Props {
   onHandleTab: (value: string) => void;
   pageTab: string;
 }
-
 import ErrorMessage from '@/includes/Common/ErrorMessage';
 import FileSlash from '@/includes/icons/FileSlash';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
-export default function (props: Props) {
+export default function TransactionsHash(props: Props) {
   const {
     t,
     network,
@@ -52,11 +51,15 @@ export default function (props: Props) {
   );
 
   const config = getConfig && getConfig(network);
+  const [loadedTabs, setLoadedTabs] = useState<string[]>([pageTab]);
 
   const onTab = (hash: string) => {
     onHandleTab(hash);
+    if (!loadedTabs.includes(hash)) {
+      setLoadedTabs([...loadedTabs, hash]);
+    }
   };
-
+  console.log(loadedTabs);
   useEffect(() => {
     let delay = 1000;
     function fetchTxn() {
@@ -180,7 +183,7 @@ export default function (props: Props) {
               <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
                 NEW
               </div>
-            </button>{' '}
+            </button>
             <button
               onClick={() => onTab('tree')}
               className={buttonStyles('tree')}
@@ -203,86 +206,97 @@ export default function (props: Props) {
             </button>
           </div>
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-            <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
-                props={{
-                  txn: txn,
-                  rpcTxn: rpcTxn,
-                  loading: isLoading,
-                  network: network,
-                  t: t,
-                  ownerId,
-                }}
-              />
-            </div>
-
-            <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
-                props={{
-                  network: network,
-                  t: t,
-                  txn: txn,
-                  rpcTxn: rpcTxn,
-                  loading: isLoading,
-                  ownerId,
-                }}
-              />
-            </div>
-            <div className={`${pageTab === 'enhanced' ? '' : 'hidden'} `}>
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
-                props={{
-                  network: network,
-                  t: t,
-                  txn: txn,
-                  rpcTxn: rpcTxn,
-                  loading: isLoading,
-                  ownerId,
-                }}
-              />
-            </div>
-            <div className={`${pageTab === 'tree' ? '' : 'hidden'} `}>
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Transactions.Tree`}
-                props={{
-                  network: network,
-                  t: t,
-                  txn: txn,
-                  rpcTxn: rpcTxn,
-                  loading: isLoading,
-                  ownerId,
-                }}
-              />
-            </div>
-            <div className={`${pageTab === 'summary' ? '' : 'hidden'} `}>
-              <Widget
-                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptSummary`}
-                props={{
-                  network: network,
-                  t: t,
-                  txn: txn,
-                  rpcTxn: rpcTxn,
-                  loading: isLoading,
-                  ownerId,
-                }}
-              />
-            </div>
-            <div className={`${pageTab === 'comments' ? '' : 'hidden'} `}>
-              <div className="py-3">
+            {loadedTabs.includes('overview') && (
+              <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
                 <Widget
-                  src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
                   props={{
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
                     network: network,
-                    path: `nearblocks.io/txns/${hash}`,
-                    limit: 10,
+                    t: t,
                     ownerId,
-                    requestSignInWithWallet,
                   }}
                 />
               </div>
-            </div>
+            )}
+            {loadedTabs.includes('execution') && (
+              <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
+                  props={{
+                    network: network,
+                    t: t,
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
+                    ownerId,
+                  }}
+                />
+              </div>
+            )}
+            {loadedTabs.includes('enhanced') && (
+              <div className={`${pageTab === 'enhanced' ? '' : 'hidden'} `}>
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
+                  props={{
+                    network: network,
+                    t: t,
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
+                    ownerId,
+                  }}
+                />
+              </div>
+            )}
+            {loadedTabs.includes('tree') && (
+              <div className={`${pageTab === 'tree' ? '' : 'hidden'} `}>
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Transactions.Tree`}
+                  props={{
+                    network: network,
+                    t: t,
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
+                    ownerId,
+                  }}
+                />
+              </div>
+            )}
+            {loadedTabs.includes('summary') && (
+              <div className={`${pageTab === 'summary' ? '' : 'hidden'} `}>
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptSummary`}
+                  props={{
+                    network: network,
+                    t: t,
+                    txn: txn,
+                    rpcTxn: rpcTxn,
+                    loading: isLoading,
+                    ownerId,
+                  }}
+                />
+              </div>
+            )}
+            {loadedTabs.includes('comments') && (
+              <div className={`${pageTab === 'comments' ? '' : 'hidden'} `}>
+                <div className="py-3">
+                  <Widget
+                    src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
+                    props={{
+                      network: network,
+                      path: `nearblocks.io/txns/${hash}`,
+                      limit: 10,
+                      ownerId,
+                      requestSignInWithWallet,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

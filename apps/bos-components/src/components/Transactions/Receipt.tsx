@@ -20,6 +20,7 @@ interface Props {
 }
 
 import FaHourglassStart from '@/includes/icons/FaHourglassStart';
+import Spinner from '@/includes/icons/Spinner';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 export default function (props: Props) {
   const { network, rpcTxn, txn, t, ownerId } = props;
@@ -27,7 +28,7 @@ export default function (props: Props) {
   const { mapRpcActionToAction } = VM.require(
     `${ownerId}/widget/includes.Utils.near`,
   );
-  const [receipt, setReceipt] = useState(null);
+  const [receipt, setReceipt] = useState<any>(null);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
@@ -114,16 +115,24 @@ export default function (props: Props) {
           </div>
         </div>
       ) : (
-        <Widget
-          src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
-          props={{
-            txn: txn,
-            receipt: receipt,
-            network: network,
-            t: t,
-            ownerId,
-          }}
-        />
+        <>
+          {!receipt?.id ? (
+            <div className="w-full h-[50vh] flex justify-center items-center">
+              <Spinner className="w-9 h-9 text-gray-100 animate-spin dark:text-black-200 fill-green-500 dark:fill-green-250" />
+            </div>
+          ) : (
+            <Widget
+              src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
+              props={{
+                txn: txn,
+                receipt: receipt,
+                network: network,
+                t: t,
+                ownerId,
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   );
