@@ -67,6 +67,7 @@ export default function ({
     'Info',
     'FAQ',
     'Comments',
+    'Feeds',
   ];
   const [isLoading, setIsLoading] = useState(false);
   const [txnLoading, setTxnLoading] = useState(false);
@@ -660,6 +661,33 @@ export default function ({
                         limit: 10,
                         ownerId,
                         requestSignInWithWallet,
+                      }}
+                    />
+                  }
+                </div>
+              </div>
+              <div className={`${pageTab === 'Feeds' ? '' : 'hidden'} `}>
+                <div className="py-3">
+                  {
+                    <Widget
+                      loading={
+                        <div className="loader">
+                          <span
+                            className="spinner-grow spinner-grow-sm me-1"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading ...
+                        </div>
+                      }
+                      src={`${ownerId}/widget/bos-components.components.Feeds.Feed`}
+                      props={{
+                        network: network,
+                        path: ``,
+                        limit: 10,
+                        ownerId,
+                        accounts: 'vaishnav_v.near',
+                        commentAccounts: 'vaishnav_v.near',
                       }}
                     />
                   }

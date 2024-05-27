@@ -46,3 +46,4 @@ declare const Toast;
 declare const Switch;
 declare const OverlayTrigger;
 declare const ethers;
+declare const state;
