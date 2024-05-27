@@ -113,6 +113,7 @@ export default function (props: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const [isLocked, setIsLocked] = useState(false);
   const [isContractLoading, setIsContractLoading] = useState(false);
+  const [isAccountLoading, setIsAccountLoading] = useState(false);
   const [schema, setSchema] = useState<SchemaInfo>({} as SchemaInfo);
   const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
     {} as ContractParseInfo,
@@ -247,6 +248,7 @@ export default function (props: Props) {
     }
 
     function viewAccount(address: string) {
+      setIsAccountLoading(true);
       asyncFetch(`${config?.rpcUrl}`, {
         method: 'POST',
         body: JSON.stringify({
@@ -267,13 +269,22 @@ export default function (props: Props) {
           (res: {
             body: {
               result: AccountDataInfo;
+              error?: any;
             };
+            status: number;
           }) => {
             const resp = res?.body?.result;
-            setAccountView(resp);
+            if (res.status === 200 && resp) {
+              setAccountView(resp);
+              setIsAccountLoading(false);
+            } else if (res?.status === 200 && res?.body?.error) {
+              setIsAccountLoading(false);
+            }
           },
         )
-        .catch(() => {});
+        .catch(() => {
+          setIsAccountLoading(false);
+        });
     }
 
     function loadSchema() {
@@ -628,7 +639,8 @@ export default function (props: Props) {
     <>
       {accountView !== null &&
         accountView?.block_hash === undefined &&
-        accountData?.deleted?.transaction_hash && (
+        accountData?.deleted?.transaction_hash &&
+        !isAccountLoading && (
           <>
             <div className="block lg:flex lg:space-x-2">
               <div className="w-full ">
@@ -811,7 +823,10 @@ export default function (props: Props) {
                     </div>
                   ) : (
                     <div className="w-full mb-2 md:mb-0">
-                      {accountData?.deleted?.transaction_hash
+                      {accountView !== null &&
+                      accountView?.block_hash === undefined &&
+                      accountData?.deleted?.transaction_hash &&
+                      !isAccountLoading
                         ? 'Deleted At:'
                         : 'Created At:'}
                     </div>
@@ -822,7 +837,10 @@ export default function (props: Props) {
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {accountData?.deleted?.transaction_hash
+                      {accountView !== null &&
+                      accountView?.block_hash === undefined &&
+                      accountData?.deleted?.transaction_hash &&
+                      !isAccountLoading
                         ? convertToUTC(
                             nanoToMilli(accountData.deleted.block_timestamp),
                             false,
