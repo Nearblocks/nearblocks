@@ -163,7 +163,7 @@ const Header = () => {
   const user = signedIn;
 
   useEffect(() => {
-    let delay = 15000;
+    let delay = 600000;
     async function fetchStats() {
       try {
         const response = await fetch(`${apiUrl}stats`, {
