@@ -21,6 +21,7 @@ interface Props {
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
+import Question from '@/includes/icons/Question';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/includes/types';
 
 export default function (props: Props) {
@@ -34,6 +35,11 @@ export default function (props: Props) {
     title: '',
     description: '',
   });
+  const [logView, setLogView] = useState(false);
+
+  const handleToggle = () => {
+    setLogView((prevState) => !prevState);
+  };
 
   const config = getConfig && getConfig(network);
 
@@ -170,6 +176,11 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, chartTypes]);
 
+  const replaceWithNull = chartData.map((item: any) => ({
+    ...item,
+    y: item.y === 0 ? null : item.y,
+  }));
+
   useEffect(() => {
     function fetchChartData() {
       asyncFetch(`${config.backendUrl}charts`).then(
@@ -302,6 +313,9 @@ export default function (props: Props) {
           enabled: false,
         },
         plotOptions: {
+          series: {
+            connectNulls: false,
+          },
           area: {
             fillColor: {
               linearGradient: {
@@ -382,6 +396,11 @@ export default function (props: Props) {
       }
       <script type="text/javascript">
         const chartConfig = ${JSON.stringify(chartConfig)};
+        if (${logView}) {
+          chartConfig.yAxis.type = 'logarithmic';
+          chartConfig.series[0].data = ${JSON.stringify(replaceWithNull)};
+          chartConfig.plotOptions.series.connectNulls = ${true};
+        }
         chartConfig.tooltip = {
           formatter: function () {
             const item= this.point;
@@ -416,7 +435,7 @@ export default function (props: Props) {
                 case "near-supply":
                     tooltipContent = \`
                       \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Sypply: <strong>\${dollarFormat(item.y)} Ⓝ</strong>
+                      Total Supply: <strong>\${dollarFormat(item.y)} Ⓝ</strong>
                     \`;
                   break;
                 case "blocks":
@@ -474,9 +493,44 @@ export default function (props: Props) {
             className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden mb-10"
             style={{ height: 580 }}
           >
-            <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200">
-              {chartInfo?.description}
-            </p>
+            <div className="border-b dark:border-black-200 flex justify-between items-center text-center">
+              <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
+                {chartInfo?.description}
+              </p>
+              {chartData?.length > 0 && (
+                <div className="flex items-center text-nearblue-600 dark:text-neargray-10">
+                  <OverlayTrigger
+                    placement="top-start"
+                    delay={{ show: 500, hide: 0 }}
+                    overlay={
+                      <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
+                        {
+                          'Toggle between Log View and Normal View. Log View uses logarithmic scale.'
+                        }
+                      </Tooltip>
+                    }
+                  >
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </OverlayTrigger>
+                  <div className="w-6 flex">
+                    <Switch.Root
+                      className="w-[24px] h-[14px] bg-neargray-50 dark:bg-neargray-600 rounded-full data-[state=checked]:bg-teal-800 dark:data-[state=checked]:bg-green-250 outline-none cursor-pointer"
+                      id="airplane-mode"
+                      style={{
+                        '-webkit-tap-highlight-color': 'rgba(0, 0, 0, 0)',
+                      }}
+                      onCheckedChange={handleToggle}
+                      checked={logView}
+                    >
+                      <Switch.Thumb className="block w-[10px] h-[10px] bg-neargray-10 dark:bg-neargray-10 rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[13px]" />
+                    </Switch.Root>
+                  </div>
+                  <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none pr-[15px] px-2">
+                    {'Log View'}
+                  </label>
+                </div>
+              )}
+            </div>
             <div className="pl-2 pr-2 py-8 h-full ">
               {chartData?.length ? (
                 <iframe
