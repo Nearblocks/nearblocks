@@ -61,13 +61,7 @@ export default function ({
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
-  const tabs = [
-    t ? t('token:fts.ft.transfers') : 'Transfers',
-    t ? t('token:fts.ft.holders') : 'Holders',
-    'Info',
-    'FAQ',
-    'Comments',
-  ];
+  const tabs = ['Transfers', 'Holders', 'Info', 'FAQ', 'Comments'];
   const [isLoading, setIsLoading] = useState(false);
   const [txnLoading, setTxnLoading] = useState(false);
   const [holderLoading, setHolderLoading] = useState(false);
@@ -581,7 +575,15 @@ export default function ({
                     }`}
                     value={tab}
                   >
-                    {tab === 'FAQ' && token ? <h2>{tab}</h2> : <h2>{tab}</h2>}
+                    {tab === 'FAQ' && token ? (
+                      <h2>{tab}</h2>
+                    ) : tab === 'Transfers' ? (
+                      <h2>{t ? t('token:fts.ft.transfers') : tab}</h2>
+                    ) : tab === 'Holders' ? (
+                      <h2>{t ? t('token:fts.ft.holders') : tab}</h2>
+                    ) : (
+                      <h2>{tab}</h2>
+                    )}
                   </button>
                 ))}
             </div>
