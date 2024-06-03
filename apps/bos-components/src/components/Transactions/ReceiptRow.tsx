@@ -418,6 +418,7 @@ export default function (props: Props) {
                       network: network,
                       Link,
                       ownerId,
+                      t,
                     }}
                   />
                 }
