@@ -26,6 +26,7 @@ const rateLimiter = catchAsync(
         INNER JOIN api__subscriptions s ON s.plan_id = p.id
       WHERE
         s.user_id = ${id}
+        AND p.type = 0
         AND s.status IN (
           ${SubscriptionStatus.ACTIVE},
           ${SubscriptionStatus.TRIALING}
