@@ -46,6 +46,7 @@ Configure the nearblocks Gateway by modifying the .env file. Customize settings 
 `BREVO_API_KEY=`
 `BREVO_TO_EMAIL=`
 `NEXT_PUBLIC_GTM_ID=GTM-P285ZPV2`
+`API_KEY=`
 
 ## Deployment
 
