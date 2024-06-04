@@ -12,14 +12,14 @@ const Detail = forwardRef(
     const { t } = useTranslation('txns');
 
     const buttonStyles = (hash: string) =>
-      `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3.5 focus:outline-none ${
+      `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-[0.95rem] focus:outline-none ${
         pageTab === hash
           ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
-          : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
+          : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
       }`;
 
     return (
-      <div ref={ref} className={`w-full z-10 ${className} pr-2`}>
+      <div ref={ref} className={`w-full z-10 ${className} pr-2 mr-3.5`}>
         {!txns && (
           <div className="md:flex items-center justify-between">
             <div className="w-80 max-w-xs px-3 py-5">
@@ -28,7 +28,7 @@ const Detail = forwardRef(
           </div>
         )}
         {txns === true && (
-          <div>
+          <div className="mr-3.5">
             <div className={buttonStyles('overview')}>
               <h2 className="p-2">
                 {t ? t('txns:txn.tabs.overview') : 'Overview'}

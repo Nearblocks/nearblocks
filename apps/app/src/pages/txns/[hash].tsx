@@ -72,14 +72,12 @@ const Txn = () => {
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />
       </Head>
+      <div className="md:flex items-center justify-between container mx-auto px-3">
+        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
+          {t ? t('txns:txn.heading') : 'Transaction Details'}
+        </h1>
+      </div>
       <div style={height} className="relative container mx-auto px-3">
-        <div>
-          <div className="md:flex items-center justify-between">
-            <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
-              {t ? t('txns:txn.heading') : 'Transaction Details'}
-            </h1>
-          </div>
-        </div>
         <VmComponent
           src={components?.transactionsHash}
           props={{
