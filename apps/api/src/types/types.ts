@@ -38,6 +38,7 @@ export type StreamTransformWrapper = (
 export type User = {
   email: string;
   id: number;
+  key_id?: number;
   keys?: Key[];
   last_login_at: string;
   plan?: Plan;
