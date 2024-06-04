@@ -59,18 +59,20 @@ export default function ({
           <div key={index} className="w-full pl-2">
             <div className="flex items-center">
               <span
-                className="text-green-500 dark:text-green-250 cursor-pointer"
+                className="flex items-center cursor-pointer"
                 onClick={() => handleClick(newPath)}
               >
-                {isExpanded ? (
-                  <ArrowDown className="fill-current" />
-                ) : (
-                  <ArrowUp className="fill-current" />
-                )}
-              </span>
-              <span className="ml-1 font-semibold text-green-500 dark:text-green-250">
-                {`"${key}": `}
-                <span className="text-green-500 dark:text-green-250 font-semibold">{` { `}</span>
+                <span className="text-green-500 dark:text-green-250">
+                  {isExpanded ? (
+                    <ArrowDown className="fill-current" />
+                  ) : (
+                    <ArrowUp className="fill-current rotate-90" />
+                  )}
+                </span>
+                <span className="ml-1 text-green-500 dark:text-green-250">
+                  {`"${key}": `}
+                  <span className="text-green-500 dark:text-green-250 font-semibold">{` { `}</span>
+                </span>
               </span>
               {isExpanded ? (
                 <></>
@@ -95,13 +97,13 @@ export default function ({
                     />
                   ) : (
                     <>
-                      <div className="ml-2 pl-8 font-semibold">
+                      <div className="ml-2 pl-8">
                         {JSON.stringify(value, null, 2)}
                       </div>
                     </>
                   )}
                 </div>
-                <div className="text-green-500 dark:text-green-250 pt-1 ml-3">{` }`}</div>
+                <div className="text-green-500 dark:text-green-250 pt-1 ml-3 font-semibold">{` }`}</div>
               </>
             ) : (
               <></>

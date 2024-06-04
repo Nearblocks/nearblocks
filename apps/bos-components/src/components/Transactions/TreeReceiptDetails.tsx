@@ -43,26 +43,46 @@ export default function (props: Props) {
               {receipt &&
                 receipt?.actions?.map((action: any, i: number) => (
                   <Fragment key={1}>
-                    <div className="text-green-500 dark:text-green-250 text-xl pt-3 px-1">
+                    <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
                       Receipt
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
                       Predecessor:{' '}
-                      <Link
-                        href={`/address/${receipt?.predecessor_id}`}
-                        className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-[120px] ml-0.5"
+                      <OverlayTrigger
+                        placement="bottom-start"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
+                            {receipt.predecessor_id}
+                          </Tooltip>
+                        }
                       >
-                        {receipt.predecessor_id}
-                      </Link>
+                        <Link
+                          href={`/address/${receipt?.predecessor_id}`}
+                          className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
+                        >
+                          {receipt.predecessor_id}
+                        </Link>
+                      </OverlayTrigger>
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
                       Receiver:{' '}
-                      <Link
-                        href={`/address/${receipt?.receiver_id}`}
-                        className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-[120px] ml-0.5"
+                      <OverlayTrigger
+                        placement="bottom-start"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
+                            {receipt.receiver_id}
+                          </Tooltip>
+                        }
                       >
-                        {` ${receipt.receiver_id}`}
-                      </Link>
+                        <Link
+                          href={`/address/${receipt?.receiver_id}`}
+                          className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
+                        >
+                          {` ${receipt.receiver_id}`}
+                        </Link>
+                      </OverlayTrigger>
                     </div>
                     <div className="w-full pl-3 word-break space-y-4">
                       <TreeTxnsActions
@@ -75,7 +95,7 @@ export default function (props: Props) {
                     </div>
                   </Fragment>
                 ))}
-              <div className="text-green-500 dark:text-green-250 text-xl px-1 pt-3">
+              <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
                 Execution Outcomes
               </div>
               <div className="pl-3 py-2">

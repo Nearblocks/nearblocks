@@ -319,7 +319,7 @@ export default function (props: Props) {
                 <TxnStatus showLabel status={txn?.outcomes?.status} />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 my-2 rounded-md text-left px-2 py-1">
+                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded-md text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}

@@ -321,14 +321,12 @@ pre[class*='language-']>code {
 .hierarchy-tree {
     margin: 0 0 1em;
     text-align: center;
+    width: 100%;
 }
 
 .hierarchy-tree,
 .hierarchy-tree ul {
     display: table;
-}
-
-.hierarchy-tree ul {
     width: 100%;
 }
 
@@ -336,6 +334,7 @@ pre[class*='language-']>code {
     display: table-cell;
     padding: 1em 0;
     vertical-align: top;
+    min-width: 120px;
 }
 
 .hierarchy-tree li:before {
@@ -363,6 +362,7 @@ pre[class*='language-']>code {
     margin: 1em .5em 1em;
     padding: 0.7em 1.5em;
     position: relative;
+    box-sizing: border-box;
 }
 
 .hierarchy-tree ul:before,
@@ -372,7 +372,6 @@ pre[class*='language-']>code {
     content: "";
     height: 1.5em;
     left: 50%;
-
     position: absolute;
 }
 
@@ -402,3 +401,4 @@ pre[class*='language-']>code {
     border: 2px solid #033f40;
     border-radius: 10px;
 }
+
