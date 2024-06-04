@@ -105,7 +105,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
     setIsVisible(false);
   };
   return (
-    <>
+    <div className="container mx-auto px-3">
       {isTokenSpam(token.contract || id) && isVisible && (
         <>
           <div className="py-2"></div>
@@ -343,6 +343,6 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

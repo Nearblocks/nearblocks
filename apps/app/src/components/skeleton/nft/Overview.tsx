@@ -8,14 +8,14 @@ const Overview = forwardRef(
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300  ">
+          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
             <Skeleton className="h-6" />
           </div>{' '}
         </div>
         <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mb-0.5">
             <div className="w-full">
-              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
+              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                 <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
                   <div className="py-.5 text-sm font-semibold">
                     <Skeleton className="h-5 w-28" />
@@ -50,7 +50,7 @@ const Overview = forwardRef(
               </div>
             </div>
             <div className="w-full">
-              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
+              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                 <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
                   <div className="py-.5 text-sm font-semibold">
                     <Skeleton className="h-5 w-28" />
@@ -87,7 +87,7 @@ const Overview = forwardRef(
             </div>
           </div>
           <div className="py-6"></div>
-          <div className="block lg:flex lg:space-x-2 mb-4">
+          <div className="block lg:flex lg:space-x-2 mb-4 sm:mt-0 -mt-0.5">
             <div className="w-full">
               <div className=" flex">
                 <div

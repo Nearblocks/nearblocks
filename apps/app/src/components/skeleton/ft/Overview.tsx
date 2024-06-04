@@ -139,27 +139,27 @@ const Overview = forwardRef(
             <div className="w-full">
               <div>
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none`}
                 >
                   Transfers
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none`}
                 >
                   Holders
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none`}
                 >
                   Info
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none`}
                 >
                   FAQ
                 </div>{' '}
                 <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
+                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:text-neargray-10 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none`}
                 >
                   Comments
                 </div>

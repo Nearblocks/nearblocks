@@ -36,7 +36,7 @@ const Overview = forwardRef(
               </div>
             </div>
             <div className="w-full">
-              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
+              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl -mb-1">
                 <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
                   <div className="py-.5 text-sm font-semibold">
                     <Skeleton className="h-5 w-28" />
