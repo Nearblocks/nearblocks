@@ -42,7 +42,7 @@ const rateLimiter = catchAsync(
 
     if (!plan) {
       if (keyId) {
-        const tokenKey = getTokenKey(id, keyId)
+        const tokenKey = getTokenKey(id, keyId);
         return await useFreePlan(res, next, id, tokenKey);
       }
       return await useFreePlan(res, next, id);
@@ -54,7 +54,7 @@ const rateLimiter = catchAsync(
       await rateLimit.consume(id);
 
       if (keyId) {
-        const tokenKey = getTokenKey(id, keyId)
+        const tokenKey = getTokenKey(id, keyId);
         await rateLimit.consume(tokenKey);
       }
       return next();
@@ -68,7 +68,7 @@ const useFreePlan = async (
   res: Response,
   next: NextFunction,
   key: number | string,
-  tokenKey: null | string = null
+  tokenKey: null | string = null,
 ) => {
   const freePlan = await getFreePlan();
 
@@ -135,6 +135,6 @@ const rateLimiterUnion = (plan: Plan) => {
   );
 };
 
-const getTokenKey = (id: number, kId: number ) => `${id}_${kId}`;
+const getTokenKey = (id: number, kId: number) => `${id}_${kId}`;
 
 export default rateLimiter;
