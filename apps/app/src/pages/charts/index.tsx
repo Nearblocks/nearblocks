@@ -7,8 +7,8 @@ import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
-import { useTheme } from 'next-themes';
 import { env } from 'next-runtime-env';
+import { useThemeStore } from '@/stores/theme';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const Charts = () => {
@@ -16,7 +16,7 @@ const Charts = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('charts:heading'),
   )}&brand=near`;

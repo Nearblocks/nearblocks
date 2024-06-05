@@ -1,6 +1,4 @@
 import Head from 'next/head';
-import { useTheme } from 'next-themes';
-
 import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/charts/Detail';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -10,6 +8,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
+import { useThemeStore } from '@/stores/theme';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const AddressesChart = () => {
@@ -17,7 +16,7 @@ const AddressesChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;

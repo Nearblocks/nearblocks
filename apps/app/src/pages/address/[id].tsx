@@ -9,15 +9,15 @@ import { useAuthStore } from '@/stores/auth';
 import Head from 'next/head';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useThemeStore } from '@/stores/theme';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Address = () => {
   const router = useRouter();
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const { id } = router.query;
   const components = useBosComponents();
   const { t } = useTranslation();

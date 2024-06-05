@@ -2,8 +2,8 @@ import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/charts/Detail';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
+import { useThemeStore } from '@/stores/theme';
 import { networkId } from '@/utils/config';
-import { useTheme } from 'next-themes';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 
@@ -12,7 +12,7 @@ const ActiveAccountsChart = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;

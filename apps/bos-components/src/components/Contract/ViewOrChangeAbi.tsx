@@ -210,7 +210,7 @@ export default function (props: Props) {
                 value={field.name}
                 onChange={(e) => onChange(e, 'name', field.id)}
                 placeholder="Argument name"
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none  dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 "
               />
               <select
                 name="type"
@@ -232,7 +232,7 @@ export default function (props: Props) {
                 value={field.value}
                 onChange={(e) => onChange(e, 'value', field.id)}
                 placeholder={field.placeholder || 'Argument value'}
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 "
               />
             </div>
             <button
@@ -270,7 +270,7 @@ export default function (props: Props) {
                 value={options.attachedDeposit}
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 "
               />
             </label>
             <label>
@@ -280,7 +280,7 @@ export default function (props: Props) {
                 value={options.gas}
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 "
               />
             </label>
           </div>

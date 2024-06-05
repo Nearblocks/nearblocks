@@ -6,13 +6,13 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
-import { useTheme } from 'next-themes';
 import Head from 'next/head';
 import { env } from 'next-runtime-env';
+import { useThemeStore } from '@/stores/theme';
 
 const TpsChart = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});

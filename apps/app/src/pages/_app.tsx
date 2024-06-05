@@ -7,7 +7,7 @@ import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 import type { NextPageWithLayout } from '@/utils/types';
 import Script from 'next/script';
 import { env } from 'next-runtime-env';
-import { ThemeProvider } from 'next-themes';
+import { useTheme } from '@/hooks/useTheme';
 
 const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
   ssr: false,
@@ -18,6 +18,7 @@ type AppPropsWithLayout = AppProps & {
 };
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   useBosLoaderInitializer();
+  useTheme();
 
   const getLayout = Component.getLayout ?? ((page) => page);
 
@@ -28,10 +29,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           'NEXT_PUBLIC_GTM_ID',
         )}`}
       />
-      <ThemeProvider attribute="class" enableSystem={false}>
-        <VmInitializer />
-        {getLayout(<Component {...pageProps} />)}
-      </ThemeProvider>
+
+      <VmInitializer />
+      {getLayout(<Component {...pageProps} />)}
     </>
   );
 }

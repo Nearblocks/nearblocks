@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useAuthStore } from '@/stores/auth';
-import { useTheme } from 'next-themes';
 
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
@@ -18,6 +17,7 @@ import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import { env } from 'next-runtime-env';
+import { useThemeStore } from '@/stores/theme';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const networkUrl =
@@ -152,7 +152,6 @@ const Header = () => {
   const [stats, setStats] = useState<Stats>({} as Stats);
   const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
   const [isLoading, setIsLoading] = useState(true);
-  const { theme, setTheme } = useTheme();
   const [error, setError] = useState(false);
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -161,6 +160,7 @@ const Header = () => {
   const accountId = useAuthStore((store) => store.accountId);
   const logOut = useAuthStore((store) => store.logOut);
   const user = signedIn;
+  const theme = useThemeStore((store) => store.theme);
 
   useEffect(() => {
     let delay = 600000;
@@ -217,6 +217,12 @@ const Header = () => {
     const interval = setInterval(fetchBlocks, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const toggleTheme = () => {
+    localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle('light');
+  };
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -331,7 +337,7 @@ const Header = () => {
             <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
               <button
                 className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                onClick={toggleTheme}
               >
                 <Image
                   src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
@@ -712,9 +718,7 @@ const Header = () => {
                       >
                         <div
                           className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer"
-                          onClick={() =>
-                            setTheme(theme === 'light' ? 'dark' : 'light')
-                          }
+                          onClick={toggleTheme}
                         >
                           <Image
                             src={`/images/${

@@ -141,7 +141,7 @@ export default function (props: Props) {
           )}
         </div>
         {!schema && (
-          <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+          <p className="text-xs mx-5 text-gray-500 mb-4  bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow dark:text-neargray-10 ">
             Contracts with Near{' '}
             <a
               className="text-green-500 dark:text-green-250"

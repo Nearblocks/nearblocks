@@ -3,7 +3,7 @@ import Script from 'next/script';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html className="light" lang="en">
       <Head>
         <Script
           id="theme-script"
