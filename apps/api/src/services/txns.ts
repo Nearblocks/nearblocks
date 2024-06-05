@@ -16,6 +16,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const to = req.validator.data.to;
   const action = req.validator.data.action;
   const method = req.validator.data.method;
+  const cursor = req.validator.data.cursor;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
@@ -41,6 +42,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
     SELECT
+      id,
       transaction_hash,
       included_in_block_hash,
       block_timestamp,
@@ -122,6 +124,9 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           ${block ? sql`included_in_block_hash = ${block}` : true}
           AND ${from ? sql`signer_account_id = ${from}` : true}
           AND ${to ? sql`receiver_account_id = ${to}` : true}
+          AND ${cursor
+      ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true}
           AND ${afterTimestamp
       ? sql`block_timestamp >= ${afterTimestamp}`
       : true}
@@ -153,16 +158,18 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         `
       : true}
         ORDER BY
-          block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-          index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          id ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
           ${limit}
         OFFSET
-          ${offset}
+          ${cursor ? 0 : offset}
       ) AS tmp using (transaction_hash)
   `;
 
-  return res.status(200).json({ txns });
+  let nextCursor = txns?.[txns?.length - 1]?.id;
+  nextCursor = txns?.length === per_page && nextCursor ? nextCursor : undefined;
+
+  return res.status(200).json({ cursor: nextCursor, txns });
 });
 
 const count = catchAsync(
