@@ -3,14 +3,15 @@ import Skeleton from '../common/Skeleton';
 import React, { Ref, forwardRef } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
+
 interface Props {
   className?: string;
 }
 const Overview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
     const { t } = useTranslation('home');
-    const { theme } = useTheme();
+    const theme = useThemeStore((store) => store.theme);
     return (
       <div ref={ref} className={`w-full z-10 ${className}`}>
         <div className="container mx-auto px-3">

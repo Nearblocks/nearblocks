@@ -7,7 +7,7 @@ import { networkId, appUrl } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const NodeExplorer = () => {
@@ -18,7 +18,7 @@ const NodeExplorer = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   const title = 'NEAR Validator List | Nearblocks';
 

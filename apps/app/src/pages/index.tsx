@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -29,7 +29,7 @@ const HomePage = () => {
   const latestRef = useRef<HTMLDivElement>(null);
   const [overviewHeight, setOverviewHeight] = useState({});
   const [latestHeight, setLatestHeight] = useState({});
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   useEffect(() => {
     const updateOuterDivHeight = () => {
