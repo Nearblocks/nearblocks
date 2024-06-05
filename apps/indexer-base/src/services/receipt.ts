@@ -132,7 +132,7 @@ const storeChunkReceipts = async (
   if (receiptData.length) {
     promises.push(
       retry(async () => {
-        await knex('receipts')
+        await knex('temp_receipts')
           .insert(receiptData)
           .onConflict(['receipt_id'])
           .ignore();
@@ -244,7 +244,7 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
     return txnHashes;
   }
 
-  const transactions = await knex('transactions')
+  const transactions = await knex('temp_transactions')
     .whereIn('converted_into_receipt_id', receiptOrDataIds)
     .select('converted_into_receipt_id', 'transaction_hash');
 

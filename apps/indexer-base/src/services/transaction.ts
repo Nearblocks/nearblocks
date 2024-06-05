@@ -25,7 +25,7 @@ export const storeTransactions = async (
 
   if (transactions.length) {
     await retry(async () => {
-      await knex('transactions')
+      await knex('temp_transactions')
         .insert(transactions)
         .onConflict(['transaction_hash'])
         .ignore();
