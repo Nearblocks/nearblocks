@@ -552,7 +552,7 @@ export default function (props: Props) {
       ).then((results: TokenListInfo[]) => {
         results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
-          const amount = rslt?.amount ?? 0;
+          const amount = typeof rslt?.amount === 'string' ? rslt.amount : 0;
 
           let sum = Big(0);
 
