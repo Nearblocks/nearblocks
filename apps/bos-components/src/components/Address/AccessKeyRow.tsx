@@ -238,7 +238,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {action}
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
             <OverlayTrigger
               placement="top"

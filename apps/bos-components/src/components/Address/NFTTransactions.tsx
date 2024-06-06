@@ -642,7 +642,7 @@ export default function (props: Props) {
         </span>
       ),
       tdClassName:
-        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
       thClassName: 'whitespace-nowrap',
     },
   ];
