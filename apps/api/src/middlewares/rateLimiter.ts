@@ -11,6 +11,7 @@ import { Plan, User } from '#types/types';
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as User)?.id;
+    const keyId = (req.user as User)?.key_id;
     const date = dayjs.utc().toISOString();
 
     if (!id) {
@@ -25,11 +26,12 @@ const rateLimiter = catchAsync(
         INNER JOIN api__subscriptions s ON s.plan_id = p.id
       WHERE
         s.user_id = ${id}
+        AND p.type = 0
         AND s.status IN (
           ${SubscriptionStatus.ACTIVE},
           ${SubscriptionStatus.TRIALING}
         )
-        AND ${date} BETWEEN s.start_data AND s.end_data
+        AND ${date} BETWEEN s.start_date AND s.end_date
       ORDER BY
         s.end_date DESC
       LIMIT
@@ -39,6 +41,10 @@ const rateLimiter = catchAsync(
     const plan = plans?.[0];
 
     if (!plan) {
+      if (keyId) {
+        const tokenKey = getTokenKey(id, keyId);
+        return await useFreePlan(res, next, id, tokenKey);
+      }
       return await useFreePlan(res, next, id);
     }
 
@@ -46,6 +52,11 @@ const rateLimiter = catchAsync(
 
     try {
       await rateLimit.consume(id);
+
+      if (keyId) {
+        const tokenKey = getTokenKey(id, keyId);
+        await rateLimit.consume(tokenKey);
+      }
       return next();
     } catch (error) {
       return res.status(429).json({ message: 'Too Many Requests' });
@@ -57,6 +68,7 @@ const useFreePlan = async (
   res: Response,
   next: NextFunction,
   key: number | string,
+  tokenKey: null | string = null,
 ) => {
   const freePlan = await getFreePlan();
 
@@ -68,6 +80,11 @@ const useFreePlan = async (
 
   try {
     await rateLimit.consume(key);
+
+    if (tokenKey) {
+      await rateLimit.consume(tokenKey);
+    }
+
     return next();
   } catch (error) {
     return res.status(429).json({ message: 'Too Many Requests' });
@@ -117,5 +134,7 @@ const rateLimiterUnion = (plan: Plan) => {
     monthRateLimiter,
   );
 };
+
+const getTokenKey = (id: number, kId: number) => `${id}_${kId}`;
 
 export default rateLimiter;

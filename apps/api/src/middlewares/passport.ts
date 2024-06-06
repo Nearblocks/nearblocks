@@ -10,7 +10,8 @@ import { userSql } from '#libs/postgres';
 const bearerVerify: VerifyFunction = async (token, done) => {
   const users = await userSql`
     SELECT
-      u.*
+      u.*,
+      k.id as key_id
     FROM
       api__users u
       LEFT JOIN api__keys k ON k.user_id = u.id
