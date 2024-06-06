@@ -219,7 +219,7 @@ export default function ({ currentPage, setPage, t, network, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
     {
       header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,

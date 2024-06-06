@@ -494,7 +494,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
   ];
 

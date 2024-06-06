@@ -456,7 +456,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-40',
     },
     {
       header: <span></span>,
@@ -564,7 +564,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-40',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
@@ -657,7 +657,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+        'pl-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
       thClassName: 'whitespace-nowrap',
     },
   ];

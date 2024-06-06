@@ -214,6 +214,31 @@ export default function (props: Props) {
                       t: t,
                       ownerId,
                     }}
+                    loading={
+                      <tr className="hover:bg-blue-900/5 h-[57px]">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-tiny ">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                      </tr>
+                    }
                   />
                 )}{' '}
               </tbody>
