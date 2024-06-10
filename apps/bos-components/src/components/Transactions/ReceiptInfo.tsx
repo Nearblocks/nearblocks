@@ -18,6 +18,7 @@ interface Props {
 }
 
 import Question from '@/includes/Common/Question';
+import { hexy } from '@/includes/hexy';
 import {
   Action,
   BlocksInfo,
@@ -102,10 +103,14 @@ export default function (props: Props) {
       let prettyArgs: object | string;
       try {
         const parsedJSONArgs = JSON.parse(decodedArgs.toString());
-        prettyArgs =
-          typeof parsedJSONArgs === 'boolean'
-            ? JSON.stringify(parsedJSONArgs)
-            : parsedJSONArgs;
+        if (parsedJSONArgs !== null) {
+          prettyArgs =
+            typeof parsedJSONArgs === 'boolean'
+              ? JSON.stringify(parsedJSONArgs)
+              : parsedJSONArgs;
+        } else {
+          prettyArgs = hexy(decodedArgs, { format: 'twos' });
+        }
       } catch {
         prettyArgs = Array.from(decodedArgs)
           .map((byte: any) => byte.toString(16).padStart(2, '0'))
@@ -125,7 +130,9 @@ export default function (props: Props) {
             <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3">
               <div className="bg-inherit text-inherit font-inherit border-none p-0">
                 <div className="max-h-52 overflow-auto">
-                  <div className="h-full w-full">{prettyArgs}</div>
+                  <div className="h-full w-full">
+                    <pre>{prettyArgs}</pre>
+                  </div>
                 </div>
               </div>
             </div>
@@ -333,7 +340,9 @@ export default function (props: Props) {
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                         className="text-green-500 dark:text-green-250"
                       >
-                        {!loading && localFormat(block?.block_height)}
+                        {!loading &&
+                          block?.block_height &&
+                          localFormat(block?.block_height)}
                       </Link>
                     )}
                   </td>
@@ -409,6 +418,7 @@ export default function (props: Props) {
                   </td>
                   <td className="py-2 pl-4">{`${
                     !loading &&
+                    receipt?.actions &&
                     convertToMetricPrefix(getGasAttached(receipt?.actions))
                   }gas`}</td>
                 </tr>
@@ -430,7 +440,9 @@ export default function (props: Props) {
                     Pre-charged Fee
                   </td>
                   <td className="py-2 pl-4">{`${
-                    !loading && yoctoToNear(getPreCharged(receipt), true)
+                    !loading &&
+                    receipt &&
+                    yoctoToNear(getPreCharged(receipt), true)
                   } Ⓝ`}</td>
                 </tr>
                 <tr>
@@ -507,6 +519,7 @@ export default function (props: Props) {
                   </td>
                   <td className="py-2 pl-4">
                     {!loading &&
+                      receipt?.outcome?.nestedReceipts &&
                       yoctoToNear(
                         getRefund(receipt?.outcome?.nestedReceipts) || '0',
                         true,

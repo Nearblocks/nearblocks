@@ -456,7 +456,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-40',
+        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
       header: <span></span>,
@@ -564,7 +564,7 @@ export default function ({
         </span>
       ),
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-40',
+        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
       header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
