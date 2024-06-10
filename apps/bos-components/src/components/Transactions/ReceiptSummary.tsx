@@ -17,6 +17,7 @@ interface Props {
   t: (key: string) => string | undefined;
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
+  loading: boolean;
 }
 
 import ErrorMessage from '@/includes/Common/ErrorMessage';
@@ -25,8 +26,7 @@ import FaHourglassStart from '@/includes/icons/FaHourglassStart';
 import FaInbox from '@/includes/icons/FaInbox';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 export default function (props: Props) {
-  const { network, rpcTxn, txn, t, ownerId } = props;
-
+  const { network, rpcTxn, txn, t, ownerId, loading } = props;
   const { mapRpcActionToAction } = VM.require(
     `${ownerId}/widget/includes.Utils.near`,
   );
@@ -119,7 +119,7 @@ export default function (props: Props) {
         <>
           <div className="relative overflow-x-auto rounded-xl">
             <table className="min-w-full divide-y rounded-xl dark:divide-black-200 dark:border-black-200">
-              <thead className="bg-gray-100 dark:bg-black-300">
+              <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                 <tr>
                   <th
                     scope="col"
@@ -164,7 +164,7 @@ export default function (props: Props) {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-                {!receipt?.id &&
+                {(!receipt?.id || loading) &&
                   [...Array(10)].map((_, i) => (
                     <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
@@ -214,8 +214,8 @@ export default function (props: Props) {
                       t: t,
                       ownerId,
                     }}
-                    loading={
-                      <tr className="hover:bg-blue-900/5 h-[57px]">
+                    loading={[...Array(10)].map((_, i) => (
+                      <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                           <Skeleton className="w-full h-4" />
                         </td>
@@ -238,7 +238,7 @@ export default function (props: Props) {
                           <Skeleton className="w-full h-4" />
                         </td>
                       </tr>
-                    }
+                    ))}
                   />
                 )}{' '}
               </tbody>

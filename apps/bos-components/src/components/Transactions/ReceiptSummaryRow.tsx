@@ -23,7 +23,6 @@ interface Props {
 
 import {
   Action,
-  BlocksInfo,
   FunctionCallActionView,
   ReceiptsPropsInfo,
   StatusInfo,
@@ -43,8 +42,6 @@ export default function (props: Props) {
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const [_block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
-  const [loading, setLoading] = useState(false);
   const [statsData, setStatsData] = useState<StatusInfo>({} as StatusInfo);
   const config = getConfig && getConfig(network);
   useEffect(() => {
@@ -76,45 +73,7 @@ export default function (props: Props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config.backendUrl]);
-  useEffect(() => {
-    function fetchBlocks() {
-      setLoading(true);
-      if (receipt?.block_hash) {
-        asyncFetch(`${config.backendUrl}blocks/${receipt?.block_hash}`)
-          .then(
-            (res: {
-              body: {
-                blocks: BlocksInfo[];
-              };
-              status: number;
-            }) => {
-              const resp = res?.body?.blocks?.[0];
-              if (res.status === 200) {
-                setBlock({
-                  author_account_id: resp.author_account_id,
-                  block_hash: resp.author_account_id,
-                  block_height: resp.block_height,
-                  block_timestamp: resp.block_timestamp,
-                  chunks_agg: resp.chunks_agg,
-                  gas_price: resp.gas_price,
-                  prev_block_hash: resp.author_account_id,
-                  receipts_agg: resp.receipts_agg,
-                  transactions_agg: resp.transactions_agg,
-                });
-                setLoading(false);
-              } else {
-                handleRateLimit(res, fetchBlocks, () => setLoading(false));
-              }
-            },
-          )
-          .catch(() => {});
-      }
-    }
-    if (config?.backendUrl) {
-      fetchBlocks();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receipt?.block_hash, config.backendUrl]);
+
   const currentPrice = statsData?.near_price || 0;
   function formatActionKind(actionKind: string) {
     return actionKind.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -143,8 +102,7 @@ export default function (props: Props) {
 
   return (
     <>
-      {!loading &&
-        receipt &&
+      {receipt &&
         receipt?.actions?.map((action: any, i: number) => (
           <tr key={action.args?.method_name + i}>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
@@ -207,9 +165,7 @@ export default function (props: Props) {
               </span>
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">{`${
-              !loading && gasAttached !== '0'
-                ? convertToMetricPrefix(gasAttached)
-                : '0 '
+              gasAttached !== '0' ? convertToMetricPrefix(gasAttached) : '0 '
             }gas`}</td>
           </tr>
         ))}
