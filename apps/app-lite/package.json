@@ -1,0 +1,42 @@
+{
+  "name": "app-lite",
+  "version": "1.0.0",
+  "author": "NearBlocks",
+  "license": "BUSL-1.1",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "dependencies": {
+    "ahooks": "3.7.11",
+    "base64-js": "1.5.1",
+    "big.js": "6.2.1",
+    "ieee754": "1.2.1",
+    "near-social-vm": "github:NearSocial/VM#2.6.1",
+    "next": "13.3.4",
+    "next-runtime-env": "1.7.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "zustand": "4.5.2"
+  },
+  "devDependencies": {
+    "@types/big.js": "~6.2",
+    "@types/node": "~20.8",
+    "@types/react": "~18.2",
+    "@types/react-dom": "~18.2",
+    "autoprefixer": "~10.4",
+    "eslint-config-custom-next": "*",
+    "nb-near": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "postcss": "~8.4",
+    "tailwindcss": "~3.4",
+    "typescript": "~5.2"
+  },
+  "resolutions": {
+    "react-singleton-hook": "4.0.1"
+  }
+}

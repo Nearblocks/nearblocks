@@ -1,0 +1,15 @@
+name: nearblocks
+services:
+  app-lite:
+    build:
+      context: .
+      dockerfile: ./apps/app-lite/Dockerfile
+    restart: always
+    ports:
+      - '127.0.0.1:3008:3000'
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_NETWORK_ID: testnet
+      NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
+      NEXT_PUBLIC_MAINNET_URL:
+      NEXT_PUBLIC_TESTNET_URL:
