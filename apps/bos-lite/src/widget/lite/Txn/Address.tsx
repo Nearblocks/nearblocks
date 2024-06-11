@@ -11,7 +11,7 @@ const Address = ({ address }: AddressProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  shortenString = shortenString || (() => <></>);
+  if (!shortenString) return null;
 
   return (
     <div className="flex items-center pb-3">

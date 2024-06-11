@@ -29,11 +29,15 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  nsToDateTime = nsToDateTime || (() => <></>);
-  yoctoToNear = yoctoToNear || (() => <></>);
-  yoctoToTgas = yoctoToTgas || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  shortenString = shortenString || (() => <></>);
+  if (
+    !rpcFetch ||
+    !nsToDateTime ||
+    !yoctoToNear ||
+    !yoctoToTgas ||
+    !formatNumber ||
+    !shortenString
+  )
+    return null;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);

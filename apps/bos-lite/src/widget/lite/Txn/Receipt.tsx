@@ -1,7 +1,3 @@
-import type { ConvertorModule } from '@/libs/convertor';
-import type { FormatterModule } from '@/libs/formatter';
-import type { UtilsModule } from '@/libs/utils';
-
 import type { ActionsProps } from './Actions';
 import type { AddressProps } from './Address';
 
@@ -22,21 +18,6 @@ const Receipt = ({
   outgoingReceipts,
   receipt,
 }: ReceiptProps) => {
-  let { yoctoToNear } = VM.require<ConvertorModule>(
-    `${config_account}/widget/lite.libs.convertor`,
-  );
-  let { formatNumber, formatSize } = VM.require<FormatterModule>(
-    `${config_account}/widget/lite.libs.formatter`,
-  );
-  let { shortenString } = VM.require<UtilsModule>(
-    `${config_account}/widget/lite.libs.utils`,
-  );
-
-  yoctoToNear = yoctoToNear || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  formatSize = formatSize || (() => <></>);
-  shortenString = shortenString || (() => <></>);
-
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

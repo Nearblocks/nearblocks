@@ -27,6 +27,8 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
   let { nestReceipts, parseOutcome, parseReceipt } =
     VM.require<ExecutionModule>(`${config_account}/widget/lite.libs.execution`);
 
+  if (!rpcFetch || !nestReceipts || !parseOutcome || !parseReceipt) return null;
+
   const [active, setActive] = useState(tabs[0]);
   const [data, setData] = useState<Data>({});
   const [error, setError] = useState<Error>({});

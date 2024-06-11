@@ -35,12 +35,15 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  yoctoToNear = yoctoToNear || (() => <></>);
-  yoctoToTgas = yoctoToTgas || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  gasLimit = gasLimit || (() => <></>);
-  refund = refund || (() => <></>);
-  shortenString = shortenString || (() => <></>);
+  if (
+    !yoctoToNear ||
+    !yoctoToTgas ||
+    !formatNumber ||
+    !gasLimit ||
+    !refund ||
+    !shortenString
+  )
+    return null;
 
   const [active, setActive] = useState('output');
 

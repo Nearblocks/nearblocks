@@ -59,22 +59,17 @@ const prettify = (args: string) => {
 };
 
 const Action = ({ action, open, setOpen }: ActionProps) => {
-  let { yoctoToNear, yoctoToTgas } = VM.require<ConvertorModule>(
+  let { yoctoToNear } = VM.require<ConvertorModule>(
     `${config_account}/widget/lite.libs.convertor`,
   );
   let { formatNumber } = VM.require<FormatterModule>(
     `${config_account}/widget/lite.libs.formatter`,
   );
-  let { gasLimit, refund, shortenString } = VM.require<UtilsModule>(
+  let { shortenString } = VM.require<UtilsModule>(
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  yoctoToNear = yoctoToNear || (() => <></>);
-  yoctoToTgas = yoctoToTgas || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  gasLimit = gasLimit || (() => <></>);
-  refund = refund || (() => <></>);
-  shortenString = shortenString || (() => <></>);
+  if (!yoctoToNear || !formatNumber || !shortenString) return null;
 
   const method =
     action.kind === 'functionCall'

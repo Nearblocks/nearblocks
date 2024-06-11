@@ -18,12 +18,12 @@ const HomeSkeleton = ({ onFinish }: { onFinish?: () => void }) => {
       <div className="py-[58px] px-6">
         <h1 className="font-heading font-bold text-[49px] tracking-[1px]">
           <Skeleton inline loading>
-            Hello, I’m the explorer
+            Hello, I’m the Near stateless explorer
           </Skeleton>
         </h1>
         <h2 className="font-heading font-medium text-[40px] tracking-[0.4px] mt-[-3px]">
           <Skeleton inline loading>
-            If I could talk, this is what I would say to you guys.
+            With me, you can check real-time data on the NEAR blockchain.
           </Skeleton>
         </h2>
       </div>
