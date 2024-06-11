@@ -37,9 +37,13 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+__ENV.js
 
 # turbo
 .turbo
 
 # neon
 target/
+
+# bos
+data.json

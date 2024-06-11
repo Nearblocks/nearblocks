@@ -5,3 +5,4 @@ static
 .next
 .bos
 *.css
+__ENV.js

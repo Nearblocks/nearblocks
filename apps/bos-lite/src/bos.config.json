@@ -1,0 +1,10 @@
+{
+  "account": "nearblocksonbos.near",
+  "aliases": ["./aliases.mainnet.json"],
+  "overrides": {
+    "testnet": {
+      "account": "nearblocks.testnet",
+      "aliases": ["./aliases.testnet.json"]
+    }
+  }
+}

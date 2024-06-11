@@ -1,0 +1,38 @@
+name: BOS Lite Components Preview
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/bos-lite/**'
+
+jobs:
+  deploy-testnet:
+    runs-on: ubuntu-latest
+    name: Deploy lite widgets to social.near (testnet)
+    env:
+      NETWORK: testnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.TESTNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.TESTNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.TESTNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.TESTNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-lite && yarn
+
+      - name: Build project
+        run: cd apps/bos-lite &&  yarn build:testnet
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
+      - name: Deploy components
+        run: |
+          cd apps/bos-lite/build/src  &&
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config testnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
