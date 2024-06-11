@@ -31,9 +31,8 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
     `${config_account}/widget/lite.libs.formatter`,
   );
 
-  yoctoToNear = yoctoToNear || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  formatSize = formatSize || (() => <></>);
+  if (!apiFetch || !rpcFetch || !yoctoToNear || !formatNumber || !formatSize)
+    return null;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState<Loading>({

@@ -30,9 +30,7 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  yoctoToNear = yoctoToNear || (() => <></>);
-  formatNumber = formatNumber || (() => <></>);
-  shortenString = shortenString || (() => <></>);
+  if (!rpcFetch || !yoctoToNear || !formatNumber || !shortenString) return null;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);

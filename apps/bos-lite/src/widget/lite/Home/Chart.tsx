@@ -1,4 +1,3 @@
-import type { ConvertorModule } from '@/libs/convertor';
 import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
 import type { Charts, ChartSeries, ChartsResponse } from '@/types/types';
@@ -7,16 +6,11 @@ const Chart = () => {
   let { apiFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
   );
-  let { formatNumber, formatScale } = VM.require<FormatterModule>(
+  let { formatNumber } = VM.require<FormatterModule>(
     `${config_account}/widget/lite.libs.formatter`,
   );
-  let { yoctoToTgas } = VM.require<ConvertorModule>(
-    `${config_account}/widget/lite.libs.convertor`,
-  );
 
-  formatNumber = formatNumber || (() => <></>);
-  formatScale = formatScale || (() => <></>);
-  yoctoToTgas = yoctoToTgas || (() => <></>);
+  if (!apiFetch || !formatNumber) return null;
 
   const [charts, setCharts] = useState<Charts[] | null>(null);
 
@@ -55,7 +49,7 @@ const Chart = () => {
       <html>
         <head>
           <title>Highcharts Line Chart</title>
-          <script src="https://code.highcharts.com/highcharts.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.3/highcharts.min.js"></script>
         </head>
         <body style="margin: 0">
           <div id="container" style="width: 100%; height: 280px"></div>

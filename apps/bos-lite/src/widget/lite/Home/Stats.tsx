@@ -16,9 +16,7 @@ const Stats = () => {
     `${config_account}/widget/lite.libs.convertor`,
   );
 
-  formatNumber = formatNumber || (() => <></>);
-  formatScale = formatScale || (() => <></>);
-  yoctoToTgas = yoctoToTgas || (() => <></>);
+  if (!apiFetch || !formatNumber || !formatScale || !yoctoToTgas) return null;
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<null | Stats>(null);
