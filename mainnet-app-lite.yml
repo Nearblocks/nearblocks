@@ -11,5 +11,5 @@ services:
       PORT: 3000
       NEXT_PUBLIC_NETWORK_ID: mainnet
       NEXT_PUBLIC_ACCOUNT_ID: nearblocksonbos.near
-      NEXT_PUBLIC_MAINNET_URL:
-      NEXT_PUBLIC_TESTNET_URL:
+      NEXT_PUBLIC_MAINNET_URL: https://lite.nearblocks.io
+      NEXT_PUBLIC_TESTNET_URL: https://lite-testnet.nearblocks.io
