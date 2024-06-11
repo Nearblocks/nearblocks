@@ -33,5 +33,11 @@ jobs:
 
       - name: Deploy components
         run: |
-          cd apps/bos-lite/build/src  &&
+          cd apps/bos-lite/dist/src
+
+          find src/widget/* -maxdepth 0 -exec mv -t ./src '{}' +
+          if [ -z "$(ls -A src/widget)" ]; then
+            rm -r src/widget
+          fi
+
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send

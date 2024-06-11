@@ -49,6 +49,17 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:latest
           cache-to: type=inline
 
+      - name: Build and push (APP LITE)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/app-lite/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/nearblocks/app-lite:latest
+          cache-from: type=registry,ref=ghcr.io/nearblocks/app-lite:latest
+          cache-to: type=inline
+
       - name: Build and push (BACKEND)
         uses: docker/build-push-action@v5
         with:
