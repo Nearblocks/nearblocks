@@ -76,11 +76,11 @@ export default function (props: Props) {
 
   return (
     <>
-      <div className="border-b  dark:border-black-200">
+      <div className="border-b dark:border-black-200">
         {!context.accountId ? (
           <>
-            <div className="w-full p-6 mx-auto m-2">
-              <div className="flex items-center justify-center h-40 bg-gray-100 border-2 border-gray-300 rounded-md dark:bg-black-600">
+            <div className="w-full p-2 mx-auto">
+              <div className="flex items-center justify-center h-16 bg-gray-100 border-2 border-gray-300 rounded-md dark:bg-black-600">
                 <p className="text-center text-gray-600 dark:text-neargray-10">
                   You must be
                   <a

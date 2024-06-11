@@ -26,20 +26,10 @@ const Token = () => {
   const [token, setToken] = useState<{ name: string; symbol: string } | null>(
     null,
   );
-  const [pageTab, setPageTab] = useState('Transfers');
-
+  const pageTab = `${router?.query?.tab || 'Transfers'}`;
   const onHandleTab = (hashValue: string) => {
-    setPageTab(hashValue);
     router.push(`/token/${id}?tab=${hashValue}`);
   };
-
-  useEffect(() => {
-    const select = `${router?.query?.tab}` || 'Transfers';
-
-    if (router?.query?.tab) {
-      setPageTab(select);
-    }
-  }, [router?.query]);
 
   useEffect(() => {
     async function fetchToken() {
@@ -158,8 +148,14 @@ const Token = () => {
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
-          skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
-          defaultSkelton={<Overview />}
+          skeleton={
+            <Overview
+              className="absolute pr-6"
+              ref={heightRef}
+              pageTab={pageTab}
+            />
+          }
+          defaultSkelton={<Overview pageTab={pageTab} />}
           onChangeHeight={onChangeHeight}
           src={components?.ftOverview}
           props={{
@@ -173,7 +169,13 @@ const Token = () => {
             pageTab: pageTab,
             requestSignInWithWallet,
           }}
-          loading={<Overview className="absolute pr-6" ref={heightRef} />}
+          loading={
+            <Overview
+              className="absolute pr-6"
+              ref={heightRef}
+              pageTab={pageTab}
+            />
+          }
         />
         <div className="py-8"></div>
       </div>

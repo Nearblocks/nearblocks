@@ -4,6 +4,7 @@ import useTranslation from 'next-translate/useTranslation';
 import Summary from '../txns/Summary';
 import Execution from '../txns/Execution';
 import Tree from '../txns/Tree';
+import Comment from './Comment';
 interface Props {
   network: string;
   txns?: boolean;
@@ -68,6 +69,8 @@ const Detail = forwardRef(
             <Execution />
           ) : pageTab === 'tree' ? (
             <Tree />
+          ) : pageTab === 'comments' ? (
+            <Comment />
           ) : (
             <>
               {network === 'testnet' && (

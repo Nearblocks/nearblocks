@@ -125,24 +125,24 @@ export default function (props: Props) {
                   </div>
                 </div>
                 <div className="w-full md:w-5/12 lg:w-1/3 xl:w-1/4">
-                  <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+                  <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                     Receipt
                   </div>
                   <div className="w-full pl-3 py-2 flex items-center">
-                    Predecessor: <Skeleton className="w-full h-4" />{' '}
+                    From: <Skeleton className="w-full h-4" />{' '}
                   </div>
                   <div className="w-full pl-3 py-2 flex items-center">
-                    Receiver: <Skeleton className="w-full h-4" />{' '}
+                    To: <Skeleton className="w-full h-4" />{' '}
                   </div>
                   <div className="w-full pl-3 word-break space-y-4">
                     <Skeleton className="w-full h-10" />{' '}
                   </div>
 
-                  <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+                  <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                     Execution Outcomes
                   </div>
                   <div className="pl-3 py-2">
-                    <span className="text-base">Logs:</span>
+                    <span>Logs:</span>
 
                     <div className="w-full break-words space-y-4">
                       <Skeleton className="w-full h-4" />{' '}
@@ -183,24 +183,24 @@ export default function (props: Props) {
                     }}
                     loading={
                       <>
-                        <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+                        <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                           Receipt
                         </div>
                         <div className="w-full pl-3 py-2 flex items-center">
-                          Predecessor: <Skeleton className="w-full h-4" />{' '}
+                          From: <Skeleton className="w-full h-4" />{' '}
                         </div>
                         <div className="w-full pl-3 py-2 flex items-center">
-                          Receiver: <Skeleton className="w-full h-4" />{' '}
+                          To: <Skeleton className="w-full h-4" />{' '}
                         </div>
                         <div className="w-full pl-3 word-break space-y-4">
                           <Skeleton className="w-full h-10" />{' '}
                         </div>
 
-                        <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+                        <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                           Execution Outcomes
                         </div>
                         <div className="pl-3 py-2">
-                          <span className="text-base">Logs:</span>
+                          <span>Logs:</span>
 
                           <div className="w-full break-words space-y-4">
                             <Skeleton className="w-full h-4" />{' '}
