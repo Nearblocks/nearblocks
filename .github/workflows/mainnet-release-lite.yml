@@ -1,15 +1,15 @@
-name: BOS Light Components Release
+name: BOS Lite Components Release
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'apps/bos-light/**'
+      - 'apps/bos-lite/**'
 jobs:
   deploy-mainnet:
     runs-on: ubuntu-latest
-    name: Deploy light widgets to social.near (mainnet)
+    name: Deploy lite widgets to social.near (mainnet)
     env:
       NETWORK: mainnet
       BOS_DEPLOY_ACCOUNT_ID: ${{ vars.MAINNET_DEPLOY_ACCOUNT }}
@@ -22,10 +22,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install BOS Components dependencies
-        run: cd apps/bos-light && yarn
+        run: cd apps/bos-lite && yarn
 
       - name: Build project
-        run: cd apps/bos-light &&  yarn build
+        run: cd apps/bos-lite &&  yarn build
 
       - name: Install near-social CLI
         run: |
@@ -33,5 +33,5 @@ jobs:
 
       - name: Deploy components
         run: |
-          cd apps/bos-light/build/src  &&
+          cd apps/bos-lite/build/src  &&
           bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send
