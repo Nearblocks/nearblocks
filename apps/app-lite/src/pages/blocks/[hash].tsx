@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import MainLayout from '@/components/Layouts/Main';
+import Meta from '@/components/Meta';
 import BlockSkeleton from '@/components/Skeletons/Block';
 import config from '@/config';
 import { useRpcStore } from '@/stores/rpc';
@@ -21,16 +22,22 @@ const Block: PageLayout = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0" ref={loader}>
-        <BlockSkeleton />
-      </div>
-      <Widgets
-        loader={<BlockSkeleton onFinish={onFinish} />}
-        props={{ hash, rpcUrl }}
-        src={`${config.account}/widget/lite.Block`}
+    <>
+      <Meta
+        description={`Near Block Hash ${hash}. The block height, timestamp, block gas used, gas price, author of the block are detailed on Near.`}
+        title={`Near Block ${hash} | NearBlocks Lite`}
       />
-    </div>
+      <div className="relative">
+        <div className="absolute inset-0" ref={loader}>
+          <BlockSkeleton />
+        </div>
+        <Widgets
+          loader={<BlockSkeleton onFinish={onFinish} />}
+          props={{ hash, rpcUrl }}
+          src={`${config.account}/widget/lite.Block`}
+        />
+      </div>
+    </>
   );
 };
 

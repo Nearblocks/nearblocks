@@ -8,6 +8,22 @@ import { useWidgetStore } from '@/stores/widgets';
 
 import JsonView from './JsonView';
 import Skeleton from './Skeleton';
+import { AddressKeysSkeleton, AddressSkeleton } from './Skeletons/Address';
+import { BlockSkeleton } from './Skeletons/Block';
+import { ErrorIconSkeleton, ErrorSkeleton } from './Skeletons/Error';
+import {
+  HomeChartSkeleton,
+  HomeSkeleton,
+  HomeStatsSkeleton,
+} from './Skeletons/Home';
+import {
+  TxnActionSkeleton,
+  TxnAddressSkeleton,
+  TxnExecutionSkeleton,
+  TxnReceiptSkeleton,
+  TxnSkeleton,
+  TxnTabsSkeleton,
+} from './Skeletons/Txn';
 
 type WidgetsProps = {
   loader?: ReactNode;
@@ -40,9 +56,23 @@ const Widgets = ({ loader, props, src }: WidgetsProps): ReactNode => {
     initNear &&
       initNear({
         customElements: {
+          AddressKeysSkeleton,
+          AddressSkeleton,
+          BlockSkeleton,
+          ErrorIconSkeleton,
+          ErrorSkeleton,
+          HomeChartSkeleton,
+          HomeSkeleton,
+          HomeStatsSkeleton,
           JsonView,
           Link: Links,
           Skeleton,
+          TxnActionSkeleton,
+          TxnAddressSkeleton,
+          TxnExecutionSkeleton,
+          TxnReceiptSkeleton,
+          TxnSkeleton,
+          TxnTabsSkeleton,
         },
         networkId: config.network,
         selector: selector(),

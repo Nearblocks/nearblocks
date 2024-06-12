@@ -13,6 +13,8 @@ export type BlockProps = {
   rpcUrl: string;
 };
 
+let ErrorSkeleton = window?.ErrorSkeleton || (() => <></>);
+let BlockSkeleton = window?.BlockSkeleton || (() => <></>);
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
 
 const Block = ({ hash, rpcUrl }: BlockProps) => {
@@ -37,7 +39,7 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
     !formatNumber ||
     !shortenString
   )
-    return null;
+    return <BlockSkeleton />;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,6 +75,7 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
     return (
       <Widget<ErrorProps>
         key="error"
+        loading={<ErrorSkeleton />}
         props={{ title: 'Error Fetching Block' }}
         src={`${config_account}/widget/lite.Atoms.Error`}
       />
@@ -82,8 +85,8 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
   return (
     <div className="relative container mx-auto">
       <div className="pt-7 pb-[26px] px-5">
-        <Skeleton className="block h-[54px] w-56" loading={loading}>
-          <h1 className="flex items-center font-heading font-medium text-[36px] tracking-[0.1px] mr-4">
+        <Skeleton className="block h-[48px] lg:h-[54px] w-56" loading={loading}>
+          <h1 className="flex items-center font-heading font-medium text-[32px] lg:text-[36px] tracking-[0.1px] mr-4">
             {formatNumber(String(block?.header.height ?? 0), 2)}
             <Widget<CopyProps>
               key="copy"

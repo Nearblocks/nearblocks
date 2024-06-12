@@ -13,8 +13,10 @@ export type KeysProps = {
   rpcUrl: string;
 };
 
-const LIMIT = 25;
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
+let AddressKeysSkeleton = window?.AddressKeysSkeleton || (() => <></>);
+
+const LIMIT = 25;
 
 const Keys = ({ id, rpcUrl }: KeysProps) => {
   let { rpcFetch } = VM.require<FetcherModule>(
@@ -30,7 +32,8 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  if (!rpcFetch || !yoctoToNear || !formatNumber || !shortenString) return null;
+  if (!rpcFetch || !yoctoToNear || !formatNumber || !shortenString)
+    return <AddressKeysSkeleton />;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +100,7 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
   };
 
   return (
-    <div className="relative rounded-lg overflow-auto bg-bg-box border border-border-body my-6">
+    <div className="relative overflow-auto">
       <table className="table-auto border-collapse w-full">
         <thead>
           <tr>

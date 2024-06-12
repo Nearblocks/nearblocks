@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import MainLayout from '@/components/Layouts/Main';
+import Meta from '@/components/Meta';
 import AddressSkeleton from '@/components/Skeletons/Address';
 import config from '@/config';
 import { useRpcStore } from '@/stores/rpc';
@@ -21,16 +22,22 @@ const Address: PageLayout = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0" ref={loader}>
-        <AddressSkeleton />
-      </div>
-      <Widgets
-        loader={<AddressSkeleton onFinish={onFinish} />}
-        props={{ id, rpcUrl }}
-        src={`${config.account}/widget/lite.Address`}
+    <>
+      <Meta
+        description={`Near Account ${id} page allows users to view account details and access keys.`}
+        title={`Near Account ${id} | NearBlocks Lite`}
       />
-    </div>
+      <div className="relative">
+        <div className="absolute inset-0" ref={loader}>
+          <AddressSkeleton />
+        </div>
+        <Widgets
+          loader={<AddressSkeleton onFinish={onFinish} />}
+          props={{ id, rpcUrl }}
+          src={`${config.account}/widget/lite.Address`}
+        />
+      </div>
+    </>
   );
 };
 

@@ -19,6 +19,9 @@ type Loading = {
   txn: boolean;
 };
 
+let ErrorSkeleton = window?.ErrorSkeleton || (() => <></>);
+let TxnSkeleton = window?.TxnSkeleton || (() => <></>);
+let TxnTabsSkeleton = window?.TxnTabsSkeleton || (() => <></>);
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
 
 const Txn = ({ hash, rpcUrl }: TxnProps) => {
@@ -44,7 +47,7 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
     !shortenString ||
     !txnFee
   )
-    return null;
+    return <TxnSkeleton />;
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState<Loading>({
@@ -80,51 +83,11 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, rpcUrl]);
 
-  const TabsLoader = () => (
-    <div className="bg-bg-box lg:rounded-xl shadow px-6 mt-8">
-      <div className="pt-4 pb-6">
-        <button className="py-1 mr-4 font-medium border-b-[3px] border-text-body">
-          Execution Plan
-        </button>
-      </div>
-      <div className="lg:px-4 py-4">
-        <div>
-          <div className="flex items-center pb-3">
-            <span className="inline-block h-4 w-4 rounded-full bg-bg-skeleton mr-3"></span>
-            <Skeleton className="block h-5 w-28" loading>
-              <span className="font-heading font-semibold text-sm">&nbsp;</span>
-            </Skeleton>
-          </div>
-          <div className="relative ml-2 mb-3 py-3 px-4">
-            <div className="arrow absolute h-full left-0 top-0 border-l border-border-body"></div>
-            <div className="space-y-2">
-              <div>
-                <div>
-                  <Skeleton className="block h-7 w-28" loading>
-                    <button className="text-sm text-black rounded py-1 px-3 bg-bg-function">
-                      &nbsp;
-                    </button>
-                  </Skeleton>
-                  <span className="font-semibold text-xs" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center pb-3">
-            <span className="inline-block h-4 w-4 rounded-full bg-bg-skeleton mr-3" />
-            <Skeleton className="block h-5 w-28" loading>
-              <span className="font-heading font-semibold text-sm">&nbsp;</span>
-            </Skeleton>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   if (error) {
     return (
       <Widget<ErrorProps>
         key="error"
+        loading={<ErrorSkeleton />}
         props={{ title: 'Error Fetching Txn' }}
         src={`${config_account}/widget/lite.Atoms.Error`}
       />
@@ -134,8 +97,11 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
   return (
     <div className="relative container mx-auto">
       <div className="pt-7 pb-[26px] px-5">
-        <Skeleton className="block h-[54px] w-[300px]" loading={loading.txn}>
-          <h1 className="flex items-center font-heading font-medium text-[36px] tracking-[0.1px] mr-4">
+        <Skeleton
+          className="block h-[48px] lg:h-[54px] w-[300px]"
+          loading={loading.txn}
+        >
+          <h1 className="flex items-center font-heading font-medium text-[32px] lg:text-[36px] tracking-[0.1px] mr-4">
             <span className="truncate">{shortenString(hash)}</span>
             <Widget<CopyProps>
               key="copy"
@@ -290,7 +256,7 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
       </div>
       <Widget<TabsProps>
         key="tabs"
-        loading={<TabsLoader />}
+        loading={<TxnTabsSkeleton />}
         props={{ hash, rpcUrl }}
         src={`${config_account}/widget/lite.Txn.Tabs`}
       />
