@@ -1,17 +1,30 @@
 interface Window {
+  AddressKeysSkeleton: () => JSX.Element;
+  AddressSkeleton: () => JSX.Element;
+  BlockSkeleton: () => JSX.Element;
+  ErrorIconSkeleton: () => JSX.Element;
+  ErrorSkeleton: () => JSX.Element;
+  HomeChartSkeleton: () => JSX.Element;
+  HomeSkeleton: () => JSX.Element;
+  HomeStatsSkeleton: () => JSX.Element;
   JsonView: ({
     children,
   }: {
     children: ReactNode;
     className?: string;
   }) => JSX.Element;
-
   Skeleton: (props: {
     children: ReactNode;
     className?: string;
     inline?: boolean;
     loading?: boolean;
   }) => JSX.Element;
+  TxnActionSkeleton: () => JSX.Element;
+  TxnAddressSkeleton: () => JSX.Element;
+  TxnExecutionSkeleton: () => JSX.Element;
+  TxnReceiptSkeleton: () => JSX.Element;
+  TxnSkeleton: () => JSX.Element;
+  TxnTabsSkeleton: () => JSX.Element;
 }
 
 declare module VM {

@@ -2,6 +2,8 @@ import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
 import type { Charts, ChartSeries, ChartsResponse } from '@/types/types';
 
+let HomeChartSkeleton = window?.HomeChartSkeleton || (() => <></>);
+
 const Chart = () => {
   let { apiFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
@@ -10,7 +12,7 @@ const Chart = () => {
     `${config_account}/widget/lite.libs.formatter`,
   );
 
-  if (!apiFetch || !formatNumber) return null;
+  if (!apiFetch || !formatNumber) return <HomeChartSkeleton />;
 
   const [charts, setCharts] = useState<Charts[] | null>(null);
 

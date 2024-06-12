@@ -3,6 +3,7 @@ import {
   RpcResponse,
   RpcResultAccount,
   RpcResultBlock,
+  RpcResultReceipt,
   RpcResultTxn,
 } from 'nb-near';
 import { Network } from 'nb-types';
@@ -13,12 +14,16 @@ export const providers =
   config.network === Network.MAINNET
     ? [
         {
-          name: 'NEAR (Default)',
+          name: 'NEAR (Archival)',
+          url: 'https://archival-rpc.mainnet.near.org',
+        },
+        {
+          name: 'NEAR',
           url: 'https://rpc.mainnet.near.org',
         },
         {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.mainnet.near.org',
+          name: 'NEAR (Beta)',
+          url: 'https://beta.rpc.mainnet.near.org',
         },
         {
           name: 'fast-near web4',
@@ -47,12 +52,16 @@ export const providers =
       ]
     : [
         {
-          name: 'NEAR (Default)',
+          name: 'NEAR (Archival)',
+          url: 'https://archival-rpc.testnet.near.org',
+        },
+        {
+          name: 'NEAR',
           url: 'https://rpc.testnet.near.org',
         },
         {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.testnet.near.org',
+          name: 'NEAR (Beta)',
+          url: 'https://beta.rpc.testnet.near.org',
         },
       ];
 
@@ -90,6 +99,20 @@ export const getTxn = async (rpc: RPC, txnHash: string) => {
     );
 
     return data as RpcResponse<RpcResultTxn>;
+  } catch (error) {
+    console.log({ error });
+    return;
+  }
+};
+
+export const getReceipt = async (rpc: RPC, receiptId: string) => {
+  try {
+    const { data } = await rpc.query(
+      { receipt_id: receiptId },
+      'view_receipt_record',
+    );
+
+    return data as RpcResponse<RpcResultReceipt>;
   } catch (error) {
     console.log({ error });
     return;

@@ -54,9 +54,12 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
 
     const resp = await search(query);
 
-    if (resp?.account) return router.push(`/address/${resp.query}`);
+    if (resp?.account)
+      return router.push(`/address/${resp.query.toLowerCase()}`);
     if (resp?.block) return router.push(`/blocks/${resp.query}`);
     if (resp?.txn) return router.push(`/txns/${resp.query}`);
+    if (resp?.receipt)
+      return router.push(`/txns/${resp.receipt.parent_transaction_hash}`);
 
     return;
   };
@@ -99,16 +102,20 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                 </div>
               </li>
             )}
-            {!loading && !results.account && !results.block && !results.txn && (
-              <li>
-                <div className="flex items-center text-base text-text-input h-7 pl-6 pr-6 md:pl-5 md:pr-6">
-                  <span className="w-7">
-                    <Warning className="h-4 w-4" />
-                  </span>
-                  No results found
-                </div>
-              </li>
-            )}
+            {!loading &&
+              !results.account &&
+              !results.block &&
+              !results.txn &&
+              !results.receipt && (
+                <li>
+                  <div className="flex items-center text-base text-text-input h-7 pl-6 pr-6 md:pl-5 md:pr-6">
+                    <span className="w-7">
+                      <Warning className="h-4 w-4" />
+                    </span>
+                    No results found
+                  </div>
+                </li>
+              )}
             {!loading && results.account && (
               <li>
                 <Link
@@ -156,6 +163,21 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                       <Txn className="text-primary w-4" />
                     </span>
                     {shortenHash(results.txn.transaction.hash)}
+                  </span>
+                </Link>
+              </li>
+            )}
+            {!loading && results.receipt && (
+              <li>
+                <Link
+                  className="flex items-center justify-between text-base hover:text-primary h-7 pl-6 pr-6 md:pl-5 md:pr-6"
+                  href={`/txns/${results.receipt.parent_transaction_hash}`}
+                >
+                  <span className="flex items-center">
+                    <span className="w-7 flex-shrink-0">
+                      <Txn className="text-primary w-4" />
+                    </span>
+                    {shortenHash(results.receipt.parent_transaction_hash)}
                   </span>
                 </Link>
               </li>

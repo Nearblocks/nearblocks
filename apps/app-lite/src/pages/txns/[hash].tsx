@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import MainLayout from '@/components/Layouts/Main';
+import Meta from '@/components/Meta';
 import TxnSkeleton from '@/components/Skeletons/Txn';
 import config from '@/config';
 import { useRpcStore } from '@/stores/rpc';
@@ -21,16 +22,22 @@ const Txn: PageLayout = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0" ref={loader}>
-        <TxnSkeleton />
-      </div>
-      <Widgets
-        loader={<TxnSkeleton onFinish={onFinish} />}
-        props={{ hash, rpcUrl }}
-        src={`${config.account}/widget/lite.Txn`}
+    <>
+      <Meta
+        description={`Near Blockchain detailed info for transaction ${hash}.`}
+        title={`Near Transaction ${hash} | NearBlocks Lite`}
       />
-    </div>
+      <div className="relative">
+        <div className="absolute inset-0" ref={loader}>
+          <TxnSkeleton />
+        </div>
+        <Widgets
+          loader={<TxnSkeleton onFinish={onFinish} />}
+          props={{ hash, rpcUrl }}
+          src={`${config.account}/widget/lite.Txn`}
+        />
+      </div>
+    </>
   );
 };
 

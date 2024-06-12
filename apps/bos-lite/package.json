@@ -11,7 +11,8 @@
     "build": "bw ws build",
     "build:testnet": "bw ws build -n testnet",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "lint:check": "tsc --noEmit && eslint ./",
+    "deploy": "bw deploy src"
   },
   "devDependencies": {
     "@near-js/types": "~0.2.0",

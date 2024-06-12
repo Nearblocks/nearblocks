@@ -9,6 +9,7 @@ export type ActionProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+let TxnActionSkeleton = window?.TxnActionSkeleton || (() => <></>);
 let JsonView = window?.JsonView || (({ children }) => <pre>{children}</pre>);
 
 const kind = {
@@ -69,7 +70,8 @@ const Action = ({ action, open, setOpen }: ActionProps) => {
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  if (!yoctoToNear || !formatNumber || !shortenString) return null;
+  if (!yoctoToNear || !formatNumber || !shortenString)
+    return <TxnActionSkeleton />;
 
   const method =
     action.kind === 'functionCall'

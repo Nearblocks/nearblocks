@@ -6,12 +6,14 @@ export type AddressProps = {
   address: string;
 };
 
+let TxnAddressSkeleton = window?.TxnAddressSkeleton || (() => <></>);
+
 const Address = ({ address }: AddressProps) => {
   let { shortenString } = VM.require<UtilsModule>(
     `${config_account}/widget/lite.libs.utils`,
   );
 
-  if (!shortenString) return null;
+  if (!shortenString) return <TxnAddressSkeleton />;
 
   return (
     <div className="flex items-center pb-3">
