@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Head from 'next/head';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import LoadingCircular from '@/components/common/LoadingCircular';
 import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
@@ -12,20 +12,20 @@ import { docsUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { env } from 'next-runtime-env';
 
 const ApiPlan = () => {
   const router = useRouter();
-
   const { status } = router.query;
-
+  const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
+  const userDashboardURL = env('NEXT_PUBLIC_USER_DASHBOARD_URL');
   const [interval, setInterval] = useState(true);
-  const [updating, _setUpdating] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, _setSubject] = useState('API');
   const [description, setDescription] = useState('');
+  const [data, setData] = useState();
 
   function get(obj: any, path: any, defaultValue = null) {
     const keys = Array.isArray(path) ? path : path.split('.');
@@ -39,63 +39,30 @@ const ApiPlan = () => {
     }
     return value;
   }
-  const data = {
-    plans: [
-      {
-        id: 1,
-        title: 'Free',
-        limit_per_second: null,
-        limit_per_minute: 500,
-        limit_per_day: 36000,
-        limit_per_month: 1080000,
-        price_monthly: 0,
-        price_annually: 0,
-      },
-      {
-        id: 2,
-        title: 'Hobby',
-        limit_per_second: null,
-        limit_per_minute: 22,
-        limit_per_day: 3000,
-        limit_per_month: 40000,
-        price_monthly: 6900,
-        price_annually: 74520,
-      },
-      {
-        id: 3,
-        title: 'Startup',
-        limit_per_second: null,
-        limit_per_minute: 67,
-        limit_per_day: 4000,
-        limit_per_month: 120000,
-        price_monthly: 12900,
-        price_annually: 139320,
-      },
-      {
-        id: 4,
-        title: 'Standard',
-        limit_per_second: null,
-        limit_per_minute: 278,
-        limit_per_day: 4000,
-        limit_per_month: 120000,
-        price_monthly: 29900,
-        price_annually: 322920,
-      },
-      {
-        id: 5,
-        title: 'Professional',
-        limit_per_second: null,
-        limit_per_minute: 1667,
-        limit_per_day: 100000,
-        limit_per_month: 3000000,
-        price_monthly: 69900,
-        price_annually: 754920,
-      },
-    ],
-  };
-  const plans = get(data, 'plans') || null;
 
-  const currentPlan = 0;
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const response = await fetch(`${userApiURL}plans`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const planData = await response.json();
+        if (response.status === 200) {
+          setData(planData);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchPlans();
+  }, [userApiURL]);
+
+  const plans = get(data, 'data') || null;
   const scrollToPlans = () => {
     const element = document.getElementById('plans');
     if (element) {
@@ -129,6 +96,18 @@ const ApiPlan = () => {
       toast.error('Something went wrong!');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onGetStarted = async (plan: any) => {
+    if (plan) {
+      router.push({
+        pathname: `${userDashboardURL}login`,
+        query: {
+          id: plan?.id,
+          interval: !interval ? 'month' : 'year',
+        },
+      });
     }
   };
 
@@ -183,6 +162,18 @@ const ApiPlan = () => {
               >
                 API Pricing Plans
               </button>
+              <Link href={userDashboardURL + '/login'} legacyBehavior>
+                <a
+                  className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                >
+                  User Dashboard
+                  <span>
+                    <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
+                  </span>
+                </a>
+              </Link>
               <Link href={docsUrl} legacyBehavior>
                 <a
                   className="flex text-sm text-green-400 dark:text-green-250 cursor-pointer mx-4 font-medium"
@@ -327,36 +318,16 @@ const ApiPlan = () => {
                       API calls a month
                     </h3>
                     <button
-                      // onClick={() => {
-                      //   if (
-                      //     item?.price_annually === 0 &&
-                      //     item?.price_monthly === 0 &&
-                      //     token
-                      //   )
-                      //     onConfirmOpen(item);
-                      //   else onGetStarted(item);
-                      // }}
+                      onClick={() => {
+                        onGetStarted(item);
+                      }}
                       className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={
-                        !updating || currentPlan === item?.price_monthly
-                      }
                     >
-                      {currentPlan
-                        ? currentPlan === item?.price_monthly
-                          ? 'Current Plan'
-                          : currentPlan < item?.price_monthly
-                          ? 'Upgrade'
-                          : 'Downgrade'
-                        : 'Get started now'}
+                      Get started now
                     </button>
                   </div>
                 </div>
               ))}
-          </div>
-          <div className="sm:px-10 2xl:px-20 ">
-            <div className="text-center border-b-2 border-nearblue dark:border-black-200 dark:bg-black-200 bg-nearblue py-2 text-green dark:text-green-250 text-sm ">
-              Sign up is temporary suspended
-            </div>
           </div>
           <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
             <div className="flex justify-center">
@@ -418,7 +389,7 @@ const ApiPlan = () => {
               </div>
             </div>
           </div>
-          <div className="flex sm:flex-row flex-col items-center  justify-center my-5">
+          <div className="flex sm:!flex-row flex-col items-center  justify-center my-5">
             <p className="text-xl text-black dark:text-neargray-10 text-center mx-4 my-6">
               Detailed documentation to get started.{' '}
             </p>
@@ -440,7 +411,7 @@ const ApiPlan = () => {
               </p>
             </div>
 
-            <div className="flex sm:flex-row flex-col">
+            <div className="flex sm:!flex-row flex-col">
               <div className="w-full sm:mr-2">
                 <p className="text-sm my-2">
                   Name <span className="text-red-500">*</span>{' '}
