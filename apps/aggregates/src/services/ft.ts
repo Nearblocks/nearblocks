@@ -83,15 +83,21 @@ const syncHolders = async (): Promise<boolean> => {
       logger.info(`${TABLE}: events: ${events.length}`);
 
       if (events.length) {
-        await trx(TABLE)
-          .insert(events)
-          .onConflict(['contract', 'account'])
-          .merge({
-            amount: trx.raw('?? + ?', [
-              `${TABLE}.amount`,
-              trx.raw('excluded.amount'),
-            ]),
-          });
+        const chunkSize = 100;
+
+        for (let i = 0; i < events.length; i += chunkSize) {
+          const chunk = events.slice(i, i + chunkSize);
+
+          await trx(TABLE)
+            .insert(chunk)
+            .onConflict(['contract', 'account'])
+            .merge({
+              amount: trx.raw('?? + ?', [
+                `${TABLE}.amount`,
+                trx.raw('excluded.amount'),
+              ]),
+            });
+        }
       }
 
       await trx('settings')
