@@ -14,13 +14,15 @@ interface Props {
   network: string;
   id: string;
   token?: Token;
+  isLoading?: boolean;
 }
 
 import CoinMarketcap from '@/includes/icons/CoinMarketcap';
 import CoinGecko from '@/includes/icons/CoinGecko';
 import { Token } from '@/includes/types';
+import Skeleton from '@/includes/Common/Skeleton';
 
-export default function ({ token, id, network, ownerId }: Props) {
+export default function ({ token, id, network, ownerId, isLoading }: Props) {
   const { localFormat, dollarNonCentFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -30,11 +32,13 @@ export default function ({ token, id, network, ownerId }: Props) {
   );
 
   const [tokens, setTokens] = useState<Token>({} as Token);
+  const [loading, setLoading] = useState(false);
 
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
     function fetchFTData() {
+      setLoading(true);
       asyncFetch(`${config.backendUrl}fts/${id}`)
         .then(
           (data: {
@@ -46,8 +50,9 @@ export default function ({ token, id, network, ownerId }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokens(resp);
+              setLoading(false);
             } else {
-              handleRateLimit(data, fetchFTData);
+              handleRateLimit(data, fetchFTData, () => setLoading(false));
             }
           },
         )
@@ -69,14 +74,27 @@ export default function ({ token, id, network, ownerId }: Props) {
 
   return (
     <div className="px-3 pt-2 pb-5 text-sm text-gray">
-      {tokens?.description && (
+      {!loading || !isLoading ? (
+        <>
+          {tokens?.description && (
+            <>
+              <h3 className="text-nearblue-600  dark:text-neargray-10 text-sm font-semibold py-2 underline">
+                Overview
+              </h3>
+              <p className="text-sm py-2 text-nearblue-600 dark:text-neargray-10">
+                {tokens?.description}
+              </p>
+            </>
+          )}
+        </>
+      ) : (
         <>
           <h3 className="text-nearblue-600  dark:text-neargray-10 text-sm font-semibold py-2 underline">
             Overview
           </h3>
-          <p className="text-sm py-2 text-nearblue-600 dark:text-neargray-10">
-            {tokens?.description}
-          </p>
+          <div className="text-sm py-2 text-nearblue-600 dark:text-neargray-10">
+            <Skeleton className="w-1/3 h-4" />
+          </div>
         </>
       )}
       <h3 className="text-nearblue-600  dark:text-neargray-10 text-sm font-semibold py-2 underline">
@@ -85,69 +103,91 @@ export default function ({ token, id, network, ownerId }: Props) {
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Volume (24H):</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.volume_24h !== null && tokens?.volume_24h !== undefined ? (
-            `$${dollarNonCentFormat(tokens?.volume_24h)}`
+          {!loading || !isLoading ? (
+            tokens?.volume_24h !== null && tokens?.volume_24h !== undefined ? (
+              `$${dollarNonCentFormat(tokens?.volume_24h)}`
+            ) : (
+              <span className="text-xs">N/A</span>
+            )
           ) : (
-            <span className="text-xs">N/A</span>
+            <Skeleton className="w-full h-4" />
           )}
         </div>
       </div>
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating MC:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.market_cap !== null && tokens?.market_cap !== undefined ? (
-            `$${dollarNonCentFormat(tokens?.market_cap)}`
+          {!loading || !isLoading ? (
+            tokens?.market_cap !== null && tokens?.market_cap !== undefined ? (
+              `$${dollarNonCentFormat(tokens?.market_cap)}`
+            ) : (
+              <span className="text-xs">N/A</span>
+            )
           ) : (
-            <span className="text-xs">N/A</span>
+            <Skeleton className="w-full h-4" />
           )}
         </div>
       </div>
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">On-chain MC:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.onchain_market_cap !== null &&
-          tokens?.onchain_market_cap !== undefined ? (
-            `$${dollarNonCentFormat(tokens?.onchain_market_cap)}`
+          {!loading || !isLoading ? (
+            tokens?.onchain_market_cap !== null &&
+            tokens?.onchain_market_cap !== undefined ? (
+              `$${dollarNonCentFormat(tokens?.onchain_market_cap)}`
+            ) : (
+              <span className="text-xs">N/A</span>
+            )
           ) : (
-            <span className="text-xs">N/A</span>
+            <Skeleton className="w-full h-4" />
           )}
         </div>
       </div>
       <div className="flex flex-wrap lg:w-1/2 py-2 text-nearblue-600 dark:text-neargray-10">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Circulating Supply:</div>
         <div className="w-full md:w-3/4 break-words">
-          {tokens?.circulating_supply !== null &&
-          tokens?.circulating_supply !== undefined ? (
-            `${localFormat(tokens?.circulating_supply)}`
+          {!loading || !isLoading ? (
+            tokens?.circulating_supply !== null &&
+            tokens?.circulating_supply !== undefined ? (
+              `${localFormat(tokens?.circulating_supply)}`
+            ) : (
+              <span className="text-xs">N/A</span>
+            )
           ) : (
-            <span className="text-xs">N/A</span>
+            <Skeleton className="w-full h-4" />
           )}
         </div>
       </div>
       <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 dark:text-neargray-10 text-xs">
         <div className="w-full md:w-1/4 mb-2 md:mb-0">Market Data Source:</div>
         <div className="w-full md:w-3/4 break-words flex">
-          {tokens?.coingecko_id && (
-            <a
-              className="text-green-500 dark:text-green-250 mr-4 flex"
-              href="https://www.coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
-              target="_blank"
-              rel="noreferrer nofollow noopener"
-            >
-              <CoinGecko className="h-4 w-4 fill-current mr-1" />
-              CoinGecko
-            </a>
-          )}
-          {tokens?.coinmarketcap_id && (
-            <a
-              className="text-green-500 dark:text-green-250 mr-4 flex"
-              href="https://coinmarketcap.com/"
-              target="_blank"
-              rel="noreferrer nofollow noopener"
-            >
-              <CoinMarketcap className="h-4 w-4 fill-current mr-1" />
-              Coinmarketcap
-            </a>
+          {!loading || !isLoading ? (
+            <>
+              {tokens?.coingecko_id && (
+                <a
+                  className="text-green-500 dark:text-green-250 mr-4 flex"
+                  href="https://www.coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                >
+                  <CoinGecko className="h-4 w-4 fill-current mr-1" />
+                  CoinGecko
+                </a>
+              )}{' '}
+              {tokens?.coinmarketcap_id && (
+                <a
+                  className="text-green-500 dark:text-green-250 mr-4 flex"
+                  href="https://coinmarketcap.com/"
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                >
+                  <CoinMarketcap className="h-4 w-4 fill-current mr-1" />
+                  Coinmarketcap
+                </a>
+              )}
+            </>
+          ) : (
+            <Skeleton className="w-full h-4" />
           )}
         </div>
       </div>

@@ -43,11 +43,11 @@ export default function (props: Props) {
               {receipt &&
                 receipt?.actions?.map((action: any, i: number) => (
                   <Fragment key={1}>
-                    <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+                    <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                       Receipt
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
-                      Predecessor:{' '}
+                      From:{' '}
                       <OverlayTrigger
                         placement="bottom-start"
                         delay={{ show: 500, hide: 0 }}
@@ -66,7 +66,7 @@ export default function (props: Props) {
                       </OverlayTrigger>
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
-                      Receiver:{' '}
+                      To:{' '}
                       <OverlayTrigger
                         placement="bottom-start"
                         delay={{ show: 500, hide: 0 }}
@@ -95,11 +95,11 @@ export default function (props: Props) {
                     </div>
                   </Fragment>
                 ))}
-              <div className="text-green-500 dark:text-green-250 text-xl pt-3 pl-3">
+              <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                 Execution Outcomes
               </div>
               <div className="pl-3 py-2">
-                <span className="text-base">Logs:</span>
+                <span>Logs:</span>
                 {!receipt ? (
                   <div className="w-full">
                     <Loader wrapperClassName="flex w-full" />
@@ -122,7 +122,9 @@ export default function (props: Props) {
                         </div>
                       </>
                     ) : (
-                      'No Logs'
+                      <div className="mt-3 bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 overflow-auto rounded-lg">
+                        No Logs
+                      </div>
                     )}
                   </div>
                 )}
