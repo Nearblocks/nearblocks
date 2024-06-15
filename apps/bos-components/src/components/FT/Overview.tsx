@@ -349,15 +349,11 @@ export default function ({
                       <div className="w-20">
                         <Skeleton className="h-4" />
                       </div>
-                    ) : (token?.fully_diluted_market_cap !== null &&
-                        token?.fully_diluted_market_cap !== undefined) ||
-                      (token?.market_cap !== null &&
-                        token?.market_cap !== undefined) ? (
+                    ) : Number(token?.fully_diluted_market_cap) > 0 ||
+                      Number(token?.market_cap) > 0 ? (
                       <div className="w-full break-words flex flex-wrap text-sm">
-                        {token?.fully_diluted_market_cap !== null &&
-                        token?.fully_diluted_market_cap !== undefined &&
-                        token?.market_cap !== null &&
-                        token?.market_cap !== undefined ? (
+                        {Number(token?.fully_diluted_market_cap) > 0 &&
+                        Number(token?.market_cap) > 0 ? (
                           <OverlayTrigger
                             placement="bottom-start"
                             delay={{ show: 500, hide: 0 }}
