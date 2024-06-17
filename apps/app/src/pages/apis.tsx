@@ -162,7 +162,7 @@ const ApiPlan = () => {
               >
                 API Pricing Plans
               </button>
-              <Link href={userDashboardURL + '/login'} legacyBehavior>
+              <Link href={userDashboardURL + 'login'} legacyBehavior>
                 <a
                   className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
                   target="_blank"
