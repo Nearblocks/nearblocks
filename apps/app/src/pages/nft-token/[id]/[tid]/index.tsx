@@ -11,7 +11,7 @@ import { Token } from '@/utils/types';
 import { env } from 'next-runtime-env';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
-
+const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const NFTokenInfo = () => {
   const router = useRouter();
   const { id, tid } = router.query;
@@ -108,6 +108,7 @@ const NFTokenInfo = () => {
             t: t,
             id: id,
             tid: tid,
+            userApiUrl,
           }}
           loading={<Detail className="absolute" ref={heightRef} />}
         />

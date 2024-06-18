@@ -15,6 +15,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
+import Banner from '@/components/Banner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -136,9 +137,9 @@ const HomePage = () => {
       <div>
         <ToastContainer />
         <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
-          <div className="container mx-auto px-3 pt-14 pb-8 mb-10 ">
-            <div className="flex flex-col lg:flex-row pb-5">
-              <div className="relative lg:w-3/5  flex-col">
+          <div className="container mx-auto px-3 py-12 mb-10">
+            <div className="flex flex-col lg:flex-row pb-5 justify-between lg:!items-center">
+              <div className="relative lg:w-3/5 flex-col">
                 <h1 className="text-white dark:text-neargray-10 text-2xl pb-3 flex flex-col">
                   {t('home:heroTitle')}
                 </h1>
@@ -164,13 +165,15 @@ const HomePage = () => {
                     }
                   />
                 </div>
-                <div className="text-white"></div>
+                <div className="text-white py-3"></div>
+              </div>
+              <div className="lg:!block hidden">
+                <Banner type="right" />
               </div>
             </div>
           </div>
         </div>
-
-        <div style={overviewHeight} className=" relative -mt-14 ">
+        <div style={overviewHeight} className="relative -mt-14 ">
           <VmComponent
             src={components?.transactionsOverview}
             skeleton={<Overview className="absolute" ref={overviewRef} />}
@@ -179,8 +182,11 @@ const HomePage = () => {
             loading={<Overview className="absolute" ref={overviewRef} />}
           />
         </div>
-
-        <div className="py-8 relative"></div>
+        <div className="py-8">
+          <div className="lg:!hidden block container mx-auto px-3">
+            <Banner type="center" />
+          </div>
+        </div>
         <section>
           <div className="container mx-auto px-3  z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

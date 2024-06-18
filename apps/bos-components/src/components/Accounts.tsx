@@ -27,6 +27,7 @@ interface Props {
   logOut: () => void;
   handleToggle: () => void;
   showAllReceipts: boolean;
+  userApiUrl: string;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -72,6 +73,7 @@ export default function (props: Props) {
     ownerId,
     handleToggle,
     showAllReceipts,
+    userApiUrl,
   } = props;
 
   const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
@@ -968,7 +970,14 @@ export default function (props: Props) {
           </div>
         </div>
       </div>
-      <div className="py-6"></div>
+      <div className="py-6">
+        {
+          <Widget
+            src={`${ownerId}/widget/includes.Common.Banner`}
+            props={{ type: 'center' }}
+          />
+        }
+      </div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
           <>
@@ -1130,6 +1139,14 @@ export default function (props: Props) {
             </div>
           </>
         </div>
+      </div>
+      <div className="mb-10">
+        {
+          <Widget
+            src={`${ownerId}/widget/includes.Common.Banner`}
+            props={{ type: 'center', userApiUrl: userApiUrl }}
+          />
+        }
       </div>
     </>
   );

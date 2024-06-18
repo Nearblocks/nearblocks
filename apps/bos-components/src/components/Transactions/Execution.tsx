@@ -118,7 +118,7 @@ export default function (props: Props) {
           <div className="p-4 md:px-8 overflow-auto">
             {!receipt?.id ? (
               <div>
-                <div className="flex pl-4 md:pl-8 flex-row mb-2.5">
+                <div className="flex flex-row mb-2.5">
                   <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
                   <div className="text-green-500 dark:text-green-250 text-sm">
                     <Skeleton className="w-40 h-4" />
@@ -127,7 +127,7 @@ export default function (props: Props) {
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="pl-4 md:pl-8 border-green-500 dark:border-green-250"
+                    className="border-green-500 dark:border-green-250"
                   >
                     <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
                       <Skeleton className="w-25 h-8" />
@@ -156,7 +156,7 @@ export default function (props: Props) {
                 }}
                 loading={
                   <div>
-                    <div className="flex pl-4 md:pl-8 flex-row mb-2.5">
+                    <div className="flex flex-row mb-2.5">
                       <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
                       <div className="text-green-500 dark:text-green-250 text-sm">
                         <Skeleton className="w-40 h-4" />
@@ -165,7 +165,7 @@ export default function (props: Props) {
                     {[...Array(3)].map((_, i) => (
                       <div
                         key={i}
-                        className="pl-4 md:pl-8 border-green-500 dark:border-green-250"
+                        className="border-green-500 dark:border-green-250"
                       >
                         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
                           <Skeleton className="w-25 h-8" />

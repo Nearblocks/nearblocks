@@ -14,7 +14,7 @@ import Skeleton from '@/components/skeleton/common/Skeleton';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-
+const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const Address = () => {
   const router = useRouter();
   const { theme } = useTheme();
@@ -146,6 +146,7 @@ const Address = () => {
             theme: theme,
             handleToggle,
             showAllReceipts,
+            userApiUrl,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />
