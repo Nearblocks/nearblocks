@@ -28,16 +28,17 @@ export const streamCsv = (
   });
 
   pool.connect((err, client, done) => {
-    if (err || client === undefined) res.status(200);
+    if (err || !client) return done();
 
     const queries = new QueryStream(query, values);
-    const streams = client!.query(queries);
+    const streams = client.query(queries);
 
     res.attachment('txns.csv');
     stringifier.pipe(res);
 
     streams.on('end', () => {
       stringifier.end();
+      pool.end();
       done();
     });
 
