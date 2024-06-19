@@ -14,64 +14,98 @@ import { ftMeta, ftTotalSupply } from '#libs/near';
 import ref from '#libs/ref';
 import { tokenAmount } from '#libs/utils';
 
-export const syncTokens = async () => {
-  const tokens = await knex
-    .select('contract_account_id')
-    .from(
-      knex
-        .select('contract_account_id')
-        .fromRaw('ft_events ft')
-        .whereNotExists(
-          knex
-            .select(1)
-            .fromRaw('errored_contracts ec')
-            .whereRaw('ft.contract_account_id = ec.contract')
-            .where('type', 'ft')
-            .where('attempts', '>=', 5),
-        )
-        .groupBy('contract_account_id')
-        .as('ft'),
-    )
-    .whereNotExists(
-      knex
-        .select('*')
-        .from('ft_meta')
-        .whereRaw('ft.contract_account_id = ft_meta.contract'),
-    )
-    .limit(10);
+type RawResp = {
+  rows: ContractResp[];
+};
 
-  await Promise.all(
-    tokens.map((token) => updateMeta(token.contract_account_id)),
+type ContractResp = {
+  contract: string;
+};
+
+export const syncTokens = async () => {
+  const tokens = await knex.raw<RawResp>(
+    `
+      SELECT
+        contract_account_id AS contract
+      FROM
+        (
+          SELECT
+            contract_account_id
+          FROM
+            (
+              SELECT DISTINCT
+                contract_account_id
+              FROM
+                ft_events
+            ) ft
+          WHERE
+            NOT EXISTS (
+              SELECT
+                1
+              FROM
+                errored_contracts ec
+              WHERE
+                ft.contract_account_id = ec.contract
+                AND type = 'ft'
+                AND attempts >= 5
+            )
+        ) AS ft
+      WHERE
+        NOT EXISTS (
+          SELECT
+            1
+          FROM
+            ft_meta
+          WHERE
+            ft.contract_account_id = ft_meta.contract
+        )
+      LIMIT
+        10;
+    `,
   );
+
+  await Promise.all(tokens?.rows.map((token) => updateMeta(token.contract)));
 };
 
 export const refreshMeta = async () => {
-  const tokens = await knex
-    .select('contract')
-    .from(
-      knex
-        .select('contract')
-        .fromRaw('ft_meta ft')
-        .where(
-          'refreshed_at',
-          '<',
-          dayjs.utc().subtract(7, 'days').toISOString(),
-        )
-        .whereNotExists(
-          knex
-            .select(1)
-            .fromRaw('errored_contracts ec')
-            .whereRaw('ft.contract = ec.contract')
-            .where('type', 'ft')
-            .where('attempts', '>=', 5),
-        )
-        .groupBy('contract')
-        .orderByRaw('refreshed_at ASC NULLS FIRST')
-        .as('ft'),
-    )
-    .limit(10);
+  const tokens = await knex.raw<RawResp>(
+    `
+        SELECT
+          contract
+        FROM
+          (
+            SELECT
+              contract
+            FROM
+              (
+                SELECT DISTINCT
+                  contract,
+                  refreshed_at
+                FROM
+                  ft_meta
+              ) ft
+            WHERE
+              refreshed_at < ?
+              AND NOT EXISTS (
+                SELECT
+                  1
+                FROM
+                  errored_contracts ec
+                WHERE
+                  ft.contract = ec.contract
+                  AND ec.type = 'ft'
+                  AND ec.attempts >= 5
+              )
+            ORDER BY
+              refreshed_at ASC NULLS FIRST
+          ) AS ft
+        LIMIT
+          10;
+    `,
+    [dayjs.utc().subtract(7, 'days').toISOString()],
+  );
 
-  await Promise.all(tokens.map((token) => updateMeta(token.contract)));
+  await Promise.all(tokens?.rows.map((token) => updateMeta(token.contract)));
 };
 
 const updateMeta = async (contract: string) => {
