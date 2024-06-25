@@ -172,3 +172,28 @@ export const findStakeChange = (stakeDelta: number) => {
       : localFormat(Number(Big(amount).abs()).toFixed()),
   };
 };
+
+export const calculateAPY = (
+  totalStake: Big,
+  epochTimestamp: string,
+  prevEpochTimestamp: string,
+  totalSupply: string,
+) => {
+  const maxInflationRate = 0.05;
+  const epochLength =
+    Big(epochTimestamp).minus(prevEpochTimestamp).toNumber() / 1e9;
+  const secondsInYear = 31536000;
+  const epochsPerYear = secondsInYear / epochLength;
+  const nearTreasuryReward = 0.1;
+
+  const apy = Big(totalSupply)
+    .times(Math.pow(1 + maxInflationRate, 1 / epochsPerYear) - 1)
+    .times(epochsPerYear)
+    .div(totalStake)
+    .times(1 - nearTreasuryReward)
+    .times(100)
+    .toNumber()
+    .toFixed(2);
+
+  return apy;
+};
