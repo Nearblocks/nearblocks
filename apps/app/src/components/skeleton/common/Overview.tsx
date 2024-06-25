@@ -64,7 +64,7 @@ const Overview = forwardRef(
             </div>
           </div>
           <div className="py-6"></div>
-          <div className="block lg:flex lg:space-x-2 mb-3">
+          <div className="block lg:flex lg:space-x-2 mb-10">
             <div className="w-full">
               <div>
                 <div
@@ -199,7 +199,7 @@ const Overview = forwardRef(
             </div>
           </div>
         </div>
-        <div className="py-8"></div>
+        <div className="py-8 mb-10"></div>
       </div>
     );
   },
