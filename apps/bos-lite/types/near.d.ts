@@ -987,7 +987,7 @@ type NestedReceiptWithOutcomeOld = {
     gasBurnt: number;
     logs: string[];
     nestedReceipts: (FailedToFindReceipt | NestedReceiptWithOutcomeOld)[];
-    status: ReceiptExecutionStatus;
+    status: RpcReceiptExecutionStatus;
     tokensBurnt: string;
   };
   predecessorId: string;
