@@ -49,22 +49,25 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
 
   const result = useMemo(() => {
     let logs = 'No logs';
-    let status = receipt.outcome.status.receiptId;
+    let status = 'Empty result';
 
     if (receipt.outcome.logs.length) {
       logs = receipt.outcome.logs.join('\n');
     }
 
-    if (receipt.outcome.status.type === 'successValue') {
-      if (receipt.outcome.status.value.length === 0) {
-        status = 'Empty result';
-      } else {
-        status = prettify(receipt.outcome.status.value) ?? '';
-      }
+    if (receipt.outcome.status.type === 'successReceiptId') {
+      status = receipt.outcome.status.receiptId;
+    }
+
+    if (
+      receipt.outcome.status.type === 'successValue' &&
+      receipt.outcome.status.value.length
+    ) {
+      status = prettify(receipt.outcome.status.value);
     }
 
     if (receipt.outcome.status.type === 'failure') {
-      status = prettify(receipt.outcome.status.error);
+      status = JSON.stringify(receipt.outcome.status.error, undefined, 2);
     }
 
     return { logs, status };

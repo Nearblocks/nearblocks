@@ -34,7 +34,7 @@ export const AddressKeysSkeleton = () => (
             <span className="block w-full border-b border-b-border-body" />
           </td>
         </tr>
-        {[...Array(25).keys()].map((key) => (
+        {[...Array(10).keys()].map((key) => (
           <tr key={key}>
             <td className="h-[46px] pl-6 pr-4 py-4">
               <span className="flex">

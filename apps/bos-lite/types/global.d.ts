@@ -27,16 +27,12 @@ interface Window {
   TxnTabsSkeleton: () => JSX.Element;
 }
 
-declare module VM {
-  function require<T>(src: string): T;
-}
-
-declare module VM {
-  function require<T>(src: string): T;
-}
-
 declare const config_account: string;
 declare const alias_api_url: string;
+
+declare module VM {
+  function require<T>(src: string): T;
+}
 
 declare const context: {
   accountId?: string;
