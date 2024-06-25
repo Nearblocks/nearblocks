@@ -50,10 +50,10 @@ const keys = catchAsync(async (req: RequestValidator<Keys>, res: Response) => {
         OFFSET
           ${offset}
       ) AS tmp using (public_key, account_id)
-      LEFT JOIN receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
-      LEFT JOIN transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
-      LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
-      LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
+      LEFT JOIN temp_receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
+      LEFT JOIN temp_transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
+      LEFT JOIN temp_receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
+      LEFT JOIN temp_transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
     ORDER BY
       CASE
         WHEN deleted_by_block_height IS NULL THEN created_by_block_height

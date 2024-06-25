@@ -253,7 +253,7 @@ const activities = catchAsync(
         args
       FROM
         action_receipt_actions
-        JOIN receipts USING (receipt_id)
+        JOIN temp_receipts USING (receipt_id)
       WHERE
         receipt_predecessor_account_id != 'system'
         AND (

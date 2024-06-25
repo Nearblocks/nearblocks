@@ -41,10 +41,10 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       ) AS deleted
     FROM
       accounts a
-      LEFT JOIN receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
-      LEFT JOIN transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
-      LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
-      LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
+      LEFT JOIN temp_receipts cbr ON cbr.receipt_id = a.created_by_receipt_id
+      LEFT JOIN temp_transactions cbrt ON cbrt.transaction_hash = cbr.originated_from_transaction_hash
+      LEFT JOIN temp_receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
+      LEFT JOIN temp_transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
     WHERE
       a.account_id = ${account}
   `;
@@ -170,8 +170,8 @@ const deployments = catchAsync(
             COUNT(*) OVER () as total
           FROM
             action_receipt_actions a
-            JOIN receipts r ON r.receipt_id = a.receipt_id
-            JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
+            JOIN temp_receipts r ON r.receipt_id = a.receipt_id
+            JOIN temp_transactions t ON t.transaction_hash = r.originated_from_transaction_hash
           WHERE
             a.receipt_receiver_account_id = ${account}
             AND a.action_kind = 'DEPLOY_CONTRACT'

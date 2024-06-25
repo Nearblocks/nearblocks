@@ -114,10 +114,10 @@ const txns = catchAsync(
               SELECT
                 1
               FROM
-                transactions
-                JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+                temp_transactions
+                JOIN temp_receipts ON temp_receipts.originated_from_transaction_hash = temp_transactions.transaction_hash
               WHERE
-                receipts.receipt_id = a.receipt_id
+                temp_receipts.receipt_id = a.receipt_id
             )
           ORDER BY
             event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
@@ -128,16 +128,16 @@ const txns = catchAsync(
         ) AS tmp using (event_index)
         INNER JOIN LATERAL (
           SELECT
-            transactions.transaction_hash,
-            transactions.included_in_block_hash,
-            transactions.block_timestamp,
+            temp_transactions.transaction_hash,
+            temp_transactions.included_in_block_hash,
+            temp_transactions.block_timestamp,
             (
               SELECT
                 JSON_BUILD_OBJECT('block_height', block_height)
               FROM
                 blocks
               WHERE
-                blocks.block_hash = transactions.included_in_block_hash
+                blocks.block_hash = temp_transactions.included_in_block_hash
             ) AS block,
             (
               SELECT
@@ -154,13 +154,13 @@ const txns = catchAsync(
               FROM
                 execution_outcomes
               WHERE
-                execution_outcomes.receipt_id = transactions.converted_into_receipt_id
+                execution_outcomes.receipt_id = temp_transactions.converted_into_receipt_id
             ) AS outcomes
           FROM
-            transactions
-            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+            temp_transactions
+            JOIN temp_receipts ON temp_receipts.originated_from_transaction_hash = temp_transactions.transaction_hash
           WHERE
-            receipts.receipt_id = ft_events.receipt_id
+            temp_receipts.receipt_id = ft_events.receipt_id
         ) txn ON TRUE
       ORDER BY
         event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
@@ -203,10 +203,10 @@ const txnsCount = catchAsync(
           SELECT
             1
           FROM
-            transactions
-            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+            temp_transactions
+            JOIN temp_receipts ON temp_receipts.originated_from_transaction_hash = temp_transactions.transaction_hash
           WHERE
-            receipts.receipt_id = a.receipt_id
+            temp_receipts.receipt_id = a.receipt_id
         )
     `;
 

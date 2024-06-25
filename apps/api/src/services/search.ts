@@ -10,7 +10,7 @@ const txnQuery = (keyword: string) => {
     SELECT
       transaction_hash
     FROM
-      transactions
+      temp_transactions
     WHERE
       transaction_hash = ${keyword}
     LIMIT
@@ -53,7 +53,7 @@ const receiptQuery = (keyword: string) => {
       receipt_id,
       originated_from_transaction_hash
     FROM
-      receipts
+      temp_receipts
     WHERE
       receipt_id = ${keyword}
     LIMIT

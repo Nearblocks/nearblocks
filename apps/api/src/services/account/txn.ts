@@ -57,10 +57,10 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
     SELECT
-      receipts.id,
-      receipts.receipt_id,
-      receipts.predecessor_account_id,
-      receipts.receiver_account_id,
+      temp_receipts.id,
+      temp_receipts.receipt_id,
+      temp_receipts.predecessor_account_id,
+      temp_receipts.receiver_account_id,
       tr.transaction_hash,
       tr.included_in_block_hash,
       tr.block_timestamp,
@@ -71,13 +71,13 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
       tr.outcomes,
       tr.outcomes_agg
     FROM
-      receipts
+      temp_receipts
       INNER JOIN (
         SELECT
           r.receipt_id
         FROM
-          receipts r
-          JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
+          temp_receipts r
+          JOIN temp_transactions t ON t.transaction_hash = r.originated_from_transaction_hash
         WHERE
           r.receipt_kind = 'ACTION'
           AND ${from || to
@@ -136,7 +136,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             FROM
               blocks
             WHERE
-              blocks.block_hash = transactions.included_in_block_hash
+              blocks.block_hash = temp_transactions.included_in_block_hash
           ) AS block,
           (
             SELECT
@@ -159,7 +159,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               action_receipt_actions
               JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
             WHERE
-              action_receipt_actions.receipt_id = receipts.receipt_id
+              action_receipt_actions.receipt_id = temp_receipts.receipt_id
           ) AS actions,
           (
             SELECT
@@ -169,9 +169,9 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               )
             FROM
               action_receipt_actions
-              JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
+              JOIN temp_receipts ON temp_receipts.receipt_id = action_receipt_actions.receipt_id
             WHERE
-              receipts.receipt_id = transactions.converted_into_receipt_id
+              temp_receipts.receipt_id = temp_transactions.converted_into_receipt_id
           ) AS actions_agg,
           (
             SELECT
@@ -188,7 +188,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             FROM
               execution_outcomes
             WHERE
-              execution_outcomes.receipt_id = transactions.converted_into_receipt_id
+              execution_outcomes.receipt_id = temp_transactions.converted_into_receipt_id
           ) AS outcomes,
           (
             SELECT
@@ -198,14 +198,14 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               )
             FROM
               execution_outcomes
-              JOIN receipts ON receipts.receipt_id = execution_outcomes.receipt_id
+              JOIN temp_receipts ON temp_receipts.receipt_id = execution_outcomes.receipt_id
             WHERE
-              receipts.originated_from_transaction_hash = transactions.transaction_hash
+              temp_receipts.originated_from_transaction_hash = temp_transactions.transaction_hash
           ) AS outcomes_agg
         FROM
-          transactions
+          temp_transactions
         WHERE
-          transactions.transaction_hash = receipts.originated_from_transaction_hash
+          temp_transactions.transaction_hash = temp_receipts.originated_from_transaction_hash
       ) tr ON TRUE
     ORDER BY
       tr.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
@@ -261,8 +261,8 @@ const txnsCount = catchAsync(
       SELECT
         ${options.select}
       FROM
-        receipts r
-        JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
+        temp_receipts r
+        JOIN temp_transactions t ON t.transaction_hash = r.originated_from_transaction_hash
       WHERE
         r.receipt_kind = '${options.action}'
         AND ${
@@ -352,9 +352,9 @@ const txnsExport = catchAsync(
     const { query, values } = keyBinder(
       `
         SELECT
-          receipts.receipt_id,
-          receipts.predecessor_account_id,
-          receipts.receiver_account_id,
+          temp_receipts.receipt_id,
+          temp_receipts.predecessor_account_id,
+          temp_receipts.receiver_account_id,
           tr.transaction_hash,
           tr.included_in_block_hash,
           tr.block_timestamp,
@@ -364,13 +364,13 @@ const txnsExport = catchAsync(
           tr.outcomes,
           tr.outcomes_agg
         FROM
-          receipts
+          temp_receipts
           INNER JOIN (
             SELECT
               r.receipt_id
             FROM
-              receipts r
-              JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
+              temp_receipts r
+              JOIN temp_transactions t ON t.transaction_hash = r.originated_from_transaction_hash
             WHERE
               r.receipt_kind = 'ACTION'
               AND (
@@ -399,7 +399,7 @@ const txnsExport = catchAsync(
                 FROM
                   blocks
                 WHERE
-                  blocks.block_hash = transactions.included_in_block_hash
+                  blocks.block_hash = temp_transactions.included_in_block_hash
               ) AS block,
               (
                 SELECT
@@ -414,7 +414,7 @@ const txnsExport = catchAsync(
                 FROM
                   action_receipt_actions
                 WHERE
-                action_receipt_actions.receipt_id = receipts.receipt_id
+                action_receipt_actions.receipt_id = temp_receipts.receipt_id
               ) AS actions,
               (
                 SELECT
@@ -424,9 +424,9 @@ const txnsExport = catchAsync(
                   )
                 FROM
                   action_receipt_actions
-                  JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
+                  JOIN temp_receipts ON temp_receipts.receipt_id = action_receipt_actions.receipt_id
                 WHERE
-                  receipts.receipt_id = transactions.converted_into_receipt_id
+                  temp_receipts.receipt_id = temp_transactions.converted_into_receipt_id
               ) AS actions_agg,
               (
                 SELECT
@@ -440,7 +440,7 @@ const txnsExport = catchAsync(
                 FROM
                   execution_outcomes
                 WHERE
-                  execution_outcomes.receipt_id = transactions.converted_into_receipt_id
+                  execution_outcomes.receipt_id = temp_transactions.converted_into_receipt_id
               ) AS outcomes,
               (
                 SELECT
@@ -450,14 +450,14 @@ const txnsExport = catchAsync(
                   )
                 FROM
                   execution_outcomes
-                  JOIN receipts ON receipts.receipt_id = execution_outcomes.receipt_id
+                  JOIN temp_receipts ON temp_receipts.receipt_id = execution_outcomes.receipt_id
                 WHERE
-                  receipts.originated_from_transaction_hash = transactions.transaction_hash
+                  temp_receipts.originated_from_transaction_hash = temp_transactions.transaction_hash
               ) AS outcomes_agg
             FROM
-              transactions
+              temp_transactions
             WHERE
-              transactions.transaction_hash = receipts.originated_from_transaction_hash
+              temp_transactions.transaction_hash = temp_receipts.originated_from_transaction_hash
           ) tr ON TRUE
         ORDER BY
           tr.block_timestamp ASC,

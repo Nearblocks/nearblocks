@@ -39,7 +39,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         SELECT
           JSON_BUILD_OBJECT('count', COUNT(included_in_block_hash))
         FROM
-          transactions
+          temp_transactions
         WHERE
           included_in_block_hash = blocks.block_hash
       ) AS transactions_agg,
@@ -47,7 +47,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         SELECT
           JSON_BUILD_OBJECT('count', COUNT(included_in_block_hash))
         FROM
-          receipts
+          temp_receipts
         WHERE
           included_in_block_hash = blocks.block_hash
       ) AS receipts_agg
@@ -111,7 +111,7 @@ const latest = catchAsync(
           SELECT
             JSON_BUILD_OBJECT('count', COUNT(included_in_block_hash))
           FROM
-            transactions
+            temp_transactions
           WHERE
             included_in_block_hash = blocks.block_hash
         ) AS transactions_agg
@@ -169,7 +169,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
         SELECT
           JSON_BUILD_OBJECT('count', COUNT(included_in_block_hash))
         FROM
-          transactions
+          temp_transactions
         WHERE
           included_in_block_hash = blocks.block_hash
       ) AS transactions_agg,
@@ -177,7 +177,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
         SELECT
           JSON_BUILD_OBJECT('count', COUNT(included_in_block_hash))
         FROM
-          receipts
+          temp_receipts
         WHERE
           included_in_block_hash = blocks.block_hash
       ) AS receipts_agg
