@@ -714,6 +714,7 @@ export type ValidatorFullData = {
     [accountId: string]: ValidatorTelemetry;
   };
   total: string;
+  lastEpochApy: string;
 };
 
 export type ReceiptStatsProps = {

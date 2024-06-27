@@ -70,6 +70,7 @@ export default function ({
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [latestBlock, setLatestBlock] = useState(0);
+
   const errorMessage = 'No validator data!';
 
   const config = getConfig && getConfig(network);
@@ -99,6 +100,7 @@ export default function ({
               elapsedTime: data?.elapsedTimeData ?? 0,
               totalSeconds: data?.totalSeconds ?? 0,
               epochProgress: data?.epochProgressData ?? 0,
+              lastEpochApy: data?.lastEpochApy ?? 0,
               validatorTelemetry: data?.validatorTelemetry ?? [],
               total: data?.total,
             };
@@ -136,6 +138,7 @@ export default function ({
         .catch(() => {})
         .finally(() => {});
     }
+
     function fetchLatestBlock() {
       asyncFetch(`${config?.backendUrl}blocks/latest?limit=1`, {
         method: 'GET',
@@ -154,6 +157,7 @@ export default function ({
         .catch(() => {})
         .finally(() => {});
     }
+
     if (config?.backendUrl) {
       fetchLatestBlock();
       fetchTotalSuppy();
@@ -396,7 +400,29 @@ export default function ({
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-24',
     },
+    {
+      header: <span>APY</span>,
+      key: 'APY',
+      cell: (row: ValidatorEpochData) => {
+        const fee: any = row?.poolInfo?.fee;
+        const lastEpochApy: any = validatorFullData[currentPage]?.lastEpochApy;
 
+        let adjustedApy = 'N/A';
+
+        if (fee !== undefined && lastEpochApy !== undefined) {
+          const calculatedApy =
+            lastEpochApy - lastEpochApy * (fee.numerator / fee.denominator);
+          adjustedApy =
+            calculatedApy === 0 ? '0%' : `${calculatedApy.toFixed(2)}%`;
+        }
+
+        return <div>{adjustedApy}</div>;
+      },
+      tdClassName:
+        'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-24',
+      thClassName:
+        'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-24',
+    },
     {
       header: <span>DELEGATORS</span>,
       key: 'deligators',
@@ -614,7 +640,7 @@ export default function ({
                 </div>
               </td>
               <td
-                colSpan={2}
+                colSpan={3}
                 className="bg-gray-50 dark:bg-black-600 px-4 py-2"
               >
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
@@ -912,7 +938,7 @@ export default function ({
                 </div>
               </td>
               <td
-                colSpan={6}
+                colSpan={7}
                 className="bg-gray-50 dark:bg-black-600 px-4 pt-2 pb-4 align-top"
               >
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
@@ -931,7 +957,7 @@ export default function ({
             </>
           )}
           {!row?.description && (
-            <td colSpan={10} className="bg-gray-50 dark:bg-black-600 px-8">
+            <td colSpan={11} className="bg-gray-50 dark:bg-black-600 px-8">
               <div className="flex justify-center text-sm text-nearblue-600 dark:text-neargray-10 font-medium py-4 ">
                 If you are node owner feel free to fill all&nbsp;
                 <a
@@ -994,50 +1020,52 @@ export default function ({
                   )}
                 </div>
               </div>
-              <div className="flex max-lg:divide-y max-lg:dark:divide-black-200 flex-col lg:flex-row ">
-                <div className="flex items-center justify-between lg:w-1/2 py-4">
-                  <div className="w-full mb-2 lg:mb-0">Current Seat Price</div>
-                  <div className="w-full break-words">
-                    {isLoading ? (
-                      <Skeleton className="h-4 w-16 break-words" />
-                    ) : (
-                      <>
-                        {validatorFullData[currentPage]?.seatPrice &&
-                        convertAmountToReadableString
-                          ? convertAmountToReadableString(
-                              validatorFullData[currentPage]?.seatPrice,
-                              'seatPriceAmount',
-                            ) + ' Ⓝ'
-                          : ''}
-                      </>
-                    )}
-                  </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Current Seat Price
                 </div>
-                <div className="flex items-center justify-between lg:w-1/2 py-4">
-                  <div className="w-full mb-2 lg:mb-0">Total Supply</div>
-                  <div className="w-full break-words">
-                    {isLoading ? (
-                      <Skeleton className="h-4 w-16 break-words" />
-                    ) : (
-                      <>
-                        <OverlayTrigger
-                          placement="top"
-                          delay={{ show: 500, hide: 0 }}
-                          overlay={
-                            <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
-                              {totalSuppy + ' yoctoⓃ'}
-                            </Tooltip>
-                          }
-                        >
-                          <span>
-                            {TotalSupply && formatNumber
-                              ? formatNumber(TotalSupply)
-                              : ''}
-                          </span>
-                        </OverlayTrigger>{' '}
-                      </>
-                    )}
-                  </div>
+                <div className="w-full md:w-3/4 break-words">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  ) : (
+                    <>
+                      {validatorFullData[currentPage]?.seatPrice &&
+                      convertAmountToReadableString
+                        ? convertAmountToReadableString(
+                            validatorFullData[currentPage]?.seatPrice,
+                            'seatPriceAmount',
+                          ) + ' Ⓝ'
+                        : ''}
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Total Supply
+                </div>
+                <div className="w-full md:w-3/4 break-words">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  ) : (
+                    <>
+                      <OverlayTrigger
+                        placement="top"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
+                            {totalSuppy + ' yoctoⓃ'}
+                          </Tooltip>
+                        }
+                      >
+                        <span>
+                          {TotalSupply && formatNumber
+                            ? formatNumber(TotalSupply)
+                            : ''}
+                        </span>
+                      </OverlayTrigger>{' '}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -1055,7 +1083,7 @@ export default function ({
                 </div>
                 <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                   {isLoading ? (
-                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-4 w-32" />
                   ) : validatorFullData[currentPage]?.elapsedTime &&
                     elapsedTime &&
                     convertTimestampToTime ? (
@@ -1071,13 +1099,27 @@ export default function ({
                 </div>
                 <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
                   {isLoading ? (
-                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-4 w-32" />
                   ) : validatorFullData[currentPage]?.totalSeconds &&
                     timeRemaining &&
                     convertTimestampToTime ? (
                     convertTimestampToTime(timeRemaining.toString())
                   ) : (
                     ''
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Last Epoch APY
+                </div>
+                <div className="w-full md:w-3/4 break-words">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  ) : validatorFullData[currentPage]?.lastEpochApy ? (
+                    validatorFullData[currentPage]?.lastEpochApy + '%'
+                  ) : (
+                    '0'
                   )}
                 </div>
               </div>
