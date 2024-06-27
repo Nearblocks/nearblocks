@@ -305,7 +305,6 @@ export default function (props: Props) {
         series: [
           {
             type: 'area',
-            data: chartData,
             color: 'rgba(3, 63, 64, 1)',
           },
         ],
@@ -400,6 +399,9 @@ export default function (props: Props) {
           chartConfig.yAxis.type = 'logarithmic';
           chartConfig.series[0].data = ${JSON.stringify(replaceWithNull)};
           chartConfig.plotOptions.series.connectNulls = ${true};
+        }
+        else{
+         chartConfig.series[0].data = ${JSON.stringify(chartData)};
         }
         chartConfig.tooltip = {
           formatter: function () {
