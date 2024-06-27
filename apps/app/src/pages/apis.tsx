@@ -13,12 +13,14 @@ import Layout from '@/components/Layouts';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+
+const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
+const userDashboardURL = env('NEXT_PUBLIC_USER_DASHBOARD_URL');
 
 const ApiPlan = () => {
   const router = useRouter();
   const { status } = router.query;
-  const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
-  const userDashboardURL = env('NEXT_PUBLIC_USER_DASHBOARD_URL');
   const [interval, setInterval] = useState(true);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
@@ -60,7 +62,7 @@ const ApiPlan = () => {
     }
 
     fetchPlans();
-  }, [userApiURL]);
+  }, []);
 
   const plans = get(data, 'data') || null;
   const scrollToPlans = () => {
@@ -230,104 +232,138 @@ const ApiPlan = () => {
             id="plans"
             className="flex justify-center sm:px-10 2xl:px-20 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6"
           >
-            {plans?.length > 0 &&
-              plans.map((item: any, index: any) => (
-                <div
-                  key={item.id}
-                  className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
-                    index === 2 && 'border-2 border-neargreen-200'
-                  }`}
-                >
-                  {index === 2 && (
-                    <div className="bg-neargreen-200 text-white px-2 text-[10px] rounded-bl-md rounded-t-r-md py-1 float-right -mr-4 -mt-4">
-                      Most used!
-                    </div>
-                  )}
-                  <div className="border-b border-b-gray-200 py-2">
-                    <h3 className="uppercase py-2 text-sm dark:text-neargray-10">
-                      {item.title}
-                    </h3>
-                    <h1 className="py-2 text-4xl">
-                      {!interval ? (
-                        <p className="dark:text-neargray-10">
-                          ${localFormat(String(item.price_monthly / 100))}
-                          {item?.price_monthly !== 0 &&
-                            item.price_annually !== 0 && (
-                              <span className="text-lg">/mo</span>
-                            )}
-                        </p>
-                      ) : (
-                        <p className="dark:text-neargray-10">
-                          {item?.price_monthly === 0 &&
-                          item.price_annually === 0 ? (
-                            <span>$0</span>
-                          ) : (
-                            <>
-                              ${dollarFormat(item.price_annually / 100 / 12)}
-                              <span className="text-lg">/mo</span>
-                            </>
-                          )}
-                        </p>
-                      )}
-                    </h1>
-                    <p className="py-2 text-gray-500 text-xs">
-                      {item?.price_monthly === 0 &&
-                      item.price_annually === 0 ? (
-                        <span>* Attribution required</span>
-                      ) : interval ? (
-                        <>
-                          <span className="text-red-500 through mr-1">
-                            <s>
-                              $
-                              {dollarNonCentFormat(
-                                String((item.price_monthly / 100) * 12),
+            {plans?.length > 0
+              ? plans.map((item: any, index: any) => (
+                  <div
+                    key={item.id}
+                    className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
+                      index === 2 && 'border-2 border-neargreen-200'
+                    }`}
+                  >
+                    {index === 2 && (
+                      <div className="bg-neargreen-200 text-white px-2 text-[10px] rounded-bl-md rounded-t-r-md py-1 float-right -mr-4 -mt-4">
+                        Most used!
+                      </div>
+                    )}
+                    <div className="border-b border-b-gray-200 py-2">
+                      <h3 className="uppercase py-2 text-sm dark:text-neargray-10">
+                        {item.title}
+                      </h3>
+                      <h1 className="py-2 text-4xl">
+                        {!interval ? (
+                          <p className="dark:text-neargray-10">
+                            ${localFormat(String(item.price_monthly / 100))}
+                            {item?.price_monthly !== 0 &&
+                              item.price_annually !== 0 && (
+                                <span className="text-lg">/mo</span>
                               )}
-                            </s>
-                          </span>{' '}
-                          ${dollarFormat(item.price_annually / 100)}/yr
-                        </>
-                      ) : (
-                        <>
-                          Or ${dollarFormat(item.price_annually / 100 / 12)}{' '}
-                          (10% off) when billed yearly
-                        </>
-                      )}
+                          </p>
+                        ) : (
+                          <p className="dark:text-neargray-10">
+                            {item?.price_monthly === 0 &&
+                            item.price_annually === 0 ? (
+                              <span>$0</span>
+                            ) : (
+                              <>
+                                ${dollarFormat(item.price_annually / 100 / 12)}
+                                <span className="text-lg">/mo</span>
+                              </>
+                            )}
+                          </p>
+                        )}
+                      </h1>
+                      <p className="py-2 text-gray-500 text-xs">
+                        {item?.price_monthly === 0 &&
+                        item.price_annually === 0 ? (
+                          <span>* Attribution required</span>
+                        ) : interval ? (
+                          <>
+                            <span className="text-red-500 through mr-1">
+                              <s>
+                                $
+                                {dollarNonCentFormat(
+                                  String((item.price_monthly / 100) * 12),
+                                )}
+                              </s>
+                            </span>{' '}
+                            ${dollarFormat(item.price_annually / 100)}/yr
+                          </>
+                        ) : (
+                          <>
+                            Or ${dollarFormat(item.price_annually / 100 / 12)}{' '}
+                            (10% off) when billed yearly
+                          </>
+                        )}
 
-                      {}
-                    </p>
+                        {}
+                      </p>
+                    </div>
+                    <div className="py-2 font-thin dark:text-neargray-10">
+                      <h3 className="py-2 text-sm">
+                        {item?.id === 1
+                          ? '6'
+                          : localFormat(item?.limit_per_minute)}{' '}
+                        calls/minute limit
+                      </h3>
+                      <h3 className="py-2 text-sm">
+                        Up to{' '}
+                        {item?.id === 1
+                          ? '333'
+                          : localFormat(item?.limit_per_day)}{' '}
+                        API calls a day
+                      </h3>
+                      <h3 className="py-2 text-sm">
+                        Up to{' '}
+                        {item?.id === 1
+                          ? '10,000'
+                          : localFormat(item?.limit_per_month)}{' '}
+                        API calls a month
+                      </h3>
+                      <button
+                        onClick={() => {
+                          onGetStarted(item);
+                        }}
+                        className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Get started now
+                      </button>
+                    </div>
                   </div>
-                  <div className="py-2 font-thin dark:text-neargray-10">
-                    <h3 className="py-2 text-sm">
-                      {item?.id === 1
-                        ? '6'
-                        : localFormat(item?.limit_per_minute)}{' '}
-                      calls/minute limit
-                    </h3>
-                    <h3 className="py-2 text-sm">
-                      Up to{' '}
-                      {item?.id === 1
-                        ? '333'
-                        : localFormat(item?.limit_per_day)}{' '}
-                      API calls a day
-                    </h3>
-                    <h3 className="py-2 text-sm">
-                      Up to{' '}
-                      {item?.id === 1
-                        ? '10,000'
-                        : localFormat(item?.limit_per_month)}{' '}
-                      API calls a month
-                    </h3>
-                    <button
-                      onClick={() => {
-                        onGetStarted(item);
-                      }}
-                      className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Get started now
-                    </button>
+                ))
+              : Array.from({ length: 5 }).map((_, index: number) => (
+                  <div
+                    key={index}
+                    className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
+                      index === 2 && 'border-2 border-neargreen-200'
+                    }`}
+                  >
+                    <div className="border-b border-b-gray-200 py-2">
+                      <h3 className="uppercase py-2 text-sm dark:text-neargray-10 flex justify-center">
+                        <Skeleton className="h-4 w-20" />
+                      </h3>
+                      <h1 className="py-2 text-4xl flex justify-center">
+                        <Skeleton className="h-8 w-40" />
+                      </h1>
+                      <h1 className="py-2 flex justify-center">
+                        <Skeleton className="h-4 w-40" />
+                      </h1>
+                    </div>
+                    <div className="py-2 font-thin dark:text-neargray-10">
+                      <h3 className="py-2 text-sm flex justify-center">
+                        <Skeleton className="h-4 w-36" />
+                      </h3>
+                      <h3 className="py-2 text-sm flex justify-center">
+                        <Skeleton className="h-4 w-40" />
+                      </h3>
+                      <h3 className="py-2 text-sm flex justify-center">
+                        <Skeleton className="h-4 w-44" />
+                      </h3>
+                      <h1 className="py-2 flex justify-center">
+                        <Skeleton className="h-8 w-52 py-4" />
+                      </h1>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
           </div>
           <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
             <div className="flex justify-center">
