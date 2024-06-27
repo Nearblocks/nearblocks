@@ -10,20 +10,20 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
         <div className=" w-full md:w-1/2">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
             <div>
-              <h2 className=" flex justify-between border-b dark:border-black-200 p-3 text-gray-600 text-sm font-semibold">
+              <h2 className=" flex justify-between border-b dark:border-black-200 p-3 text-gray-600 dark:text-neargray-10 text-sm font-semibold">
                 <span>Staking Overview</span>
               </h2>
             </div>
-            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
-              <div className="flex  py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   Current Validators
                 </div>
                 <div className="w-full md:w-3/4 break-words">
                   <Skeleton className="h-4 w-16 break-words" />
                 </div>
               </div>
-              <div className="flex  py-4">
+              <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                   Total Staked
                 </div>
@@ -31,18 +31,20 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                   <Skeleton className="h-4 w-16 break-words" />
                 </div>
               </div>
-              <div className="flex max-md:divide-y  flex-col md:flex-row ">
-                <div className="flex w-full md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Current Seat Price</div>
-                  <div className="w-full break-words">
-                    <Skeleton className="h-4 w-16 break-words" />
-                  </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Current Seat Price
                 </div>
-                <div className="flex w-full md:w-1/2 py-4">
-                  <div className="w-full mb-2 md:mb-0">Total Supply</div>
-                  <div className="w-full break-words">
-                    <Skeleton className="h-4 w-16 break-words" />
-                  </div>
+                <div className="w-full md:w-3/4 break-words">
+                  <Skeleton className="h-4 w-16 break-words" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Total Supply
+                </div>
+                <div className="w-full md:w-3/4 break-words">
+                  <Skeleton className="h-4 w-16 break-words" />
                 </div>
               </div>
             </div>
@@ -50,24 +52,32 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
         </div>
         <div className=" w-full md:w-1/2">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
-            <h2 className="border-b dark:border-black-200 p-3 text-gray-600 text-sm font-semibold">
+            <h2 className="border-b dark:border-black-200 dark:text-neargray-10 p-3 text-gray-600 text-sm font-semibold">
               Epoch Information
             </h2>
-            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                  Epoch Elapsed Time:
+                  Epoch Elapsed Time
                 </div>
                 <div className="w-full text-green-500 md:w-3/4 break-words">
-                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
-                  Next Epoch ETA:
+                  Next Epoch ETA
                 </div>
                 <div className="w-full md:w-3/4 text-green-500 break-words">
-                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                  Last Epoch APY
+                </div>
+                <div className="w-full md:w-3/4 text-green-500 break-words">
+                  <Skeleton className="h-4 w-16" />
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
@@ -92,7 +102,7 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
           </div>
           <div className="overflow-x-auto ">
             <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
-              <thead className="bg-gray-100 dark:bg-black-200 h-[51px]">
+              <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                 <tr>
                   <th
                     scope="col"
