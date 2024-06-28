@@ -27,6 +27,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const to = req.validator.data.to;
   const action = req.validator.data.action;
   const method = req.validator.data.method;
+  const cursor = req.validator.data.cursor;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
@@ -56,6 +57,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
     SELECT
+      receipts.id,
       receipts.receipt_id,
       receipts.predecessor_account_id,
       receipts.receiver_account_id,
@@ -89,6 +91,9 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             OR r.receiver_account_id = ${account}
           )
         `}
+          AND ${cursor
+      ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true}
           AND ${afterTimestamp
       ? sql`t.block_timestamp >= ${afterTimestamp}`
       : true}
@@ -110,15 +115,16 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         `
       : true}
         ORDER BY
-          t.block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-          t.index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          t.id ${order === 'desc' ? sql`DESC` : sql`ASC`},
+          r.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
           ${limit}
         OFFSET
-          ${offset}
+          ${cursor ? 0 : offset}
       ) AS tmp using (receipt_id)
       INNER JOIN LATERAL (
         SELECT
+          id,
           transaction_hash,
           included_in_block_hash,
           block_timestamp,
@@ -202,11 +208,13 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           transactions.transaction_hash = receipts.originated_from_transaction_hash
       ) tr ON TRUE
     ORDER BY
-      tr.block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-      tr.index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+      tr.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
   `;
 
-  return res.status(200).json({ txns });
+  let nextCursor = txns?.[txns?.length - 1]?.id;
+  nextCursor = txns?.length === per_page && nextCursor ? nextCursor : undefined;
+
+  return res.status(200).json({ cursor: nextCursor, txns });
 });
 
 const txnsCount = catchAsync(

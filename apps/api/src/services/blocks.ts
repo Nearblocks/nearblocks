@@ -10,6 +10,7 @@ import { RequestValidator } from '#types/types';
 const EXPIRY = 5; // 5 sec
 
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
+  const cursor = req.validator.data.cursor;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
 
@@ -57,18 +58,24 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           block_height
         FROM
           blocks
+        WHERE
+          ${cursor ? sql`block_height < ${cursor}` : true}
         ORDER BY
           block_height DESC
         LIMIT
           ${limit}
         OFFSET
-          ${offset}
+          ${cursor ? 0 : offset}
       ) AS tmp USING (block_height)
     ORDER BY
       block_height DESC
   `;
 
-  return res.status(200).json({ blocks });
+  let nextCursor = blocks?.[blocks?.length - 1]?.block_height;
+  nextCursor =
+    blocks?.length === per_page && nextCursor ? nextCursor : undefined;
+
+  return res.status(200).json({ blocks, cursor: nextCursor });
 });
 
 const count = catchAsync(async (_req: Request, res: Response) => {
