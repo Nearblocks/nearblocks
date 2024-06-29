@@ -8,7 +8,7 @@ import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import Arrow from '@/components/Icons/Arrow';
 import SwitchButton from '@/components/SwitchButton';
 import { dollarFormat, dollarNonCentFormat, localFormat } from '@/utils/libs';
-import { docsUrl } from '@/utils/config';
+import { docsUrl, userDashboardURL } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,7 +16,6 @@ import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
-const userDashboardURL = env('NEXT_PUBLIC_USER_DASHBOARD_URL');
 
 const ApiPlan = () => {
   const router = useRouter();
@@ -164,17 +163,16 @@ const ApiPlan = () => {
               >
                 API Pricing Plans
               </button>
-              <Link href={userDashboardURL + 'login'} legacyBehavior>
-                <a
-                  className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
-                  target="_blank"
-                  rel="noreferrer nofollow noopener"
-                >
-                  User Dashboard
-                  <span>
-                    <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
-                  </span>
-                </a>
+              <Link
+                href={userDashboardURL}
+                rel="noreferrer nofollow noopener"
+                className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
+                target="_blank"
+              >
+                User Dashboard
+                <span>
+                  <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
+                </span>
               </Link>
               <Link href={docsUrl} legacyBehavior>
                 <a
