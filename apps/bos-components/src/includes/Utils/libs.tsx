@@ -20,6 +20,7 @@ export default function () {
           backendUrl: 'https://api3.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.mainnet.near.org',
           appUrl: 'https://nearblocks.io/',
+          aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
       case 'testnet':
         return {
@@ -27,6 +28,7 @@ export default function () {
           backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.testnet.near.org/',
           appUrl: 'https://testnet.nearblocks.io/',
+          aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
       default:
         return {};
@@ -298,6 +300,24 @@ export default function () {
     return args;
   };
 
+  function jsonParser(jsonString: string) {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.error('Error parsing JSON', e);
+      return null;
+    }
+  }
+
+  function jsonStringify(obj: any) {
+    try {
+      return JSON.stringify(obj);
+    } catch (e) {
+      console.error('Error stringifying JSON', e);
+      return null;
+    }
+  }
+
   return {
     getConfig,
     handleRateLimit,
@@ -318,5 +338,7 @@ export default function () {
     convertTimestampToTime,
     mapFeilds,
     fetchData,
+    jsonParser,
+    jsonStringify,
   };
 }
