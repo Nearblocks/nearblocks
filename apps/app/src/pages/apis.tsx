@@ -103,7 +103,7 @@ const ApiPlan = () => {
   const onGetStarted = async (plan: any) => {
     if (plan) {
       router.push({
-        pathname: `${userDashboardURL}login`,
+        pathname: `${userDashboardURL}`,
         query: {
           id: plan?.id,
           interval: !interval ? 'month' : 'year',
