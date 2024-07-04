@@ -339,7 +339,9 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {gasUsed ? convertToMetricPrefix(gasUsed) + 'gas' : ''}
+                  {typeof gasUsed !== 'string'
+                    ? convertToMetricPrefix(gasUsed) + 'gas'
+                    : ''}
                 </div>
               )}
             </div>
@@ -383,7 +385,7 @@ export default function (props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {gasUsed && block?.gas_price
+                  {typeof gasUsed !== 'string' && block?.gas_price
                     ? gasFee(gasUsed, block?.gas_price) + ' Ⓝ'
                     : ''}
                 </div>
