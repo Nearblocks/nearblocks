@@ -317,6 +317,11 @@ const ApiPlan = () => {
                           : localFormat(item?.limit_per_month)}{' '}
                         API calls a month
                       </h3>
+                      <h3 className="py-2 text-sm">
+                        {item?.id === 1 || item?.id === 2
+                          ? 'Personal Use'
+                          : 'Commercial Use'}
+                      </h3>
                       <button
                         onClick={() => {
                           onGetStarted(item);
@@ -355,6 +360,9 @@ const ApiPlan = () => {
                       </h3>
                       <h3 className="py-2 text-sm flex justify-center">
                         <Skeleton className="h-4 w-44" />
+                      </h3>
+                      <h3 className="py-2 text-sm flex justify-center">
+                        <Skeleton className="h-4 w-40" />
                       </h3>
                       <h1 className="py-2 flex justify-center">
                         <Skeleton className="h-8 w-52 py-4" />

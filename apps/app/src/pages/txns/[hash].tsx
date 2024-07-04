@@ -9,6 +9,7 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { useAuthStore } from '@/stores/auth';
+import SponserdText from '@/components/SponserdText';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -73,9 +74,12 @@ const Txn = () => {
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />
       </Head>
       <div className="md:flex items-center justify-between container mx-auto px-3">
-        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
+        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 pt-5 pb-2 border-b w-full">
           {t ? t('txns:txn.heading') : 'Transaction Details'}
         </h1>
+      </div>
+      <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
+        <SponserdText />
       </div>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent

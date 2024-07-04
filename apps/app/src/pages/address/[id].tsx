@@ -11,10 +11,11 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import { env } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import SponserdText from '@/components/SponserdText';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-
+const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const Address = () => {
   const router = useRouter();
   const { theme } = useTheme();
@@ -102,14 +103,14 @@ const Address = () => {
         <link rel="canonical" href={`${appUrl}/address/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
-        <div className="flex items-center justify-between flex-wrap pt-4 ">
+        <div className="flex items-center justify-between flex-wrap pt-4">
           {!id ? (
             <div className="w-80 max-w-xs px-3 py-5">
               <Skeleton className="h-7" />
             </div>
           ) : (
-            <div className="flex md:flex-wrap">
-              <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10">
+            <div className="flex md:flex-wrap w-full">
+              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10 border-b w-full mb-5">
                 Near Account:&nbsp;
                 {id && (
                   <span className="text-green-500 dark:text-green-250">
@@ -128,6 +129,9 @@ const Address = () => {
               </h1>
             </div>
           )}
+          <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
+            <SponserdText />
+          </div>
         </div>
         <VmComponent
           skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
@@ -146,6 +150,7 @@ const Address = () => {
             theme: theme,
             handleToggle,
             showAllReceipts,
+            userApiUrl,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />

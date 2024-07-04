@@ -25,9 +25,10 @@ interface Props {
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
+  userApiUrl: string;
 }
 
-export default function ({ network, t, id, tid, ownerId }: Props) {
+export default function ({ network, t, id, tid, ownerId, userApiUrl }: Props) {
   const { getConfig, handleRateLimit, shortenAddress, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
@@ -342,6 +343,14 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
             }
           </div>
         </div>
+      </div>
+      <div className="mb-10">
+        {
+          <Widget
+            src={`${ownerId}/widget/includes.Common.Banner`}
+            props={{ type: 'center', userApiUrl: userApiUrl }}
+          />
+        }
       </div>
     </div>
   );
