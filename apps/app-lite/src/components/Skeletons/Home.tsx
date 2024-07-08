@@ -87,7 +87,13 @@ export const HomeStatsSkeleton = () => (
 
 export const HomeSkeleton = () => (
   <div className="relative container mx-auto">
-    <div className="py-[58px] px-6">
+    <div className="flex items-center px-4 py-6 sm:px-6">
+      <Skeleton className="w-full h-16" loading>
+        <></>
+      </Skeleton>
+      <hr className="h-px border-0 border-b border-primary/20" />
+    </div>
+    <div className="py-[58px] px-6 items-center">
       <h1 className="font-heading font-bold text-[40px] lg:text-[48px] tracking-[1px]">
         <Skeleton inline loading>
           Hello, I’m the Near stateless explorer
@@ -99,9 +105,13 @@ export const HomeSkeleton = () => (
         </Skeleton>
       </h2>
     </div>
-    <hr className="h-px border-0 border-b border-primary/20" />
-    <HomeChartSkeleton />
-    <HomeStatsSkeleton />
+    <div className="flex items-center justify-center w-full">
+      <div className="lg:w-1/2 flex items-center justify-center">
+        <Skeleton className="w-full h-16" loading>
+          <></>
+        </Skeleton>
+      </div>
+    </div>
   </div>
 );
 

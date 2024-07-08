@@ -1,3 +1,10 @@
+import {
+  RpcResultAccount,
+  RpcResultBlock,
+  RpcResultReceipt,
+  RpcResultTxn,
+} from 'nb-near';
+
 export type IconProps = {
   className?: string;
 };
@@ -57,4 +64,18 @@ export type PriceResponse = {
 
 export type Price = {
   near_price: string;
+};
+
+export type SearchResult = {
+  account: RpcResultAccount | undefined;
+  block: RpcResultBlock | undefined;
+  query: string | undefined;
+  receipt: RpcResultReceipt | undefined;
+  txn: RpcResultTxn | undefined;
+};
+export type Debounce = {
+  (url: string, value: string): void;
+  cancel(): void;
+  flush(url: string, value: string): void;
+  isPending(): boolean;
 };

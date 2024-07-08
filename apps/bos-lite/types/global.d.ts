@@ -91,3 +91,5 @@ type inferBodyType<
 }[T];
 
 declare const Big;
+declare const styled;
+declare const createGlobalStyle;

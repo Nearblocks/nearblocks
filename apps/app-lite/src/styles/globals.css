@@ -55,7 +55,8 @@
 @tailwind components;
 @tailwind utilities;
 
-.arrow::before, .arrow::after {
+.arrow::before,
+.arrow::after {
   @apply content-[''] absolute bottom-0 w-px h-1 border-l border-border-body;
 }
 

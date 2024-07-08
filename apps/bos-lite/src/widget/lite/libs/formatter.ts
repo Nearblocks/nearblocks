@@ -3,12 +3,23 @@ import type * as big from 'big.js';
 type FormatNumber = (value: string, decimals: number) => string;
 type FormatScale = (value: string, decimals: number) => string;
 type FormatSize = (value: string, decimals: number) => string;
+type YoctoToNear = (value: string) => string;
+type ShortenHash = (value: string) => string;
+type ShortenAddress = (value: string) => string;
+type IsValidAccount = (value: string) => boolean;
 
 export type FormatterModule = {
   formatNumber: FormatNumber;
   formatScale: FormatScale;
   formatSize: FormatSize;
+  isValidAccount: IsValidAccount;
+  shortenAddress: ShortenAddress;
+  shortenHash: ShortenHash;
+  yoctoToNear: YoctoToNear;
 };
+const YOCTO_PER_NEAR = Big(10).pow(24);
+const ACCOUNT_ID_REGEX =
+  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
 const formatter = (): FormatterModule => {
   const formatNumber: FormatNumber = (value, decimals) => {
@@ -60,8 +71,34 @@ const formatter = (): FormatterModule => {
 
     return `${formatted} ${sizes[i]}`;
   };
+  const yoctoToNear: YoctoToNear = (yocto) =>
+    Big(yocto).div(YOCTO_PER_NEAR).toString();
+  const shortenHash: ShortenHash = (hash) =>
+    `${hash && hash.slice(0, 6)}...${hash.slice(-4)}`;
+  const shortenAddress: ShortenAddress = (address) => {
+    const string = String(address);
 
-  return { formatNumber, formatScale, formatSize };
+    if (string.length <= 20) return string;
+
+    return `${string.slice(0, 10)}...${string.slice(-7)}`;
+  };
+  const isValidAccount: IsValidAccount = (accountId) => {
+    return (
+      accountId.length >= 2 &&
+      accountId.length <= 64 &&
+      ACCOUNT_ID_REGEX.test(accountId)
+    );
+  };
+
+  return {
+    formatNumber,
+    formatScale,
+    formatSize,
+    isValidAccount,
+    shortenAddress,
+    shortenHash,
+    yoctoToNear,
+  };
 };
 
 export default formatter;

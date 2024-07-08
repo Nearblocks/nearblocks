@@ -3,7 +3,19 @@ import type { FormatterModule } from '@/libs/formatter';
 import type { Charts, ChartSeries, ChartsResponse } from '@/types/types';
 
 let HomeChartSkeleton = window?.HomeChartSkeleton || (() => <></>);
+const Container = styled.div`
+  
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
 
+    iframe {
+      width: 100%;
+      overflow: hidden
+      border-style: none;
+    }
+  `;
 const Chart = () => {
   let { apiFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
@@ -123,13 +135,9 @@ const Chart = () => {
   }, [charts]);
 
   return (
-    <div className="flex flex-col pt-4 pb-6">
-      <iframe
-        className="w-full overflow-hidden border-none"
-        srcDoc={srcDoc}
-        style={{ height: 280 }}
-      />
-    </div>
+    <Container>
+      <iframe srcDoc={srcDoc} style={{ height: 280 }} />
+    </Container>
   );
 };
 
