@@ -34,7 +34,7 @@ export default function ({ network, t, ownerId }: Props) {
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
-    let delay = 5000;
+    let delay = 60000;
 
     function fetchLatestBlocks() {
       asyncFetch(`${config?.backendUrl}blocks/latest`)
