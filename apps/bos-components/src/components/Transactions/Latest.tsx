@@ -38,7 +38,7 @@ export default function ({ t, network, ownerId }: Props) {
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
-    let delay = 5000;
+    let delay = 60000;
 
     function fetchLatestTxns() {
       asyncFetch(`${config.backendUrl}txns/latest`)

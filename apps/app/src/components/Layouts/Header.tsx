@@ -214,7 +214,7 @@ const Header = () => {
     }
 
     fetchBlocks();
-    const interval = setInterval(fetchBlocks, 5000);
+    const interval = setInterval(fetchBlocks, 60000);
     return () => clearInterval(interval);
   }, []);
 
