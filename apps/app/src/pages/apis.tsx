@@ -8,7 +8,7 @@ import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import Arrow from '@/components/Icons/Arrow';
 import SwitchButton from '@/components/SwitchButton';
 import { dollarFormat, dollarNonCentFormat, localFormat } from '@/utils/libs';
-import { docsUrl, userDashboardURL } from '@/utils/config';
+import { docsUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -103,7 +103,7 @@ const ApiPlan = () => {
   const onGetStarted = async (plan: any) => {
     if (plan) {
       router.push({
-        pathname: `${userDashboardURL}`,
+        pathname: `https://dash.nearblocks.io/login`,
         query: {
           id: plan?.id,
           interval: !interval ? 'month' : 'year',
@@ -164,7 +164,7 @@ const ApiPlan = () => {
                 API Pricing Plans
               </button>
               <Link
-                href={userDashboardURL}
+                href="https://dash.nearblocks.io/login"
                 rel="noreferrer nofollow noopener"
                 className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
                 target="_blank"
