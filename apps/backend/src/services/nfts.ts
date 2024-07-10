@@ -67,7 +67,7 @@ const updateContract = async (contract: string) => {
   try {
     const meta = await nftMeta(contract);
 
-    if (meta?.name && meta?.symbol) {
+    if (meta?.name) {
       return knex('nft_meta')
         .insert({
           base_uri: meta.base_uri || null,
@@ -77,7 +77,7 @@ const updateContract = async (contract: string) => {
           reference: meta.reference || null,
           reference_hash: meta.reference_hash || null,
           spec: meta.spec || null,
-          symbol: meta.symbol,
+          symbol: meta.symbol ?? '',
         })
         .onConflict('contract')
         .ignore();
