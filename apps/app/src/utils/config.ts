@@ -31,6 +31,3 @@ export const docsUrl: string =
   networkId === 'mainnet'
     ? 'https://api3.nearblocks.io/api-docs'
     : 'https://api3-testnet.nearblocks.io/api-docs';
-
-export const userDashboardURL: string =
-  env('NEXT_PUBLIC_USER_DASHBOARD_URL') + 'login';
