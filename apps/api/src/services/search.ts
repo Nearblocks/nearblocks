@@ -41,7 +41,7 @@ const accountQuery = (keyword: string) => {
     FROM
       accounts
     WHERE
-      account_id = ${keyword}
+      account_id = ${keyword.toLocaleLowerCase()}
     LIMIT
       1
   `;
