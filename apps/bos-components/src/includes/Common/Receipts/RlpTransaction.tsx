@@ -1,10 +1,31 @@
 interface Props {
   ownerId: string;
   pretty: string;
+  method: string;
+  receiver: string;
+  network: string;
 }
-export default function ({ pretty }: Props) {
-  const decoded = pretty && Buffer.from(pretty, 'base64');
-  const parsed = decoded && JSON.parse(decoded.toString());
+export default function ({
+  ownerId,
+  pretty,
+  method,
+  receiver,
+  network,
+}: Props) {
+  const { getConfig } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+  const { jsonParser } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+  const { jsonStringify } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
+
+  const config = getConfig && getConfig(network);
+
+  const decoded =
+    method === 'submit' && receiver.includes('aurora')
+      ? pretty
+      : pretty && Buffer.from(pretty, 'base64');
+  const parsed =
+    method === 'submit' && receiver.includes('aurora')
+      ? decoded
+      : decoded && jsonParser(decoded.toString());
 
   const [format, setFormat] = useState('rlp');
 
@@ -26,7 +47,7 @@ export default function ({ pretty }: Props) {
   }
 
   const [displayedArgs, setDisplayedArgs] = useState(
-    parsed && JSON.stringify(decodeTransaction(parsed), null, 2),
+    parsed && jsonStringify(decodeTransaction(parsed), null, 2),
   );
 
   const handleFormatChange = (event: any) => {
@@ -36,14 +57,14 @@ export default function ({ pretty }: Props) {
     switch (selectedFormat) {
       case 'rlp':
         const data = decodeTransaction(parsed);
-        transformedArgs = data && JSON.stringify(data, null, 2);
+        transformedArgs = data && jsonStringify(data, null, 2);
         break;
       case 'table':
         const tableData = decodeTransaction(parsed);
         transformedArgs = tableData && tableData?.tx_bytes_b64;
         break;
       default:
-        transformedArgs = parsed && JSON.stringify(parsed, null, 2);
+        transformedArgs = parsed && jsonStringify(parsed, null, 2);
     }
     setDisplayedArgs(transformedArgs);
   };
@@ -59,7 +80,7 @@ export default function ({ pretty }: Props) {
             <table className="table-auto w-full border-collapse">
               <thead>
                 <tr>
-                  <th className="border px-4 py-2">Name</th>
+                  <th className="border px-4 py-2 whitespace-nowrap">Name</th>
                   <th className="border px-4 py-2">Data</th>
                 </tr>
               </thead>
@@ -67,21 +88,67 @@ export default function ({ pretty }: Props) {
                 {displayedArgs &&
                   Object.entries(displayedArgs).map(([key, value]) => (
                     <tr key={key}>
-                      <td className="border px-4 py-2">{key}</td>
+                      <td className="border px-4 py-2 whitespace-nowrap align-top">
+                        {key}
+                      </td>
                       <td className="border px-4 py-2">
-                        {JSON.stringify(value)}
+                        {key === 'hash' ? (
+                          <a
+                            href={`${config?.aurorablocksUrl}/tx/${value}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-500 dark:text-green-250 hover:no-underline"
+                          >
+                            {String(value)}
+                          </a>
+                        ) : (
+                          <>{String(value)}</>
+                        )}
                       </td>
                     </tr>
                   ))}
               </tbody>
             </table>
           </div>
+        ) : method === 'submit' &&
+          receiver.includes('aurora') &&
+          format === 'rlp' ? (
+          <div
+            className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3"
+            style={{ height: '150px' }}
+          >
+            {displayedArgs &&
+              Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
+                ([key, value]) => (
+                  <p key={key} className="mb-2">
+                    {key}:{' '}
+                    {key === 'hash' ? (
+                      <a
+                        href={`${config?.aurorablocksUrl}/tx/${value}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green-500 dark:text-green-250 hover:no-underline"
+                      >
+                        {String(value)}
+                      </a>
+                    ) : (
+                      <>{String(value)}</>
+                    )}
+                  </p>
+                ),
+              )}
+          </div>
         ) : (
           <textarea
             readOnly
             rows={4}
-            value={displayedArgs}
+            value={
+              method === 'submit' && receiver.includes('aurora')
+                ? jsonParser(displayedArgs).tx_bytes_b64
+                : displayedArgs
+            }
             className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+            style={{ height: '150px' }}
           ></textarea>
         )}
         <select

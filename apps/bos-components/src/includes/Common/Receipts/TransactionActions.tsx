@@ -14,7 +14,7 @@ import Stake from '@/includes/Common/Receipts/Action/Stake';
 import Transfer from '@/includes/Common/Receipts/Action/Transfer';
 
 const TransactionActions = (props: TransActionProps) => {
-  const { action, receiver, t, ownerId } = props;
+  const { action, receiver, t, ownerId, network } = props;
   const { mapRpcActionToAction } = VM.require(
     `${ownerId}/widget/includes.Utils.near`,
   );
@@ -78,6 +78,7 @@ const TransactionActions = (props: TransActionProps) => {
           receiver={receiver}
           t={t}
           ownerId={ownerId}
+          network={network}
         />
       );
     case 'STAKE':
