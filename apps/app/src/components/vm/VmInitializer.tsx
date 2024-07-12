@@ -53,11 +53,33 @@ export default function VmInitializer() {
   const accountId = account.accountId;
   const setAuthStore = useAuthStore((state) => state.set);
   const setVmStore = useVmStore((store) => store.set);
-  // const { requestAuthentication, saveCurrentUrl } = useSignInRedirect();
+  const TestNearConfig = {
+    networkId: 'testnet',
+    nodeUrl: 'https://rpc.testnet.pagoda.co',
+    archivalNodeUrl: 'https://archival-rpc.testnet.pagoda.co/',
+    contractName: 'v1.social08.testnet',
+    walletUrl: 'https://wallet.testnet.near.org',
+    wrapNearAccountId: 'wrap.testnet',
+    apiUrl: 'https://discovery-api.stage.testnet.near.org',
+    enableWeb4FastRpc: false,
+  };
+  const MainNearConfig = {
+    networkId: 'mainnet',
+    nodeUrl: 'https://rpc.mainnet.pagoda.co',
+    archivalNodeUrl: 'https://archival-rpc.mainnet.pagoda.co/',
+    contractName: 'social.near',
+    walletUrl: 'https://wallet.near.org',
+    wrapNearAccountId: 'wrap.near',
+    apiUrl: 'https://api.near.social',
+    enableWeb4FastRpc: false,
+  };
+  const customRpcEndpoint =
+    networkId === 'mainnet' ? MainNearConfig : TestNearConfig;
   useEffect(() => {
     initNear &&
       initNear({
         networkId: bosNetworkId,
+        config: customRpcEndpoint,
         walletConnectCallback: () => {},
         selector: setupWalletSelector({
           network: networkId,
@@ -86,6 +108,7 @@ export default function VmInitializer() {
           ),
         },
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initNear]);
 
   useEffect(() => {
