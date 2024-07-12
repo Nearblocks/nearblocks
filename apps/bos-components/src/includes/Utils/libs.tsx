@@ -16,17 +16,17 @@ export default function () {
     switch (network) {
       case 'mainnet':
         return {
-          nodeUrl: 'https://rpc.mainnet.near.org',
+          nodeUrl: 'https://rpc.mainnet.pagoda.co',
           backendUrl: 'https://api3.nearblocks.io/v1/',
-          rpcUrl: 'https://beta.rpc.mainnet.near.org',
+          rpcUrl: 'https://archival-rpc.mainnet.pagoda.co/',
           appUrl: 'https://nearblocks.io/',
           aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
       case 'testnet':
         return {
-          nodeUrl: 'https://rpc.testnet.near.org',
+          nodeUrl: 'https://rpc.testnet.pagoda.co',
           backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
-          rpcUrl: 'https://beta.rpc.testnet.near.org/',
+          rpcUrl: 'https://archival-rpc.testnet.pagoda.co/',
           appUrl: 'https://testnet.nearblocks.io/',
           aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
