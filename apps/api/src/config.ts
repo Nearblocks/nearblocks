@@ -9,6 +9,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -19,6 +20,7 @@ const env = cleanEnv(process.env, {
   REDIS_URL: url({ default: '' }),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
+  TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
   USER_DB_URL: str(),
 });
 
@@ -27,6 +29,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
+  mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryRows: 5000,
   network: env.NETWORK,
@@ -38,6 +41,7 @@ const config: Config = {
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
+  testnetUrl: env.TESTNET_URL,
   userDbUrl: env.USER_DB_URL,
 };
 
