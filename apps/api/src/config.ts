@@ -9,7 +9,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  MAINNET_URL: str(),
+  MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -20,7 +20,7 @@ const env = cleanEnv(process.env, {
   REDIS_URL: url({ default: '' }),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
-  TESTNET_URL: str(),
+  TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
   USER_DB_URL: str(),
 });
 
