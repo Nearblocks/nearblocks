@@ -7,7 +7,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
     `${props.ownerId}/widget/includes.Utils.libs`,
   );
 
-  const { t, args, receiver } = props;
+  const { t, args, receiver, network } = props;
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
@@ -28,6 +28,10 @@ const FunctionCall = (props: TransactionActionInfo) => {
     return pretty;
   }
 
+  const modifiedData =
+    args?.method_name === 'submit' && receiver.includes('aurora')
+      ? { tx_bytes_b64: args.args_base64 || args.args }
+      : args.args_base64 || args.args;
   return (
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
@@ -39,12 +43,16 @@ const FunctionCall = (props: TransactionActionInfo) => {
           {shortenAddress(receiver)}
         </a>
       </a>
-      {args?.method_name === 'rlp_execute' ? (
+      {args?.method_name === 'rlp_execute' ||
+      (args?.method_name === 'submit' && receiver.includes('aurora')) ? (
         <Widget
           src={`${props.ownerId}/widget/includes.Common.Receipts.RlpTransaction`}
           props={{
             ownerId: props.ownerId,
-            pretty: args.args_base64 || args.args,
+            pretty: modifiedData,
+            method: args?.method_name,
+            receiver,
+            network,
           }}
         />
       ) : (

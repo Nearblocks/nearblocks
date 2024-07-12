@@ -325,6 +325,7 @@ export default function (props: Props) {
                     receiver={receipt?.receiver_id}
                     t={t}
                     ownerId={ownerId}
+                    network={network}
                   />
                 ))}
             </div>
