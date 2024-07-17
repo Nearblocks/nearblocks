@@ -28,7 +28,7 @@ interface Props {
 
 export default function ({ network, id, tokenFilter, ownerId }: Props) {
   const { dollarFormat, localFormat } = VM.require(
-    `${ownerId}/widget/includes.Utils.format`,
+    `${ownerId}/widget/includes.Utils.formats`,
   );
 
   const { getConfig, handleRateLimit } = VM.require(

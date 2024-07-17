@@ -120,7 +120,13 @@ export default function (props: Props) {
 
       const args = mapFeilds(fields) ?? {};
       const res: { transaction_outcome: { id: string } } | null | any =
-        Near.call(id, toSnakeCase(method?.name), args);
+        Near.call(
+          id,
+          toSnakeCase(method?.name),
+          args,
+          options?.gas,
+          options?.attachedDeposit,
+        );
       setError(null);
       setTxn(res?.transaction_outcome?.id);
       setResult(JSON.stringify(res, null, 2));

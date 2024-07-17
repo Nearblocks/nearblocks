@@ -147,7 +147,13 @@ export default function (props: Props) {
 
       const args = mapFeilds(fields) ?? {};
       const res: { transaction_outcome: { id: string } } | null | any =
-        Near.call(id, toSnakeCase(method), args);
+        Near.call(
+          id,
+          toSnakeCase(method),
+          args,
+          options?.gas,
+          options?.attachedDeposit,
+        );
       setError(null);
       setTxn(res?.transaction_outcome?.id);
       setResult(JSON.stringify(res, null, 2));
@@ -223,6 +229,7 @@ export default function (props: Props) {
           },
         )
         .catch(() => {});
+      setLoading(false);
     } catch (error) {
       console.log({ error });
     }
