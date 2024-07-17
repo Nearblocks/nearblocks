@@ -346,7 +346,7 @@ export default function ({
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
                 <Link
-                  href={`/address/${row.accountId}`}
+                  href={`/node-explorer/${row.accountId}`}
                   className="hover:no-underline"
                 >
                   <a className="text-green-500 dark:text-green-250 hover:no-underline">

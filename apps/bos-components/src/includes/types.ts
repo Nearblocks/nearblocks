@@ -719,6 +719,24 @@ export type ValidatorFullData = {
   lastEpochApy: string;
 };
 
+export type DelegatorInfo = {
+  account_id: string;
+  can_withdraw: boolean;
+  staked_balance: string;
+  unstaked_balance: string;
+};
+
+export type ValidatorStatus = {
+  currentEpoch: boolean;
+  nextEpoch: boolean;
+  afterNextEpoch: boolean;
+};
+
+export type RewardFraction = {
+  denominator: number;
+  numerator: number;
+};
+
 export type ReceiptStatsProps = {
   receipt: {
     outcome: {

@@ -2,6 +2,7 @@ import type { NetworkId } from '@/utils/types';
 import { env } from 'next-runtime-env';
 type NetworkComponents = {
   nodeExplorer: string;
+  delegators: string;
   sponsoredText: string;
   account: string;
   blocksList: string;
@@ -28,6 +29,7 @@ const accountId = env('NEXT_PUBLIC_ACCOUNT_ID');
 
 const ComponentUrl = {
   nodeExplorer: `${accountId}/widget/bos-components.components.NodeExplorer`,
+  delegators: `${accountId}/widget/bos-components.components.Delegators`,
   sponsoredText: `${accountId}/widget/bos-components.components.Shared.SponsoredText`,
   account: `${accountId}/widget/bos-components.components.Accounts`,
   blocksList: `${accountId}/widget/bos-components.components.Blocks.List`,
