@@ -11,7 +11,7 @@ const ExplorerSelector = () => {
   const router = useRouter();
 
   return (
-    <div className="p-2">
+    <div>
       <VmComponent
         src={components?.home}
         props={{ path: router?.asPath, network: network }}
