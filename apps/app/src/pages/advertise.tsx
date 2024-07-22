@@ -91,23 +91,31 @@ const AdvertisePage = () => {
         </div>
         <div className="w-[90%] flex flex-col lg:flex-row text-center lg:border mt-4 lg:!mt-16 py-4 text-neargray-600 dark:text-neargray-10">
           <div className="w-full flex flex-row">
-            <div className="w-full lg:w-1/2 p-4">
-              <div className="text-2xl font-semibold">#1</div>
-              <span className="text-sm">NEAR Block Explorer</span>
+            <div className="w-full lg:w-1/2 p-4 flex flex-col items-center">
+              <div className="flex flex-col sm:items-end w-fit justify-center">
+                <div className="text-2xl font-semibold px-1">#1</div>
+                <span className="text-sm pt-1">NEAR Block Explorer</span>
+              </div>
             </div>
-            <div className="w-full lg:w-1/2 p-4 border-l">
-              <div className="text-2xl font-semibold">3M</div>
-              <span className="text-sm">Page Views Per Month</span>
+            <div className="w-full lg:w-1/2 p-4 border-l flex flex-col items-center">
+              <div className="flex flex-col sm:items-end w-fit justify-center">
+                <div className="text-2xl font-semibold px-1">3M</div>
+                <span className="text-sm pt-1">Page Views Per Month</span>
+              </div>
             </div>
           </div>
           <div className="w-full flex flex-row">
-            <div className="w-full lg:w-1/2 p-4 border-t-[1px] lg:border-l lg:border-t-0">
-              <div className="text-2xl font-semibold">900K</div>
-              <span className="text-sm">Unique Visitors per Month</span>
+            <div className="w-full lg:w-1/2 p-4 border-t-[1px] lg:border-l lg:border-t-0 flex flex-col items-center">
+              <div className="flex flex-col sm:items-end w-fit justify-center">
+                <div className="text-2xl font-semibold px-1">900K</div>
+                <span className="text-sm pt-1">Unique Visitors per Month</span>
+              </div>
             </div>
-            <div className="w-full lg:w-1/2 p-4 border-t-[1px] lg:border-t-0 border-l">
-              <div className="text-2xl font-semibold">150K</div>
-              <span className="text-sm">Registered Users</span>
+            <div className="w-full lg:w-1/2 p-4 border-t-[1px] lg:border-t-0 border-l flex flex-col items-center">
+              <div className="flex flex-col sm:items-end w-fit justify-center">
+                <div className="text-2xl font-semibold px-1">150K</div>
+                <span className="text-sm pt-1">Registered Users</span>
+              </div>
             </div>
           </div>
         </div>
