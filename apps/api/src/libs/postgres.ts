@@ -17,7 +17,6 @@ if (config.dbCa) {
 const sql = postgres(config.dbUrl, {
   connection: {
     application_name: 'api',
-    statement_timeout: 60 * 1000, // 60s
   },
   max: 60,
   ssl: ssl?.ca ? ssl : false,
@@ -26,7 +25,6 @@ const sql = postgres(config.dbUrl, {
 export const userSql = postgres(config.userDbUrl, {
   connection: {
     application_name: 'user-api',
-    statement_timeout: 60 * 1000, // 60s
   },
   max: 60,
   ssl: ssl?.ca ? ssl : false,
