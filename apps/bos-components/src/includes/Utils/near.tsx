@@ -105,12 +105,12 @@ export default function () {
   }
 
   function tokenPercentage(supply: string, amount: string, decimal: string) {
+    // @ts-ignore
     const nearAmount = Big(amount).div(Big(10).pow(decimal));
     const nearSupply = Big(supply);
-
-    return nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
+    let percentage = nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
+    return Big(percentage).gt(100) ? '100.00' : percentage;
   }
-
   function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
     let txLogs: TransactionLog[] = [];
 
