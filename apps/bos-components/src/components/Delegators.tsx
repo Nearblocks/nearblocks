@@ -377,12 +377,14 @@ export default function ({
   };
 
   useEffect(() => {
-    fetchContactInfo(accountId);
-    fetchRewardRatio(accountId);
-    fetchDelegatorsCount(accountId);
-    fetchValidators(accountId);
+    if (config?.rpcUrl) {
+      fetchContactInfo(accountId);
+      fetchRewardRatio(accountId);
+      fetchDelegatorsCount(accountId);
+      fetchValidators(accountId);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, currentPage]);
+  }, [config?.rpcUrl, accountId, currentPage]);
 
   const columns = [
     {
@@ -752,7 +754,8 @@ export default function ({
               </div>
             ) : (
               count &&
-              count !== 0 && (
+              typeof count === 'number' &&
+              count > 0 && (
                 <>
                   <div className="flex flex-col">
                     <div className="leading-7">
