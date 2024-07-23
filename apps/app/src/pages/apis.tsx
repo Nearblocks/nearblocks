@@ -221,7 +221,7 @@ const ApiPlan = () => {
               >
                 Annually{' '}
                 <span className="text-green-400 dark:text-green-250">
-                  (Save 10%)
+                  (Save 15%)
                 </span>
               </p>
             </div>
@@ -299,7 +299,7 @@ const ApiPlan = () => {
                             {dollarFormat(
                               (item.price_annually / 100 / 12).toString(),
                             )}{' '}
-                            (10% off) when billed yearly
+                            (15% off) when billed yearly
                           </>
                         )}
 
