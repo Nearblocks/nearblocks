@@ -68,7 +68,9 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
     <form
       autoCapitalize="none"
       autoComplete="off"
-      className={`relative flex-grow px-5 ${className}`}
+      className={`relative flex-grow px-5 ${
+        results.query ? 'rounded-t-lg' : 'rounded-lg'
+      } ${className}`}
       onSubmit={onSubmit}
     >
       <label className="peer flex items-center flex-grow">

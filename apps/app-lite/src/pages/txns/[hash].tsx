@@ -41,6 +41,6 @@ const Txn: PageLayout = () => {
   );
 };
 
-Txn.getLayout = MainLayout;
+Txn.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
 export default Txn;

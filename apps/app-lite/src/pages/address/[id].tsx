@@ -41,6 +41,6 @@ const Address: PageLayout = () => {
   );
 };
 
-Address.getLayout = MainLayout;
+Address.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
 export default Address;
