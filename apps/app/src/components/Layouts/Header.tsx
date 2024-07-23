@@ -22,8 +22,9 @@ import { env } from 'next-runtime-env';
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const networkUrl =
   network === 'mainnet'
-    ? env('NEXT_PUBLIC_TESTNET_URL')
-    : env('NEXT_PUBLIC_MAINNET_URL');
+    ? 'https://testnet.nearblocks.io'
+    : 'https://nearblocks.io';
+
 const menus = [
   {
     id: 1,
@@ -641,7 +642,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
-                            href={env('NEXT_PUBLIC_MAINNET_URL')}
+                            href="https://nearblocks.io"
                           >
                             Mainnet
                           </a>
@@ -649,7 +650,7 @@ const Header = () => {
                         <li>
                           <a
                             className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
-                            href={env('NEXT_PUBLIC_TESTNET_URL')}
+                            href="https://testnet.nearblocks.io"
                           >
                             Testnet
                           </a>
@@ -680,7 +681,7 @@ const Header = () => {
                                 ? 'text-green-500 dark:text-green-250'
                                 : 'text-gray-500 dark:text-neargray-10'
                             }`}
-                            href={env('NEXT_PUBLIC_MAINNET_URL')}
+                            href="https://nearblocks.io"
                           >
                             Mainnet
                           </a>
@@ -692,7 +693,7 @@ const Header = () => {
                                 ? 'text-green-500 dark:text-green-250'
                                 : 'text-gray-500 dark:text-neargray-10'
                             }`}
-                            href={env('NEXT_PUBLIC_TESTNET_URL')}
+                            href="https://testnet.nearblocks.io"
                           >
                             Testnet
                           </a>
