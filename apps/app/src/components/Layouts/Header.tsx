@@ -300,7 +300,7 @@ const Header = () => {
                                 ? dollarFormat(stats?.near_price)
                                 : stats?.near_price ?? ''}
                             </p>
-                            {stats?.change_24 > 0 ? (
+                            {Number(stats?.change_24) > 0 ? (
                               <>
                                 <span className="text-neargreen text-xs">
                                   (+

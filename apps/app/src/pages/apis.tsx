@@ -263,7 +263,10 @@ const ApiPlan = () => {
                               <span>$0</span>
                             ) : (
                               <>
-                                ${dollarFormat(item.price_annually / 100 / 12)}
+                                $
+                                {dollarFormat(
+                                  (item.price_annually / 100 / 12).toString(),
+                                )}
                                 <span className="text-lg">/mo</span>
                               </>
                             )}
@@ -284,11 +287,18 @@ const ApiPlan = () => {
                                 )}
                               </s>
                             </span>{' '}
-                            ${dollarFormat(item.price_annually / 100)}/yr
+                            $
+                            {dollarFormat(
+                              (item.price_annually / 100).toString(),
+                            )}
+                            /yr
                           </>
                         ) : (
                           <>
-                            Or ${dollarFormat(item.price_annually / 100 / 12)}{' '}
+                            Or $
+                            {dollarFormat(
+                              (item.price_annually / 100 / 12).toString(),
+                            )}{' '}
                             (10% off) when billed yearly
                           </>
                         )}
