@@ -22,8 +22,9 @@ const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const networkUrl =
   network === 'mainnet'
-    ? env('NEXT_PUBLIC_TESTNET_URL')
-    : env('NEXT_PUBLIC_MAINNET_URL');
+    ? 'https://testnet.nearblocks.io'
+    : 'https://nearblocks.io';
+
 const HomePage = () => {
   const components = useBosComponents();
   const router = useRouter();
