@@ -15,7 +15,11 @@ import Settings from '../Icons/Settings';
 import { NetworkMenu, RpcMenu } from './Menu';
 import Search from './Search';
 
-const Navbar = () => {
+type NavbarProps = {
+  hideSearch?: boolean;
+};
+
+const Navbar = ({ hideSearch }: NavbarProps) => {
   const theme = useThemeStore((store) => store.theme);
   const [showMenu, setMenu] = useState(false);
   const [showSearch, setSearch] = useState(false);
@@ -29,17 +33,23 @@ const Navbar = () => {
   const toggleSearch = () => setSearch((show) => !show);
 
   return (
-    <div className="container mx-auto bg-bg-box font-sans font-light text-text-box relative z-20 shadow lg:rounded-xl">
+    <div
+      className={`container mx-auto font-sans font-light text-text-box relative z-20 ${
+        !hideSearch && 'bg-bg-box shadow lg:rounded-xl'
+      }`}
+    >
       <div className="flex items-center px-4 py-6 sm:px-6">
         <div className="sm:mr-10">
           <Link href="/">
             <Logo className="h-9" />
           </Link>
         </div>
-        <Search
-          className="hidden md:flex border-x border-border-body"
-          dropdownClassName="mt-[26px] rounded-b-lg"
-        />
+        {!hideSearch && (
+          <div className="border-x w-full hidden md:flex border-border-body">
+            <Search dropdownClassName="mt-[26px] rounded-b-lg" />
+          </div>
+        )}
+
         <div className="h-10 flex items-center ml-auto sm:pl-5">
           <Menu className="flex space-x-2">
             <MenuItem
@@ -70,11 +80,13 @@ const Navbar = () => {
                 </>
               }
             />
-            <MenuItem
-              className="inline-flex md:hidden"
-              onClick={toggleSearch}
-              trigger={<SearchIcon className="h-5" />}
-            />
+            {!hideSearch && (
+              <MenuItem
+                className="inline-flex md:hidden"
+                onClick={toggleSearch}
+                trigger={<SearchIcon className="h-5" />}
+              />
+            )}
             <MenuItem
               onClick={toggleTheme}
               trigger={
@@ -93,7 +105,7 @@ const Navbar = () => {
           </Menu>
         </div>
       </div>
-      {showSearch && (
+      {showSearch && !hideSearch && (
         <div className="absolute right-0 left-0 z-20 bg-bg-box md:hidden border-b border-border-body shadow-sm">
           <Search className="py-4 border-t border-border-body" />
         </div>

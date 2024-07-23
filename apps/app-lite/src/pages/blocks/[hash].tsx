@@ -41,6 +41,6 @@ const Block: PageLayout = () => {
   );
 };
 
-Block.getLayout = MainLayout;
+Block.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
 export default Block;
