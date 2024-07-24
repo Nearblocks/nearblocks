@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { Menu, MenuDropdown, MenuItem } from '@/components/Menu';
+import { useCustomRpcStore } from '@/stores/customRpc';
+import { useRpcStore } from '@/stores/rpc';
 import { useThemeStore } from '@/stores/theme';
 
 import CaretDown from '../Icons/CaretDown';
@@ -12,7 +14,7 @@ import Network from '../Icons/Network';
 import Rpc from '../Icons/Rpc';
 import SearchIcon from '../Icons/Search';
 import Settings from '../Icons/Settings';
-import { NetworkMenu, RpcMenu } from './Menu';
+import { NetworkMenu, RpcMenu, RpcModal } from './Menu';
 import Search from './Search';
 
 type NavbarProps = {
@@ -23,6 +25,11 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
   const theme = useThemeStore((store) => store.theme);
   const [showMenu, setMenu] = useState(false);
   const [showSearch, setSearch] = useState(false);
+  const [showModal, setshowModal] = useState(false);
+  const [newRpcName, setNewRpcName] = useState('');
+  const [newRpcUrl, setNewRpcUrl] = useState('');
+  const { addRpc } = useCustomRpcStore();
+  const setRpc = useRpcStore((state) => state.setRpc);
 
   const toggleTheme = () => {
     localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
@@ -31,6 +38,17 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
   };
   const toggleMenu = () => setMenu((show) => !show);
   const toggleSearch = () => setSearch((show) => !show);
+
+  const handleAddRpc = () => {
+    if (newRpcName && newRpcUrl) {
+      const newProvider = { name: newRpcName, url: newRpcUrl };
+      addRpc(newProvider);
+      setRpc(newRpcUrl);
+      setNewRpcName('');
+      setNewRpcUrl('');
+      setshowModal(false);
+    }
+  };
 
   return (
     <div
@@ -70,7 +88,7 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
               className="hidden md:inline-flex"
               dropdown={
                 <MenuDropdown className="bg-bg-box rounded-b-lg shadow mt-[26px] min-w-28">
-                  <RpcMenu />
+                  <RpcMenu setshowModal={setshowModal} />
                 </MenuDropdown>
               }
               trigger={
@@ -115,11 +133,20 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
           <div className="container mx-auto">
             <ul className="whitespace-nowrap text-sm pb-4 space-y-4">
               <NetworkMenu />
-              <RpcMenu />
+              <RpcMenu setshowModal={setshowModal} />
             </ul>
           </div>
         </div>
       )}
+      <RpcModal
+        isOpen={showModal}
+        onAdd={handleAddRpc}
+        onClose={() => setshowModal(false)}
+        rpcName={newRpcName}
+        rpcUrl={newRpcUrl}
+        setRpcName={setNewRpcName}
+        setRpcUrl={setNewRpcUrl}
+      />
     </div>
   );
 };

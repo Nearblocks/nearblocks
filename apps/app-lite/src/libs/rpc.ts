@@ -26,10 +26,6 @@ export const providers =
           url: 'https://beta.rpc.mainnet.near.org',
         },
         {
-          name: 'fast-near web4',
-          url: 'https://rpc.web4.near.page',
-        },
-        {
           name: 'FASTNEAR Free',
           url: 'https://free.rpc.fastnear.com',
         },

@@ -32,6 +32,7 @@ const config: Config = {
       primary: 'rgb(var(--color-primary))',
       black: '#000',
       white: '#fff',
+      red: '#dc2626',
       'bg-body': 'rgb(var(--color-bg-body))',
       'bg-box': 'rgb(var(--color-bg-box))',
       'bg-skeleton': 'rgb(var(--color-bg-skeleton))',

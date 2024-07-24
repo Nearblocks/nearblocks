@@ -110,7 +110,7 @@ export const MenuButton = ({ checked, children, onClick }: MenuButtonProps) => {
         onClick={onClick}
       >
         <span className="w-5">{checked && <Check className="w-3" />}</span>
-        {children}
+        <span className="truncate max-w-[120px]">{children}</span>
       </button>
     </li>
   );
