@@ -14,12 +14,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useTheme } from 'next-themes';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
 
 const ApiPlan = () => {
   const router = useRouter();
   const { status } = router.query;
+  const { theme } = useTheme();
   const [interval, setInterval] = useState(true);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
@@ -333,9 +335,7 @@ const ApiPlan = () => {
                           : 'Commercial Use'}
                       </h3>
                       <button
-                        onClick={() => {
-                          onGetStarted(item);
-                        }}
+                        onClick={() => onGetStarted(item)}
                         className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Get started now
@@ -352,34 +352,67 @@ const ApiPlan = () => {
                   >
                     <div className="border-b border-b-gray-200 py-2">
                       <h3 className="uppercase py-2 text-sm dark:text-neargray-10 flex justify-center">
-                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-20 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h3>
                       <h1 className="py-2 text-4xl flex justify-center">
-                        <Skeleton className="h-8 w-40" />
+                        <Skeleton className="h-8 w-40 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h1>
                       <h1 className="py-2 flex justify-center">
-                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h1>
                     </div>
                     <div className="py-2 font-thin dark:text-neargray-10">
                       <h3 className="py-2 text-sm flex justify-center">
-                        <Skeleton className="h-4 w-36" />
+                        <Skeleton className="h-4 w-36 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h3>
                       <h3 className="py-2 text-sm flex justify-center">
-                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h3>
                       <h3 className="py-2 text-sm flex justify-center">
-                        <Skeleton className="h-4 w-44" />
+                        <Skeleton className="h-4 w-44 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h3>
                       <h3 className="py-2 text-sm flex justify-center">
-                        <Skeleton className="h-4 w-40" />
+                        <Skeleton className="h-4 w-40 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h3>
                       <h1 className="py-2 flex justify-center">
-                        <Skeleton className="h-8 w-52 py-4" />
+                        <Skeleton className="h-8 w-52 py-4 dark:bg-black-600 dark:divide-black-200 divide-y" />
                       </h1>
                     </div>
                   </div>
                 ))}
+          </div>
+          <div
+            key={theme}
+            className="flex justify-between sm:px-10 2xl:px-20 sm:mx-20 max-sm:mx-4 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6 rounded-md relative"
+            style={{
+              background:
+                theme === 'dark'
+                  ? `url('data:image/svg+xml,<svg width="465" height="531" viewBox="0 0 465 531" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.15" filter="url(%23filter0_f_5812_5853)"><path d="M171.441 464.295L406.334 153.143C419.529 135.664 416.094 110.805 398.655 97.5588L349.496 60.2201C346.597 58.0182 343.493 56.2753 340.272 54.9795C324.033 48.4478 304.805 53.2759 293.748 67.9219L58.8548 379.074C45.6601 396.553 49.0945 421.412 66.5339 434.658L115.693 471.997C133.205 485.298 158.191 481.847 171.441 464.295Z" fill="url(%23paint0_linear_5812_5853)"/></g><defs><filter id="filter0_f_5812_5853" x="0.830566" y="2.125" width="463.528" height="527.967" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="25" result="effect1_foregroundBlur_5812_5853"/></filter><linearGradient id="paint0_linear_5812_5853" x1="-111.575" y1="466.16" x2="125.061" y2="623.426" gradientUnits="userSpaceOnUse"><stop stop-color="%23112D36"/><stop offset="0.526042" stop-color="%237BD6F3"/><stop offset="1" stop-color="%23112B36"/></linearGradient></defs></svg>') no-repeat right center, #1f2228`
+                  : `url('data:image/svg+xml,<svg width="465" height="531" viewBox="0 0 465 531" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.15" filter="url(%23filter0_f_5812_5853)"><path d="M171.441 464.295L406.334 153.143C419.529 135.664 416.094 110.805 398.655 97.5588L349.496 60.2201C346.597 58.0182 343.493 56.2753 340.272 54.9795C324.033 48.4478 304.805 53.2759 293.748 67.9219L58.8548 379.074C45.6601 396.553 49.0945 421.412 66.5339 434.658L115.693 471.997C133.205 485.298 158.191 481.847 171.441 464.295Z" fill="url(%23paint0_linear_5812_5853)"/></g><defs><filter id="filter0_f_5812_5853" x="0.830566" y="2.125" width="463.528" height="527.967" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="25" result="effect1_foregroundBlur_5812_5853"/></filter><linearGradient id="paint0_linear_5812_5853" x1="-111.575" y1="466.16" x2="125.061" y2="623.426" gradientUnits="userSpaceOnUse"><stop stop-color="%23112D36"/><stop offset="0.526042" stop-color="%237BD6F3"/><stop offset="1" stop-color="%23112B36"/></linearGradient></defs></svg>') no-repeat right center, #0d494a`,
+              backgroundSize: 'auto, cover',
+            }}
+          >
+            <div className="w-full h-full max-sm:px-4">
+              <div className="flex-grow-1">
+                <div className="mb-1 text-sm text-neargray-10">Enterprise</div>
+                <h4 className="text-white font-semibold text-2xl">
+                  Dedicated Plan
+                </h4>
+                <div className="text-opacity-75 text-sm pt-2 text-neargray-10">
+                  Greater rate limit with SLA support. Suitable for Enterprise
+                  user that uses large scale of Nearblocks data.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
+              <Link
+                href="/contact"
+                className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10"
+                type="button"
+              >
+                Contact Us <Arrow className="text-black-600" />
+              </Link>
+            </div>
           </div>
           <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
             <div className="flex justify-center">
