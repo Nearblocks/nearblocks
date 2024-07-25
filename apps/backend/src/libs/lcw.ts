@@ -12,7 +12,7 @@ const getBtcPrice = async (price: number) => {
     { code: 'BTC', currency: 'USD', meta: true },
     {
       headers: { 'x-api-key': config.lcwApiKey },
-      timeout: 10000,
+      timeout: 60000,
     },
   );
 
@@ -31,7 +31,7 @@ const marketData = async (id: string, full = false) => {
       { code: id, currency: 'USD', meta: true },
       {
         headers: { 'x-api-key': config.lcwApiKey },
-        timeout: 10000,
+        timeout: 60000,
       },
     );
 
@@ -86,7 +86,7 @@ const marketHistory = async (
       },
       {
         headers: { 'x-api-key': config.lcwApiKey },
-        timeout: 10000,
+        timeout: 60000,
       },
     );
 
@@ -116,7 +116,7 @@ const marketSearch = async (contract: string): Promise<null | string> => {
       { address, currency: 'USD', meta: false, platform },
       {
         headers: { 'x-api-key': config.lcwApiKey },
-        timeout: 10000,
+        timeout: 60000,
       },
     );
 

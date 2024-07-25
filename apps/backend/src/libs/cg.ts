@@ -31,7 +31,7 @@ const marketData = async (id: string, full = false) => {
   try {
     const price = await axios.get(
       `https://pro-api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false&x_cg_pro_api_key=${config.coingeckoApiKey}`,
-      { timeout: 10000 },
+      { timeout: 60000 },
     );
 
     const data: FTMarketData = {
@@ -73,7 +73,7 @@ const marketHistory = async (
   try {
     const price = await axios.get(
       `https://pro-api.coingecko.com/api/v3/coins/near/history?date=${date}&localization=false&x_cg_pro_api_key=${config.coingeckoApiKey}`,
-      { timeout: 10000 },
+      { timeout: 60000 },
     );
 
     return {
@@ -99,7 +99,7 @@ const marketSearch = async (address: string): Promise<null | string> => {
   try {
     const coin = await axios.get(
       `https://pro-api.coingecko.com/api/v3/coins/${platform}/contract/${contract}?x_cg_pro_api_key=${config.coingeckoApiKey}`,
-      { timeout: 10000 },
+      { timeout: 60000 },
     );
 
     return coin?.data?.id ?? null;

@@ -12,14 +12,14 @@ const marketData = async (id: string, full = false) => {
         `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${id}&convert=usd`,
         {
           headers: { 'X-CMC_PRO_API_KEY': config.cmcApiKey },
-          timeout: 10000,
+          timeout: 60000,
         },
       ),
       axios.get(
         `https://pro-api.coinmarketcap.com/v1/cryptocurrency/info?id=${id}`,
         {
           headers: { 'X-CMC_PRO_API_KEY': config.cmcApiKey },
-          timeout: 10000,
+          timeout: 60000,
         },
       ),
     ]);
@@ -64,7 +64,7 @@ const marketSearch = async (address: string) => {
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/info?address=${address}`,
       {
         headers: { 'X-CMC_PRO_API_KEY': config.cmcApiKey },
-        timeout: 10000,
+        timeout: 60000,
       },
     );
 
