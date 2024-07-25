@@ -639,8 +639,7 @@ export default function (props: Props) {
 
   return (
     <>
-      {accountView !== null &&
-        accountView?.block_hash === undefined &&
+      {accountView === null &&
         accountData?.deleted?.transaction_hash &&
         !isAccountLoading && (
           <>

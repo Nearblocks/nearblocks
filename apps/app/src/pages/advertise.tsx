@@ -89,7 +89,7 @@ const AdvertisePage = () => {
             />
           </div>
         </div>
-        <div className="w-[90%] flex flex-col lg:flex-row text-center lg:border mt-4 lg:!mt-16 py-4 text-neargray-600 dark:text-neargray-10">
+        <div className="sm:w-[90%] flex flex-col lg:flex-row text-center lg:border mt-4 lg:!mt-16 py-4 text-neargray-600 dark:text-neargray-10">
           <div className="w-full flex flex-row">
             <div className="w-full lg:w-1/2 p-4 flex flex-col items-center">
               <div className="flex flex-col sm:items-end w-fit justify-center">
@@ -119,7 +119,7 @@ const AdvertisePage = () => {
             </div>
           </div>
         </div>
-        <div className="text-neargray-600 pt-12 pb-16 px-6 w-[90%] soft-shadow divide-y dark:divide-black-200 rounded-lg bg-white dark:bg-black-600 dark:text-neargray-10 mt-8">
+        <div className="text-neargray-600 pt-12 pb-16 px-6 sm:w-[90%] soft-shadow divide-y dark:divide-black-200 rounded-lg bg-white dark:bg-black-600 dark:text-neargray-10 mt-8">
           <div className="pb-3 text-center">
             <h2 className="text-base lg:!text-2xl font-medium dark:text-green-250 text-green-500">
               {t('Advertisement Types')}
