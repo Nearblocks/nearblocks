@@ -33,7 +33,7 @@ const LinkContainer = styled.div`
   grid-auto-rows: minmax(100px, auto);
   gap: 24px;
   min-width: 300px;
-  margin-top: 2.5rem;
+  margin-top: 24px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -66,9 +66,8 @@ const H1 = styled.h1`
   font-stretch: 100%;
   overflow-wrap: break-word;
   box-sizing: border-box;
-  font-size: 72px;
   @media (max-width: 768px) {
-    font-size: 60px;
+    font-size: 48px;
   };
 `;
 const H3 = styled.h3`
@@ -166,7 +165,7 @@ const ExplorerHead = styled.h3`
   font-weight: 500;
   line-height: 130%;
   letter-spacing: 0.3px;
-  padding: 32px 0px 24px;
+  padding: 26px 0px 16px;
   color: #000;
 `;
 const ExplorerText = styled.p`
