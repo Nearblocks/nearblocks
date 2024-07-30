@@ -19,40 +19,39 @@ const Container = styled.div`
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lato:wght@400;700&display=swap');
 `;
 const InnerContainer = styled.div`
-  @media (min-width: 768px) {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 7rem;
-    padding-left: 14rem;
-    padding-right: 14rem;
-    padding-bottom: 8rem;
+  max-width: 1224px;
+  background-color: rgb(255, 255, 255);
+  min-height: 260px;
+  @media (min-width: 640px) {
+    margin: 72px auto;
   }
-  height: 100vh;
-`;
-
-const Section = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  .logo {
-    height: 2.5rem;
-  }
-  margin-top: auto;
-  margin-bottom: auto;
 `;
 
 const LinkContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(100px, auto);
+  gap: 24px;
+  min-width: 300px;
   margin-top: 2.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+`;
+const Background = styled.div`
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGeSURBVHgB7doxTisxEAbgeY/mvQro6NiSDo6QkpJbcA2OwjWooKQMJ2DpKENJBV7FEYoBeQSIZr9PGk2cItWvsdfZnSBjKHVf6rnUbdD1N8g4K7VX6jhIEaycofaTIEWwcoam0yFYOYe179WiQ7Byhk8+8wnB6munlHNWgmD1tUGyFSYIVl8bJFcOCYLV106s/aBrJ2hNE+qo1GmpRanz2J5aB6X+x/oQv/l+FWz5E/O1iHU4pom0W/u0/uoZahnrgN2VGuv6Jpidl1+o2T5BznkrfKj9MdZT6l9836r+3k2pq1KXMVNz3gpbU7hOmj49AQ7x/lJ0WWsK5xhv2+AYkHQR29vbddDluqFvbNZPQZdg9S07az4gWH3tHZVgJQhW3xjb4XIZyo+Z3nffHN79CZ1gYuXc1b4KEytFsHLGptMhWDlj7Q9BimDlbJ4Ex4AftggHdwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIpXoUVLSWulnzoAAAAASUVORK5CYII=);
+  background-size: 75px 75px;
+  background-repeat: repeat;
+  background-position: center top;
+  padding: 1px;
+  justify-content: center;
+  flex-direction: column;
 `;
 
 const H1 = styled.h1`
@@ -61,21 +60,18 @@ const H1 = styled.h1`
   text-align: center;
   font-feature-settings: normal;
   letter-spacing: -1.08px;
-  line-height 72px
+  line-height: 100%
   color: #000;
   margin: 0;
   font-stretch: 100%;
   overflow-wrap: break-word;
   box-sizing: border-box;
-  justify-content: center;
-  -webkit-font-smoothing: antialiased;
-
-  @media (min-width: 768px) {
-    font-size 72px;
+  font-size: 72px;
+  @media (max-width: 768px) {
+    font-size: 60px;
   };
 `;
-
-const H2 = styled.h3`
+const H3 = styled.h3`
 --text-l: 400 20px/1.3 Inter, Lato, "Lucida Grande", Tahoma, sans-serif;
   font: var(--text-l);
   color: #1b1b18;
@@ -83,7 +79,7 @@ const H2 = styled.h3`
   overflow-wrap: break-word;
   text-align: center;
   justify-content: center;
-  ont-feature-settings normal;
+  font-feature-settings normal;
   display: block;
   letter-spacing: 0.3px;
   font-stretch 100%;
@@ -93,10 +89,10 @@ const H2 = styled.h3`
   margin-inline-end: 0px;
   line-height: 130%;
   font-weight: 400 !important;
-  -webkit-font-smoothing: antialiased;
 
-  @media (min-width: 768px) {
-     font-size 20px;
+  @media (max-width: 768px) {
+     font-size 16px !important;
+     padding-top:1rem;
   }
 `;
 
@@ -105,31 +101,30 @@ const H6 = styled.h6`
   font-weight: 500;
   margin-bottom: 0.5rem;
   font-size: 32px;
-  @media (min-width: 1024px) {
-    font-size: 40px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
   }
   letter-spacing: 0.4px;
 `;
-
-const NearBlocksButton = styled.a<{
+const NearExplorerButton = styled.a<{
   isSelected?: string;
   isLinkActive?: boolean;
 }>`
-  height: 191px;
-  width: 264px;
-  background-color: #fff;
-  border: ${(props: any) =>
-    props.isSelected ? '2px solid #000' : '2px solid #000'};
+  background-color: #ffffff;
+  border: 1px solid rgb(27, 27, 24);
   position: relative;
-  border-radius: 10px;
-  box-shadow: ${(props: any) => (props.isSelected ? '' : ' 0 0 3px  #999')};
-  margin: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border-radius: 8px;
+  padding: 32px;
   flex-direction: column;
-
+  .logo {
+    height: 45px;
+    width: auto;
+  }
+  transition: all 0.4s ease 0s;
+  cursor: pointer;
+  outline: none;
   &:hover {
+    background-color: rgb(227, 227, 224);
     text-decoration: none;
   }
 `;
@@ -154,34 +149,6 @@ const Tag = styled.span`
   margin-right: 5px;
 `;
 
-const NearExplorerButton = styled.a<{
-  isSelected?: string;
-  isLinkActive?: boolean;
-}>`
-  height: 191px;
-  background-color: #ffffff;
-  width: 264px;
-  border: ${(props: any) =>
-    props.isSelected ? '3px solid #00EC97' : '2px solid #000'};
-  position: relative;
-  border-radius: 10px;
-  box-shadow: ${(props: any) => (props.isSelected ? '' : ' 0 0 3px  #999')};
-  ${(props: any) =>
-    props.isSelected ? `border:3px solid #00EC97;` : `2px solid #000`};
-  margin: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  .logo {
-    height: 2.5rem;
-  }
-
-  &:hover {
-    text-decoration: none;
-  }
-`;
-
 const Badge = styled.span`
   font-size: 12px;
   text-align: center;
@@ -193,15 +160,26 @@ const Badge = styled.span`
   margin-bottom: 18px;
 `;
 
-const ExplorerText = styled.p<{ mtop: string }>`
-  --tw-text-opacity: 1;
-  color: rgb(75 85 99 / var(--tw-text-opacity));
-  margin-top: ${(props: any) => (props.mtop ? props.mtop : '')};
+const ExplorerHead = styled.h3`
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 130%;
+  letter-spacing: 0.3px;
+  padding: 32px 0px 24px;
+  color: #000;
 `;
-
+const ExplorerText = styled.p`
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 450;
+  line-height: 150%;
+  letter-spacing: 0.14px;
+  color: #000;
+`;
 const LogoContainer = styled.div`
-  height: 4rem;
-  width: 11rem;
+  height: 45px;
+  width: auto;
   display: flex;
   align-items: center;
 `;
@@ -234,21 +212,6 @@ const FooterText = styled.div`
   font-size: 0.875rem;
   display: flex;
   justify-content: flex-end;
-`;
-
-const Background = styled.div`
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGeSURBVHgB7doxTisxEAbgeY/mvQro6NiSDo6QkpJbcA2OwjWooKQMJ2DpKENJBV7FEYoBeQSIZr9PGk2cItWvsdfZnSBjKHVf6rnUbdD1N8g4K7VX6jhIEaycofaTIEWwcoam0yFYOYe179WiQ7Byhk8+8wnB6munlHNWgmD1tUGyFSYIVl8bJFcOCYLV106s/aBrJ2hNE+qo1GmpRanz2J5aB6X+x/oQv/l+FWz5E/O1iHU4pom0W/u0/uoZahnrgN2VGuv6Jpidl1+o2T5BznkrfKj9MdZT6l9836r+3k2pq1KXMVNz3gpbU7hOmj49AQ7x/lJ0WWsK5xhv2+AYkHQR29vbddDluqFvbNZPQZdg9S07az4gWH3tHZVgJQhW3xjb4XIZyo+Z3nffHN79CZ1gYuXc1b4KEytFsHLGptMhWDlj7Q9BimDlbJ4Ex4AftggHdwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIpXoUVLSWulnzoAAAAASUVORK5CYII=);
-  background-size: 75px 75px;
-  background-repeat: repeat;
-  background-position: center top;
-  padding: 1px;
-  justify-content: center;
-  flex-direction: column;
-  padding: 5px;
 `;
 
 const InnerSection = styled.div`
@@ -486,9 +449,9 @@ export default function (props: Props) {
   return (
     <>
       <Container>
-        <InnerContainer>
-          <Background>
-            <Section>
+        <Background>
+          <InnerContainer>
+            <>
               <InnerSection>
                 <H1>NEAR Explorer Selector</H1>
                 {getFirstPathSegment(path) &&
@@ -505,7 +468,7 @@ export default function (props: Props) {
                 {selectUrlAfterSecondSlash(path) && (
                   <Badge>{shortenHex(selectUrlAfterSecondSlash(path))}</Badge>
                 )}
-                <H2>Choose from the available NEAR Explorers below</H2>
+                <H3>Choose from the available NEAR Explorers below</H3>
                 <LinkContainer>
                   <NearExplorerButton
                     href={
@@ -529,15 +492,19 @@ export default function (props: Props) {
                     }
                   >
                     <ImageTab
-                      height="4rem"
+                      width="auto"
+                      height="45px"
                       src={
                         'https://explorer.near.org/images/pikespeak_logo.png'
                       }
                       alt="Pikespeak"
                     ></ImageTab>
-                    <ExplorerText mtop="0.5rem">Pikespeak</ExplorerText>
+                    <ExplorerHead>Pikespeak</ExplorerHead>
+                    <ExplorerText>
+                      Data & Analytics on the NEAR Protocol.
+                    </ExplorerText>
                   </NearExplorerButton>
-                  <NearBlocksButton
+                  <NearExplorerButton
                     href={
                       !hasLinkNearblocks
                         ? href || config.nearblocks + path
@@ -557,13 +524,17 @@ export default function (props: Props) {
                   >
                     <Tag>Recommended</Tag>
                     <ImageTab
-                      height="65px"
-                      width="174px"
+                      height="45px"
+                      width="auto"
                       src={'https://nearblocks.io/images/nb-black-on-bos.svg'}
                       alt="Nearblocks"
                     ></ImageTab>
-                    <ExplorerText mtop="0.5rem">Nearblocks</ExplorerText>
-                  </NearBlocksButton>
+                    <ExplorerHead>Nearblocks</ExplorerHead>
+                    <ExplorerText>
+                      Leading user friendly Blockchain Explorer and Analytics
+                      Platform for Near Protocol.
+                    </ExplorerText>
+                  </NearExplorerButton>
                   <NearExplorerButton
                     href={
                       !hasLinkNearblocksLite
@@ -589,24 +560,27 @@ export default function (props: Props) {
                     <LogoContainer>
                       <Logo className="logo" />
                     </LogoContainer>
-                    <ExplorerText mtop="0.5rem">Nearblocks Lite</ExplorerText>
+                    <ExplorerHead>Nearblocks Lite</ExplorerHead>
+                    <ExplorerText>
+                      RPC Based explorer built on BOS.
+                    </ExplorerText>
                   </NearExplorerButton>
                 </LinkContainer>
               </InnerSection>
-            </Section>
-          </Background>
-          <Footer>
-            <FooterText>
-              <a href="https://github.com/Nearblocks/nearblocks/blob/main/apps/bos-components/src/components/ExplorerSelector.tsx">
-                <ImageTab
-                  height="2rem"
-                  src={'https://nearblocks.io/images/github_icon.svg'}
-                  alt="ExplorerSelector"
-                />
-              </a>
-            </FooterText>
-          </Footer>
-        </InnerContainer>
+            </>
+            <Footer>
+              <FooterText>
+                <a href="https://github.com/Nearblocks/nearblocks/blob/main/apps/bos-components/src/components/ExplorerSelector.tsx">
+                  <ImageTab
+                    height="2rem"
+                    src={'https://nearblocks.io/images/github_icon.svg'}
+                    alt="ExplorerSelector"
+                  />
+                </a>
+              </FooterText>
+            </Footer>
+          </InnerContainer>
+        </Background>
       </Container>
     </>
   );
