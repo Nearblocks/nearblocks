@@ -1,0 +1,43 @@
+name: BOS Lite Components Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/bos-lite/**'
+jobs:
+  deploy-mainnet:
+    runs-on: ubuntu-latest
+    name: Deploy lite widgets to social.near (mainnet)
+    env:
+      NETWORK: mainnet
+      BOS_DEPLOY_ACCOUNT_ID: ${{ vars.MAINNET_DEPLOY_ACCOUNT }}
+      BOS_SIGNER_ACCOUNT_ID: ${{ vars.MAINNET_SIGNER_ACCOUNT }}
+      BOS_SIGNER_PUBLIC_KEY: ${{ vars.MAINNET_SIGNER_PUBLIC_KEY }}
+      BOS_SIGNER_PRIVATE_KEY: ${{ secrets.MAINNET_SIGNER_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install BOS Components dependencies
+        run: cd apps/bos-lite && yarn
+
+      - name: Build project
+        run: cd apps/bos-lite &&  yarn build
+
+      - name: Install near-social CLI
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bos-cli-rs/bos-cli-rs/releases/download/v0.3.13/bos-cli-installer.sh  | sh
+
+      - name: Deploy components
+        run: |
+          cd apps/bos-lite/dist/src
+
+          find src/widget/* -maxdepth 0 -exec mv -t ./src '{}' +
+          if [ -z "$(ls -A src/widget)" ]; then
+            rm -r src/widget
+          fi
+
+          bos components deploy "$BOS_DEPLOY_ACCOUNT_ID" sign-as "$BOS_SIGNER_ACCOUNT_ID" network-config mainnet sign-with-plaintext-private-key --signer-public-key "$BOS_SIGNER_PUBLIC_KEY" --signer-private-key "$BOS_SIGNER_PRIVATE_KEY" send

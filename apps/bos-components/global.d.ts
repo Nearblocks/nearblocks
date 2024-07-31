@@ -12,6 +12,15 @@ declare const useEffect: (
   deps?: React.DependencyList,
 ) => void;
 
+declare namespace Near {
+  function asyncView(
+    contractName: string,
+    methodName: string,
+    args?: object,
+    blockId?: string | number,
+  ): Promise;
+}
+
 declare const styled;
 declare const asyncFetch;
 declare const useCache;
@@ -33,3 +42,7 @@ declare const Files;
 declare const Link;
 declare const CommitButton;
 declare const VM;
+declare const Toast;
+declare const Switch;
+declare const OverlayTrigger;
+declare const ethers;

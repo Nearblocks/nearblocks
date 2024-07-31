@@ -25,9 +25,28 @@ const txns = catchAsync(
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
     const event = req.validator.data.event;
+    const cursor = req.validator.data.cursor?.replace('n', '');
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp = null;
+    let beforeTimestamp = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     const { limit, offset } = getPagination(page, per_page);
     const txns = await sql`
@@ -42,6 +61,7 @@ const txns = catchAsync(
         txn.block_timestamp,
         txn.block,
         txn.outcomes,
+        txn.outcomes_agg,
         (
           SELECT
             JSON_BUILD_OBJECT(
@@ -72,8 +92,17 @@ const txns = catchAsync(
             ft_events a
           WHERE
             affected_account_id = ${account}
-            AND ${involved ? sql` involved_account_id = ${involved}` : true}
-            AND ${event ? sql` cause = ${event}` : true}
+            AND ${involved ? sql`involved_account_id = ${involved}` : true}
+            AND ${event ? sql`cause = ${event}` : true}
+            AND ${cursor
+        ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+        : true}
+            AND ${afterTimestamp
+        ? sql`block_timestamp >= ${afterTimestamp}`
+        : true}
+            AND ${beforeTimestamp
+        ? sql`block_timestamp < ${beforeTimestamp}`
+        : true}
             AND EXISTS (
               SELECT
                 1
@@ -96,7 +125,7 @@ const txns = catchAsync(
           LIMIT
             ${limit}
           OFFSET
-            ${offset}
+            ${cursor ? 0 : offset}
         ) AS tmp using (event_index)
         INNER JOIN LATERAL (
           SELECT
@@ -127,7 +156,19 @@ const txns = catchAsync(
                 execution_outcomes
               WHERE
                 execution_outcomes.receipt_id = transactions.converted_into_receipt_id
-            ) AS outcomes
+            ) AS outcomes,
+            (
+              SELECT
+                JSON_BUILD_OBJECT(
+                  'transaction_fee',
+                  COALESCE(receipt_conversion_tokens_burnt, 0) + COALESCE(SUM(tokens_burnt), 0)
+                )
+              FROM
+                execution_outcomes
+                JOIN receipts ON receipts.receipt_id = execution_outcomes.receipt_id
+              WHERE
+                receipts.originated_from_transaction_hash = transactions.transaction_hash
+            ) AS outcomes_agg
           FROM
             transactions
             JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
@@ -138,7 +179,11 @@ const txns = catchAsync(
         event_index ${order === 'desc' ? sql`DESC` : sql`ASC`}
     `;
 
-    return res.status(200).json({ txns });
+    let nextCursor = txns?.[txns?.length - 1]?.event_index;
+    nextCursor =
+      txns?.length === per_page && nextCursor ? `${nextCursor}n` : undefined;
+
+    return res.status(200).json({ cursor: nextCursor, txns });
   },
 );
 
@@ -147,9 +192,33 @@ const txnsCount = catchAsync(
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
     const event = req.validator.data.event;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     const useFormat = true;
-    const bindings = { account, event, involved };
+    const bindings = {
+      account,
+      afterTimestamp,
+      beforeTimestamp,
+      event,
+      involved,
+    };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -159,6 +228,8 @@ const txnsCount = catchAsync(
         affected_account_id = :account
         AND ${involved ? `involved_account_id = :involved` : true}
         AND ${event ? `cause = :event` : true}
+        AND ${afterTimestamp ? `block_timestamp >= :afterTimestamp` : true}
+        AND ${beforeTimestamp ? `block_timestamp < :beforeTimestamp` : true}
         AND EXISTS (
           SELECT
             1

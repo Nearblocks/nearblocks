@@ -9,9 +9,11 @@ import Router from 'next/router';
 
 import Layout from '@/components/Layouts';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
+import { useAuthStore } from '@/stores/auth';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Token = () => {
   const router = useRouter();
@@ -24,20 +26,10 @@ const Token = () => {
   const [token, setToken] = useState<{ name: string; symbol: string } | null>(
     null,
   );
-  const [pageTab, setPageTab] = useState('Transfers');
-
+  const pageTab = `${router?.query?.tab || 'Transfers'}`;
   const onHandleTab = (hashValue: string) => {
-    setPageTab(hashValue);
     router.push(`/token/${id}?tab=${hashValue}`);
   };
-
-  useEffect(() => {
-    const select = `${router?.query?.tab}` || 'Transfers';
-
-    if (router?.query?.tab) {
-      setPageTab(select);
-    }
-  }, [router?.query]);
 
   useEffect(() => {
     async function fetchToken() {
@@ -68,7 +60,7 @@ const Token = () => {
   const description = token
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}`;
+  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}&brand=near`;
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -135,6 +127,10 @@ const Token = () => {
     setHeight({});
   };
 
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
   return (
     <>
       <Head>
@@ -152,8 +148,14 @@ const Token = () => {
       </Head>
       <div style={height} className="relative container mx-auto px-3">
         <VmComponent
-          skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
-          defaultSkelton={<Overview />}
+          skeleton={
+            <Overview
+              className="absolute pr-6"
+              ref={heightRef}
+              pageTab={pageTab}
+            />
+          }
+          defaultSkelton={<Overview pageTab={pageTab} />}
           onChangeHeight={onChangeHeight}
           src={components?.ftOverview}
           props={{
@@ -165,8 +167,15 @@ const Token = () => {
             onFilterClear: onFilterClear,
             onHandleTab: onHandleTab,
             pageTab: pageTab,
+            requestSignInWithWallet,
           }}
-          loading={<Overview className="absolute pr-6" ref={heightRef} />}
+          loading={
+            <Overview
+              className="absolute pr-6"
+              ref={heightRef}
+              pageTab={pageTab}
+            />
+          }
         />
         <div className="py-8"></div>
       </div>

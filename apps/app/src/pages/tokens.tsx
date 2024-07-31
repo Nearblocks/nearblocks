@@ -7,8 +7,10 @@ import { ReactElement, useEffect, useRef, useState } from 'react';
 import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const TopFTTokens = () => {
   const router = useRouter();
@@ -46,6 +48,7 @@ const TopFTTokens = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20NEP-141%20Tokens&brand=near`;
 
   return (
     <>
@@ -79,17 +82,14 @@ const TopFTTokens = () => {
           property="twitter:description"
           content="A curated list of all NEP-141 Tokens within the Near Protocol Ecoystem. Discover statistics, holders, transaction volume and more."
         />
-        <meta property="og:image" content="/thumbnail/thumbnail_tokens.png" />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_tokens.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/tokens`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10">
               Near Protocol Ecosystem Tokens (NEP-141)
             </h1>
           </div>

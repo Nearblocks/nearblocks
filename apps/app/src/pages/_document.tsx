@@ -28,17 +28,10 @@ export default function Document() {
           href="/favicon_16x16.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
-        {/* Google Tag Manager */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              `(function(w,l){` +
-              `w[l] = w[l] || [];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});` +
-              `})(window,'dataLayer');`,
-          }}
-        />
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/__ENV.js" />
       </Head>
-      <body className="overflow-x-hidden">
+      <body className="overflow-x-hidden   dark:bg-black-300">
         <Main />
         <NextScript />
       </body>

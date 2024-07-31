@@ -229,7 +229,7 @@ export default function (props: Props) {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
       ></div>
     );
   };
@@ -251,8 +251,8 @@ export default function (props: Props) {
   }, [txn, config.backendUrl]);
 
   return (
-    <div className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
-      <div className="text-sm text-nearblue-600">
+    <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
+      <div className="text-sm text-nearblue-600 dark:text-neargray-10">
         {network === 'testnet' && (
           <div className="flex flex-wrap p-4 text-red-500">
             {t
@@ -263,24 +263,21 @@ export default function (props: Props) {
 
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.hash.tooltip')
                     : 'Unique identifier (hash) of this transaction.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.hash.text.0') : 'Txn Hash'}
           </div>
           {loading ? (
@@ -295,24 +292,21 @@ export default function (props: Props) {
         </div>
         <div className="flex flex-wrap items-start p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.status.tooltip')
                     : 'The status of the transaction.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.status.text.0') : 'Status'}
           </div>
           {loading ? (
@@ -325,7 +319,7 @@ export default function (props: Props) {
                 <TxnStatus showLabel status={txn?.outcomes?.status} />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 my-2 rounded-md text-left px-2 py-1">
+                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded-md text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}
@@ -334,24 +328,21 @@ export default function (props: Props) {
         </div>
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.block.tooltip')
                     : 'The number of the block in which the transaction was recorded.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.block.text.0') : 'Block Height'}
           </div>
           {loading ? (
@@ -364,7 +355,7 @@ export default function (props: Props) {
                 href={`/blocks/${txn?.included_in_block_hash}`}
                 className="hover:no-underline"
               >
-                <a className="text-green-500 hover:no-underline">
+                <a className="text-green-500 dark:text-green-250 hover:no-underline">
                   {txn?.block?.block_height
                     ? localFormat(txn?.block?.block_height)
                     : txn?.block?.block_height ?? ''}
@@ -377,24 +368,21 @@ export default function (props: Props) {
         </div>
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.timestamp.tooltip')
                     : 'Timestamp of when this transaction was submitted.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.timestamp.text.0') : 'Timestamp'}
           </div>
           {loading ? (
@@ -416,22 +404,19 @@ export default function (props: Props) {
         </div>
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   The shard number in which the transaction was executed in
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             Shard Number
           </div>
           {loading ? (
@@ -445,44 +430,26 @@ export default function (props: Props) {
           )}
         </div>
       </div>
-      {((actions?.length > 0 &&
-        actions.some((item: any) =>
-          [
-            'CreateAccount',
-            'DeleteAccount',
-            'DeployContract',
-            'Stake',
-            'Transfer',
-          ].includes(item?.action_kind),
-        )) ||
-        (logs.length > 0 &&
-          logs.some((item: TransactionLog, i: number) => (
-            <EventLogs
-              key={i}
-              event={item}
-              network={network}
-              ownerId={ownerId}
-            />
-          )))) && (
-        <div id="action-row" className="bg-white text-sm text-nearblue-600">
+      {(actions?.length > 0 || logs?.length > 0) && (
+        <div
+          id="action-row"
+          className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+        >
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <div>
-                      <Question className="w-4 h-4 fill-current mr-1" />
-                    </div>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    align="start"
-                    side="bottom"
-                  >
+              <OverlayTrigger
+                placement="bottom-start"
+                delay={{ show: 500, hide: 0 }}
+                overlay={
+                  <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                     Highlighted events of the transaction
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+                  </Tooltip>
+                }
+              >
+                <div>
+                  <Question className="w-4 h-4 fill-current mr-1" />
+                </div>
+              </OverlayTrigger>
               Transaction Actions
             </div>
             {loading ? (
@@ -491,7 +458,7 @@ export default function (props: Props) {
               </div>
             ) : (
               <div className="w-full md:w-3/4">
-                <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
+                <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white dark:bg-black-600">
                   <ScrollArea.Viewport className="w-full h-full rounded">
                     <div
                       id="action-column"
@@ -511,16 +478,16 @@ export default function (props: Props) {
                     </div>
                   </ScrollArea.Viewport>
                   <ScrollArea.Scrollbar
-                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 dark:bg-black-600 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
                     orientation="vertical"
                   >
-                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 dark:bg-black-200 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
                   <ScrollArea.Scrollbar
-                    className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                    className="flex select-none touch-none p-0.5 bg-neargray-25 dark:bg-black-600 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
                     orientation="horizontal"
                   >
-                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                    <ScrollArea.Thumb className="flex-1 bg-neargray-50 dark:bg-black-600 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                   </ScrollArea.Scrollbar>
                   <ScrollArea.Corner className="bg-neargray-50" />
                 </ScrollArea.Root>
@@ -529,27 +496,24 @@ export default function (props: Props) {
           </div>
         </div>
       )}
-      <div className="bg-white text-sm text-nearblue-600">
+      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.from.tooltip')
                     : 'Account that signed and sent the transaction'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.from.text.0') : 'From'}
           </div>
           {loading ? (
@@ -562,7 +526,7 @@ export default function (props: Props) {
                 href={`/address/${txn?.signer_account_id}`}
                 className="hover:no-underline"
               >
-                <a className="text-green-500 hover:no-underline">
+                <a className="text-green-500  dark:text-green-250 hover:no-underline">
                   {txn?.signer_account_id}
                 </a>
               </Link>
@@ -571,24 +535,21 @@ export default function (props: Props) {
         </div>
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.to.tooltip')
                     : 'Account receiving the transaction.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {isContract
               ? 'Interacted With (To)'
               : t
@@ -605,7 +566,7 @@ export default function (props: Props) {
                 href={`/address/${txn?.receiver_account_id}`}
                 className="hover:no-underline"
               >
-                <a className="text-green-500 hover:no-underline">
+                <a className="text-green-500 dark:text-green-250 hover:no-underline">
                   {txn?.receiver_account_id}
                 </a>
               </Link>
@@ -616,22 +577,19 @@ export default function (props: Props) {
       {(fts?.length > 0 || nfts?.length > 0) && (
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   List of tokens transferred in the transaction
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             Tokens Transferred
           </div>
           {loading ? (
@@ -640,7 +598,7 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="relative w-full md:w-3/4">
-              <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white">
+              <ScrollArea.Root className="w-full h-full rounded overflow-hidden bg-white dark:bg-black-600">
                 <ScrollArea.Viewport className="w-full h-full rounded">
                   <div className="max-h-[302px] break-words space-y-3">
                     {fts?.map((ft: any) => (
@@ -658,7 +616,7 @@ export default function (props: Props) {
                                   href={`/address/${ft?.involved_account_id}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                  <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                     {shortenAddress(
                                       ft?.involved_account_id ?? '',
                                     )}
@@ -675,7 +633,7 @@ export default function (props: Props) {
                                   href={`/address/${ft?.affected_account_id}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green-500 font-normal pl-1">
+                                  <a className="text-green-500 dark:text-green-250 font-normal pl-1">
                                     {shortenAddress(
                                       ft?.affected_account_id ?? '',
                                     )}
@@ -695,7 +653,7 @@ export default function (props: Props) {
                                   href={`/address/${ft?.affected_account_id}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                  <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                     {shortenAddress(
                                       ft?.affected_account_id ?? '',
                                     )}
@@ -712,7 +670,7 @@ export default function (props: Props) {
                                   href={`/address/${ft?.involved_account_id}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green-500 font-normal pl-1">
+                                  <a className="text-green-500 dark:text-green-250 font-normal pl-1">
                                     {shortenAddress(
                                       ft?.involved_account_id ?? '',
                                     )}
@@ -742,7 +700,7 @@ export default function (props: Props) {
                           href={`/token/${ft?.ft_meta?.contract}`}
                           className="hover:no-underline"
                         >
-                          <a className="text-green flex items-center hover:no-underline">
+                          <a className="text-green dark:text-green-250 flex items-center hover:no-underline">
                             <TokenImage
                               src={ft?.ft_meta?.icon}
                               alt={ft?.ft_meta?.name}
@@ -751,8 +709,9 @@ export default function (props: Props) {
                             />
                             {shortenToken(ft?.ft_meta?.name ?? '')}
                             <span>
-                              &nbsp;(
-                              {shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})
+                              {`(${shortenTokenSymbol(
+                                ft?.ft_meta?.symbol ?? '',
+                              )})`}
                             </span>
                           </a>
                         </Link>
@@ -774,7 +733,7 @@ export default function (props: Props) {
                                           href={`/address/${nft?.involved_account_id}`}
                                           className="hover:no-underline"
                                         >
-                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                             {shortenAddress(
                                               nft?.involved_account_id ?? '',
                                             )}
@@ -793,7 +752,7 @@ export default function (props: Props) {
                                           href={`/address/${nft?.affected_account_id}`}
                                           className="hover:no-underline"
                                         >
-                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                             {shortenAddress(
                                               nft?.affected_account_id ?? '',
                                             )}
@@ -815,7 +774,7 @@ export default function (props: Props) {
                                           href={`/address/${nft?.affected_account_id}`}
                                           className="hover:no-underline"
                                         >
-                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                             {shortenAddress(
                                               nft?.affected_account_id ?? '',
                                             )}
@@ -834,7 +793,7 @@ export default function (props: Props) {
                                           href={`/address/${nft?.involved_account_id}`}
                                           className="hover:no-underline"
                                         >
-                                          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+                                          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
                                             {shortenAddress(
                                               nft?.involved_account_id ?? '',
                                             )}
@@ -858,7 +817,7 @@ export default function (props: Props) {
                                       href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="hover:no-underline"
                                     >
-                                      <a className="text-green hover:no-underline">
+                                      <a className="text-green hover:no-underline dark:text-green-250">
                                         {shortenToken(nft?.token_id ?? '')}
                                       </a>
                                     </Link>
@@ -869,7 +828,7 @@ export default function (props: Props) {
                                   href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="hover:no-underline"
                                 >
-                                  <a className="text-green flex items-center hover:no-underline">
+                                  <a className="text-green flex items-center hover:no-underline dark:text-green-250">
                                     <TokenImage
                                       src={nft?.nft_meta?.icon}
                                       alt={nft?.nft_meta?.name}
@@ -919,16 +878,16 @@ export default function (props: Props) {
                   </div>
                 </ScrollArea.Viewport>
                 <ScrollArea.Scrollbar
-                  className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                  className="flex select-none touch-none p-0.5 bg-neargray-25 dark:bg-black-600 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
                   orientation="vertical"
                 >
-                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 dark:bg-black-200 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                 </ScrollArea.Scrollbar>
                 <ScrollArea.Scrollbar
-                  className="flex select-none touch-none p-0.5 bg-neargray-25 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+                  className="flex select-none touch-none p-0.5 bg-neargray-25 dark:bg-black-600 transition-colors duration-[160ms] ease-out hover:bg-neargray-25 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
                   orientation="horizontal"
                 >
-                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
+                  <ScrollArea.Thumb className="flex-1 bg-neargray-50 dark:bg-black-600 rounded-[10px] relative before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-full before:h-full before:min-w-[44px] before:min-h-[44px]" />
                 </ScrollArea.Scrollbar>
                 <ScrollArea.Corner className="bg-neargray-50" />
               </ScrollArea.Root>
@@ -936,27 +895,24 @@ export default function (props: Props) {
           )}
         </div>
       )}
-      <div className="bg-white text-sm text-nearblue-600">
+      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.deposit.tooltip')
                     : 'Sum of all NEAR tokens transferred from the Signing account to the Receiver account. This includes tokens sent in a Transfer action(s), and as deposits on Function Call action(s).'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </OverlayTrigger>
             {t ? t('txns:txn.deposit.text.0') : 'Deposit Value'}
           </div>
           {loading ? (
@@ -965,54 +921,48 @@ export default function (props: Props) {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words">
-              <Tooltip.Provider>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <span>
-                      {txn.actions_agg?.deposit
-                        ? yoctoToNear(txn.actions_agg?.deposit, true)
-                        : txn.actions_agg?.deposit ?? ''}{' '}
-                      Ⓝ
-                      {currentPrice && network === 'mainnet'
-                        ? ` ($${fiatValue(
-                            yoctoToNear(txn.actions_agg?.deposit ?? 0, false),
-                            currentPrice,
-                          )})`
-                        : ''}
-                    </span>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content
-                    className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    align="start"
-                    side="bottom"
-                  >
+              <OverlayTrigger
+                placement="bottom-start"
+                delay={{ show: 500, hide: 0 }}
+                overlay={
+                  <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                     {t
                       ? t('txns:txn.deposit.tooltip')
                       : 'Sum of all NEAR tokens transferred from the Signing account to the Receiver account. This includes tokens sent in a Transfer action(s), and as deposits on Function Call action(s).'}
-                  </Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+                  </Tooltip>
+                }
+              >
+                <span>
+                  {txn.actions_agg?.deposit
+                    ? yoctoToNear(txn.actions_agg?.deposit, true)
+                    : txn.actions_agg?.deposit ?? ''}{' '}
+                  Ⓝ
+                  {currentPrice && network === 'mainnet'
+                    ? ` ($${fiatValue(
+                        yoctoToNear(txn.actions_agg?.deposit ?? 0, false),
+                        currentPrice,
+                      )})`
+                    : ''}
+                </span>
+              </OverlayTrigger>
             </div>
           )}
         </div>
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.fee.tooltip')
                     : 'Total fee paid in NEAR to execute this transaction.'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <Question className="w-4 h-4 fill-current mr-1" />
+            </OverlayTrigger>
             {t ? t('txns:txn.fee.text.0') : 'Transaction fee'}
           </div>
           {loading ? (
@@ -1038,22 +988,19 @@ export default function (props: Props) {
       {network === 'mainnet' && date && (
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                   {t
                     ? t('txns:txn.price.tooltip')
                     : 'Closing price of Ⓝ on date of transaction'}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <Question className="w-4 h-4 fill-current mr-1" />
+            </OverlayTrigger>
             {t ? t('txns:txn.price.text.0') : 'Ⓝ Price'}
           </div>
           {loading ? (
@@ -1070,7 +1017,7 @@ export default function (props: Props) {
 
       <Accordion.Root
         type="single"
-        className="text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y border-b"
+        className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y border-b"
         defaultValue={more ? 'item-1' : undefined}
         collapsible
       >
@@ -1079,11 +1026,11 @@ export default function (props: Props) {
             <div className="flex flex-wrap p-4">
               <Accordion.Trigger asChild onClick={toggleContent}>
                 {!more ? (
-                  <span className="text-green-500 flex items-center cursor-pointer">
+                  <span className="text-green-500 dark:text-green-250 flex items-center cursor-pointer">
                     Click to see more <ArrowDown className="fill-current" />
                   </span>
                 ) : (
-                  <span className="text-green-500 flex items-center cursor-pointer">
+                  <span className="text-green-500 dark:text-green-250 flex items-center cursor-pointer">
                     Click to see less <ArrowUp className="fill-current" />
                   </span>
                 )}
@@ -1094,22 +1041,19 @@ export default function (props: Props) {
             <div>
               <div className="flex flex-wrap p-4">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                  <Tooltip.Provider>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger asChild>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </Tooltip.Trigger>
-                      <Tooltip.Content
-                        className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        align="start"
-                        side="bottom"
-                      >
+                  <OverlayTrigger
+                    placement="bottom-start"
+                    delay={{ show: 500, hide: 0 }}
+                    overlay={
+                      <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                         {t
                           ? t('txns:txn.gas.tooltip')
                           : 'Maximum amount of gas allocated for the transaction & the amount eventually used.'}
-                      </Tooltip.Content>
-                    </Tooltip.Root>
-                  </Tooltip.Provider>
+                      </Tooltip>
+                    }
+                  >
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </OverlayTrigger>
                   {t ? t('txns:txn.gas.text.0') : 'Gas Limit & Usage by Txn'}
                 </div>
                 {loading ? (
@@ -1123,33 +1067,28 @@ export default function (props: Props) {
                     ) + 'gas'}
                     <span className="text-gray-300 px-1">|</span>
                     {convertToMetricPrefix(txn?.outcomes_agg?.gas_used ?? 0)}gas
-                    (
-                    {gasPercentage(
+                    {`(${gasPercentage(
                       txn?.outcomes_agg?.gas_used ?? 0,
                       txn?.actions_agg?.gas_attached ?? 0,
-                    )}
-                    )
+                    )})`}
                   </div>
                 )}
               </div>
               <div className="flex flex-wrap p-4">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                  <Tooltip.Provider>
-                    <Tooltip.Root>
-                      <Tooltip.Trigger asChild>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </Tooltip.Trigger>
-                      <Tooltip.Content
-                        className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        align="start"
-                        side="bottom"
-                      >
+                  <OverlayTrigger
+                    placement="bottom-start"
+                    delay={{ show: 500, hide: 0 }}
+                    overlay={
+                      <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                         {t
                           ? t('txns:txn.burnt.tooltip')
                           : 'Total amount of Gas & Token burnt from this transaction.'}
-                      </Tooltip.Content>
-                    </Tooltip.Root>
-                  </Tooltip.Provider>
+                      </Tooltip>
+                    }
+                  >
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </OverlayTrigger>
                   {t ? t('txns:txn.burnt.text.0') : 'Burnt Gas & Tokens by Txn'}
                 </div>
                 {loading ? (
@@ -1158,12 +1097,14 @@ export default function (props: Props) {
                   </div>
                 ) : (
                   <div className="w-full  text-xs items-center flex md:w-3/4 break-words">
-                    <div className="bg-orange-50 rounded-md px-2 py-1">
+                    <div className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥</span>
                       {convertToMetricPrefix(
                         txn.receipt_conversion_gas_burnt ?? 0,
                       ) + 'gas'}
-                      <span className="text-gray-300 px-1">|</span>{' '}
+                      <span className="text-gray-300 dark:text-neargray-10 px-1">
+                        |
+                      </span>{' '}
                       {txn.receipt_conversion_tokens_burnt
                         ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)
                         : txn.receipt_conversion_tokens_burnt ?? ''}{' '}

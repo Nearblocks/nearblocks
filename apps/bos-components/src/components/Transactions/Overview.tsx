@@ -12,6 +12,7 @@
 interface Props {
   ownerId: string;
   network: string;
+  theme: String;
   t: (key: string, options?: { days?: number }) => string | undefined;
 }
 
@@ -23,7 +24,7 @@ import {
   ChartSeriesInfo,
 } from '@/includes/types';
 
-export default function ({ network, t, ownerId }: Props) {
+export default function ({ network, t, ownerId, theme }: Props) {
   const { currency, dollarFormat, formatCustomDate, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -68,6 +69,7 @@ export default function ({ network, t, ownerId }: Props) {
               total_supply: resp.total_supply,
               total_txns: resp.total_txns,
               volume: resp.volume,
+              tps: resp.tps,
             });
             if (isLoading) setIsLoading(false);
           } else {
@@ -150,6 +152,7 @@ export default function ({ network, t, ownerId }: Props) {
           spacingBottom: 0,
           spacingLeft: 0,
           spacingRight: 10,
+          backgroundColor: 'transparent',
         },
         title: {
           text: null,
@@ -160,6 +163,9 @@ export default function ({ network, t, ownerId }: Props) {
           tickLength: 0,
           labels: {
             step: 7,
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
           },
           categories: chartData.categories,
         },
@@ -167,6 +173,11 @@ export default function ({ network, t, ownerId }: Props) {
           gridLineWidth: 0,
           title: {
             text: null,
+          },
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
           },
         },
         legend: {
@@ -203,11 +214,16 @@ export default function ({ network, t, ownerId }: Props) {
     }
 
     fetchData();
-  }, [chartData]);
+  }, [chartData, theme]);
 
   const iframeSrc = `
       <html>
         <head>
+        <style>
+        body, html{
+          background-color: ${theme === 'dark' ? '#0D0D0D' : '#ffff'};
+        }
+        </style>
           <script src="https://code.highcharts.com/highcharts.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
           <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
@@ -238,30 +254,35 @@ export default function ({ network, t, ownerId }: Props) {
   const nearPrice = stats?.near_price ?? '';
   const nearBtcPrice = stats?.near_btc_price ?? '';
   const change24 = stats?.change_24 ?? '';
+  const totalTxns = stats?.total_txns ?? 0;
   return (
     <div className="container mx-auto px-3">
-      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0  dark:bg-black-600">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             network === 'mainnet'
               ? 'grid-rows-3 lg:grid-cols-3'
               : 'grid-rows-2 lg:grid-cols-2'
-          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3`}
+          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
         >
           {network === 'mainnet' && (
             <>
-              <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:pb-0 md:px-5">
+              <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y  lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
                 <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                   <div className="items-center flex justify-left mr-3 ">
                     <img
-                      src={`${config?.appUrl}images/near price.svg`}
+                      src={`${config.appUrl}images/${
+                        theme === 'dark'
+                          ? 'near price_dark.svg'
+                          : 'near price.svg'
+                      }`}
                       alt={t ? t('home:nearPrice') : 'nearPrice'}
                       width="24"
                       height="24"
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 text-sm ">
+                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
                       {t ? t('home:nearPrice') : 'NEAR PRICE'}
                     </p>
                     {isLoading ? (
@@ -271,7 +292,7 @@ export default function ({ network, t, ownerId }: Props) {
                         href="/charts/near-price"
                         className="hover:no-underline flex items-center"
                       >
-                        <a className="leading-6 text-nearblue-600 hover:no-underline px-1 ">
+                        <a className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline px-1 ">
                           {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                           <span className="text-nearblue-700">
                             {nearBtcPrice
@@ -305,14 +326,16 @@ export default function ({ network, t, ownerId }: Props) {
                 <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                   <div className="items-center flex justify-left mr-3 ">
                     <img
-                      src={`${config.appUrl}images/market.svg`}
+                      src={`${config.appUrl}images/${
+                        theme === 'dark' ? 'market_dark.svg' : 'market.svg'
+                      }`}
                       alt={t ? t('home:marketCap') : 'marketCap'}
                       width="24"
                       height="24"
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                       {t ? t('home:marketCap') : ' MARKET CAP'}
                     </p>
                     {isLoading ? (
@@ -336,34 +359,61 @@ export default function ({ network, t, ownerId }: Props) {
               </div>
             </>
           )}
-          <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:pb-0 md:px-5">
+          <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
             <div className="flex flex-row justify-between py-5 lg:pb-5 lg:px-0">
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <img
-                    src={`${config?.appUrl}images/transactions.svg`}
+                    src={`${config.appUrl}images/${
+                      theme === 'dark'
+                        ? 'transactions_dark.svg'
+                        : 'transactions.svg'
+                    }`}
                     alt={t ? t('home:transactions') : 'transactions'}
                     width="24"
                     height="24"
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t ? t('home:transactions') : 'TRANSACTIONS'}
                   </p>
                   {isLoading ? (
                     <Skeleton className="my-1 h-4" />
                   ) : (
-                    <p className="leading-6 text-nearblue-700">
-                      {stats?.total_txns
-                        ? currency(stats?.total_txns)
-                        : stats?.total_txns ?? ''}
-                    </p>
+                    <div className="flex flex-row">
+                      <p className="leading-6 text-nearblue-600 dark:text-neargray-10 mr-0.5">
+                        {totalTxns ? currency(stats?.total_txns) : ''}
+                      </p>
+                      <p className="leading-6 text-nearblue-700">
+                        <Tooltip.Provider>
+                          <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                              <div>
+                                <Link
+                                  href="/charts/tps"
+                                  className="hover:no-underline"
+                                >
+                                  {stats?.tps ? `(${stats?.tps} TPS)` : ''}
+                                </Link>
+                              </div>
+                            </Tooltip.Trigger>
+                            <Tooltip.Content
+                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                              align="start"
+                              side="bottom"
+                            >
+                              Transactions per second
+                            </Tooltip.Content>
+                          </Tooltip.Root>
+                        </Tooltip.Provider>
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {' '}
                   {t ? t('home:gasPrice') : 'GAS PRICE'}
                 </p>
@@ -382,14 +432,16 @@ export default function ({ network, t, ownerId }: Props) {
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <img
-                    src={`${config.appUrl}images/pickaxe.svg`}
+                    src={`${config.appUrl}images/${
+                      theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
+                    }`}
                     alt={t ? t('home:activeValidator') : 'activeValidator'}
                     width="24"
                     height="24"
                   />
                 </div>
                 <div className="ml-2">
-                  <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     <Link href="/node-explorer" className="hover:no-underline">
                       {' '}
                       {t ? t('home:activeValidator') : 'ACTIVE VALIDATORS'}{' '}
@@ -409,7 +461,7 @@ export default function ({ network, t, ownerId }: Props) {
                 </div>
               </div>
               <div className="flex flex-col text-right">
-                <p className="uppercase font-semibold text-nearblue-600 text-sm">
+                <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {t ? t('home:avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
                 {isLoading ? (
@@ -418,7 +470,9 @@ export default function ({ network, t, ownerId }: Props) {
                   <Link href="/charts/blocks" className="hover:no-underline">
                     <a className="leading-6 text-nearblue-700 hover:no-underline">
                       {stats?.avg_block_time
-                        ? stats?.avg_block_time + ' s'
+                        ? `${
+                            (stats?.avg_block_time).replace(/\.?0+$/, '') + ' s'
+                          }`
                         : ''}
                     </a>
                   </Link>
@@ -426,21 +480,24 @@ export default function ({ network, t, ownerId }: Props) {
               </div>
             </div>
           </div>
-          <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 md:pt-0 md:px-5">
+          <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
             <div className="flex-1 py-5 lg:px-0">
-              <p className="uppercase font-semibold text-nearblue-600 text-sm">
+              <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                 {' '}
                 {t
                   ? t('home:transactionHistory', { days: 14 })
                   : 'NEAR TRANSACTION HISTORY IN 14 DAYS'}
               </p>
-              <div className="mt-1 h-28">
+              <div className="mt-1 h-28 dark:bg-black-600">
                 {chartData ? (
                   <iframe
+                    allowTransparency={true}
                     srcDoc={iframeSrc}
                     style={{
                       width: '100%',
                       border: 'none',
+                      backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
+                      paddingRight: '20px',
                     }}
                   />
                 ) : (

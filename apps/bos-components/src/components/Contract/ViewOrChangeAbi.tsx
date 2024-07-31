@@ -90,15 +90,18 @@ export default function (props: Props) {
 
     try {
       const args = mapFeilds(fields) ?? {};
-      const res: { transaction_outcome: { id: string } } | null | any =
-        Near.view(id, toSnakeCase(method?.name), args);
-
-      if (res !== null) {
-        setError(null);
-        setTxn(res?.transaction_outcome?.id);
-
-        setResult(JSON.stringify(res, null, 2));
-      }
+      Near.asyncView(id, toSnakeCase(method?.name), args)
+        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
+          setError(null);
+          setTxn(resp?.transaction_outcome?.id);
+          setResult(JSON.stringify(resp, null, 2));
+        })
+        .catch((error: any) => {
+          console.log(error);
+          setTxn(null);
+          setError(error?.message);
+          setResult(null);
+        });
     } catch (error: any) {
       setTxn(null);
       setError(error);
@@ -117,13 +120,16 @@ export default function (props: Props) {
 
       const args = mapFeilds(fields) ?? {};
       const res: { transaction_outcome: { id: string } } | null | any =
-        Near.call(id, toSnakeCase(method?.name), args);
-
-      if (res !== null) {
-        setError(null);
-        setTxn(res?.transaction_outcome?.id);
-        setResult(JSON.stringify(res, null, 2));
-      }
+        Near.call(
+          id,
+          toSnakeCase(method?.name),
+          args,
+          options?.gas,
+          options?.attachedDeposit,
+        );
+      setError(null);
+      setTxn(res?.transaction_outcome?.id);
+      setResult(JSON.stringify(res, null, 2));
     } catch (error: any) {
       setTxn(null);
       setError(error);
@@ -173,7 +179,7 @@ export default function (props: Props) {
       key={index}
     >
       <Accordion.Header>
-        <Accordion.Trigger className="bg-gray-50 border rounded flex items-center justify-between px-4 py-2 w-full">
+        <Accordion.Trigger className="bg-gray-50 dark:bg-black-200/50 border dark:border-black-200 rounded flex items-center justify-between px-4 py-2 w-full">
           <span>
             <span className="text-gray-400">{index + 1}.</span>{' '}
             {toSnakeCase(method.name ?? '')}
@@ -185,22 +191,19 @@ export default function (props: Props) {
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center">
             Arguments
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                   Specify an arguments schema.
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </div>
           <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
           <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
@@ -219,7 +222,7 @@ export default function (props: Props) {
                 name="type"
                 value={field.type}
                 onChange={(e) => onChange(e, 'type', field.id)}
-                className="col-span-2 bg-white block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
               >
                 <option value="" disabled>
                   Type
@@ -249,22 +252,19 @@ export default function (props: Props) {
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center">
             Options
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    <Question className="w-4 h-4 fill-current ml-1" />
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-                  align="start"
-                  side="bottom"
-                >
+            <OverlayTrigger
+              placement="bottom-start"
+              delay={{ show: 500, hide: 0 }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2">
                   Optional arguments for write operations.
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </OverlayTrigger>
           </div>
         </div>
         <div className="slide-down disclosure">
@@ -317,7 +317,7 @@ export default function (props: Props) {
           <textarea
             readOnly
             rows={6}
-            className="block appearance-none outline-none w-full border rounded-lg bg-red-50 border-red-100 p-3 mt-3 resize-y"
+            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
             value={error}
           />
         )}
@@ -348,7 +348,7 @@ export default function (props: Props) {
           <textarea
             readOnly
             rows={6}
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3 resize-y"
+            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y"
             value={result}
           />
         )}

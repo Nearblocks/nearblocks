@@ -21,12 +21,12 @@ const DeleteAccount = (props: ActionPropsInfo) => {
     );
   };
   return (
-    <div className="flex flex-wrap items-center break-all leading-7">
-      <FaRight className="inline-flex text-gray-400 text-xs" />
+    <div className="action flex flex-wrap items-center break-all leading-7">
+      <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">
         Delete Account{' '}
         <a href={`/address/${props.action.to}`}>
-          <a className="text-green-500 font-normal pl-1">
+          <a className="text-green-500 dark:text-green-250 font-normal pl-1">
             {shortenAddress(props.action.to)}
           </a>
         </a>

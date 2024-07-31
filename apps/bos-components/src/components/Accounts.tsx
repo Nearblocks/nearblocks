@@ -12,6 +12,8 @@
  * @param {string} [accountId] - The account ID of the signed-in user, passed as a string.
  * @param {Function} [logOut] - Function to log out.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} handleToggle - Function to toggle between showing all and unique receipts.
+ * @param {boolean} showAllReceipts - Boolean indicating whether to show all receipts or not.
  */
 
 interface Props {
@@ -23,6 +25,9 @@ interface Props {
   accountId: string;
   ownerId: string;
   logOut: () => void;
+  handleToggle: () => void;
+  showAllReceipts: boolean;
+  userApiUrl: string;
 }
 
 import FaExternalLinkAlt from '@/includes/icons/FaExternalLinkAlt';
@@ -37,13 +42,15 @@ import {
   FtsInfo,
   ContractCodeInfo,
   AccessKeyInfo,
-  ContractInfo,
   FtInfo,
   TokenListInfo,
   ContractParseInfo,
   SchemaInfo,
+  SpamToken,
+  AccountDataInfo,
 } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
+import WarningIcon from '@/includes/icons/WarningIcon';
 
 const tabs = [
   'Transactions',
@@ -64,6 +71,9 @@ export default function (props: Props) {
     accountId,
     logOut,
     ownerId,
+    handleToggle,
+    showAllReceipts,
+    userApiUrl,
   } = props;
 
   const { dollarFormat, localFormat, weight, convertToUTC } = VM.require(
@@ -77,6 +87,7 @@ export default function (props: Props) {
     shortenAddress,
     getConfig,
     handleRateLimit,
+    fetchData,
   } = VM.require(`${ownerId}/widget/includes.Utils.libs`);
 
   const { encodeArgs, decodeArgs } = VM.require(
@@ -96,17 +107,21 @@ export default function (props: Props) {
     {} as DeploymentsInfo,
   );
   const [tokenData, setTokenData] = useState<TokenInfo>({} as TokenInfo);
+  const [nftTokenData, setNftTokenData] = useState<TokenInfo>({} as TokenInfo);
   const [inventoryData, setInventoryData] = useState<InventoryInfo>(
     {} as InventoryInfo,
   );
-  const [contract, setContract] = useState<ContractInfo>({} as ContractInfo);
+  const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
-  const [code, setCode] = useState<ContractCodeInfo>({} as ContractCodeInfo);
-  const [key, setKey] = useState<AccessKeyInfo>({} as AccessKeyInfo);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isContractLoading, setIsContractLoading] = useState(false);
+  const [isAccountLoading, setIsAccountLoading] = useState(false);
   const [schema, setSchema] = useState<SchemaInfo>({} as SchemaInfo);
   const [contractInfo, setContractInfo] = useState<ContractParseInfo>(
     {} as ContractParseInfo,
   );
+  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
 
   const config = getConfig && getConfig(network);
 
@@ -114,6 +129,174 @@ export default function (props: Props) {
     setPageTab(tabs[index]);
     onFilterClear('');
   };
+
+  useEffect(() => {
+    function contractCode(address: string) {
+      setIsContractLoading(true);
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_code',
+            finality: 'final',
+            account_id: address,
+            prefix_base64: '',
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: ContractCodeInfo;
+              error?: any;
+            };
+            status: number;
+          }) => {
+            const resp = res?.body?.result;
+            if (res.status === 200 && resp) {
+              if (resp?.code_base64) {
+                setContract({
+                  block_hash: resp.block_hash,
+                  block_height: resp.block_height,
+                  code_base64: resp.code_base64,
+                  hash: resp.hash,
+                });
+                asyncFetch(
+                  `${config?.backendUrl}account/${id}/contract/parse`,
+                  {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  },
+                )
+                  .then(
+                    (res: {
+                      body: {
+                        contract: {
+                          contract: ContractParseInfo;
+                          schema: SchemaInfo;
+                        }[];
+                      };
+                      status: number;
+                    }) => {
+                      const resp = res.body.contract;
+                      if (res.status === 200 && resp && resp.length > 0) {
+                        const [{ contract, schema }] = resp;
+                        setContractInfo(contract);
+                        setSchema(schema);
+                      }
+                    },
+                  )
+                  .catch(() => {});
+              }
+              setIsContractLoading(false);
+            } else if (res?.status === 200 && res?.body?.error) {
+              setIsContractLoading(false);
+            }
+          },
+        )
+        .catch(() => {
+          setIsContractLoading(false);
+        });
+    }
+
+    function viewAccessKeys(address: string) {
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_access_key_list',
+            finality: 'final',
+            account_id: address,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: AccessKeyInfo;
+            };
+            status: number;
+          }) => {
+            const resp = res?.body?.result;
+            if (res.status === 200 && resp) {
+              const locked = (resp.keys || []).every(
+                (key: {
+                  access_key: {
+                    nonce: string;
+                    permission: string;
+                  };
+                  public_key: string;
+                }) => key.access_key.permission !== 'FullAccess',
+              );
+              setIsLocked(locked);
+            }
+          },
+        )
+        .catch(() => {});
+    }
+
+    function viewAccount(address: string) {
+      setIsAccountLoading(true);
+      asyncFetch(`${config?.rpcUrl}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 'dontcare',
+          method: 'query',
+          params: {
+            request_type: 'view_account',
+            finality: 'final',
+            account_id: address,
+          },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (res: {
+            body: {
+              result: AccountDataInfo;
+              error?: any;
+            };
+            status: number;
+          }) => {
+            const resp = res?.body?.result;
+            if (res.status === 200 && resp) {
+              setAccountView(resp);
+              setIsAccountLoading(false);
+            } else if (res?.status === 200 && res?.body?.error) {
+              setIsAccountLoading(false);
+            }
+          },
+        )
+        .catch(() => {
+          setIsAccountLoading(false);
+        });
+    }
+
+    function loadSchema() {
+      if (!id) return;
+
+      Promise.all([contractCode(id), viewAccessKeys(id), viewAccount(id)]);
+    }
+
+    loadSchema();
+  }, [id, config?.rpcUrl, config?.backendUrl]);
 
   useEffect(() => {
     function fetchStatsData() {
@@ -233,6 +416,31 @@ export default function (props: Props) {
         .catch(() => {});
     }
 
+    function fetchNftTokenData() {
+      asyncFetch(`${config?.backendUrl}nfts/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(
+          (data: {
+            body: {
+              contracts: TokenInfo[];
+            };
+            status: number;
+          }) => {
+            const tokenResp = data?.body?.contracts?.[0];
+            if (data.status === 200) {
+              setNftTokenData(tokenResp);
+            } else {
+              handleRateLimit(data, fetchNftTokenData);
+            }
+          },
+        )
+        .catch(() => {});
+    }
+
     function fetchInventoryData() {
       setInventoryLoading(true);
       asyncFetch(`${config?.backendUrl}account/${id}/inventory`, {
@@ -264,11 +472,20 @@ export default function (props: Props) {
         )
         .catch(() => {});
     }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
     if (config?.backendUrl) {
       fetchStatsData();
       fetchAccountData();
       fetchContractData();
       fetchTokenData();
+      fetchNftTokenData();
       fetchInventoryData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -337,7 +554,7 @@ export default function (props: Props) {
       ).then((results: TokenListInfo[]) => {
         results.forEach((rslt: TokenListInfo) => {
           const ftrslt = rslt;
-          const amount = rslt?.amount ?? 0;
+          const amount = typeof rslt?.amount === 'string' ? rslt.amount : 0;
 
           let sum = Big(0);
 
@@ -401,130 +618,6 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, config?.rpcUrl]);
 
-  useEffect(() => {
-    function contractCode(address: string) {
-      asyncFetch(`${config?.rpcUrl}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 'dontcare',
-          method: 'query',
-          params: {
-            request_type: 'view_code',
-            finality: 'final',
-            account_id: address,
-            prefix_base64: '',
-          },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(
-          (res: {
-            body: {
-              result: ContractCodeInfo;
-            };
-          }) => {
-            const resp = res?.body?.result;
-            setCode({
-              block_hash: resp.block_hash,
-              block_height: resp.block_height,
-              code_base64: resp.code_base64,
-              hash: resp.hash,
-            });
-          },
-        )
-        .catch(() => {});
-    }
-
-    function viewAccessKeys(address: string) {
-      asyncFetch(`${config?.rpcUrl}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 'dontcare',
-          method: 'query',
-          params: {
-            request_type: 'view_access_key_list',
-            finality: 'final',
-            account_id: address,
-          },
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(
-          (res: {
-            body: {
-              result: AccessKeyInfo;
-            };
-          }) => {
-            const resp = res?.body?.result;
-            setKey({
-              block_hash: resp.block_hash,
-              block_height: resp.block_height,
-              keys: resp?.keys,
-              hash: resp?.hash,
-            });
-          },
-        )
-        .catch(() => {});
-    }
-
-    function loadSchema() {
-      if (!id) return;
-
-      Promise.all([contractCode(id), viewAccessKeys(id)]);
-    }
-    loadSchema();
-  }, [id, config?.rpcUrl]);
-
-  useEffect(() => {
-    if (code?.code_base64) {
-      const locked = (key.keys || []).every(
-        (key: {
-          access_key: {
-            nonce: string;
-            permission: string;
-          };
-          public_key: string;
-        }) => key.access_key.permission !== 'FullAccess',
-      );
-
-      function fetchContractInfo() {
-        asyncFetch(`${config?.backendUrl}account/${id}/contract/parse`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(
-            (res: {
-              body: {
-                contract: { contract: ContractParseInfo; schema: SchemaInfo }[];
-              };
-              status: number;
-            }) => {
-              const resp = res.body.contract;
-              if (res.status === 200 && resp && resp.length > 0) {
-                const [{ contract, schema }] = resp;
-                setContractInfo(contract);
-                setSchema(schema);
-              }
-            },
-          )
-          .catch(() => {});
-      }
-
-      fetchContractInfo();
-
-      setContract({ ...code, locked });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, key, config?.backendUrl, id]);
-
   const handleFilter = (name: string, value: string) => {
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
@@ -543,42 +636,63 @@ export default function (props: Props) {
 
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
+
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap pt-4 ">
-        {!id ? (
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-7" />
-          </div>
-        ) : (
-          <div className="flex md:flex-wrap">
-            <h1 className="py-4 break-all space-x-2 text-xl text-gray-700 leading-8 px-2">
-              Near Account: @
-              {id && (
-                <span className="font-semibold text-green-500 ">{id}</span>
-              )}
-              {
-                <Widget
-                  src={`${ownerId}/widget/bos-components.components.Shared.Buttons`}
-                  props={{
-                    id: id,
-                    config: config,
-                  }}
-                />
-              }
-            </h1>
-          </div>
+      {accountView === null &&
+        accountData?.deleted?.transaction_hash &&
+        !isAccountLoading && (
+          <>
+            <div className="block lg:flex lg:space-x-2">
+              <div className="w-full ">
+                <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+                  <p className="mb-0 items-center break-words">
+                    <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+                    {`This account was deleted on ${
+                      accountData?.deleted?.transaction_hash
+                        ? convertToUTC(
+                            nanoToMilli(accountData.deleted.block_timestamp),
+                            false,
+                          )
+                        : ''
+                    }`}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="py-2"></div>
+          </>
         )}
-      </div>
+      {accountView !== null &&
+        accountView?.block_hash !== undefined &&
+        isLocked &&
+        accountData &&
+        accountData?.deleted?.transaction_hash === null &&
+        contract === null &&
+        !isContractLoading && (
+          <>
+            <div className="block lg:flex lg:space-x-2">
+              <div className="w-full ">
+                <div className="h-full w-full inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+                  <p className="mb-0 items-center">
+                    <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+                    This account has no full access keys
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="py-2"></div>
+          </>
+        )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-xl">
-            <div className="flex justify-between border-b p-3 text-nearblue-600">
+          <div className="h-full bg-white soft-shadow rounded-xl dark:bg-black-600">
+            <div className="flex justify-between border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10">
               <h2 className="leading-6 text-sm font-semibold">
                 {t ? t('address:overview') : 'Overview'}
               </h2>
               {tokenData?.name && (
-                <div className="flex items-center text-xs bg-gray-100 rounded-md px-2 py-1">
+                <div className="flex items-center text-xs bg-gray-100 dark:bg-black-200 dark:text-neargray-10 rounded-md px-2 py-1">
                   <div className="truncate max-w-[110px]">
                     {tokenData?.name}
                   </div>
@@ -595,7 +709,7 @@ export default function (props: Props) {
                 </div>
               )}
             </div>
-            <div className="px-3 divide-y text-sm text-nearblue-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex flex-wrap py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:balance') : 'Balance'}:
@@ -613,7 +727,7 @@ export default function (props: Props) {
               {network === 'mainnet' &&
                 accountData?.amount &&
                 statsData?.near_price && (
-                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+                  <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">
                       {t ? t('address:value') : 'Value:'}
                     </div>
@@ -642,7 +756,7 @@ export default function (props: Props) {
                     )}
                   </div>
                 )}
-              <div className="flex flex-wrap py-4 text-sm text-nearblue-600">
+              <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('address:tokens') : 'Tokens:'}
                 </div>
@@ -655,6 +769,7 @@ export default function (props: Props) {
                     id={id}
                     appUrl={config?.appUrl}
                     ownerId={ownerId}
+                    spamTokens={spamTokens.blacklist}
                   />
                 </div>
               </div>
@@ -662,11 +777,11 @@ export default function (props: Props) {
           </div>
         </div>
         <div className="w-full">
-          <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-            <h2 className="leading-6 border-b p-3 text-nearblue-600 text-sm font-semibold">
+          <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+            <h2 className="leading-6 border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
               {t ? t('address:moreInfo') : 'Account information'}
             </h2>
-            <div className="px-3 divide-y text-sm text-nearblue-600">
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex justify-between">
                 <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
@@ -685,7 +800,9 @@ export default function (props: Props) {
                   )}
                 </div>
                 <div className="flex ml-4  xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
-                  <div className="w-full mb-2 md:mb-0">Storage Used:</div>
+                  <div className="w-full mb-2 md:mb-0">
+                    {t ? t('address:storageUsed') : 'Storage Used'}:
+                  </div>
                   {loading ? (
                     <div className="w-full break-words">
                       <Skeleton className="h-4 w-28" />
@@ -707,7 +824,10 @@ export default function (props: Props) {
                     </div>
                   ) : (
                     <div className="w-full mb-2 md:mb-0">
-                      {accountData?.deleted?.transaction_hash
+                      {accountView !== null &&
+                      accountView?.block_hash === undefined &&
+                      accountData?.deleted?.transaction_hash &&
+                      !isAccountLoading
                         ? 'Deleted At:'
                         : 'Created At:'}
                     </div>
@@ -718,7 +838,10 @@ export default function (props: Props) {
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {accountData?.deleted?.transaction_hash
+                      {accountView !== null &&
+                      accountView?.block_hash === undefined &&
+                      accountData?.deleted?.transaction_hash &&
+                      !isAccountLoading
                         ? convertToUTC(
                             nanoToMilli(accountData.deleted.block_timestamp),
                             false,
@@ -734,11 +857,11 @@ export default function (props: Props) {
                     </div>
                   )}
                 </div>
-                {contract?.hash && !loading ? (
+                {contract && contract?.hash && !loading ? (
                   <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                     <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {contract?.locked ? 'Yes' : 'No'}
+                      {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
                     </div>
                   </div>
                 ) : (
@@ -755,7 +878,7 @@ export default function (props: Props) {
                       href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a className="text-green-500 dark:text-green-250 hover:no-underline">
                         {shortenAddress(
                           deploymentData.receipt_predecessor_account_id ?? '',
                         )}
@@ -766,7 +889,7 @@ export default function (props: Props) {
                       href={`/txns/${deploymentData.transaction_hash}`}
                       className="hover:no-underline"
                     >
-                      <a className="text-green-500 hover:no-underline">
+                      <a className="text-green-500 dark:text-green-250 hover:no-underline">
                         {shortenAddress(deploymentData.transaction_hash ?? '')}
                       </a>
                     </Link>
@@ -790,7 +913,7 @@ export default function (props: Props) {
                         href={`/token/${id}`}
                         className="hover:no-underline"
                       >
-                        <a className="flex text-green-500 hover:no-underline">
+                        <a className="flex text-green-500 dark:text-green-250 hover:no-underline">
                           <span className="inline-block truncate max-w-[110px] mr-1">
                             {tokenData.name}
                           </span>
@@ -802,10 +925,42 @@ export default function (props: Props) {
                         </a>
                       </Link>
                       {tokenData.price && (
-                        <div className="text-nearblue-600 ml-1">
+                        <div className="text-nearblue-600 dark:text-neargray-10 ml-1">
                           (@ ${localFormat(tokenData.price)})
                         </div>
                       )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {nftTokenData?.name && (
+                <div className="flex flex-wrap items-center justify-between py-4">
+                  <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                    NFT Token Tracker:
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    <div className="flex items-center">
+                      <TokenImage
+                        src={nftTokenData?.icon}
+                        alt={nftTokenData?.name}
+                        appUrl={config.appUrl}
+                        className="w-4 h-4 mr-2"
+                      />
+                      <Link
+                        href={`/nft-token/${id}`}
+                        className="hover:no-underline"
+                      >
+                        <a className="flex text-green-500 dark:text-green-250 hover:no-underline">
+                          <span className="inline-block truncate max-w-[110px] mr-1">
+                            {nftTokenData.name}
+                          </span>
+                          (
+                          <span className="inline-block truncate max-w-[80px]">
+                            {nftTokenData.symbol}
+                          </span>
+                          )
+                        </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -833,10 +988,10 @@ export default function (props: Props) {
                       onClick={() => {
                         onTab(index);
                       }}
-                      className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                      className={`  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                         pageTab === tab
-                          ? 'rounded-lg bg-green-600 text-white'
-                          : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                          ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+                          : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10'
                       }`}
                       value={tab}
                     >
@@ -847,12 +1002,16 @@ export default function (props: Props) {
                       ) : tab === 'Contract' ? (
                         <div className="flex h-full">
                           <h2>{tab}</h2>
-                          <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
+                          <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-3 px-1 ">
                             NEW
                           </div>
                         </div>
                       ) : tab === 'Comments' ? (
                         <h2>{t ? t('address:comments') : tab}</h2>
+                      ) : tab === 'NFT Token Txns' ? (
+                        <h2>{t ? t('address:nftTokenTxns') : tab}</h2>
+                      ) : tab === 'Access Keys' ? (
+                        <h2>{t ? t('address:accessKeys') : tab}</h2>
                       ) : (
                         <h2>{tab}</h2>
                       )}
@@ -873,6 +1032,8 @@ export default function (props: Props) {
                       handleFilter: handleFilter,
                       onFilterClear: onFilterClear,
                       ownerId,
+                      handleToggle,
+                      showAllReceipts,
                     }}
                   />
                 }
@@ -935,6 +1096,7 @@ export default function (props: Props) {
                           t: t,
                           id: id,
                           contract: contract,
+                          isLocked: isLocked,
                           schema: schema,
                           contractInfo: contractInfo,
                           requestSignInWithWallet: requestSignInWithWallet,
@@ -950,7 +1112,7 @@ export default function (props: Props) {
               )}
               <div className={`${pageTab === 'Comments' ? '' : 'hidden'} `}>
                 {
-                  <div className="bg-white soft-shadow rounded-xl pb-1">
+                  <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                     <div className="py-3">
                       <Widget
                         src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
@@ -959,6 +1121,7 @@ export default function (props: Props) {
                           path: `nearblocks.io/address/${id}`,
                           ownerId,
                           limit: 10,
+                          requestSignInWithWallet,
                         }}
                       />
                     </div>
@@ -968,6 +1131,14 @@ export default function (props: Props) {
             </div>
           </>
         </div>
+      </div>
+      <div className="mb-10">
+        {
+          <Widget
+            src={`${ownerId}/widget/includes.Common.Banner`}
+            props={{ type: 'center', userApiUrl: userApiUrl }}
+          />
+        }
       </div>
     </>
   );

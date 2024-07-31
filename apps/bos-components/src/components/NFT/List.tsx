@@ -24,6 +24,8 @@ import TokenImage from '@/includes/icons/TokenImage';
 import { Sorting, Token } from '@/includes/types';
 import Skeleton from '@/includes/Common/Skeleton';
 import SortIcon from '@/includes/icons/SortIcon';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
 const initialSorting: Sorting = {
   sort: 'txns_day',
@@ -117,10 +119,6 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
     if (config?.backendUrl) {
       fetchTotalTokens();
       fetchTokens('', sorting, currentPage);
-      if (sorting) {
-        fetchTotalTokens();
-        fetchTokens('', sorting, currentPage);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.backendUrl, currentPage, sorting]);
@@ -149,7 +147,7 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
       tdClassName:
         'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-700 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[1px]',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[1px]',
     },
     {
       header: <span>Token</span>,
@@ -167,7 +165,7 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
               href={`/nft-token/${row?.contract}`}
               className="hover:no-underline"
             >
-              <a className="flex text-green-500 hover:no-underline">
+              <a className="flex text-green-500 dark:text-green-250 hover:no-underline">
                 <span className="inline-block truncate max-w-[200px] mr-1">
                   {row?.name}
                 </span>
@@ -180,9 +178,9 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
         </>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm  text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm  text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>Tokens</span>,
@@ -193,9 +191,9 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[160px]',
     },
     {
       header: <span>Holders</span>,
@@ -204,9 +202,9 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
         <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider w-[160px]',
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[160px]',
     },
     {
       header: (
@@ -214,10 +212,10 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
           <button
             type="button"
             onClick={() => onOrder('txns_day')}
-            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex flex-row whitespace-nowrap"
+            className="w-full px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row whitespace-nowrap"
           >
             {sorting.sort === 'txns_day' && (
-              <div className="text-nearblue-600 font-semibold">
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
                 <SortIcon order={sorting.order} />
               </div>
             )}
@@ -230,7 +228,7 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
         <span>{row?.transfers_day ? localFormat(row?.transfers_day) : ''}</span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top',
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
       thClassName: 'w-[160px]',
     },
   ];
@@ -267,16 +265,19 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
 
   return (
     <>
-      <div className=" bg-white border soft-shadow rounded-xl pb-1 ">
-        <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
+      <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl pb-1 ">
+        <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 dark:text-neargray-10 px-3 py-2">
           {isLoading ? (
             <div className="max-w-lg pl-3 w-full py-3.5 ">
               <Skeleton className=" h-4" />
             </div>
           ) : (
             <p className="pl-3">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              NEP-171 Token Contracts found
+              {Object.keys(tokens).length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              NEP-171 Token Contracts found`}
             </p>
           )}
           <div className={`flex w-full h-10 sm:w-80 mr-2`}>
@@ -286,19 +287,19 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
                   name="search"
                   autoComplete="off"
                   placeholder="Search"
-                  className="search ml-2 pl-8 token-search bg-white w-full h-full text-sm py-2 outline-none border rounded-xl"
+                  className="search ml-2 pl-8 token-search bg-white dark:bg-black-600 dark:border-black-200 w-full h-full text-sm py-2 outline-none border rounded-xl"
                   onChange={onChange}
                 />
               </label>
               {searchResults?.length > 0 && (
                 <div className="z-50 relative">
-                  <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white py-2 shadow">
+                  <div className="text-xs rounded-b-md -mr-2 ml-2 -mt-1 bg-white dark:bg-black-600 py-2 shadow">
                     {searchResults.map((token) => (
                       <div
                         key={token?.contract}
-                        className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                        className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <Link href={`/token/${token?.contract}`}>
+                        <Link href={`/nft-token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage
@@ -336,7 +337,13 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
             limit: initialPagination.per_page,
             pageLimit: 200,
             setPage: setPage,
-            Error: errorMessage,
+            Error: (
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={errorMessage || ''}
+                mutedText="Please try again later"
+              />
+            ),
           }}
         />
       </div>

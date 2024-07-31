@@ -14,6 +14,7 @@ export interface TTables {
   access_keys: AccessKey;
   accounts: Account;
   action_receipt_actions: ActionReceiptAction;
+  action_receipt_input_data: ActionReceiptInputData;
   action_receipt_output_data: ActionReceiptOutputData;
   balance_events: BalanceEvent;
   blocks: Block;
@@ -31,6 +32,7 @@ export interface TTables {
   receipts: Receipt;
   settings: Setting;
   stats: Stats;
+  tps: TPS;
   transactions: Transaction;
 }
 
@@ -60,6 +62,11 @@ export type ActionReceiptAction = {
   receipt_included_in_block_timestamp: string;
   receipt_predecessor_account_id: string;
   receipt_receiver_account_id: string;
+};
+
+export type ActionReceiptInputData = {
+  input_data_id: string;
+  input_to_receipt_id: string;
 };
 
 export type ActionReceiptOutputData = {
@@ -299,6 +306,12 @@ export type Stats = {
   total_supply: null | string;
   total_txns: null | string;
   volume: null | string;
+};
+
+export type TPS = {
+  date: string;
+  shards: JsonValue;
+  txns: number;
 };
 
 export type Transaction = {

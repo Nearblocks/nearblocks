@@ -7,9 +7,12 @@ import useTranslation from 'next-translate/useTranslation';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
+import { useAuthStore } from '@/stores/auth';
+import SponserdText from '@/components/SponserdText';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const Txn = () => {
   const router = useRouter();
@@ -18,25 +21,16 @@ const Txn = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const [pageTab, setPageTab] = useState('overview');
+  const pageTab = `${router?.query?.tab || 'overview'}`;
 
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
   const description = t('txns:txn.metaDescription', { txn: hash });
-  const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}`;
+  const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
 
   const onHandleTab = (hashValue: string) => {
-    setPageTab(hashValue);
     router.push(`/txns/${hash}?tab=${hashValue}`);
   };
-
-  useEffect(() => {
-    const select = `${router?.query?.tab}` || 'overview';
-
-    if (router?.query?.tab) {
-      setPageTab(select);
-    }
-  }, [router?.query]);
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -60,6 +54,10 @@ const Txn = () => {
     setHeight({});
   };
 
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
   return (
     <>
       <Head>
@@ -75,14 +73,15 @@ const Txn = () => {
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />
       </Head>
+      <div className="md:flex items-center justify-between container mx-auto px-3">
+        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 pt-5 pb-2 border-b w-full">
+          {t ? t('txns:txn.heading') : 'Transaction Details'}
+        </h1>
+      </div>
+      <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
+        <SponserdText />
+      </div>
       <div style={height} className="relative container mx-auto px-3">
-        <div>
-          <div className="md:flex items-center justify-between">
-            <h1 className="text-xl text-nearblue-600 px-2 py-5">
-              {t ? t('txns:txn.heading') : 'Transaction Details'}
-            </h1>
-          </div>
-        </div>
         <VmComponent
           src={components?.transactionsHash}
           props={{
@@ -90,6 +89,7 @@ const Txn = () => {
             network: networkId,
             t: t,
             onHandleTab: onHandleTab,
+            requestSignInWithWallet,
             pageTab: pageTab,
           }}
           skeleton={

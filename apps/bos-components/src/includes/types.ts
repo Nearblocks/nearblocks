@@ -149,6 +149,7 @@ export type StatusInfo = {
   total_supply: string;
   total_txns: string;
   volume: string;
+  tps: string;
 };
 
 export type ChartSeriesInfo = {
@@ -479,8 +480,7 @@ export type ActionPropsInfo = {
     to: string;
     action_kind: string;
     args: {
-      stake: string;
-      deposit: string;
+      [key: string]: string;
     };
   };
   ownerId: string;
@@ -494,6 +494,21 @@ export type ArgsPropsInfo = {
         receiver_id: string;
       };
     };
+  };
+  delegate_action: {
+    actions: {
+      FunctionCall: {
+        method_name: string;
+        args: string;
+        deposit: string;
+        gas: string;
+      };
+    }[];
+    max_block_height: string;
+    nonce: string;
+    public_key: string;
+    receiver_id: string;
+    sender_id: string;
   };
   public_key: string;
   beneficiary_id: string;
@@ -509,6 +524,8 @@ export type TransactionActionInfo = {
   receiver: string;
   t: (key: string) => string | undefined;
   ownerId: string;
+  action?: any;
+  network?: string;
 };
 
 export type ReceiptsPropsInfo = {
@@ -676,6 +693,7 @@ export type TransActionProps = {
   receiver: any;
   t: (key: string) => string | undefined;
   ownerId: string;
+  network?: string;
 };
 
 export type TokenInfoProps = {
@@ -698,6 +716,25 @@ export type ValidatorFullData = {
     [accountId: string]: ValidatorTelemetry;
   };
   total: string;
+  lastEpochApy: string;
+};
+
+export type DelegatorInfo = {
+  account_id: string;
+  can_withdraw: boolean;
+  staked_balance: string;
+  unstaked_balance: string;
+};
+
+export type ValidatorStatus = {
+  currentEpoch: boolean;
+  nextEpoch: boolean;
+  afterNextEpoch: boolean;
+};
+
+export type RewardFraction = {
+  denominator: number;
+  numerator: number;
 };
 
 export type ReceiptStatsProps = {
@@ -1551,3 +1588,29 @@ export type Status = {
     events: { height: number; sync: boolean };
   };
 };
+
+export type chartDataInfo = {
+  date: string;
+  txns: string;
+  shards: { txns: string; shard: string }[];
+};
+
+export type AccountDataInfo = {
+  amount: string;
+  locked: string;
+  code_hash: string;
+  storage_usage: string;
+  storage_paid_at: string;
+  block_height: string;
+  block_hash: string;
+};
+export type SpamToken = {
+  blacklist: string[];
+};
+
+export type GuessableTypeString =
+  | 'null'
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'json';

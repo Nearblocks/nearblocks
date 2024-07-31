@@ -1,10 +1,11 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import dayjs from '#libs/dayjs';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import { Count, Item, Latest, List } from '#libs/schema/txns';
-import { getPagination } from '#libs/utils';
+import { getPagination, msToNsTime } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
 const EXPIRY = 5; // 5 sec
@@ -15,13 +16,33 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const to = req.validator.data.to;
   const action = req.validator.data.action;
   const method = req.validator.data.method;
+  const cursor = req.validator.data.cursor;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
+  const afterDate = req.validator.data.after_date;
+  const beforeDate = req.validator.data.before_date;
+  let afterTimestamp = null;
+  let beforeTimestamp = null;
+
+  if (afterDate) {
+    afterTimestamp = msToNsTime(
+      dayjs(afterDate, 'YYYY-MM-DD', true)
+        .add(1, 'day')
+        .startOf('day')
+        .valueOf(),
+    );
+  }
+  if (beforeDate) {
+    beforeTimestamp = msToNsTime(
+      dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+  }
 
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
     SELECT
+      id,
       transaction_hash,
       included_in_block_hash,
       block_timestamp,
@@ -103,6 +124,15 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           ${block ? sql`included_in_block_hash = ${block}` : true}
           AND ${from ? sql`signer_account_id = ${from}` : true}
           AND ${to ? sql`receiver_account_id = ${to}` : true}
+          AND ${cursor
+      ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true}
+          AND ${afterTimestamp
+      ? sql`block_timestamp >= ${afterTimestamp}`
+      : true}
+          AND ${beforeTimestamp
+      ? sql`block_timestamp < ${beforeTimestamp}`
+      : true}
           AND ${action || method
       ? sql`
           EXISTS (
@@ -128,16 +158,18 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         `
       : true}
         ORDER BY
-          block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-          index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          id ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
           ${limit}
         OFFSET
-          ${offset}
+          ${cursor ? 0 : offset}
       ) AS tmp using (transaction_hash)
   `;
 
-  return res.status(200).json({ txns });
+  let nextCursor = txns?.[txns?.length - 1]?.id;
+  nextCursor = txns?.length === per_page && nextCursor ? nextCursor : undefined;
+
+  return res.status(200).json({ cursor: nextCursor, txns });
 });
 
 const count = catchAsync(
@@ -147,8 +179,34 @@ const count = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp = null;
+    let beforeTimestamp = null;
 
-    if (!block && !from && !to && !action && !method) {
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
+
+    if (
+      !block &&
+      !from &&
+      !to &&
+      !action &&
+      !method &&
+      !afterTimestamp &&
+      !beforeTimestamp
+    ) {
       const txns = await sql`
         SELECT
           count_estimate ('SELECT
@@ -169,6 +227,10 @@ const count = catchAsync(
         ${block ? sql`included_in_block_hash = ${block}` : true}
         AND ${from ? sql`signer_account_id = ${from}` : true}
         AND ${to ? sql`receiver_account_id = ${to}` : true}
+        AND ${afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true}
+        AND ${beforeTimestamp
+        ? sql`block_timestamp < ${beforeTimestamp}`
+        : true}
         AND ${action || method
         ? sql`
             EXISTS (

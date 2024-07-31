@@ -16,7 +16,7 @@ const isBlockInSync = (height: number) => height <= BLOCK_RANGE;
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
-const status = catchAsync(async (_req: Request, res: Response) => {
+const getSettings = async () => {
   const [settings, block, rpcBlock, stats, statsNew] = await redis.cache(
     'sync:settings',
     async () => {
@@ -63,6 +63,21 @@ const status = catchAsync(async (_req: Request, res: Response) => {
     EXPIRY,
   );
 
+  return { block, rpcBlock, settings, stats, statsNew };
+};
+
+const timestampQuery = (block: number) => sql`
+  SELECT
+    block_timestamp
+  FROM
+    blocks
+  WHERE
+    block_height = ${block}
+`;
+
+const status = catchAsync(async (_req: Request, res: Response) => {
+  const { block, rpcBlock, settings, stats, statsNew } = await getSettings();
+
   if (!rpcBlock) {
     return res.status(500).json({ message: 'RPC Error' });
   }
@@ -82,26 +97,8 @@ const status = catchAsync(async (_req: Request, res: Response) => {
   );
 
   const [ftHoldersTime, nftHoldersTime] = await Promise.all([
-    ftHolders?.value?.sync
-      ? sql`
-          SELECT
-            block_timestamp
-          FROM
-            blocks
-          WHERE
-            block_height = ${ftHolders.value.sync}
-        `
-      : null,
-    nftHolders?.value?.sync
-      ? sql`
-          SELECT
-            block_timestamp
-          FROM
-            blocks
-          WHERE
-            block_height = ${nftHolders.value.sync}
-        `
-      : null,
+    ftHolders?.value?.sync ? timestampQuery(ftHolders.value.sync) : null,
+    nftHolders?.value?.sync ? timestampQuery(nftHolders.value.sync) : null,
   ]);
 
   const status = {
@@ -154,4 +151,116 @@ const status = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json({ status });
 });
 
-export default { status };
+const ft = catchAsync(async (_req: Request, res: Response) => {
+  const { rpcBlock, settings } = await getSettings();
+
+  if (!rpcBlock) {
+    return res.status(500).json({ message: 'RPC Error' });
+  }
+
+  const latestBlock = rpcBlock?.header?.height;
+  const ftHolders = settings.find((item: Setting) => item.key === 'ft_holders');
+
+  const ftHoldersTime = ftHolders?.value?.sync
+    ? await timestampQuery(ftHolders.value.sync)
+    : null;
+
+  const status = {
+    height: ftHolders?.value?.sync,
+    sync: isBlockInSync(latestBlock - ftHolders?.value?.sync),
+    timestamp: ftHoldersTime?.[0]?.block_timestamp,
+  };
+
+  return res.status(200).json({ status });
+});
+
+const nft = catchAsync(async (_req: Request, res: Response) => {
+  const { rpcBlock, settings } = await getSettings();
+
+  if (!rpcBlock) {
+    return res.status(500).json({ message: 'RPC Error' });
+  }
+
+  const latestBlock = rpcBlock?.header?.height;
+  const nftHolders = settings.find(
+    (item: Setting) => item.key === 'nft_holders',
+  );
+
+  const ftHoldersTime = nftHolders?.value?.sync
+    ? await timestampQuery(nftHolders.value.sync)
+    : null;
+
+  const status = {
+    height: nftHolders?.value?.sync,
+    sync: isBlockInSync(latestBlock - nftHolders?.value?.sync),
+    timestamp: ftHoldersTime?.[0]?.block_timestamp,
+  };
+
+  return res.status(200).json({ status });
+});
+
+const balance = catchAsync(async (_req: Request, res: Response) => {
+  const { rpcBlock, settings } = await getSettings();
+
+  if (!rpcBlock) {
+    return res.status(500).json({ message: 'RPC Error' });
+  }
+
+  const latestBlock = rpcBlock?.header?.height;
+  const balance = settings.find((item: Setting) => item.key === 'balance');
+
+  const status = {
+    height: balance?.value?.sync,
+    sync: isBlockInSync(latestBlock - balance?.value?.sync),
+  };
+
+  return res.status(200).json({ status });
+});
+
+const base = catchAsync(async (_req: Request, res: Response) => {
+  const { block, rpcBlock } = await getSettings();
+
+  if (!rpcBlock) {
+    return res.status(500).json({ message: 'RPC Error' });
+  }
+
+  const latestBlock = rpcBlock?.header?.height;
+
+  const status = {
+    height: block?.[0]?.block_height,
+    sync: isBlockInSync(latestBlock - block?.[0]?.block_height),
+  };
+
+  return res.status(200).json({ status });
+});
+
+const events = catchAsync(async (_req: Request, res: Response) => {
+  const { rpcBlock, settings } = await getSettings();
+
+  if (!rpcBlock) {
+    return res.status(500).json({ message: 'RPC Error' });
+  }
+
+  const latestBlock = rpcBlock?.header?.height;
+  const events = settings.find((item: Setting) => item.key === 'events');
+
+  const status = {
+    height: events?.value?.sync,
+    sync: isBlockInSync(latestBlock - events?.value?.sync),
+  };
+
+  return res.status(200).json({ status });
+});
+
+const stats = catchAsync(async (_req: Request, res: Response) => {
+  const { stats } = await getSettings();
+
+  const status = {
+    date: stats?.[0]?.date,
+    sync: isDateInSync(stats?.[0]?.date),
+  };
+
+  return res.status(200).json({ status });
+});
+
+export default { balance, base, events, ft, nft, stats, status };

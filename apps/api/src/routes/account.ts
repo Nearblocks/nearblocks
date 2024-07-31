@@ -4,10 +4,12 @@ import schema from '#libs/schema/account';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import activity from '#services/account/activity';
 import ft from '#services/account/ft';
 import account from '#services/account/index';
 import key from '#services/account/key';
 import nft from '#services/account/nft';
+import stake from '#services/account/stake';
 import txn from '#services/account/txn';
 
 const route = Router();
@@ -100,7 +102,7 @@ const routes = (app: Router) => {
    * @summary Get access keys by pagination
    * @tags Account
    * @param {string} account.path.required - account id
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -125,7 +127,10 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -141,6 +146,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
@@ -152,7 +159,10 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -166,6 +176,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get(
@@ -181,7 +193,10 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
-   * @param {number} page.query - json:{"minimum": 1, "default": 1}
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
@@ -195,12 +210,76 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
    * @param {string} event.query - event kind
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get(
     '/:account/nft-txns/count',
     validator(schema.nftTxnsCount),
     nft.txnsCount,
+  );
+
+  /**
+   * GET /v1/account/{account}/stake-txns
+   * @summary Get account stake txns by pagination
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:account/stake-txns', validator(schema.stakeTxns), stake.txns);
+
+  /**
+   * GET /v1/account/{account}/stake-txns/count
+   * @summary Get account stake txns count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/stake-txns/count',
+    validator(schema.stakeTxnsCount),
+    stake.txnsCount,
+  );
+
+  /**
+   * GET /v1/account/{account}/activities
+   * @summary Get account balance change activities by pagination
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/activities',
+    validator(schema.activities),
+    activity.changes,
+  );
+
+  /**
+   * GET /v1/account/{account}/activities/count
+   * @summary Get account balance change activities count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/activities/count',
+    validator(schema.activitiesCount),
+    activity.changesCount,
   );
 };
 

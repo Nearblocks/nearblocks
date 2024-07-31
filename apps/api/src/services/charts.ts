@@ -33,4 +33,27 @@ const latest = catchAsync(async (_req: Request, res: Response) => {
   return res.status(200).json({ charts });
 });
 
-export default { latest, list };
+const tps = catchAsync(async (_req: Request, res: Response) => {
+  const charts = await sql`
+    SELECT
+      date,
+      txns,
+      shards
+    FROM
+      tps
+    WHERE
+      date >= (
+        EXTRACT(
+          EPOCH
+          FROM
+            NOW() - INTERVAL '10 minutes'
+        )
+      )::BIGINT
+    ORDER BY
+      date DESC;
+  `;
+
+  return res.status(200).json({ charts });
+});
+
+export default { latest, list, tps };

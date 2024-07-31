@@ -1,9 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{tsx,jsx,ts}'],
+  darkMode: 'class',
   theme: {
     extend: {
-      darkMode: 'class',
       fontFamily: {
         sans: "'Manrope', sans-serif",
       },
@@ -22,7 +22,13 @@ module.exports = {
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
-        black: '#1B1B1B',
+        black: {
+          DEFAULT: '#1B1B1B',
+          200: '#1F2228',
+          500: '#171717',
+          300: '#121212',
+          600: '#0D0D0D',
+        },
         white: '#fff',
         blue: '#21325b',
         theme: '#000c00',
@@ -33,17 +39,21 @@ module.exports = {
         neargreen: {
           DEFAULT: '#35C154',
           200: '#338E7B',
+          300: '#00a186',
         },
         nearblue: {
           DEFAULT: '#F1F9FF',
           600: '#4b5563',
+          650: '#adb5bd',
           700: '#9CA3AF',
         },
         neargray: {
           DEFAULT: '#676767',
+          10: '#e0e0e0',
           25: '#FAFAFA',
           50: '#8E8E8E',
           600: '#676767',
+          650: '#bbbbbb',
           700: '#E9ECEF',
           800: '#DEE2E6',
         },
@@ -63,6 +73,7 @@ module.exports = {
           DEFAULT: '#0d494a',
           100: '#357172',
           200: '#2b6768',
+          250: '#31766A',
           300: '#215d5e',
           400: '#175354',
           500: '#0d494a',
@@ -70,6 +81,14 @@ module.exports = {
           700: '#003536',
           800: '#002b2c',
           900: '#002122',
+        },
+        nearyellow: {
+          400: '#cc9a06',
+        },
+        nearred: {
+          300: '#ea868f',
+          400: '#842029',
+          500: '#2c0b0e',
         },
         brightgreen: {
           DEFAULT: '#36C054',

@@ -47,13 +47,13 @@ export default function (props: TransactionReceiptInfo) {
         className={`${
           convertionReceipt
             ? 'pl-0 border-transparent'
-            : 'pl-12 border-green-500 '
+            : 'pl-4 md:pl-8 border-green-500 dark:border-green-250'
         } ${className} `}
       >
         {convertionReceipt ? (
           <div className="flex flex-row mb-2.5">
-            <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-            <div className="text-green-500 text-sm">
+            <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
+            <div className="text-green-500 dark:text-green-250 text-sm">
               {receipt?.predecessorId}
             </div>
           </div>
@@ -69,12 +69,12 @@ export default function (props: TransactionReceiptInfo) {
               expandAll: expandAll,
               fellowOutgoingReceipts: remainingFellowOutgoingReceipts,
               convertionReceipt: false,
-              className: 'pb-5 !mt-0 border-l mt-2.5 ml-2.5',
+              className: 'pb-4 !mt-0 border-l mt-2.5 ml-2.5',
               ownerId,
             }}
           />
         ) : null}
-        <div className="flex flex-col relative border-l border-green-500  py-2 pl-7 ml-2.5">
+        <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
           {receipt?.actions &&
             receipt?.actions.map((action: any, index: number) => (
               <Widget
@@ -92,7 +92,7 @@ export default function (props: TransactionReceiptInfo) {
             ))}
         </div>
         {isTxTypeActive ? (
-          <div className="border-l border-black ml-2.5">
+          <div className="border-l border-green-500 dark:border-green-250 ml-2.5">
             <Widget
               src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptInfo`}
               props={{
@@ -106,10 +106,12 @@ export default function (props: TransactionReceiptInfo) {
         ) : null}
         <div className="relative flex flex-row my-2.5">
           <ArrowDown
-            className={`absolute left-0.5 -top-5 ml-px  w-4 h-4 text-green-500`}
+            className={`absolute left-0.5 -top-5 ml-px  w-4 h-4 fill-current text-green-500 dark:text-green-250`}
           />
-          <div className="bg-gray-200 h-5 w-5 rounded-full mr-3"></div>
-          <div className="text-green-500 text-sm ">{receipt?.receiverId}</div>
+          <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
+          <div className="text-green-500 dark:text-green-250 text-sm ">
+            {receipt?.receiverId}
+          </div>
         </div>
       </div>
       {lastNonRefundNestedReceipt ? (

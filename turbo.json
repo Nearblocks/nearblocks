@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["PORT"],
+  "globalEnv": ["PORT", "NODE_ENV"],
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
@@ -17,7 +17,11 @@
         "BREVO_URL",
         "BREVO_API_KEY",
         "BREVO_TO_EMAIL",
-        "NEXT_PUBLIC_GTM_ID"
+        "NEXT_PUBLIC_GTM_ID",
+        "NODE_ENV",
+        "NEXT_PUBLIC_USER_API_URL",
+        "NEXT_PUBLIC_USER_DASHBOARD_URL",
+        "NEXT_PUBLIC_API_URL"
       ]
     },
     "lint": {

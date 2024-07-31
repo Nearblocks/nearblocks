@@ -20,7 +20,7 @@ export default function (props: TokenInfoProps) {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
       ></div>
     );
   };
@@ -66,24 +66,28 @@ export default function (props: TokenInfoProps) {
   }, [contract, config?.rpcUrl]);
 
   return !meta?.name ? (
-    <Loader wrapperClassName="flex w-full max-w-xl" />
+    <Loader wrapperClassName="flex w-full max-w-xs" />
   ) : (
     <>
       <span className="font-normal px-1">
         {amount
-          ? localFormat(tokenAmount(amount, meta?.decimals || decimals, true))
+          ? localFormat(tokenAmount(amount, decimals || meta?.decimals, true))
           : amount ?? ''}
       </span>
-      <span className="flex items-center">
-        <TokenImage
-          src={meta?.icon}
-          alt={meta?.name}
-          appUrl={config?.appUrl}
-          className="w-4 h-4 mx-1"
-        />
-        {shortenToken(meta?.name)}
-        <span>&nbsp;({shortenTokenSymbol(meta?.symbol)})</span>
-      </span>
+      <Link href={`/token/${contract}`} className="hover:no-underline">
+        <a className="text-green flex items-center hover:no-underline dark:text-green-250">
+          <span className="flex items-center">
+            <TokenImage
+              src={meta?.icon}
+              alt={meta?.name}
+              appUrl={config?.appUrl}
+              className="w-4 h-4 mx-1"
+            />
+            {shortenToken(meta?.name)}
+            <span>&nbsp;({shortenTokenSymbol(meta?.symbol)})</span>
+          </span>
+        </a>
+      </Link>
     </>
   );
 }

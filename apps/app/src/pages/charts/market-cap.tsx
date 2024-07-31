@@ -7,12 +7,16 @@ import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Detail from '@/components/skeleton/charts/Detail';
 import Notice from '@/components/common/Notice';
+import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const MarketCapChart = () => {
   const { t } = useTranslation();
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -32,7 +36,9 @@ const MarketCapChart = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
-
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('charts:marketCap.heading'),
+  )}&brand=near`;
   return (
     <>
       <Head>
@@ -55,28 +61,13 @@ const MarketCapChart = () => {
           property="twitter:description"
           content={t('charts:marketCap.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${process.env.NEXT_PUBLIC_OG_URL}/thumbnail/chart?title=${t(
-            'charts:marketCap.heading',
-          )}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/market-cap`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
             <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
               {t('charts:marketCap.heading')}
@@ -102,6 +93,7 @@ const MarketCapChart = () => {
                   poweredBy: false,
                   network: networkId,
                   t: t,
+                  theme: theme,
                 }}
                 loading={
                   <Detail

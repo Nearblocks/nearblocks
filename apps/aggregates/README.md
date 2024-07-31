@@ -1,6 +1,8 @@
 ## Aggregates
 
-Aggregates ft and nft token holders
+- ft token holders
+- nft token holders
+- txns per seconds (tps)
 
 ### Config
 
@@ -8,6 +10,7 @@ Aggregates ft and nft token holders
 DATABASE_URL=
 FT_HOLDERS_TABLE=
 NFT_HOLDERS_TABLE=
+TPS_TABLE=
 
 # Optional
 DATABASE_CA=

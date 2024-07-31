@@ -6,6 +6,7 @@ import pg from 'pg';
 import QueryStream from 'pg-query-stream';
 
 import config from '#config';
+import logger from '#libs/logger';
 import { StreamTransformWrapper } from '#types/types';
 
 import { ssl } from './db.js';
@@ -26,18 +27,27 @@ export const streamCsv = (
     columns,
     header: true,
   });
+  pool.on('error', (error) => logger.error(error));
 
   pool.connect((err, client, done) => {
-    if (err || client === undefined) res.status(200);
+    if (err || !client) return done();
 
     const queries = new QueryStream(query, values);
-    const streams = client!.query(queries);
+    const streams = client.query(queries);
 
     res.attachment('txns.csv');
     stringifier.pipe(res);
 
+    streams.on('error', (error) => {
+      logger.error(error);
+      stringifier.end();
+      pool.end();
+      done();
+    });
+
     streams.on('end', () => {
       stringifier.end();
+      pool.end();
       done();
     });
 

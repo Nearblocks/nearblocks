@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "axios": "1.6.2",
-    "near-api-js": "2.1.4"
+    "near-api-js": "4.0.1"
   },
   "devDependencies": {
     "eslint-config-custom-node": "*",
+    "near-lake-framework": "2.0.0",
     "nb-tsconfig": "*",
     "typescript": "~5.2"
   }

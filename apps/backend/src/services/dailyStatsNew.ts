@@ -11,6 +11,14 @@ import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 import { circulatingSupply } from '#libs/supply';
 
+type RawResp = {
+  rows: CountResp[];
+};
+
+type CountResp = {
+  count: number | string;
+};
+
 const marketData = async (date: Dayjs) => {
   if (config.network === Network.TESTNET) {
     return {
@@ -127,41 +135,98 @@ const txnData = async (start: string, end: string, price?: null | string) => {
 const addressData = async (start: string, end: string) => {
   const [
     newAccounts,
-    activeAccounts,
     deletedAccounts,
+    activeAccounts,
     newContracts,
     activeContracts,
   ] = await Promise.all([
     knex('accounts as a')
-      .join('receipts as r', 'r.receipt_id', '=', 'a.created_by_receipt_id')
-      .where('r.included_in_block_timestamp', '>=', start)
-      .where('r.included_in_block_timestamp', '<', end)
-      .count('a.created_by_receipt_id')
-      .first(),
-    knex('transactions')
-      .where('block_timestamp', '>=', start)
-      .where('block_timestamp', '<', end)
-      .countDistinct('signer_account_id')
+      .join('blocks as b', 'b.block_height', '=', 'a.created_by_block_height')
+      .where('b.block_timestamp', '>=', start)
+      .where('b.block_timestamp', '<', end)
+      .count('a.created_by_block_height')
       .first(),
     knex('accounts as a')
-      .join('receipts as r', 'r.receipt_id', '=', 'a.deleted_by_receipt_id')
-      .where('r.included_in_block_timestamp', '>=', start)
-      .where('r.included_in_block_timestamp', '<', end)
-      .count('a.deleted_by_receipt_id')
+      .join('blocks as b', 'b.block_height', '=', 'a.deleted_by_block_height')
+      .where('b.block_timestamp', '>=', start)
+      .where('b.block_timestamp', '<', end)
+      .count('a.deleted_by_block_height')
       .first(),
-    knex('action_receipt_actions as a')
-      .join('receipts as r', 'r.receipt_id', '=', 'a.receipt_id')
-      .where('r.included_in_block_timestamp', '>=', start)
-      .where('r.included_in_block_timestamp', '<', end)
-      .andWhere('a.action_kind', '=', 'DEPLOY_CONTRACT')
-      .countDistinct({ count: 'r.receiver_account_id' })
-      .first(),
-    knex('action_receipt_actions')
-      .where('receipt_included_in_block_timestamp', '>=', start)
-      .where('receipt_included_in_block_timestamp', '<', end)
-      .andWhere('action_kind', '=', 'FUNCTION_CALL')
-      .countDistinct({ count: 'receipt_receiver_account_id' })
-      .first(),
+    knex.raw<RawResp>(
+      `
+        SELECT
+          COUNT(*)
+        FROM
+          (
+            WITH
+              distinct_signers AS (
+                SELECT DISTINCT
+                  "signer_account_id"
+                FROM
+                  "transactions"
+                WHERE
+                  "block_timestamp" >= ?
+                  AND "block_timestamp" < ?
+              )
+            SELECT
+              *
+            FROM
+              distinct_signers
+          ) AS subquery;
+      `,
+      [start, end],
+    ),
+    knex.raw<RawResp>(
+      `
+        SELECT
+          COUNT(*)
+        FROM
+          (
+            SELECT DISTINCT
+              r.receiver_account_id
+            FROM
+              (
+                SELECT
+                  receipt_id,
+                  receiver_account_id
+                FROM
+                  receipts
+                WHERE
+                  included_in_block_timestamp >= ?
+                  AND included_in_block_timestamp < ?
+              ) AS r
+              INNER JOIN action_receipt_actions AS a ON a.receipt_id = r.receipt_id
+            WHERE
+              a.action_kind = 'DEPLOY_CONTRACT'
+          ) AS subquery
+      `,
+      [start, end],
+    ),
+    knex.raw<RawResp>(
+      `
+        SELECT
+          COUNT(*)
+        FROM
+          (
+            WITH
+              distinct_receivers AS (
+                SELECT DISTINCT
+                  receipt_receiver_account_id
+                FROM
+                  action_receipt_actions
+                WHERE
+                  action_kind = 'FUNCTION_CALL'
+                  AND receipt_included_in_block_timestamp >= ?
+                  AND receipt_included_in_block_timestamp < ?
+              )
+            SELECT
+              *
+            FROM
+              distinct_receivers
+          ) AS subquery;
+      `,
+      [start, end],
+    ),
   ]);
 
   await knex.raw(
@@ -190,19 +255,38 @@ const addressData = async (start: string, end: string) => {
     [start, end],
   );
 
-  const uniqueContracts = await knex('deployed_contracts')
-    .countDistinct({ count: 'code_sha256' })
-    .where('block_timestamp', '>=', start)
-    .where('block_timestamp', '<', end)
-    .first();
+  const uniqueContracts = await knex.raw<RawResp>(
+    `
+      SELECT
+        COUNT(*)
+      FROM
+        (
+          WITH
+            distinct_contracts AS (
+              SELECT DISTINCT
+                code_sha256
+              FROM
+                deployed_contracts
+              WHERE
+                block_timestamp >= ?
+                AND block_timestamp < ?
+            )
+          SELECT
+            *
+          FROM
+            distinct_contracts
+        ) AS subquery;
+    `,
+    [start, end],
+  );
 
   return {
-    active_accounts: activeAccounts?.count?.toString(),
-    active_contracts: activeContracts?.count?.toString(),
+    active_accounts: activeAccounts?.rows?.[0]?.count.toString(),
+    active_contracts: activeContracts?.rows?.[0]?.count?.toString(),
     deleted_accounts: deletedAccounts?.count?.toString(),
     new_accounts: newAccounts?.count?.toString(),
-    new_contracts: newContracts?.count?.toString(),
-    unique_contracts: uniqueContracts?.count?.toString(),
+    new_contracts: newContracts?.rows?.[0]?.count?.toString(),
+    unique_contracts: uniqueContracts?.rows?.[0]?.count?.toString(),
   };
 };
 

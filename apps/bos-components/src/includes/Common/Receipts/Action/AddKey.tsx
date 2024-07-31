@@ -18,7 +18,7 @@ const AddKey = (props: TransactionActionInfo) => {
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
         {props.t ? props.t('txns:txn.actions.addKey.2') : 'added for'}
         <a href={`/address/${props.receiver}`} className="hover:no-underline">
-          <a className="text-green-500 font-bold hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
             {shortenAddress(props.receiver)}
           </a>
         </a>{' '}
@@ -31,12 +31,12 @@ const AddKey = (props: TransactionActionInfo) => {
   if (props.args.access_key.permission.permission_kind) {
     return (
       <div className="py-1">
-        <FaKey className="inline-flex text-gray-400 mr-1" />{' '}
+        <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
         {props.t ? props.t('txns:txn.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
         {props.t ? props.t('txns:txn.actions.addKey.2') : 'added for'}{' '}
         <a href={`/address/${props.receiver}`} className="hover:no-underline">
-          <a className="text-green-500 font-bold hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
             {shortenAddress(props.receiver)}
           </a>
         </a>{' '}
@@ -50,7 +50,7 @@ const AddKey = (props: TransactionActionInfo) => {
 
   return (
     <div className="py-1">
-      <FaKey className="inline-flex text-gray-400 mr-1" />{' '}
+      <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
       {props.t ? props.t('txns:txn.actions.addKey.1') : 'Access key'} (
       <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
       {props.t ? props.t('txns:txn.actions.addKey.2') : 'added for'}
@@ -59,7 +59,7 @@ const AddKey = (props: TransactionActionInfo) => {
         href={`/address/${props.args.access_key.permission.FunctionCall.receiver_id}`}
         className="hover:no-underline"
       >
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(
             props.args.access_key.permission.FunctionCall.receiver_id,
           )}

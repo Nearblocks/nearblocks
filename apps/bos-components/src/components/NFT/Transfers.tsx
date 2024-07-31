@@ -7,12 +7,14 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
  */
 
 interface Props {
   ownerId: string;
   network: string;
   id: string;
+  t: (key: string) => string | undefined;
 }
 
 import Skeleton from '@/includes/Common/Skeleton';
@@ -20,8 +22,10 @@ import TxnStatus from '@/includes/Common/Status';
 import Clock from '@/includes/icons/Clock';
 import { TransactionInfo } from '@/includes/types';
 import FaLongArrowAltRight from '@/includes/icons/FaLongArrowAltRight';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FaInbox from '@/includes/icons/FaInbox';
 
-export default function ({ network, id, ownerId }: Props) {
+export default function ({ network, id, ownerId, t }: Props) {
   const { formatTimestampToString, getTimeAgoString, localFormat } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
@@ -32,26 +36,21 @@ export default function ({ network, id, ownerId }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [countLoading, setcountLoading] = useState(false);
-  const initialPage = 1;
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(0);
-  const [txns, setTxns] = useState<{ [key: number]: TransactionInfo[] }>({});
+  const [txns, setTxns] = useState<TransactionInfo[] | undefined>(undefined);
+  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
 
   const config = getConfig && getConfig(network);
 
+  const apiUrl = `nfts/${id}/txns?`;
+
+  const [url, setUrl] = useState(apiUrl);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
+
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = 'No transactions found!';
   const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const setPage = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  useEffect(() => {
-    setCurrentPage(currentPage);
-  }, [currentPage]);
 
   useEffect(() => {
     function fetchTotalTxns() {
@@ -82,40 +81,48 @@ export default function ({ network, id, ownerId }: Props) {
         .finally(() => {});
     }
 
-    function fetchTxnsData(page: number) {
+    function fetchTxnsData() {
       setIsLoading(true);
 
-      asyncFetch(
-        `${config?.backendUrl}nfts/${id}/txns?order=desc&page=${page}&per_page=25`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      asyncFetch(`${config?.backendUrl}${url}order=desc`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-        .then((data: { body: { txns: TransactionInfo[] }; status: number }) => {
-          const resp = data?.body?.txns;
-          if (data.status === 200 && Array.isArray(resp) && resp.length > 0) {
-            setTxns((prevData) => ({ ...prevData, [page]: resp }));
-            setIsLoading(false);
-          } else {
-            handleRateLimit(
-              data,
-              () => fetchTxnsData(page),
-              () => setIsLoading(false),
-            );
-          }
-        })
+      })
+        .then(
+          (data: {
+            body: { txns: TransactionInfo[]; cursor: string | undefined };
+            status: number;
+          }) => {
+            const resp = data?.body?.txns;
+            let cursor = data?.body?.cursor;
+            if (data.status === 200) {
+              setCursor(cursor);
+              if (Array.isArray(resp) && resp.length > 0) {
+                setTxns(resp);
+              } else if (resp.length === 0) {
+                setTxns(undefined);
+              }
+              setIsLoading(false);
+            } else {
+              handleRateLimit(
+                data,
+                () => fetchTxnsData(),
+                () => setIsLoading(false),
+              );
+            }
+          },
+        )
         .catch(() => {});
     }
     if (config?.backendUrl) {
       fetchTotalTxns();
-      fetchTxnsData(currentPage);
+      fetchTxnsData();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config?.backendUrl, currentPage, id]);
+  }, [config?.backendUrl, id, url]);
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -144,12 +151,12 @@ export default function ({ network, id, ownerId }: Props) {
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap">
+                <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250  whitespace-nowrap">
                   <Link
                     href={`/txns/${row?.transaction_hash}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green-500 font-medium hover:no-underline">
+                    <a className="text-green-500 dark:text-green-250 font-medium hover:no-underline">
                       {row?.transaction_hash}
                     </a>
                   </Link>
@@ -166,37 +173,34 @@ export default function ({ network, id, ownerId }: Props) {
           </Tooltip.Provider>
         </span>
       ),
-      tdClassName: 'px-5 py-4 text-sm text-nearblue-600',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 whitespace-nowrap text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>METHOD</span>,
       key: 'cause',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span className="bg-blue-900/10 text-xs text-nearblue-600 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-                  <span className="block truncate">{row?.cause}</span>
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="center"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {row?.cause}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
+              <span className="block truncate">{row?.cause}</span>
+            </span>
+          </OverlayTrigger>
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>From</span>,
@@ -209,10 +213,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -220,7 +224,7 @@ export default function ({ network, id, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -251,10 +255,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -262,7 +266,7 @@ export default function ({ network, id, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -289,9 +293,9 @@ export default function ({ network, id, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span></span>,
@@ -320,10 +324,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.involved_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -331,7 +335,7 @@ export default function ({ network, id, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.involved_account_id)
                           }
@@ -362,10 +366,10 @@ export default function ({ network, id, ownerId }: Props) {
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
                     <span
-                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 whitespace-nowrap ${
+                      className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
                         row?.affected_account_id === address
-                          ? ' rounded-md bg-[#FFC10740] border-[#FFC10740] border border-dashed p-0.5 px-1 -m-[1px] cursor-pointer text-[#033F40]'
-                          : 'text-green-500 p-0.5 px-1'
+                          ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                          : 'text-green-500 dark:text-green-250 border-transparent'
                       }`}
                     >
                       <Link
@@ -373,7 +377,7 @@ export default function ({ network, id, ownerId }: Props) {
                         className="hover:no-underline"
                       >
                         <a
-                          className="text-green-500 hover:no-underline"
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
                           onMouseOver={(e) =>
                             onHandleMouseOver(e, row?.affected_account_id)
                           }
@@ -400,94 +404,74 @@ export default function ({ network, id, ownerId }: Props) {
         );
       },
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span>TOKEN ID</span>,
       key: 'token_id',
       cell: (row: TransactionInfo) => (
         <>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <div className="max-w-[110px] inline-block truncate">
-                  {row?.token_id}
-                </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom-start"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {row?.token_id}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <div className="max-w-[110px] inline-block truncate">
+              {row?.token_id}
+            </div>
+          </OverlayTrigger>
         </>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 ',
+      tdClassName:
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: (
         <>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button
-                  type="button"
-                  onClick={toggleShowAge}
-                  className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 focus:outline-none flex-row whitespace-nowrap"
-                >
-                  {showAge ? (
-                    <>
-                      {'AGE'}
-                      <Clock className="text-green-500 ml-2" />
-                    </>
-                  ) : (
-                    <> {'DATE TIME (UTC)'}</>
-                  )}
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="center"
-                side="top"
-              >
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {showAge
                   ? 'Click to show Datetime Format'
                   : 'Click to show Age Format'}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <button
+              type="button"
+              onClick={toggleShowAge}
+              className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row whitespace-nowrap"
+            >
+              {showAge ? (
+                <>
+                  {'AGE'}
+                  <Clock className="text-green-500 dark:text-green-250 ml-2" />
+                </>
+              ) : (
+                <> {'DATE TIME (UTC)'}</>
+              )}
+            </button>
+          </OverlayTrigger>
         </>
       ),
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span>
-                  {!showAge
-                    ? row?.block_timestamp
-                      ? formatTimestampToString(
-                          nanoToMilli(row?.block_timestamp),
-                        )
-                      : ''
-                    : row?.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                    : ''}
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                align="start"
-                side="bottom"
-              >
+          <OverlayTrigger
+            placement="bottom-start"
+            delay={{ show: 500, hide: 0 }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                 {showAge
                   ? row?.block_timestamp
                     ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
@@ -495,12 +479,23 @@ export default function ({ network, id, ownerId }: Props) {
                   : row?.block_timestamp
                   ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
                   : ''}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span>
+              {!showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''}
+            </span>
+          </OverlayTrigger>
         </span>
       ),
-      tdClassName: 'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
       thClassName: 'inline-flex',
     },
     {
@@ -512,16 +507,16 @@ export default function ({ network, id, ownerId }: Props) {
             href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
             className="hover:no-underline"
           >
-            <a className="bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded hover:no-underline">
+            <a className="bg-gray-100 dark:bg-black-200 hover:bg-gray-200 px-2 py-1 rounded hover:no-underline">
               View NFT &gt;
             </a>
           </Link>
         </span>
       ),
       tdClassName:
-        'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 font-medium',
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider whitespace-nowrap',
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
   ];
   return (
@@ -533,9 +528,12 @@ export default function ({ network, id, ownerId }: Props) {
       ) : (
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              transactions found
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+              {txns &&
+                txns.length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                } transactions found`}
             </p>
           </div>
         </div>
@@ -544,15 +542,22 @@ export default function ({ network, id, ownerId }: Props) {
         src={`${ownerId}/widget/bos-components.components.Shared.Table`}
         props={{
           columns: columns,
-          data: txns[currentPage],
+          data: txns,
           isLoading: isLoading,
-          isPagination: true,
           count: totalCount,
-          page: currentPage,
           limit: 25,
-          pageLimit: 200,
-          setPage: setPage,
-          Error: errorMessage,
+          cursorPagination: true,
+          cursor: cursor,
+          apiUrl: apiUrl,
+          setUrl: setUrl,
+          ownerId: ownerId,
+          Error: (
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage || ''}
+              mutedText="Please try again later"
+            />
+          ),
         }}
       />
     </>

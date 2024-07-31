@@ -29,6 +29,11 @@ const FormContact = () => {
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
+      } else {
+        setName('');
+        setEmail('');
+        setDescription('');
+        setSubject('');
       }
     } catch (err) {
       console.log(err);
@@ -39,7 +44,7 @@ const FormContact = () => {
 
   return (
     <form onSubmit={submitForm}>
-      <p className="text-lg text-black font-medium sm:mt-0 mt-10">
+      <p className="text-lg text-black dark:text-neargray-10 font-medium sm:mt-0 mt-10">
         {t(`Contact Form:`)}
       </p>
       <div className="mt-10 flex flex-col gap-4">
@@ -48,7 +53,7 @@ const FormContact = () => {
           id="name"
           placeholder="Enter name..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200   border border-{#E5E7EB} rounded outline-blue text-base"
           onChange={(e) => setName(e.target.value)}
           value={name}
           required
@@ -59,20 +64,19 @@ const FormContact = () => {
           type="email"
           placeholder="Enter email..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <p className="font-semibold text-base">{t('Subject')}</p>
-        <label className="relative hidden md:flex">
+        <label className="relative md:flex">
           <select
             onChange={(e) => setSubject(e.target.value)}
-            className="px-3 py-1.5 bg-white border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
+            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
+            value={subject}
           >
-            <option selected disabled={true}>
-              Select subject
-            </option>
+            <option value="">Select subject</option>
             <option value="Advertising">Advertising</option>
             <option value="Partnership / Press">Partnership / Press </option>
             <option value="Feature Request">Feature Request</option>
@@ -87,16 +91,17 @@ const FormContact = () => {
           id="message"
           placeholder="Max characters (300 words)"
           autoComplete="off"
-          className="px-3 py-1.5 bg-white border border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
           maxLength={300}
           rows={5}
           onChange={(e) => setDescription(e.target.value)}
-          defaultValue={description}
+          value={description}
           required
         />
         <button
           type="submit"
-          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 hover:bg-green-400 rounded w-fit"
+          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
+          disabled={loading}
         >
           {loading ? <LoadingCircular /> : t('Send Message')}
         </button>

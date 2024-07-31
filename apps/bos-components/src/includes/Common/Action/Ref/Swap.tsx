@@ -27,7 +27,7 @@ const Swap = (props: EventPropsInfo) => {
   if (log?.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 text-xs" />
       <span className="font-bold px-1">Swap </span>
       {
@@ -55,7 +55,7 @@ const Swap = (props: EventPropsInfo) => {
       <span className="font-bold text-gray px-1">
         On{' '}
         <a href="/address/v2.ref-finance.near" className="hover:no-underline">
-          <a className="text-green-500 font-normal hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal hover:no-underline">
             Ref Finance
           </a>
         </a>

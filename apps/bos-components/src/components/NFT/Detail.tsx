@@ -16,7 +16,8 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 import ArrowUp from '@/includes/icons/ArrowUp';
 import Question from '@/includes/icons/Question';
 import TokenImage from '@/includes/icons/TokenImage';
-import { Token } from '@/includes/types';
+import WarningIcon from '@/includes/icons/WarningIcon';
+import { SpamToken, Token } from '@/includes/types';
 
 interface Props {
   ownerId: string;
@@ -24,16 +25,19 @@ interface Props {
   t: (key: string) => string | undefined;
   id: string;
   tid: string;
+  userApiUrl: string;
 }
 
-export default function ({ network, t, id, tid, ownerId }: Props) {
-  const { getConfig, handleRateLimit, shortenAddress } = VM.require(
+export default function ({ network, t, id, tid, ownerId, userApiUrl }: Props) {
+  const { getConfig, handleRateLimit, shortenAddress, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [token, setToken] = useState<Token>({} as Token);
   const [loading, setLoading] = useState(false);
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
+  const [isVisible, setIsVisible] = useState(true);
 
   const config = getConfig && getConfig(network);
 
@@ -64,6 +68,15 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
         )
         .catch(() => {});
     }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
+
     if (config?.backendUrl) {
       fetchToken();
     }
@@ -79,11 +92,50 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
     }
   };
 
+  function isTokenSpam(tokenName: string) {
+    if (spamTokens)
+      for (const spamToken of spamTokens.blacklist) {
+        const cleanedToken = spamToken.replace(/^\*/, '');
+        if (tokenName.endsWith(cleanedToken)) {
+          return true;
+        }
+      }
+    return false;
+  }
+  const handleClose = () => {
+    setIsVisible(false);
+  };
   return (
-    <>
+    <div className="container mx-auto px-3">
+      {isTokenSpam(token.contract || id) && isVisible && (
+        <>
+          <div className="py-2"></div>
+          <div className="w-full flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+            <p className="items-center">
+              <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
+              This token is reported to have been spammed to many users. Please
+              exercise caution when interacting with it. Click
+              <a
+                href="https://github.com/Nearblocks/spam-token-list"
+                className="underline mx-0.5"
+                target="_blank"
+              >
+                here
+              </a>
+              for more info.
+            </p>
+            <span
+              className="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer"
+              onClick={handleClose}
+            >
+              X
+            </span>
+          </div>
+        </>
+      )}
       <div className="grid md:grid-cols-12 pt-4 mb-2">
         <div className="md:col-span-5 lg:col-span-4 pt-4">
-          <div className="bg-white border rounded-xl soft-shadow p-3 aspect-square">
+          <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl soft-shadow p-3 aspect-square">
             {
               <Widget
                 src={`${ownerId}/widget/bos-components.components.Shared.NFTImage`}
@@ -100,7 +152,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </div>
         </div>
         <div className="md:col-span-7 lg:col-span-8 md:px-4 lg:pl-8 pt-4">
-          <h1 className="break-all space-x-2 text-xl text-gray-700 leading-8 font-semibold">
+          <h1 className="break-all space-x-2 text-xl text-gray-700 dark:text-neargray-10 leading-8 font-semibold">
             {loading ? (
               <div className="w-80 max-w-xs">
                 <Skeleton className="h-6" />
@@ -110,7 +162,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
             )}
           </h1>
           <Link href={`/nft-token/${id}`} className="hover:no-underline">
-            <a className="break-all text-green leading-6 text-sm hover:no-underline">
+            <a className="break-all text-green dark:text-green-250 leading-6 text-sm hover:no-underline">
               {loading ? (
                 <div className="w-60 max-w-xs py-2">
                   <Skeleton className="h-4" />
@@ -132,7 +184,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </Link>
           <Accordion.Root
             type="multiple"
-            className="bg-white border rounded-xl  soft-shadow mt-4"
+            className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl  soft-shadow mt-4"
             defaultValue={indices}
             collapsible
           >
@@ -140,7 +192,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
               <Accordion.Header>
                 <Accordion.Trigger
                   onClick={() => toggleItem(1)}
-                  className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 border-b focus:outline-none p-3"
+                  className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
                 >
                   <h2>Details</h2>
                   {indices?.includes(1) ? (
@@ -150,27 +202,24 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                   )}
                 </Accordion.Trigger>
               </Accordion.Header>
-              <Accordion.Content className="text-sm text-nearblue-600">
-                <div className="divide-solid divide-gray-200 divide-y">
+              <Accordion.Content className="text-sm text-nearblue-600 dark:text-neargray-10">
+                <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
                   {token?.asset && (
                     <div className="flex p-4">
                       <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
-                        <Tooltip.Provider>
-                          <Tooltip.Root>
-                            <Tooltip.Trigger asChild>
-                              <div>
-                                <Question className="w-4 h-4 fill-current mr-1" />
-                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Content
-                              className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                              align="start"
-                              side="bottom"
-                            >
+                        <OverlayTrigger
+                          placement="bottom-start"
+                          delay={{ show: 500, hide: 0 }}
+                          overlay={
+                            <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                               Current owner of this NFT
-                            </Tooltip.Content>
-                          </Tooltip.Root>
-                        </Tooltip.Provider>
+                            </Tooltip>
+                          }
+                        >
+                          <div>
+                            <Question className="w-4 h-4 fill-current mr-1" />
+                          </div>
+                        </OverlayTrigger>
                         Owner:
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
@@ -178,7 +227,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                           href={`/address/${token?.asset?.owner}`}
                           className="hover:no-underline"
                         >
-                          <a className="text-green hover:no-underline">
+                          <a className="text-green dark:text-green-250 hover:no-underline">
                             {shortenAddress &&
                               shortenAddress(token?.asset?.owner ?? '')}
                           </a>
@@ -188,22 +237,19 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                   )}
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
-                      <Tooltip.Provider>
-                        <Tooltip.Root>
-                          <Tooltip.Trigger asChild>
-                            <div>
-                              <Question className="w-4 h-4 fill-current mr-1" />
-                            </div>
-                          </Tooltip.Trigger>
-                          <Tooltip.Content
-                            className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                            align="start"
-                            side="bottom"
-                          >
+                      <OverlayTrigger
+                        placement="bottom-start"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                             Address of this NFT contract
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      </Tooltip.Provider>
+                          </Tooltip>
+                        }
+                      >
+                        <div>
+                          <Question className="w-4 h-4 fill-current mr-1" />
+                        </div>
+                      </OverlayTrigger>
                       Contract Address:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
@@ -211,7 +257,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                         href={`/address/${id}`}
                         className="hover:no-underline"
                       >
-                        <a className="text-green hover:no-underline">
+                        <a className="text-green  dark:text-green-250 hover:no-underline">
                           {shortenAddress && shortenAddress(id ?? '')}
                         </a>
                       </Link>
@@ -219,44 +265,38 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                   </div>
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
-                      <Tooltip.Provider>
-                        <Tooltip.Root>
-                          <Tooltip.Trigger asChild>
-                            <div>
-                              <Question className="w-4 h-4 fill-current mr-1" />
-                            </div>
-                          </Tooltip.Trigger>
-                          <Tooltip.Content
-                            className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                            align="start"
-                            side="bottom"
-                          >
+                      <OverlayTrigger
+                        placement="bottom-start"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                             {"This NFT's unique token ID"}
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      </Tooltip.Provider>
+                          </Tooltip>
+                        }
+                      >
+                        <div>
+                          <Question className="w-4 h-4 fill-current mr-1" />
+                        </div>
+                      </OverlayTrigger>
                       Token ID:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">{tid}</div>
                   </div>
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
-                      <Tooltip.Provider>
-                        <Tooltip.Root>
-                          <Tooltip.Trigger asChild>
-                            <div>
-                              <Question className="w-4 h-4 fill-current mr-1" />
-                            </div>
-                          </Tooltip.Trigger>
-                          <Tooltip.Content
-                            className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                            align="start"
-                            side="bottom"
-                          >
+                      <OverlayTrigger
+                        placement="bottom-start"
+                        delay={{ show: 500, hide: 0 }}
+                        overlay={
+                          <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
                             The standard followed by this NFT
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      </Tooltip.Provider>
+                          </Tooltip>
+                        }
+                      >
+                        <div>
+                          <Question className="w-4 h-4 fill-current mr-1" />
+                        </div>
+                      </OverlayTrigger>
                       Token Standard:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">NEP-171</div>
@@ -268,7 +308,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
               <Accordion.Item value={2}>
                 <Accordion.Trigger
                   onClick={() => toggleItem(2)}
-                  className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 border-b focus:outline-none p-3"
+                  className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
                 >
                   <h2>Description</h2>
                   {indices.includes(2) ? (
@@ -277,7 +317,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
                     <ArrowDown className="fill-current" />
                   )}
                 </Accordion.Trigger>
-                <Accordion.Content className="text-sm text-nearblue-600 border-b p-3">
+                <Accordion.Content className="text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 p-3">
                   {token.description}
                 </Accordion.Content>
               </Accordion.Item>
@@ -288,7 +328,7 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
       <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
-          <div className="bg-white soft-shadow rounded-xl pb-1">
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             {
               <Widget
                 src={`${ownerId}/widget/bos-components.components.NFT.TokenTransfers`}
@@ -304,6 +344,14 @@ export default function ({ network, t, id, tid, ownerId }: Props) {
           </div>
         </div>
       </div>
-    </>
+      <div className="mb-10">
+        {
+          <Widget
+            src={`${ownerId}/widget/includes.Common.Banner`}
+            props={{ type: 'center', userApiUrl: userApiUrl }}
+          />
+        }
+      </div>
+    </div>
   );
 }

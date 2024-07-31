@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/widget/lite/*"],
+      "@/types/*": ["./types/*"]
+    },
+    "jsx": "react-jsx",
+    "outDir": "./build",
+    "rootDir": "."
+  },
+  "exclude": ["node_modules"],
+  "extends": "nb-tsconfig/nextjs.json",
+  "include": [
+    "src/**/*",
+    "types/**/*",
+    "../../node_modules/near-social-vm-types",
+    "../../node_modules/@near-js/types"
+  ]
+}

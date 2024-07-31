@@ -7,28 +7,38 @@
  * @param {string} [network] - The network data to show, either mainnet or testnet
  * @param {string} [id] - The token identifier passed as a string
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [t] - A function for internationalization (i18n) provided by the next-translate package.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
  */
 
 interface Props {
   ownerId: string;
   network: string;
   id: string;
+  t: (key: string) => string | undefined;
+  requestSignInWithWallet: () => void;
 }
 
 import Links from '@/includes/Common/Links';
 import Skeleton from '@/includes/Common/Skeleton';
 import TokenImage from '@/includes/icons/TokenImage';
 import WarningIcon from '@/includes/icons/WarningIcon';
-import { Status, Token } from '@/includes/types';
+import { SpamToken, Status, Token } from '@/includes/types';
 
 const tabs = ['Transfers', 'Holders', 'Inventory', 'Comments'];
 
-export default function ({ network, id, ownerId }: Props) {
+export default function ({
+  network,
+  id,
+  ownerId,
+  t,
+  requestSignInWithWallet,
+}: Props) {
   const { localFormat, getTimeAgoString } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
   );
 
-  const { getConfig, handleRateLimit, nanoToMilli } = VM.require(
+  const { getConfig, handleRateLimit, nanoToMilli, fetchData } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
   );
 
@@ -44,7 +54,11 @@ export default function ({ network, id, ownerId }: Props) {
     sync: true,
     timestamp: '',
   });
-
+  const [spamTokens, setSpamTokens] = useState<SpamToken>({ blacklist: [] });
+  const [isVisible, setIsVisible] = useState(true);
+  const handleClose = () => {
+    setIsVisible(false);
+  };
   const config = getConfig && getConfig(network);
 
   useEffect(() => {
@@ -133,6 +147,15 @@ export default function ({ network, id, ownerId }: Props) {
         )
         .catch(() => {});
     }
+    fetchData &&
+      fetchData(
+        'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
+        (response: any) => {
+          const data = JSON.parse(response);
+          setSpamTokens(data);
+        },
+      );
+
     if (config?.backendUrl) {
       fetchNFTData();
       fetchTxnsCount();
@@ -142,7 +165,16 @@ export default function ({ network, id, ownerId }: Props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.backendUrl, id]);
-
+  function isTokenSpam(tokenName: string) {
+    if (spamTokens)
+      for (const spamToken of spamTokens.blacklist) {
+        const cleanedToken = spamToken.replace(/^\*/, '');
+        if (tokenName.endsWith(cleanedToken)) {
+          return true;
+        }
+      }
+    return false;
+  }
   const onTab = (index: number) => {
     setPageTab(tabs[index]);
   };
@@ -150,12 +182,12 @@ export default function ({ network, id, ownerId }: Props) {
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
-        {!token ? (
+        {isLoading ? (
           <div className="w-80 max-w-xs px-3 py-5">
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-nearblue-600 leading-8 py-4 px-2">
+          <h1 className="break-all space-x-2 text-xl text-nearblue-600 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 src={token?.icon}
@@ -171,15 +203,41 @@ export default function ({ network, id, ownerId }: Props) {
           </h1>
         )}
       </div>
+      {isTokenSpam(token?.contract || id) && isVisible && (
+        <>
+          <div className="w-full flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+            <p className="items-center">
+              <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
+              This token is reported to have been spammed to many users. Please
+              exercise caution when interacting with it. Click
+              <a
+                href="https://github.com/Nearblocks/spam-token-list"
+                className="underline mx-0.5"
+                target="_blank"
+              >
+                here
+              </a>
+              for more info.
+            </p>
+            <span
+              className="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-400 cursor-pointer"
+              onClick={handleClose}
+            >
+              X
+            </span>
+          </div>
+          <div className="py-2"></div>
+        </>
+      )}
       <div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-xl">
-              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+            <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 Overview
               </h2>
 
-              <div className="px-3 divide-y text-sm text-nearblue-600">
+              <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex flex-wrap py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Total Supply:
@@ -213,16 +271,11 @@ export default function ({ network, id, ownerId }: Props) {
                       <div className="flex items-center">
                         {holders ? localFormat(holders) : ''}
                         {!status.sync && (
-                          <Tooltip.Provider>
-                            <Tooltip.Root>
-                              <Tooltip.Trigger asChild>
-                                <WarningIcon className="w-4 h-4 fill-current ml-1" />
-                              </Tooltip.Trigger>
-                              <Tooltip.Content
-                                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                                align="start"
-                                side="bottom"
-                              >
+                          <OverlayTrigger
+                            placement="bottom-start"
+                            delay={{ show: 500, hide: 0 }}
+                            overlay={
+                              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words">
                                 Holders count is out of sync. Last synced block
                                 is
                                 <span className="font-bold mx-0.5">
@@ -233,9 +286,11 @@ export default function ({ network, id, ownerId }: Props) {
                                     nanoToMilli(status.timestamp),
                                   )}).`}
                                 Holders data will be delayed.
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          </Tooltip.Provider>
+                              </Tooltip>
+                            }
+                          >
+                            <WarningIcon className="w-4 h-4 fill-current ml-1" />
+                          </OverlayTrigger>
                         )}
                       </div>
                     </div>
@@ -245,11 +300,11 @@ export default function ({ network, id, ownerId }: Props) {
             </div>
           </div>
           <div className="w-full">
-            <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-              <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+            <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 Profile Summary
               </h2>
-              <div className="px-3 divide-y text-sm text-nearblue-600">
+              <div className="px-3 divide-y  dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
                   {isLoading ? (
@@ -257,12 +312,12 @@ export default function ({ network, id, ownerId }: Props) {
                       <Skeleton className="h-4 w-32" />
                     </div>
                   ) : (
-                    <div className="w-full text-green-500 md:w-3/4 break-words">
+                    <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
                         href={`/address/${token?.contract}`}
                         className="hover:no-underline"
                       >
-                        <a className="text-green-500 hover:no-underline">
+                        <a className="text-green-500 dark:text-green-250 hover:no-underline">
                           {token?.contract}
                         </a>
                       </Link>
@@ -273,7 +328,7 @@ export default function ({ network, id, ownerId }: Props) {
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Official Site:
                   </div>
-                  <div className="w-full md:w-3/4 text-green-500 break-words">
+                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
                     {isLoading ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
@@ -312,10 +367,10 @@ export default function ({ network, id, ownerId }: Props) {
                   <button
                     key={index}
                     onClick={() => onTab(index)}
-                    className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
+                    className={`  text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none ${
                       pageTab === tab
-                        ? 'rounded-lg bg-green-600 text-white'
-                        : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
+                        ? 'rounded-lg bg-green-600 dark:bg-green-250  text-white'
+                        : 'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10'
                     }`}
                     value={tab}
                   >
@@ -323,7 +378,7 @@ export default function ({ network, id, ownerId }: Props) {
                   </button>
                 ))}
             </div>
-            <div className="bg-white soft-shadow rounded-xl pb-1">
+            <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
               <div className={`${pageTab === 'Transfers' ? '' : 'hidden'} `}>
                 {
                   <Widget
@@ -331,6 +386,7 @@ export default function ({ network, id, ownerId }: Props) {
                     props={{
                       network: network,
                       id: id,
+                      t: t,
                       ownerId,
                     }}
                   />
@@ -370,6 +426,7 @@ export default function ({ network, id, ownerId }: Props) {
                         path: `nearblocks.io/nft/${id}`,
                         limit: 10,
                         ownerId,
+                        requestSignInWithWallet,
                       }}
                     />
                   }

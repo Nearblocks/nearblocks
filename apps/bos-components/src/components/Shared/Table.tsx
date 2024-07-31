@@ -1,3 +1,4 @@
+import CursorPaginator from '@/includes/Common/CursorPaginator';
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
 /**
@@ -14,6 +15,11 @@ import Skeleton from '@/includes/Common/Skeleton';
  * @param {function} renderRowSubComponent - A function is used to render a sub-component for each row in the table.
  * @param {Array} expanded - An array of numbers representing the indices of rows that are expanded.
  * @param {boolean} isExpanded -  Flag for compact table display.
+ * @param {boolean} cursorPagination - Indicates if cursor pagination is enabled for the table
+ * @param {string} cursor - Cursor to be set when pagination is applied.
+ * @param {string} apiUrl - URL used for attaching cursor during pagination.
+ * @param {function} setUrl - A function used to set the URL on the current table.
+ * @param {string} ownerId - The identifier of the owner of the component.
  */
 interface column {
   header: string;
@@ -36,7 +42,12 @@ interface Props {
   renderRowSubComponent: (row: any, rowIndex?: number) => React.ReactNode;
   expanded: number[];
   isExpanded: false;
-  Error: string;
+  Error: string | any;
+  cursorPagination: boolean;
+  cursor: string;
+  apiUrl: string;
+  setUrl: (url: string) => void;
+  ownerId: string;
 }
 
 export default function (props: Props) {
@@ -44,8 +55,8 @@ export default function (props: Props) {
     return (
       <>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y border-t">
-            <thead className="bg-gray-100 h-[51px]">
+          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
                 {props.columns.map((column, index) => (
                   <th key={index} scope="col" className={column.thClassName}>
@@ -54,7 +65,7 @@ export default function (props: Props) {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
               {[...Array(props.limit)].map((_, index) => (
                 <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
                   {props.columns.map((column, colIndex) => (
@@ -71,9 +82,21 @@ export default function (props: Props) {
           <Paginator
             count={props.count}
             page={props.page}
+            isLoading={props.isLoading}
             limit={props.limit}
             pageLimit={props.pageLimit}
             setPage={props.setPage}
+          />
+        ) : null}
+        {props.cursorPagination ? (
+          <CursorPaginator
+            apiUrl={props.apiUrl}
+            count={props.count}
+            limit={props.limit}
+            setUrl={props.setUrl}
+            cursor={props.cursor}
+            isLoading={props.isLoading}
+            ownerId={props.ownerId}
           />
         ) : null}
       </>
@@ -82,8 +105,12 @@ export default function (props: Props) {
   return (
     <>
       {props.isExpanded ? (
-        <div className={`bg-gray-50 overflow-x-auto`}>
-          <table className={'min-w-full divide-y border-separate '}>
+        <div className={`bg-gray-50 dark:bg-black-600 overflow-x-auto`}>
+          <table
+            className={
+              'min-w-full divide-y dark:divide-black-200 dark:border-black border-separate '
+            }
+          >
             <thead>
               <tr>
                 {props?.columns.map((column: column, index: number) => (
@@ -104,21 +131,6 @@ export default function (props: Props) {
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
-                    <tr
-                      key={`expandRow-${rowIndex}`}
-                      className=" hover:bg-blue-900/5 h-[57px]"
-                    >
-                      {props.columns.map((column: column, colIndex: number) => (
-                        <td
-                          key={`expandCol-${colIndex}`}
-                          className={column.tdClassName}
-                        >
-                          {column.cell
-                            ? column.cell(row, rowIndex)
-                            : row[column.key]}
-                        </td>
-                      ))}
-                    </tr>
                     {row?.showWarning && (
                       <tr
                         key={`expandWarning-${rowIndex}`}
@@ -132,6 +144,18 @@ export default function (props: Props) {
                         </td>
                       </tr>
                     )}
+                    <tr key={`expandRow-${rowIndex}`} className="h-[57px]">
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td
+                          key={`expandCol-${colIndex}`}
+                          className={column.tdClassName}
+                        >
+                          {column.cell
+                            ? column.cell(row, rowIndex)
+                            : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
                   </Fragment>
                 ))}
             </tbody>
@@ -139,8 +163,8 @@ export default function (props: Props) {
         </div>
       ) : (
         <div className="overflow-x-auto ">
-          <table className="min-w-full divide-y border-t">
-            <thead className="bg-gray-100 h-[51px]">
+          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
                 {props?.columns.map((column: column, index: number) => (
                   <th key={index} scope="col" className={column.thClassName}>
@@ -149,7 +173,7 @@ export default function (props: Props) {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
               {!props.isLoading && props.data === undefined && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
@@ -160,21 +184,6 @@ export default function (props: Props) {
               {props.data &&
                 props.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
-                    <tr
-                      key={`row-${rowIndex}`}
-                      className=" hover:bg-blue-900/5 h-[57px]"
-                    >
-                      {props.columns.map((column: column, colIndex: number) => (
-                        <td
-                          key={`col-${colIndex}`}
-                          className={column.tdClassName}
-                        >
-                          {column.cell
-                            ? column.cell(row, rowIndex)
-                            : row[column.key]}
-                        </td>
-                      ))}
-                    </tr>
                     {row?.showWarning && (
                       <tr
                         key={`warning-${rowIndex}`}
@@ -188,6 +197,21 @@ export default function (props: Props) {
                         </td>
                       </tr>
                     )}
+                    <tr
+                      key={`row-${rowIndex}`}
+                      className="hover:bg-blue-900/5 h-[57px]"
+                    >
+                      {props.columns.map((column: column, colIndex: number) => (
+                        <td
+                          key={`col-${colIndex}`}
+                          className={column.tdClassName}
+                        >
+                          {column.cell
+                            ? column.cell(row, rowIndex)
+                            : row[column.key]}
+                        </td>
+                      ))}
+                    </tr>
                     {row.isExpanded ||
                     (props.expanded.length > 0 &&
                       props.expanded.includes(row.index))
@@ -199,13 +223,25 @@ export default function (props: Props) {
           </table>
         </div>
       )}
-      {props.isPagination ? (
+      {props.isPagination && props.data ? (
         <Paginator
           count={props.count}
+          isLoading={props.isLoading}
           page={props.page}
           limit={props.limit}
           pageLimit={props.pageLimit}
           setPage={props.setPage}
+        />
+      ) : null}
+      {props.cursorPagination && props.data ? (
+        <CursorPaginator
+          apiUrl={props.apiUrl}
+          count={props.count}
+          limit={props.limit}
+          setUrl={props.setUrl}
+          cursor={props.cursor}
+          isLoading={props.isLoading}
+          ownerId={props.ownerId}
         />
       ) : null}
     </>

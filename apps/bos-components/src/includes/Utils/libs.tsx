@@ -1,14 +1,16 @@
-import { Debounce, FieldType, FieldValueTypes } from '@/includes/types';
+import { Debounce, FieldType, GuessableTypeString } from '@/includes/types';
 
 export default function () {
-  const networkAccountId =
-    context.networkId === 'mainnet'
-      ? 'nearblocksonbos.near'
-      : 'nearblocks.testnet';
-
-  const { localFormat, formatWithCommas } = VM.require(
-    `${networkAccountId}/widget/includes.Utils.formats`,
-  );
+  function formatWithCommas(number: string) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function localFormat(number: string) {
+    const bigNumber = Big(number);
+    const formattedNumber = bigNumber
+      .toFixed(5)
+      .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+    return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
+  }
 
   function getConfig(network: string) {
     switch (network) {
@@ -18,6 +20,7 @@ export default function () {
           backendUrl: 'https://api3.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.mainnet.near.org',
           appUrl: 'https://nearblocks.io/',
+          aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
       case 'testnet':
         return {
@@ -25,6 +28,7 @@ export default function () {
           backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.testnet.near.org/',
           appUrl: 'https://testnet.nearblocks.io/',
+          aurorablocksUrl: 'https://aurora.exploreblocks.io',
         };
       default:
         return {};
@@ -90,7 +94,25 @@ export default function () {
       }
     }
   }
-
+  function fetchData(
+    url: string,
+    callback: (data: any) => void,
+    options?: any,
+  ) {
+    asyncFetch(url, options)
+      .then((data: { body: any; status: number }) => {
+        const resp = data?.body;
+        if (data.status === 200) {
+          callback(resp);
+        } else {
+          handleRateLimit(data, () => fetchData(url, callback, options));
+        }
+      })
+      .catch((error: any) => {
+        console.error('Error fetching data:', error);
+        throw error;
+      });
+  }
   function yoctoToNear(yocto: string, format: boolean) {
     const YOCTO_PER_NEAR = Big(10).pow(24).toString();
 
@@ -182,6 +204,9 @@ export default function () {
   }
 
   function fiatValue(big: string, price: string) {
+    if (big === '0') {
+      return '0';
+    }
     const value = Big(big).mul(Big(price));
     const stringValue = value.toFixed(6); // Set the desired maximum fraction digits
 
@@ -247,29 +272,52 @@ export default function () {
       100,
     );
   }
-  function mapFeilds(fields: FieldType[]) {
-    const args = {};
 
-    fields.forEach((fld) => {
-      let value: string | boolean | number | null = fld.value;
+  const strToType = (str: string, type: GuessableTypeString): unknown => {
+    switch (type) {
+      case 'json':
+        return JSON.parse(str);
+      case 'number':
+        return Number(str);
+      case 'boolean':
+        return (
+          str.trim().length > 0 && !['false', '0'].includes(str.toLowerCase())
+        );
+      case 'null':
+        return null;
+      default:
+        return str + '';
+    }
+  };
 
-      if (fld.type === 'number') {
-        value = Number(value);
-      } else if (fld.type === 'boolean') {
-        value =
-          value.trim().length > 0 &&
-          !['false', '0'].includes(value.toLowerCase());
-      } else if (fld.type === 'json') {
-        value = JSON.parse(value);
-      } else if (fld.type === 'null') {
-        value = null;
-      }
+  const mapFeilds = (fields: FieldType[]) => {
+    const args: any = {};
 
-      (args as Record<string, FieldValueTypes>)[fld.name] = value + '';
+    fields.forEach((fld: FieldType) => {
+      args[fld.name] = strToType(fld.value, fld.type as GuessableTypeString);
     });
 
     return args;
+  };
+
+  function jsonParser(jsonString: string) {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.error('Error parsing JSON', e);
+      return null;
+    }
   }
+
+  function jsonStringify(value: any, replacer?: any, space?: number) {
+    try {
+      return JSON.stringify(value, replacer, space);
+    } catch (e) {
+      console.error('Error stringifying JSON', e);
+      return null;
+    }
+  }
+
   return {
     getConfig,
     handleRateLimit,
@@ -289,5 +337,8 @@ export default function () {
     convertAmountToReadableString,
     convertTimestampToTime,
     mapFeilds,
+    fetchData,
+    jsonParser,
+    jsonStringify,
   };
 }

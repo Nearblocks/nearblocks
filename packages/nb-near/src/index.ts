@@ -1,12 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { validators } from 'near-api-js';
-export type {
-  AccountView,
-  BlockHeader,
-  BlockResult,
-  EpochValidatorInfo,
-  Provider,
-} from 'near-api-js/lib/providers/provider.js';
+
+export * from './types.js';
 
 export const validatorApi = validators;
 

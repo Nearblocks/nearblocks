@@ -5,11 +5,13 @@ import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import {
   ActionReceiptAction,
+  ActionReceiptInputData,
   ActionReceiptOutputData,
   Receipt,
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
@@ -48,6 +50,7 @@ const storeChunkReceipts = async (
 
   const receiptData: Receipt[] = [];
   const receiptActionsData: ActionReceiptAction[] = [];
+  const receiptInputData: ActionReceiptInputData[] = [];
   const receiptOutputData: ActionReceiptOutputData[] = [];
 
   receipts.forEach((receipt, receiptIndex) => {
@@ -62,13 +65,49 @@ const storeChunkReceipts = async (
     }
 
     if ('Action' in receipt.receipt) {
+      receipt.receipt.Action.inputDataIds.forEach((dataId) => {
+        receiptInputData.push(
+          getActionReceiptInputData(receiptOrDataId, dataId),
+        );
+      });
       receipt.receipt.Action.outputDataReceivers.forEach((receiver) => {
         receiptOutputData.push(
           getActionReceiptOutputData(receiptOrDataId, receiver),
         );
       });
 
-      receipt.receipt.Action.actions.forEach((action, actionIndex) => {
+      let actionIndex = 0;
+      receipt.receipt.Action.actions.forEach((action) => {
+        if (isDelegateAction(action)) {
+          receiptActionsData.push(
+            getActionReceiptActionData(
+              blockTimestamp,
+              receiptOrDataId,
+              actionIndex,
+              action,
+              receipt.predecessorId,
+              receipt.receiverId,
+            ),
+          );
+          actionIndex += 1;
+
+          action.Delegate.delegateAction.actions.forEach((action) => {
+            receiptActionsData.push(
+              getActionReceiptActionData(
+                blockTimestamp,
+                receiptOrDataId,
+                actionIndex,
+                action,
+                receipt.predecessorId,
+                receipt.receiverId,
+              ),
+            );
+            actionIndex += 1;
+          });
+
+          return;
+        }
+
         receiptActionsData.push(
           getActionReceiptActionData(
             blockTimestamp,
@@ -79,6 +118,7 @@ const storeChunkReceipts = async (
             receipt.receiverId,
           ),
         );
+        actionIndex += 1;
       });
     }
 
@@ -113,6 +153,17 @@ const storeChunkReceipts = async (
         await knex('action_receipt_actions')
           .insert(receiptActionsData)
           .onConflict(['receipt_id', 'index_in_action_receipt'])
+          .ignore();
+      }),
+    );
+  }
+
+  if (receiptInputData.length) {
+    promises.push(
+      retry(async () => {
+        await knex('action_receipt_input_data')
+          .insert(receiptInputData)
+          .onConflict(['input_data_id', 'input_to_receipt_id'])
           .ignore();
       }),
     );
@@ -171,6 +222,26 @@ const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
 
 const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
   const txnHashes: Map<string, string> = new Map();
+  const receiptInputs = await knex('action_receipt_input_data')
+    .innerJoin(
+      'receipts',
+      'action_receipt_input_data.input_to_receipt_id',
+      'receipts.receipt_id',
+    )
+    .whereIn('input_data_id', receiptOrDataIds)
+    .select('input_data_id', 'originated_from_transaction_hash');
+
+  receiptInputs.forEach((outputReceipt) => {
+    txnHashes.set(
+      outputReceipt.input_data_id,
+      outputReceipt.originated_from_transaction_hash,
+    );
+  });
+
+  if (txnHashes.size === receiptOrDataIds.length) {
+    return txnHashes;
+  }
+
   const receiptOutputs = await knex('action_receipt_output_data')
     .innerJoin(
       'receipts',
@@ -272,6 +343,14 @@ const getActionReceiptActionData = (
     receipt_receiver_account_id: receiverId,
   };
 };
+
+const getActionReceiptInputData = (
+  receiptId: string,
+  dataId: string,
+): ActionReceiptInputData => ({
+  input_data_id: dataId,
+  input_to_receipt_id: receiptId,
+});
 
 const getActionReceiptOutputData = (
   receiptId: string,

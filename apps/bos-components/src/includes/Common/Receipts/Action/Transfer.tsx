@@ -17,7 +17,7 @@ const Transfer = (props: TransactionActionInfo) => {
       </span>{' '}
       {t ? t('txns:txn.actions.transfer.1') : 'to'}
       <a href={`/address/${receiver}`} className="hover:no-underline">
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(receiver)}
         </a>
       </a>

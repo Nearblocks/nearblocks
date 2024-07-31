@@ -19,8 +19,8 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
+import FaHourglassStart from '@/includes/icons/FaHourglassStart';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
-
 export default function (props: Props) {
   const { network, rpcTxn, txn, t, ownerId } = props;
 
@@ -98,9 +98,22 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
+  const txnsPending = txn?.outcomes?.status === null;
   return (
-    <div className="bg-white text-sm text-nearblue-600 divide-solid divide-gray-200 divide-y">
-      {
+    <div className=" text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
+      {txnsPending ? (
+        <div className="flex justify-center text-base p-24">
+          <div className="text-center">
+            <div className="inline-flex items-center text-base rounded bg-yellow-50 dark:bg-black-200 text-yellow-500 animate-spin my-3">
+              <FaHourglassStart className="w-5 !h-5" />
+            </div>
+
+            <h1 className="text-lg text-nearblue-600 dark:text-neargray-10">
+              This transaction is pending confirmation.
+            </h1>
+          </div>
+        </div>
+      ) : (
         <Widget
           src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptRow`}
           props={{
@@ -111,7 +124,7 @@ export default function (props: Props) {
             ownerId,
           }}
         />
-      }
+      )}
     </div>
   );
 }

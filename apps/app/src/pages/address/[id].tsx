@@ -8,17 +8,36 @@ import Layout from '@/components/Layouts';
 import { useAuthStore } from '@/stores/auth';
 import Head from 'next/head';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import SponserdText from '@/components/SponserdText';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const Address = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const { id } = router.query;
   const components = useBosComponents();
   const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const [showAllReceipts, setShowAllReceipts] = useState(false);
+  useEffect(() => {
+    const allReceipts = localStorage.getItem('showAllReceipts');
+    if (allReceipts === null) {
+      localStorage.setItem('showAllReceipts', 'false');
+    } else {
+      setShowAllReceipts(allReceipts === 'true');
+    }
+  }, []);
+  const handleToggle = () => {
+    const allReceipts = !showAllReceipts;
+    localStorage.setItem('showAllReceipts', allReceipts.toString());
+    setShowAllReceipts(allReceipts);
+  };
 
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
@@ -49,7 +68,7 @@ const Address = () => {
   const signedIn = useAuthStore((store) => store.signedIn);
   const account = useAuthStore((store) => store.account);
   const logOut = useAuthStore((store) => store.logOut);
-
+  const thumbnail = `${ogUrl}/thumbnail/account?address=${id}&network=${network}&brand=near`;
   return (
     <>
       <Head>
@@ -78,21 +97,42 @@ const Address = () => {
           property="twitter:description"
           content={t('address:metaDescription', { address: id })}
         />
-        <meta
-          property="og:image"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
-        <meta
-          property="og:image:secure_url"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
-        <meta
-          name="twitter:image:src"
-          content={`${ogUrl}/thumbnail/account?address=${id}&network=${network}`}
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/address/${id}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">
+        <div className="flex items-center justify-between flex-wrap pt-4">
+          {!id ? (
+            <div className="w-80 max-w-xs px-3 py-5">
+              <Skeleton className="h-7" />
+            </div>
+          ) : (
+            <div className="flex md:flex-wrap w-full">
+              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10 border-b w-full mb-5">
+                Near Account:&nbsp;
+                {id && (
+                  <span className="text-green-500 dark:text-green-250">
+                    @<span className="font-semibold">{id}</span>
+                  </span>
+                )}
+                {
+                  <VmComponent
+                    src={components?.buttons}
+                    props={{
+                      id: id,
+                      theme: theme,
+                    }}
+                  />
+                }
+              </h1>
+            </div>
+          )}
+          <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
+            <SponserdText />
+          </div>
+        </div>
         <VmComponent
           skeleton={<Overview className="absolute pr-6" ref={heightRef} />}
           defaultSkelton={<Overview />}
@@ -107,6 +147,10 @@ const Address = () => {
             accountId:
               account && account?.loading === false ? account?.accountId : null,
             logOut: logOut,
+            theme: theme,
+            handleToggle,
+            showAllReceipts,
+            userApiUrl,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />

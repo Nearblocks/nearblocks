@@ -55,6 +55,12 @@ const charts = [
     image: '/images/charts/txn-volume.svg',
     exclude: networkId === 'testnet',
   },
+  {
+    link: '/charts/tps',
+    text: 'Near Transactions per Second Chart',
+    image: '/images/charts/tps.svg',
+    exclude: false,
+  },
 ];
 const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   const { t } = useTranslation('charts');
@@ -65,11 +71,11 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
           <>
             {chart.exclude === false && (
               <div
-                className="block bg-white border soft-shadow rounded-xl overflow-hidden"
+                className="block bg-white dark:border-black-200 dark:bg-black-600 border soft-shadow rounded-xl overflow-hidden"
                 key={chart.link}
               >
                 <div>
-                  <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b truncate">
+                  <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b dark:border-black-200 truncate">
                     <h2>{t(chart.text)}</h2>
                   </a>
                 </div>

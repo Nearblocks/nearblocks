@@ -8,9 +8,10 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import Detail from '@/components/skeleton/nft/Detail';
 import { Token } from '@/utils/types';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const NFTokenInfo = () => {
   const router = useRouter();
   const { id, tid } = router.query;
@@ -96,7 +97,7 @@ const NFTokenInfo = () => {
         <meta property="twitter:description" content={meta.description} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
-      <div style={height} className="relative container mx-auto">
+      <div style={height} className="relative">
         <VmComponent
           skeleton={<Detail className="absolute" ref={heightRef} />}
           defaultSkelton={<Detail />}
@@ -107,6 +108,7 @@ const NFTokenInfo = () => {
             t: t,
             id: id,
             tid: tid,
+            userApiUrl,
           }}
           loading={<Detail className="absolute" ref={heightRef} />}
         />

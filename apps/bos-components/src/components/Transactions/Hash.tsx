@@ -12,24 +12,33 @@
  * @param {string} [pageTab] - The page tab being displayed. (Optional)
  *                                 Example: If provided, tab=overview in the url it will select the overview tab of transaction details.
  * @param {string} ownerId - The identifier of the owner of the component.
+ * @param {Function} [requestSignInWithWallet] - Function to initiate sign-in with a wallet.
  */
 
 interface Props {
   ownerId: string;
   network: string;
   t: (key: string) => string | undefined;
+  requestSignInWithWallet: () => void;
   hash: string;
   onHandleTab: (value: string) => void;
   pageTab: string;
 }
 
-import ArrowDown from '@/includes/icons/ArrowDown';
+import ErrorMessage from '@/includes/Common/ErrorMessage';
+import FileSlash from '@/includes/icons/FileSlash';
 import { TransactionInfo, RPCTransactionInfo } from '@/includes/types';
 
-const hashes = ['overview', 'execution', 'comments'];
-
 export default function (props: Props) {
-  const { t, network, hash, onHandleTab, pageTab, ownerId } = props;
+  const {
+    t,
+    network,
+    hash,
+    onHandleTab,
+    pageTab,
+    ownerId,
+    requestSignInWithWallet,
+  } = props;
 
   const { getConfig, handleRateLimit } = VM.require(
     `${ownerId}/widget/includes.Utils.libs`,
@@ -38,18 +47,18 @@ export default function (props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [txn, setTxn] = useState<TransactionInfo | null>(null);
   const [error, setError] = useState(false);
-  const [isToggle, setIsToggle] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<RPCTransactionInfo>(
     {} as RPCTransactionInfo,
   );
 
   const config = getConfig && getConfig(network);
 
-  const onTab = (index: number) => {
-    onHandleTab(hashes[index]);
+  const onTab = (hash: string) => {
+    onHandleTab(hash);
   };
 
   useEffect(() => {
+    let delay = 1000;
     function fetchTxn() {
       setIsLoading(true);
       asyncFetch(`${config.backendUrl}txns/${hash}`)
@@ -62,6 +71,10 @@ export default function (props: Props) {
           }) => {
             const resp = data?.body?.txns?.[0];
             if (data.status === 200) {
+              if (resp?.outcomes?.status === null) {
+                setTimeout(fetchTxn, delay);
+                delay = 15000;
+              }
               setError(false);
               setTxn(resp);
               setIsLoading(false);
@@ -121,161 +134,158 @@ export default function (props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, config?.rpcUrl]);
 
+  const buttonStyles = (hash: string) =>
+    `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+      pageTab === hash
+        ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+        : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
+    }`;
+
   return (
-    <>
+    <Fragment key="hash">
       {error || (!isLoading && !txn) ? (
-        <div className="text-nearblue-700 text-xs px-2 mb-4">
-          {t ? t('txns:txnError') : 'Transaction Error'}
+        <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+          <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
+            <ErrorMessage
+              icons={<FileSlash />}
+              message="Sorry, We are unable to locate this TxnHash"
+              mutedText={hash}
+            />
+          </div>
         </div>
       ) : (
         <>
           <div>
-            {hashes &&
-              hashes.map((hash, index) => (
-                <button
-                  key={index}
-                  onClick={() => onTab(index)}
-                  className={`text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
-                    pageTab === hash
-                      ? 'rounded-lg bg-green-600 text-white'
-                      : 'hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600'
-                  }`}
-                  value={hash}
-                >
-                  {hash === 'overview' ? (
-                    <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.overview') : 'Overview'}
-                    </h2>
-                  ) : hash === 'execution' ? (
-                    pageTab !== 'execution' ? (
-                      <div className="p-2">
-                        <h2 className="flex">
-                          {isToggle
-                            ? 'Enhanced Plan'
-                            : t
-                            ? t('txns:txn.tabs.execution')
-                            : 'Execution Plan'}
-                          <ArrowDown className="h-4 w-4 fill-current ml-1" />
-                        </h2>
-                        <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-11 -mt-7 px-1 ">
-                          NEW
-                        </div>
-                      </div>
-                    ) : (
-                      <Popover.Root key={isToggle}>
-                        <Popover.Trigger asChild>
-                          <button
-                            className="flex p-2 text-xs  rounded focus:outline-none"
-                            aria-label="Update dimensions"
-                          >
-                            {isToggle
-                              ? 'Enhanced Plan'
-                              : t
-                              ? t('txns:txn.tabs.execution')
-                              : 'Execution Plan'}
-                            <ArrowDown className="h-4 w-4 fill-current ml-1" />
-                            <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-24 -mt-3 px-1 ">
-                              NEW
-                            </div>{' '}
-                          </button>
-                        </Popover.Trigger>
-                        <Popover.Content
-                          className="bg-white w-48 shadow-lg border rounded-lg slide-down mt-2 z-50"
-                          sideOffset={5}
-                        >
-                          <ul className="divide-y">
-                            <li
-                              onClick={() => setIsToggle(false)}
-                              className={`py-2 text-nearblue-600 rounded-t-lg ${
-                                !isToggle ? 'bg-gray-300' : ''
-                              }`}
-                            >
-                              {t('txns:txn.tabs.execution') || 'Execution Plan'}
-                            </li>
-                            <li
-                              onClick={() => setIsToggle(true)}
-                              className={`py-2 text-nearblue-600 rounded-b-lg ${
-                                isToggle ? 'bg-gray-300' : ''
-                              }`}
-                            >
-                              Enhanced Plan
-                            </li>
-                          </ul>
-                        </Popover.Content>
-                      </Popover.Root>
-                    )
-                  ) : (
-                    <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.comments') : 'Comments'}
-                    </h2>
-                  )}
-                </button>
-              ))}
+            <button
+              onClick={() => onTab('overview')}
+              className={buttonStyles('overview')}
+            >
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.overview') : 'Overview'}
+              </h2>
+            </button>
+            <button
+              onClick={() => onTab('execution')}
+              className={buttonStyles('execution')}
+            >
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
+              </h2>
+            </button>
+            <button
+              onClick={() => onTab('enhanced')}
+              className={buttonStyles('enhanced')}
+            >
+              <h2 className="p-2">{'Enhanced Plan'}</h2>
+              <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
+                NEW
+              </div>
+            </button>{' '}
+            <button
+              onClick={() => onTab('tree')}
+              className={buttonStyles('tree')}
+            >
+              <h2 className="p-2">Tree Plan</h2>
+            </button>
+            <button
+              onClick={() => onTab('summary')}
+              className={buttonStyles('summary')}
+            >
+              <h2 className="p-2">Receipt Summary</h2>
+            </button>
+            <button
+              onClick={() => onTab('comments')}
+              className={buttonStyles('comments')}
+            >
+              <h2 className="p-2">
+                {t ? t('txns:txn.tabs.comments') : 'Comments'}
+              </h2>
+            </button>
           </div>
-          <div className="bg-white soft-shadow rounded-xl pb-1">
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className={`${pageTab === 'overview' ? '' : 'hidden'} `}>
-              {
-                <Widget
-                  src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
-                  props={{
-                    txn: txn,
-                    rpcTxn: rpcTxn,
-                    loading: isLoading,
-                    network: network,
-                    t: t,
-                    ownerId,
-                  }}
-                />
-              }
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.Detail`}
+                props={{
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  network: network,
+                  t: t,
+                  ownerId,
+                }}
+              />
             </div>
+
             <div className={`${pageTab === 'execution' ? '' : 'hidden'} `}>
-              <div className={`${isToggle ? '' : 'hidden'} `}>
-                {
-                  <Widget
-                    src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
-                    props={{
-                      network: network,
-                      t: t,
-                      txn: txn,
-                      rpcTxn: rpcTxn,
-                      loading: isLoading,
-                      ownerId,
-                    }}
-                  />
-                }
-              </div>
-              <div className={`${isToggle ? 'hidden' : ''} `}>
-                <Widget
-                  src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
-                  props={{
-                    network: network,
-                    t: t,
-                    txn: txn,
-                    rpcTxn: rpcTxn,
-                    loading: isLoading,
-                    ownerId,
-                  }}
-                />
-              </div>
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.Receipt`}
+                props={{
+                  network: network,
+                  t: t,
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  ownerId,
+                }}
+              />
+            </div>
+            <div className={`${pageTab === 'enhanced' ? '' : 'hidden'} `}>
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.Execution`}
+                props={{
+                  network: network,
+                  t: t,
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  ownerId,
+                }}
+              />
+            </div>
+            <div className={`${pageTab === 'tree' ? '' : 'hidden'} `}>
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.Tree`}
+                props={{
+                  network: network,
+                  t: t,
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  ownerId,
+                }}
+              />
+            </div>
+            <div className={`${pageTab === 'summary' ? '' : 'hidden'} `}>
+              <Widget
+                src={`${ownerId}/widget/bos-components.components.Transactions.ReceiptSummary`}
+                props={{
+                  network: network,
+                  t: t,
+                  txn: txn,
+                  rpcTxn: rpcTxn,
+                  loading: isLoading,
+                  ownerId,
+                }}
+              />
             </div>
             <div className={`${pageTab === 'comments' ? '' : 'hidden'} `}>
               <div className="py-3">
-                {
-                  <Widget
-                    src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
-                    props={{
-                      network: network,
-                      path: `nearblocks.io/txns/${hash}`,
-                      limit: 10,
-                      ownerId,
-                    }}
-                  />
-                }
+                <Widget
+                  src={`${ownerId}/widget/bos-components.components.Comments.Feed`}
+                  props={{
+                    network: network,
+                    path: `nearblocks.io/txns/${hash}`,
+                    limit: 10,
+                    ownerId,
+                    requestSignInWithWallet,
+                  }}
+                />
               </div>
             </div>
           </div>
         </>
       )}
-    </>
+    </Fragment>
   );
 }

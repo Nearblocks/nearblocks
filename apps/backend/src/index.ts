@@ -23,8 +23,8 @@ const errorHandler = (error: unknown) => {
 };
 
 const jobs: Bree.JobOptions[] = [
-  { cron: '1 0 * * *', name: 'stats' }, // every day at 00:01:00
-  { cron: '*/1 * * * *', name: 'daily-stats', timeout: '15s' }, // run every 1m for now
+  { cron: '*/15 * * * * *', hasSeconds: true, name: 'stats' }, // every 15s
+  { cron: '1 0 * * *', name: 'daily-stats', timeout: '5s' }, // every day at 00:01:00
   { cron: '*/30 * * * *', name: 'daily-stats-new', timeout: '15s' }, // run every 30m for now
   { cron: '0 */12 * * *', name: 'circulating-supply', timeout: '30s' }, // run every 12h for now
   { cron: '* * * * *', name: 'ft-meta' }, // every minute
@@ -32,7 +32,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '* * * * *', name: 'ft-market-search' }, // every minute
   { cron: '*/5 * * * * *', hasSeconds: true, name: 'ft-total-supply' }, // every 5s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nft-meta' }, // every 10s
-  { cron: '*/5 * * * * *', hasSeconds: true, name: 'events' }, // every 5s
+  // { cron: '*/5 * * * * *', hasSeconds: true, name: 'events' }, // every 5s
   { cron: '*/10 * * * *', name: 'pool-id' }, // every 10 minute
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'pool-info' }, // every 10s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'staking-pool' }, // every 10s

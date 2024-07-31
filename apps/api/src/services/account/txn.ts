@@ -27,9 +27,28 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const to = req.validator.data.to;
   const action = req.validator.data.action;
   const method = req.validator.data.method;
+  const cursor = req.validator.data.cursor;
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
+  const afterDate = req.validator.data.after_date;
+  const beforeDate = req.validator.data.before_date;
+  let afterTimestamp = null;
+  let beforeTimestamp = null;
+
+  if (afterDate) {
+    afterTimestamp = msToNsTime(
+      dayjs(afterDate, 'YYYY-MM-DD', true)
+        .add(1, 'day')
+        .startOf('day')
+        .valueOf(),
+    );
+  }
+  if (beforeDate) {
+    beforeTimestamp = msToNsTime(
+      dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+  }
 
   if (from && to && from !== account && to !== account) {
     return res.status(200).json({ txns: [] });
@@ -38,6 +57,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
   const txns = await sql`
     SELECT
+      receipts.id,
       receipts.receipt_id,
       receipts.predecessor_account_id,
       receipts.receiver_account_id,
@@ -45,6 +65,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
       tr.included_in_block_hash,
       tr.block_timestamp,
       tr.block,
+      tr.receipt_conversion_tokens_burnt,
       tr.actions,
       tr.actions_agg,
       tr.outcomes,
@@ -58,7 +79,8 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           receipts r
           JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
         WHERE
-          ${from || to
+          r.receipt_kind = 'ACTION'
+          AND ${from || to
       ? sql`
           r.predecessor_account_id = ${from ?? account}
           AND r.receiver_account_id = ${to ?? account}
@@ -69,6 +91,15 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
             OR r.receiver_account_id = ${account}
           )
         `}
+          AND ${cursor
+      ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true}
+          AND ${afterTimestamp
+      ? sql`t.block_timestamp >= ${afterTimestamp}`
+      : true}
+          AND ${beforeTimestamp
+      ? sql`t.block_timestamp < ${beforeTimestamp}`
+      : true}
           AND ${action || method
       ? sql`
           EXISTS (
@@ -84,19 +115,21 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         `
       : true}
         ORDER BY
-          t.block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-          t.index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+          t.id ${order === 'desc' ? sql`DESC` : sql`ASC`},
+          r.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
           ${limit}
         OFFSET
-          ${offset}
+          ${cursor ? 0 : offset}
       ) AS tmp using (receipt_id)
       INNER JOIN LATERAL (
         SELECT
+          id,
           transaction_hash,
           included_in_block_hash,
           block_timestamp,
           index_in_chunk,
+          receipt_conversion_tokens_burnt,
           (
             SELECT
               JSON_BUILD_OBJECT('block_height', block_height)
@@ -112,11 +145,19 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
                   'action',
                   action_receipt_actions.action_kind,
                   'method',
-                  action_receipt_actions.args ->> 'method_name'
+                  action_receipt_actions.args ->> 'method_name',
+                  'deposit',
+                  COALESCE(
+                    (action_receipt_actions.args ->> 'deposit')::NUMERIC,
+                    0
+                  ),
+                  'fee',
+                  COALESCE(execution_outcomes.tokens_burnt, 0)
                 )
               )
             FROM
               action_receipt_actions
+              JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
             WHERE
               action_receipt_actions.receipt_id = receipts.receipt_id
           ) AS actions,
@@ -167,11 +208,13 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           transactions.transaction_hash = receipts.originated_from_transaction_hash
       ) tr ON TRUE
     ORDER BY
-      tr.block_timestamp ${order === 'desc' ? sql`DESC` : sql`ASC`},
-      tr.index_in_chunk ${order === 'desc' ? sql`DESC` : sql`ASC`}
+      tr.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
   `;
 
-  return res.status(200).json({ txns });
+  let nextCursor = txns?.[txns?.length - 1]?.id;
+  nextCursor = txns?.length === per_page && nextCursor ? nextCursor : undefined;
+
+  return res.status(200).json({ cursor: nextCursor, txns });
 });
 
 const txnsCount = catchAsync(
@@ -181,13 +224,39 @@ const txnsCount = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
     }
 
     const useFormat = true;
-    const bindings = { account, action, from, method, to };
+    const bindings = {
+      account,
+      action,
+      afterDate,
+      beforeDate,
+      from,
+      method,
+      to,
+    };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -209,6 +278,8 @@ const txnsCount = catchAsync(
               )
             `
         }
+        AND ${afterTimestamp ? `t.block_timestamp >= :afterTimestamp` : true}
+        AND ${beforeTimestamp ? `t.block_timestamp < :beforeTimestamp` : true}
         AND ${
           action || method
             ? `EXISTS (

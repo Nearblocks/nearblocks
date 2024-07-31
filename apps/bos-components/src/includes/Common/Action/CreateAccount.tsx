@@ -20,12 +20,12 @@ const CreateAccount = (props: ActionPropsInfo) => {
     );
   };
   return (
-    <div className="flex flex-wrap items-center break-all leading-7">
-      <FaRight className="inline-flex text-gray-400 text-xs" />
+    <div className="action flex flex-wrap items-center break-all leading-7">
+      <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">
         Create Account{' '}
         <a href={`/address/${props.action.to}`} className="hover:no-underline">
-          <a className="text-green-500 font-normal pl-1 hover:no-underline">
+          <a className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline">
             {shortenAddress(props.action.to)}
           </a>
         </a>

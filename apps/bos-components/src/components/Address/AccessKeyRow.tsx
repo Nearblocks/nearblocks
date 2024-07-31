@@ -52,56 +52,54 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
       case 'CREATE_ACCOUNT':
       case 'CreateAccount':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {t('createAccount')}
           </div>
         );
       case 'DEPLOY_CONTRACT':
       case 'DeployContract':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {t('deployContract')}
           </div>
         );
       case 'TRANSFER':
       case 'Transfer':
         return (
-          <div className="bg-emerald-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-emerald-50 py-1 flex items-center text-xs">
             {t('transfer')}
           </div>
         );
       case 'STAKE':
       case 'Stake':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
-            {t('stake')}
-          </div>
+          <div className="py-1 flex items-center text-xs">{t('stake')}</div>
         );
       case 'ADD_KEY':
       case 'AddKey':
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             Acces Key Created
           </div>
         );
       case 'DELETE_KEY':
       case 'DeleteKey':
         return (
-          <div className="bg-red-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-red-50 py-1 flex items-center text-xs">
             Acces Key Deleted
           </div>
         );
       case 'DELETE_ACCOUNT':
       case 'DeleteAccount':
         return (
-          <div className="bg-red-50 px-1 py-1 flex justify-center items-center text-xs">
+          <div className="bg-red-50 py-1 flex items-center text-xs">
             {t('deleteAccount')}
           </div>
         );
 
       default:
         return (
-          <div className="px-1 py-1 flex justify-center items-center text-xs">
+          <div className="py-1 flex items-center text-xs">
             {capitalizeWords(method)}
           </div>
         );
@@ -148,14 +146,14 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
   return (
     <>
       <tr key={accessKey.public_key} className="hover:bg-blue-900/5">
-        <td className="px-6 py-4 text-sm text-nearblue-600 ">
+        <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip.Provider>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 font-medium whitespace-nowrap">
+                  <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 font-medium whitespace-nowrap">
                     <Link href={`/txns/${txn?.transaction_hash}`}>
-                      <a className="text-green-500">
+                      <a className="text-green-500 dark:text-green-250">
                         {txn?.transaction_hash && txn?.transaction_hash}
                       </a>
                     </Link>
@@ -173,24 +171,30 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             'Genesis'
           )}
         </td>
-        <td className="pl-6 pr-2 py-4 text-sm text-nearblue-600  ">
-          <Tooltip.Provider>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <span className="truncate max-w-[120px] inline-block align-bottom ">
-                  {accessKey.public_key}
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                sideOffset={5}
-              >
+        <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 500, hide: 0 }}
+            popperConfig={{
+              modifiers: {
+                name: 'offset',
+                options: {
+                  offset: [0, 5],
+                },
+              },
+            }}
+            overlay={
+              <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words">
                 {accessKey.public_key}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
+              </Tooltip>
+            }
+          >
+            <span className="truncate max-w-[120px] inline-block align-bottom ">
+              {accessKey.public_key}
+            </span>
+          </OverlayTrigger>
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-start">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
           {accessKey.permission_kind === 'FUNCTION_CALL' ? (
             <div className="bg-blue-900/10 rounded px-4 h-6 flex items-center justify-center text-center text-xs">
               Limited
@@ -201,12 +205,12 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  flex justify-start ">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
               {keyInfo?.permission?.FunctionCall?.method_names.length > 0
@@ -221,7 +225,7 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
             </div>
           )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {keyInfo &&
             Object.keys(keyInfo).length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
@@ -231,30 +235,24 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
                 true,
               )}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {action}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 ">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
-            <Tooltip.Provider>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <span>
-                    {showWhen
-                      ? txn?.block_timestamp
-                        ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                        : ''
-                      : txn?.block_timestamp
-                      ? formatTimestampToString(
-                          nanoToMilli(txn?.block_timestamp),
-                        )
-                      : ''}
-                  </span>
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                  sideOffset={5}
-                >
+            <OverlayTrigger
+              placement="top"
+              delay={{ show: 500, hide: 0 }}
+              popperConfig={{
+                modifiers: {
+                  name: 'offset',
+                  options: {
+                    offset: [0, 5],
+                  },
+                },
+              }}
+              overlay={
+                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2">
                   {!showWhen
                     ? txn?.block_timestamp
                       ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
@@ -262,9 +260,19 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
                     : txn?.block_timestamp
                     ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
                     : ''}
-                </Tooltip.Content>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+                </Tooltip>
+              }
+            >
+              <span>
+                {showWhen
+                  ? txn?.block_timestamp
+                    ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
+                    : ''
+                  : txn?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
+                  : ''}
+              </span>
+            </OverlayTrigger>
           ) : (
             'Genesis'
           )}

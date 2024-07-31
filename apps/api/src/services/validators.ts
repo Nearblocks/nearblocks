@@ -2,9 +2,11 @@ import Big from 'big.js';
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import { viewBlock } from '#libs/near';
 import redis from '#libs/redis';
 import { List } from '#libs/schema/validators';
 import {
+  calculateAPY,
   calculateTotalStake,
   elapsedTime,
   epochProgress,
@@ -135,11 +137,32 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
       },
     );
 
+    let lastEpochApy = '0';
+
+    try {
+      const block = await viewBlock({ finality: 'final' });
+      const [prevEpoch, epoch] = await Promise.all([
+        viewBlock({ blockId: block.header.epoch_id }),
+        viewBlock({ blockId: block.header.next_epoch_id }),
+      ]);
+
+      lastEpochApy = calculateAPY(
+        totalStake,
+        epoch.header.timestamp_nanosec,
+        prevEpoch.header.timestamp_nanosec,
+        block.header.total_supply,
+      );
+    } catch (error) {
+      console.log({ error });
+      //
+    }
+
     return res.status(200).json({
       currentValidators: currentValidators.length,
       elapsedTimeData,
       epochProgressData,
       epochStatsCheck,
+      lastEpochApy,
       latestBlock,
       total: combinedData.length,
       totalSeconds,
@@ -154,6 +177,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     elapsedTimeData: 0,
     epochProgressData: 0,
     epochStatsCheck: 0,
+    lastEpochApy: 0,
     latestBlock: {},
     total: 0,
     totalSeconds: 0,

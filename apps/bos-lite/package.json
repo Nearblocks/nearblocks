@@ -1,0 +1,29 @@
+{
+  "name": "bos-lite",
+  "version": "1.0.0",
+  "author": "NearBlocks",
+  "license": "BUSL-1.1",
+  "type": "module",
+  "scripts": {
+    "bw": "bos-workspace",
+    "dev": "bw ws dev",
+    "dev:testnet": "bw ws dev -n testnet",
+    "build": "bw ws build",
+    "build:testnet": "bw ws build -n testnet",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./",
+    "deploy": "bw deploy src"
+  },
+  "devDependencies": {
+    "@near-js/types": "~0.2.0",
+    "@types/big.js": "~6.2",
+    "@types/react": "~18.3.1",
+    "bos-workspace": "~1.0.0-alpha.19",
+    "eslint-config-custom-next": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-near": "*",
+    "near-social-vm-types": "~1.0.0",
+    "typescript": "~5.2"
+  }
+}

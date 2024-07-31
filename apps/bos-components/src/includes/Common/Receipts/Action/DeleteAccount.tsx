@@ -13,7 +13,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         : 'Delete account'}{' '}
       (
       <a href={`/address/${props.receiver}`} className="hover:no-underline">
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(props.receiver)}
         </a>
       </a>
@@ -25,7 +25,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         href={`/address/${props.args.beneficiary_id}`}
         className="hover:no-underline"
       >
-        <a className="text-green-500 font-bold hover:no-underline">
+        <a className="text-green-500 dark:text-green-250 font-bold hover:no-underline">
           {shortenAddress(props.args.beneficiary_id)}
         </a>
       </a>

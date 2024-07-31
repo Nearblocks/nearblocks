@@ -17,6 +17,7 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
+  mainnetUrl: string;
   maxQueryCost: number;
   maxQueryRows: number;
   network: string;
@@ -28,6 +29,7 @@ export type Config = {
   redisUrl: string;
   rpcUrl: string;
   sentryDsn?: string;
+  testnetUrl: string;
   userDbUrl: string;
 };
 
@@ -38,6 +40,7 @@ export type StreamTransformWrapper = (
 export type User = {
   email: string;
   id: number;
+  key_id?: number;
   keys?: Key[];
   last_login_at: string;
   plan?: Plan;
@@ -88,5 +91,6 @@ export type ValidationError = {
 export type RawQueryParams = {
   action?: string;
   method?: string;
+  methods?: string[];
   select: string;
 };

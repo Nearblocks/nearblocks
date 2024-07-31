@@ -185,14 +185,14 @@ export default function ({ network, id, token, ownerId }: Props) {
 
   return (
     <div itemScope itemType="http://schema.org/FAQPage">
-      <div className="px-3 pb-2 text-sm divide-y divide-gray-200 space-y-2">
+      <div className="px-3 pb-2 text-sm divide-y divide-gray-200 dark:divide-black-200 space-y-2">
         <div
           itemScope
           itemProp="mainEntity"
           itemType="https://schema.org/Question"
         >
           <h3
-            className="text-nearblue-600 text-sm font-semibold pt-4 pb-2"
+            className="text-nearblue-600 dark:text-neargray-10 text-sm font-semibold pt-4 pb-2"
             itemProp="name"
           >
             What is {name} price now?
@@ -202,7 +202,10 @@ export default function ({ network, id, token, ownerId }: Props) {
             itemProp="acceptedAnswer"
             itemType="https://schema.org/Answer"
           >
-            <div itemProp="text" className="text-sm text-nearblue-600 py-2">
+            <div
+              itemProp="text"
+              className="text-sm text-nearblue-600 dark:text-neargray-10 py-2"
+            >
               The live price of {name} is{' '}
               {tokens?.price !== null && tokens?.price !== undefined ? (
                 `$${dollarFormat(tokens?.price)} (${tokenTicker} / USD)`
@@ -249,7 +252,7 @@ export default function ({ network, id, token, ownerId }: Props) {
           itemType="https://schema.org/Question"
         >
           <h3
-            className="text-nearblue-600 text-sm font-semibold pt-4 pb-2"
+            className="text-nearblue-600 dark:text-neargray-10 text-sm font-semibold pt-4 pb-2"
             itemProp="name"
           >
             When was {name} created on Near Protocol?
@@ -259,7 +262,10 @@ export default function ({ network, id, token, ownerId }: Props) {
             itemProp="acceptedAnswer"
             itemType="https://schema.org/Answer"
           >
-            <div className="text-sm text-nearblue-600 py-2" itemProp="text">
+            <div
+              className="text-sm text-nearblue-600 dark:text-neargray-10 py-2"
+              itemProp="text"
+            >
               The{' '}
               <Link href={`/address/${id}`}>
                 <a className="underline">{name}</a>
@@ -300,7 +306,7 @@ export default function ({ network, id, token, ownerId }: Props) {
           itemType="https://schema.org/Question"
         >
           <h3
-            className="text-nearblue-600 text-sm font-semibold pt-4 pb-2"
+            className="text-nearblue-600 dark:text-neargray-10 text-sm font-semibold pt-4 pb-2"
             itemProp="name"
           >
             How many {name} tokens are there?
@@ -310,7 +316,10 @@ export default function ({ network, id, token, ownerId }: Props) {
             itemProp="acceptedAnswer"
             itemType="https://schema.org/Answer"
           >
-            <div className="text-sm text-nearblue-600 py-2" itemProp="text">
+            <div
+              className="text-sm text-nearblue-600 dark:text-neargray-10 py-2"
+              itemProp="text"
+            >
               There are currently{' '}
               {tokens?.circulating_supply !== null ? (
                 `${

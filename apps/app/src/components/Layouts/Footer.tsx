@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import useTranslation from 'next-translate/useTranslation';
-
+import { useTheme } from 'next-themes';
 import Arrow from '../Icons/Arrow';
-
 const Footer = () => {
   const { t } = useTranslation('common');
+  const { theme } = useTheme();
   const currentDate = new Date();
   return (
-    <footer className="footer">
+    <footer className="footer dark:bg-black-600  ">
       <div className="bg-bottom-right">
         <div className="bg-bottom-left">
           <div className="container mx-auto px-3 pb-32">
@@ -16,15 +16,19 @@ const Footer = () => {
               <div className="w-64">
                 <div className="text-sm text-grey-dark flex flex-col py-3">
                   <Image
-                    src="/images/nearblocksblack.svg"
-                    className="block py-3 mr-2"
-                    width="234"
-                    height="54"
+                    src={
+                      theme === 'dark'
+                        ? '/images/nb-black-on-bos_dark.svg'
+                        : '/images/nb-black-on-bos.svg'
+                    }
+                    className="block"
+                    width="174"
+                    height="40"
                     alt="NearBlocks"
                     layout="fixed"
                   />
                 </div>
-                <p className="max-w-xs text-black text-xs leading-6 pb-3">
+                <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
                   {t('footer.description')}
                 </p>
                 <div>
@@ -34,7 +38,11 @@ const Footer = () => {
                     rel="noreferrer nofollow noopener"
                   >
                     <Image
-                      src="/images/twitter_icon.svg"
+                      src={
+                        theme === 'dark'
+                          ? '/images/twitter_icon_black.svg'
+                          : '/images/twitter_icon.svg'
+                      }
                       width={24}
                       height={24}
                       alt="Twitter"
@@ -47,7 +55,11 @@ const Footer = () => {
                     rel="noreferrer nofollow noopener"
                   >
                     <Image
-                      src="/images/github_icon.svg"
+                      src={
+                        theme === 'dark'
+                          ? '/images/github_icon_black.svg'
+                          : '/images/github_icon.svg'
+                      }
                       width={24}
                       height={24}
                       alt="Github"
@@ -55,28 +67,25 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
-
               <div className="hidden lg:!block"></div>
               <div className="hidden lg:!block">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   &nbsp;
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6">
+                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/">&nbsp;</Link>
                   </li>
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   Tools
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6">
+                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/apis" legacyBehavior>
-                      <a target="_blank" rel="noreferrer nofollow noopener">
-                        {t('footer.links.api')}
-                      </a>
+                      <a>{t('footer.links.api')}</a>
                     </Link>
                   </li>
                   <li>
@@ -96,10 +105,10 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   {t('footer.links.explore')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6">
+                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200 ">
                   <li>
                     <Link href="/blocks" legacyBehavior>
                       <a>{t('footer.links.latestBlocks')}</a>
@@ -123,30 +132,13 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
                   {t('footer.links.company')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6">
+                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/about" legacyBehavior>
                       <a>{t('footer.links.about')}</a>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="https://careers.near.org/companies/invoker-labs"
-                      legacyBehavior
-                    >
-                      <a
-                        className="flex"
-                        target="_blank"
-                        rel="noreferrer nofollow noopener"
-                      >
-                        Careers
-                        <span>
-                          <Arrow className="-rotate-45 -mt-0 h-4 w-4" />
-                        </span>
-                      </a>
                     </Link>
                   </li>
                   <li>
@@ -167,16 +159,19 @@ const Footer = () => {
                 </ul>
               </div>
             </div>
-            <div className="flex justify-between border-t border-gray-200">
-              <p className="text-green-500 text-xs pb-1 pt-6 text-center ">
+            <div className="flex justify-between border-t border-gray-200 dark:border-black-200">
+              <p className="text-green-500 dark:text-green-250 text-xs pb-1 pt-6 text-center ">
                 NearBlocks © {currentDate.getFullYear()}
               </p>
             </div>
             <div className="text-gray-400 text-xs flex items-center flex-wrap pb-1">
               Price feeds aggregated by{' '}
-              <Link href="http://coingecko.com/" legacyBehavior>
+              <Link
+                href="http://coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
+                legacyBehavior
+              >
                 <a
-                  className="mx-1"
+                  className="mx-1  flex items-center"
                   target="_blank"
                   rel="noreferrer nofollow noopener"
                 >
@@ -199,5 +194,4 @@ const Footer = () => {
     </footer>
   );
 };
-
 export default Footer;

@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const Content = ({ i18nKey = '404:description' }) => {
   return (
     <DynamicNamespaces namespaces={['404']}>
-      <div className="text-center text-black text-2xl pt-10 top-4">
+      <div className="text-center text-black dark:text-neargray-10 text-2xl pt-10 top-4">
         <Trans i18nKey={i18nKey} components={[<strong key="1" />]} />
       </div>
       <div className="flex justify-center pt-12 z-10">
@@ -29,12 +29,12 @@ const Error = () => {
         </Head>
         <div className="errorContainer flex flex-col items-center justify-center">
           <div className="px-3 pt-12 errorContent absolute flex flex-col justify-center">
-            <div className="text-center text-black text-8xl pt-20 font-semibold">
+            <div className="text-center text-black dark:text-neargray-10 text-8xl pt-20 font-semibold">
               404
             </div>
             {<Content />}
           </div>
-          <div className="errorBg "></div>
+          <div className="errorBg"></div>
         </div>
       </section>
     </>

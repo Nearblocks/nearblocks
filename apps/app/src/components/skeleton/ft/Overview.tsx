@@ -1,27 +1,40 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
+import useTranslation from 'next-translate/useTranslation';
+import Comment from '../common/Comment';
+import Info from './Info';
+import FAQ from './FAQ';
 interface Props {
   className?: string;
+  pageTab?: string;
 }
 const Overview = forwardRef(
-  ({ className }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
+    const { t } = useTranslation('token');
+
+    const buttonStyles = (hash: string) =>
+      `relative text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none ${
+        pageTab === hash
+          ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+          : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
+      }`;
     return (
       <div ref={ref} className={`w-full z-50 ${className}`}>
         <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25">
+          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
             <Skeleton className="h-7" />
           </div>{' '}
         </div>
         <div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
             <div className="w-full">
-              <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-                <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+                <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   Overview
                 </h2>
 
-                <div className="px-3 divide-y text-sm text-nearblue-600">
-                  <div className="flex divide-x my-2">
+                <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
+                  <div className="flex divide-x dark:divide-black-200 my-2">
                     <div className="flex-col flex-1 flex-wrap py-1">
                       <div className="w-full text-gray-400 text-xs uppercase mb-1  text-[80%]">
                         Price
@@ -84,11 +97,11 @@ const Overview = forwardRef(
               </div>
             </div>
             <div className="w-full">
-              <div className="h-full bg-white soft-shadow rounded-xl overflow-hidden">
-                <h2 className="border-b p-3 text-nearblue-600 text-sm font-semibold">
+              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+                <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   Profile Summary
                 </h2>
-                <div className="px-3 divide-y text-sm text-nearblue-600">
+                <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                   <div className="flex flex-wrap items-center justify-between py-4">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                       Contract:
@@ -138,135 +151,133 @@ const Overview = forwardRef(
           <div className="block lg:flex lg:space-x-2 mb-4">
             <div className="w-full">
               <div>
-                <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  Transfers
+                <div className={buttonStyles('Transfers')}>
+                  {t ? t('fts.ft.transfers') : 'Transfers'}
                 </div>{' '}
-                <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  Holders
+                <div className={buttonStyles('Holders')}>
+                  {' '}
+                  {t ? t('fts.ft.holders') : 'Holders'}
                 </div>{' '}
-                <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  Info
-                </div>{' '}
-                <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  FAQ
-                </div>{' '}
-                <div
-                  className={`text-nearblue-600 hover:bg-neargray-800 bg-neargray-700 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  Comments
-                </div>
+                <div className={buttonStyles('Info')}>Info</div>{' '}
+                <div className={buttonStyles('FAQ')}>FAQ</div>{' '}
+                <div className={buttonStyles('Comments')}>Comments</div>
               </div>
 
               <div className="relative">
                 <div
                   ref={ref}
-                  className={`bg-white border soft-shadow rounded-xl overflow-hidden`}
+                  className={`bg-white dark:bg-black-600 border dark:border-black-200 soft-shadow rounded-xl overflow-hidden`}
                 >
-                  <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 px-3 py-2">
-                    <div className="max-w-lg pl-3 w-full py-3.5 ">
-                      <Skeleton className=" h-4" />
-                    </div>
-                  </div>
-                  <div className="overflow-x-auto ">
-                    <table className="min-w-full divide-y border-t">
-                      <thead className="bg-gray-100 h-[51px]">
-                        <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                          >
-                            <Skeleton className="h-4" />
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {[...Array(25)].map((_, i) => (
-                          <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-tiny align-top ">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
-                              <Skeleton className="h-4" />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="bg-white px-2 py-3 flex items-center justify-between border-t md:px-4">
-                    <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                      <div></div>
-                      <Skeleton className="w-64 h-4" />
-                    </div>
-                  </div>
+                  {pageTab === 'Info' ? (
+                    <Info />
+                  ) : pageTab === 'FAQ' ? (
+                    <FAQ />
+                  ) : pageTab === 'Comments' ? (
+                    <Comment />
+                  ) : (
+                    <>
+                      <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 dark:text-neargray-10 px-3 py-2">
+                        <div className="max-w-lg pl-3 w-full py-3.5 ">
+                          <Skeleton className=" h-4" />
+                        </div>
+                      </div>
+                      <div className="overflow-x-auto ">
+                        <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+                          <thead className="bg-gray-100 dark:bg-black-200 h-[51px]">
+                            <tr>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                              >
+                                <Skeleton className="h-4" />
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white dark:bg-black-600  divide-y dark:divide-black-200 divide-gray-200">
+                            {[...Array(25)].map((_, i) => (
+                              <tr
+                                key={i}
+                                className="hover:bg-blue-900/5 h-[53px]"
+                              >
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10  align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-tiny align-top ">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
+                                  <Skeleton className="h-4" />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4">
+                        <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                          <div></div>
+                          <Skeleton className="w-64 h-4" />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

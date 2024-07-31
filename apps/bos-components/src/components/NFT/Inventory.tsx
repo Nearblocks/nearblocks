@@ -10,8 +10,10 @@
  * @param {string} ownerId - The identifier of the owner of the component.
  */
 
+import ErrorMessage from '@/includes/Common/ErrorMessage';
 import Paginator from '@/includes/Common/Paginator';
 import Skeleton from '@/includes/Common/Skeleton';
+import FaInbox from '@/includes/icons/FaInbox';
 import { Token } from '@/includes/types';
 
 interface Props {
@@ -50,7 +52,6 @@ export default function ({ network, id, token, ownerId }: Props) {
 
   useEffect(() => {
     function fetchNFTData() {
-      setIsLoading(true);
       asyncFetch(`${config.backendUrl}nfts/${id}`)
         .then(
           (data: {
@@ -62,7 +63,6 @@ export default function ({ network, id, token, ownerId }: Props) {
             const resp = data?.body?.contracts?.[0];
             if (data.status === 200) {
               setTokenData(resp);
-              setIsLoading(false);
             } else {
               handleRateLimit(data, fetchNFTData, () => setIsLoading(false));
             }
@@ -144,13 +144,27 @@ export default function ({ network, id, token, ownerId }: Props) {
           <Skeleton className="h-4" />
         </div>
       ) : (
-        <div className={`flex flex-col lg:flex-row pt-4 border-b`}>
+        <div
+          className={`flex flex-col lg:flex-row pt-4 border-b dark:border-black-200`}
+        >
           <div className="flex flex-col">
-            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600">
-              A total of {localFormat && localFormat(totalCount.toString())}{' '}
-              tokens found
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+              {tokens.length > 0 &&
+                `A total of ${
+                  localFormat && localFormat(totalCount.toString())
+                }${' '}
+              tokens found`}
             </p>
           </div>
+        </div>
+      )}
+      {!isLoading && tokens.length === 0 && (
+        <div className="px-6 py-4 text-gray-400 text-xs">
+          <ErrorMessage
+            icons={<FaInbox />}
+            message="There are no matching entries"
+            mutedText="Please try again later"
+          />
         </div>
       )}
       <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
@@ -168,10 +182,10 @@ export default function ({ network, id, token, ownerId }: Props) {
                   <Skeleton className="h-40" />
                 </div>
               </a>
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
                 <Skeleton className="h-4" />
               </div>
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
                 <Skeleton className="h-4" />
               </div>
             </div>
@@ -180,7 +194,7 @@ export default function ({ network, id, token, ownerId }: Props) {
           tokens &&
           tokens?.map((nft: Token) => (
             <div
-              className="max-w-full border rounded p-3 mx-auto md:mx-0"
+              className="max-w-full border dark:border-black-200 rounded p-3 mx-auto md:mx-0"
               key={nft?.contract + nft?.token}
             >
               <Link
@@ -203,23 +217,25 @@ export default function ({ network, id, token, ownerId }: Props) {
                   }
                 </a>
               </Link>
-              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 mt-4">
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
                 Token ID:{' '}
                 <Link
                   href={`/nft-token/${nft?.contract}/${nft?.token}`}
                   className="hover:no-underline"
                 >
-                  <a className="text-green hover:no-underline">{nft?.token}</a>
+                  <a className="text-green dark:text-green-250 hover:no-underline">
+                    {nft?.token}
+                  </a>
                 </Link>
               </div>
               {nft?.asset && (
-                <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600">
+                <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
                   Owner:{' '}
                   <Link
                     href={`/address/${nft?.asset?.owner}`}
                     className="hover:no-underline"
                   >
-                    <a className="text-green hover:no-underline">
+                    <a className="text-green dark:text-green-250 hover:no-underline">
                       {nft?.asset?.owner}
                     </a>
                   </Link>
@@ -228,13 +244,16 @@ export default function ({ network, id, token, ownerId }: Props) {
             </div>
           ))}
       </div>
-      <Paginator
-        count={totalCount}
-        page={currentPage}
-        setPage={setPage}
-        limit={24}
-        pageLimit={200}
-      />
+      {tokens.length > 0 && (
+        <Paginator
+          count={totalCount}
+          page={currentPage}
+          isLoading={isLoading}
+          setPage={setPage}
+          limit={24}
+          pageLimit={200}
+        />
+      )}
     </>
   );
 }

@@ -6,4 +6,5 @@ export interface Config {
   ftHoldersTable: string;
   nftHoldersTable: string;
   sentryDsn?: string;
+  tpsTable: string;
 }

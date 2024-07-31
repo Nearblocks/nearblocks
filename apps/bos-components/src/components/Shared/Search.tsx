@@ -13,12 +13,15 @@ interface Props {
   t: (key: string) => string | undefined;
   isHeader?: boolean;
   router: { push: (path: string) => void };
+  networkUrl: string;
 }
 
 import SearchIcon from '@/includes/icons/SearchIcon';
 import ArrowDown from '@/includes/icons/ArrowDown';
 import { search } from '@/includes/search';
 import { SearchResult } from '@/includes/types';
+import ErrorIcon from '@/includes/icons/ErrorIcon';
+import ToastMessage from '@/includes/Common/ToastMessage';
 
 export default function SearchBar({
   isHeader,
@@ -26,6 +29,7 @@ export default function SearchBar({
   network,
   router,
   ownerId,
+  networkUrl,
 }: Props) {
   const { localFormat, shortenHex } = VM.require(
     `${ownerId}/widget/includes.Utils.formats`,
@@ -35,11 +39,10 @@ export default function SearchBar({
     `${ownerId}/widget/includes.Utils.libs`,
   );
   const [keyword, setKeyword] = useState('');
-  const [query, setQuery] = useState('');
   const [result, setResult] = useState<SearchResult>({} as SearchResult);
   const [filter, setFilter] = useState('all');
   const [isResultsVisible, setIsResultsVisible] = useState(false);
-
+  const [showToast, setShowToast] = useState(false);
   const config = getConfig && getConfig(network);
 
   // Determine whether to show search results
@@ -55,74 +58,115 @@ export default function SearchBar({
   const hideSearchResults = () => {
     setIsResultsVisible(false);
   };
-  // Debounced keyword update
-  const debouncedSetKeyword = useMemo(
-    () => debounce && debounce(500, (value: string) => setKeyword(value)),
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
+  const SearchToast = () => {
+    return (
+      <div className="flex items-center">
+        <div className="text-red-500 ">
+          <ErrorIcon className=" mr-2 h-5 w-5" />
+        </div>
+        <Toast.Title className="text-nearblue-700">
+          No results. Try on
+        </Toast.Title>
+        <Toast.Description asChild>
+          <a
+            href={networkUrl}
+            className="text-green-500 dark:text-green-250 ml-2"
+          >
+            {network === 'mainnet' ? 'Testnet' : 'Mainnet'}
+          </a>
+        </Toast.Description>
+      </div>
+    );
+  };
+  useEffect(() => {
+    const time = setTimeout(() => {
+      if (showToast) {
+        setShowToast(false);
+      }
+    }, 3000);
+    return () => clearTimeout(time);
+  }, [showToast]);
   const redirect = (route: any) => {
     switch (route?.type) {
       case 'block':
-        return router.push(`/blocks/${route?.path}`);
+        return `/blocks/${route?.path}`;
       case 'txn':
-        return router.push(`/txns/${route?.path}`);
+        return `/txns/${route?.path}`;
       case 'receipt':
-        return router.push(`/txns/${route?.path}`);
+        return `/txns/${route?.path}`;
       case 'address':
-        return router.push(`/address/${route?.path}`);
+        return `/address/${route?.path}`;
       default:
-        return;
+        return null;
     }
   };
+
+  const fetchData = useCallback(
+    (keyword: string, filter: string) => {
+      if (filter && keyword && config.backendUrl) {
+        search(keyword, filter, false, config.backendUrl).then((data: any) => {
+          setResult(data || {});
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [config.backendUrl, filter],
+  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSetKeyword = useCallback(
+    debounce
+      ? debounce(500, (value: string) => {
+          fetchData(value, filter);
+        })
+      : (value: string) => fetchData(value, filter),
+
+    [fetchData],
+  );
   // Handle input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newNextValue = event.target.value.replace(/[\s,]/g, '') as string;
-    setQuery(newNextValue);
-    debouncedSetKeyword && debouncedSetKeyword(newNextValue);
+    debouncedSetKeyword(newNextValue);
+    setKeyword(newNextValue);
     showSearchResults();
   };
 
   const onSubmit = () => {
-    if (filter && query && config.backendUrl) {
-      search(query, filter, true, config.backendUrl).then((data: any) => {
+    if (filter && keyword && config.backendUrl) {
+      search(keyword, filter, true, config.backendUrl).then((data: any) => {
         hideSearchResults();
-        redirect(data);
+        const redirectPath = redirect(data);
+        if (redirectPath) {
+          router.push(redirectPath);
+        } else {
+          setShowToast(true);
+        }
       });
     }
   };
   const onSelect = () => {
     hideSearchResults();
   };
-  useEffect(() => {
-    const fetchData = (keyword: string, filter: string) => {
-      if (filter && keyword) {
-        search(keyword, filter, false, config.backendUrl).then((data: any) => {
-          setResult(data || {});
-        });
-      }
-    };
-    if (config.backendUrl) {
-      fetchData(keyword, filter);
-    }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyword, filter, config.backendUrl]);
   // Handle filter change
-  const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) =>
+  const onFilter = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilter(event.target.value);
-
+    if (keyword && config.backendUrl) {
+      fetchData(keyword, event.target.value);
+    }
+  };
   return (
     <>
+      {showToast && <ToastMessage content={<SearchToast />} />}
       <div className="flex flex-grow">
         <div className={`flex w-full ${isHeader ? 'h-11' : 'h-12'}`}>
           <label className="relative hidden md:flex">
             <select
               className={`h-full block text-sm text-nearblue-600 ${
-                isHeader ? 'bg-blue-900/[0.05]' : 'bg-gray-100'
-              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border`}
+                isHeader
+                  ? 'bg-blue-900/[0.05] dark:bg-black dark:text-neargray-10'
+                  : 'bg-gray-100 dark:bg-black-500 dark:text-neargray-10'
+              }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border  dark:border-black-200 dark:text-neargray-10	`}
               value={filter}
               onChange={onFilter}
             >
@@ -139,7 +183,7 @@ export default function SearchBar({
                 {t ? t('common:search.filters.addresses') : 'Addresses'}
               </option>
             </select>
-            <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 pointer-events-none" />
+            <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
           </label>
           <div className="flex-grow">
             <input
@@ -148,7 +192,8 @@ export default function SearchBar({
                   ? t('common:search.placeholder')
                   : 'Search by Account ID / Txn Hash / Block'
               }
-              className="search bg-white w-full h-full text-sm px-4 py-3 outline-none border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+              className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+              autoCapitalize="off"
               onChange={handleChange}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -157,11 +202,11 @@ export default function SearchBar({
               }}
             />
             {isResultsVisible && showResults && (
-              <div className="z-50 relative">
-                <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border">
+              <div className="z-50 relative dark:bg-black-600">
+                <div className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border dark:border-black-200 dark:bg-black-600">
                   {result?.accounts && result.accounts.length > 0 && (
                     <>
-                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 rounded">
+                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                         {t ? t('common:search.list.address') : 'Account'}
                       </h3>
                       {result.accounts.map((address) => (
@@ -171,7 +216,7 @@ export default function SearchBar({
                           key={address.account_id}
                         >
                           <div
-                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
                             onClick={onSelect}
                           >
                             {shortenAddress(address.account_id)}
@@ -182,7 +227,7 @@ export default function SearchBar({
                   )}
                   {result?.txns && result.txns.length > 0 && (
                     <>
-                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 rounded">
+                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                         {t ? t('common:search.list.txns') : 'Txns'}
                       </h3>
                       {result.txns.map((txn) => (
@@ -192,7 +237,7 @@ export default function SearchBar({
                           key={txn.transaction_hash}
                         >
                           <div
-                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                             onClick={onSelect}
                           >
                             {shortenHex(txn.transaction_hash)}
@@ -203,7 +248,7 @@ export default function SearchBar({
                   )}
                   {result?.receipts && result.receipts.length > 0 && (
                     <>
-                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 rounded">
+                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                         Receipts
                       </h3>
                       {result.receipts.map((receipt) => (
@@ -213,7 +258,7 @@ export default function SearchBar({
                           key={receipt.receipt_id}
                         >
                           <div
-                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                             onClick={onSelect}
                           >
                             {shortenHex(receipt.receipt_id)}
@@ -224,7 +269,7 @@ export default function SearchBar({
                   )}
                   {result?.blocks && result.blocks.length > 0 && (
                     <>
-                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 rounded">
+                      <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                         {t ? t('common:search.list.blocks') : 'Blocks'}
                       </h3>
                       {result.blocks.map((block) => (
@@ -234,7 +279,7 @@ export default function SearchBar({
                           key={block.block_hash}
                         >
                           <div
-                            className="mx-2 px-2 py-2 hover:bg-gray-100 cursor-pointer hover:border-gray-500 truncate"
+                            className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                             onClick={onSelect}
                           >
                             #
@@ -256,10 +301,12 @@ export default function SearchBar({
             type="button"
             onClick={() => onSubmit()}
             className={`${
-              isHeader ? 'bg-blue-900/[0.05]' : 'bg-gray-100'
-            } rounded-r-lg px-5 outline-none focus:outline-none border`}
+              isHeader
+                ? 'bg-blue-900/[0.05] dark:bg-black-600'
+                : 'bg-gray-100 dark:bg-black-500'
+            } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
           >
-            <SearchIcon className="text-gray-700 fill-current " />
+            <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
           </button>
         </div>
       </div>

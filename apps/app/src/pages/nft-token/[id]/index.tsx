@@ -4,17 +4,20 @@ import { apiUrl, networkId, appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Overview from '@/components/skeleton/nft/Overview';
+import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { Token } from '@/utils/types';
+import { env } from 'next-runtime-env';
+import { useAuthStore } from '@/stores/auth';
 
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const NFToken = () => {
   const router = useRouter();
   const { id } = router.query;
   const components = useBosComponents();
+  const { t } = useTranslation();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
   const [token, setToken] = useState<Token | null>(null);
@@ -57,7 +60,7 @@ const NFToken = () => {
   const description = token
     ? `All you need to know about the ${token.name} NFT Collection : Statistics, total supply, number of holders, latest transactions & meta-data.`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}`;
+  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}&brand=near`;
 
   useEffect(() => {
     updateOuterDivHeight();
@@ -70,6 +73,10 @@ const NFToken = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
 
   return (
     <>
@@ -95,6 +102,8 @@ const NFToken = () => {
           props={{
             id: id,
             network: networkId,
+            requestSignInWithWallet,
+            t: t,
           }}
           loading={<Overview className="absolute pr-6" ref={heightRef} />}
         />{' '}

@@ -24,6 +24,14 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get('/latest', charts.latest);
+
+  /**
+   * GET /v1/charts/tps
+   * @summary Get txns per second by shards chart data
+   * @tags Charts
+   * @return 200 - success response
+   */
+  route.get('/tps', charts.tps);
 };
 
 export default routes;

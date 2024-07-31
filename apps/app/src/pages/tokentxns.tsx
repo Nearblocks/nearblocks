@@ -4,29 +4,19 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId, appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import { ReactElement, useEffect, useRef, useState } from 'react';
-import Router, { useRouter } from 'next/router';
 import List from '@/components/skeleton/common/List';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const ToxenTxns = () => {
-  const router = useRouter();
   const components = useBosComponents();
-  const { page } = router.query;
   const { t } = useTranslation();
-  const initialPage = page ? Number(page) : 1;
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
-  const setPage = (pageNumber: number) => {
-    Router.push(`/tokentxns?page=${pageNumber}`, undefined, { shallow: true });
-    setCurrentPage(pageNumber);
-  };
 
-  useEffect(() => {
-    setCurrentPage(page ? Number(page) : 1);
-  }, [page]);
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -46,6 +36,7 @@ const ToxenTxns = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20NEP-141%20Token%20Transfers&brand=near`;
 
   return (
     <>
@@ -67,20 +58,14 @@ const ToxenTxns = () => {
           property="twitter:description"
           content={t('token:fts.metaDescription')}
         />
-        <meta
-          property="og:image"
-          content="/thumbnail/thumbnail_tokentxns.png"
-        />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_tokentxns.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/tokentxns`} />
       </Head>
       <section>
-        <div className="bg-hero-pattern h-72">
+        <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
           <div className="container mx-auto px-3">
-            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+            <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10">
               {t ? t('token:fts.heading') : 'Token Transfers'}
             </h1>
           </div>
@@ -96,8 +81,6 @@ const ToxenTxns = () => {
                 onChangeHeight={onChangeHeight}
                 props={{
                   t: t,
-                  currentPage: currentPage,
-                  setPage: setPage,
                   network: networkId,
                 }}
                 loading={<List className="absolute" ref={heightRef} />}

@@ -3,12 +3,14 @@ import Head from 'next/head';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import useTranslation from 'next-translate/useTranslation';
-import { networkId, appUrl } from '@/utils/config';
+import { networkId, appUrl, apiUrl } from '@/utils/config';
 import Detail from '@/components/skeleton/common/Detail';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Layout from '@/components/Layouts';
+import { env } from 'next-runtime-env';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const Block = () => {
   const router = useRouter();
@@ -17,6 +19,7 @@ const Block = () => {
   const components = useBosComponents();
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const [blockHeight, setBlockHeight] = useState(0);
   const updateOuterDivHeight = () => {
     if (heightRef.current) {
       const Height = heightRef.current.offsetHeight;
@@ -36,6 +39,27 @@ const Block = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}blocks/${hash}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        setBlockHeight(Number(data.blocks[0].block_height));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    if (apiUrl && hash) {
+      fetchData();
+    }
+  }, [hash]);
+
+  const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
   return (
     <>
       <Head>
@@ -71,6 +95,9 @@ const Block = () => {
           property="twitter:description"
           content={t('blocks:block.metaDescription', { block: hash })}
         />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/blocks/${hash}`} />
       </Head>
       <div style={height} className="relative container mx-auto px-3">

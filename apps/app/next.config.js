@@ -1,5 +1,7 @@
 const path = require('path');
+const { configureRuntimeEnv } = require('next-runtime-env/build/configure');
 const nextTranslate = require('next-translate-plugin');
+configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = nextTranslate({
@@ -24,6 +26,11 @@ const nextConfig = nextTranslate({
       },
       {
         source: '/transactions/:slug',
+        destination: '/txns/:slug',
+        permanent: true,
+      },
+      {
+        source: '/tx/:slug',
         destination: '/txns/:slug',
         permanent: true,
       },

@@ -6,7 +6,10 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import { networkId, appUrl } from '@/utils/config';
 import Router, { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const NodeExplorer = () => {
   const router = useRouter();
   const components = useBosComponents();
@@ -15,6 +18,7 @@ const NodeExplorer = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const heightRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState({});
+  const { theme } = useTheme();
 
   const title = 'NEAR Validator List | Nearblocks';
 
@@ -48,6 +52,7 @@ const NodeExplorer = () => {
   const onChangeHeight = () => {
     setHeight({});
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20Validator%20Explorer&brand=near`;
   return (
     <>
       <Head>
@@ -55,9 +60,11 @@ const NodeExplorer = () => {
         <meta name="title" content={title} />
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
-      <div className="bg-hero-pattern h-72">
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             NEAR Protocol Validator Explorer
@@ -75,6 +82,7 @@ const NodeExplorer = () => {
               currentPage: currentPage,
               setPage: setPage,
               network: networkId,
+              theme: theme,
             }}
             loading={<Index className="absolute" ref={heightRef} />}
           />

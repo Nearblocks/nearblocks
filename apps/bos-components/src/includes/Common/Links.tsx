@@ -32,7 +32,7 @@ const Links = (props: any) => {
                 <img
                   width="16"
                   height="16"
-                  className="w-4 h-4"
+                  className="w-4 h-4 dark:invert dark:filter"
                   src="/images/twitter_icon.svg"
                   alt="Twitter"
                 />
@@ -117,7 +117,7 @@ const Links = (props: any) => {
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
               <a
-                href={`https://www.coingecko.com/en/coins/${meta.coingecko_id}`}
+                href={`https://www.coingecko.com/en/coins/${meta.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 className="flex"

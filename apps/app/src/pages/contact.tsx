@@ -5,9 +5,14 @@ import Layout from '@/components/Layouts';
 import useTranslation from 'next-translate/useTranslation';
 import FormContact from '@/components/Layouts/FormContact';
 import { appUrl } from '@/utils/config';
+import { env } from 'next-runtime-env';
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const Contract = () => {
   const { t } = useTranslation();
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+    t('contact:heading'),
+  )}&brand=near`;
 
   return (
     <Fragment>
@@ -22,21 +27,18 @@ const Contract = () => {
           property="twitter:description"
           content={t('home:metaDescription')}
         />
-        <meta property="og:image" content="/thumbnail/thumbnail_contact.png" />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_contact.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
-      <div className="bg-hero-pattern h-72"></div>
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
       <div className="container mx-auto px-3 md:px-14 flex flex-col items-start md:py-16 mt-[-300px]">
-        <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white">
+        <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
           {t('Contact Nearblocks')}
         </h1>
-        <div className="text-neargray-600 sm:grid sm:grid-cols-11 pt-12 pb-8 gap-6 pl-8 pr-14 w-full soft-shadow sm:divide-x rounded-lg bg-white lg:mt-8 mt-4">
+        <div className="text-neargray-600 dark:text-neargray-10 sm:grid sm:grid-cols-11 pt-12 pb-8 gap-6 pl-8 pr-14 w-full soft-shadow sm:divide-x rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">
           <div className="col-span-5">
-            <p className="text-lg text-black font-medium">
+            <p className="text-lg text-black font-medium dark:text-neargray-10">
               {t(`Drop us a message, but please be aware that:`)}
             </p>
             <div className="mt-10 flex flex-col gap-8">

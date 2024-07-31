@@ -11,7 +11,7 @@ const deposits = z.object({
 const activities = z.object({
   account: z.string(),
   limit: z.number().min(0).max(100).optional().default(10),
-  offset: z.number().optional(),
+  offset: z.number().max(5000).optional(),
 });
 
 const receivers = z.object({
