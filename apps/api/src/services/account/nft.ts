@@ -1,4 +1,5 @@
-import { Response } from 'express';
+import { stringify } from 'csv-stringify';
+import { NextFunction, Response } from 'express';
 
 import config from '#config';
 import catchAsync from '#libs/async';
@@ -6,13 +7,8 @@ import dayjs from '#libs/dayjs';
 import db from '#libs/db';
 import sql from '#libs/postgres';
 import { NftTxns, NftTxnsCount, NftTxnsExport } from '#libs/schema/account';
-import { streamCsv } from '#libs/stream';
 import { getPagination, keyBinder, msToNsTime, nsToMsTime } from '#libs/utils';
-import {
-  RawQueryParams,
-  RequestValidator,
-  StreamTransformWrapper,
-} from '#types/types';
+import { RawQueryParams, RequestValidator } from '#types/types';
 
 const txns = catchAsync(
   async (req: RequestValidator<NftTxns>, res: Response) => {
@@ -275,7 +271,11 @@ const txnsCount = catchAsync(
 );
 
 const txnsExport = catchAsync(
-  async (req: RequestValidator<NftTxnsExport>, res: Response) => {
+  async (
+    req: RequestValidator<NftTxnsExport>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     const account = req.validator.data.account;
     const start = msToNsTime(
       dayjs(req.validator.data.start, 'YYYY-MM-DD', true)
@@ -288,157 +288,163 @@ const txnsExport = catchAsync(
         .valueOf(),
     );
 
-    const { query, values } = keyBinder(
-      `
-        SELECT
-          event_index,
-          affected_account_id,
-          involved_account_id,
-          delta_amount,
-          cause,
-          token_id,
-          txn.transaction_hash,
-          txn.included_in_block_hash,
-          txn.block_timestamp,
-          txn.block,
-          txn.outcomes,
-          (
-            SELECT
-              json_build_object(
-                'contract',
-                contract,
-                'name',
-                name,
-                'symbol',
-                symbol,
-                'icon',
-                icon,
-                'base_uri',
-                base_uri,
-                'reference',
-                reference
-              )
-            FROM
-              nft_meta
-            WHERE
-              nft_meta.contract = contract_account_id
-          ) AS nft
-        FROM
-          nft_events
-          INNER JOIN (
-            SELECT
-              event_index
-            FROM
-              nft_events a
-              JOIN receipts r ON r.receipt_id = a.receipt_id
-              JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
-            WHERE
-              affected_account_id = :account
-              AND EXISTS (
-                SELECT
-                  1
-                FROM
-                  nft_token_meta nft
-                WHERE
-                  nft.contract = a.contract_account_id
-                  AND nft.token = a.token_id
-              )
-              AND EXISTS (
-                SELECT
-                  1
-                FROM
-                  transactions
-                  JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
-                WHERE
-                  receipts.receipt_id = a.receipt_id
-              )
-              AND t.block_timestamp BETWEEN :start AND :end
-            ORDER BY
-              event_index ASC
-            LIMIT
-              5000
-          ) AS tmp using(
+    const txns = await sql`
+      SELECT
+        event_index,
+        affected_account_id,
+        involved_account_id,
+        delta_amount,
+        cause,
+        token_id,
+        txn.transaction_hash,
+        txn.included_in_block_hash,
+        txn.block_timestamp,
+        txn.block,
+        txn.outcomes,
+        (
+          SELECT
+            JSON_BUILD_OBJECT(
+              'contract',
+              contract,
+              'name',
+              name,
+              'symbol',
+              symbol,
+              'icon',
+              icon,
+              'base_uri',
+              base_uri,
+              'reference',
+              reference
+            )
+          FROM
+            nft_meta
+          WHERE
+            nft_meta.contract = contract_account_id
+        ) AS nft
+      FROM
+        nft_events
+        INNER JOIN (
+          SELECT
             event_index
-          )
-          INNER JOIN LATERAL (
-            SELECT
-              transactions.transaction_hash,
-              transactions.included_in_block_hash,
-              transactions.block_timestamp,
-              (
-                SELECT
-                  json_build_object(
-                    'block_height',
-                    block_height
+          FROM
+            nft_events a
+            JOIN receipts r ON r.receipt_id = a.receipt_id
+            JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
+          WHERE
+            affected_account_id = ${account}
+            AND EXISTS (
+              SELECT
+                1
+              FROM
+                nft_token_meta nft
+              WHERE
+                nft.contract = a.contract_account_id
+                AND nft.token = a.token_id
+            )
+            AND EXISTS (
+              SELECT
+                1
+              FROM
+                transactions
+                JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+              WHERE
+                receipts.receipt_id = a.receipt_id
+            )
+            AND t.block_timestamp BETWEEN ${start} AND ${end}
+          ORDER BY
+            event_index ASC
+          LIMIT
+            5000
+        ) AS tmp using (event_index)
+        INNER JOIN LATERAL (
+          SELECT
+            transactions.transaction_hash,
+            transactions.included_in_block_hash,
+            transactions.block_timestamp,
+            (
+              SELECT
+                JSON_BUILD_OBJECT('block_height', block_height)
+              FROM
+                blocks
+              WHERE
+                blocks.block_hash = transactions.included_in_block_hash
+            ) AS block,
+            (
+              SELECT
+                JSON_BUILD_OBJECT(
+                  'status',
+                  BOOL_AND(
+                    CASE
+                      WHEN status = 'SUCCESS_RECEIPT_ID'
+                      OR status = 'SUCCESS_VALUE' THEN TRUE
+                      ELSE FALSE
+                    END
                   )
-                FROM
-                  blocks
-                WHERE
-                  blocks.block_hash = transactions.included_in_block_hash
-              ) AS block,
-              (
-                SELECT
-                  json_build_object(
-                    'status',
-                    BOOL_AND (
-                      CASE WHEN status = 'SUCCESS_RECEIPT_ID'
-                      OR status = 'SUCCESS_VALUE' THEN TRUE ELSE FALSE END
-                    )
-                  )
-                FROM
-                  execution_outcomes
-                WHERE
-                  execution_outcomes.receipt_id = transactions.converted_into_receipt_id
-              ) AS outcomes
-            FROM
-              transactions
-              JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
-            WHERE
-              receipts.receipt_id = nft_events.receipt_id
-          ) txn ON TRUE
-        ORDER BY
-          event_index ASC
-      `,
-      { account, end, start },
-    );
+                )
+              FROM
+                execution_outcomes
+              WHERE
+                execution_outcomes.receipt_id = transactions.converted_into_receipt_id
+            ) AS outcomes
+          FROM
+            transactions
+            JOIN receipts ON receipts.originated_from_transaction_hash = transactions.transaction_hash
+          WHERE
+            receipts.receipt_id = nft_events.receipt_id
+        ) txn ON TRUE
+      ORDER BY
+        event_index ASC
+    `;
 
-    const columns = [
-      { header: 'Status', key: 'status' },
-      { header: 'Txn Hash', key: 'hash' },
-      { header: 'Method', key: 'method' },
-      { header: 'Affected', key: 'affected' },
-      { header: 'Involved', key: 'involved' },
-      { header: 'Direction', key: 'direction' },
-      { header: 'Token', key: 'involved' },
-      { header: 'Token ID', key: 'id' },
-      { header: 'Token', key: 'token' },
-      { header: 'Contract', key: 'contract' },
-      { header: 'Block', key: 'block' },
-      { header: 'Time', key: 'timestamp' },
-    ];
-    const transform: StreamTransformWrapper =
-      (stringifier) => (row, _, callback) => {
-        const status = row.outcomes.status;
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=txns.csv');
 
-        stringifier.write({
-          affected: row.affected_account_id || 'system',
-          block: row.block.block_height,
-          contract: row.nft ? row.nft.contract : '',
-          direction: row.delta_amount > 0 ? 'In' : 'Out',
-          hash: row.transaction_hash,
-          id: row.token_id,
-          involved: row.involved_account_id || 'system',
-          method: row.cause,
-          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
-          timestamp: dayjs(+nsToMsTime(row.block_timestamp)).format(
-            'YYYY-MM-DD HH:mm:ss',
-          ),
-          token: row.nft ? `${row.nft.name} (${row.nft.symbol})` : '',
-        });
-        callback();
-      };
+    const stringifier = stringify({
+      columns: [
+        { header: 'Status', key: 'status' },
+        { header: 'Txn Hash', key: 'hash' },
+        { header: 'Method', key: 'method' },
+        { header: 'Affected', key: 'affected' },
+        { header: 'Involved', key: 'involved' },
+        { header: 'Direction', key: 'direction' },
+        { header: 'Token', key: 'involved' },
+        { header: 'Token ID', key: 'id' },
+        { header: 'Token', key: 'token' },
+        { header: 'Contract', key: 'contract' },
+        { header: 'Block', key: 'block' },
+        { header: 'Time', key: 'timestamp' },
+      ],
+      header: true,
+    });
 
-    return streamCsv(res, query, values, columns, transform);
+    stringifier.on('error', (error) => {
+      next(error);
+    });
+
+    stringifier.pipe(res);
+
+    txns.forEach((txn) => {
+      const status = txn.outcomes.status;
+
+      stringifier.write({
+        affected: txn.affected_account_id || 'system',
+        block: txn.block.block_height,
+        contract: txn.nft ? txn.nft.contract : '',
+        direction: txn.delta_amount > 0 ? 'In' : 'Out',
+        hash: txn.transaction_hash,
+        id: txn.token_id,
+        involved: txn.involved_account_id || 'system',
+        method: txn.cause,
+        status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
+        timestamp: dayjs(+nsToMsTime(txn.block_timestamp)).format(
+          'YYYY-MM-DD HH:mm:ss',
+        ),
+        token: txn.nft ? `${txn.nft.name} (${txn.nft.symbol})` : '',
+      });
+    });
+
+    stringifier.end();
   },
 );
 
