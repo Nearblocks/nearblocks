@@ -10,7 +10,7 @@ import redis from '#libs/redis';
 
 const EXPIRY = 5; // 5 sec
 const DATE_RANGE = 2;
-const BLOCK_RANGE = 250;
+const BLOCK_RANGE = 500;
 
 const isBlockInSync = (height: number) => height <= BLOCK_RANGE;
 const isDateInSync = (date: string) =>
