@@ -299,7 +299,7 @@ export default function ({ network, currentPage, setPage, t, ownerId }: Props) {
                         key={token?.contract}
                         className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 cursor-pointer hover:border-gray-500 truncate"
                       >
-                        <Link href={`/token/${token?.contract}`}>
+                        <Link href={`/nft-token/${token?.contract}`}>
                           <a className="flex items-center my-1 whitespace-nowrap ">
                             <div className="flex-shrink-0 h-5 w-5 mr-2">
                               <TokenImage

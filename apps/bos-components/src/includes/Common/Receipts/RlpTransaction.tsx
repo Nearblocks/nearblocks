@@ -74,7 +74,7 @@ export default function ({
       <>
         {format === 'table' ? (
           <div
-            className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3"
+            className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
             style={{ height: '150px' }}
           >
             <table className="table-auto w-full border-collapse">
@@ -92,7 +92,9 @@ export default function ({
                         {key}
                       </td>
                       <td className="border px-4 py-2">
-                        {key === 'hash' ? (
+                        {key === 'hash' &&
+                        method === 'submit' &&
+                        receiver.includes('aurora') ? (
                           <a
                             href={`${config?.aurorablocksUrl}/tx/${value}`}
                             target="_blank"
@@ -110,11 +112,11 @@ export default function ({
               </tbody>
             </table>
           </div>
-        ) : method === 'submit' &&
-          receiver.includes('aurora') &&
-          format === 'rlp' ? (
+        ) : format === 'rlp' &&
+          method === 'submit' &&
+          receiver.includes('aurora') ? (
           <div
-            className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3"
+            className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
             style={{ height: '150px' }}
           >
             {displayedArgs &&
@@ -145,7 +147,7 @@ export default function ({
             value={
               method === 'submit' && receiver.includes('aurora')
                 ? jsonParser(displayedArgs).tx_bytes_b64
-                : displayedArgs
+                : jsonStringify(jsonParser(displayedArgs), null, 2)
             }
             className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
             style={{ height: '150px' }}

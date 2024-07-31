@@ -309,9 +309,9 @@ export default function () {
     }
   }
 
-  function jsonStringify(obj: any) {
+  function jsonStringify(value: any, replacer?: any, space?: number) {
     try {
-      return JSON.stringify(obj);
+      return JSON.stringify(value, replacer, space);
     } catch (e) {
       console.error('Error stringifying JSON', e);
       return null;
