@@ -55,12 +55,16 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
 
   useEffect(() => {
     if (rpcFetch && rpcUrl && id) {
+      setLoading((state: Loading) => ({ ...state, address: true }));
       rpcFetch<RpcResultAccount>(rpcUrl, 'query', {
         account_id: id,
         finality: 'final',
         request_type: 'view_account',
       })
-        .then((response) => setAddress(response))
+        .then((response) => {
+          setAddress(response);
+          setError(null);
+        })
         .catch(setError)
         .finally(() =>
           setLoading((state: Loading) => ({ ...state, address: false })),
@@ -68,6 +72,7 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
     }
 
     if (apiFetch) {
+      setLoading((state: Loading) => ({ ...state, stats: true }));
       apiFetch<StatsResponse>(`${alias_api_url}/stats`)
         .then((response) => setStats(response?.stats?.[0]))
         .catch(console.log)
