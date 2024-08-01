@@ -1,15 +1,13 @@
-import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
 import { Network } from 'nb-types';
 
 import { MenuButton, MenuLink, MenuTitle } from '@/components/Menu';
-import Skeleton from '@/components/Skeleton';
-import config from '@/config';
 import { getProviders } from '@/libs/rpc';
 import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 
+import CopyButton from '../CopyButton';
 import Add from '../Icons/Add';
 import Close from '../Icons/Close';
 interface RpcModalProps {
@@ -21,8 +19,6 @@ interface RpcModalProps {
   setRpcName: (name: string) => void;
   setRpcUrl: (url: string) => void;
 }
-
-const Widgets = dynamic(() => import('@/components/Widgets'), { ssr: false });
 
 export const LanguageMenu = () => {
   return (
@@ -97,18 +93,10 @@ export const RpcMenu = ({
           </MenuButton>
           {customRpc.some((p) => p.url === provider.url) && (
             <div className="flex items-center justify-between">
-              <Widgets
-                loader={
-                  <Skeleton loading>
-                    <span className="w-full"></span>
-                  </Skeleton>
-                }
-                props={{
-                  buttonClassName: 'mx-2',
-                  className: 'text-primary w-3',
-                  text: `https://lite.nearblocks.io/?rpcUrl=${provider.url}`,
-                }}
-                src={`${config.account}/widget/lite.Atoms.Copy`}
+              <CopyButton
+                buttonClassName="mx-2"
+                className="text-primary w-3"
+                url={provider.url}
               />
               <button
                 className="mr-2 px-2 text-red rounded"
