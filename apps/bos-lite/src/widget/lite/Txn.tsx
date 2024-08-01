@@ -59,6 +59,8 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
 
   useEffect(() => {
     if (rpcFetch && rpcUrl && hash) {
+      setLoading((state: Loading) => ({ ...state, txn: true }));
+      setLoading((state: Loading) => ({ ...state, block: true }));
       rpcFetch<RpcResultTxn>(rpcUrl, 'tx', {
         sender_account_id: 'bowen',
         tx_hash: hash,
@@ -66,10 +68,14 @@ const Txn = ({ hash, rpcUrl }: TxnProps) => {
       })
         .then((response) => {
           setTxn(response);
+          setError(null);
           rpcFetch<RpcResultBlock>(rpcUrl, 'block', {
             block_id: response.transaction_outcome.block_hash,
           })
-            .then((response) => setBlock(response))
+            .then((response) => {
+              setBlock(response);
+              setError(null);
+            })
             .catch(setError)
             .finally(() =>
               setLoading((state: Loading) => ({ ...state, block: false })),

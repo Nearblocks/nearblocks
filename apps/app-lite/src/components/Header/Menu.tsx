@@ -1,16 +1,17 @@
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
 import { Network } from 'nb-types';
 
 import { MenuButton, MenuLink, MenuTitle } from '@/components/Menu';
+import Skeleton from '@/components/Skeleton';
 import config from '@/config';
-import { providers } from '@/libs/rpc';
-import { useCustomRpcStore } from '@/stores/customRpc';
+import { getProviders } from '@/libs/rpc';
+import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 
 import Add from '../Icons/Add';
 import Close from '../Icons/Close';
-
 interface RpcModalProps {
   isOpen: boolean;
   onAdd: () => void;
@@ -20,6 +21,8 @@ interface RpcModalProps {
   setRpcName: (name: string) => void;
   setRpcUrl: (url: string) => void;
 }
+
+const Widgets = dynamic(() => import('@/components/Widgets'), { ssr: false });
 
 export const LanguageMenu = () => {
   return (
@@ -33,27 +36,41 @@ export const LanguageMenu = () => {
 };
 
 export const NetworkMenu = () => {
+  const setRpc = useRpcStore((state) => state.setRpc);
+  const network = useNetworkStore((state) => state.network);
+  const setNetwork = useNetworkStore((state) => state.setNetwork);
+
+  const setMainnet = () => {
+    setNetwork(Network.MAINNET);
+    setRpc(getProviders(Network.MAINNET)?.[0]?.url);
+  };
+
+  const setTestnet = () => {
+    setNetwork(Network.TESTNET);
+    setRpc(getProviders(Network.TESTNET)?.[0]?.url);
+  };
+
   return (
     <>
       <MenuTitle>Network</MenuTitle>
-      <MenuLink
-        checked={config.network === Network.MAINNET}
-        href={config.mainnetUrl || '/'}
-      >
+      <MenuButton checked={network === Network.MAINNET} onClick={setMainnet}>
         Mainnet
-      </MenuLink>
-      <MenuLink
-        checked={config.network === Network.TESTNET}
-        href={config.testnetUrl || '/'}
-      >
+      </MenuButton>
+      <MenuButton checked={network === Network.TESTNET} onClick={setTestnet}>
         Testnet
-      </MenuLink>
+      </MenuButton>
     </>
   );
 };
 
-export const RpcMenu = ({ setshowModal }: any) => {
-  const { customRpc, removeRpc } = useCustomRpcStore();
+export const RpcMenu = ({
+  setShowModal,
+}: {
+  setShowModal: (value: boolean) => void;
+}) => {
+  const { getCustomRpc, removeRpc } = useNetworkStore();
+  const customRpc = getCustomRpc();
+  const providers = useNetworkStore((state) => state.providers);
   const rpcUrl = useRpcStore((state) => state.rpc);
   const setRpc = useRpcStore((state) => state.setRpc);
 
@@ -65,7 +82,7 @@ export const RpcMenu = ({ setshowModal }: any) => {
         <span>RPC</span>
         <button
           className="flex justify-center items-center"
-          onClick={() => setshowModal(true)}
+          onClick={() => setShowModal(true)}
         >
           <Add className="w-3" />
         </button>
@@ -79,12 +96,27 @@ export const RpcMenu = ({ setshowModal }: any) => {
             {provider.name}
           </MenuButton>
           {customRpc.some((p) => p.url === provider.url) && (
-            <button
-              className="mx-2 px-2 text-red rounded"
-              onClick={() => removeRpc(provider.url)}
-            >
-              <Close className="w-3 text-red" />
-            </button>
+            <div className="flex items-center justify-between">
+              <Widgets
+                loader={
+                  <Skeleton loading>
+                    <span className="w-full"></span>
+                  </Skeleton>
+                }
+                props={{
+                  buttonClassName: 'mx-2',
+                  className: 'text-primary w-3',
+                  text: `https://lite.nearblocks.io/?rpcUrl=${provider.url}`,
+                }}
+                src={`${config.account}/widget/lite.Atoms.Copy`}
+              />
+              <button
+                className="mr-2 px-2 text-red rounded"
+                onClick={() => removeRpc(provider.url)}
+              >
+                <Close className="w-3 text-red" />
+              </button>
+            </div>
           )}
         </div>
       ))}
@@ -102,7 +134,10 @@ export const RpcModal: React.FC<RpcModalProps> = ({
   setRpcUrl,
 }) => {
   const [urlError, setUrlError] = useState('');
-  const { customRpc } = useCustomRpcStore();
+  const { addRpc, getCustomRpc } = useNetworkStore();
+  const providers = useNetworkStore((state) => state.providers);
+
+  const customRpc = getCustomRpc();
 
   const handleAdd = () => {
     const allProviders = [...providers, ...customRpc];
@@ -113,9 +148,7 @@ export const RpcModal: React.FC<RpcModalProps> = ({
       setUrlError('This URL already exists.');
     } else {
       setUrlError('');
-    }
-
-    if (!urlExists) {
+      addRpc({ name: rpcName, url: rpcUrl });
       onAdd();
     }
   };

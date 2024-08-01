@@ -49,6 +49,7 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
   useEffect(() => {
     if (rpcFetch && rpcUrl && id) {
       setLoading(true);
+
       rpcFetch<RpcResultAccessKey>(rpcUrl, 'query', {
         account_id: id,
         finality: 'final',
@@ -83,13 +84,14 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
 
           if (keys.length) {
             setKeys(keys);
+            setError(null);
           }
         })
         .catch(setError)
         .finally(() => setLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, rpcUrl]);
 
   const onPrev = () => {
     setPage((prevPage: number) => Math.max(prevPage - 1, 1));
