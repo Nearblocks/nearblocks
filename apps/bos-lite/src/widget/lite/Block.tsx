@@ -47,10 +47,14 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
 
   useEffect(() => {
     if (rpcFetch && rpcUrl && hash) {
+      setLoading(true);
       const blockId = !isNaN(Number(hash)) ? Number(hash) : hash;
 
       rpcFetch<RpcResultBlock>(rpcUrl, 'block', { block_id: blockId })
-        .then((response) => setBlock(response))
+        .then((response) => {
+          setBlock(response);
+          setError(null);
+        })
         .catch(setError)
         .finally(() => setLoading(false));
     }

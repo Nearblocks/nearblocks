@@ -87,6 +87,7 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
               receiptsMap,
             ),
           }));
+          setError((state: Error) => ({ ...state, [active]: null }));
         })
         .catch((err: unknown) =>
           setError((state: Error) => ({ ...state, [active]: err })),
@@ -96,7 +97,7 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
         );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hash, active, data]);
+  }, [hash, active, data, rpcUrl]);
 
   return (
     <div className="bg-bg-box lg:rounded-xl shadow px-6 mt-8">

@@ -2,7 +2,10 @@ import { GetServerSideProps } from 'next';
 
 import { RPC } from 'nb-near';
 
-import { getReceipt, providers } from '@/libs/rpc';
+import { getReceipt } from '@/libs/rpc';
+import { useNetworkStore } from '@/stores/network';
+
+const { providers } = useNetworkStore.getState();
 
 const rpcUrl = providers[0].url;
 const rpc = new RPC(rpcUrl);

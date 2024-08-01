@@ -2,14 +2,9 @@ import { useCallback, useState } from 'react';
 
 import { RPC } from 'nb-near';
 
-import {
-  getAccount,
-  getBlock,
-  getReceipt,
-  getTxn,
-  providers,
-} from '@/libs/rpc';
+import { getAccount, getBlock, getReceipt, getTxn } from '@/libs/rpc';
 import { isValidAccount } from '@/libs/utils';
+import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 import { SearchResult } from '@/types/types';
 
@@ -20,6 +15,8 @@ const initial = {
   receipt: undefined,
   txn: undefined,
 };
+
+const { providers } = useNetworkStore.getState();
 const options = { defaultValue: providers?.[0]?.url };
 
 export const useSearch = () => {

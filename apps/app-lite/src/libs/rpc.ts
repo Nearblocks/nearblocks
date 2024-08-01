@@ -8,10 +8,8 @@ import {
 } from 'nb-near';
 import { Network } from 'nb-types';
 
-import config from '@/config';
-
-export const providers =
-  config.network === Network.MAINNET
+export const getProviders = (netwrok: string) => {
+  return netwrok === Network.MAINNET
     ? [
         {
           name: 'NEAR (Archival)',
@@ -60,6 +58,7 @@ export const providers =
           url: 'https://beta.rpc.testnet.near.org',
         },
       ];
+};
 
 export const getAccount = async (rpc: RPC, accountId: string) => {
   try {

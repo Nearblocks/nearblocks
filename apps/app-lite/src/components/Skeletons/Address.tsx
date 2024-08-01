@@ -3,9 +3,8 @@ import { useEffect } from 'react';
 import { Network } from 'nb-types';
 
 import Skeleton from '@/components/Skeleton';
-import config from '@/config';
+import { useNetworkStore } from '@/stores/network';
 import { SkeletonProps } from '@/types/types';
-
 export const AddressKeysSkeleton = () => (
   <div className="relative overflow-auto">
     <table className="table-auto border-collapse w-full">
@@ -78,61 +77,68 @@ export const AddressKeysSkeleton = () => (
   </div>
 );
 
-export const AddressSkeleton = () => (
-  <div className="relative container mx-auto">
-    <div className="pt-7 pb-[26px] px-5">
-      <Skeleton className="h-[48px] lg:h-[54px] w-full overflow-hidden" loading>
-        <h1 className="flex items-center font-heading font-medium text-[32px]lg:text-[36px] tracking-[0.1px] mr-4">
-          &nbsp;
-        </h1>
-      </Skeleton>
-    </div>
-    <div className="sm:flex flex-wrap">
-      <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-        <h2 className="font-medium text-sm mb-0.5">Balance</h2>
-        <Skeleton className="h-[39px] w-32" loading>
-          <p className="font-heading font-medium text-[26px]">&nbsp;</p>
+export const AddressSkeleton = () => {
+  const { network } = useNetworkStore();
+
+  return (
+    <div className="relative container mx-auto">
+      <div className="pt-7 pb-[26px] px-5">
+        <Skeleton
+          className="h-[48px] lg:h-[54px] w-full overflow-hidden"
+          loading
+        >
+          <h1 className="flex items-center font-heading font-medium text-[32px]lg:text-[36px] tracking-[0.1px] mr-4">
+            &nbsp;
+          </h1>
         </Skeleton>
       </div>
-      {config.network === Network.MAINNET && (
+      <div className="sm:flex flex-wrap">
         <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Value</h2>
+          <h2 className="font-medium text-sm mb-0.5">Balance</h2>
           <Skeleton className="h-[39px] w-32" loading>
             <p className="font-heading font-medium text-[26px]">&nbsp;</p>
           </Skeleton>
         </div>
-      )}
-      <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-        <h2 className="font-medium text-sm mb-0.5">Validator Stake</h2>
-        <Skeleton className="h-[39px] w-32" loading>
-          <p className="font-heading font-medium text-[26px]">&nbsp;</p>
-        </Skeleton>
-      </div>
-      <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-        <h2 className="font-medium text-sm mb-0.5">Storage Used</h2>
-        <Skeleton className="h-[39px] w-32" loading>
-          <p className="font-heading font-medium text-[26px]">&nbsp;</p>
-        </Skeleton>
-      </div>
-      {config.network === Network.MAINNET && (
+        {network === Network.MAINNET && (
+          <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
+            <h2 className="font-medium text-sm mb-0.5">Value</h2>
+            <Skeleton className="h-[39px] w-32" loading>
+              <p className="font-heading font-medium text-[26px]">&nbsp;</p>
+            </Skeleton>
+          </div>
+        )}
         <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Type</h2>
-          <Skeleton className="h-[39px] w-28" loading>
+          <h2 className="font-medium text-sm mb-0.5">Validator Stake</h2>
+          <Skeleton className="h-[39px] w-32" loading>
             <p className="font-heading font-medium text-[26px]">&nbsp;</p>
           </Skeleton>
         </div>
-      )}
-    </div>
-    <div className="bg-bg-box lg:rounded-xl shadow mt-8">
-      <div className="pt-4 pb-6 mx-6">
-        <button className="font-medium border-b-[3px] border-text-body py-1 mr-4">
-          Access Keys
-        </button>
+        <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
+          <h2 className="font-medium text-sm mb-0.5">Storage Used</h2>
+          <Skeleton className="h-[39px] w-32" loading>
+            <p className="font-heading font-medium text-[26px]">&nbsp;</p>
+          </Skeleton>
+        </div>
+        {network === Network.MAINNET && (
+          <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
+            <h2 className="font-medium text-sm mb-0.5">Type</h2>
+            <Skeleton className="h-[39px] w-28" loading>
+              <p className="font-heading font-medium text-[26px]">&nbsp;</p>
+            </Skeleton>
+          </div>
+        )}
       </div>
-      <AddressKeysSkeleton />
+      <div className="bg-bg-box lg:rounded-xl shadow mt-8">
+        <div className="pt-4 pb-6 mx-6">
+          <button className="font-medium border-b-[3px] border-text-body py-1 mr-4">
+            Access Keys
+          </button>
+        </div>
+        <AddressKeysSkeleton />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AddressSkeletonWrapper = ({ onFinish }: SkeletonProps) => {
   useEffect(() => {

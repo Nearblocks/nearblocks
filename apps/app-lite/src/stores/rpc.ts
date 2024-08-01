@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { providers } from '@/libs/rpc';
+import { useNetworkStore } from './network';
 
 type RpcState = {
   rpc: string;
@@ -10,10 +10,14 @@ type RpcState = {
 
 export const useRpcStore = create(
   persist<RpcState>(
-    (set) => ({
-      rpc: providers?.[0]?.url,
-      setRpc: (rpc) => set(() => ({ rpc })),
-    }),
+    (set) => {
+      const { providers } = useNetworkStore.getState();
+
+      return {
+        rpc: providers?.[0]?.url,
+        setRpc: (rpc) => set({ rpc }),
+      };
+    },
     { name: 'rpc-url' },
   ),
 );
