@@ -20,6 +20,11 @@ const env = cleanEnv(process.env, {
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
   USER_DB_URL: str(),
+  RATELIMITER_REDIS_PASSWORD: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_NAME: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_PASSWORD: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_URLS: str({ default: '' }),
+  RATELIMITER_REDIS_URL: url({ default: '' }),
 });
 
 const config: Config = {
@@ -36,6 +41,11 @@ const config: Config = {
   redisSentinelPassword: env.REDIS_SENTINEL_PASSWORD,
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
+  ratelimiterRedisPassword: env.RATELIMITER_REDIS_PASSWORD,
+  ratelimiterRedisSentinelName: env.RATELIMITER_REDIS_SENTINEL_NAME,
+  ratelimiterRedisSentinelPassword: env.RATELIMITER_REDIS_SENTINEL_PASSWORD,
+  ratelimiterRedisSentinelUrls: env.RATELIMITER_REDIS_SENTINEL_URLS,
+  ratelimiterRedisUrl: env.RATELIMITER_REDIS_URL,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
   userDbUrl: env.USER_DB_URL,

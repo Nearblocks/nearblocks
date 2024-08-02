@@ -38,12 +38,9 @@ if (config.redisSentinelName) {
 }
 
 const redis = new Redis(`api:${config.network}`, options);
-const userRedis = new Redis(`user-api:${config.network}`, options);
 
 export const redisClient = redis.client();
-export const userRedisClient = userRedis.client();
 
 redisClient.on('error', errorHandler);
-userRedisClient.on('error', errorHandler);
 
 export default redis;
