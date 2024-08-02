@@ -1,6 +1,7 @@
 import config from '#config';
 import logger from '#libs/logger';
-import redis, { userRedisClient } from '#libs/redis';
+import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
+import redis from '#libs/redis';
 import sentry from '#libs/sentry';
 
 import app from './app.js';
@@ -13,7 +14,7 @@ const onSignal = async (signal: number | string) => {
   try {
     await Promise.all([
       redis.quit(),
-      userRedisClient.quit(),
+      ratelimiterRedisClient.quit(),
       sentry.close(1000),
     ]);
   } catch (error) {

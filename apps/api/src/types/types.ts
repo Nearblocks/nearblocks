@@ -22,6 +22,11 @@ export type Config = {
   maxQueryRows: number;
   network: string;
   port: number;
+  ratelimiterRedisPassword: string;
+  ratelimiterRedisSentinelName: string;
+  ratelimiterRedisSentinelPassword: string;
+  ratelimiterRedisSentinelUrls: string;
+  ratelimiterRedisUrl: string;
   redisPassword: string;
   redisSentinelName: string;
   redisSentinelPassword: string;
