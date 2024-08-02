@@ -32,12 +32,16 @@ if (config.ratelimiterRedisSentinelName) {
 
     if (config.ratelimiterRedisPassword) {
       ratelimiterOptions.password = config.ratelimiterRedisPassword;
-      ratelimiterOptions.sentinelPassword = config.ratelimiterRedisSentinelPassword;
+      ratelimiterOptions.sentinelPassword =
+        config.ratelimiterRedisSentinelPassword;
     }
   }
 }
 
-const ratelimiterRedis = new Redis(`user-api:${config.network}`, ratelimiterOptions);
+const ratelimiterRedis = new Redis(
+  `user-api:${config.network}`,
+  ratelimiterOptions,
+);
 
 export const ratelimiterRedisClient = ratelimiterRedis.client();
 

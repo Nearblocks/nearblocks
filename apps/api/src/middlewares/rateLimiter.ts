@@ -4,9 +4,9 @@ import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import { userSql } from '#libs/postgres';
+import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 import { SubscriptionStatus } from '#types/enums';
 import { Plan, User } from '#types/types';
-import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

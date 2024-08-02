@@ -21,6 +21,11 @@ export type Config = {
   maxQueryRows: number;
   network: string;
   port: number;
+  ratelimiterRedisPassword: string;
+  ratelimiterRedisSentinelName: string;
+  ratelimiterRedisSentinelPassword: string;
+  ratelimiterRedisSentinelUrls: string;
+  ratelimiterRedisUrl: string;
   redisPassword: string;
   redisSentinelName: string;
   redisSentinelPassword: string;
@@ -29,11 +34,6 @@ export type Config = {
   rpcUrl: string;
   sentryDsn?: string;
   userDbUrl: string;
-  ratelimiterRedisPassword: string;
-  ratelimiterRedisSentinelName: string;
-  ratelimiterRedisSentinelPassword: string;
-  ratelimiterRedisSentinelUrls: string;
-  ratelimiterRedisUrl: string;
 };
 
 export type StreamTransformWrapper = (
