@@ -82,6 +82,11 @@ export enum EventCause {
   TRANSFER = 'TRANSFER',
 }
 
+export enum DexEventType {
+  BUY = 'BUY',
+  SELL = 'SELL',
+}
+
 export enum NEP {
   Nep141 = 'nep141',
   Nep171 = 'nep171',

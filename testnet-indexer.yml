@@ -27,6 +27,15 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file: testnet.indexer.env
+  indexer-dex:
+    container_name: testnet-indexer-dex
+    build:
+      context: .
+      dockerfile: ./apps/indexer-dex/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: testnet.indexer.env
 
 volumes:
   redis-data:
