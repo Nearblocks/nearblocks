@@ -226,6 +226,8 @@ export default function (props: Props) {
     },
     tooltip: {
       valueDecimals: 2,
+      headerFormat:
+        '<span style="color: rgb(51, 51, 51); font-size: 0.8em; fill: rgb(51, 51, 51);">{point.key:%A, %e %b %Y, %H:%M:%S}</span><br/>',
     },
     series: chartTpsData,
   };
