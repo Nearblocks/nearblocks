@@ -129,62 +129,75 @@ export default function () {
     const formattedValue = bigValue.toFixed(1).replace(/\.0+$/, '');
     return `${formattedValue} ${suffixes[suffixIndex]}`;
   }
-  function getTimeAgoString(timestamp: string) {
-    const currentUTC = Date.now();
-    const date = new Date(timestamp);
-    const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
 
-    const intervals = {
-      year: seconds / (60 * 60 * 24 * 365),
-      month: seconds / (60 * 60 * 24 * 30),
-      week: seconds / (60 * 60 * 24 * 7),
-      day: seconds / (60 * 60 * 24),
-      hour: seconds / (60 * 60),
-      minute: seconds / 60,
-    };
+  function getTimeAgoString(timestamp: string): string {
+    try {
+      const currentUTC = Date.now();
+      const date = new Date(timestamp);
 
-    if (intervals.year >= 1) {
-      return (
-        Math.floor(intervals.year) +
-        ' year' +
-        (Math.floor(intervals.year) > 1 ? 's' : '') +
-        ' ago'
-      );
-    } else if (intervals.month >= 1) {
-      return (
-        Math.floor(intervals.month) +
-        ' month' +
-        (Math.floor(intervals.month) > 1 ? 's' : '') +
-        ' ago'
-      );
-    } else if (intervals.day >= 1) {
-      return (
-        Math.floor(intervals.day) +
-        ' day' +
-        (Math.floor(intervals.day) > 1 ? 's' : '') +
-        ' ago'
-      );
-    } else if (intervals.hour >= 1) {
-      return (
-        Math.floor(intervals.hour) +
-        ' hour' +
-        (Math.floor(intervals.hour) > 1 ? 's' : '') +
-        ' ago'
-      );
-    } else if (intervals.minute >= 1) {
-      return (
-        Math.floor(intervals.minute) +
-        ' minute' +
-        (Math.floor(intervals.minute) > 1 ? 's' : '') +
-        ' ago'
-      );
-    } else {
-      return 'a few seconds ago';
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date format');
+      }
+
+      const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
+
+      const intervals = {
+        year: seconds / (60 * 60 * 24 * 365),
+        month: seconds / (60 * 60 * 24 * 30),
+        week: seconds / (60 * 60 * 24 * 7),
+        day: seconds / (60 * 60 * 24),
+        hour: seconds / (60 * 60),
+        minute: seconds / 60,
+      };
+
+      if (intervals.year >= 1) {
+        return (
+          Math.floor(intervals.year) +
+          ' year' +
+          (Math.floor(intervals.year) > 1 ? 's' : '') +
+          ' ago'
+        );
+      } else if (intervals.month >= 1) {
+        return (
+          Math.floor(intervals.month) +
+          ' month' +
+          (Math.floor(intervals.month) > 1 ? 's' : '') +
+          ' ago'
+        );
+      } else if (intervals.day >= 1) {
+        return (
+          Math.floor(intervals.day) +
+          ' day' +
+          (Math.floor(intervals.day) > 1 ? 's' : '') +
+          ' ago'
+        );
+      } else if (intervals.hour >= 1) {
+        return (
+          Math.floor(intervals.hour) +
+          ' hour' +
+          (Math.floor(intervals.hour) > 1 ? 's' : '') +
+          ' ago'
+        );
+      } else if (intervals.minute >= 1) {
+        return (
+          Math.floor(intervals.minute) +
+          ' minute' +
+          (Math.floor(intervals.minute) > 1 ? 's' : '') +
+          ' ago'
+        );
+      } else {
+        return 'a few seconds ago';
+      }
+    } catch (error) {
+      console.error('Error in getTimeAgoString:', error);
+      return 'Invalid time';
     }
   }
+
   function formatWithCommas(number: string) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
+
   function formatTimestampToString(timestamp: string) {
     const date = new Date(timestamp);
 
