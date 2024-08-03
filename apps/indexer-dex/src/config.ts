@@ -39,7 +39,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  delta: 10,
+  delta: 100,
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
   preloadSize: 10,

@@ -8,6 +8,9 @@ DEX indexer works with events produced by DEXs
 DATABASE_URL=
 RPC_URL=
 NETWORK=mainnet
+S3_ENDPOINT=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
 
 # Optional
 DATABASE_CA=

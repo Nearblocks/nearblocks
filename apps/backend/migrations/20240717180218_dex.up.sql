@@ -8,8 +8,9 @@ CREATE TABLE dex_pairs (
   quote TEXT NOT NULL,
   price_token NUMERIC(32, 12),
   price_usd NUMERIC(32, 12),
-  updated_at TIMESTAMP NOT NULL,
-  PRIMARY KEY (id)
+  updated_at TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE (contract, pool)
 );
 
 CREATE TABLE dex_events (
@@ -23,7 +24,7 @@ CREATE TABLE dex_events (
   amount_usd NUMERIC(32, 12) NOT NULL,
   maker TEXT NOT NULL,
   type dex_event_type NOT NULL,
-  "timestamp" INTEGER NOT NULL,
+  "timestamp" INTEGER NOT NULL
 );
 
 CREATE INDEX dp_contract_idx ON dex_pairs (contract);
@@ -33,7 +34,7 @@ CREATE INDEX dp_base_idx ON dex_pairs (base);
 CREATE INDEX dp_quote_idx ON dex_pairs (quote);
 
 SELECT
-  create_hypertable ('dex_events', by_range ("timestamp", 604800));
+  create_hypertable ('dex_events', by_range ('timestamp', 604800));
 
 CREATE INDEX de_pair_id_timestamp_idx ON dex_events (pair_id, "timestamp" DESC);
 
@@ -67,7 +68,9 @@ GROUP BY
   bucket_1m,
   pair_id
 ORDER BY
-  bucket_1m;
+  bucket_1m
+WITH
+  NO DATA;
 
 CREATE MATERIALIZED VIEW dex_events_1h
 WITH
@@ -90,7 +93,9 @@ GROUP BY
   bucket_1h,
   pair_id
 ORDER BY
-  bucket_1h;
+  bucket_1h
+WITH
+  NO DATA;
 
 CREATE MATERIALIZED VIEW dex_events_1d
 WITH
@@ -113,11 +118,14 @@ GROUP BY
   bucket_1d,
   pair_id
 ORDER BY
-  bucket_1d;
+  bucket_1d
+WITH
+  NO DATA;
 
 SELECT
   add_continuous_aggregate_policy (
     'dex_events_1m',
+    start_offset => NULL,
     end_offset => 60,
     schedule_interval => INTERVAL '1 minute'
   );
@@ -125,6 +133,7 @@ SELECT
 SELECT
   add_continuous_aggregate_policy (
     'dex_events_1h',
+    start_offset => NULL,
     end_offset => 3600,
     schedule_interval => INTERVAL '1 hour'
   );
@@ -132,6 +141,7 @@ SELECT
 SELECT
   add_continuous_aggregate_policy (
     'dex_events_1d',
+    start_offset => NULL,
     end_offset => 86400,
     schedule_interval => INTERVAL '1 day'
   );

@@ -1,4 +1,5 @@
 import { logger } from 'nb-logger';
+import { Network } from 'nb-types';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -7,9 +8,11 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing dex indexer...');
-    logger.info('syncing dex data...');
-    await syncData();
+    if (config.network === Network.MAINNET) {
+      logger.info({ network: config.network }, 'initializing dex indexer...');
+      logger.info('syncing dex data...');
+      await syncData();
+    }
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);

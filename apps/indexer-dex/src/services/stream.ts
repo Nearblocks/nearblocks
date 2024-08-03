@@ -24,12 +24,14 @@ export const syncData = async () => {
   const settings = await knex('settings').where({ key: dexKey }).first();
   const latestBlock = settings?.value?.sync;
 
-  if (!lakeConfig.startBlockHeight && latestBlock) {
+  if (latestBlock) {
     const next = +latestBlock - config.delta;
 
-    logger.info(`last synced block: ${latestBlock}`);
-    logger.info(`syncing from block: ${next}`);
-    lakeConfig.startBlockHeight = next;
+    if (next > lakeConfig.startBlockHeight) {
+      logger.info(`last synced block: ${latestBlock}`);
+      logger.info(`syncing from block: ${next}`);
+      lakeConfig.startBlockHeight = next;
+    }
   }
 
   for await (const message of stream(lakeConfig)) {
