@@ -5,6 +5,7 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  API_ACCESS_KEY: str(),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -30,6 +31,7 @@ const env = cleanEnv(process.env, {
 });
 
 const config: Config = {
+  apiAccessKey: env.API_ACCESS_KEY,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,

@@ -13,6 +13,7 @@ export interface RequestValidators<T> extends Request {
 export type RequestValidator<T> = Required<RequestValidators<T>>;
 
 export type Config = {
+  apiAccessKey: string;
   dbCa: string;
   dbCert: string;
   dbKey: string;
