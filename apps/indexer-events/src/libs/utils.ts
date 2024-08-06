@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { types } from 'near-lake-framework';
+import { types } from 'nb-lake';
 
 const require = createRequire(import.meta.url);
 const json = require('nb-json');

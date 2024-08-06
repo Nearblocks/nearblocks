@@ -18,8 +18,7 @@
   "dependencies": {
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
-    "lodash-es": "4.17.21",
-    "near-lake-framework": "2.0.0"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "~4.17",
@@ -27,6 +26,7 @@
     "eslint-config-custom-node": "*",
     "rimraf": "~5.0",
     "nb-knex": "*",
+    "nb-lake": "*",
     "nb-logger": "*",
     "nb-near": "*",
     "nb-tsconfig": "*",

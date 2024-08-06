@@ -1,6 +1,6 @@
 import { snakeCase, toUpper } from 'lodash-es';
-import { types } from 'near-lake-framework';
 
+import { types } from 'nb-lake';
 import { EventStatus, ExecutionOutcomeStatus } from 'nb-types';
 
 export const mapStateChangeStatus = (

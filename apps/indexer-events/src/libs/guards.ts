@@ -1,5 +1,4 @@
-import { types } from 'near-lake-framework';
-
+import { types } from 'nb-lake';
 import { FTLogKind, NEP, NFTLogKind } from 'nb-types';
 
 import {
