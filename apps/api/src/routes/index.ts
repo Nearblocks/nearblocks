@@ -4,6 +4,7 @@ import account from '#routes/account';
 import analytics from '#routes/analytics';
 import blocks from '#routes/blocks';
 import charts from '#routes/charts';
+import contract from '#routes/contract';
 import exports from '#routes/exports';
 import fts from '#routes/fts';
 import keys from '#routes/keys';
@@ -36,6 +37,7 @@ const routes = () => {
   sync(app);
   txns(app);
   validators(app);
+  contract(app);
 
   return app;
 };

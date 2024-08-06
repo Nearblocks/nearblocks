@@ -1,0 +1,53 @@
+{
+  "name": "contract-verifier",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "dependencies": {
+    "@sentry/node": "7.74.1",
+    "@types/express": "4.17.21",
+    "@types/ioredis": "5.0.0",
+    "@types/node": "20.14.4",
+    "axios": "1.7.2",
+    "body-parser": "1.20.2",
+    "bs58": "6.0.0",
+    "bullmq": "5.10.4",
+    "child_process": "1.0.2",
+    "envalid": "8.0.0",
+    "express": "4.19.2",
+    "ioredis": "5.3.2",
+    "multer": "1.4.5-lts.1",
+    "postgres": "3.4.4",
+    "unzipper": "0.12.2",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "@types/multer": "~1.4.11",
+    "@types/unzipper": "~0.10.9",
+    "globals": "~15.9.0",
+    "nb-logger": "*",
+    "nb-redis": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "nodemon": "~2.0",
+    "rimraf": "~5.0",
+    "ts-node": "~10.9.2",
+    "typescript": "~5.2",
+    "eslint-config-custom-node": "*"
+  }
+}
