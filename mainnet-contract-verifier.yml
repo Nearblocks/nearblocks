@@ -1,0 +1,13 @@
+version: '3.6'
+services:
+  contract-verifier:
+    container_name: mainnet-contract-verifier
+    build:
+      context: .
+      dockerfile: ./apps/contract-verifier/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: mainnet.contract-verifier.env
+    ports:
+      - '3008:3001'
