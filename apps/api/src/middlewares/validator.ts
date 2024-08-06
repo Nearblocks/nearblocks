@@ -11,7 +11,7 @@ const validator = <T extends ZodTypeAny>(schema: T) => {
     next: NextFunction,
   ) => {
     const result = schema.safeParse(
-      merge(req.body ?? {}, req.query ?? {}, req.params ?? {}),
+      merge(req.body ?? {}, req.query ?? {}, req.params ?? {}, req.files ?? {}),
     );
 
     if (!result.success) {
