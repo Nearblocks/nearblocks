@@ -1,5 +1,4 @@
-import { types } from 'near-lake-framework';
-
+import { types } from 'nb-lake';
 import { Network, StateChangeCauseView, StateChangeValueView } from 'nb-types';
 
 export type Config = {

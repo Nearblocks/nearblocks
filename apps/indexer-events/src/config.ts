@@ -44,7 +44,7 @@ const config: Config = {
   delta: 100, // start from blocks earlier on sync interuption
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,
-  preloadSize: 100, // blocks to preload in nearlake
+  preloadSize: 10, // blocks to preload in nearlake
   rpcUrl: env.RPC_URL,
   s3BucketName,
   s3Endpoint,

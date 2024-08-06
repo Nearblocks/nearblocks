@@ -1,6 +1,5 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
 import config from '#config';
