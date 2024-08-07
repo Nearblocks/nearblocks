@@ -1,20 +1,73 @@
 import Head from 'next/head';
 import useTranslation from 'next-translate/useTranslation';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { ReactElement } from 'react';
 import { appUrl } from '@/utils/config';
-import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
-import List from '@/components/Transaction/List';
+import dynamic from 'next/dynamic';
+import fetcher from '@/utils/fetcher';
+import queryString from 'qs';
+
+const Layout = dynamic(() => import('@/components/Layouts'));
+const List = dynamic(() => import('@/components/Transactions/List'));
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
-const TransactionList = () => {
-  const { t } = useTranslation();
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  dataCount: any;
+  error: boolean;
+  apiUrl: string;
+}> = async (context) => {
+  const { query } = context;
 
+  const apiUrl = `txns`;
+  const fetchUrl = `${apiUrl}?${queryString.stringify(query)}`;
+  const countUrl = `txns/count?${queryString.stringify(query)}`;
+
+  try {
+    const [dataResult, dataCountResult] = await Promise.allSettled([
+      fetcher(fetchUrl),
+      fetcher(countUrl),
+    ]);
+
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const dataCount =
+      dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
+    const error = dataResult.status === 'rejected';
+
+    return {
+      props: {
+        data,
+        dataCount,
+        error,
+        apiUrl,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return {
+      props: {
+        data: null,
+        dataCount: null,
+        error: true,
+        apiUrl: '',
+      },
+    };
+  }
+};
+
+const TransactionList = ({
+  data,
+  dataCount,
+  error,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { t } = useTranslation();
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('txns:heading'),
   )}&brand=near`;
+
   return (
     <>
       <Head>
@@ -44,7 +97,7 @@ const TransactionList = () => {
       <div className="container mx-auto px-3 -mt-48">
         <div className="relative block lg:flex lg:space-x-2">
           <div className=" w-full">
-            <List />
+            <List txnsData={data} txnsCount={dataCount} error={error} />
           </div>
         </div>
       </div>
@@ -52,7 +105,5 @@ const TransactionList = () => {
     </>
   );
 };
-
 TransactionList.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
-
 export default TransactionList;
