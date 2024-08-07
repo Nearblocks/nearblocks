@@ -1,5 +1,4 @@
-import { stream, types } from 'near-lake-framework';
-
+import { stream, types } from 'nb-lake';
 import { logger } from 'nb-logger';
 
 import config from '#config';
@@ -7,9 +6,26 @@ import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncRefFinance } from '#services/contracts/v2.ref-finance.near';
 
+const fetchBlocks = async (block: number, limit: number) => {
+  try {
+    const blocks = await knex('blocks')
+      .select('block_height')
+      .where('block_height', '>=', block)
+      .orderBy('block_height', 'asc')
+      .limit(limit);
+
+    return blocks.map((block) => block.block_height);
+  } catch (error) {
+    logger.error(error);
+    sentry.captureException(error);
+    return [];
+  }
+};
+
 const dexKey = 'dex';
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
+  fetchBlocks,
   s3BucketName: config.s3BucketName,
   s3RegionName: config.s3RegionName,
   startBlockHeight: config.startBlockHeight,

@@ -1,6 +1,6 @@
 import { cleanEnv, str, url } from 'envalid';
-import { types } from 'near-lake-framework';
 
+import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
 import { Config } from '#types/types';

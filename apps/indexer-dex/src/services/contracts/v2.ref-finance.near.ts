@@ -1,5 +1,4 @@
-import { types } from 'near-lake-framework';
-
+import { types } from 'nb-lake';
 import { logger } from 'nb-logger';
 import { DexEvents, DexPairs } from 'nb-types';
 

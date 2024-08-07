@@ -1,8 +1,8 @@
 import { createRequire } from 'module';
 
 import Big from 'big.js';
-import { types } from 'near-lake-framework';
 
+import { types } from 'nb-lake';
 import { DexEventType, DexPairs } from 'nb-types';
 
 import config from '#config';
