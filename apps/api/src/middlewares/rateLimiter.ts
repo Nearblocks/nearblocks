@@ -11,6 +11,7 @@ import { Plan, User } from '#types/types';
 
 const CUSTOM_RATE_LIMIT_MESSAGE =
   'You have exceeded your API request limit. Please try again later or upgrade your plan for higher limits at https://nearblocks.io/apis.';
+
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as User)?.id;

@@ -39,7 +39,7 @@
     "passport-http-bearer": "1.0.1",
     "pg": "8.11.3",
     "pg-query-stream": "4.5.3",
-    "postgres": "3.4.3",
+    "postgres": "https://github.com/Nearblocks/postgres",
     "query-string": "8.1.0",
     "rate-limiter-flexible": "3.0.4",
     "zod": "3.22.4"
