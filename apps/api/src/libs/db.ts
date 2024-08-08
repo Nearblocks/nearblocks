@@ -3,6 +3,7 @@ import { ConnectionOptions } from 'tls';
 import pg from 'pg';
 
 import config from '#config';
+import logger from '#libs/logger';
 
 const { Pool } = pg;
 
@@ -21,7 +22,8 @@ const db = new Pool({
   connectionString: config.dbUrl,
   max: 60,
   ssl: ssl?.ca ? ssl : false,
-  statement_timeout: 60 * 1000, // 60s
 });
+
+db.on('error', (err: Error) => logger.error(err));
 
 export default db;

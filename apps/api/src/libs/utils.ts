@@ -4,10 +4,9 @@ import { decompress } from 'fzstd';
 import { format } from 'numerable';
 
 import logger from '#libs/logger';
+import { callFunction } from '#libs/near';
 import Sentry from '#libs/sentry';
 import { ValidationError } from '#types/types';
-
-import { callFunction } from './near.js';
 
 type ABIResponse = {
   block_hash: string;
