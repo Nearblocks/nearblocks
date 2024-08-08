@@ -141,7 +141,7 @@ const parse = catchAsync(
     try {
       schema = await abiSchema(account);
     } catch (error) {
-      logger.error({ abiSchemaError: error });
+      // logger.error({ abiSchemaError: error });
     }
 
     return res.status(200).json({ contract: [{ contract, schema }] });
