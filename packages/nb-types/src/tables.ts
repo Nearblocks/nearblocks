@@ -1,6 +1,7 @@
 import {
   AccessKeyPermissionKind,
   ActionKind,
+  DexEventType,
   EventCause,
   EventStatus,
   ExecutionOutcomeStatus,
@@ -21,6 +22,8 @@ export interface TTables {
   chunks: Chunk;
   daily_stats: DailyStats;
   deployed_contracts: DeployedContracts;
+  dex_events: DexEvents;
+  dex_pairs: DexPairs;
   errored_contracts: ErroredContracts;
   execution_outcome_receipts: ExecutionOutcomeReceipt;
   execution_outcomes: ExecutionOutcome;
@@ -141,6 +144,31 @@ export type DeployedContracts = {
   contract: string;
   id: number;
   receipt_id: string;
+};
+
+export type DexEvents = {
+  amount_usd: string;
+  base_amount: string;
+  event_index: string;
+  maker: string;
+  pair_id: string;
+  price_token: string;
+  price_usd: string;
+  quote_amount: string;
+  receipt_id: string;
+  timestamp: string;
+  type: DexEventType;
+};
+
+export type DexPairs = {
+  base: string;
+  contract: string;
+  id?: string;
+  pool: string;
+  price_token: null | string;
+  price_usd: null | string;
+  quote: string;
+  updated_at?: unknown;
 };
 
 export type ErroredContracts = {

@@ -83,6 +83,7 @@ CREATE TABLE temp_execution_outcome_receipts (
 );
 
 CREATE TABLE temp_receipts (
+  id BIGSERIAL,
   receipt_id TEXT NOT NULL,
   included_in_block_hash TEXT NOT NULL,
   included_in_chunk_hash TEXT NOT NULL,
@@ -92,10 +93,12 @@ CREATE TABLE temp_receipts (
   receipt_kind receipt_kind NOT NULL,
   originated_from_transaction_hash TEXT NOT NULL,
   included_in_block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (receipt_id)
+  PRIMARY KEY (id),
+  UNIQUE (receipt_id)
 );
 
 CREATE TABLE temp_transactions (
+  id BIGSERIAL,
   transaction_hash TEXT NOT NULL,
   included_in_block_hash TEXT NOT NULL,
   included_in_chunk_hash TEXT NOT NULL,
@@ -107,7 +110,8 @@ CREATE TABLE temp_transactions (
   receipt_conversion_gas_burnt NUMERIC(20, 0),
   receipt_conversion_tokens_burnt NUMERIC(45, 0),
   block_timestamp BIGINT NOT NULL,
-  PRIMARY KEY (transaction_hash)
+  PRIMARY KEY (id),
+  UNIQUE (transaction_hash)
 );
 
 CREATE INDEX t_ak_account_id_idx ON temp_access_keys USING btree (account_id);
