@@ -52,6 +52,7 @@ export type DataReceipt = {
 export type ReceiptAction = {
   args: string;
   kind: ActionKind;
+  rlpHash: null | string;
 };
 
 export type AccessKeyPermission = {
@@ -61,4 +62,8 @@ export type AccessKeyPermission = {
     receiver_id: string;
   };
   permission_kind: AccessKeyPermissionKind;
+};
+
+export type RlpJson = {
+  tx_bytes_b64: string;
 };

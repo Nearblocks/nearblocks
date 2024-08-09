@@ -62,6 +62,7 @@ export type ActionReceiptAction = {
   receipt_included_in_block_timestamp: string;
   receipt_predecessor_account_id: string;
   receipt_receiver_account_id: string;
+  rlp_hash: null | string;
 };
 
 export type ActionReceiptInputData = {
