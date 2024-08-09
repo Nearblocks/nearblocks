@@ -20,8 +20,6 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import Table from '../common/Table';
 import { Tooltip } from '@reach/tooltip';
-import { useFetch } from '@/hooks/useFetch';
-import useQSFilters from '@/hooks/useQSFilters';
 import useSorting from '@/hooks/useSorting';
 import useTranslation from 'next-translate/useTranslation';
 import Filters from '../common/Filters';
@@ -35,81 +33,83 @@ const initialForm = {
   to: '',
 };
 
-const List = () => {
+const List = ({
+  txnsData,
+  txnsCount,
+  loading,
+  apiUrl,
+  setUrl,
+  error,
+  filters,
+  setFilters,
+}: any) => {
   const { t } = useTranslation();
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
+  const { sorting, setSorting, resetSorting } = useSorting();
 
-  const { qs, filters, setFilters } = useQSFilters();
-  const { sqs, sorting, setSorting, resetSorting } = useSorting();
-  const apiUrl = `txns?`;
-  const [url, setUrl] = useState(apiUrl);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     if (name === 'type') {
       if (isAction(value)) {
-        return setForm((state) => ({
-          ...state,
-          action: value,
-          method: '',
-        }));
+        setForm((prev) => ({ ...prev, action: value, method: '' }));
+      } else {
+        setForm((prev) => ({ ...prev, method: value, action: '' }));
       }
-
-      return setForm((state) => ({
-        ...state,
-        method: value,
-        action: '',
-      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
-
-    return setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const { data: txnsCount } = useFetch(`txns/count?${qs}`);
-  const { data: txnsData, loading, error } = useFetch(`${url}${qs}&${sqs}`);
-
-  const count: number = txnsCount?.txns[0]?.count;
+  const count = txnsCount?.txns[0]?.count;
   const txns = txnsData?.txns;
   let cursor = txnsData?.cursor;
 
-  const toggleShowAge = () => setShowAge((s) => !s);
+  const toggleShowAge = () => setShowAge((prev) => !prev);
 
-  const onFilter = (e: any) => {
+  const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetSorting();
-    setFilters((state) => ({ ...state, ...form }));
+    const updatedFilters = { ...filters, ...form, cursor: undefined };
+    setFilters(updatedFilters);
     setPage(1);
-    setUrl(apiUrl);
+
+    const newUrl = new URL(window.location.href);
+    Object.keys(updatedFilters).forEach((key) => {
+      if (updatedFilters[key]) {
+        newUrl.searchParams.set(key, updatedFilters[key].toString());
+      } else {
+        newUrl.searchParams.delete(key);
+      }
+    });
+
+    setUrl(newUrl.toString());
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const name = e.currentTarget.name;
+    const { name } = e.currentTarget;
     resetSorting();
     if (name === 'type') {
-      setForm((f) => ({ ...f, action: '', method: '' }));
-      setFilters((state) => ({
-        ...state,
+      setForm((prev) => ({ ...prev, action: '', method: '' }));
+      setFilters((prev: any) => ({
+        ...prev,
         action: undefined,
         method: undefined,
       }));
-      setUrl(apiUrl);
-      setPage(1);
     } else {
-      setForm((f) => ({ ...f, [name]: '' }));
-      setFilters((state) => ({ ...state, [name]: undefined }));
-      setUrl(apiUrl);
-      setPage(1);
+      setForm((prev) => ({ ...prev, [name]: '' }));
+      setFilters((prev: any) => ({ ...prev, [name]: undefined }));
     }
+    setUrl(apiUrl);
+    setPage(1);
   };
 
   const onAllClear = () => {
-    const values = Object.keys(filters).reduce(
+    const clearedFilters = Object.keys(filters).reduce(
       (acc, key) => {
         acc[key] = undefined;
         return acc;
@@ -120,24 +120,43 @@ const List = () => {
     setPage(1);
     setUrl(apiUrl);
     setForm(initialForm);
-    setFilters((state) => ({ ...state, ...values }));
+    setFilters((prev: any) => ({ ...prev, ...clearedFilters }));
   };
 
   const onOrder = () => {
-    setSorting((state) => ({
-      ...state,
-      order: state.order === 'asc' ? 'desc' : 'asc',
+    const newOrder = filters.order === 'asc' ? 'desc' : 'asc';
+    const updatedFilters = { ...filters, order: newOrder };
+    setFilters(updatedFilters);
+    setSorting((prev) => ({
+      ...prev,
+      order: prev.order === 'asc' ? 'desc' : 'asc',
     }));
+    const newUrl = new URL(window.location.href);
+    Object.keys(updatedFilters).forEach((key) => {
+      if (updatedFilters[key]) {
+        newUrl.searchParams.set(key, updatedFilters[key].toString());
+      } else {
+        newUrl.searchParams.delete(key);
+      }
+    });
+    setUrl(newUrl.toString());
   };
 
-  const onHandleMouseOver = (e: any, id: string) => {
+  const onHandleMouseOver = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-
     setAddress(id);
   };
+
   const handleMouseLeave = () => {
     setAddress('');
   };
+
+  function removeCursor(obj: any) {
+    const { cursor, ...rest } = obj;
+    return rest;
+  }
+
+  const modifiedFilter = removeCursor(filters);
 
   const columns: any = [
     {
@@ -525,9 +544,9 @@ const List = () => {
                 }`}
             </p>
           </div>
-          {filters && Object.keys(filters).length > 0 && (
+          {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
             <div className="lg:ml-auto px-6">
-              <Filters filters={filters} onClear={onAllClear} />
+              <Filters filters={modifiedFilter} onClear={onAllClear} />
             </div>
           )}
         </div>

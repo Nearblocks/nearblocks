@@ -6,17 +6,34 @@ export type ExecutionProps = {
 
 let TxnReceiptSkeleton = window?.TxnReceiptSkeleton || (() => <></>);
 
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 1.5rem;
+`;
+const TextLabel = styled.span`
+  color: var(--text-label);
+`;
+const Botton = styled.button`
+  background-color: transparent;
+  background-image: none;
+  border: none;
+`;
+
 const Execution = ({ receipt }: ExecutionProps) => {
   const [expand, setExpand] = useState(false);
 
   return (
     <>
-      <div className="flex justify-between items-center text-sm mb-6">
-        <span className="text-text-label">&nbsp;</span>
-        <button onClick={() => setExpand((e) => !e)}>
+      <Container>
+        <TextLabel>&nbsp;</TextLabel>
+        <Botton onClick={() => setExpand((e) => !e)}>
           {expand ? 'Collapse All -' : 'Expand All +'}
-        </button>
-      </div>
+        </Botton>
+      </Container>
       <Widget<ReceiptProps>
         key="receipt"
         loading={<TxnReceiptSkeleton />}

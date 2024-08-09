@@ -13,6 +13,33 @@ let TxnActionSkeleton = window?.TxnActionSkeleton || (() => <></>);
 let TxnAddressSkeleton = window?.TxnAddressSkeleton || (() => <></>);
 let TxnReceiptSkeleton = window?.TxnReceiptSkeleton || (() => <></>);
 
+const Container = styled.div`
+  .receipt {
+    margin-left: 0.5rem;
+    padding-left: 1rem;
+    border-left-width: 1px;
+    border-color: rgb(var(--color-border-body));
+  }
+`;
+const ActionContainer = styled.div`
+  position: relative;
+  margin-left: 0.5rem /* 8px */;
+  margin-bottom: 0.75rem /* 12px */;
+  padding-top: 0.75rem /* 12px */;
+  padding-bottom: 0.75rem /* 12px */;
+  padding-left: 1rem /* 16px */;
+  padding-right: 1rem /* 16px */;
+`;
+
+const Arrow = styled.div`
+  position: absolute;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  border-left-width: 1px;
+  border-color: rgb(var(--color-border-body));
+`;
+
 const Receipt = ({
   className,
   convertion,
@@ -38,7 +65,7 @@ const Receipt = ({
   const lastNonRefundReceipt = filterRefundReceipts.at(-1);
 
   return (
-    <div className={className}>
+    <Container className={className}>
       {convertion && (
         <Widget<AddressProps>
           key="address-1"
@@ -52,7 +79,7 @@ const Receipt = ({
           key="execution-1"
           loading={<TxnReceiptSkeleton />}
           props={{
-            className: 'ml-2 pl-4 border-l border-border-body',
+            className: 'receipt',
             convertion: false,
             expand,
             outgoingReceipts: remainingOutgoingReceipts,
@@ -61,8 +88,8 @@ const Receipt = ({
           src={`${config_account}/widget/lite.Txn.Receipt`}
         />
       )}
-      <div className="relative ml-2 mb-3 py-3 px-4">
-        <div className="arrow absolute h-full left-0 top-0 border-l border-border-body" />
+      <ActionContainer>
+        <Arrow className="arrow" />
         <Widget<ActionsProps>
           key="actions"
           loading={<TxnActionSkeleton />}
@@ -74,7 +101,7 @@ const Receipt = ({
           }}
           src={`${config_account}/widget/lite.Txn.Actions`}
         />
-      </div>
+      </ActionContainer>
       <Widget<AddressProps>
         key="address-2"
         loading={<TxnAddressSkeleton />}
@@ -94,7 +121,7 @@ const Receipt = ({
           src={`${config_account}/widget/lite.Txn.Receipt`}
         />
       )}
-    </div>
+    </Container>
   );
 };
 

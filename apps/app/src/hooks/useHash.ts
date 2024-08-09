@@ -1,24 +1,48 @@
 import { useRouter } from 'next/router';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-const useHash = (): [string | undefined, (newHash: string) => void] => {
-  const { push, asPath } = useRouter();
+const useHash = (
+  param: string,
+): [string | undefined, (newHash: string) => void] => {
+  const router = useRouter();
+  const { query, pathname, push, events } = router;
 
-  const hash = useMemo(() => asPath.split('#')[1], [asPath]);
+  const [hash, setHashState] = useState<string | undefined>(() => {
+    const value = query[param];
+    return Array.isArray(value)
+      ? value.join('&')
+      : (value as string | undefined);
+  });
 
   const setHash = useCallback(
-    (newHash: string) => {
+    (newValue: string) => {
       push(
         {
-          pathname: new URL(asPath, 'http://localhost/').pathname,
-          hash: newHash,
+          pathname,
+          query: { ...query, [param]: newValue },
         },
         undefined,
         { shallow: true },
       );
+      setHashState(newValue);
     },
-    [asPath, push],
+    [pathname, query, param, push],
   );
+
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      const newQuery = new URL(url, window.location.origin).searchParams.get(
+        param,
+      );
+      setHashState(newQuery || undefined);
+    };
+
+    events.on('routeChangeComplete', handleRouteChange);
+
+    return () => {
+      events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [param, events]);
 
   return [hash, setHash];
 };

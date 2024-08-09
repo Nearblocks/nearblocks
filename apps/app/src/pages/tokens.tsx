@@ -97,7 +97,7 @@ const TopFTTokens = () => {
 
         <div className="container mx-auto px-3 -mt-48 ">
           <div style={height} className="relative block lg:flex lg:space-x-2">
-            <div className="w-full ">
+            <div className="w-full " suppressHydrationWarning={true}>
               <VmComponent
                 src={components?.ftList}
                 skeleton={<List className="absolute" ref={heightRef} />}

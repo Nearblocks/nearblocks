@@ -15,7 +15,7 @@ const Filters: React.FC<FiltersProps> = ({
   if (!stripped.length) return null;
 
   return (
-    <div className="flex items-center px-2 text-sm mb-4 text-gray-500 lg:ml-auto">
+    <div className="flex items-center px-2 text-sm text-gray-500 lg:ml-auto space-x-4 ">
       Filtered By:
       <span className="flex items-center bg-gray-100 rounded-full px-3 py-1 ml-1 space-x-2">
         {stripped.map((key) => (

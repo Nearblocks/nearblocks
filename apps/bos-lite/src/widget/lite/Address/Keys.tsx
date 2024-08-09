@@ -15,6 +15,219 @@ export type KeysProps = {
 
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
 let AddressKeysSkeleton = window?.AddressKeysSkeleton || (() => <></>);
+const Container = styled.div`
+  position: relative;
+  overflow: auto;
+  .td-border {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    span {
+      display: block;
+      width: 100%;
+      border-bottom-width: 1px;
+      border-bottom-color: rgb(var(--color-border-body));
+    }
+  }
+  .public-key-skeleton {
+    height: 1.25rem;
+    width: 190px;
+  }
+  .common-skeleton {
+    height: 1.25rem;
+    width: 64px;
+  }
+  .contract-skeleton {
+    height: 1.25rem;
+    width: 100px;
+  }
+  .method-skeleton {
+    height: 1.25rem;
+    width: 160px;
+  }
+  .tooltip-mr-1 {
+    margin-right: 0.25rem;
+  }
+  .loading {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .copy-button {
+    height: 1rem;
+    vertical-align: text-bottom;
+  }
+  .copy-class {
+    width: 1rem;
+  }
+`;
+const Table = styled.table`
+  table-layout: auto;
+  border-collapse: collapse;
+  width: 100%;
+`;
+const Tr = styled.tr<{ bgcolor: string }>`
+  &:hover: {
+    background-color: ${(props: any) => (props.bgcolor ? props.bgcolor : '')};
+  }
+`;
+const Th = styled.th<{
+  pbottom?: string;
+  pleft?: string;
+  pright?: string;
+  ptop?: string;
+  width?: string;
+}>`
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(var(--color-text-label));
+  text-transform: uppercase;
+  text-align: left;
+  width: ${(props: any) => (props.width ? props.width : '')};
+  padding-left: ${(props: any) => (props.pleft ? props.pleft : '')};
+  padding-right: ${(props: any) => (props.pright ? props.pright : '')};
+  padding-top: ${(props: any) => (props.ptop ? props.ptop : '')};
+  padding-bottom: ${(props: any) => (props.pbottom ? props.pbottom : '')};
+`;
+const Td = styled.td<{
+  color?: string;
+  fsize?: string;
+  fweight?: string;
+  height?: string;
+  lheight?: string;
+  pbottom?: string;
+  pleft?: string;
+  pright?: string;
+  ptop?: string;
+}>`
+  font-weight: ${(props: any) => (props.fweight ? props.fweight : '')};
+  font-size: ${(props: any) => (props.fsize ? props.fsize : '')};
+  line-height: ${(props: any) => (props.lheight ? props.lheight : '')};
+  color: ${(props: any) => (props.color ? props.color : '')};
+  height: ${(props: any) => (props.height ? props.height : '')};
+  padding-left: ${(props: any) => (props.pleft ? props.pleft : '')};
+  padding-right: ${(props: any) => (props.pright ? props.pright : '')};
+  padding-top: ${(props: any) => (props.ptop ? props.ptop : '')};
+  padding-bottom: ${(props: any) => (props.pbottom ? props.pbottom : '')};
+  .flex-span {
+    display: flex;
+  }
+  .access-span {
+    background-color: rgb(var(--color-bg-function));
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0 / var(--tw-text-opacity));
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-radius: 0.25rem;
+  }
+  .method-span-loader {
+    display: block;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+const Pagination = styled.div`
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top-width: 1px;
+    border-top-color: rgb(var(--color-border-body));
+  }
+  .page {
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: rgb(var(--color-text-label));
+    text-transform: uppercase;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+`;
+const Button = styled.button<{
+  color?: string;
+  fsize?: string;
+  fweight?: string;
+  height?: string;
+  lheight?: string;
+  mbottom?: string;
+  mleft?: string;
+  mright?: string;
+  mtop?: string;
+  pbottom?: string;
+  pleft?: string;
+  pright?: string;
+  ptop?: string;
+}>`
+  font-weight: ${(props: any) => (props.fweight ? props.fweight : '')};
+  font-size: ${(props: any) => (props.fsize ? props.fsize : '')};
+  line-height: ${(props: any) => (props.lheight ? props.lheight : '')};
+  color: ${(props: any) => (props.color ? props.color : '')};
+  text-transform: uppercase;
+  padding-left: ${(props: any) => (props.pleft ? props.pleft : '')};
+  padding-right: ${(props: any) => (props.pright ? props.pright : '')};
+  padding-top: ${(props: any) => (props.ptop ? props.ptop : '')};
+  padding-bottom: ${(props: any) => (props.pbottom ? props.pbottom : '')};
+  margin-left: ${(props: any) => (props.mleft ? props.mleft : '')};
+  margin-right: ${(props: any) => (props.mright ? props.mright : '')};
+  margin-top: ${(props: any) => (props.mtop ? props.mtop : '')};
+  margin-bottom: ${(props: any) => (props.mbottom ? props.mbottom : '')};
+  border-radius: 0.25rem;
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  margin: 0;
+  border-width: 1px;
+  border-color: rgb(var(--color-border-body));
+`;
+
+const PrevButton = styled(Button)`
+  &:hover {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+    color: rgb(var(--color-primary));
+    border-color: rgb(var(--color-primary));
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: rgb(var(--color-text-label));
+    border-color: rgb(var(--color-border-body));
+  }
+`;
+const NextButton = styled(Button)`
+  &:hover {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+    color: rgb(var(--color-primary));
+    border-color: rgb(var(--color-primary));
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: rgb(var(--color-text-label));
+    border-color: rgb(var(--color-border-body));
+  }
+`;
 
 const LIMIT = 25;
 
@@ -102,77 +315,145 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
   };
 
   return (
-    <div className="relative overflow-auto">
-      <table className="table-auto border-collapse w-full">
+    <Container>
+      <Table>
         <thead>
           <tr>
-            <th className="w-[300px] font-normal text-xs text-text-label uppercase text-left pl-6 pr-4 py-4">
+            <Th
+              pbottom="1rem"
+              pleft="1.5rem"
+              pright="1rem"
+              ptop="1rem"
+              width="300px"
+            >
               Public Key
-            </th>
-            <th className="w-[84px] font-normal text-xs text-text-label uppercase text-left px-4 py-4">
+            </Th>
+            <Th
+              pbottom="1rem"
+              pleft="1rem"
+              pright="1rem"
+              ptop="1rem"
+              width="84px"
+            >
               Access
-            </th>
-            <th className="w-[160px] font-normal text-xs text-text-label uppercase text-left px-4 py-4">
+            </Th>
+            <Th
+              pbottom="1rem"
+              pleft="1rem"
+              pright="1rem"
+              ptop="1rem"
+              width="160px"
+            >
               Contract
-            </th>
-            <th className="w-[240px] font-normal text-xs text-text-label uppercase text-left px-4 py-4">
+            </Th>
+            <Th
+              pbottom="1rem"
+              pleft="1rem"
+              pright="1rem"
+              ptop="1rem"
+              width="240px"
+            >
               Methods
-            </th>
-            <th className="w-[112px] font-normal text-xs text-text-label uppercase text-left pl-4 pr-6 py-4">
+            </Th>
+            <Th
+              pbottom="1rem"
+              pleft="1rem"
+              pright="1.5rem"
+              ptop="1rem"
+              width="112px"
+            >
               Allowance
-            </th>
+            </Th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td className="px-6" colSpan={5}>
-              <span className="block w-full border-b border-b-border-body" />
+            <td className="td-border" colSpan={5}>
+              <span />
             </td>
           </tr>
           {loading ? (
             [...Array(LIMIT).keys()].map((key) => (
               <tr key={key}>
-                <td className="h-[46px] pl-6 pr-4 py-4">
-                  <span className="flex">
-                    <Skeleton className="h-5 w-[190px]" loading>
+                <Td
+                  height="46px"
+                  pbottom="1rem"
+                  pleft="1.5rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
+                  <span className="flex-span">
+                    <Skeleton className="public-key-skeleton" loading>
                       &nbsp;
                     </Skeleton>
                   </span>
-                </td>
-                <td className="h-[46px] px-4 py-4">
-                  <span className="flex">
-                    <Skeleton className="h-5 w-[64px]" loading>
+                </Td>
+                <Td
+                  className="h-[46px] px-4 py-4"
+                  height="46px"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
+                  <span className="flex-span">
+                    <Skeleton className="common-skeleton" loading>
                       &nbsp;
                     </Skeleton>
                   </span>
-                </td>
-                <td className="h-[46px] px-4 py-4">
-                  <span className="flex">
-                    <Skeleton className="h-5 w-[100px]" loading>
+                </Td>
+                <Td
+                  height="46px"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
+                  <span className="flex-span">
+                    <Skeleton className="contract-skeleton" loading>
                       &nbsp;
                     </Skeleton>
                   </span>
-                </td>
-                <td className="h-[46px] px-4 py-4">
-                  <span className="flex">
-                    <Skeleton className="h-5 w-[160px]" loading>
+                </Td>
+                <Td
+                  height="46px"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
+                  <span className="flex-span">
+                    <Skeleton className="method-skeleton" loading>
                       &nbsp;
                     </Skeleton>
                   </span>
-                </td>
-                <td className="h-[46px] pl-4 pr-6 py-4">
-                  <span className="flex">
-                    <Skeleton className="h-5 w-[64px]" loading>
+                </Td>
+                <Td
+                  height="46px"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1.5rem"
+                  ptop="1rem"
+                >
+                  <span className="flex-span">
+                    <Skeleton className="common-skeleton" loading>
                       &nbsp;
                     </Skeleton>
                   </span>
-                </td>
+                </Td>
               </tr>
             ))
           ) : items?.length ? (
             items?.map((key) => (
-              <tr className="hover:bg-bg-body" key={key.publicKey}>
-                <td className="text-sm pl-6 pr-4 py-4">
+              <Tr bgcolor="rgb(var(--color-bg-body))" key={key.publicKey}>
+                <Td
+                  fsize="0.875rem"
+                  lheight="1.25rem"
+                  pbottom="1rem"
+                  pleft="1.5rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
                   <Widget<TooltipProps>
                     key="tooltip"
                     loading={shortenString(key.publicKey, 15)}
@@ -180,15 +461,13 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
                       children: shortenString(key.publicKey, 15),
                       tooltip: (
                         <span>
-                          <span className="mr-1">{key.publicKey}</span>
+                          <span className="tooltip-mr-1">{key.publicKey}</span>
                           <Widget<CopyProps>
                             key="copy"
-                            loading={
-                              <span className="block w-4 h-4 truncate" />
-                            }
+                            loading={<span className="loading" />}
                             props={{
-                              buttonClassName: 'h-4 align-text-bottom',
-                              className: 'w-4',
+                              buttonClassName: 'copy-button',
+                              className: 'copy-class',
                               text: key.publicKey,
                             }}
                             src={`${config_account}/widget/lite.Atoms.Copy`}
@@ -198,13 +477,26 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
                     }}
                     src={`${config_account}/widget/lite.Atoms.Tooltip`}
                   />
-                </td>
-                <td className="text-xs px-4 py-4">
-                  <span className="bg-bg-function text-black px-2 py-1 rounded">
-                    {key.access}
-                  </span>
-                </td>
-                <td className="font-medium text-sm px-4 py-4">
+                </Td>
+                <Td
+                  fsize="0.75rem"
+                  lheight="1rem"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
+                  <span className="access-span">{key.access}</span>
+                </Td>
+                <Td
+                  fsize="0.875rem"
+                  fweight="500"
+                  lheight="1.25rem"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
                   {key.contract && (
                     <Widget<TooltipProps>
                       key="tooltip"
@@ -220,18 +512,23 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
                       src={`${config_account}/widget/lite.Atoms.Tooltip`}
                     />
                   )}
-                </td>
-                <td className="text-sm px-4 py-4">
+                </Td>
+                <Td
+                  fsize="0.875rem"
+                  lheight="1.25rem"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1rem"
+                  ptop="1rem"
+                >
                   <Widget<TooltipProps>
                     key="tooltip"
                     loading={
-                      <span className="block w-[200px] truncate">
-                        {key.methods}
-                      </span>
+                      <span className="method-span-loader">{key.methods}</span>
                     }
                     props={{
                       children: (
-                        <span className="block w-[200px] truncate">
+                        <span className="method-span-loader">
                           {key.methods}
                         </span>
                       ),
@@ -239,57 +536,96 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
                     }}
                     src={`${config_account}/widget/lite.Atoms.Tooltip`}
                   />
-                </td>
-                <td className="text-sm pl-4 pr-6 py-4">
+                </Td>
+                <Td
+                  fsize="0.875rem"
+                  lheight="1.25rem"
+                  pbottom="1rem"
+                  pleft="1rem"
+                  pright="1.5rem"
+                  ptop="1rem"
+                >
                   {key.allowance
                     ? `${formatNumber(yoctoToNear(key.allowance), 4)} Ⓝ`
                     : ''}
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))
           ) : error ? (
             <tr>
-              <td
-                className="font-medium text-sm text-text-label px-6 py-4"
+              <Td
+                color="rgb(var(--color-text-label))"
                 colSpan={5}
+                fsize="0.875rem"
+                fweight="500"
+                lheight="1.25rem"
+                pbottom="1rem"
+                pleft="1.5rem"
+                pright="1.5rem"
+                ptop="1rem"
               >
                 Error fetching access keys
-              </td>
+              </Td>
             </tr>
           ) : (
             <tr>
-              <td
-                className="font-medium text-sm text-text-label px-6 py-4"
+              <Td
+                color="rgb(var(--color-text-label))"
                 colSpan={5}
+                fsize="0.875rem"
+                fweight="500"
+                lheight="1.25rem"
+                pbottom="1rem"
+                pleft="1.5rem"
+                pright="1.5rem"
+                ptop="1rem"
               >
                 No access keys
-              </td>
+              </Td>
             </tr>
           )}
         </tbody>
-      </table>
-      <div className="px-6">
-        <div className="flex items-center justify-between border-t border-t-border-body">
-          <button
-            className="font-normal text-xs text-text-label uppercase px-2 py-1 rounded mr-4 my-4 border border-border-body hover:text-primary hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:text-text-label disabled:border-border-body"
+      </Table>
+      <Pagination>
+        <div className="container">
+          <PrevButton
+            color="rgb(var(--color-text-label))"
             disabled={page <= 1}
+            fsize="0.75rem"
+            fweight="400"
+            lheight="1rem"
+            mbottom="1rem"
+            mright="1rem"
+            mtop="1rem"
             onClick={onPrev}
+            pbottom="0.25rem"
+            pleft="0.5rem"
+            pright="0.5rem"
+            ptop="0.25rem"
           >
             Prev
-          </button>
-          <div className="font-normal text-xs text-text-label uppercase px-2 py-1 mx-4 my-4">
-            Page {page}
-          </div>
-          <button
-            className="font-normal text-xs text-text-label uppercase px-2 py-1 rounded ml-4 my-4 border border-border-body hover:text-primary hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:text-text-label disabled:border-border-body"
+          </PrevButton>
+          <div className="page">Page {page}</div>
+          <NextButton
+            color="rgb(var(--color-text-label))"
             disabled={page >= pages}
+            fsize="0.75rem"
+            fweight="400"
+            lheight="1rem"
+            mbottom="1rem"
+            mleft="1rem"
+            mtop="1rem"
             onClick={onNext}
+            pbottom="0.25rem"
+            pleft="0.5rem"
+            pright="0.5rem"
+            ptop="0.25rem"
           >
             Next
-          </button>
+          </NextButton>
         </div>
-      </div>
-    </div>
+      </Pagination>
+    </Container>
   );
 };
 

@@ -18,13 +18,15 @@ const SponserdText: React.FC<any> = () => {
   useEffect(() => {
     const fetchHtmlContent = async () => {
       try {
-        const response = await fetch(
-          `${userApiUrl}approved-campaigns/text-ads`,
-        );
+        if (userApiUrl) {
+          const response = await fetch(
+            `${userApiUrl}approved-campaigns/text-ads`,
+          );
 
-        if (response?.ok) {
-          const html = await response.text();
-          setHtmlContent(html);
+          if (response?.ok) {
+            const html = await response.text();
+            setHtmlContent(html);
+          }
         }
       } catch (error) {
         console.error('Error fetching HTML content:', error);
@@ -37,7 +39,10 @@ const SponserdText: React.FC<any> = () => {
     return (
       <div>
         {htmlContent && (
-          <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+          <div
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+            suppressHydrationWarning={true}
+          />
         )}
       </div>
     );
@@ -46,7 +51,10 @@ const SponserdText: React.FC<any> = () => {
       <div>
         {htmlContent && (
           <div className="relative">
-            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+              suppressHydrationWarning={true}
+            />
           </div>
         )}
       </div>

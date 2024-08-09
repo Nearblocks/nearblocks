@@ -26,6 +26,41 @@ let TxnExecutionSkeleton = window?.TxnExecutionSkeleton || (() => <></>);
 
 let tabs = [0];
 
+const Container = styled.div`
+  background-color: rgb(var(--color-bg-box));
+  @media (min-width: 1024px) {
+    border-radius: 0.75rem;
+  }
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
+    0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  margin-top: 2rem;
+`;
+const TabContainer = styled.div`
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+`;
+
+const Button = styled.button<{ isActive: boolean }>`
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-right: 1rem;
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  ${(props: any) =>
+    props.isActive
+      ? `font-weight: 500; border-bottom-width: 3px;  border-color: rgb(var(--color-text-body));`
+      : `color: rgb(var(--color-text-label));`};
+`;
+
 const Tabs = ({ hash, rpcUrl }: TabsProps) => {
   let { rpcFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
@@ -100,22 +135,18 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
   }, [hash, active, data, rpcUrl]);
 
   return (
-    <div className="bg-bg-box lg:rounded-xl shadow px-6 mt-8">
-      <div className="pt-4 pb-6">
+    <Container>
+      <TabContainer>
         {tabs.map((tab) => (
-          <button
-            className={`py-1 mr-4 ${
-              active === tab
-                ? 'font-medium border-b-[3px] border-text-body'
-                : 'text-text-label'
-            }`}
+          <Button
+            isActive={active === tab}
             key={tab}
             onClick={() => setActive(tab)}
           >
             {tab === 0 && 'Execution Plan'}
-          </button>
+          </Button>
         ))}
-      </div>
+      </TabContainer>
       <div className="lg:px-4 pb-6">
         {error[active] ? (
           <Widget<ErrorProps>
@@ -139,7 +170,7 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
           </>
         )}
       </div>
-    </div>
+    </Container>
   );
 };
 

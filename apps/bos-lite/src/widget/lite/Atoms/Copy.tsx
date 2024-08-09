@@ -6,6 +6,13 @@ export type CopyProps = {
   text: string;
 };
 
+const Button = styled.button`
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+`;
+
 const Copy = ({ buttonClassName, className, text }: CopyProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -16,7 +23,7 @@ const Copy = ({ buttonClassName, className, text }: CopyProps) => {
   };
 
   return (
-    <button className={buttonClassName} onClick={onCopy}>
+    <Button className={buttonClassName} onClick={onCopy}>
       {copied ? (
         <Widget<IconProps>
           key="check-icon"
@@ -30,7 +37,7 @@ const Copy = ({ buttonClassName, className, text }: CopyProps) => {
           src={`${config_account}/widget/lite.Icons.Copy`}
         />
       )}
-    </button>
+    </Button>
   );
 };
 

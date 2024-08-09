@@ -23,6 +23,117 @@ const prettify = (args: string) => {
     return args;
   }
 };
+const ActionContainer = styled.div`
+  &:not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.5rem calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.5rem var(--tw-space-y-reverse));
+  }
+`;
+const Section = styled.div`
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+`;
+const ActionOutput = styled.div`
+  padding-top: 1.5rem;
+  .resultClass {
+    margin-bottom: 1.5rem;
+  }
+`;
+const OutputHeading = styled.h3`
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 0.25rem;
+`;
+
+const OutputButton = styled.button<{ isActive?: boolean }>`
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  ${(props: any) =>
+    props.isActive
+      ? `font-weight: 500; border-bottom-width: 3px; border-color: rgb(var(--color-text-body)); -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;`
+      : `color: rgb(var(--color-text-label)); background-color: transparent;
+  background-image: none; border:none;`};
+`;
+
+const InspectButton = styled.button<{ isActive?: boolean }>`
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-left: 1rem;
+  ${(props: any) =>
+    props.isActive
+      ? `font-weight: 500; border-bottom-width: 3px; border-color: rgb(var(--color-text-body)); -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;`
+      : `color: rgb(var(--color-text-label)); background-color: transparent;
+  background-image: none; border:none;`};
+`;
+
+const InspectContainer = styled.div`
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  padding-top: 1.5rem;
+  padding-bottom: 0.75rem;
+`;
+
+const InspectDataContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const InspectDataHeading = styled.h3`
+  width: 8rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+`;
+const InspectData = styled.p`
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  position: relative;
+  .copyButton {
+    width: 1rem;
+    margin-left: 0.25rem;
+  }
+  .copyIcon {
+    display: none;
+    color: rgb(var(--color-primary));
+    width: 0.875rem;
+  }
+
+  &:hover .copyIcon {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .tooltip-link {
+    font-weight: 500;
+    color: inherit;
+    text-decoration: inherit;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+`;
+
+const StyledParagraph = styled.p`
+  margin-bottom: 0.5rem;
+`;
 
 const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
   let { yoctoToNear, yoctoToTgas } = VM.require<ConvertorModule>(
@@ -75,7 +186,7 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
 
   return (
     <>
-      <div className="space-y-2">
+      <ActionContainer>
         {actions.map((action, index) => (
           <Widget<ActionProps>
             key={`action-${index}`}
@@ -84,44 +195,36 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
             src={`${config_account}/widget/lite.Txn.Action`}
           />
         ))}
-      </div>
+      </ActionContainer>
       {open && (
-        <div className="px-4 pt-6">
+        <Section>
           <div>
-            <button
-              className={` text-sm py-1 mr-4 ${
-                active === 'output'
-                  ? 'font-medium border-b-[3px] border-text-body'
-                  : 'text-text-label'
-              }`}
+            <OutputButton
+              isActive={active === 'output'}
               onClick={() => setActive('output')}
             >
               Output
-            </button>
-            <button
-              className={` text-sm py-1 mr-4 ${
-                active === 'inspect'
-                  ? 'font-medium border-b-[3px] border-text-body'
-                  : 'text-text-label'
-              }`}
+            </OutputButton>
+            <InspectButton
+              isActive={active === 'inspect'}
               onClick={() => setActive('inspect')}
             >
               Inspect
-            </button>
+            </InspectButton>
           </div>
           {active === 'output' && (
-            <div className="pt-6">
-              <h3 className="text-sm mb-1">Logs</h3>
-              <JsonView className="mb-6">{result.logs}</JsonView>
-              <h3 className="text-sm mb-1">Result</h3>
-              <JsonView className="mb-6">{result.status}</JsonView>
-            </div>
+            <ActionOutput>
+              <OutputHeading>Logs</OutputHeading>
+              <JsonView className="resultClass">{result.logs}</JsonView>
+              <OutputHeading>Result</OutputHeading>
+              <JsonView className="resultClass">{result.status}</JsonView>
+            </ActionOutput>
           )}
           {active === 'inspect' && (
-            <div className="text-sm pt-6 pb-3">
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Receipt</h3>
-                <p className="flex items-center group mb-2">
+            <InspectContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Receipt</InspectDataHeading>
+                <InspectData>
                   <Widget<TooltipProps>
                     key="tooltip"
                     props={{
@@ -133,23 +236,23 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
                   <Widget<CopyProps>
                     key="copy"
                     props={{
-                      buttonClassName: 'w-4 ml-1',
-                      className: 'hidden text-primary w-3.5 group-hover:block',
+                      buttonClassName: 'copyButton',
+                      className: 'copyIcon',
                       text: receipt.id,
                     }}
                     src={`${config_account}/widget/lite.Atoms.Copy`}
                   />
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Block</h3>
-                <p className="flex items-center group mb-2">
+                </InspectData>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Block</InspectDataHeading>
+                <InspectData>
                   <Widget<TooltipProps>
                     key="tooltip"
                     props={{
                       children: (
                         <Link
-                          className="font-medium"
+                          className="tooltip-link"
                           href={`/blocks/${receipt.outcome.block.hash}`}
                         >
                           {shortenString(receipt.outcome.block.hash)}
@@ -162,23 +265,23 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
                   <Widget<CopyProps>
                     key="copy"
                     props={{
-                      buttonClassName: 'w-4 ml-1',
-                      className: 'hidden text-primary w-3.5 group-hover:block',
+                      buttonClassName: 'copyButton',
+                      className: 'copyIcon',
                       text: receipt.outcome.block.hash,
                     }}
                     src={`${config_account}/widget/lite.Atoms.Copy`}
                   />
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">From</h3>
-                <p className="flex items-center group mb-2">
+                </InspectData>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>From</InspectDataHeading>
+                <InspectData>
                   <Widget<TooltipProps>
                     key="tooltip"
                     props={{
                       children: (
                         <Link
-                          className="font-medium"
+                          className="tooltip-link"
                           href={`/address/${receipt.predecessorId}`}
                         >
                           {shortenString(receipt.predecessorId, 10, 10, 22)}
@@ -191,23 +294,23 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
                   <Widget<CopyProps>
                     key="copy"
                     props={{
-                      buttonClassName: 'w-4 ml-1',
-                      className: 'hidden text-primary w-3.5 group-hover:block',
+                      buttonClassName: 'copyButton',
+                      className: 'copyIcon',
                       text: receipt.predecessorId,
                     }}
                     src={`${config_account}/widget/lite.Atoms.Copy`}
                   />
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">To</h3>
-                <p className="flex items-center group mb-2">
+                </InspectData>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>To</InspectDataHeading>
+                <InspectData>
                   <Widget<TooltipProps>
                     key="tooltip"
                     props={{
                       children: (
                         <Link
-                          className="font-medium"
+                          className="tooltip-link"
                           href={`/address/${receipt.receiverId}`}
                         >
                           {shortenString(receipt.receiverId, 10, 10, 22)}
@@ -220,49 +323,49 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
                   <Widget<CopyProps>
                     key="copy"
                     props={{
-                      buttonClassName: 'w-4 ml-1',
-                      className: 'hidden text-primary w-3.5 group-hover:block',
+                      buttonClassName: 'copyButton',
+                      className: 'copyIcon',
                       text: receipt.receiverId,
                     }}
                     src={`${config_account}/widget/lite.Atoms.Copy`}
                   />
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Gas Limit</h3>
-                <p className="mb-2">
+                </InspectData>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Gas Limit</InspectDataHeading>
+                <StyledParagraph>
                   {formatNumber(yoctoToTgas(gasLimit(receipt.actions)), 2)}
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Gas Burned</h3>
-                <p className="mb-2">
+                </StyledParagraph>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Gas Burned</InspectDataHeading>
+                <StyledParagraph>
                   {formatNumber(
                     yoctoToTgas(String(receipt.outcome.gasBurnt)),
                     2,
                   )}{' '}
                   TGas
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Tokens Burned</h3>
-                <p className="mb-2">
+                </StyledParagraph>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Tokens Burned</InspectDataHeading>
+                <StyledParagraph>
                   {formatNumber(yoctoToNear(receipt.outcome.tokensBurnt), 6)} Ⓝ
-                </p>
-              </div>
-              <div className="flex items-center">
-                <h3 className="w-32 mb-2">Refunded</h3>
-                <p className="mb-2">
+                </StyledParagraph>
+              </InspectDataContainer>
+              <InspectDataContainer>
+                <InspectDataHeading>Refunded</InspectDataHeading>
+                <StyledParagraph>
                   {formatNumber(
                     yoctoToNear(refund(receipt.outcome.nestedReceipts)),
                     6,
                   )}{' '}
                   Ⓝ
-                </p>
-              </div>
-            </div>
+                </StyledParagraph>
+              </InspectDataContainer>
+            </InspectContainer>
           )}
-        </div>
+        </Section>
       )}
     </>
   );

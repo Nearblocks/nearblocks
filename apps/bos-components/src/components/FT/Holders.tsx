@@ -246,7 +246,7 @@ export default function ({ network, id, token, ownerId }: Props) {
           : null;
         return (
           <>
-            {percentage === null ? 'N/A' : `${percentage}%`}
+            {percentage === null ? 'N/A' : `${percentage}%tyhry`}
             {percentage !== null && percentage <= 100 && percentage >= 0 && (
               <div className="h-0.5 mt-1 w-full bg-gray-100">
                 <div

@@ -31,3 +31,27 @@ export const docsUrl: string =
   networkId === 'mainnet'
     ? 'https://api3.nearblocks.io/api-docs'
     : 'https://api3-testnet.nearblocks.io/api-docs';
+
+export const userDashboardURL: string =
+  env('NEXT_PUBLIC_USER_DASHBOARD_URL') + 'login';
+
+export function getConfig(network: string) {
+  switch (network) {
+    case 'mainnet':
+      return {
+        nodeUrl: 'https://rpc.mainnet.near.org',
+        backendUrl: 'https://api.nearblocks.io/v1/',
+        rpcUrl: 'https://beta.rpc.mainnet.near.org',
+        appUrl: 'https://nearblocks.io/',
+      };
+    case 'testnet':
+      return {
+        nodeUrl: 'https://rpc.testnet.near.org',
+        backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
+        rpcUrl: 'https://beta.rpc.testnet.near.org/',
+        appUrl: 'https://testnet.nearblocks.io/',
+      };
+    default:
+      return {};
+  }
+}

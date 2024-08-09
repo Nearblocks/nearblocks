@@ -15,21 +15,25 @@ import Link from 'next/link';
 import { Tooltip } from '@reach/tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
-import { useFetch } from '@/hooks/useFetch';
 import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import Table from '../common/Table';
+import TimeStamp from '../common/TimeStamp';
 
-const List = () => {
+const List = ({
+  data,
+  totalCount,
+  isLoading,
+  countLoading,
+  apiUrl,
+  setUrl,
+  error,
+}: any) => {
   const { t } = useTranslation();
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
   const [address, setAddress] = useState('');
-  const apiUrl = `blocks?`;
-  const [url, setUrl] = useState(apiUrl);
-  const { data, error, loading: isLoading } = useFetch(`${url}`);
-  const { data: totalCount, loading: countLoading } = useFetch('blocks/count');
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -101,28 +105,7 @@ const List = () => {
       key: 'block_timestamp',
       cell: (row: BlocksInfo) => (
         <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
         </span>
       ),
       tdClassName:

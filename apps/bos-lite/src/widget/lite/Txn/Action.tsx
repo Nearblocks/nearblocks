@@ -14,39 +14,39 @@ let JsonView = window?.JsonView || (({ children }) => <pre>{children}</pre>);
 
 const kind = {
   addKey: {
-    bg: 'bg-bg-key-add',
+    bg: 'bg-addKey',
     text: 'Access Key Created',
   },
   createAccount: {
-    bg: 'bg-bg-account-add',
+    bg: 'bg-createAccount',
     text: 'Account Created',
   },
   delegateAction: {
-    bg: 'bg-bg-function',
+    bg: 'bg-functionCall',
     text: 'Delegate Action',
   },
   deleteAccount: {
-    bg: 'bg-bg-account-delete',
+    bg: 'bg-deleteAccount',
     text: 'Account Deleted',
   },
   deleteKey: {
-    bg: 'bg-bg-key-delete',
+    bg: 'bg-deleteKey',
     text: 'Access Key Deleted',
   },
   deployContract: {
-    bg: 'bg-bg-contract',
+    bg: 'bg-deployContract',
     text: 'Contract Deployed',
   },
   functionCall: {
-    bg: 'bg-bg-function',
+    bg: 'bg-functionCall',
     text: '',
   },
   stake: {
-    bg: 'bg-bg-stake',
+    bg: 'bg-stake',
     text: 'Restake',
   },
   transfer: {
-    bg: 'bg-bg-transfer',
+    bg: 'bg-transfer',
     text: 'Transfer',
   },
 };
@@ -58,6 +58,66 @@ const prettify = (args: string) => {
     return args;
   }
 };
+const Container = styled.div`
+  .bg-addKey {
+    background-color: rgb(var(--color-bg-key-add));
+  }
+  .bg-createAccount {
+    background-color: rgb(var(--color-bg-account-add));
+  }
+  .bg-functionCall {
+    background-color: rgb(var(--color-bg-function));
+  }
+  .bg-deleteAccount {
+    background-color: rgb(var(--color-bg-account-delete));
+  }
+  .bg-deleteKey {
+    background-color: rgb(var(--color-bg-key-delete));
+  }
+  .bg-deployContract {
+    background-color: rgb(var(--color-bg-contract));
+  }
+  .bg-stake {
+    background-color: rgb(var(--color-bg-stake));
+  }
+  .bg-transfer {
+    background-color: rgb(var(--color-bg-transfer));
+  }
+`;
+const Button = styled.button`
+  height: 1.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+  border-radius: 0.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+`;
+const Toggler = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.75rem;
+`;
+
+const Deposit = styled.span`
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1rem;
+`;
+
+const Args = styled.div`
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+`;
 
 const Action = ({ action, open, setOpen }: ActionProps) => {
   let { yoctoToNear } = VM.require<ConvertorModule>(
@@ -87,11 +147,9 @@ const Action = ({ action, open, setOpen }: ActionProps) => {
   }, [action]);
 
   return (
-    <div>
-      <button
-        className={`h-7 text-sm text-black rounded py-1 px-3 ${
-          kind[action.kind].bg
-        }`}
+    <Container>
+      <Button
+        className={`${kind[action.kind].bg}`}
         onClick={() => setOpen((o) => !o)}
       >
         {method.length > 22 ? (
@@ -106,21 +164,19 @@ const Action = ({ action, open, setOpen }: ActionProps) => {
         ) : (
           method
         )}
-        <span className="inline-flex items-center justify-center w-3">
-          {open ? '-' : '+'}
-        </span>
-      </button>
-      <span className="font-semibold text-xs">
+        <Toggler>{open ? '-' : '+'}</Toggler>
+      </Button>
+      <Deposit>
         {action.kind === 'transfer'
           ? `${formatNumber(yoctoToNear(action.args.deposit), 6)} Ⓝ`
           : null}
-      </span>
+      </Deposit>
       {open && args && (
-        <div className="px-4 py-6">
+        <Args>
           <JsonView>{args}</JsonView>
-        </div>
+        </Args>
       )}
-    </div>
+    </Container>
   );
 };
 

@@ -5,7 +5,9 @@ import ArrowDown from '@/includes/icons/ArrowDown';
 
 export default function () {
   const networkAccountId =
-    context.networkId === 'mainnet' ? 'nearblocks.near' : 'nearblocks.testnet';
+    context.networkId === 'mainnet'
+      ? 'nearblocksonbos.near'
+      : 'nearblocks.testnet';
 
   const { getConfig } = VM.require(
     `${networkAccountId}/widget/includes.Utils.libs`,

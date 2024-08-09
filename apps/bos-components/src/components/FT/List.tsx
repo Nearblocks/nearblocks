@@ -339,7 +339,6 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
     {
       header: (
         <span>
-          {' '}
           <button
             type="button"
             onClick={() => onOrder('onchain_market_cap')}
@@ -433,7 +432,10 @@ export default function ({ t, network, currentPage, setPage, ownerId }: Props) {
               }`}
           </p>
         )}
-        <div className={`flex w-full h-10 sm:w-80 mr-2`}>
+        <div
+          className={`flex w-full h-10 sm:w-80 mr-2`}
+          suppressHydrationWarning={true}
+        >
           <div className="flex-grow">
             <label htmlFor="token-search" id="token-search">
               <input

@@ -263,21 +263,15 @@ export default function (props: Props) {
 
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-            <OverlayTrigger
-              placement="bottom-start"
-              delay={{ show: 500, hide: 0 }}
-              overlay={
-                <Tooltip className="fixed h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2">
-                  {t
-                    ? t('txns:txn.hash.tooltip')
-                    : 'Unique identifier (hash) of this transaction.'}
-                </Tooltip>
-              }
+            <Tooltip
+              label={t('txn.hash.tooltip')}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 bottom-full left-1/2 transform -translate-x-1/2 mb-2"
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            </OverlayTrigger>
+            </Tooltip>
+            {t('txn.hash.text.0')}
             {t ? t('txns:txn.hash.text.0') : 'Txn Hash'}
           </div>
           {loading ? (

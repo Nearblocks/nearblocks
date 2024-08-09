@@ -146,7 +146,11 @@ const Token = () => {
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/token/${id}}`} />
       </Head>
-      <div style={height} className="relative container mx-auto px-3">
+      <div
+        style={height}
+        className="relative container mx-auto px-3"
+        suppressHydrationWarning={true}
+      >
         <VmComponent
           skeleton={
             <Overview

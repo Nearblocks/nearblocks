@@ -23,6 +23,132 @@ let AddressSkeleton = window?.AddressSkeleton || (() => <></>);
 let AddressKeysSkeleton = window?.AddressKeysSkeleton || (() => <></>);
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
 
+const Container = styled.div`
+  position: relative;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  @media (min-width: 1024px) {
+    max-width: 1024px;
+  }
+  @media (min-width: 1280px) {
+    max-width: 1072px;
+  }
+  .addressSkeleton {
+    display: block;
+    height: 48px;
+    @media (min-width: 1024px) {
+      height: 54px;
+    }
+    width: 100%;
+  }
+`;
+const AddressContainer = styled.div`
+  padding-top: 1.75rem;
+  padding-bottom: 26px;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+`;
+
+const AddressHeading = styled.h1`
+  display: flex;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 32px;
+  letter-spacing: 0.1px;
+  margin-right: 1rem;
+  @media (min-width: 1024px) {
+    font-size: 36px;
+  }
+  .headingSpan {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .copyButton {
+    margin-left: 0.75rem;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+  }
+  .copyClass {
+    color: rgb(var(--color-primary));
+    width: 1.5rem;
+  }
+`;
+
+const StatsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  .statsSkeleton {
+    display: block;
+    height: 39px;
+    width: 8rem;
+  }
+  .statsSkeletonType {
+    display: block;
+    height: 39px;
+    width: 7rem /* 112px */;
+  }
+`;
+const StatsDataContainer = styled.div`
+  width: 100%;
+  @media (min-width: 640px) {
+    width: 50%;
+  }
+  @media (min-width: 1024px) {
+    width: 33.333333%;
+  }
+  padding-left: 1.25rem;
+  margin-bottom: 1.5rem;
+  height: 60px;
+`;
+
+const StatsDataHeading = styled.h2`
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 0.125rem;
+`;
+const SatsData = styled.p<{ fsize?: string }>`
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: ${(props: any) => (props.fsize ? props.fsize : '')};
+`;
+
+const AccesskeyContainer = styled.div`
+  background-color: rgb(var(--color-bg-box));
+  @media (min-width: 1024px) {
+    border-radius: 0.75rem;
+  }
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
+    0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  margin-top: 2rem;
+`;
+const AccesskeyHeading = styled.div`
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+`;
+const Button = styled.button`
+  font-weight: 500;
+  border-bottom-width: 3px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-right: 1rem;
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+`;
+
 const Address = ({ id, rpcUrl }: AddressProps) => {
   let { apiFetch, rpcFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
@@ -95,89 +221,84 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
   }
 
   return (
-    <div className="relative container mx-auto">
-      <div className="pt-7 pb-[26px] px-5">
-        <Skeleton
-          className="block h-[48px] lg:h-[54px] w-full"
-          loading={loading.address}
-        >
-          <h1 className="flex items-center font-heading font-medium text-[32px] lg:text-[36px] tracking-[0.1px] mr-4">
-            <span className="truncate">{id}</span>
+    <Container>
+      <AddressContainer>
+        <Skeleton className="addressSkeleton" loading={loading.address}>
+          <AddressHeading>
+            <span className="headingSpan">{id}</span>
             <Widget<CopyProps>
               key="copy"
               props={{
-                buttonClassName: 'ml-3',
-                className: 'text-primary w-6',
+                buttonClassName: 'copyButton',
+                className: 'copyClass',
                 text: id,
               }}
               src={`${config_account}/widget/lite.Atoms.Copy`}
             />
-          </h1>
+          </AddressHeading>
         </Skeleton>
-      </div>
-      <div className="flex flex-wrap">
-        <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Balance</h2>
-          <Skeleton className="block h-[39px] w-32" loading={loading.address}>
-            <p className="font-heading font-medium text-[26px]">
+      </AddressContainer>
+      <StatsContainer>
+        <StatsDataContainer>
+          <StatsDataHeading>Balance</StatsDataHeading>
+          <Skeleton className="statsSkeleton" loading={loading.address}>
+            <SatsData fsize="26px">
               {formatNumber(yoctoToNear(address?.amount ?? '0'), 2)} Ⓝ
-            </p>
+            </SatsData>
           </Skeleton>
-        </div>
+        </StatsDataContainer>
         {context.networkId === 'mainnet' && (
-          <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-            <h2 className="font-medium text-sm mb-0.5">Value</h2>
+          <StatsDataContainer>
+            <StatsDataHeading>Value</StatsDataHeading>
             <Skeleton
-              className="block h-[39px] w-32"
+              className="statsSkeleton"
               loading={loading.address || loading.stats}
             >
-              <p className="font-heading font-medium text-[26px]">${value}</p>
+              <SatsData fsize="26px">${value}</SatsData>
             </Skeleton>
-          </div>
+          </StatsDataContainer>
         )}
-        <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Validator Stake</h2>
-          <Skeleton className="block h-[39px] w-32" loading={loading.address}>
-            <p className="font-heading font-medium text-[26px]">
+        <StatsDataContainer>
+          <StatsDataHeading>Validator Stake</StatsDataHeading>
+          <Skeleton className="statsSkeleton" loading={loading.address}>
+            <SatsData fsize="26px">
               {formatNumber(yoctoToNear(address?.locked ?? '0'), 2)} Ⓝ
-            </p>
+            </SatsData>
           </Skeleton>
-        </div>
-        <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Storage Used</h2>
-          <Skeleton className="block h-[39px] w-32" loading={loading.address}>
-            <p className="font-heading font-medium text-[26px]">
+        </StatsDataContainer>
+        <StatsDataContainer>
+          <StatsDataHeading>Storage Used</StatsDataHeading>
+          <Skeleton className="statsSkeleton" loading={loading.address}>
+            <SatsData fsize="26px">
               {formatSize(String(address?.storage_usage ?? 0), 2)}
-            </p>
+            </SatsData>
           </Skeleton>
-        </div>
+        </StatsDataContainer>
         {context.networkId === 'mainnet' && (
-          <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-            <h2 className="font-medium text-sm mb-0.5">Type</h2>
-            <Skeleton className="block h-[39px] w-28" loading={loading.address}>
-              <p className="font-heading font-medium text-[24px]">
+          <StatsDataContainer>
+            <StatsDataHeading>Type</StatsDataHeading>
+            <Skeleton className="statsSkeletonType" loading={loading.address}>
+              <SatsData fsize="24px">
                 {address?.code_hash === ACCOUNT_CODE_HASH
                   ? 'Account'
                   : 'Contract'}
-              </p>
+              </SatsData>
             </Skeleton>
-          </div>
+          </StatsDataContainer>
         )}
-      </div>
-      <div className="bg-bg-box lg:rounded-xl shadow mt-8">
-        <div className="pt-4 pb-6 mx-6">
-          <button className="font-medium border-b-[3px] border-text-body py-1 mr-4">
-            Access Keys
-          </button>
-        </div>
+      </StatsContainer>
+      <AccesskeyContainer>
+        <AccesskeyHeading>
+          <Button>Access Keys</Button>
+        </AccesskeyHeading>
         <Widget<KeysProps>
           key="keys"
           loading={<AddressKeysSkeleton />}
           props={{ id, rpcUrl }}
           src={`${config_account}/widget/lite.Address.Keys`}
         />
-      </div>
-    </div>
+      </AccesskeyContainer>
+    </Container>
   );
 };
 

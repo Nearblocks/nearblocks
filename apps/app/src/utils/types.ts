@@ -492,8 +492,6 @@ export type AccountContractInfo = {
 
 export type EventPropsInfo = {
   event: TransactionLog;
-  network: string;
-  ownerId: string;
 };
 
 export type DepositPropsInfo = {
@@ -502,8 +500,6 @@ export type DepositPropsInfo = {
     account_id: string;
     amount: string;
   }[];
-  network: string;
-  ownerId: string;
 };
 
 export type ActionPropsInfo = {
@@ -515,7 +511,6 @@ export type ActionPropsInfo = {
       [key: string]: string;
     };
   };
-  ownerId: string;
 };
 export type ArgsPropsInfo = {
   access_key: {
@@ -554,8 +549,6 @@ export type ArgsPropsInfo = {
 export type TransactionActionInfo = {
   args: ArgsPropsInfo;
   receiver: string;
-  t: (key: string) => string | undefined;
-  ownerId: string;
   action?: any;
 };
 
@@ -722,16 +715,12 @@ export type TransActionProps = {
     args: ArgsPropsInfo;
   };
   receiver: any;
-  t: (key: string) => string | undefined;
-  ownerId: string;
 };
 
 export type TokenInfoProps = {
   contract: string;
   amount: string;
-  decimals: string;
-  ownerId: string;
-  network: string;
+  decimals?: any;
 };
 
 export type ValidatorFullData = {
@@ -1483,9 +1472,6 @@ export type ParseOutcomeInfo = {
 };
 
 export type TransactionReceiptInfo = {
-  ownerId: string;
-  network: string;
-  t: (key: string) => string | undefined;
   receipt: any;
   fellowOutgoingReceipts: any;
   expandAll: any;
@@ -1494,9 +1480,6 @@ export type TransactionReceiptInfo = {
 };
 
 export type ReceiptKindInfo = {
-  ownerId: string;
-  network: string;
-  t: (key: string) => string | undefined;
   action: any;
   onClick?: any;
   isTxTypeActive: boolean;
