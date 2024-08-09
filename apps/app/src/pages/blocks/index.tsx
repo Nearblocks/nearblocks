@@ -1,17 +1,67 @@
+import { ReactElement } from 'react';
 import Head from 'next/head';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement } from 'react';
-import { appUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
-import { env } from 'next-runtime-env';
 import List from '@/components/Blocks/List';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import { env } from 'next-runtime-env';
+import { appUrl } from '@/utils/config';
+import fetcher from '@/utils/fetcher';
+import queryString from 'qs';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
-const Blocks = () => {
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  dataCount: any;
+  error: boolean;
+}> = async (context) => {
+  const { query } = context;
+  const apiUrl = 'blocks';
+  const fetchUrl = query
+    ? `blocks?${queryString.stringify(query)}`
+    : `${apiUrl}`;
+
+  try {
+    const [dataResult, dataCountResult] = await Promise.allSettled([
+      fetcher(fetchUrl),
+      fetcher('blocks/count'),
+    ]);
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const dataCount =
+      dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
+    const error = dataResult.status === 'rejected';
+
+    return {
+      props: {
+        data,
+        dataCount,
+        error,
+        apiUrl,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching blocks:', error);
+    return {
+      props: {
+        data: null,
+        dataCount: null,
+        error: true,
+        apiUrl: '',
+      },
+    };
+  }
+};
+
+const Blocks = ({
+  data,
+  dataCount,
+  error,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURIComponent(
     t('blocks:heading'),
   )}&brand=near`;
 
@@ -44,9 +94,9 @@ const Blocks = () => {
         </div>
       </div>
       <div className="container mx-auto px-3 -mt-48">
-        <div className=" relative block lg:flex lg:space-x-2">
-          <div className="w-full ">
-            <List />
+        <div className="relative block lg:flex lg:space-x-2">
+          <div className="w-full">
+            <List data={data} totalCount={dataCount} error={error} />
           </div>
         </div>
       </div>

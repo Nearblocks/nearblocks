@@ -6,11 +6,8 @@ import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 import {
   localFormat,
-  nanoToMilli,
   truncateString,
   yoctoToNear,
-  formatTimestampToString,
-  getTimeAgoString,
   isAction,
 } from '@/utils/libs';
 import SortIcon from '../Icons/SortIcon';
@@ -20,13 +17,22 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import Table from '../common/Table';
 import { Tooltip } from '@reach/tooltip';
-import { useFetch } from '@/hooks/useFetch';
-import useQSFilters from '@/hooks/useQSFilters';
-import useSorting from '@/hooks/useSorting';
 import useTranslation from 'next-translate/useTranslation';
 import Filters from '../common/Filters';
 import Filter from '../Icons/Filter';
-import Skeleton from '../skeleton/common/Skeleton';
+import { useRouter } from 'next/router';
+import TimeStamp from '../common/TimeStamp';
+
+interface ListProps {
+  txnsData: {
+    txns: TransactionInfo[];
+    cursor: string;
+  };
+  txnsCount: {
+    txns: { count: string }[];
+  };
+  error: boolean;
+}
 
 const initialForm = {
   action: '',
@@ -35,109 +41,124 @@ const initialForm = {
   to: '',
 };
 
-const List = () => {
+const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const { t } = useTranslation();
+  const router = useRouter();
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
-
-  const { qs, filters, setFilters } = useQSFilters();
-  const { sqs, sorting, setSorting, resetSorting } = useSorting();
-  const apiUrl = `txns?`;
-  const [url, setUrl] = useState(apiUrl);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
-  const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
-    if (name === 'type') {
-      if (isAction(value)) {
-        return setForm((state) => ({
-          ...state,
-          action: value,
-          method: '',
-        }));
-      }
-
-      return setForm((state) => ({
-        ...state,
-        method: value,
-        action: '',
-      }));
-    }
-
-    return setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const { data: txnsCount } = useFetch(`txns/count?${qs}`);
-  const { data: txnsData, loading, error } = useFetch(`${url}${qs}&${sqs}`);
-
-  const count: number = txnsCount?.txns[0]?.count;
+  const count = txnsCount?.txns[0]?.count;
   const txns = txnsData?.txns;
   let cursor = txnsData?.cursor;
 
-  const toggleShowAge = () => setShowAge((s) => !s);
-
-  const onFilter = (e: any) => {
-    e.preventDefault();
-    resetSorting();
-    setFilters((state) => ({ ...state, ...form }));
-    setPage(1);
-    setUrl(apiUrl);
-  };
-
-  const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const name = e.currentTarget.name;
-    resetSorting();
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     if (name === 'type') {
-      setForm((f) => ({ ...f, action: '', method: '' }));
-      setFilters((state) => ({
-        ...state,
-        action: undefined,
-        method: undefined,
-      }));
-      setUrl(apiUrl);
-      setPage(1);
+      if (isAction(value)) {
+        setForm((prev) => ({ ...prev, action: value, method: '' }));
+      } else {
+        setForm((prev) => ({ ...prev, method: value, action: '' }));
+      }
     } else {
-      setForm((f) => ({ ...f, [name]: '' }));
-      setFilters((state) => ({ ...state, [name]: undefined }));
-      setUrl(apiUrl);
-      setPage(1);
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const onAllClear = () => {
-    const values = Object.keys(filters).reduce(
-      (acc, key) => {
-        acc[key] = undefined;
-        return acc;
-      },
-      {} as Record<string, undefined>,
-    );
-    resetSorting();
+  const toggleShowAge = () => setShowAge((prev) => !prev);
+
+  const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     setPage(1);
-    setUrl(apiUrl);
+
+    const { action, method, from, to } = form;
+    const { pathname, query } = router;
+    const { cursor, ...updatedQuery } = query;
+
+    const queryParams = {
+      ...(action && { action }),
+      ...(method && { method }),
+      ...(from && { from }),
+      ...(to && { to }),
+    };
+
+    const finalQuery = { ...updatedQuery, ...queryParams };
+
+    router.push({ pathname, query: finalQuery });
+  };
+
+  const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const { name } = e.currentTarget;
+
+    setPage(1);
+    const { cursor, ...restQuery } = router.query;
+
+    if (name === 'type') {
+      setForm((prev) => ({ ...prev, action: '', method: '' }));
+      const { action, method, ...newQuery } = restQuery;
+
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      });
+      return;
+    } else {
+      setForm((f) => ({ ...f, [name]: '' }));
+      const { [name]: _, ...newQuery } = restQuery;
+
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      });
+    }
+
+    setPage(1);
+  };
+
+  const onAllClear = () => {
     setForm(initialForm);
-    setFilters((state) => ({ ...state, ...values }));
+
+    const { cursor, action, method, from, to, block, ...newQuery } =
+      router.query;
+
+    router.push({
+      pathname: router.pathname,
+      query: newQuery,
+    });
   };
 
   const onOrder = () => {
-    setSorting((state) => ({
-      ...state,
-      order: state.order === 'asc' ? 'desc' : 'asc',
-    }));
+    const currentOrder = router.query.order || 'desc';
+    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        order: newOrder,
+      },
+    });
   };
 
-  const onHandleMouseOver = (e: any, id: string) => {
+  const onHandleMouseOver = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-
     setAddress(id);
   };
+
   const handleMouseLeave = () => {
     setAddress('');
   };
+
+  function removeCursor() {
+    const queryParams = router.query;
+    const { cursor, order, ...rest } = queryParams;
+    return rest;
+  }
+
+  const modifiedFilter = removeCursor();
 
   const columns: any = [
     {
@@ -466,7 +487,7 @@ const List = () => {
           </Tooltip>
           <button type="button" onClick={onOrder} className="px-2">
             <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
-              <SortIcon order={sorting.order} />
+              <SortIcon order={router.query.order as string} />
             </div>
           </button>
         </div>
@@ -474,28 +495,7 @@ const List = () => {
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
         </span>
       ),
       tdClassName:
@@ -506,42 +506,32 @@ const List = () => {
 
   return (
     <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
-      {loading ? (
-        <div className="pl-6 max-w-lg w-full py-5 ">
-          <Skeleton className="h-4" />
+      <div className={`flex flex-col lg:flex-row pt-4`}>
+        <div className="flex flex-col">
+          <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+            {count &&
+              txns?.length > 0 &&
+              `${
+                t
+                  ? t('txns:listing', {
+                      count: localFormat ? localFormat(count.toString()) : '',
+                    })
+                  : `More than > ${count} transactions found`
+              }`}
+          </p>
         </div>
-      ) : (
-        <div className={`flex flex-col lg:flex-row pt-4`}>
-          <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-              {count &&
-                txns?.length > 0 &&
-                `${
-                  t
-                    ? t('txns:listing', {
-                        count: localFormat ? localFormat(count.toString()) : '',
-                      })
-                    : `More than > ${count} transactions found`
-                }`}
-            </p>
+        {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
+          <div className="lg:ml-auto px-6">
+            <Filters filters={modifiedFilter} onClear={onAllClear} />
           </div>
-          {filters && Object.keys(filters).length > 0 && (
-            <div className="lg:ml-auto px-6">
-              <Filters filters={filters} onClear={onAllClear} />
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
       <Table
         columns={columns}
         data={txns}
-        isLoading={loading}
-        count={count}
         limit={25}
         cursorPagination={true}
         cursor={cursor}
-        apiUrl={apiUrl}
-        setUrl={setUrl}
         page={page}
         setPage={setPage}
         Error={error}
