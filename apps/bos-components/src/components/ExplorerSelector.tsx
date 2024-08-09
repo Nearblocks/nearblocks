@@ -38,9 +38,14 @@ const InnerContainer = styled.div`
   }
 `;
 
-const LinkContainer = styled.div`
+const LinkContainer = styled.div<{
+  isAvailable?: boolean;
+}>`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  ${(props: any) =>
+    props.isAvailable
+      ? 'grid-template-columns: repeat(3, 1fr)'
+      : 'grid-template-columns: repeat(2, 1fr)'};
   grid-auto-rows: minmax(100px, auto);
   gap: 24px;
   min-width: 300px;
@@ -130,6 +135,9 @@ const NearExplorerButton = styled.a<{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-decoration: none;
+  ${(props: any) =>
+    props.isLinkActive ? 'pointer-events: none' : 'pointer-events: auto'};
 
   .logo {
     height: 45px;
@@ -287,7 +295,9 @@ export default function (props: Props) {
         ? 'https://testnet.nearblocks.io'
         : 'https://nearblocks.io',
     nearblocksLite:
-      props?.network === 'testnet' ? null : 'https://lite.nearblocks.io',
+      props?.network === 'testnet'
+        ? 'https://lite.nearblocks.io'
+        : 'https://lite.nearblocks.io',
     pikespeakai: props?.network === 'testnet' ? null : 'https://pikespeak.ai',
   };
 
@@ -347,19 +357,32 @@ export default function (props: Props) {
     if (link)
       switch (getFirstPathSegment(link)) {
         case 'accounts':
-          return (
-            config.nearblocksLite +
-            '/address/' +
-            selectUrlAfterSecondSlash(link)
-          );
+          return props?.network === 'testnet'
+            ? config.nearblocksLite +
+                '/address/' +
+                selectUrlAfterSecondSlash(link) +
+                `?rpcUrl=https://archival-rpc.testnet.near.org`
+            : config.nearblocksLite +
+                '/address/' +
+                selectUrlAfterSecondSlash(link);
         case 'transactions':
-          return (
-            config.nearblocksLite + '/txns/' + selectUrlAfterSecondSlash(link)
-          );
+          return props?.network === 'testnet'
+            ? config.nearblocksLite +
+                '/txns/' +
+                selectUrlAfterSecondSlash(link) +
+                `?rpcUrl=https://archival-rpc.testnet.near.org`
+            : config.nearblocksLite +
+                '/txns/' +
+                selectUrlAfterSecondSlash(link);
         case 'blocks':
-          return (
-            config.nearblocksLite + '/blocks/' + selectUrlAfterSecondSlash(link)
-          );
+          return props?.network === 'testnet'
+            ? config.nearblocksLite +
+                '/blocks/' +
+                selectUrlAfterSecondSlash(link) +
+                `?rpcUrl=https://archival-rpc.testnet.near.org`
+            : config.nearblocksLite +
+                '/blocks/' +
+                selectUrlAfterSecondSlash(link);
 
         default:
           return config.nearblocksLite;
@@ -464,6 +487,7 @@ export default function (props: Props) {
   function onSelect(value: string) {
     setSelected(value);
   }
+
   return (
     <>
       <Container>
@@ -487,7 +511,7 @@ export default function (props: Props) {
                   <Badge>{shortenHex(selectUrlAfterSecondSlash(path))}</Badge>
                 )}
                 <H3>Choose from the available NEAR Explorers below</H3>
-                <LinkContainer>
+                <LinkContainer isAvailable={config.pikespeakai !== null}>
                   <NearExplorerButton
                     href={
                       !hasLinkNearblocksLite
@@ -544,38 +568,40 @@ export default function (props: Props) {
                     ></ImageTab>
                     <ExplorerHead>Nearblocks</ExplorerHead>
                   </NearExplorerButton>
-                  <NearExplorerButton
-                    href={
-                      !hasLinkPeakspeak
-                        ? (pikespeakHref && pikespeakHref) ||
-                          (config.pikespeakai ?? '') + path
-                        : config.pikespeakai ?? ''
-                    }
-                    isSelected={
-                      selected === 'pikespeakai'
-                        ? !linkPikespeakai(path)
-                          ? false
-                          : true
-                        : false
-                    }
-                    onClick={() => {
-                      onSelect('pikespeakai');
-                    }}
-                    isLinkActive={
-                      !linkPikespeakai(path) || config.pikespeakai === null
-                    }
-                    isMobileFirst={false}
-                  >
-                    <ImageTab
-                      width="auto"
-                      height="45px"
-                      src={
-                        'https://explorer.near.org/images/pikespeak_logo.png'
+                  {config.pikespeakai === null ? null : (
+                    <NearExplorerButton
+                      href={
+                        !hasLinkPeakspeak
+                          ? (pikespeakHref && pikespeakHref) ||
+                            (config.pikespeakai ?? '') + path
+                          : config.pikespeakai ?? ''
                       }
-                      alt="Pikespeak"
-                    ></ImageTab>
-                    <ExplorerHead>Pikespeak</ExplorerHead>
-                  </NearExplorerButton>
+                      isSelected={
+                        selected === 'pikespeakai'
+                          ? !linkPikespeakai(path)
+                            ? false
+                            : true
+                          : false
+                      }
+                      onClick={() => {
+                        onSelect('pikespeakai');
+                      }}
+                      isLinkActive={
+                        !linkPikespeakai(path) || config.pikespeakai === null
+                      }
+                      isMobileFirst={false}
+                    >
+                      <ImageTab
+                        width="auto"
+                        height="45px"
+                        src={
+                          'https://explorer.near.org/images/pikespeak_logo.png'
+                        }
+                        alt="Pikespeak"
+                      ></ImageTab>
+                      <ExplorerHead>Pikespeak</ExplorerHead>
+                    </NearExplorerButton>
+                  )}
                 </LinkContainer>
               </InnerSection>
             </>
