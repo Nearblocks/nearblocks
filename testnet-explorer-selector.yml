@@ -10,5 +10,5 @@ services:
     environment:
       PORT: 3000
       NEXT_PUBLIC_NETWORK_ID: testnet
-      NEXT_PUBLIC_BOS_NETWORK: mainnet
+      NEXT_PUBLIC_BOS_NETWORK: testnet
       NEXT_PUBLIC_ACCOUNT_ID: nearblocks.testnet
