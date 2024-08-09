@@ -331,7 +331,7 @@ const getActionReceiptActionData = (
   predecessorId: string,
   receiverId: string,
 ): ActionReceiptAction => {
-  const { args, kind } = mapActionKind(action);
+  const { args, kind, rlpHash } = mapActionKind(action);
 
   return {
     action_kind: kind,
@@ -341,6 +341,7 @@ const getActionReceiptActionData = (
     receipt_included_in_block_timestamp: blockTimestamp,
     receipt_predecessor_account_id: predecessorId,
     receipt_receiver_account_id: receiverId,
+    rlp_hash: rlpHash,
   };
 };
 

@@ -1,6 +1,7 @@
 import { createRequire } from 'module';
 
 import { base58 } from '@scure/base';
+import { decodeBase64, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 import { types } from 'near-lake-framework';
 
@@ -24,7 +25,7 @@ import {
   isTransferAction,
 } from '#libs/guards';
 import sentry from '#libs/sentry';
-import { AccessKeyPermission, ReceiptAction } from '#types/types';
+import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
 
 const require = createRequire(import.meta.url);
 const json = require('nb-json');
@@ -55,6 +56,7 @@ export const mapReceiptKind = (receipt: types.ReceiptEnum): ReceiptKind => {
 export const mapActionKind = (action: types.Action): ReceiptAction => {
   let kind = ActionKind.UNKNOWN;
   let args = {};
+  let rlpHash = null;
 
   if (
     action === 'CreateAccount' ||
@@ -82,6 +84,7 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
 
     try {
       jsonArgs = decodeArgs(action.FunctionCall.args);
+      rlpHash = getRlpHash(action.FunctionCall.methodName, jsonArgs);
     } catch (error) {
       base64Args = action.FunctionCall.args;
     }
@@ -164,6 +167,7 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
   return {
     args: jsonStringify(args),
     kind,
+    rlpHash,
   };
 };
 
@@ -200,4 +204,38 @@ export const isExecutionSuccess = (status: types.ExecutionStatus) => {
 export const errorHandler = (error: Error) => {
   logger.error(error);
   sentry.captureException(error);
+};
+
+export const isNearImplicit = (account: string) =>
+  account.length === 64 && /[a-f0-9]{64}/.test(account);
+
+export const isEthImplicit = (account: string) =>
+  account.length === 42 &&
+  account.startsWith('0x') &&
+  /^[a-f0-9]{40}$/.test(account.slice(2));
+
+export const getRlpHash = (method: string, args: unknown) => {
+  console.log({ args, method });
+  if (method !== 'rlp_execute') return null;
+
+  try {
+    const rlpArgs = (args as RlpJson)?.tx_bytes_b64;
+
+    if (rlpArgs) {
+      const decoded = decodeRlp(rlpArgs);
+
+      return decoded.hash;
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const decodeRlp = (args: string) => {
+  const base64 = decodeBase64(args);
+  const hexString = hexlify(base64);
+
+  return Transaction.from(hexString);
 };
