@@ -4,7 +4,6 @@ import { Setting } from 'nb-types';
 
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
-import { viewBlock } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 
@@ -17,7 +16,7 @@ const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
 const getSettings = async () => {
-  const [settings, block, rpcBlock, stats, statsNew] = await redis.cache(
+  const [settings, block, stats, statsNew] = await redis.cache(
     'sync:settings',
     async () => {
       return await Promise.all([
@@ -37,7 +36,6 @@ const getSettings = async () => {
           LIMIT
             1
         `,
-        viewBlock({ finality: 'final' }),
         sql`
           SELECT
             date
@@ -63,7 +61,7 @@ const getSettings = async () => {
     EXPIRY,
   );
 
-  return { block, rpcBlock, settings, stats, statsNew };
+  return { block, settings, stats, statsNew };
 };
 
 const timestampQuery = (block: number) => sql`
@@ -76,13 +74,9 @@ const timestampQuery = (block: number) => sql`
 `;
 
 const status = catchAsync(async (_req: Request, res: Response) => {
-  const { block, rpcBlock, settings, stats, statsNew } = await getSettings();
+  const { block, settings, stats, statsNew } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
   const events = settings.find((item: Setting) => item.key === 'events');
   const balance = settings.find((item: Setting) => item.key === 'balance');
   const ftHolders = settings.find((item: Setting) => item.key === 'ft_holders');
@@ -152,13 +146,9 @@ const status = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const ft = catchAsync(async (_req: Request, res: Response) => {
-  const { rpcBlock, settings } = await getSettings();
+  const { block, settings } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
   const ftHolders = settings.find((item: Setting) => item.key === 'ft_holders');
 
   const ftHoldersTime = ftHolders?.value?.sync
@@ -175,13 +165,9 @@ const ft = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const nft = catchAsync(async (_req: Request, res: Response) => {
-  const { rpcBlock, settings } = await getSettings();
+  const { block, settings } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
   const nftHolders = settings.find(
     (item: Setting) => item.key === 'nft_holders',
   );
@@ -200,13 +186,9 @@ const nft = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const balance = catchAsync(async (_req: Request, res: Response) => {
-  const { rpcBlock, settings } = await getSettings();
+  const { block, settings } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
   const balance = settings.find((item: Setting) => item.key === 'balance');
 
   const status = {
@@ -218,13 +200,9 @@ const balance = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const base = catchAsync(async (_req: Request, res: Response) => {
-  const { block, rpcBlock } = await getSettings();
+  const { block } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
 
   const status = {
     height: block?.[0]?.block_height,
@@ -235,13 +213,9 @@ const base = catchAsync(async (_req: Request, res: Response) => {
 });
 
 const events = catchAsync(async (_req: Request, res: Response) => {
-  const { rpcBlock, settings } = await getSettings();
+  const { block, settings } = await getSettings();
 
-  if (!rpcBlock) {
-    return res.status(500).json({ message: 'RPC Error' });
-  }
-
-  const latestBlock = rpcBlock?.header?.height;
+  const latestBlock = block?.[0]?.block_height;
   const events = settings.find((item: Setting) => item.key === 'events');
 
   const status = {
