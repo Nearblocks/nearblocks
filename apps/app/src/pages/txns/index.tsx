@@ -4,12 +4,10 @@ import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { ReactElement } from 'react';
 import { appUrl } from '@/utils/config';
 import { env } from 'next-runtime-env';
-import dynamic from 'next/dynamic';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
-
-const Layout = dynamic(() => import('@/components/Layouts'));
-const List = dynamic(() => import('@/components/Transactions/List'));
+import List from '@/components/Transactions/List';
+import Layout from '@/components/Layouts';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');

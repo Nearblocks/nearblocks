@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { txnMethod } from '../../utils/near';
 import Link from 'next/link';
 import TxnStatus from '../common/Status';
@@ -22,6 +22,7 @@ import Filters from '../common/Filters';
 import Filter from '../Icons/Filter';
 import { useRouter } from 'next/router';
 import TimeStamp from '../common/TimeStamp';
+import { Spinner } from '../common/Spinner';
 
 interface ListProps {
   txnsData: {
@@ -48,11 +49,30 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
   const count = txnsCount?.txns[0]?.count;
   const txns = txnsData?.txns;
   let cursor = txnsData?.cursor;
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -121,7 +141,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const onAllClear = () => {
     setForm(initialForm);
 
-    const { cursor, action, method, from, to, block, ...newQuery } =
+    const { cursor, action, method, from, to, block, order, ...newQuery } =
       router.query;
 
     router.push({
@@ -154,7 +174,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, ...rest } = queryParams;
+    const { cursor, order, p, ...rest } = queryParams;
     return rest;
   }
 
@@ -506,6 +526,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
   return (
     <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
+      {loading && <Spinner />}
       <div className={`flex flex-col lg:flex-row pt-4`}>
         <div className="flex flex-col">
           <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
