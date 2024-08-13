@@ -1,25 +1,63 @@
 import { formatWithCommas } from '@/utils/libs';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
 interface PaginatorProps {
-  apiUrl: string;
   page: number;
   setPage: (page: number) => void;
-  setUrl: (url: string) => void;
   cursor: string | undefined;
-  isLoading?: boolean;
 }
-const CursorPaginator = (props: PaginatorProps) => {
-  const { setPage, setUrl, page, cursor, apiUrl, isLoading } = props;
 
-  function constructURL(params: string | undefined) {
-    return params ? `${apiUrl}cursor=${params}&` : apiUrl;
-  }
+const CursorPaginator = (props: PaginatorProps) => {
+  const router = useRouter();
+  const { setPage, page, cursor } = props;
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+      const { p } = router.query;
+      const newPage = p ? parseInt(p as string, 10) : 1;
+      if (newPage !== page) {
+        setPage(newPage);
+      }
+    };
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [page, router, setPage]);
+
+  const initialLoad = useRef(true);
+  useEffect(() => {
+    if (initialLoad.current) {
+      initialLoad.current = false;
+      const { cursor, p, ...restQuery } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: restQuery,
+      });
+    }
+  }, [router]);
+
   const handleNextPage = () => {
-    setUrl(constructURL(cursor));
+    if (loading) return;
+    setLoading(true);
     setPage(page + 1);
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        cursor,
+        p: page + 1,
+      },
+    });
   };
+
   const onFirst = () => {
-    setUrl(props.apiUrl);
+    const { pathname, query } = router;
+    const { cursor, p, ...updatedQuery } = query;
     setPage(1);
+    router.push({ pathname, query: updatedQuery });
   };
 
   return (
@@ -33,10 +71,10 @@ const CursorPaginator = (props: PaginatorProps) => {
           >
             <button
               type="button"
-              disabled={page === 1 || isLoading}
+              disabled={page === 1 || loading}
               onClick={onFirst}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
-                page === 1 || isLoading
+                page === 1 || loading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
@@ -52,10 +90,10 @@ const CursorPaginator = (props: PaginatorProps) => {
             </button>
             <button
               type="button"
-              disabled={isLoading || !cursor}
+              disabled={!cursor || loading}
               onClick={handleNextPage}
               className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium text-xs ${
-                props.isLoading || !props.cursor
+                !props.cursor || loading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}

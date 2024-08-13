@@ -21,7 +21,8 @@
         "NODE_ENV",
         "NEXT_PUBLIC_USER_API_URL",
         "NEXT_PUBLIC_USER_DASHBOARD_URL",
-        "NEXT_PUBLIC_API_URL"
+        "NEXT_PUBLIC_API_URL",
+        "API_ACCESS_KEY"
       ]
     },
     "lint": {
