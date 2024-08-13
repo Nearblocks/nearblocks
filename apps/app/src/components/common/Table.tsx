@@ -9,6 +9,7 @@ interface column {
   tdClassName: string;
   thClassName?: string;
 }
+
 interface Props {
   columns: column[];
   data: any[];
@@ -17,7 +18,7 @@ interface Props {
   page: number;
   limit: number;
   pageLimit?: number;
-  setPage: (page: number) => void;
+  setPage?: (page: number) => void;
   renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
   expanded?: number[];
   isExpanded?: false;
@@ -154,19 +155,18 @@ const Table = (props: Props) => {
       {props.isPagination &&
       !props.Error &&
       props.data?.length !== 0 &&
-      props.page &&
       props.pageLimit &&
-      props.count &&
-      props.setPage ? (
+      props.count ? (
         <Paginator
           count={props.count}
-          page={props.page}
           limit={props.limit}
           pageLimit={props.pageLimit}
-          setPage={props.setPage}
         />
       ) : null}
-      {props.cursorPagination && !props.Error && props.data?.length !== 0 ? (
+      {props.cursorPagination &&
+      !props.Error &&
+      props.data?.length !== 0 &&
+      props.setPage ? (
         <CursorPaginator
           page={props.page}
           setPage={props.setPage}

@@ -317,11 +317,17 @@ export function urlHostName(url: string) {
 
 export function holderPercentage(supply: string, quantity: string) {
   const percentage = Big(quantity).div(Big(supply)).mul(Big(100));
-  return percentage.gt(100) ? '100.00' : percentage.toFixed(2);
+  return percentage.gt(100)
+    ? '100'
+    : percentage.toFixed(2) === '0.00'
+    ? '0'
+    : percentage.toFixed(2);
 }
+
 export function formatWithCommas(number: string) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
 export function priceFormat(number: string) {
   const bigNumber = Big(number);
   const formattedNumber = bigNumber

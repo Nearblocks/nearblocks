@@ -2,7 +2,7 @@ import { localFormat, truncateString } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TxnStatus from '../common/Status';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
@@ -17,8 +17,8 @@ import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import TokenImage from '../common/TokenImage';
-import TimeStamp from '../common/TimeStamp';
 import { Spinner } from '../common/Spinner';
+import dynamic from 'next/dynamic';
 
 const initialForm = {
   event: '',
@@ -32,6 +32,8 @@ interface NftTokenTxnsProps {
   cursor: string;
   tab: string;
 }
+
+const TimeStamp = dynamic(() => import('../common/TimeStamp'), { ssr: false });
 
 const NFTTransactions = ({
   txns,
@@ -47,6 +49,7 @@ const NFTTransactions = ({
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -69,6 +72,24 @@ const NFTTransactions = ({
       },
     });
   };
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -475,71 +496,70 @@ const NFTTransactions = ({
   const modifiedFilter = removeCursor();
 
   return (
-    <div className="bg-white dark:bg-black-600  soft-shadow rounded-xl pb-1">
-      {tab === 'nfttokentxns' ? (
-        <>
-          {!txns ? (
-            <div className="pl-6 max-w-lg w-full py-5 ">
-              <Skeleton className="h-4" />
-            </div>
-          ) : (
-            <div className={`flex flex-col lg:flex-row pt-4`}>
-              <div className="flex flex-col">
-                <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {txns &&
-                    txns.length > 0 &&
-                    `A total of ${
-                      localFormat && localFormat(count.toString())
-                    }${' '}
+    <>
+      {loading && <Spinner />}
+      <div className="bg-white dark:bg-black-600  soft-shadow rounded-xl pb-1">
+        {tab === 'nfttokentxns' ? (
+          <>
+            {!txns ? (
+              <div className="pl-6 max-w-lg w-full py-5 ">
+                <Skeleton className="h-4" />
+              </div>
+            ) : (
+              <div className={`flex flex-col lg:flex-row pt-4`}>
+                <div className="flex flex-col">
+                  <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+                    {txns &&
+                      txns.length > 0 &&
+                      `A total of ${
+                        localFormat && localFormat(count.toString())
+                      }${' '}
               transactions found`}
-                </p>
+                  </p>
+                </div>
+                <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                  <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
+                    {txns && txns.length > 0 && (
+                      <button className="hover:no-underline ">
+                        <Link
+                          href={`/nft-token/exportdata?address=${id}`}
+                          className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800"
+                        >
+                          <p>CSV Export</p>
+                          <span className="ml-2">
+                            <Download />
+                          </span>
+                        </Link>
+                      </button>
+                    )}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
-                <Filters filters={modifiedFilter} onClear={onAllClear} />
-                <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-                  {txns && txns.length > 0 && (
-                    <button className="hover:no-underline ">
-                      <Link
-                        href={`/nft-token/exportdata?address=${id}`}
-                        className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800"
-                      >
-                        <p>CSV Export</p>
-                        <span className="ml-2">
-                          <Download />
-                        </span>
-                      </Link>
-                    </button>
-                  )}
-                </span>
-              </div>
-            </div>
-          )}
-          <Table
-            columns={columns}
-            data={txns}
-            limit={25}
-            cursorPagination={true}
-            cursor={cursor}
-            page={page}
-            setPage={setPage}
-            Error={error}
-            ErrorText={
-              <ErrorMessage
-                icons={<FaInbox />}
-                message={errorMessage}
-                mutedText="Please try again later"
-              />
-            }
-          />
-        </>
-      ) : (
-        <div className="w-full h-[500px]">
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 z-50">
-            <Spinner />
-          </div>
-        </div>
-      )}
-    </div>
+            )}
+            <Table
+              columns={columns}
+              data={txns}
+              limit={25}
+              cursorPagination={true}
+              cursor={cursor}
+              page={page}
+              setPage={setPage}
+              Error={error}
+              ErrorText={
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message={errorMessage}
+                  mutedText="Please try again later"
+                />
+              }
+            />
+          </>
+        ) : (
+          <div className="w-full h-[500px]"></div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -12,7 +12,7 @@ const TimeStamp = ({ timestamp, showAge = true }: any) => {
       }
       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
     >
-      <span>
+      <span suppressHydrationWarning>
         {showAge
           ? dayjs().to(dayjs(nanoToMilli(timestamp || 0)))
           : dayjs

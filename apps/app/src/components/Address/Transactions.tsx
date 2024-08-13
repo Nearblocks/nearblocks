@@ -52,6 +52,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
   const [address, setAddress] = useState('');
   const [showAllReceipts, setShowAllReceipts] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const allReceipts = localStorage.getItem('showAllReceipts');
@@ -554,95 +555,112 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     return rest;
   }
 
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
+
   const modifiedFilter = removeCursor();
 
   return (
-    <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
-      {tab === 'txns' ? (
-        <>
-          {!txns ? (
-            <div className="pl-6 max-w-lg w-full py-5 ">
-              <Skeleton className="h-4" />
-            </div>
-          ) : (
-            <div className={`flex flex-col lg:flex-row pt-4`}>
-              <div className="flex flex-col">
-                <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {Object.keys(txns).length > 0 &&
-                    `A total of${' '}
+    <>
+      {loading && <Spinner />}
+      <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
+        {tab === 'txns' ? (
+          <>
+            {!txns ? (
+              <div className="pl-6 max-w-lg w-full py-5 ">
+                <Skeleton className="h-4" />
+              </div>
+            ) : (
+              <div className={`flex flex-col lg:flex-row pt-4`}>
+                <div className="flex flex-col">
+                  <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+                    {Object.keys(txns).length > 0 &&
+                      `A total of${' '}
                   ${
                     count ? localFormat && localFormat(count.toString()) : 0
                   }${' '}
                   transactions found`}
-                </p>
-              </div>
-              <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
-                <Filters filters={modifiedFilter} onClear={onAllClear} />
-                <div className="flex items-center space-x-4">
-                  {Object.keys(txns).length > 0 && (
-                    <>
-                      <button className="hover:no-underline">
-                        <Link
-                          href={`/exportdata?address=${id}`}
-                          className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
-                        >
-                          <p>CSV Export</p>
-                          <span className="ml-2">
-                            <Download />
-                          </span>
-                        </Link>
-                      </button>
-                      <div className="flex items-center space-x-2">
-                        <Tooltip
-                          label={`Toggle between Receipts Mode and All Receipts. The 'All Receipts' view shows all receipts, while the 'Receipts Mode' view only shows the last receipt of each transaction.`}
-                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                        >
-                          <button className="hover:no-underline">
-                            <Question className="w-4 h-4 fill-current mr-1" />
-                          </button>
-                        </Tooltip>
-                        <label className="flex items-center space-x-2">
-                          <SwitchButton
-                            selected={showAllReceipts}
-                            onChange={handleToggle}
-                          />
-                          <span className="text-nearblue-600 dark:text-neargray-10 text-[15px] leading-none pr-[15px]">
-                            ALL RECEIPTS
-                          </span>
-                        </label>
-                      </div>
-                    </>
-                  )}
+                  </p>
+                </div>
+                <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                  <div className="flex items-center space-x-4">
+                    {Object.keys(txns).length > 0 && (
+                      <>
+                        <button className="hover:no-underline">
+                          <Link
+                            href={`/exportdata?address=${id}`}
+                            className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                          >
+                            <p>CSV Export</p>
+                            <span className="ml-2">
+                              <Download />
+                            </span>
+                          </Link>
+                        </button>
+                        <div className="flex items-center space-x-2">
+                          <Tooltip
+                            label={`Toggle between Receipts Mode and All Receipts. The 'All Receipts' view shows all receipts, while the 'Receipts Mode' view only shows the last receipt of each transaction.`}
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                          >
+                            <button className="hover:no-underline">
+                              <Question className="w-4 h-4 fill-current mr-1" />
+                            </button>
+                          </Tooltip>
+                          <label className="flex items-center space-x-2">
+                            <SwitchButton
+                              selected={showAllReceipts}
+                              onChange={handleToggle}
+                            />
+                            <span className="text-nearblue-600 dark:text-neargray-10 text-[15px] leading-none pr-[15px]">
+                              ALL RECEIPTS
+                            </span>
+                          </label>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <Table
-            columns={columns}
-            data={filterTxns}
-            limit={25}
-            cursorPagination={true}
-            cursor={cursor}
-            page={page}
-            setPage={setPage}
-            Error={error}
-            ErrorText={
-              <ErrorMessage
-                icons={<FaInbox />}
-                message={errorMessage || ''}
-                mutedText="Please try again later"
-              />
-            }
-          />
-        </>
-      ) : (
-        <div className="w-full h-[500px]">
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 z-50">
-            <Spinner />
-          </div>
-        </div>
-      )}
-    </div>
+            )}
+            <Table
+              columns={columns}
+              data={filterTxns}
+              limit={25}
+              cursorPagination={true}
+              cursor={cursor}
+              page={page}
+              setPage={setPage}
+              Error={error}
+              ErrorText={
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message={errorMessage || ''}
+                  mutedText="Please try again later"
+                />
+              }
+            />
+          </>
+        ) : (
+          <div className="w-full h-[500px]"></div>
+        )}
+      </div>
+    </>
   );
 };
 export default Transactions;

@@ -1,23 +1,22 @@
 import Question from '@/components/Icons/Question';
-import { useFetch } from '@/hooks/useFetch';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
-import { ContractCodeInfo } from '@/utils/types';
+import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 interface Props {
   contract: ContractCodeInfo;
   isLocked: boolean;
+  data: { deployments: DeploymentsInfo[] };
 }
-const Info = (props: Props) => {
-  const { contract, isLocked } = props;
-  const router = useRouter();
-  const { id } = router.query;
-  const { data, loading } = useFetch(`account/${id}/contract/deployments`);
-  const [createAction, updateAction] = data?.deployments || [];
 
+const Info = (props: Props) => {
+  const { contract, isLocked, data } = props;
+  const deployments = data?.deployments;
+  const [createAction, updateAction] = deployments || [];
   const action = updateAction || createAction;
+
+  console.log(contract, 's s qs  s');
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -42,7 +41,7 @@ const Info = (props: Props) => {
             </Tooltip>
             Last Updated
           </div>
-          {loading ? (
+          {!deployments ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -65,7 +64,7 @@ const Info = (props: Props) => {
             </Tooltip>
             Transaction Hash
           </div>
-          {loading ? (
+          {!deployments ? (
             <Loader wrapperClassName="w-32" />
           ) : (
             <div className="w-full md:w-3/4 break-words">
@@ -92,7 +91,7 @@ const Info = (props: Props) => {
             </Tooltip>
             Contract Locked
           </div>
-          {loading ? (
+          {!deployments ? (
             <Loader wrapperClassName="w-32" />
           ) : (
             <div className="w-full md:w-3/4 break-words">
@@ -112,7 +111,7 @@ const Info = (props: Props) => {
             </Tooltip>
             Code Hash
           </div>
-          {loading ? (
+          {!deployments || !contract ? (
             <Loader wrapperClassName="w-32" />
           ) : (
             <div className="w-full md:w-3/4 break-words">{contract?.hash}</div>

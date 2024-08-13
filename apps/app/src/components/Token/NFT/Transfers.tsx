@@ -1,53 +1,66 @@
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { Spinner } from '@/components/common/Spinner';
 import TxnStatus from '@/components/common/Status';
 import Table from '@/components/common/Table';
+import TimeStamp from '@/components/common/TimeStamp';
 import Clock from '@/components/Icons/Clock';
 import FaInbox from '@/components/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useFetch } from '@/hooks/useFetch';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-} from '@/utils/libs';
+import { localFormat } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 interface Props {
-  id: string;
+  txns: any;
+  count: any;
+  cursor: any;
+  error: boolean;
+  tab: string;
 }
 
-const Transfers = ({ id }: Props) => {
+const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   const { t } = useTranslation();
   const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
-  const apiUrl = `nfts/${id}/txns?`;
-  const [url, setUrl] = useState(apiUrl);
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
+  const [page, setPage] = useState(1);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const { data, error, loading } = useFetch(`${url}order=desc`);
-  const { data: countData, loading: countLoading } = useFetch(
-    `nfts/${id}/txns/count`,
-  );
-
-  const txns = data?.txns || [];
-  const count = countData?.txns?.[0]?.count || 0;
-  const cursor = data?.cursor;
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
 
     setAddress(id);
   };
+
   const handleMouseLeave = () => {
     setAddress('');
   };
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
+
   const columns = [
     {
       header: <span></span>,
@@ -312,28 +325,7 @@ const Transfers = ({ id }: Props) => {
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
         </span>
       ),
       tdClassName:
@@ -361,44 +353,48 @@ const Transfers = ({ id }: Props) => {
   ];
   return (
     <>
+      {loading && <Spinner />}
       <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-        {countLoading ? (
-          <div className="pl-6 max-w-lg w-full py-5 ">
-            <Skeleton className="h-4" />
-          </div>
-        ) : (
-          <div className={`flex flex-col lg:flex-row pt-4`}>
-            <div className="flex flex-col">
-              <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                {txns &&
-                  txns.length > 0 &&
-                  `A total of ${
-                    localFormat && localFormat(count.toString())
-                  } transactions found`}
-              </p>
-            </div>
-          </div>
-        )}
-        <Table
-          columns={columns}
-          data={txns}
-          isLoading={loading}
-          countLoading={countLoading}
-          count={count}
-          limit={25}
-          cursorPagination={true}
-          cursor={cursor}
-          apiUrl={apiUrl}
-          setUrl={setUrl}
-          Error={error}
-          ErrorText={
-            <ErrorMessage
-              icons={<FaInbox />}
-              message={errorMessage}
-              mutedText="Please try again later"
+        {tab === 'transfers' ? (
+          <>
+            {!txns ? (
+              <div className="pl-6 max-w-lg w-full py-5 ">
+                <Skeleton className="h-4" />
+              </div>
+            ) : (
+              <div className={`flex flex-col lg:flex-row pt-4`}>
+                <div className="flex flex-col">
+                  <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+                    {txns &&
+                      txns.length > 0 &&
+                      `A total of ${
+                        localFormat && localFormat(count.toString())
+                      } transactions found`}
+                  </p>
+                </div>
+              </div>
+            )}
+            <Table
+              columns={columns}
+              data={txns}
+              limit={25}
+              cursorPagination={true}
+              cursor={cursor}
+              page={page}
+              setPage={setPage}
+              Error={error}
+              ErrorText={
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message={errorMessage}
+                  mutedText="Please try again later"
+                />
+              }
             />
-          }
-        />
+          </>
+        ) : (
+          <div className="w-full h-[500px]"></div>
+        )}
       </div>
     </>
   );

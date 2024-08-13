@@ -12,7 +12,6 @@ import Buttons from '@/components/Address/Buttons';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import classNames from 'classnames';
 import 'react-tabs/style/react-tabs.css';
-import { fetcher } from '@/hooks/useFetch';
 import useRpc from '@/hooks/useRpc';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import {
@@ -27,6 +26,10 @@ import Transactions from '@/components/Address/Transactions';
 import queryString from 'qs';
 import TokenTransactions from '@/components/Address/TokenTransactions';
 import NFTTransactions from '@/components/Address/NFTTransactions';
+import AccessKeys from '@/components/Address/AccessKeys';
+import Overview from '@/components/Address/Contract/Overview';
+import fetcher from '@/utils/fetcher';
+import { Spinner } from '@/components/common/Spinner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -51,7 +54,7 @@ export const getServerSideProps: GetServerSideProps<{
   data: any;
   dataCount: any;
   error: boolean;
-  tab: any;
+  tab: string;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...query },
@@ -71,13 +74,19 @@ export const getServerSideProps: GetServerSideProps<{
       txnApiUrl = id && `account/${id}/ft-txns`;
       txnCountUrl = id && `account/${id}/ft-txns/count`;
       break;
-    case 'nfttoken id && txns':
+    case 'nfttokentxns':
       txnApiUrl = `account/${id}/nft-txns`;
       txnCountUrl = id && `account/${id}/nft-txns/count`;
       break;
     case 'accesskeys':
       txnApiUrl = id && `account/${id}/keys`;
       txnCountUrl = id && `account/${id}/keys/count`;
+      break;
+    case 'contract':
+      txnApiUrl = id && `account/${id}/contract/deployments`;
+      break;
+    case 'comments':
+      txnApiUrl = id && `account/${id}/contract/deployments`;
       break;
     default:
       return {
@@ -212,6 +221,9 @@ const Address = ({
   const count = dataCount?.txns?.[0]?.count;
   const txnCursor = data?.cursor;
 
+  const keys = data?.keys || [];
+  const keysCount = dataCount?.keys?.[0]?.count || 0;
+
   useEffect(() => {
     const loadSchema = async () => {
       if (!id) return;
@@ -231,7 +243,6 @@ const Address = ({
             return null;
           }),
         ]);
-
         if (code && code?.code_base64) {
           setContract({
             block_hash: code.block_hash,
@@ -546,14 +557,22 @@ const Address = ({
                       tab={tab}
                     />
                   </TabPanel>
-                  <TabPanel>{/* <AccessKeys /> */}</TabPanel>
                   <TabPanel>
-                    {/* <Overview
-                    schema={schema}
-                    contract={contract as ContractCodeInfo}
-                    contractInfo={contractInfo}
-                    isLocked={isLocked}
-                  /> */}
+                    <AccessKeys
+                      keys={keys}
+                      count={keysCount}
+                      error={error}
+                      tab={tab}
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <Overview
+                      schema={schema}
+                      contract={contract as ContractCodeInfo}
+                      contractInfo={contractInfo}
+                      isLocked={isLocked}
+                      deployments={contractData}
+                    />
                   </TabPanel>
                 </Tabs>
               </div>

@@ -13,7 +13,7 @@ import WarningIcon from '../Icons/WarningIcon';
 import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 import TokenHoldings from '../common/TokenHoldings';
 import Link from 'next/link';
-import { getConfig, networkId } from '@/utils/config';
+import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { useRouter } from 'next/router';
@@ -40,8 +40,6 @@ const Balance = ({
   const router = useRouter();
   const { id } = router.query;
   const { t } = useTranslation();
-  const config = getConfig && getConfig(networkId);
-
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
 

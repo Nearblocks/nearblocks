@@ -3,7 +3,6 @@ import ErrorMessage from '../common/ErrorMessage';
 import { BlocksInfo } from '@/utils/types';
 import {
   convertToMetricPrefix,
-  formatTimestampToString,
   gasFee,
   getTimeAgoString,
   localFormat,

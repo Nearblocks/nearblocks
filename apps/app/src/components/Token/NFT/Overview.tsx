@@ -2,44 +2,30 @@ import Links from '@/components/common/Links';
 import WarningIcon from '@/components/Icons/WarningIcon';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useFetch } from '@/hooks/useFetch';
-import useHash from '@/hooks/useHash';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { SpamToken } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import classNames from 'classnames';
-import Transfers from './Transfers';
-import Holders from './Holders';
-import Inventory from './Inventory';
+import { useState } from 'react';
 import TokenImage from '@/components/common/TokenImage';
 
-const tabs = [' ', 'holders', 'inventory', 'comments'];
+interface Props {
+  token: any;
+  status: any;
+  transfers: any;
+  holders: any;
+}
 
-const Overview = () => {
+const Overview = ({ token, status, transfers, holders }: Props) => {
   const router = useRouter();
   const { id } = router.query;
-  const [hash, setHash] = useHash();
-  const [tabIndex, setTabIndex] = useState(0);
-  const { data, loading } = useFetch(`nfts/${id}`);
-  const { data: syncData } = useFetch(`sync/status`);
-  const { data: transfersData, loading: txnLoading } = useFetch(
-    `nfts/${id}/txns/count`,
-  );
-  const { data: holdersData, loading: holderLoading } = useFetch(
-    `nfts/${id}/holders/count`,
-  );
-  const token = data?.contracts?.[0];
-  const status = syncData?.status?.aggregates.nft_holders;
-  const transfers = transfersData?.txns?.[0]?.count;
-  const holders = holdersData?.holders?.[0]?.count;
   const [isVisible, setIsVisible] = useState(true);
-  console.log('holdersData', status);
+
   const handleClose = () => {
     setIsVisible(false);
   };
+
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -56,29 +42,10 @@ const Overview = () => {
     return false;
   }
 
-  useEffect(() => {
-    const index = tabs.indexOf(hash as string);
-    if (index !== tabIndex) {
-      setTabIndex(index === -1 ? 0 : index);
-    }
-  }, [hash, tabIndex]);
-
-  const onTab = (index: number) => setHash(tabs[index]);
-
-  const getClassName = (selected: boolean) =>
-    classNames(
-      'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
-      {
-        'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
-          !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
-      },
-    );
-
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
-        {loading ? (
+        {!token ? (
           <div className="w-80 max-w-xs px-3 py-5">
             <Skeleton className="h-7" />
           </div>
@@ -137,7 +104,7 @@ const Overview = () => {
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Total Supply:
                   </div>
-                  {loading ? (
+                  {!token ? (
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
@@ -151,7 +118,7 @@ const Overview = () => {
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Transfers:
                   </div>
-                  {txnLoading ? (
+                  {!transfers ? (
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
@@ -163,7 +130,7 @@ const Overview = () => {
                 </div>
                 <div className="flex flex-wrap py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Holders:</div>
-                  {holderLoading ? (
+                  {!holders ? (
                     <Skeleton className="h-4 w-32" />
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
@@ -207,7 +174,7 @@ const Overview = () => {
               <div className="px-3 divide-y  dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
-                  {loading ? (
+                  {!token ? (
                     <div className="w-full md:w-3/4 break-words">
                       <Skeleton className="h-4 w-32" />
                     </div>
@@ -227,7 +194,7 @@ const Overview = () => {
                     Official Site:
                   </div>
                   <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
-                    {loading ? (
+                    {!token ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
                       <Link
@@ -245,7 +212,7 @@ const Overview = () => {
                   </div>
                   <div className="w-full md:w-3/4 break-words">
                     {/* corrections needed */}
-                    {loading ? (
+                    {!token ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
                       <Links meta={token} />
@@ -253,50 +220,6 @@ const Overview = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-        <div className="py-6"></div>
-        <div className="block lg:flex lg:space-x-2 mb-4">
-          <div className="w-full">
-            <div>
-              <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
-                <TabList className={'flex flex-wrap'}>
-                  <Tab
-                    className={getClassName(tabs[0] === tabs[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Transfers</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(tabs[1] === tabs[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Holders</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(tabs[2] === tabs[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Inventory</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(tabs[3] === tabs[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Comments</h2>
-                  </Tab>
-                </TabList>
-                <TabPanel>
-                  <Transfers id={id as string} />
-                </TabPanel>
-                <TabPanel>
-                  <Holders id={id as string} tokens={token} />
-                </TabPanel>
-                <TabPanel>
-                  <Inventory id={id as string} token={token} />
-                </TabPanel>
-              </Tabs>
             </div>
           </div>
         </div>
