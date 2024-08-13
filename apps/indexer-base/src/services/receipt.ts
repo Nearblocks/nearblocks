@@ -331,12 +331,13 @@ const getActionReceiptActionData = (
   predecessorId: string,
   receiverId: string,
 ): ActionReceiptAction => {
-  const { args, kind } = mapActionKind(action);
+  const { args, kind, rlpHash } = mapActionKind(action);
 
   return {
     action_kind: kind,
     args,
     index_in_action_receipt: actionIndex,
+    nep518_rlp_hash: rlpHash,
     receipt_id: receiptId,
     receipt_included_in_block_timestamp: blockTimestamp,
     receipt_predecessor_account_id: predecessorId,

@@ -9,6 +9,7 @@ import {
   isDeleteAccountAction,
   isTransferAction,
 } from '#libs/guards';
+import { isEthImplicit, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
 
@@ -101,7 +102,10 @@ export const storeChunkAccounts = async (
           continue;
         }
 
-        if (isTransferAction(action) && accountId.length === 64) {
+        if (
+          isTransferAction(action) &&
+          (isNearImplicit(accountId) || isEthImplicit(accountId))
+        ) {
           accounts.set(
             accountId,
             getAccountData(block.height, accountId, receiptId),
