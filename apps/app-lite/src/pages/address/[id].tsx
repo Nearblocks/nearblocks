@@ -6,6 +6,7 @@ import MainLayout from '@/components/Layouts/Main';
 import Meta from '@/components/Meta';
 import AddressSkeleton from '@/components/Skeletons/Address';
 import config from '@/config';
+import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 import { PageLayout } from '@/types/types';
 
@@ -16,6 +17,7 @@ const Address: PageLayout = () => {
   const { id } = router.query;
   const loader = useRef<HTMLDivElement>(null);
   const rpcUrl = useRpcStore((state) => state.rpc);
+  const network = useNetworkStore((state) => state.network);
 
   const onFinish = () => {
     if (loader.current) loader.current.style.display = 'none';
@@ -33,7 +35,7 @@ const Address: PageLayout = () => {
         </div>
         <Widgets
           loader={<AddressSkeleton onFinish={onFinish} />}
-          props={{ id, rpcUrl }}
+          props={{ id, network, rpcUrl }}
           src={`${config.account}/widget/lite.Address`}
         />
       </div>

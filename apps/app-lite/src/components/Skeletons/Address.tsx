@@ -78,7 +78,7 @@ export const AddressKeysSkeleton = () => (
 );
 
 export const AddressSkeleton = () => {
-  const { network } = useNetworkStore();
+  const network = useNetworkStore((state) => state.network);
 
   return (
     <div className="relative container mx-auto">

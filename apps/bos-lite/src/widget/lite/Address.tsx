@@ -10,6 +10,7 @@ import type { Stats, StatsResponse } from '@/types/types';
 
 type AddressProps = {
   id: string;
+  network: string;
   rpcUrl: string;
 };
 
@@ -23,7 +24,7 @@ let AddressSkeleton = window?.AddressSkeleton || (() => <></>);
 let AddressKeysSkeleton = window?.AddressKeysSkeleton || (() => <></>);
 let Skeleton = window?.Skeleton || (({ children }) => <>{children}</>);
 
-const Address = ({ id, rpcUrl }: AddressProps) => {
+const Address = ({ id, network, rpcUrl }: AddressProps) => {
   let { apiFetch, rpcFetch } = VM.require<FetcherModule>(
     `${config_account}/widget/lite.libs.fetcher`,
   );
@@ -124,7 +125,7 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
             </p>
           </Skeleton>
         </div>
-        {context.networkId === 'mainnet' && (
+        {network === 'mainnet' && (
           <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
             <h2 className="font-medium text-sm mb-0.5">Value</h2>
             <Skeleton
@@ -151,7 +152,7 @@ const Address = ({ id, rpcUrl }: AddressProps) => {
             </p>
           </Skeleton>
         </div>
-        {context.networkId === 'mainnet' && (
+        {network === 'mainnet' && (
           <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
             <h2 className="font-medium text-sm mb-0.5">Type</h2>
             <Skeleton className="block h-[39px] w-28" loading={loading.address}>
