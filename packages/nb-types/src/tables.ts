@@ -58,11 +58,11 @@ export type ActionReceiptAction = {
   action_kind: ActionKind;
   args: JsonValue;
   index_in_action_receipt: number;
+  nep518_rlp_hash: null | string;
   receipt_id: string;
   receipt_included_in_block_timestamp: string;
   receipt_predecessor_account_id: string;
   receipt_receiver_account_id: string;
-  rlp_hash: null | string;
 };
 
 export type ActionReceiptInputData = {

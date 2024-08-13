@@ -337,11 +337,11 @@ const getActionReceiptActionData = (
     action_kind: kind,
     args,
     index_in_action_receipt: actionIndex,
+    nep518_rlp_hash: rlpHash,
     receipt_id: receiptId,
     receipt_included_in_block_timestamp: blockTimestamp,
     receipt_predecessor_account_id: predecessorId,
     receipt_receiver_account_id: receiverId,
-    rlp_hash: rlpHash,
   };
 };
 

@@ -215,7 +215,6 @@ export const isEthImplicit = (account: string) =>
   /^[a-f0-9]{40}$/.test(account.slice(2));
 
 export const getRlpHash = (method: string, args: unknown) => {
-  console.log({ args, method });
   if (method !== 'rlp_execute') return null;
 
   try {
