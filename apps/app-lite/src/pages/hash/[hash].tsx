@@ -5,10 +5,12 @@ import { RPC } from 'nb-near';
 import { getReceipt } from '@/libs/rpc';
 import { useNetworkStore } from '@/stores/network';
 
-const providers = useNetworkStore.getState().providers;
+const network = useNetworkStore.getState().network;
 
-const rpcUrl = providers[0].url;
-const rpc = new RPC(rpcUrl);
+const rpc =
+  network === 'mainnet'
+    ? new RPC('https://beta.rpc.mainnet.near.org')
+    : new RPC('https://beta.rpc.testnet.near.org');
 
 export const getServerSideProps = (async (context) => {
   const {
