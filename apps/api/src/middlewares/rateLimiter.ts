@@ -61,14 +61,33 @@ const rateLimiter = catchAsync(
     }
 
     const rateLimit = rateLimiterUnion(plan);
-
     try {
-      await rateLimit.consume(id);
-
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
+        const now = dayjs.utc().toISOString();
+        await userSql`
+          INSERT INTO
+            api_key_usages (user_id, key_id, TIME, count, plan_id)
+          VALUES
+            (
+              ${id},
+              ${keyId},
+              ${now},
+              1,
+              ${plan.id}
+            )
+          ON CONFLICT (user_id, key_id, TIME) DO
+          UPDATE
+          SET
+            count = api_key_usages.count + 1
+        `;
         await rateLimit.consume(tokenKey);
       }
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      await rateLimit.consume(id);
       return next();
     } catch (error) {
       return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
@@ -89,14 +108,34 @@ const useFreePlan = async (
   }
 
   const rateLimit = rateLimiterUnion(freePlan);
-
   try {
-    await rateLimit.consume(key);
-
     if (tokenKey) {
+      const [, keyId] = tokenKey.split('_');
+      const tokenKeyValue = parseInt(keyId, 10);
+      const now = dayjs.utc().toISOString();
+      await userSql`
+        INSERT INTO
+          api_key_usages (user_id, key_id, TIME, count, plan_id)
+        VALUES
+          (
+            ${key},
+            ${tokenKeyValue},
+            ${now},
+            1,
+            ${freePlan.id}
+          )
+        ON CONFLICT (user_id, key_id, TIME) DO
+        UPDATE
+        SET
+          count = api_key_usages.count + 1
+      `;
       await rateLimit.consume(tokenKey);
     }
-
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await rateLimit.consume(key);
     return next();
   } catch (error) {
     return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
