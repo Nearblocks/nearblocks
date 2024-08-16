@@ -49,7 +49,7 @@ const routes = (app: Router) => {
    * @tags DEX
    * @param {number} pair.path.required - pair id
    * @param {string} a.query - maker account id
-   * @param {number} cursor.query - next page cursor
+   * @param {string} cursor.query - next page cursor
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @return 200 - success response
    */

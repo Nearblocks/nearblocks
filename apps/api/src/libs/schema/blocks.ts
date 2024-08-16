@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const list = z.object({
-  cursor: z.number().positive().optional(),
+  cursor: z.string().optional(),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });

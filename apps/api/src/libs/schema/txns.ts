@@ -20,7 +20,7 @@ const list = z.object({
       { message: 'Invalid date' },
     ),
   block: z.string().optional(),
-  cursor: z.number().positive().optional(),
+  cursor: z.string().optional(),
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),

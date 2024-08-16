@@ -14,7 +14,7 @@ const count = z.object({
 });
 
 const txns = z.object({
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   page: z.number().positive().max(200).optional().default(1),
   per_page: z.number().positive().max(25).optional().default(25),
 });
@@ -27,7 +27,7 @@ const item = z.object({
 
 const nftTxns = z.object({
   contract: z.string(),
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
@@ -67,7 +67,7 @@ const tokenItem = z.object({
 
 const tokenTxns = z.object({
   contract: z.string(),
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),

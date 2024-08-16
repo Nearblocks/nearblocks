@@ -158,7 +158,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const pair = req.validator.data.pair;
   const a = req.validator.data.a;
   const per_page = req.validator.data.per_page;
-  const cursor = req.validator.data.cursor?.replace('n', '');
+  const cursor = req.validator.data.cursor;
 
   const txns = await sql`
     SELECT
@@ -176,8 +176,7 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   `;
 
   let nextCursor = txns?.[txns?.length - 1]?.event_index;
-  nextCursor =
-    txns?.length === per_page && nextCursor ? `${nextCursor}n` : undefined;
+  nextCursor = txns?.length === per_page && nextCursor ? nextCursor : undefined;
 
   return res.status(200).json({ cursor: nextCursor, txns });
 });

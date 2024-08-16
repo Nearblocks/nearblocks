@@ -60,7 +60,7 @@ const txns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.number().positive().optional(),
+  cursor: z.string().optional(),
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -117,7 +117,7 @@ const ftTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -171,7 +171,7 @@ const nftTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -225,7 +225,7 @@ const stakeTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.number().positive().optional(),
+  cursor: z.string().optional(),
   from: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
@@ -255,7 +255,7 @@ const stakeTxnsCount = z.object({
 
 const activities = z.object({
   account: z.string(),
-  cursor: z.string().length(36).optional(),
+  cursor: z.string().optional(),
   per_page: z.number().positive().max(25).optional().default(25),
 });
 
