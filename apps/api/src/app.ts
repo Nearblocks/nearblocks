@@ -20,7 +20,16 @@ const app = express();
 
 app.set('x-powered-by', false);
 app.set('query parser', (str: string) =>
-  qs.parse(str, { parseBooleans: true, parseNumbers: true }),
+  qs.parse(str, {
+    parseBooleans: true,
+    parseNumbers: true,
+    types: {
+      account: 'string',
+      cursor: 'string',
+      hash: 'string',
+      keyword: 'string',
+    },
+  }),
 );
 
 app.use(sentry.Handlers.requestHandler());

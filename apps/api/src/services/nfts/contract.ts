@@ -47,7 +47,7 @@ const txns = catchAsync(
   async (req: RequestValidator<NftTxns>, res: Response) => {
     const contract = req.validator.data.contract;
     const event = req.validator.data.event;
-    const cursor = req.validator.data.cursor?.replace('n', '');
+    const cursor = req.validator.data.cursor;
     const page = req.validator.data.page;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
@@ -166,7 +166,7 @@ const txns = catchAsync(
 
     let nextCursor = txns?.[txns?.length - 1]?.event_index;
     nextCursor =
-      txns?.length === per_page && nextCursor ? `${nextCursor}n` : undefined;
+      txns?.length === per_page && nextCursor ? nextCursor : undefined;
 
     return res.status(200).json({ cursor: nextCursor, txns });
   },

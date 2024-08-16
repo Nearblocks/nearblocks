@@ -11,7 +11,7 @@ import { RawQueryParams, RequestValidator } from '#types/types';
 const changes = catchAsync(
   async (req: RequestValidator<Activities>, res: Response) => {
     const account = req.validator.data.account;
-    const cursor = req.validator.data.cursor?.replace('n', '');
+    const cursor = req.validator.data.cursor;
     const per_page = req.validator.data.per_page;
 
     const activities = await sql`
@@ -39,9 +39,7 @@ const changes = catchAsync(
 
     let nextCursor = activities?.[activities?.length - 1]?.event_index;
     nextCursor =
-      activities?.length === per_page && nextCursor
-        ? `${nextCursor}n`
-        : undefined;
+      activities?.length === per_page && nextCursor ? nextCursor : undefined;
 
     return res.status(200).json({ activities, cursor: nextCursor });
   },

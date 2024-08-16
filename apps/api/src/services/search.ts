@@ -6,6 +6,20 @@ import { Item } from '#libs/schema/search';
 import { RequestValidator } from '#types/types';
 
 const txnQuery = (keyword: string) => {
+  if (keyword.startsWith('0x')) {
+    return sql`
+      SELECT
+        r.originated_from_transaction_hash AS transaction_hash
+      FROM
+        receipts r
+        JOIN action_receipt_actions ara ON r.receipt_id = ara.receipt_id
+      WHERE
+        ara.nep518_rlp_hash = ${keyword}
+      LIMIT
+        1
+    `;
+  }
+
   return sql`
     SELECT
       transaction_hash
@@ -19,6 +33,8 @@ const txnQuery = (keyword: string) => {
 };
 
 const blockQuery = (keyword: string) => {
+  const query = keyword.replace(/^0x/, '');
+
   return sql`
     SELECT
       block_height,
@@ -26,9 +42,9 @@ const blockQuery = (keyword: string) => {
     FROM
       blocks
     WHERE
-      ${!isNaN(+keyword)
-      ? sql`block_height = ${keyword}`
-      : sql`block_hash = ${keyword}`}
+      ${!isNaN(+query)
+      ? sql`block_height = ${query}`
+      : sql`block_hash = ${query}`}
     LIMIT
       1
   `;

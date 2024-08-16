@@ -129,7 +129,7 @@ const routes = (app: Router) => {
    * @param {string} method.query - function call method
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
@@ -229,7 +229,7 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {number} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
