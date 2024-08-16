@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import Head from 'next/head';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
@@ -8,6 +8,8 @@ import { env } from 'next-runtime-env';
 import { appUrl } from '@/utils/config';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
+import { useRouter } from 'next/router';
+import { Spinner } from '@/components/common/Spinner';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
@@ -60,6 +62,37 @@ const Blocks = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURIComponent(
     t('blocks:heading'),
@@ -93,6 +126,7 @@ const Blocks = ({
           </h1>
         </div>
       </div>
+      {loading && <Spinner />}
       <div className="container mx-auto px-3 -mt-48">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full">

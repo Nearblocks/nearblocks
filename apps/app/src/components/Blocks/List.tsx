@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ErrorMessage from '../common/ErrorMessage';
 import { BlocksInfo } from '@/utils/types';
 import {
@@ -14,8 +14,6 @@ import FaInbox from '../Icons/FaInbox';
 import useTranslation from 'next-translate/useTranslation';
 import Table from '../common/Table';
 import TimeStamp from '../common/TimeStamp';
-import { useRouter } from 'next/router';
-import { Spinner } from '../common/Spinner';
 
 interface ListProps {
   data: {
@@ -30,12 +28,10 @@ interface ListProps {
 
 const List = ({ data, totalCount, error }: ListProps) => {
   const { t } = useTranslation();
-  const router = useRouter();
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
   const [address, setAddress] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -52,24 +48,6 @@ const List = ({ data, totalCount, error }: ListProps) => {
   const cursor = data?.cursor;
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      setLoading(true);
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const columns: any = [
     {
@@ -232,53 +210,54 @@ const List = ({ data, totalCount, error }: ListProps) => {
     },
   ];
   return (
-    <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
-      {loading && <Spinner />}
-      <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
-        {blocks && blocks.length > 0 && (
-          <p className="sm:w-full w-65">
-            {t
-              ? t('blocks:listing', {
-                  from: start?.block_height
-                    ? localFormat && localFormat(start?.block_height)
-                    : start?.block_height ?? '',
-                  to: end?.block_height
-                    ? localFormat && localFormat(end?.block_height)
-                    : end?.block_height ?? '',
-                  count: localFormat && localFormat(count.toString()),
-                })
-              : `Block #${
-                  start?.block_height
-                    ? localFormat && localFormat(start?.block_height)
-                    : start?.block_height ?? ''
-                } to ${
-                  '#' + end?.block_height
-                    ? localFormat && localFormat(end?.block_height)
-                    : end?.block_height ?? ''
-                } (Total of ${
-                  localFormat && localFormat(count.toString())
-                } blocks)`}{' '}
-          </p>
-        )}
+    <>
+      <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
+        <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
+          {blocks && blocks.length > 0 && (
+            <p className="sm:w-full w-65">
+              {t
+                ? t('blocks:listing', {
+                    from: start?.block_height
+                      ? localFormat && localFormat(start?.block_height)
+                      : start?.block_height ?? '',
+                    to: end?.block_height
+                      ? localFormat && localFormat(end?.block_height)
+                      : end?.block_height ?? '',
+                    count: localFormat && localFormat(count.toString()),
+                  })
+                : `Block #${
+                    start?.block_height
+                      ? localFormat && localFormat(start?.block_height)
+                      : start?.block_height ?? ''
+                  } to ${
+                    '#' + end?.block_height
+                      ? localFormat && localFormat(end?.block_height)
+                      : end?.block_height ?? ''
+                  } (Total of ${
+                    localFormat && localFormat(count.toString())
+                  } blocks)`}{' '}
+            </p>
+          )}
+        </div>
+        <Table
+          columns={columns}
+          data={blocks}
+          limit={25}
+          cursorPagination={true}
+          cursor={cursor}
+          page={page}
+          setPage={setPage}
+          Error={error}
+          ErrorText={
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage}
+              mutedText="Please try again later"
+            />
+          }
+        />
       </div>
-      <Table
-        columns={columns}
-        data={blocks}
-        limit={25}
-        cursorPagination={true}
-        cursor={cursor}
-        page={page}
-        setPage={setPage}
-        Error={error}
-        ErrorText={
-          <ErrorMessage
-            icons={<FaInbox />}
-            message={errorMessage}
-            mutedText="Please try again later"
-          />
-        }
-      />
-    </div>
+    </>
   );
 };
 export default List;
