@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { txnMethod } from '../../utils/near';
 import Link from 'next/link';
 import TxnStatus from '../common/Status';
@@ -22,7 +22,6 @@ import Filters from '../common/Filters';
 import Filter from '../Icons/Filter';
 import { useRouter } from 'next/router';
 import TimeStamp from '../common/TimeStamp';
-import { Spinner } from '../common/Spinner';
 
 interface ListProps {
   txnsData: {
@@ -49,30 +48,11 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
 
   const count = txnsCount?.txns[0]?.count;
   const txns = txnsData?.txns;
   let cursor = txnsData?.cursor;
-
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      setLoading(true);
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,7 +76,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
     const { action, method, from, to } = form;
     const { pathname, query } = router;
-    const { cursor, ...updatedQuery } = query;
+    const { cursor, p, ...updatedQuery } = query;
 
     const queryParams = {
       ...(action && { action }),
@@ -114,7 +94,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     const { name } = e.currentTarget;
 
     setPage(1);
-    const { cursor, ...restQuery } = router.query;
+    const { cursor, p, ...restQuery } = router.query;
 
     if (name === 'type') {
       setForm((prev) => ({ ...prev, action: '', method: '' }));
@@ -141,7 +121,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const onAllClear = () => {
     setForm(initialForm);
 
-    const { cursor, action, method, from, to, block, order, ...newQuery } =
+    const { cursor, action, method, from, to, block, order, p, ...newQuery } =
       router.query;
 
     router.push({
@@ -525,46 +505,49 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   ];
 
   return (
-    <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
-      {loading && <Spinner />}
-      <div className={`flex flex-col lg:flex-row pt-4`}>
-        <div className="flex flex-col">
-          <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-            {count &&
-              txns?.length > 0 &&
-              `${
-                t
-                  ? t('txns:listing', {
-                      count: localFormat ? localFormat(count.toString()) : '',
-                    })
-                  : `More than > ${count} transactions found`
-              }`}
-          </p>
-        </div>
-        {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
-          <div className="lg:ml-auto px-6">
-            <Filters filters={modifiedFilter} onClear={onAllClear} />
+    <>
+      {' '}
+      {/* {loading && <Spinner />} */}
+      <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
+        <div className={`flex flex-col lg:flex-row pt-4`}>
+          <div className="flex flex-col">
+            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+              {count &&
+                txns?.length > 0 &&
+                `${
+                  t
+                    ? t('txns:listing', {
+                        count: localFormat ? localFormat(count.toString()) : '',
+                      })
+                    : `More than > ${count} transactions found`
+                }`}
+            </p>
           </div>
-        )}
+          {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
+            <div className="lg:ml-auto px-6">
+              <Filters filters={modifiedFilter} onClear={onAllClear} />
+            </div>
+          )}
+        </div>
+        <Table
+          columns={columns}
+          data={txns}
+          limit={25}
+          cursorPagination={true}
+          cursor={cursor}
+          page={page}
+          setPage={setPage}
+          Error={error}
+          ErrorText={
+            <ErrorMessage
+              icons={<FaInbox />}
+              message={errorMessage}
+              mutedText="Please try again later"
+            />
+          }
+        />
       </div>
-      <Table
-        columns={columns}
-        data={txns}
-        limit={25}
-        cursorPagination={true}
-        cursor={cursor}
-        page={page}
-        setPage={setPage}
-        Error={error}
-        ErrorText={
-          <ErrorMessage
-            icons={<FaInbox />}
-            message={errorMessage}
-            mutedText="Please try again later"
-          />
-        }
-      />
-    </div>
+    </>
   );
 };
 
