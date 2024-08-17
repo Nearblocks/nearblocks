@@ -131,13 +131,14 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   };
 
   const onOrder = () => {
-    const currentOrder = router.query.order || 'desc';
+    const { pathname, query } = router;
+    const { cursor, p, order, ...updatedQuery } = query;
+    const currentOrder = order ?? 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
     router.push({
-      pathname: router.pathname,
+      pathname: pathname,
       query: {
-        ...router.query,
+        ...updatedQuery,
         order: newOrder,
       },
     });

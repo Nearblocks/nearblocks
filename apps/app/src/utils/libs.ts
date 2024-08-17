@@ -482,5 +482,29 @@ export function urlHostName(url: string) {
 
 export function holderPercentage(supply: string, quantity: string) {
   const percentage = Big(quantity).div(Big(supply)).mul(Big(100));
-  return percentage.gt(100) ? '100.00' : percentage.toFixed(2);
+
+  return percentage.gt(100)
+    ? '100'
+    : percentage.toFixed(2) === '0.00'
+    ? '0'
+    : percentage.toFixed(2);
+}
+
+export function tokenAmount(
+  amount: string,
+  decimal: string,
+  format: boolean,
+): string {
+  if (amount === undefined || amount === null) return 'N/A';
+
+  const decimalNumber = Number(decimal);
+  if (isNaN(decimalNumber)) throw new Error('Invalid decimal value');
+
+  const near = Big(amount).div(Big(10).pow(decimalNumber));
+
+  const formattedValue = format
+    ? near.toFixed(8).replace(/\.?0+$/, '')
+    : near.toFixed(decimalNumber).replace(/\.?0+$/, '');
+
+  return formattedValue;
 }

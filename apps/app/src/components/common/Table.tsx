@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import Paginator from './Paginator';
 import CursorPaginator from './CursorPaginator';
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface column {
   header: string | JSX.Element;
@@ -11,13 +12,13 @@ interface column {
 }
 interface Props {
   columns: column[];
-  data: any[];
+  data?: any[];
   isPagination?: boolean;
   count?: number;
   page: number;
   limit: number;
   pageLimit?: number;
-  setPage: (page: number) => void;
+  setPage?: (page: number) => void;
   renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
   expanded?: number[];
   isExpanded?: false;
@@ -25,8 +26,55 @@ interface Props {
   ErrorText?: string | any;
   cursorPagination?: boolean;
   cursor?: string;
+  shallow?: boolean;
+  isLoading?: boolean;
 }
 const Table = (props: Props) => {
+  if (props.isLoading) {
+    return (
+      <>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
+              <tr>
+                {props.columns &&
+                  props.columns.map((column, index) => (
+                    <th key={index} scope="col" className={column.thClassName}>
+                      {column.header}
+                    </th>
+                  ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
+              {[...Array(props.limit)].map((_, index) => (
+                <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
+                  {props.columns.map((column, colIndex) => (
+                    <td key={colIndex} className={column.tdClassName}>
+                      <Skeleton className="h-4" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {props.isPagination && props.page && props.pageLimit ? (
+          <Paginator
+            count={props.count as number}
+            limit={props.limit}
+            pageLimit={props.pageLimit}
+          />
+        ) : null}
+        {props.cursorPagination && props.setPage ? (
+          <CursorPaginator
+            cursor={props.cursor}
+            page={props.page}
+            setPage={props.setPage}
+          />
+        ) : null}
+      </>
+    );
+  }
   return (
     <>
       {props.isExpanded ? (
@@ -46,7 +94,7 @@ const Table = (props: Props) => {
               </tr>
             </thead>
             <tbody>
-              {(props.Error || props.data.length === 0) && (
+              {(props.Error || props.data?.length === 0) && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.ErrorText}
@@ -100,7 +148,7 @@ const Table = (props: Props) => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
-              {(props.Error || props.data.length === 0) && (
+              {(props.Error || props.data?.length === 0) && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.ErrorText}
@@ -154,19 +202,19 @@ const Table = (props: Props) => {
       {props.isPagination &&
       !props.Error &&
       props.data?.length !== 0 &&
-      props.page &&
       props.pageLimit &&
-      props.count &&
-      props.setPage ? (
+      props.count ? (
         <Paginator
           count={props.count}
-          page={props.page}
           limit={props.limit}
           pageLimit={props.pageLimit}
-          setPage={props.setPage}
+          shallow={props.shallow}
         />
       ) : null}
-      {props.cursorPagination && !props.Error && props.data?.length !== 0 ? (
+      {props.cursorPagination &&
+      !props.Error &&
+      props.data?.length !== 0 &&
+      props.setPage ? (
         <CursorPaginator
           page={props.page}
           setPage={props.setPage}

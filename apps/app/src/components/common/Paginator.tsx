@@ -1,47 +1,75 @@
 import useTranslation from 'next-translate/useTranslation';
 import FaChevronLeft from '../Icons/FaChevronLeft';
 import FaChevronRight from '../Icons/FaChevronRight';
-
+import { useRouter } from 'next/router';
 interface PaginatorProps {
   count: number;
-  page: number;
   limit: number;
   pageLimit: number;
-  setPage: (page: number) => void;
+  shallow?: boolean;
 }
-
 const Paginator = (props: PaginatorProps) => {
   const { t } = useTranslation('common');
+  const router = useRouter();
+  const { page } = router.query;
+  const currentPage = page ? Number(page) : 1;
   let pages: number;
-  const { page, count, limit, setPage = () => {}, pageLimit = 200 } = props;
+  const { count, limit, shallow, pageLimit = 200 } = props;
   if (count > 0) {
     pages = Math.ceil(count / limit);
   } else {
     pages = 1;
   }
+
   pages = pages > pageLimit ? pageLimit : pages;
   const onPrev = () => {
-    if (page <= 1) return null;
-
-    const newPage = (page || 1) - 1;
-    setPage(newPage);
-    return;
+    if (currentPage <= 1) return;
+    const newPage = currentPage - 1;
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: newPage },
+      },
+      undefined,
+      { shallow: shallow },
+    );
   };
   const onNext = () => {
-    if (page >= pages) return null;
-
-    const newPage = (page || 1) + 1;
-    setPage(newPage);
-    return;
+    if (currentPage >= pages) return;
+    const newPage = currentPage + 1;
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: newPage },
+      },
+      undefined,
+      { shallow: shallow },
+    );
   };
-  const onFirst = () => setPage(1);
-  const onLast = () => setPage(pages);
-
+  const onFirst = () => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: 1 },
+      },
+      undefined,
+      { shallow: shallow },
+    );
+  };
+  const onLast = () => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, page: pages },
+      },
+      undefined,
+      { shallow: shallow },
+    );
+  };
   return (
     <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4 rounded-b-xl">
       <div className="flex-1 flex items-center justify-between">
         <div></div>
-
         <div>
           <div
             className="relative z-0 inline-flex rounded-md"
@@ -49,10 +77,10 @@ const Paginator = (props: PaginatorProps) => {
           >
             <button
               type="button"
-              disabled={page <= 1 || pages === 1}
+              disabled={currentPage <= 1 || pages === 1}
               onClick={onFirst}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
-                page <= 1
+                currentPage <= 1
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
@@ -61,10 +89,10 @@ const Paginator = (props: PaginatorProps) => {
             </button>
             <button
               type="button"
-              disabled={page <= 1 || pages === 1}
+              disabled={currentPage <= 1 || pages === 1}
               onClick={onPrev}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 font-medium ${
-                page <= 1
+                currentPage <= 1
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               } rounded-md  bg-gray-100 dark:bg-black-200`}
@@ -76,14 +104,14 @@ const Paginator = (props: PaginatorProps) => {
               disabled
               className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500  rounded-md  bg-gray-100 dark:bg-black-200 dark:text-neargray-10"
             >
-              Page {page} of {pages}
+              Page {currentPage} of {pages}
             </button>
             <button
               type="button"
-              disabled={page >= pages || pages === 1}
+              disabled={currentPage >= pages || pages === 1}
               onClick={onNext}
               className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium ${
-                page >= pages
+                currentPage >= pages
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
@@ -92,10 +120,10 @@ const Paginator = (props: PaginatorProps) => {
             </button>
             <button
               type="button"
-              disabled={page >= pages || pages === 1}
+              disabled={currentPage >= pages || pages === 1}
               onClick={onLast}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium rounded-md ${
-                page >= pages
+                currentPage >= pages
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
@@ -108,5 +136,4 @@ const Paginator = (props: PaginatorProps) => {
     </div>
   );
 };
-
 export default Paginator;

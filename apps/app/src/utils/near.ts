@@ -116,7 +116,9 @@ export function tokenPercentage(
   const nearAmount = Big(amount).div(Big(10).pow(decimal));
   const nearSupply = Big(supply);
 
-  return nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
+  return nearAmount.div(nearSupply).mul(Big(100)).toFixed(2) === '0.00'
+    ? '0'
+    : nearAmount.div(nearSupply).mul(Big(100)).toFixed(2);
 }
 
 export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
