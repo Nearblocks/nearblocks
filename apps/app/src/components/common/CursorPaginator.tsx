@@ -28,14 +28,21 @@ const CursorPaginator = (props: PaginatorProps) => {
   }, [page, router, setPage]);
 
   const initialLoad = useRef(true);
+
   useEffect(() => {
     if (initialLoad.current) {
       initialLoad.current = false;
-      const { cursor, p, ...restQuery } = router.query;
-      router.replace({
-        pathname: router.pathname,
-        query: restQuery,
-      });
+      const {
+        pathname,
+        query: { cursor, p, ...updatedQuery },
+      } = router;
+
+      if (cursor && p) {
+        router.replace({
+          pathname: pathname,
+          query: updatedQuery,
+        });
+      }
     }
   }, [router]);
 

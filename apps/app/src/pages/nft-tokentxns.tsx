@@ -1,41 +1,111 @@
 import Head from 'next/head';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useRef, useState } from 'react';
-import List from '@/components/skeleton/common/List';
-import Layout from '@/components/Layouts';
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
+import { ReactElement, useEffect, useState } from 'react';
 import { env } from 'next-runtime-env';
+import queryString from 'qs';
+import Layout from '@/components/Layouts';
+import TransfersList from '@/components/Tokens/NFTTransfers';
+import { useRouter } from 'next/router';
+import { Spinner } from '@/components/common/Spinner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
-const NftToxenTxns = () => {
-  const components = useBosComponents();
-  const { t } = useTranslation();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  dataCount: any;
+  syncDetails: any;
+  error: boolean;
+}> = async (context) => {
+  const { query } = context;
+  const apiUrl = 'nfts/txns';
+  const fetchUrl = query
+    ? `nfts/txns?${queryString.stringify(query)}`
+    : `${apiUrl}`;
 
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
+  try {
+    const [dataResult, dataCountResult, syncResult] = await Promise.allSettled([
+      fetcher(fetchUrl),
+      fetcher('nfts/txns/count'),
+      fetcher(`sync/status`),
+    ]);
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const dataCount =
+      dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
+    const syncDetails =
+      syncResult.status === 'fulfilled' ? syncResult.value : null;
+    const error = dataResult.status === 'rejected';
+
+    return {
+      props: {
+        data,
+        dataCount,
+        syncDetails,
+        error,
+        apiUrl,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching nftTransfers:', error);
+    return {
+      props: {
+        data: null,
+        dataCount: null,
+        syncDetails: null,
+        error: true,
+        apiUrl: '',
+      },
+    };
+  }
+};
+
+const NftToxenTxns = ({
+  data,
+  dataCount,
+  syncDetails,
+  error,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const status: {
+    height: 0;
+    sync: true;
+  } = syncDetails?.status?.indexers?.events;
+
   useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
 
     return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
     };
-  }, []);
-  const onChangeHeight = () => {
-    setHeight({});
-  };
+  }, [router]);
+
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20NEP-171%20Token%20Transfers&brand=near`;
 
   return (
@@ -70,20 +140,15 @@ const NftToxenTxns = () => {
             </h1>
           </div>
         </div>
-
+        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48 ">
-          <div style={height} className="relative block lg:flex lg:space-x-2">
+          <div className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">
-              <VmComponent
-                src={components?.nftTransfersList}
-                skeleton={<List className="absolute" ref={heightRef} />}
-                defaultSkelton={<List />}
-                onChangeHeight={onChangeHeight}
-                props={{
-                  t: t,
-                  network: networkId,
-                }}
-                loading={<List className="absolute" ref={heightRef} />}
+              <TransfersList
+                data={data}
+                totalCount={dataCount}
+                error={error}
+                status={status}
               />
             </div>
           </div>

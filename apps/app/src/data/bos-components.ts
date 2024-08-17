@@ -24,6 +24,7 @@ type NetworkComponents = {
   exportData: string;
   buttons: string;
   tpsChart: string;
+  commentsFeed: string;
 };
 const accountId = env('NEXT_PUBLIC_ACCOUNT_ID');
 
@@ -51,6 +52,7 @@ const ComponentUrl = {
   exportData: `${accountId}/widget/bos-components.components.ExportData`,
   buttons: `${accountId}/widget/bos-components.components.Shared.Buttons`,
   tpsChart: `${accountId}/widget/bos-components.components.Transactions.TpsChart`,
+  commentsFeed: `${accountId}/widget/bos-components.components.Comments.Feed`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,
