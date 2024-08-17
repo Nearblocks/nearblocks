@@ -7,231 +7,296 @@ import dayjs from '#libs/dayjs';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 
-const EXPIRY = 5; // 5 sec
-const DATE_RANGE = 2;
-const BLOCK_RANGE = 500;
+const EXPIRY = 5; // 5s
+const DATE_RANGE = 2; // 2d
+const BLOCK_RANGE = 300; // 5m
+const EVENT_RANGE = 60; // 1m
 
-const isBlockInSync = (height: number) => height <= BLOCK_RANGE;
+const isInSync = (timestamp: string) =>
+  dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
+const isEventInSync = (latest: string, current: string) =>
+  +latest.slice(0, 10) - +current.slice(0, 10) <= EVENT_RANGE;
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
-const getSettings = async () => {
-  const [settings, block, stats, statsNew] = await redis.cache(
-    'sync:settings',
+const getLatestBlock = async () => {
+  return redis.cache(
+    'sync:block',
     async () => {
-      return await Promise.all([
-        sql`
-          SELECT
-            *
-          FROM
-            settings
-        `,
-        sql`
-          SELECT
-            block_height
-          FROM
-            blocks
-          ORDER BY
-            block_height DESC
-          LIMIT
-            1
-        `,
-        sql`
-          SELECT
-            date
-          FROM
-            daily_stats
-          ORDER BY
-            date DESC
-          LIMIT
-            1
-        `,
-        sql`
-          SELECT
-            date
-          FROM
-            daily_stats_new
-          ORDER BY
-            date DESC
-          LIMIT
-            1
-        `,
-      ]);
+      return await sql`
+        SELECT
+          block_height,
+          block_timestamp
+        FROM
+          blocks
+        ORDER BY
+          block_height DESC
+        LIMIT
+          1
+      `;
     },
     EXPIRY,
   );
-
-  return { block, settings, stats, statsNew };
 };
 
-const timestampQuery = (block: number) => sql`
-  SELECT
-    block_timestamp
-  FROM
-    blocks
-  WHERE
-    block_height = ${block}
-`;
-
-const status = catchAsync(async (_req: Request, res: Response) => {
-  const { block, settings, stats, statsNew } = await getSettings();
-
-  const latestBlock = block?.[0]?.block_height;
-  const events = settings.find((item: Setting) => item.key === 'events');
-  const balance = settings.find((item: Setting) => item.key === 'balance');
-  const ftHolders = settings.find((item: Setting) => item.key === 'ft_holders');
-  const nftHolders = settings.find(
-    (item: Setting) => item.key === 'nft_holders',
+const getBlock = (block: number) => {
+  return redis.cache(
+    `sync:block:${block}`,
+    async () => {
+      return await sql`
+        SELECT
+          block_height,
+          block_timestamp
+        FROM
+          blocks
+        WHERE
+          block_height = ${block}
+      `;
+    },
+    EXPIRY,
   );
-  const eventSnapshots = settings.find(
-    (item: Setting) => item.key === 'event-snapshots',
-  );
-  const deletedAccounts = settings.find(
-    (item: Setting) => item.key === 'deleted-accounts',
-  );
+};
 
-  const [ftHoldersTime, nftHoldersTime] = await Promise.all([
-    ftHolders?.value?.sync ? timestampQuery(ftHolders.value.sync) : null,
-    nftHolders?.value?.sync ? timestampQuery(nftHolders.value.sync) : null,
+const getSettings = async () => {
+  return redis.cache(
+    'sync:settings',
+    async () => {
+      return await sql`
+        SELECT
+          *
+        FROM
+          settings
+      `;
+    },
+    EXPIRY,
+  );
+};
+
+const getLatestFTEvent = async () => {
+  return redis.cache(
+    'sync:ft',
+    async () => {
+      return await sql`
+        SELECT
+          block_height,
+          block_timestamp
+        FROM
+          ft_events
+        ORDER BY
+          block_timestamp DESC
+        LIMIT
+          1
+      `;
+    },
+    EXPIRY,
+  );
+};
+
+const getLatestNFTEvent = async () => {
+  return redis.cache(
+    'sync:nft',
+    async () => {
+      return await sql`
+        SELECT
+          block_height,
+          block_timestamp
+        FROM
+          nft_events
+        ORDER BY
+          block_timestamp DESC
+        LIMIT
+          1
+      `;
+    },
+    EXPIRY,
+  );
+};
+
+const getLatestStats = async () => {
+  return redis.cache(
+    `sync:stats`,
+    async () => {
+      return await sql`
+        SELECT
+          date
+        FROM
+          daily_stats
+        ORDER BY
+          date DESC
+        LIMIT
+          1
+      `;
+    },
+    EXPIRY,
+  );
+};
+
+const getBaseStatus = async () => {
+  const latestBlock = await getLatestBlock();
+
+  const height = latestBlock?.[0].block_height;
+  const timestamp = latestBlock?.[0].block_timestamp;
+
+  return { height, sync: isInSync(timestamp), timestamp };
+};
+
+const getBalanceStatus = async () => {
+  const settings = await getSettings();
+
+  const balanceHeight = settings.find((item: Setting) => item.key === 'balance')
+    ?.value?.sync;
+
+  if (!balanceHeight) {
+    return { height: null, sync: false, timestamp: null };
+  }
+
+  const syncedBlock = await getBlock(balanceHeight);
+
+  const height = syncedBlock?.[0].block_height;
+  const timestamp = syncedBlock?.[0].block_timestamp;
+
+  return { height, sync: isInSync(timestamp), timestamp };
+};
+
+const getEventStatus = async () => {
+  const settings = await getSettings();
+
+  const eventHeight = settings.find((item: Setting) => item.key === 'events')
+    ?.value?.sync;
+
+  if (!eventHeight) {
+    return { height: null, sync: false, timestamp: null };
+  }
+
+  const syncedBlock = await getBlock(eventHeight);
+
+  const height = syncedBlock?.[0].block_height;
+  const timestamp = syncedBlock?.[0].block_timestamp;
+
+  return { height, sync: isInSync(timestamp), timestamp };
+};
+
+const getFTHoldersStatus = async () => {
+  const settings = await getSettings();
+
+  const ftHoldersHeight = settings.find(
+    (item: Setting) => item.key === 'ft_holders',
+  )?.value?.sync;
+
+  if (!ftHoldersHeight) {
+    return { height: null, sync: false, timestamp: null };
+  }
+
+  const [eventBlock, syncedBlock] = await Promise.all([
+    getLatestFTEvent(),
+    getBlock(ftHoldersHeight),
   ]);
 
-  const status = {
-    aggregates: {
-      ft_holders: {
-        height: ftHolders?.value?.sync,
-        sync: isBlockInSync(latestBlock - ftHolders?.value?.sync),
-        timestamp: ftHoldersTime?.[0]?.block_timestamp,
-      },
-      nft_holders: {
-        height: nftHolders?.value?.sync,
-        sync: isBlockInSync(latestBlock - nftHolders?.value?.sync),
-        timestamp: nftHoldersTime?.[0]?.block_timestamp,
-      },
-    },
-    indexers: {
-      balance: {
-        height: balance?.value?.sync,
-        sync: isBlockInSync(latestBlock - balance?.value?.sync),
-      },
-      base: {
-        height: block?.[0]?.block_height,
-        sync: isBlockInSync(latestBlock - block?.[0]?.block_height),
-      },
-      events: {
-        height: events?.value?.sync,
-        sync: isBlockInSync(latestBlock - events?.value?.sync),
-      },
-    },
-    jobs: {
-      daily_stats: {
-        date: stats?.[0]?.date,
-        sync: isDateInSync(stats?.[0]?.date),
-      },
-      daily_stats_new: {
-        date: statsNew?.[0]?.date,
-        sync: isDateInSync(statsNew?.[0]?.date),
-      },
-      deleted_accounts: {
-        height: deletedAccounts?.value?.sync,
-        sync: isBlockInSync(latestBlock - deletedAccounts?.value?.sync),
-      },
-      event_snapshots: {
-        date: eventSnapshots?.value?.date,
-        sync: isDateInSync(eventSnapshots?.value?.date),
-      },
-    },
+  const height = syncedBlock?.[0].block_height;
+  const timestamp = syncedBlock?.[0].block_timestamp;
+  const eventTimestamp = eventBlock?.[0].block_timestamp;
+
+  return {
+    height,
+    sync: isInSync(timestamp) || isEventInSync(eventTimestamp, timestamp),
+    timestamp,
   };
+};
 
-  return res.status(200).json({ status });
-});
+const getNFTHoldersStatus = async () => {
+  const settings = await getSettings();
 
-const ft = catchAsync(async (_req: Request, res: Response) => {
-  const { block, settings } = await getSettings();
-
-  const latestBlock = block?.[0]?.block_height;
-  const ftHolders = settings.find((item: Setting) => item.key === 'ft_holders');
-
-  const ftHoldersTime = ftHolders?.value?.sync
-    ? await timestampQuery(ftHolders.value.sync)
-    : null;
-
-  const status = {
-    height: ftHolders?.value?.sync,
-    sync: isBlockInSync(latestBlock - ftHolders?.value?.sync),
-    timestamp: ftHoldersTime?.[0]?.block_timestamp,
-  };
-
-  return res.status(200).json({ status });
-});
-
-const nft = catchAsync(async (_req: Request, res: Response) => {
-  const { block, settings } = await getSettings();
-
-  const latestBlock = block?.[0]?.block_height;
-  const nftHolders = settings.find(
+  const nftHoldersHeight = settings.find(
     (item: Setting) => item.key === 'nft_holders',
-  );
+  )?.value?.sync;
 
-  const ftHoldersTime = nftHolders?.value?.sync
-    ? await timestampQuery(nftHolders.value.sync)
-    : null;
+  if (!nftHoldersHeight) {
+    return { height: null, sync: false, timestamp: null };
+  }
 
-  const status = {
-    height: nftHolders?.value?.sync,
-    sync: isBlockInSync(latestBlock - nftHolders?.value?.sync),
-    timestamp: ftHoldersTime?.[0]?.block_timestamp,
+  const [eventBlock, syncedBlock] = await Promise.all([
+    getLatestNFTEvent(),
+    getBlock(nftHoldersHeight),
+  ]);
+
+  const height = syncedBlock?.[0].block_height;
+  const timestamp = syncedBlock?.[0].block_timestamp;
+  const eventTimestamp = eventBlock?.[0].block_timestamp;
+
+  return {
+    height,
+    sync: isInSync(timestamp) || isEventInSync(eventTimestamp, timestamp),
+    timestamp,
   };
+};
 
-  return res.status(200).json({ status });
-});
+const getStatStatus = async () => {
+  const stats = await getLatestStats();
+
+  const date = stats?.[0]?.date;
+
+  return { date, sync: isDateInSync(date) };
+};
 
 const balance = catchAsync(async (_req: Request, res: Response) => {
-  const { block, settings } = await getSettings();
-
-  const latestBlock = block?.[0]?.block_height;
-  const balance = settings.find((item: Setting) => item.key === 'balance');
-
-  const status = {
-    height: balance?.value?.sync,
-    sync: isBlockInSync(latestBlock - balance?.value?.sync),
-  };
+  const status = await getBalanceStatus();
 
   return res.status(200).json({ status });
 });
 
 const base = catchAsync(async (_req: Request, res: Response) => {
-  const { block } = await getSettings();
-
-  const latestBlock = block?.[0]?.block_height;
-
-  const status = {
-    height: block?.[0]?.block_height,
-    sync: isBlockInSync(latestBlock - block?.[0]?.block_height),
-  };
+  const status = await getBaseStatus();
 
   return res.status(200).json({ status });
 });
 
 const events = catchAsync(async (_req: Request, res: Response) => {
-  const { block, settings } = await getSettings();
+  const status = await getEventStatus();
 
-  const latestBlock = block?.[0]?.block_height;
-  const events = settings.find((item: Setting) => item.key === 'events');
+  return res.status(200).json({ status });
+});
 
-  const status = {
-    height: events?.value?.sync,
-    sync: isBlockInSync(latestBlock - events?.value?.sync),
-  };
+const ft = catchAsync(async (_req: Request, res: Response) => {
+  const status = await getFTHoldersStatus();
+
+  return res.status(200).json({ status });
+});
+
+const nft = catchAsync(async (_req: Request, res: Response) => {
+  const status = await getNFTHoldersStatus();
 
   return res.status(200).json({ status });
 });
 
 const stats = catchAsync(async (_req: Request, res: Response) => {
-  const { stats } = await getSettings();
+  const status = await getStatStatus();
+
+  return res.status(200).json({ status });
+});
+
+const status = catchAsync(async (_req: Request, res: Response) => {
+  const [base, balance, events, ft, nft, stats] = await Promise.all([
+    getBaseStatus(),
+    getBalanceStatus(),
+    getEventStatus(),
+    getFTHoldersStatus(),
+    getNFTHoldersStatus(),
+    getStatStatus(),
+  ]);
 
   const status = {
-    date: stats?.[0]?.date,
-    sync: isDateInSync(stats?.[0]?.date),
+    aggregates: {
+      ft_holders: ft,
+      nft_holders: nft,
+    },
+    indexers: {
+      balance,
+      base,
+      events,
+    },
+    jobs: {
+      daily_stats: stats,
+    },
   };
 
   return res.status(200).json({ status });
