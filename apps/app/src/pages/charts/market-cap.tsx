@@ -1,44 +1,85 @@
 import Head from 'next/head';
 import Layout from '@/components/Layouts';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useRef, useState } from 'react';
-import Detail from '@/components/skeleton/charts/Detail';
+import { ReactElement, useEffect, useState } from 'react';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import fetcher from '@/utils/fetcher';
+import Chart from '@/components/Charts/Chart';
+import { useRouter } from 'next/router';
+import { Spinner } from '@/components/common/Spinner';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-const MarketCapChart = () => {
+
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  error: boolean;
+}> = async () => {
+  try {
+    const [dataResult] = await Promise.allSettled([fetcher('charts')]);
+
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const error = dataResult.status === 'rejected';
+
+    return {
+      props: {
+        data,
+        error,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        data: null,
+        error: true,
+      },
+    };
+  }
+};
+
+const MarketCapChart = ({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const components = useBosComponents();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
-  const { theme } = useTheme();
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
 
     return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
     };
-  }, []);
-  const onChangeHeight = () => {
-    setHeight({});
-  };
+  }, [router]);
+
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('charts:marketCap.heading'),
   )}&brand=near`;
+
   return (
     <>
       <Head>
@@ -74,35 +115,15 @@ const MarketCapChart = () => {
             </h1>
           </div>
         </div>
+        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48">
           <div className="container mx-auto px-3 -mt-36">
-            <div style={height} className="relative">
-              <VmComponent
-                src={components?.charts}
-                skeleton={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'market-cap'}
-                    ref={heightRef}
-                  />
-                }
-                defaultSkelton={<Detail chartTypes={'market-cap'} />}
-                onChangeHeight={onChangeHeight}
-                props={{
-                  chartTypes: 'market-cap',
-                  poweredBy: false,
-                  network: networkId,
-                  t: t,
-                  theme: theme,
-                }}
-                loading={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'market-cap'}
-                    ref={heightRef}
-                  />
-                }
-              />{' '}
+            <div className="relative">
+              <Chart
+                poweredBy={false}
+                chartTypes={'market-cap'}
+                chartsData={data}
+              />
             </div>
           </div>
         </div>

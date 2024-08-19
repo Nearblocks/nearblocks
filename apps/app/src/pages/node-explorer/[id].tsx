@@ -1,60 +1,26 @@
 import Head from 'next/head';
-import Router, { useRouter } from 'next/router';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
-import useTranslation from 'next-translate/useTranslation';
+import { useRouter } from 'next/router';
+import { appUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement } from 'react';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import Delegator from '@/components/skeleton/node-explorer/Delegator';
+import Buttons from '@/components/Address/Buttons';
+import Delegators from '@/components/NodeExplorer/Delegators';
+
 const network = env('NEXT_PUBLIC_NETWORK_ID');
-const Delegators = () => {
+
+const Delegator = () => {
   const router = useRouter();
-  const { id } = router.query;
-  const components = useBosComponents();
-  const { t } = useTranslation();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
-  const { page } = router.query;
-  const initialPage = page ? Number(page) : 1;
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const { theme } = useTheme();
+  const { id }: any = router.query;
+
   const title = `${network === 'testnet' ? 'TESTNET ' : ''}${
     id ? `${id}: ` : ''
   } delegators | NearBlocks`;
   const description = id
     ? `Node Validator ${id} (${id}) Delegators Listing`
     : '';
-  const setPage = (pageNumber: number) => {
-    Router.push(`/node-explorer/${id}?page=${pageNumber}`, undefined, {
-      shallow: true,
-    });
-    setCurrentPage(pageNumber);
-  };
-  useEffect(() => {
-    setCurrentPage(page ? Number(page) : 1);
-  }, [page]);
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
-  useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
-    return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
-    };
-  }, []);
-  const onChangeHeight = () => {
-    setHeight({});
-  };
+
   return (
     <>
       <Head>
@@ -86,13 +52,7 @@ const Delegators = () => {
                         @<span className="font-semibold">{id}</span>
                       </span>
                       <span className="ml-2">
-                        <VmComponent
-                          src={components?.buttons}
-                          props={{
-                            id: id,
-                            theme: theme,
-                          }}
-                        />
+                        <Buttons address={id} />
                       </span>
                     </span>
                   )}
@@ -101,26 +61,12 @@ const Delegators = () => {
             </div>
           )}
         </div>
-        <div style={height}>
-          <VmComponent
-            src={components?.delegators}
-            skeleton={<Delegator className="absolute" ref={heightRef} />}
-            defaultSkelton={<Delegator className="ml-3" />}
-            onChangeHeight={onChangeHeight}
-            props={{
-              accountId: id,
-              currentPage: currentPage,
-              setPage: setPage,
-              network: networkId,
-              theme: theme,
-              t: t,
-            }}
-            loading={<Delegator className="absolute" ref={heightRef} />}
-          />
+        <div>
+          <Delegators accountId={id} />
         </div>
       </div>
     </>
   );
 };
-Delegators.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
-export default Delegators;
+Delegator.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+export default Delegator;

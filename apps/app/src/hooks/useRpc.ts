@@ -65,6 +65,110 @@ const useRpc = () => {
       public_key: key,
     });
 
+  const getAccount = async (poolId: string, account_id: string | undefined) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: poolId,
+        method_name: 'get_account',
+        args_base64: encodeArgs({ account_id }),
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const getNumberOfAccounts = async (poolId: string) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: poolId,
+        method_name: 'get_number_of_accounts',
+        args_base64: 'e30=',
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const getAccounts = async (
+    poolId: string,
+    start: number,
+    limit: number,
+    setLoading: (loading: boolean) => void,
+    setError: (error: boolean) => void,
+  ) => {
+    setLoading(true);
+    setError(false);
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: poolId,
+        method_name: 'get_accounts',
+        args_base64: encodeArgs({ from_index: start, limit: limit }),
+      });
+      const result = (resp as any).result;
+      setLoading(false);
+      return decodeArgs(result);
+    } catch (error) {
+      setError(true);
+      setLoading(false);
+      console.error('Error fetching accounts:', error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getValidators = async () => {
+    try {
+      const validators = await provider.validators(null);
+      return validators;
+    } catch (error) {
+      console.error('Error fetching validators:', error);
+      return null;
+    }
+  };
+
+  const getRewardFeeFraction = async (poolId: string) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: poolId,
+        method_name: 'get_reward_fee_fraction',
+        args_base64: 'e30=',
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const getFieldsByPool = async (poolId: string) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: 'pool-details.near',
+        method_name: 'get_fields_by_pool',
+        args_base64: encodeArgs({ pool_id: poolId }),
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      return null;
+    }
+  };
+
   return {
     getBlockDetails,
     contractCode,
@@ -72,6 +176,12 @@ const useRpc = () => {
     viewAccount,
     ftBalanceOf,
     viewAccessKey,
+    getAccount,
+    getAccounts,
+    getNumberOfAccounts,
+    getValidators,
+    getRewardFeeFraction,
+    getFieldsByPool,
   };
 };
 export default useRpc;

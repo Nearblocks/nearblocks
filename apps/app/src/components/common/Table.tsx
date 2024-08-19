@@ -15,7 +15,7 @@ interface Props {
   data?: any[];
   isPagination?: boolean;
   count?: number;
-  page: number;
+  page?: number;
   limit: number;
   pageLimit?: number;
   setPage?: (page: number) => void;
@@ -58,14 +58,14 @@ const Table = (props: Props) => {
             </tbody>
           </table>
         </div>
-        {props.isPagination && props.page && props.pageLimit ? (
+        {props.isPagination && props.pageLimit ? (
           <Paginator
             count={props.count as number}
             limit={props.limit}
             pageLimit={props.pageLimit}
           />
         ) : null}
-        {props.cursorPagination && props.setPage ? (
+        {props.cursorPagination && props.page && props.setPage ? (
           <CursorPaginator
             cursor={props.cursor}
             page={props.page}
@@ -214,6 +214,7 @@ const Table = (props: Props) => {
       {props.cursorPagination &&
       !props.Error &&
       props.data?.length !== 0 &&
+      props.page &&
       props.setPage ? (
         <CursorPaginator
           page={props.page}

@@ -1,44 +1,81 @@
 import Head from 'next/head';
 import Layout from '@/components/Layouts';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useRef, useState } from 'react';
-import Detail from '@/components/skeleton/charts/Detail';
+import { ReactElement, useEffect, useState } from 'react';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import fetcher from '@/utils/fetcher';
+import Chart from '@/components/Charts/Chart';
+import { useRouter } from 'next/router';
+import { Spinner } from '@/components/common/Spinner';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-const NearSupplyChart = () => {
-  const { t } = useTranslation();
-  const components = useBosComponents();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
-  const { theme } = useTheme();
 
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  error: boolean;
+}> = async () => {
+  try {
+    const [dataResult] = await Promise.allSettled([fetcher('charts')]);
+
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const error = dataResult.status === 'rejected';
+
+    return {
+      props: {
+        data,
+        error,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        data: null,
+        error: true,
+      },
+    };
+  }
+};
+
+const NearSupplyChart = ({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
 
     return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
     };
-  }, []);
+  }, [router]);
 
-  const onChangeHeight = () => {
-    setHeight({});
-  };
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('charts:nearSupply.heading'),
   )}&brand=near`;
@@ -83,34 +120,14 @@ const NearSupplyChart = () => {
             </h1>
           </div>
         </div>
+        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48">
           <div className="container mx-auto px-3 -mt-36">
-            <div style={height} className="relative">
-              <VmComponent
-                src={components?.charts}
-                skeleton={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'near-supply'}
-                    ref={heightRef}
-                  />
-                }
-                defaultSkelton={<Detail chartTypes={'near-supply'} />}
-                onChangeHeight={onChangeHeight}
-                props={{
-                  chartTypes: 'near-supply',
-                  poweredBy: false,
-                  network: networkId,
-                  t: t,
-                  theme: theme,
-                }}
-                loading={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'near-supply'}
-                    ref={heightRef}
-                  />
-                }
+            <div className="relative">
+              <Chart
+                poweredBy={false}
+                chartTypes={'near-supply'}
+                chartsData={data}
               />
             </div>
           </div>

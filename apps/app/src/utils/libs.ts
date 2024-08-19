@@ -508,3 +508,63 @@ export function tokenAmount(
 
   return formattedValue;
 }
+
+export function timeAgo(unixTimestamp: number): string {
+  const currentTimestamp: number = Math.floor(Date.now() / 1000);
+  const secondsAgo: number = currentTimestamp - unixTimestamp;
+
+  if (secondsAgo < 5) {
+    return 'Just now';
+  } else if (secondsAgo < 60) {
+    return `${secondsAgo} seconds ago`;
+  } else if (secondsAgo < 3600) {
+    const minutesAgo: number = Math.floor(secondsAgo / 60);
+    return `${minutesAgo} minute${minutesAgo > 1 ? 's' : ''} ago`;
+  } else if (secondsAgo < 86400) {
+    const hoursAgo: number = Math.floor(secondsAgo / 3600);
+    return `${hoursAgo} hour${hoursAgo > 1 ? 's' : ''} ago`;
+  } else if (secondsAgo < 2592000) {
+    const daysAgo: number = Math.floor(secondsAgo / 86400);
+    return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
+  } else if (secondsAgo < 31536000) {
+    const monthsAgo: number = Math.floor(secondsAgo / 2592000);
+    return `${monthsAgo} month${monthsAgo > 1 ? 's' : ''} ago`;
+  } else {
+    const yearsAgo: number = Math.floor(secondsAgo / 31536000);
+    return `${yearsAgo} year${yearsAgo > 1 ? 's' : ''} ago`;
+  }
+}
+
+export function convertTimestampToTime(timestamp: string) {
+  const timestampBig = new Big(timestamp);
+
+  const hours = timestampBig.div(3600).round(0, 0).toString();
+  const minutes = timestampBig.mod(3600).div(60).round(0, 0).toString();
+  const seconds = timestampBig.mod(60).round(0, 0).toString();
+
+  return `${hours.padStart(2, '0')}H ${minutes.padStart(
+    2,
+    '0',
+  )}M ${seconds.padStart(2, '0')}S`;
+}
+
+export function convertAmountToReadableString(amount: string, type: string) {
+  if (!amount) return null;
+
+  let value = '';
+  let suffix = '';
+
+  const nearNomination = new Big(10).pow(24);
+
+  const amountInNear = new Big(amount).div(nearNomination);
+
+  if (type === 'totalSupply' || type === 'totalStakeAmount') {
+    value = formatWithCommas(amountInNear.div(1e6).toFixed(1));
+    suffix = 'M';
+  } else if (type === 'seatPriceAmount') {
+    value = formatWithCommas(amountInNear.round().toString());
+  } else {
+    value = amount.toString();
+  }
+  return `${value}${suffix}`;
+}
