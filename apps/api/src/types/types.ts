@@ -18,6 +18,7 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
+  dbWriteUrl: string;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryRows: number;

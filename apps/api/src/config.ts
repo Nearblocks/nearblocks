@@ -10,6 +10,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  DATABASE_WRITE_URL: str(),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -36,6 +37,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
+  dbWriteUrl: env.DATABASE_WRITE_URL,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryRows: 5000,

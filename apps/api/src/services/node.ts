@@ -2,7 +2,7 @@ import { Response } from 'express';
 import geoip from 'geoip-lite';
 
 import catchAsync from '#libs/async';
-import sql from '#libs/postgres';
+import { writeSql } from '#libs/postgres';
 import { NodeTelemetry } from '#libs/schema/node';
 import { RequestValidator } from '#types/types';
 
@@ -42,13 +42,13 @@ const telemetry = catchAsync(
       status: data.chain.status,
     };
 
-    await sql`
+    await writeSql`
       INSERT INTO
-        nodes ${sql(node)}
+        nodes ${writeSql(node)}
       ON CONFLICT (node_id) DO
       UPDATE
       SET
-        ${sql(node)}
+        ${writeSql(node)}
     `;
 
     return res.status(200).json();
