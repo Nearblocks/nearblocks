@@ -577,6 +577,7 @@ export function jsonParser(jsonString: string) {
     return null;
   }
 }
+
 export function jsonStringify(obj: any, replacer?: any, space?: any) {
   try {
     return JSON.stringify(obj, replacer, space);
@@ -584,4 +585,15 @@ export function jsonStringify(obj: any, replacer?: any, space?: any) {
     console.error('Error stringifying JSON', e);
     return null;
   }
+}
+
+export const isValidAccount = (accountId: string) => {
+  const ACCOUNT_ID_REGEX =
+    /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+
+  return (
+    accountId.length >= 2 &&
+    accountId.length <= 64 &&
+    ACCOUNT_ID_REGEX.test(accountId)
+  );
 }

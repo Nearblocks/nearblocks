@@ -79,3 +79,22 @@ export const useFetch = <T = any>(
     loading: !error && !data,
   };
 };
+
+export const poster = (
+  url: string,
+  data: any,
+  options: AxiosRequestConfig = {},
+) =>
+  request
+    .post(url, data, {
+      headers: {
+        'Secs-Fetch-Key': fetchKey,
+        ...(options?.headers || {}),
+      },
+      attempt: 1,
+      ...options,
+    })
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
