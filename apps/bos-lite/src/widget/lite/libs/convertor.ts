@@ -38,29 +38,23 @@ const convertor = (): ConvertorModule => {
     return ns.div(MS_PER_NS).toNumber();
   };
 
-  const nsToDateTime: NsToDateTime = (value, format) => {
-    const date = new Date(nsToMs(value));
+  const nsToDateTime = (value: number | string, format: string) => {
+    const date = new Date(Number(value) / 1e6);
 
-    const year = date.getFullYear().toString();
-    const year2 = date.getFullYear().toString().slice(2);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hour = date.getHours();
-    const hour12 = (hour % 12 || 12).toString().padStart(2, '0');
-    const minute = date.getMinutes().toString().padStart(2, '0');
-    const second = date.getSeconds().toString().padStart(2, '0');
-    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const year = date.getUTCFullYear().toString();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const hour = date.getUTCHours().toString().padStart(2, '0');
+    const minute = date.getUTCMinutes().toString().padStart(2, '0');
+    const second = date.getUTCSeconds().toString().padStart(2, '0');
 
     const replacements: { [key: string]: string } = {
       YYYY: year,
-      YY: year2,
       MM: month,
       DD: day,
-      HH: hour.toString().padStart(2, '0'),
-      hh: hour12,
+      HH: hour,
       mm: minute,
       ss: second,
-      AA: ampm,
     };
 
     let formatted = format;

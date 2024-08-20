@@ -91,3 +91,4 @@ type inferBodyType<
 }[T];
 
 declare const Big;
+declare const ethers;

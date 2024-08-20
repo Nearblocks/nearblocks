@@ -80,7 +80,7 @@ const Actions = ({ actions, open, receipt, setOpen }: ActionsProps) => {
           <Widget<ActionProps>
             key={`action-${index}`}
             loading={<TxnActionSkeleton />}
-            props={{ action, open, setOpen }}
+            props={{ action, open, receiver: receipt.receiverId, setOpen }}
             src={`${config_account}/widget/lite.Txn.Action`}
           />
         ))}

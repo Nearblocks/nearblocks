@@ -91,7 +91,7 @@ export const TxnSkeleton = () => (
         </Skeleton>
       </div>
       <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-        <h2 className="font-medium text-sm mb-0.5">Time</h2>
+        <h2 className="font-medium text-sm mb-0.5">Time (UTC)</h2>
         <Skeleton className="block h-[39px] w-[280px]" loading>
           <div className="font-heading font-medium text-[24px]">&nbsp;</div>
         </Skeleton>
