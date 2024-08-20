@@ -1,45 +1,78 @@
 import Layout from '@/components/Layouts';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
-import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useRef, useState } from 'react';
-import Detail from '@/components/skeleton/charts/Detail';
+import { appUrl } from '@/utils/config';
+import { ReactElement, useEffect, useState } from 'react';
 import Notice from '@/components/common/Notice';
-import { useTheme } from 'next-themes';
 import Head from 'next/head';
 import { env } from 'next-runtime-env';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import fetcher from '@/utils/fetcher';
+import TpsCharts from '@/components/Charts/TpsChart';
+import { useRouter } from 'next/router';
+import { Spinner } from '@/components/common/Spinner';
 
-const TpsChart = () => {
-  const { t } = useTranslation();
-  const { theme } = useTheme();
-  const components = useBosComponents();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  error: boolean;
+}> = async () => {
+  try {
+    const [dataResult] = await Promise.allSettled([fetcher('charts/tps')]);
 
-  const ogUrl = env('NEXT_PUBLIC_OG_URL');
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const error = dataResult.status === 'rejected';
 
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
+    return {
+      props: {
+        data,
+        error,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching tpsChart:', error);
+    return {
+      props: {
+        data: null,
+        error: true,
+      },
+    };
+  }
+};
+
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
+const Tps = ({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
 
     return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
     };
-  }, []);
-
-  const onChangeHeight = () => {
-    setHeight({});
-  };
+  }, [router]);
 
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     'Near Transactions per Second Chart',
@@ -88,34 +121,14 @@ const TpsChart = () => {
             </h1>
           </div>
         </div>
+        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48">
           <div className="container mx-auto px-3 -mt-36">
-            <div style={height} className="relative">
-              <VmComponent
-                src={components?.tpsChart}
-                skeleton={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'near-tps'}
-                    ref={heightRef}
-                  />
-                }
-                defaultSkelton={<Detail chartTypes={'near-tps'} />}
-                onChangeHeight={onChangeHeight}
-                props={{
-                  chartTypes: 'near-tps',
-                  poweredBy: false,
-                  network: networkId,
-                  t: t,
-                  theme: theme,
-                }}
-                loading={
-                  <Detail
-                    className="absolute"
-                    chartTypes={'near-tps'}
-                    ref={heightRef}
-                  />
-                }
+            <div className="relative">
+              <TpsCharts
+                poweredBy={false}
+                chartTypes={'near-tps'}
+                data={data}
               />
             </div>
           </div>
@@ -126,8 +139,8 @@ const TpsChart = () => {
   );
 };
 
-TpsChart.getLayout = (page: ReactElement) => (
+Tps.getLayout = (page: ReactElement) => (
   <Layout notice={<Notice />}>{page}</Layout>
 );
 
-export default TpsChart;
+export default Tps;
