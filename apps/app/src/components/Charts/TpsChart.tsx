@@ -147,6 +147,9 @@ const TpsChart = (props: Props) => {
       height: 430,
       backgroundColor: 'transparent',
     },
+    accessibility: {
+      enabled: false,
+    },
     boost: {
       useGPUTranslations: true,
     },
@@ -216,6 +219,7 @@ const TpsChart = (props: Props) => {
       <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
       <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/big.js@5.2.2"></script>
+      <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <style>
       body {
         background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};

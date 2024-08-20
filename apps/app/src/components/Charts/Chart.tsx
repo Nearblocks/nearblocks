@@ -242,6 +242,9 @@ const Chart = (props: Props) => {
           zoomType: 'x',
           backgroundColor: 'transparent',
         },
+        accessibility: {
+          enabled: false,
+        },
         title: {
           text: titleText,
           style: {
@@ -340,13 +343,15 @@ const Chart = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartData, chartTypes, theme]);
 
-  const iframeSrc = `
+  const iframeSrc = chartConfig
+    ? `
     <html>
       <head>
         <script src="https://code.highcharts.com/highcharts.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
         <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/big.js@5.2.2"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
       <style>
         body {
           background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};
@@ -458,7 +463,8 @@ const Chart = (props: Props) => {
         </script>
       </body>
     </html>
-  `;
+  `
+    : ``;
 
   return (
     <div>

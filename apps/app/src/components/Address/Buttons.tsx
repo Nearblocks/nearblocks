@@ -81,9 +81,9 @@ const Buttons = ({ address }: Props) => {
       >
         <DialogContent
           aria-label="Qr Code"
-          className="max-w-xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
+          className="max-w-xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden dark:bg-black-600"
         >
-          <div className="flex items-center justify-between bg-gray-100 px-3 py-4">
+          <div className="flex items-center justify-between bg-gray-100 px-3 py-4 dark:bg-black-200 dark:text-neargray-10">
             <h4 className="flex items-center text-xs break-all">{address}</h4>
             <button className="text-gray-500 fill-current" onClick={onToggle}>
               <CloseCircle />

@@ -1,3 +1,5 @@
+import { useTheme } from 'next-themes';
+
 /**
  * @interface Props
  * @param {string} [value] - The data value to be encoded as a QR code (e.g., a URL, text, etc.).
@@ -12,13 +14,13 @@ interface Props {
 }
 
 const QrCode = (props: Props) => {
-  const colorDark = props.theme === 'dark' ? '#ffffff' : '#000000';
-  const colorLight = props.theme === 'dark' ? '#000000' : '#ffffff';
+  const { theme } = useTheme();
+
+  const colorDark = theme === 'dark' ? '#ffffff' : '#000000';
+  const colorLight = theme === 'dark' ? '#000000' : '#ffffff';
 
   const srcData = `
-    <html style="background-color: ${
-      props.theme === 'dark' ? '#0d0d0d' : '#fffff'
-    };">
+    <html style="background-color: ${theme === 'dark' ? '#0d0d0d' : '#fffff'};">
     <body>
       <div id="qrcode" style="display: flex; flex-direction: column; justify-content: center; align-items: center;"></div>
     

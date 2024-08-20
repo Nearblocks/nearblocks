@@ -26,6 +26,7 @@ const Footer = () => {
                     height="40"
                     alt="NearBlocks"
                     layout="fixed"
+                    priority
                   />
                 </div>
                 <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
@@ -46,6 +47,7 @@ const Footer = () => {
                       width={24}
                       height={24}
                       alt="Twitter"
+                      priority
                     />
                   </a>
                   <a
@@ -63,6 +65,7 @@ const Footer = () => {
                       width={24}
                       height={24}
                       alt="Github"
+                      priority
                     />
                   </a>
                 </div>
@@ -181,6 +184,7 @@ const Footer = () => {
                     className="inline-flex w-5 h-5"
                     width={20}
                     height={20}
+                    priority
                   />{' '}
                 </a>
               </Link>

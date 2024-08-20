@@ -1,6 +1,7 @@
 import { useRpcStore } from '@/stores/rpc';
 import { providers } from 'near-api-js';
 import { decodeArgs, encodeArgs } from '../utils/near';
+import { AccessInfo } from '@/utils/types';
 
 const useRpc = () => {
   const rpcUrl: any = useRpcStore((state) => state.rpc);
@@ -57,13 +58,18 @@ const useRpc = () => {
     }
   };
 
-  const viewAccessKey = async (address: string, key: string) =>
-    provider.query({
+  const viewAccessKey = async (
+    address: string,
+    key: string,
+  ): Promise<AccessInfo> => {
+    const response = await provider.query({
       request_type: 'view_access_key',
       finality: 'final',
       account_id: address,
       public_key: key,
     });
+    return response as unknown as AccessInfo;
+  };
 
   const getAccount = async (poolId: string, account_id: string | undefined) => {
     try {

@@ -421,7 +421,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
 
     return (
       <>
-        <tr className="border-none bg-gray-50 dark:bg-black-500">
+        <tr className="border-none bg-gray-50 dark:bg-black-300">
           {telemetry && (
             <>
               <td colSpan={2} className="pl-8 py-2">
@@ -673,6 +673,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                                 : '/images/twitter_icon.svg'
                             }
                             alt="Twitter"
+                            priority
                           />
                         </a>
                       )}
@@ -698,6 +699,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                                 : '/images/discord_icon.svg'
                             }
                             alt="Discord"
+                            priority
                           />
                         </a>
                       )}
@@ -723,6 +725,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                                 : '/images/github_icon.svg'
                             }
                             alt="Github"
+                            priority
                           />
                         </a>
                       )}
