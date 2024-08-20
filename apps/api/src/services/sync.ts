@@ -4,6 +4,7 @@ import { Setting } from 'nb-types';
 
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
+import logger from '#libs/logger';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 
@@ -152,8 +153,13 @@ const getBalanceStatus = async () => {
 
   const syncedBlock = await getBlock(balanceHeight);
 
-  const height = syncedBlock?.[0].block_height;
-  const timestamp = syncedBlock?.[0].block_timestamp;
+  if (!syncedBlock?.[0]) {
+    logger.warn({ syncedBlock });
+    return { height: balanceHeight, sync: false, timestamp: null };
+  }
+
+  const height = syncedBlock[0].block_height;
+  const timestamp = syncedBlock[0].block_timestamp;
 
   return { height, sync: isInSync(timestamp), timestamp };
 };
@@ -170,8 +176,13 @@ const getEventStatus = async () => {
 
   const syncedBlock = await getBlock(eventHeight);
 
-  const height = syncedBlock?.[0].block_height;
-  const timestamp = syncedBlock?.[0].block_timestamp;
+  if (!syncedBlock?.[0]) {
+    logger.warn({ syncedBlock });
+    return { height: eventHeight, sync: false, timestamp: null };
+  }
+
+  const height = syncedBlock[0].block_height;
+  const timestamp = syncedBlock[0].block_timestamp;
 
   return { height, sync: isInSync(timestamp), timestamp };
 };
@@ -192,9 +203,14 @@ const getFTHoldersStatus = async () => {
     getBlock(ftHoldersHeight),
   ]);
 
-  const height = syncedBlock?.[0].block_height;
-  const timestamp = syncedBlock?.[0].block_timestamp;
-  const eventTimestamp = eventBlock?.[0].block_timestamp;
+  if (!eventBlock?.[0] || !syncedBlock?.[0]) {
+    logger.warn({ eventBlock, syncedBlock });
+    return { height: ftHoldersHeight, sync: false, timestamp: null };
+  }
+
+  const height = syncedBlock[0].block_height;
+  const timestamp = syncedBlock[0].block_timestamp;
+  const eventTimestamp = eventBlock[0].block_timestamp;
 
   return {
     height,
@@ -219,9 +235,14 @@ const getNFTHoldersStatus = async () => {
     getBlock(nftHoldersHeight),
   ]);
 
-  const height = syncedBlock?.[0].block_height;
-  const timestamp = syncedBlock?.[0].block_timestamp;
-  const eventTimestamp = eventBlock?.[0].block_timestamp;
+  if (!eventBlock?.[0] || !syncedBlock?.[0]) {
+    logger.warn({ eventBlock, syncedBlock });
+    return { height: nftHoldersHeight, sync: false, timestamp: null };
+  }
+
+  const height = syncedBlock[0].block_height;
+  const timestamp = syncedBlock[0].block_timestamp;
+  const eventTimestamp = eventBlock[0].block_timestamp;
 
   return {
     height,
@@ -234,6 +255,10 @@ const getStatStatus = async () => {
   const stats = await getLatestStats();
 
   const date = stats?.[0]?.date;
+
+  if (!date) {
+    return { date, sync: false };
+  }
 
   return { date, sync: isDateInSync(date) };
 };
