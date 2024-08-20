@@ -8,6 +8,7 @@ Update environment variables in `*.api.env`
 
 ```
 DATABASE_URL=
+DATABASE_WRITE_URL=
 USER_DB_URL=
 REDIS_SENTINEL_NAME=
 REDIS_SENTINEL_URLS=

@@ -22,6 +22,14 @@ const sql = postgres(config.dbUrl, {
   ssl: ssl?.ca ? ssl : false,
 });
 
+export const writeSql = postgres(config.dbWriteUrl, {
+  connection: {
+    application_name: 'api-write',
+  },
+  max: 60,
+  ssl: ssl?.ca ? ssl : false,
+});
+
 export const userSql = postgres(config.userDbUrl, {
   connection: {
     application_name: 'user-api',
