@@ -567,7 +567,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
             </>
           )}
         </tr>
-        <tr className="border-none bg-gray-50 dark:bg-black-500">
+        <tr className="border-none bg-gray-50 dark:bg-black-300">
           {row?.description && (
             <>
               <td colSpan={2} className="pl-8 pt-2 pb-4 align-top">

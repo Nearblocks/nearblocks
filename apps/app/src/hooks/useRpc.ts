@@ -2,6 +2,7 @@ import { useRpcStore } from '@/stores/rpc';
 import { providers } from 'near-api-js';
 import { decodeArgs, encodeArgs } from '../utils/near';
 import { AccessInfo } from '@/utils/types';
+import { baseDecode } from 'borsh';
 
 const useRpc = () => {
   const rpcUrl: any = useRpcStore((state) => state.rpc);
@@ -174,6 +175,24 @@ const useRpc = () => {
       return null;
     }
   };
+  const ftMetadata = async (contract: string) => {
+    try {
+      const resp = (await provider.query({
+        request_type: 'call_function',
+        finality: 'final',
+        account_id: contract,
+        method_name: 'ft_metadata',
+        args_base64: '',
+      })) as any;
+
+      return decodeArgs(resp.result);
+    } catch (error) {
+      return {};
+    }
+  };
+
+  const transactionStatus = async (hash: any, signer: any) =>
+    provider.txStatusReceipts(baseDecode(hash), signer);
 
   return {
     getBlockDetails,
@@ -188,6 +207,8 @@ const useRpc = () => {
     getValidators,
     getRewardFeeFraction,
     getFieldsByPool,
+    ftMetadata,
+    transactionStatus,
   };
 };
 export default useRpc;

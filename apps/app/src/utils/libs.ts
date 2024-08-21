@@ -568,3 +568,20 @@ export function convertAmountToReadableString(amount: string, type: string) {
   }
   return `${value}${suffix}`;
 }
+
+export function jsonParser(jsonString: string) {
+  try {
+    return JSON.parse(jsonString);
+  } catch (e) {
+    console.error('Error parsing JSON', e);
+    return null;
+  }
+}
+export function jsonStringify(obj: any, replacer?: any, space?: any) {
+  try {
+    return JSON.stringify(obj, replacer, space);
+  } catch (e) {
+    console.error('Error stringifying JSON', e);
+    return null;
+  }
+}

@@ -1,63 +1,189 @@
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import Detail from '@/components/skeleton/common/Detail';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { useAuthStore } from '@/stores/auth';
 import SponserdText from '@/components/SponserdText';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import FileSlash from '@/components/Icons/FileSlash';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Details from '@/components/Transactions/Details';
+import useHash from '@/hooks/useHash';
+import classNames from 'classnames';
+import Receipt from '@/components/Transactions/Receipt';
+import Execution from '@/components/Transactions/Execution';
+import Tree from '@/components/Transactions/Tree';
+import ReceiptSummary from '@/components/Transactions/ReceiptSummary';
+import { VmComponent } from '@/components/vm/VmComponent';
+import { useBosComponents } from '@/hooks/useBosComponents';
+import Comment from '@/components/skeleton/common/Comment';
+import useRpc from '@/hooks/useRpc';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import fetcher from '@/utils/fetcher';
+import { nanoToMilli } from '@/utils/libs';
+import { Spinner } from '@/components/common/Spinner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const hashes = [' ', 'execution', 'enhanced', 'tree', 'summary', 'comments'];
 
-const Txn = () => {
+export const getServerSideProps: GetServerSideProps<{
+  data: any;
+  statsData: any;
+  error: boolean;
+  isContract: any;
+  price: any;
+}> = async (context) => {
+  const {
+    query: { hash = '' },
+  } = context;
+
+  try {
+    const [dataResult, statsDataResult] = await Promise.allSettled([
+      fetcher(`txns/${hash}`),
+      fetcher(`stats`),
+    ]);
+
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const statsData =
+      statsDataResult.status === 'fulfilled' ? statsDataResult.value : null;
+
+    const error = dataResult.status === 'rejected';
+
+    const txn = data?.txns?.[0];
+
+    let price: number | null = null;
+    if (txn?.block_timestamp) {
+      const timestamp = new Date(nanoToMilli(txn.block_timestamp));
+      const currentDate = new Date();
+      const currentDt = currentDate.toISOString().split('T')[0];
+      const blockDt = timestamp.toISOString().split('T')[0];
+
+      if (currentDt > blockDt) {
+        const priceData = await fetcher(`stats/price?date=${blockDt}`);
+        price = priceData?.stats?.[0]?.near_price || null;
+      }
+    }
+    const [contractResult] = await Promise.allSettled([
+      fetcher(`account/${txn.receiver_account_id}`),
+    ]);
+
+    const isContract =
+      contractResult.status === 'fulfilled' ? contractResult.value : null;
+    return {
+      props: {
+        data,
+        error,
+        statsData,
+        isContract,
+        price,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return {
+      props: {
+        data: null,
+        error: true,
+        statsData: null,
+        isContract: false,
+        price: null,
+      },
+    };
+  }
+};
+
+const Txn = ({
+  data,
+  error,
+  statsData,
+  isContract,
+  price,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { t } = useTranslation();
-  const { hash } = router.query;
   const components = useBosComponents();
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
-  const pageTab = `${router?.query?.tab || 'overview'}`;
+  const { hash } = router.query;
+  const [pageHash, setHash] = useHash();
+  const [rpcTxn, setRpcTxn] = useState<any>({});
+  const [tabIndex, setTabIndex] = useState(0);
+  const { transactionStatus } = useRpc();
+  const txn = data?.txns?.[0];
+  const [loading, setLoading] = useState(false);
 
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
   const description = t('txns:txn.metaDescription', { txn: hash });
   const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
 
-  const onHandleTab = (hashValue: string) => {
-    router.push(`/txns/${hash}?tab=${hashValue}`);
-  };
+  useEffect(() => {
+    const index = hashes.indexOf(pageHash as string);
 
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
+    setTabIndex(index === -1 ? 0 : index);
+  }, [pageHash]);
+
+  const onTab = (index: number) => setHash(hashes[index]);
 
   useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
-
-    return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
-    };
-  }, []);
-
-  const onChangeHeight = () => {
-    setHeight({});
-  };
+    if (txn) {
+      transactionStatus(txn.transaction_hash, txn.signer_account_id)
+        .then(setRpcTxn)
+        .catch(console.log);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txn, tabIndex]);
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
   );
 
+  const contract = useMemo(
+    () =>
+      isContract.account?.[0]?.code_hash !== '11111111111111111111111111111111',
+    [isContract],
+  );
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    const handleRouteChangeStart = (url: string) => {
+      if (url !== router.asPath) {
+        timeout = setTimeout(() => {
+          setLoading(true);
+        }, 300);
+      }
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    router.events.on('routeChangeError', handleRouteChangeComplete);
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      router.events.off('routeChangeError', handleRouteChangeComplete);
+    };
+  }, [router]);
+
+  const getClassName = (selected: boolean) =>
+    classNames(
+      'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none rounded-lg',
+      {
+        'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
+          !selected,
+        'bg-green-600 dark:bg-green-250 text-white': selected,
+      },
+    );
   return (
     <>
       <Head>
@@ -74,47 +200,118 @@ const Txn = () => {
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />
       </Head>
       <div className="md:flex items-center justify-between container mx-auto px-3">
-        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 pt-5 pb-2 border-b w-full">
+        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 pt-5 pb-2 border-b w-full dark:border-black-200">
           {t ? t('txns:txn.heading') : 'Transaction Details'}
         </h1>
       </div>
+      {loading && <Spinner />}
       <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
         <SponserdText />
       </div>
-      <div style={height} className="relative container mx-auto px-3">
-        <VmComponent
-          src={components?.transactionsHash}
-          props={{
-            hash: hash,
-            network: networkId,
-            t: t,
-            onHandleTab: onHandleTab,
-            requestSignInWithWallet,
-            pageTab: pageTab,
-          }}
-          skeleton={
-            <Detail
-              className="absolute"
-              txns={true}
-              ref={heightRef}
-              network={networkId}
-              pageTab={pageTab}
-            />
-          }
-          defaultSkelton={
-            <Detail txns={true} network={networkId} pageTab={pageTab} />
-          }
-          onChangeHeight={onChangeHeight}
-          loading={
-            <Detail
-              className="absolute"
-              txns={true}
-              ref={heightRef}
-              network={networkId}
-              pageTab={pageTab}
-            />
-          }
-        />
+      <div className="relative container mx-auto px-3">
+        <Fragment key="hash">
+          {error || !data ? (
+            <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+              <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
+                <ErrorMessage
+                  icons={<FileSlash />}
+                  message="Sorry, We are unable to locate this TxnHash"
+                  mutedText={hash || ''}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
+                <TabList className={'flex flex-wrap'}>
+                  <Tab
+                    className={getClassName(hashes[0] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <h2>{t('txns:txn.tabs.overview')}</h2>
+                  </Tab>
+                  <Tab
+                    className={getClassName(hashes[1] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <h2>{t('txns:txn.tabs.execution')}</h2>
+                  </Tab>
+                  <Tab
+                    className={getClassName(hashes[2] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <div className="flex h-full">
+                      <h2>Enhanced Plan</h2>
+                      <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-[4.7rem] -mt-4 px-1 ">
+                        NEW
+                      </div>
+                    </div>
+                  </Tab>
+                  <Tab
+                    className={getClassName(hashes[3] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <h2>Tree Plan</h2>
+                  </Tab>
+
+                  <Tab
+                    className={getClassName(hashes[4] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <h2>Receipt Summary</h2>
+                  </Tab>
+                  <Tab
+                    className={getClassName(hashes[5] === hashes[tabIndex])}
+                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                  >
+                    <h2>{t('txns:txn.tabs.comments')}</h2>
+                  </Tab>
+                </TabList>
+                <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+                  <TabPanel>
+                    <Details
+                      txn={txn}
+                      rpcTxn={rpcTxn}
+                      statsData={statsData}
+                      loading={error || !data}
+                      isContract={contract}
+                      price={price}
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <Receipt txn={txn} rpcTxn={rpcTxn} />
+                  </TabPanel>
+                  <TabPanel>
+                    <Execution txn={txn} rpcTxn={rpcTxn} />
+                  </TabPanel>
+                  <TabPanel>
+                    <Tree txn={txn} rpcTxn={rpcTxn} />
+                  </TabPanel>
+                  <TabPanel>
+                    <ReceiptSummary
+                      txn={txn}
+                      rpcTxn={rpcTxn}
+                      loading={error || !data}
+                    />
+                  </TabPanel>
+                  <TabPanel>
+                    <VmComponent
+                      src={components?.commentsFeed}
+                      defaultSkelton={<Comment />}
+                      props={{
+                        network: network,
+                        path: `nearblocks.io/txns/${hash}`,
+                        limit: 10,
+                        requestSignInWithWallet,
+                      }}
+                      loading={<Comment />}
+                    />
+                  </TabPanel>
+                </div>
+              </Tabs>
+            </>
+          )}
+        </Fragment>
       </div>
       <div className="py-8"></div>
     </>
