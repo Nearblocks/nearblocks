@@ -145,3 +145,98 @@ a {
 #action-row:not(#action-row:has(.action)) {
   display: none;
 }
+
+/* Styles for tree  */
+
+.hierarchy-tree,
+.hierarchy-tree ul,
+.hierarchy-tree li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.hierarchy-tree {
+  margin: 0 0 1em;
+  text-align: center;
+  width: 100%;
+}
+
+.hierarchy-tree,
+.hierarchy-tree ul {
+  display: table;
+  width: 100%;
+}
+
+.hierarchy-tree li {
+  display: table-cell;
+  padding: 1em 0;
+  vertical-align: top;
+  min-width: 120px;
+}
+
+.hierarchy-tree li:before {
+  outline: solid 1px silver;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0.55em;
+}
+
+.hierarchy-tree li:first-child:before {
+  left: 50%;
+}
+
+.hierarchy-tree li:last-child:before {
+  right: 50%;
+}
+
+.hierarchy-tree div,
+.hierarchy-tree span {
+  border: solid .1em silver;
+  border-radius: .2em;
+  display: inline-block;
+  margin: 1em .5em 1em;
+  padding: 0.7em 1.5em;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.hierarchy-tree ul:before,
+.hierarchy-tree div:before,
+.hierarchy-tree span:before {
+  outline: solid 1px silver;
+  content: "";
+  height: 1.5em;
+  left: 50%;
+  position: absolute;
+}
+
+.hierarchy-tree ul:before {
+  top: -1em;
+}
+
+.hierarchy-tree div:before,
+.hierarchy-tree span:before {
+  top: -1.55em;
+}
+
+.hierarchy-tree>li {
+  margin-top: 0;
+}
+
+.hierarchy-tree>li:before,
+.hierarchy-tree>li:after,
+.hierarchy-tree>li>div:before,
+.hierarchy-tree>li>span:before {
+  outline: none;
+}
+
+.hierarchy-tree .solid {
+  background: #033f40;
+  color: white;
+  border: 2px solid #033f40;
+  border-radius: 10px;
+}
