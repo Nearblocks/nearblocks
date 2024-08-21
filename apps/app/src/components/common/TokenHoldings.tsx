@@ -6,7 +6,6 @@ import { Menu, MenuItems, MenuButton, MenuPopover } from '@reach/menu-button';
 import ArrowDown from '../Icons/ArrowDown';
 import Link from 'next/link';
 import Big from 'big.js';
-import Image from 'next/image';
 
 interface Props {
   id?: string;
@@ -22,6 +21,7 @@ interface Props {
 }
 
 const TokenHoldings = (props: Props) => {
+  /* eslint-disable @next/next/no-img-element */
   const Loading = (props: { className: string }) => {
     return (
       <div
@@ -90,7 +90,7 @@ const TokenHoldings = (props: Props) => {
                             <div key={index}>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
-                                  <Image
+                                  <img
                                     src={
                                       token?.ft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
@@ -99,6 +99,7 @@ const TokenHoldings = (props: Props) => {
                                     width={16}
                                     height={16}
                                     className="w-4 h-4"
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
                                 <span>
@@ -160,15 +161,16 @@ const TokenHoldings = (props: Props) => {
                             <div>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
-                                  <Image
+                                  <img
                                     src={
                                       nft?.nft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
                                     }
-                                    alt={nft?.nft_meta?.name || 'NFT Icon'}
+                                    alt={nft?.nft_meta?.name}
                                     width={16}
                                     height={16}
                                     className="w-4 h-4"
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
                                 <span>
