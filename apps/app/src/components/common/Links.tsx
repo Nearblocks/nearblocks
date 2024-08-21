@@ -28,6 +28,7 @@ const Links = (props: any) => {
               height={16}
               src="/images/twitter_icon.svg"
               alt="Twitter"
+              priority
             />
           </a>
         </Tooltip>
@@ -53,6 +54,7 @@ const Links = (props: any) => {
               className="w-4 h-4"
               src="/images/facebook_icon.svg"
               alt="Facebook"
+              priority
             />
           </a>
         </Tooltip>

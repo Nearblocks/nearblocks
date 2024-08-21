@@ -266,6 +266,7 @@ const Header = () => {
                     height="40"
                     alt="NearBlocks"
                     layout="fixed"
+                    priority
                   />
                 </a>
               </Link>

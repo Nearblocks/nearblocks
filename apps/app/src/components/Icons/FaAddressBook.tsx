@@ -3,7 +3,7 @@ const FaAddressBook = () => {
     <svg
       stroke="currentColor"
       fill="currentColor"
-      stroke-width="0"
+      strokeWidth="0"
       viewBox="0 0 448 512"
       color="#db9a04"
       height="10"

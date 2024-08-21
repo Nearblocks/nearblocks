@@ -373,6 +373,7 @@ const Delegators = ({ accountId }: Props) => {
                                           : '/images/twitter_icon.svg'
                                       }
                                       alt="Twitter"
+                                      priority
                                     />
                                   </a>
                                 )}
@@ -423,6 +424,7 @@ const Delegators = ({ accountId }: Props) => {
                                           : '/images/github_icon.svg'
                                       }
                                       alt="Github"
+                                      priority
                                     />
                                   </a>
                                 )}
@@ -475,7 +477,7 @@ const Delegators = ({ accountId }: Props) => {
                 Uptime information
               </h2>
               <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
-                <div className="flex items-center py-4 h-16">
+                <div className="flex items-center py-4 sm:h-16">
                   <div className="w-60 md:w-1/4 sm:mb-2 md:mb-0">Blocks</div>
                   {!loading ? (
                     currentEpochInfo && (
@@ -506,7 +508,7 @@ const Delegators = ({ accountId }: Props) => {
                     <Skeleton className="h-7 w-65 break-words" />
                   )}
                 </div>
-                <div className="flex items-center py-4 h-16">
+                <div className="flex items-center py-4 sm:h-16">
                   <div className="w-64 md:w-1/4 sm:mb-2 md:mb-0">Chunks</div>
                   {!loading ? (
                     currentEpochInfo && (
