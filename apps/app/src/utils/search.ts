@@ -1,66 +1,6 @@
-import { SearchResult, SearchRoute } from './types';
+import { fetcher } from '@/hooks/useFetch';
 
-export async function search(
-  keyword: string,
-  filter: string,
-  returnPath?: boolean,
-  url?: string,
-): Promise<SearchResult | SearchRoute | null> {
-  const route = getRoute(filter);
-
-  try {
-    const response = await fetch(`${url}search/${route}?keyword=${keyword}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const resp = await response.json();
-
-    if (!resp) {
-      return returnPath
-        ? null
-        : { blocks: [], txns: [], accounts: [], receipts: [] };
-    }
-
-    if (resp.blocks?.length) {
-      return returnPath
-        ? { type: 'block', path: resp.blocks[0].block_hash }
-        : { blocks: resp.blocks, txns: [], accounts: [], receipts: [] };
-    }
-
-    if (resp.txns?.length) {
-      return returnPath
-        ? { type: 'txn', path: resp.txns[0].transaction_hash }
-        : { blocks: [], txns: resp.txns, accounts: [], receipts: [] };
-    }
-
-    if (resp.receipts?.length) {
-      return returnPath
-        ? {
-            type: 'txn',
-            path: resp.receipts[0].originated_from_transaction_hash,
-          }
-        : { blocks: [], txns: [], accounts: [], receipts: resp.receipts };
-    }
-
-    if (resp.accounts?.length) {
-      return returnPath
-        ? { type: 'address', path: resp.accounts[0].account_id }
-        : { blocks: [], txns: [], accounts: resp.accounts, receipts: [] };
-    }
-
-    return returnPath
-      ? null
-      : { blocks: [], txns: [], accounts: [], receipts: [] };
-  } catch (err) {
-    console.error({ err });
-    return null;
-  }
-}
-
-function getRoute(filter: string): string {
+const getRoute = (filter: string) => {
   switch (filter) {
     case 'txns':
       return 'txns';
@@ -71,4 +11,65 @@ function getRoute(filter: string): string {
     default:
       return '';
   }
-}
+};
+
+const search = async (
+  keyword: string,
+  filter: string,
+  returnPath?: boolean,
+) => {
+  try {
+    const route = getRoute(filter);
+
+    if (keyword.includes('.')) {
+      keyword = keyword.toLowerCase();
+    }
+
+    const resp = await fetcher(`/search/${route}?keyword=${keyword}`);
+
+    const data = {
+      blocks: [],
+      txns: [],
+      accounts: [],
+      receipts: [],
+    };
+
+    if (resp?.blocks?.length) {
+      if (returnPath) {
+        return { type: 'block', path: resp.blocks[0].block_hash };
+      }
+      data.blocks = resp.blocks;
+    }
+
+    if (resp?.txns?.length) {
+      if (returnPath) {
+        return { type: 'txn', path: resp.txns[0].transaction_hash };
+      }
+      data.txns = resp.txns;
+    }
+
+    if (resp?.receipts?.length) {
+      if (returnPath) {
+        return {
+          type: 'txn',
+          path: resp.receipts[0].originated_from_transaction_hash,
+        };
+      }
+      data.receipts = resp.receipts;
+    }
+
+    if (resp?.accounts?.length) {
+      if (returnPath) {
+        return { type: 'address', path: resp.accounts[0].account_id };
+      }
+      data.accounts = resp.accounts;
+    }
+
+    return returnPath ? null : data;
+  } catch (error) {
+    console.log({ error });
+    return returnPath ? null : {};
+  }
+};
+
+export default search;

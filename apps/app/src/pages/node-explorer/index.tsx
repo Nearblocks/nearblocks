@@ -17,17 +17,19 @@ export const getServerSideProps: GetServerSideProps<{
   totalSupply: any;
   latestBlock: any;
   error: boolean;
+  statsDetails: any;
 }> = async (context) => {
   const { query } = context;
   const fetchUrl = `validators?${queryString.stringify(query)}`;
   const totalSupplyUrl = `stats`;
   const latestBlockUrl = `blocks/latest?limit=1`;
   try {
-    const [dataResult, totalSupplyResult, latestBlockResult] =
+    const [dataResult, totalSupplyResult, latestBlockResult, statsResult] =
       await Promise.allSettled([
         fetcher(fetchUrl),
         fetcher(totalSupplyUrl),
         fetcher(latestBlockUrl),
+        fetcher(`stats`),
       ]);
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const totalSupply =
@@ -35,12 +37,16 @@ export const getServerSideProps: GetServerSideProps<{
     const latestBlock =
       latestBlockResult.status === 'fulfilled' ? latestBlockResult.value : null;
     const error = dataResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+
     return {
       props: {
         data,
         totalSupply,
         latestBlock,
         error,
+        statsDetails,
       },
     };
   } catch (error) {
@@ -51,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<{
         totalSupply: null,
         error: true,
         latestBlock: null,
+        statsDetails: null,
       },
     };
   }
@@ -125,5 +132,12 @@ const NodeExplorer = ({
     </>
   );
 };
-NodeExplorer.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+NodeExplorer.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 export default NodeExplorer;

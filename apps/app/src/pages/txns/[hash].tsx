@@ -36,20 +36,27 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   isContract: any;
   price: any;
+  latestBlocks: any;
 }> = async (context) => {
   const {
     query: { hash = '' },
   } = context;
 
   try {
-    const [dataResult, statsDataResult] = await Promise.allSettled([
-      fetcher(`txns/${hash}`),
-      fetcher(`stats`),
-    ]);
+    const [dataResult, statsDataResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher(`txns/${hash}`),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const statsData =
       statsDataResult.status === 'fulfilled' ? statsDataResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     const error = dataResult.status === 'rejected';
 
@@ -80,6 +87,7 @@ export const getServerSideProps: GetServerSideProps<{
         statsData,
         isContract,
         price,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -91,6 +99,7 @@ export const getServerSideProps: GetServerSideProps<{
         statsData: null,
         isContract: false,
         price: null,
+        latestBlocks: null,
       },
     };
   }
@@ -318,6 +327,12 @@ const Txn = ({
   );
 };
 
-Txn.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
-
+Txn.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsData}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 export default Txn;

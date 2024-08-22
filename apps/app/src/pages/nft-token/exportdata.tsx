@@ -6,6 +6,42 @@ import { appUrl, networkId } from '@/utils/config';
 import { useRouter } from 'next/router';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
 
 const ExportData = () => {
   const heightRef = useRef<HTMLDivElement>(null);
@@ -76,6 +112,13 @@ const ExportData = () => {
   );
 };
 
-ExportData.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+ExportData.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default ExportData;

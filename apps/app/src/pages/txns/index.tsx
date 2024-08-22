@@ -19,6 +19,8 @@ export const getServerSideProps: GetServerSideProps<{
   dataCount: any;
   error: boolean;
   apiUrl: string;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const { query } = context;
 
@@ -27,15 +29,24 @@ export const getServerSideProps: GetServerSideProps<{
   const countUrl = `txns/count?${queryString.stringify(query)}`;
 
   try {
-    const [dataResult, dataCountResult] = await Promise.allSettled([
-      fetcher(fetchUrl),
-      fetcher(countUrl),
-    ]);
+    const [dataResult, dataCountResult, statsResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher(fetchUrl),
+        fetcher(countUrl),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
     const error = dataResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     return {
       props: {
@@ -43,6 +54,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount,
         error,
         apiUrl,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -53,6 +66,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: null,
         error: true,
         apiUrl: '',
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -138,5 +153,12 @@ const TransactionList = ({
     </>
   );
 };
-TransactionList.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+TransactionList.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 export default TransactionList;

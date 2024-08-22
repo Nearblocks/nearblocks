@@ -18,6 +18,8 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   id: string;
   tid: string;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const {
     query: { id, tid, ...query },
@@ -27,18 +29,32 @@ export const getServerSideProps: GetServerSideProps<{
     ? `${apiUrl}/txns?${QueryString.stringify(query)}`
     : `${apiUrl}/txns`;
   try {
-    const [tokenData, txnsListResult, txnsCountResult] =
-      await Promise.allSettled([
-        fetcher(apiUrl),
-        fetcher(fetchUrl),
-        fetcher(`${apiUrl}/txns/count`),
-      ]);
+    const [
+      tokenData,
+      txnsListResult,
+      txnsCountResult,
+      statsResult,
+      latestBlocksResult,
+    ] = await Promise.allSettled([
+      fetcher(apiUrl),
+      fetcher(fetchUrl),
+      fetcher(`${apiUrl}/txns/count`),
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
     const tokenInfo = tokenData.status === 'fulfilled' ? tokenData.value : null;
     const txnsList =
       txnsListResult.status === 'fulfilled' ? txnsListResult.value : null;
     const txnsCount =
       txnsCountResult.status === 'fulfilled' ? txnsCountResult.value : null;
     const error = txnsListResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
     return {
       props: {
         tokenInfo,
@@ -47,6 +63,8 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         id,
         tid,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -59,6 +77,8 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         id: null,
         tid: null,
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -147,5 +167,12 @@ const NFTokenInfo = ({
     </>
   );
 };
-NFTokenInfo.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+NFTokenInfo.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 export default NFTokenInfo;

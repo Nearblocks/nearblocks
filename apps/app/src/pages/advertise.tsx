@@ -9,8 +9,45 @@ import { env } from 'next-runtime-env';
 //import ImageModal from '@/components/ImageModal';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
+
 const AdvertisePage = () => {
   const { t } = useTranslation();
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Advertise&brand=near`;
@@ -316,6 +353,13 @@ const AdvertisePage = () => {
   );
 };
 
-AdvertisePage.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+AdvertisePage.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 
 export default AdvertisePage;

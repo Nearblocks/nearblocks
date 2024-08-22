@@ -175,6 +175,7 @@ const useRpc = () => {
       return null;
     }
   };
+
   const ftMetadata = async (contract: string) => {
     try {
       const resp = (await provider.query({

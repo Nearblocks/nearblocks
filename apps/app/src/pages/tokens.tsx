@@ -17,6 +17,8 @@ export const getServerSideProps: GetServerSideProps<{
   data: any;
   dataCount: any;
   error: boolean;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async ({ query }) => {
   const params = { ...query, order: query.order || 'desc' };
   const fetchUrl = `fts?sort=onchain_market_cap&per_page=50&${QueryString.stringify(
@@ -24,24 +26,49 @@ export const getServerSideProps: GetServerSideProps<{
   )}`;
   const countUrl = `fts/count?${QueryString.stringify(params)}`;
 
-  const [dataResult, dataCountResult] = await Promise.allSettled([
-    fetcher(fetchUrl),
-    fetcher(countUrl),
-  ]);
+  try {
+    const [dataResult, dataCountResult, statsResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher(fetchUrl),
+        fetcher(countUrl),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
 
-  const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
-  const dataCount =
-    dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
-  const error =
-    dataResult.status === 'rejected' || dataCountResult.status === 'rejected';
+    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
+    const dataCount =
+      dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
+    const error =
+      dataResult.status === 'rejected' || dataCountResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
-  return {
-    props: {
-      data,
-      dataCount,
-      error,
-    },
-  };
+    return {
+      props: {
+        data,
+        dataCount,
+        error,
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching FT tokens:', error);
+
+    return {
+      props: {
+        data: null,
+        dataCount: null,
+        error: true,
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
 };
 
 const TopFTTokens = ({
@@ -140,6 +167,13 @@ const TopFTTokens = ({
   );
 };
 
-TopFTTokens.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+TopFTTokens.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 
 export default TopFTTokens;

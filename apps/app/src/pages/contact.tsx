@@ -6,8 +6,45 @@ import useTranslation from 'next-translate/useTranslation';
 import FormContact from '@/components/Layouts/FormContact';
 import { appUrl } from '@/utils/config';
 import { env } from 'next-runtime-env';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
+
 const Contract = () => {
   const { t } = useTranslation();
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
@@ -75,6 +112,12 @@ const Contract = () => {
   );
 };
 
-Contract.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
-
+Contract.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 export default Contract;

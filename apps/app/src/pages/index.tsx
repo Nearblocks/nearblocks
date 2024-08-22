@@ -1,61 +1,103 @@
 import Head from 'next/head';
 import Layout from '@/components/Layouts';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import Latest from '@/components/skeleton/home/Latest';
-import Overview from '@/components/skeleton/home/Overview';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { networkId, appUrl, apiUrl } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { search } from '@/utils/search';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
-import { useTheme } from 'next-themes';
 import Banner from '@/components/Banner';
 import SponserdText from '@/components/SponserdText';
+import LatestBlocks from '@/components/Blocks/Latest';
+import Search from '@/components/common/Search';
+import fetcher from '@/utils/fetcher';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Overview from '@/components/Transactions/Overview';
+import LatestTransactions from '@/components/Transactions/Latest';
+import search from '@/utils/search';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-const networkUrl =
-  network === 'mainnet'
-    ? 'https://testnet.nearblocks.io'
-    : 'https://nearblocks.io';
 
-const HomePage = () => {
-  const components = useBosComponents();
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  chartDetails: any;
+  blockDetails: any;
+  txnsDetails: any;
+  latestBlocks: any;
+  error: boolean;
+}> = async () => {
+  try {
+    const [
+      statsResult,
+      chartResult,
+      blockResult,
+      txnsResult,
+      latestBlocksResult,
+    ] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`charts/latest`),
+      fetcher(`blocks/latest`),
+      fetcher(`txns/latest`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const chartDetails =
+      chartResult.status === 'fulfilled' ? chartResult.value : null;
+    const blockDetails =
+      blockResult.status === 'fulfilled' ? blockResult.value : null;
+    const txnsDetails =
+      txnsResult.status === 'fulfilled' ? txnsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    const error = statsResult.status === 'rejected';
+
+    return {
+      props: {
+        statsDetails,
+        chartDetails,
+        blockDetails,
+        txnsDetails,
+        latestBlocks,
+        error,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching blocks:', error);
+    return {
+      props: {
+        statsDetails: null,
+        chartDetails: null,
+        blockDetails: null,
+        txnsDetails: null,
+        latestBlocks: null,
+        error: true,
+      },
+    };
+  }
+};
+
+const HomePage = ({
+  statsDetails,
+  chartDetails,
+  blockDetails,
+  txnsDetails,
+  error,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const overviewRef = useRef<HTMLDivElement>(null);
-  const latestRef = useRef<HTMLDivElement>(null);
-  const [overviewHeight, setOverviewHeight] = useState({});
-  const [latestHeight, setLatestHeight] = useState({});
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    const updateOuterDivHeight = () => {
-      if (overviewRef.current && latestRef.current) {
-        const overviewHeight = overviewRef.current.offsetHeight;
-        const latestHeight = latestRef.current.offsetHeight;
-        setOverviewHeight({ height: overviewHeight });
-        setLatestHeight({ height: latestHeight });
-      } else {
-        setOverviewHeight({});
-        setLatestHeight({});
-      }
-    };
-
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
-
-    return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
-    };
-  }, []);
-
   const { t } = useTranslation();
+
+  const stats = statsDetails?.stats?.[0];
+  const charts = chartDetails;
+  const blocks = blockDetails?.blocks || [];
+  const txns = txnsDetails?.txns || [];
 
   const SearchToast = () => {
     if (network === 'testnet') {
@@ -98,15 +140,17 @@ const HomePage = () => {
     };
     const fetchData = () => {
       if (q) {
-        search(q, 'all', true, apiUrl).then((data: any) => {
+        search(q, 'all', true).then((data: any) => {
           redirect(data);
         });
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, apiUrl]);
+  }, [q]);
+
   const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
+
   return (
     <>
       <Head>
@@ -138,38 +182,18 @@ const HomePage = () => {
       </Head>
       <div>
         <ToastContainer />
-
         <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
-          <div className="container mx-auto px-3 py-12 mb-10">
+          <div className="container mx-auto px-3 py-14 mb-10">
             <div className="flex flex-col lg:flex-row pb-5 lg:!items-center">
               <div className="relative lg:w-3/5 flex-col">
                 <h1 className="text-white dark:text-neargray-10 text-2xl pb-3 flex flex-col">
                   {t('home:heroTitle')}
                 </h1>
-                <div className="h-12">
-                  <VmComponent
-                    src={components?.search}
-                    skeleton={
-                      <div className="absolute  w-full ">
-                        <Skeleton className="h-12" />
-                      </div>
-                    }
-                    props={{
-                      isHeader: false,
-                      t: t,
-                      network: networkId,
-                      router,
-                      networkUrl,
-                    }}
-                    loading={
-                      <div className="absolute  w-full ">
-                        <Skeleton className="h-12" />
-                      </div>
-                    }
-                  />
+                <div className="h-12" suppressHydrationWarning={true}>
+                  <Search />
                 </div>
                 <div className="text-white"></div>
-                <div className="text-white pt-3">
+                <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
                   <SponserdText />
                 </div>
               </div>
@@ -179,14 +203,8 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <div style={overviewHeight} className="relative -mt-14 ">
-          <VmComponent
-            src={components?.transactionsOverview}
-            skeleton={<Overview className="absolute" ref={overviewRef} />}
-            defaultSkelton={<Overview />}
-            props={{ t: t, network: networkId, theme: theme }}
-            loading={<Overview className="absolute" ref={overviewRef} />}
-          />
+        <div className="relative -mt-14 ">
+          <Overview stats={stats} chartsDetails={charts} error={error} />
         </div>
         <div className="py-8">
           <div className="lg:!hidden block container mx-auto px-3">
@@ -201,15 +219,8 @@ const HomePage = () => {
                   <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                     {t('home:latestBlocks')}
                   </h2>
-
-                  <div style={latestHeight} className="relative">
-                    <VmComponent
-                      src={components?.blocksLatest}
-                      skeleton={<Latest className="absolute" ref={latestRef} />}
-                      defaultSkelton={<Latest />}
-                      props={{ t: t, network: networkId }}
-                      loading={<Latest className="absolute" ref={latestRef} />}
-                    />
+                  <div className="relative">
+                    <LatestBlocks blocks={blocks} error={error} />
                   </div>
                 </div>
               </div>
@@ -218,14 +229,8 @@ const HomePage = () => {
                   <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                     {t('home:latestTxns')}
                   </h2>
-                  <div style={latestHeight} className="relative">
-                    <VmComponent
-                      skeleton={<Latest className="absolute" ref={latestRef} />}
-                      defaultSkelton={<Latest />}
-                      src={components?.transactionsLatest}
-                      props={{ t: t, network: networkId }}
-                      loading={<Latest className="absolute" ref={latestRef} />}
-                    />
+                  <div className="relative">
+                    <LatestTransactions txns={txns} error={error} />
                   </div>
                 </div>
               </div>
@@ -237,6 +242,13 @@ const HomePage = () => {
   );
 };
 
-HomePage.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+HomePage.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default HomePage;

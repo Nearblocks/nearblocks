@@ -8,8 +8,45 @@ import { env } from 'next-runtime-env';
 import Chart from '@/components/Charts/Chart';
 import { useRouter } from 'next/router';
 import { Spinner } from '@/components/common/Spinner';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
+
 const Charts = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -86,7 +123,12 @@ const Charts = () => {
 };
 
 Charts.getLayout = (page: ReactElement) => (
-  <Layout notice={<Notice />}>{page}</Layout>
+  <Layout
+    notice={<Notice />}
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
 );
-
 export default Charts;

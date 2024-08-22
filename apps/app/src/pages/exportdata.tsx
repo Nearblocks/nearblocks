@@ -4,6 +4,42 @@ import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 import Export from '@/components/Export';
 import { appUrl } from '@/utils/config';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
 
 const ExportData = () => {
   const router = useRouter();
@@ -41,6 +77,13 @@ const ExportData = () => {
   );
 };
 
-ExportData.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+ExportData.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 
 export default ExportData;
