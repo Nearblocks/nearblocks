@@ -15,8 +15,44 @@ import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useTheme } from 'next-themes';
+import { GetServerSideProps } from 'next';
+import fetcher from '@/utils/fetcher';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching charts:', error);
+    return {
+      props: {
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
 
 const ApiPlan = () => {
   const router = useRouter();
@@ -553,6 +589,13 @@ const ApiPlan = () => {
   );
 };
 
-ApiPlan.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+ApiPlan.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 
 export default ApiPlan;

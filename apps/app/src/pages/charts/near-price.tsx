@@ -16,17 +16,32 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 export const getServerSideProps: GetServerSideProps<{
   data: any;
   error: boolean;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async () => {
   try {
-    const [dataResult] = await Promise.allSettled([fetcher('charts')]);
+    const [dataResult, statsResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher('charts'),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const error = dataResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     return {
       props: {
         data,
         error,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -35,6 +50,8 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         data: null,
         error: true,
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -135,7 +152,13 @@ const NearPriceChart = ({
 };
 
 NearPriceChart.getLayout = (page: ReactElement) => (
-  <Layout notice={<Notice />}>{page}</Layout>
+  <Layout
+    notice={<Notice />}
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
 );
 
 export default NearPriceChart;

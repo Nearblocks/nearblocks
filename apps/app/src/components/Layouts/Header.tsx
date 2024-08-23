@@ -1,29 +1,22 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from 'next-themes';
-
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
 import ArrowDown from '../Icons/ArrowDown';
 import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { VmComponent } from '../vm/VmComponent';
-import { apiUrl, networkId } from '@/utils/config';
+import { networkId } from '@/utils/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
-import { env } from 'next-runtime-env';
-
-const network = env('NEXT_PUBLIC_NETWORK_ID');
-const networkUrl =
-  network === 'mainnet'
-    ? 'https://testnet.nearblocks.io'
-    : 'https://nearblocks.io';
+import Rpc from '../Icons/Rpc';
+import dynamic from 'next/dynamic';
+import Search from '../common/Search';
 
 const menus = [
   {
@@ -145,16 +138,20 @@ const languages = [
   },
 ];
 
-const Header = () => {
-  const components = useBosComponents();
+const RpcMenu = dynamic(() => import('./RpcMenu'), { ssr: false });
+
+interface Props {
+  statsDetails?: { stats: Stats[] };
+  latestBlocks?: { blocks: BlocksInfo[] };
+}
+
+const Header = ({ statsDetails, latestBlocks }: Props) => {
+  /* eslint-disable @next/next/no-img-element */
+
   const router = useRouter();
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
-  const [stats, setStats] = useState<Stats>({} as Stats);
-  const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
-  const [isLoading, setIsLoading] = useState(true);
   const { theme, setTheme } = useTheme();
-  const [error, setError] = useState(false);
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
   );
@@ -163,61 +160,8 @@ const Header = () => {
   const logOut = useAuthStore((store) => store.logOut);
   const user = signedIn;
 
-  useEffect(() => {
-    let delay = 600000;
-    async function fetchStats() {
-      try {
-        const response = await fetch(`${apiUrl}stats`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const dataArray = await response.json();
-        const data: Stats = dataArray?.stats?.[0];
-        if (response.status === 200) {
-          setStats(data);
-          setError(false);
-        }
-      } catch (error) {
-        setError(true);
-        console.log(error);
-      } finally {
-        if (isLoading) setIsLoading(false);
-      }
-    }
-
-    fetchStats();
-
-    const interval = setInterval(fetchStats, delay);
-
-    return () => clearInterval(interval);
-  }, [isLoading]);
-
-  useEffect(() => {
-    async function fetchBlocks() {
-      try {
-        const response = await fetch(`${apiUrl}blocks/latest?limit=1`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.status === 200) {
-          setBlock(data.blocks[0]);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchBlocks();
-    const interval = setInterval(fetchBlocks, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const stats: Stats | undefined = statsDetails?.stats?.[0];
+  const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -266,12 +210,11 @@ const Header = () => {
                     height="40"
                     alt="NearBlocks"
                     layout="fixed"
-                    priority
                   />
                 </a>
               </Link>
               {showSearch &&
-                (error || isLoading ? (
+                (!stats ? (
                   <div className="py-3">
                     <Skeleton className="h-4 mt-[5px]" />
                   </div>
@@ -343,7 +286,6 @@ const Header = () => {
                   alt="NearBlocks"
                 />
               </button>
-
               <button
                 className="flex md:!hidden items-center justify-center"
                 onClick={() => setOpen((o) => !o)}
@@ -356,23 +298,7 @@ const Header = () => {
             {showSearch && (
               <div className="relative h-full w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 md:!pt-2 md:!pb-0 order-2 md:!order-1">
                 <div className="h-11">
-                  <VmComponent
-                    src={components?.search}
-                    skeleton={
-                      <>
-                        <div className="absolute top-0 left-0 w-full md:mt-2 mt-0 pb-4 h-11 pr-0 md:pr-8 px-3 md:px-0">
-                          <Skeleton className="h-11" />
-                        </div>
-                      </>
-                    }
-                    props={{
-                      isHeader: true,
-                      t: t,
-                      network: networkId,
-                      router,
-                      networkUrl,
-                    }}
-                  />
+                  <Search header />
                 </div>
               </div>
             )}
@@ -602,7 +528,6 @@ const Header = () => {
                   </>
                 </li>
               </ul>
-
               <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
                 <li>
                   <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
@@ -615,7 +540,45 @@ const Header = () => {
                     />
                   </span>
                 </li>
-
+                {/* rpc start */}
+                <li>
+                  <>
+                    <Collapse
+                      trigger={({ show, onClick }) => (
+                        <a
+                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline"
+                          href="#"
+                          onClick={onClick}
+                        >
+                          <Rpc className="h-5 text-black-200 dark:text-white" />
+                          <ArrowDown
+                            className={`fill-current transition-transform w-5 h-5 ${
+                              show && 'transform rotate-180'
+                            }`}
+                          />
+                        </a>
+                      )}
+                    >
+                      <ul className="border-l-2 border-green-500 dark:text-green-250 md:hidden ml-4">
+                        <RpcMenu />
+                      </ul>
+                    </Collapse>
+                    <span className="group hidden md:flex w-full relative h-full">
+                      <a
+                        className={`hidden md:flex items-center justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-0 mr-3`}
+                        href="#"
+                      >
+                        <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded">
+                          <Rpc className="h-5 text-neargray-600 dark:filter dark:invert" />
+                        </div>
+                      </a>
+                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                        <RpcMenu />
+                      </ul>
+                    </span>
+                  </>
+                </li>
+                {/* rpc end */}
                 <li>
                   <>
                     <Collapse
@@ -659,14 +622,13 @@ const Header = () => {
                         </li>
                       </ul>
                     </Collapse>
-
                     <span className="group hidden md:flex w-full relative h-full">
                       <a
                         className={`hidden md:flex  items-center justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-0 mr-3`}
                         href="#"
                       >
                         <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded">
-                          <Image
+                          <img
                             src="/images/near.svg"
                             width="14"
                             height="14"
@@ -705,7 +667,6 @@ const Header = () => {
                   </>
                 </li>
               </ul>
-
               <ul className="hidden md:flex justify-end text-gray-500 pb-4 md:pb-0">
                 <li>
                   <>
@@ -719,13 +680,14 @@ const Header = () => {
                             setTheme(theme === 'light' ? 'dark' : 'light')
                           }
                         >
-                          <Image
+                          <img
                             src={`/images/${
                               theme === 'dark' ? 'moon.svg' : 'sun.svg'
                             }`}
                             width="14"
                             height="14"
                             alt="NearBlocks"
+                            // eslint-disable-next-line @next/next/no-img-element
                           />
                         </div>
                       </span>

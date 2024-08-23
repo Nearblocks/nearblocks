@@ -37,7 +37,10 @@ const Banner: React.FC<BannerProps> = ({ type }) => {
 
   if (isMobile) {
     return (
-      <div className="w-full flex aspect-auto relative">
+      <div
+        className="w-full flex aspect-auto relative"
+        suppressHydrationWarning={true}
+      >
         <div>
           {htmlContent && (
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
@@ -50,7 +53,10 @@ const Banner: React.FC<BannerProps> = ({ type }) => {
     );
   } else {
     return (
-      <div className="flex-col lg:mb-0 lg:mt-0 hidden lg:flex mx-auto justify-center py-1">
+      <div
+        className="flex-col lg:mb-0 lg:mt-0 hidden lg:flex mx-auto justify-center py-1"
+        suppressHydrationWarning={true}
+      >
         {htmlContent && (
           <div className="relative">
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />

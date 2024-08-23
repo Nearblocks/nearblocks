@@ -17,6 +17,8 @@ export const getServerSideProps: GetServerSideProps<{
   data: any;
   dataCount: any;
   error: boolean;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async ({ query }) => {
   const params = { ...query, order: query.order || 'desc' };
   const fetchUrl = `nfts?sort=txns_day&per_page=50&${QueryString.stringify(
@@ -25,22 +27,33 @@ export const getServerSideProps: GetServerSideProps<{
   const countUrl = `nfts/count?${QueryString.stringify(params)}`;
 
   try {
-    const [dataResult, dataCountResult] = await Promise.allSettled([
-      fetcher(fetchUrl),
-      fetcher(countUrl),
-    ]);
+    const [dataResult, dataCountResult, statsResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher(fetchUrl),
+        fetcher(countUrl),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
     const error =
       dataResult.status === 'rejected' || dataCountResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     return {
       props: {
         data,
         dataCount,
         error,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -51,6 +64,8 @@ export const getServerSideProps: GetServerSideProps<{
         data: null,
         dataCount: null,
         error: true,
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -153,6 +168,12 @@ const TopNFTTokens = ({
   );
 };
 
-TopNFTTokens.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
-
+TopNFTTokens.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 export default TopNFTTokens;

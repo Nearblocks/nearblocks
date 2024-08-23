@@ -43,6 +43,7 @@ export const getServerSideProps: GetServerSideProps<{
   accountDetais: any;
   contractDetails: any;
   tokenFilterDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const {
     query: { id = '', a = '', tab = 'transfers', ...query },
@@ -89,6 +90,7 @@ export const getServerSideProps: GetServerSideProps<{
       accountResult,
       contractResult,
       tokenFilterResult,
+      latestBlocksResult,
     ] = await Promise.allSettled([
       fetchData('stats'),
       fetchData(id && `fts/${id}`),
@@ -100,6 +102,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetchData(id && `account/${id}`),
       fetchData(id && `account/${id}/contract/deployments`),
       fetchData(a && `account/${a}/inventory`),
+      fetchData(`blocks/latest?limit=1`),
     ]);
 
     const getResult = (result: PromiseSettledResult<any>) =>
@@ -119,6 +122,7 @@ export const getServerSideProps: GetServerSideProps<{
         accountDetais: getResult(accountResult),
         contractDetails: getResult(contractResult),
         tokenFilterDetails: getResult(tokenFilterResult),
+        latestBlocks: getResult(latestBlocksResult),
       },
     };
   } catch (error) {
@@ -137,6 +141,7 @@ export const getServerSideProps: GetServerSideProps<{
         accountDetais: null,
         contractDetails: null,
         tokenFilterDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -385,6 +390,13 @@ const TokenDetails = ({
   );
 };
 
-TokenDetails.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+TokenDetails.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlock}
+  >
+    {page}
+  </Layout>
+);
 
 export default TokenDetails;

@@ -18,6 +18,8 @@ export const getServerSideProps: GetServerSideProps<{
   data: any;
   dataCount: any;
   error: boolean;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const { query } = context;
   const apiUrl = 'blocks';
@@ -26,14 +28,23 @@ export const getServerSideProps: GetServerSideProps<{
     : `${apiUrl}`;
 
   try {
-    const [dataResult, dataCountResult] = await Promise.allSettled([
-      fetcher(fetchUrl),
-      fetcher('blocks/count'),
-    ]);
+    const [dataResult, dataCountResult, statsResult, latestBlocksResult] =
+      await Promise.allSettled([
+        fetcher(fetchUrl),
+        fetcher('blocks/count'),
+        fetcher(`stats`),
+        fetcher(`blocks/latest?limit=1`),
+      ]);
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
     const error = dataResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     return {
       props: {
@@ -41,6 +52,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount,
         error,
         apiUrl,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -51,6 +64,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: null,
         error: true,
         apiUrl: '',
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -139,6 +154,13 @@ const Blocks = ({
   );
 };
 
-Blocks.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+Blocks.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default Blocks;

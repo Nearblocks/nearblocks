@@ -68,6 +68,7 @@ export const getServerSideProps: GetServerSideProps<{
   dataCount: any;
   error: boolean;
   tab: string;
+  latestBlocks: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...query },
@@ -122,6 +123,7 @@ export const getServerSideProps: GetServerSideProps<{
       inventoryResult,
       dataResult,
       dataCountResult,
+      latestBlocksResult,
     ] = await Promise.allSettled([
       fetchData('stats'),
       fetchData(id && `account/${id}`),
@@ -132,6 +134,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetchData(id && `account/${id}/inventory`),
       fetchData(fetchUrl),
       fetchData(countUrl),
+      fetchData(`blocks/latest?limit=1`),
     ]);
 
     const getResult = (result: PromiseSettledResult<any>) =>
@@ -150,6 +153,7 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: getResult(dataCountResult),
         error: dataResult.status === 'rejected',
         tab,
+        latestBlocks: getResult(latestBlocksResult),
       },
     };
   } catch (error) {
@@ -167,6 +171,7 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: null,
         error: true,
         tab: 'txns',
+        latestBlocks: null,
       },
     };
   }
@@ -508,7 +513,9 @@ const Address = ({
             </div>
           )}
           <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
-            <SponserdText />
+            <div className="min-h-[80px] md:min-h-[25px]">
+              <SponserdText />
+            </div>
           </div>
         </div>
         <Balance
@@ -671,6 +678,13 @@ const Address = ({
   );
 };
 
-Address.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+Address.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default Address;

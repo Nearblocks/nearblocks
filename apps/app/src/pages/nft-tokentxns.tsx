@@ -19,6 +19,8 @@ export const getServerSideProps: GetServerSideProps<{
   dataCount: any;
   syncDetails: any;
   error: boolean;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const { query } = context;
   const apiUrl = 'nfts/txns';
@@ -27,10 +29,18 @@ export const getServerSideProps: GetServerSideProps<{
     : `${apiUrl}`;
 
   try {
-    const [dataResult, dataCountResult, syncResult] = await Promise.allSettled([
+    const [
+      dataResult,
+      dataCountResult,
+      syncResult,
+      statsResult,
+      latestBlocksResult,
+    ] = await Promise.allSettled([
       fetcher(fetchUrl),
       fetcher('nfts/txns/count'),
       fetcher(`sync/status`),
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
     ]);
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -38,6 +48,12 @@ export const getServerSideProps: GetServerSideProps<{
     const syncDetails =
       syncResult.status === 'fulfilled' ? syncResult.value : null;
     const error = dataResult.status === 'rejected';
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
 
     return {
       props: {
@@ -45,7 +61,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount,
         syncDetails,
         error,
-        apiUrl,
+        statsDetails,
+        latestBlocks,
       },
     };
   } catch (error) {
@@ -56,7 +73,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: null,
         syncDetails: null,
         error: true,
-        apiUrl: '',
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -158,5 +176,12 @@ const NftToxenTxns = ({
     </>
   );
 };
-NftToxenTxns.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+NftToxenTxns.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 export default NftToxenTxns;

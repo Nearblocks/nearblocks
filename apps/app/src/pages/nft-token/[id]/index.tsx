@@ -35,6 +35,8 @@ export const getServerSideProps: GetServerSideProps<{
   dataCount: any;
   error: boolean;
   tab: string;
+  statsDetails: any;
+  latestBlocks: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'transfers', ...query },
@@ -79,6 +81,8 @@ export const getServerSideProps: GetServerSideProps<{
       syncResult,
       dataResult,
       dataCountResult,
+      statsResult,
+      latestBlocksResult,
     ] = await Promise.allSettled([
       fetchData(id && `nfts/${id}`),
       fetchData(id && `nfts/${id}/txns/count`),
@@ -86,6 +90,8 @@ export const getServerSideProps: GetServerSideProps<{
       fetchData(`sync/status`),
       fetchData(fetchUrl),
       fetchData(countUrl),
+      fetchData(`stats`),
+      fetchData(`blocks/latest?limit=1`),
     ]);
 
     const getResult = (result: PromiseSettledResult<any>) =>
@@ -101,6 +107,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: getResult(dataCountResult),
         error: dataResult.status === 'rejected',
         tab,
+        statsDetails: getResult(statsResult),
+        latestBlocks: getResult(latestBlocksResult),
       },
     };
   } catch (error) {
@@ -115,6 +123,8 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: null,
         error: true,
         tab: 'transfers',
+        statsDetails: null,
+        latestBlocks: null,
       },
     };
   }
@@ -348,6 +358,13 @@ const NFToken = ({
   );
 };
 
-NFToken.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+NFToken.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default NFToken;
