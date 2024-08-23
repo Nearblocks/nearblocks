@@ -197,6 +197,10 @@ export type ChartConfigType = {
     spacingBottom: number;
     spacingLeft: number;
     spacingRight: number;
+    backgroundColor: string;
+  };
+  accessibility: {
+    enabled: boolean;
   };
   title: {
     text: null;
@@ -207,13 +211,21 @@ export type ChartConfigType = {
     tickLength: number;
     labels: {
       step: number;
+      style: {
+        color: string;
+      };
     };
-    categories: string;
+    categories: string[];
   };
   yAxis: {
     gridLineWidth: number;
     title: {
       text: null;
+    };
+    labels: {
+      style: {
+        color: string;
+      };
     };
   };
   legend: {
@@ -232,14 +244,18 @@ export type ChartConfigType = {
       };
     };
   };
-  series: [ChartSeriesInfo];
+  series: {
+    type: string;
+    data: { y: number; date: string; price: number }[];
+    color: string;
+  }[];
   exporting: {
     enabled: boolean;
   };
   credits: {
     enabled: boolean;
   };
-};
+} | null;
 
 export type ChartInfo = {
   date: string;
