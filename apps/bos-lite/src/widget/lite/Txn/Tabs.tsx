@@ -40,6 +40,7 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
   const [data, setData] = useState<Data>({});
   const [error, setError] = useState<Error>({});
   const [loading, setLoading] = useState<Loading>({});
+  const [expand, setExpand] = useState(false);
 
   useEffect(() => {
     if (rpcFetch && rpcUrl && hash && active === 0) {
@@ -101,20 +102,28 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
 
   return (
     <div className="bg-bg-box lg:rounded-xl shadow px-6 mt-8">
-      <div className="pt-4 pb-6">
-        {tabs.map((tab) => (
-          <button
-            className={`py-1 mr-4 ${
-              active === tab
-                ? 'font-medium border-b-[3px] border-text-body'
-                : 'text-text-label'
-            }`}
-            key={tab}
-            onClick={() => setActive(tab)}
-          >
-            {tab === 0 && 'Execution Plan'}
+      <div className="flex justify-between">
+        <div className="pt-4 pb-6">
+          {tabs.map((tab) => (
+            <button
+              className={`py-1 mr-4 ${
+                active === tab
+                  ? 'font-medium border-b-[3px] border-text-body'
+                  : 'text-text-label'
+              }`}
+              key={tab}
+              onClick={() => setActive(tab)}
+            >
+              {tab === 0 && 'Execution Plan'}
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-text-label">&nbsp;</span>
+          <button onClick={() => setExpand((e) => !e)}>
+            {expand ? 'Collapse All -' : 'Expand All +'}
           </button>
-        ))}
+        </div>
       </div>
       <div className="lg:px-4 pb-6">
         {error[active] ? (
@@ -132,7 +141,10 @@ const Tabs = ({ hash, rpcUrl }: TabsProps) => {
               <Widget<ExecutionProps>
                 key="execution"
                 loading={<TxnExecutionSkeleton />}
-                props={{ receipt: data[active] as NestedReceiptWithOutcome }}
+                props={{
+                  expand,
+                  receipt: data[active] as NestedReceiptWithOutcome,
+                }}
                 src={`${config_account}/widget/lite.Txn.Execution`}
               />
             )}

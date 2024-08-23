@@ -1,22 +1,15 @@
 import type { ReceiptProps } from './Receipt';
 
 export type ExecutionProps = {
+  expand: boolean;
   receipt: FailedToFindReceipt | NestedReceiptWithOutcome;
 };
 
 let TxnReceiptSkeleton = window?.TxnReceiptSkeleton || (() => <></>);
 
-const Execution = ({ receipt }: ExecutionProps) => {
-  const [expand, setExpand] = useState(false);
-
+const Execution = ({ expand, receipt }: ExecutionProps) => {
   return (
     <>
-      <div className="flex justify-between items-center text-sm mb-6">
-        <span className="text-text-label">&nbsp;</span>
-        <button onClick={() => setExpand((e) => !e)}>
-          {expand ? 'Collapse All -' : 'Expand All +'}
-        </button>
-      </div>
       <Widget<ReceiptProps>
         key="receipt"
         loading={<TxnReceiptSkeleton />}

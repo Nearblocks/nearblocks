@@ -6,6 +6,7 @@ import type { UtilsModule } from '@/libs/utils';
 export type ActionProps = {
   action: Action;
   open: boolean;
+  receiver: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -59,7 +60,7 @@ const prettify = (args: string) => {
   }
 };
 
-const Action = ({ action, open, setOpen }: ActionProps) => {
+const Action = ({ action, open, receiver, setOpen }: ActionProps) => {
   let { yoctoToNear } = VM.require<ConvertorModule>(
     `${config_account}/widget/lite.libs.convertor`,
   );
@@ -85,6 +86,11 @@ const Action = ({ action, open, setOpen }: ActionProps) => {
 
     return '';
   }, [action]);
+
+  const modifiedData =
+    method === 'submit' && receiver.includes('aurora')
+      ? { tx_bytes_b64: (action.args as any).args || args }
+      : (action.args as any).args || args;
 
   return (
     <div>
@@ -117,7 +123,21 @@ const Action = ({ action, open, setOpen }: ActionProps) => {
       </span>
       {open && args && (
         <div className="px-4 py-6">
-          <JsonView>{args}</JsonView>
+          {method === 'rlp_execute' ||
+          (method === 'submit' && receiver.includes('aurora')) ? (
+            <Widget<any>
+              key="rlp_execute"
+              loading={<></>}
+              props={{
+                method: method,
+                pretty: modifiedData,
+                receiver,
+              }}
+              src={`${config_account}/widget/lite.Txn.RlpTransaction`}
+            />
+          ) : (
+            <JsonView>{args}</JsonView>
+          )}
         </div>
       )}
     </div>

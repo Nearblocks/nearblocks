@@ -13,10 +13,18 @@ type TxnFee = (
   receiptsOutcome: ExecutionOutcomeWithIdView[],
   txnTokensBurnt: string,
 ) => string;
+type JsonParser = <T>(jsonString: string) => any | T;
+type JsonStringify = (
+  value: any,
+  replacer?: any,
+  space?: number,
+) => null | string;
 
 export type UtilsModule = {
   depositAmount: DepositAmount;
   gasLimit: GasLimit;
+  jsonParser: JsonParser;
+  jsonStringify: JsonStringify;
   refund: Refund;
   shortenString: ShortenString;
   txnFee: TxnFee;
@@ -97,9 +105,29 @@ const utils = (): UtilsModule => {
     return `${text.slice(0, prefix)}...${text.slice(-suffix)}`;
   };
 
+  const jsonParser: JsonParser = (jsonString) => {
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.error('Error parsing JSON', e);
+      return null;
+    }
+  };
+
+  const jsonStringify: JsonStringify = (value, replacer, space) => {
+    try {
+      return JSON.stringify(value, replacer, space);
+    } catch (e) {
+      console.error('Error stringifying JSON', e);
+      return null;
+    }
+  };
+
   return {
     depositAmount,
     gasLimit,
+    jsonParser,
+    jsonStringify,
     refund,
     shortenString,
     txnFee,

@@ -36,6 +36,7 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
   const [newRpcUrl, setNewRpcUrl] = useState('');
   const setRpc = useRpcStore((state) => state.setRpc);
   const addRpc = useNetworkStore((state) => state.addRpc);
+  const network = useNetworkStore((state) => state.network);
 
   const toggleTheme = () => {
     localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
@@ -62,15 +63,20 @@ const Navbar = ({ hideSearch }: NavbarProps) => {
         !hideSearch && 'bg-bg-box shadow lg:rounded-xl'
       }`}
     >
-      <div className="flex items-center px-4 py-6 sm:px-6">
-        <div className="sm:mr-10">
+      <div className="flex items-center px-4 py-7 sm:px-6">
+        <div className="sm:mr-10 relative">
           <Link href="/">
             <Logo className="h-9" />
           </Link>
+          {network === 'testnet' && (
+            <span className="py-2 px-2 font-normal text-xs text-text-label absolute">
+              Testnet Network
+            </span>
+          )}
         </div>
         {!hideSearch && (
           <div className="border-x w-full hidden md:flex border-border-body">
-            <Search dropdownClassName="mt-[26px] rounded-b-lg" />
+            <Search dropdownClassName="mt-[30px] rounded-b-lg" />
           </div>
         )}
 

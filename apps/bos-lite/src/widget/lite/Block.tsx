@@ -133,7 +133,7 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
           </Skeleton>
         </div>
         <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
-          <h2 className="font-medium text-sm mb-0.5">Time</h2>
+          <h2 className="font-medium text-sm mb-0.5">Time (UTC)</h2>
           <Skeleton
             className="block h-[39px] w-60 overflow-hidden"
             loading={loading}
@@ -141,7 +141,7 @@ const Block = ({ hash, rpcUrl }: BlockProps) => {
             <div className="font-heading font-medium text-[24px]">
               {nsToDateTime(
                 block?.header.timestamp_nanosec ?? '0',
-                'DD/MM/YY hh:mm:ss AA',
+                'YYYY-MM-DD HH:mm:ss',
               )}
             </div>
           </Skeleton>

@@ -12,10 +12,10 @@ const Home: PageLayout = () => {
       />
       <div className="relative container mx-auto">
         <div className="py-[58px] px-6 text-center">
-          <h1 className="font-heading font-bold text-[40px] lg:text-[48px] tracking-[1px]">
+          <h1 className="font-heading font-medium text-[48px] lg:text-[72px] tracking-[-1.08px] leading-[100%]">
             Hello, I’m the Near stateless explorer
           </h1>
-          <h2 className="font-heading font-medium text-[32px] lg:text-[40px] tracking-[0.4px] mt-[-3px]">
+          <h2 className="font-heading font-normal text-[16px] lg:text-[20px] tracking-[0.3px] my-5 leading-[130%]">
             With me, you can check real-time data on the NEAR blockchain.
           </h2>
         </div>
