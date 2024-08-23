@@ -59,10 +59,12 @@ const Charts = () => {
         <meta name="title" content={t('charts:metaTitle')} />
         <meta name="description" content={t('charts:metaDescription')} />
         <meta property="og:title" content={t('charts:metaTitle')} />
-        <meta property="og:image" content={thumbnail} />
         <meta property="og:description" content={t('charts:metaDescription')} />
         <meta property="twitter:title" content={t('charts:metaTitle')} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('charts:metaDescription')}

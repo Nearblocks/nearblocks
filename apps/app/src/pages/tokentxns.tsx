@@ -113,7 +113,9 @@ const ToxenTxns = ({
           content={t('token:fts.metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/tokentxns`} />
       </Head>
       <section>

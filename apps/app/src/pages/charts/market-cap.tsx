@@ -86,6 +86,7 @@ const MarketCapChart = ({
           content={t('charts:marketCap.metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/market-cap`} />

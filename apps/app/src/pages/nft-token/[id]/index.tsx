@@ -189,7 +189,9 @@ const NFToken = ({
   const description = token
     ? `All you need to know about the ${token.name} NFT Collection : Statistics, total supply, number of holders, latest transactions & meta-data.`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/thumbnail/nft?token=${
+    token?.name && encodeURI(token?.name)
+  }&network=${network}&brand=near`;
 
   useEffect(() => {
     if (tab) {
@@ -231,6 +233,7 @@ const NFToken = ({
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={description} />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}`} />

@@ -129,6 +129,7 @@ const Block = ({
           content={t('blocks:block.metaDescription', { block: blockHash })}
         />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/blocks/${blockHash}`} />

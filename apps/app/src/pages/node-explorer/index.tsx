@@ -78,7 +78,9 @@ const NodeExplorer = ({
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">

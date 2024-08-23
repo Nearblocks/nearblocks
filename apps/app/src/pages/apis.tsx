@@ -54,6 +54,7 @@ export const getServerSideProps: GetServerSideProps<{
   }
 };
 
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const ApiPlan = () => {
   const router = useRouter();
   const { status } = router.query;
@@ -137,6 +138,7 @@ const ApiPlan = () => {
       setLoading(false);
     }
   };
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=APIs&brand=near`;
 
   const onGetStarted = async (plan: any) => {
     if (plan) {
@@ -162,11 +164,10 @@ const ApiPlan = () => {
           name="description"
           content="NearBlocks APIs derives data from NearBlock's Near Protocol (NEAR) Block Explorer to cater for Near Protocol applications through API Endpoints."
         />
-        <meta property="og:image" content="/thumbnail/thumbnail_apis.png" />
-        <meta
-          property="twitter:image"
-          content="/thumbnail/thumbnail_apis.png"
-        />
+        <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
       </Head>
       <section>
         <ToastContainer />

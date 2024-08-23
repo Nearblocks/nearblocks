@@ -10,6 +10,8 @@ import fetcher from '@/utils/fetcher';
 import Detail from '@/components/Tokens/NFT/Detail';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
 export const getServerSideProps: GetServerSideProps<{
   tokenInfo: any;
   txnsList: any;
@@ -82,6 +84,7 @@ export const getServerSideProps: GetServerSideProps<{
     };
   }
 };
+
 const NFTokenInfo = ({
   tokenInfo,
   txnsList,
@@ -91,6 +94,7 @@ const NFTokenInfo = ({
   tid,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const token: Token | null = tokenInfo?.tokens?.[0];
+
   const meta = useMemo(() => {
     const prefix = network === 'testnet' ? 'TESTNET ' : '';
     const title = token
@@ -109,6 +113,11 @@ const NFTokenInfo = ({
     };
   }, [token]);
 
+  const thumbnail = `${ogUrl}/thumbnail/nft?token=${
+    (token?.title || token?.token) &&
+    encodeURIComponent(token.title || token.token)
+  }&network=${network}&brand=near`;
+
   return (
     <>
       <Head>
@@ -119,6 +128,10 @@ const NFTokenInfo = ({
         <meta property="og:description" content={meta.description} />
         <meta property="twitter:title" content={meta.title} />
         <meta property="twitter:description" content={meta.description} />
+        <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
       <div className="relative">

@@ -158,11 +158,13 @@ const HomePage = ({
         </title>
         <meta name="title" content={t('home:metaTitle')} />
         <meta name="description" content={t('home:metaDescription')} />
-        <meta property="og:image" content={thumbnail} />
         <meta property="og:title" content={t('home:metaTitle')} />
         <meta property="og:description" content={t('home:metaDescription')} />
         <meta property="twitter:title" content={t('home:metaTitle')} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <meta
           property="twitter:description"
           content={t('home:metaDescription')}

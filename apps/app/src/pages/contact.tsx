@@ -260,7 +260,9 @@ const Contact = () => {
         <meta property="twitter:title" content={t('heading')} />
         <meta property="twitter:description" content={t('metaDescription')} />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
       <ToastContainer />
