@@ -16,7 +16,7 @@ const count = z.object({
 const txns = z.object({
   cursor: z.string().optional(),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const txnsCount = z.object({
@@ -36,7 +36,7 @@ const ftTxns = z.object({
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const ftTxnsCount = z.object({
@@ -49,7 +49,7 @@ const holders = z.object({
   contract: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const holdersCount = z.object({
