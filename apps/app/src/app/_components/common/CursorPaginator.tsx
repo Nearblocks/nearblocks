@@ -1,70 +1,59 @@
+'use client';
 import { formatWithCommas } from '@/utils/libs';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 interface PaginatorProps {
+  apiUrl: string;
   page: number;
   setPage: (page: number) => void;
+  // setUrl: (url: string) => void;
   cursor: string | undefined;
+  isLoading?: boolean;
 }
 const CursorPaginator = (props: PaginatorProps) => {
+  const { setPage, page, cursor, isLoading } = props;
+
   const router = useRouter();
-  const { setPage, page, cursor } = props;
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-      const { p } = router.query;
-      const newPage = p ? parseInt(p as string, 10) : 1;
-      if (newPage !== page) {
-        setPage(newPage);
-      }
-    };
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
-  }, [page, router, setPage]);
-
-  const initialLoad = useRef(true);
-
-  useEffect(() => {
-    if (initialLoad.current) {
-      initialLoad.current = false;
-      const {
-        pathname,
-        query: { cursor, p, ...updatedQuery },
-      } = router;
-
-      if (cursor && p) {
-        router.replace({
-          pathname: pathname,
-          query: updatedQuery,
-        });
-      }
-    }
-  }, [router]);
 
   const handleNextPage = () => {
-    if (loading) return;
-    setLoading(true);
-    setPage(page + 1);
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        cursor,
-        p: page + 1,
-      },
-    });
+    console.log({ cursor });
+    // Get the current URL and search parameters
+    if (cursor) {
+      const currentUrl = new URL(window?.location.href);
+      const params = new URLSearchParams(currentUrl?.search);
+
+      // Set or update the cursor parameter
+      params.set('cursor', `${cursor}`);
+
+      // Construct the new URL with updated search parameters
+      const newUrl = `${currentUrl?.pathname}?${params?.toString()}`;
+
+      // Update the URL in the browser
+      router.push(newUrl);
+
+      // Update the page state
+      setPage(page + 1);
+    }
   };
 
   const onFirst = () => {
-    const { pathname, query } = router;
-    const { cursor, p, ...updatedQuery } = query;
+    // Get the current URL and search parameters
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+
+    // Remove the cursor parameter
+    params.delete('cursor');
+
+    // Construct the new URL without the cursor parameter
+    const newUrl = `${currentUrl.pathname}?${params.toString()}`;
+
+    // Update the URL in the browser
+    router.replace(newUrl);
+
+    // Update the API URL and reset the page state
+    // setUrl(props.apiUrl);
     setPage(1);
-    router.push({ pathname, query: updatedQuery });
   };
+
   return (
     <>
       <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4 rounded-b-xl">
@@ -76,10 +65,10 @@ const CursorPaginator = (props: PaginatorProps) => {
           >
             <button
               type="button"
-              disabled={page === 1 || loading}
+              disabled={page === 1 || isLoading}
               onClick={onFirst}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
-                page === 1 || loading
+                page === 1 || isLoading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
@@ -95,10 +84,10 @@ const CursorPaginator = (props: PaginatorProps) => {
             </button>
             <button
               type="button"
-              disabled={!cursor || loading}
+              disabled={isLoading || !cursor}
               onClick={handleNextPage}
               className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium text-xs ${
-                !props.cursor || loading
+                props.isLoading || !props.cursor
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}

@@ -22,6 +22,7 @@ declare module 'axios' {
     retries?: number;
     refreshInterval?: number;
     revalidateOnReconnect?: boolean;
+    cache?: 'no-store' | 'default';
   }
 }
 

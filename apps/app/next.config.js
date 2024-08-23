@@ -1,16 +1,21 @@
 const path = require('path');
 const { configureRuntimeEnv } = require('next-runtime-env/build/configure');
+// const createNextIntlPlugin = require('next-intl/plugin');
 const nextTranslate = require('next-translate-plugin');
+
+// const withNextIntl = createNextIntlPlugin('./src/app/config/i18n.ts');
+
 configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = nextTranslate({
+const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   optimizeFonts: false,
   output: 'standalone',
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    // ppr:true
   },
   webpack: (config, options) => {
     config.experiments.asyncWebAssembly = true;
@@ -36,6 +41,6 @@ const nextConfig = nextTranslate({
       },
     ];
   },
-});
+};
 
-module.exports = nextConfig;
+module.exports = nextTranslate(nextConfig);

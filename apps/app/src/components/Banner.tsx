@@ -27,6 +27,7 @@ const Banner: React.FC<BannerProps> = ({ type }) => {
         if (response?.ok) {
           const html = await response.text();
           setHtmlContent(html);
+          console.log({ htmlContent });
         }
       } catch (error) {
         console.error('Error fetching HTML content:', error);

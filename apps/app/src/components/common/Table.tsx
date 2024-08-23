@@ -1,8 +1,8 @@
+'use client';
 import { Fragment } from 'react';
 import Paginator from './Paginator';
 import CursorPaginator from './CursorPaginator';
 import Skeleton from '../skeleton/common/Skeleton';
-
 interface column {
   header: string | JSX.Element;
   key: string;

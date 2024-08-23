@@ -1,36 +1,43 @@
-import { useState } from 'react';
+'use client';
+import { Suspense, useState } from 'react';
 import ErrorMessage from '../common/ErrorMessage';
 import { BlocksInfo } from '@/utils/types';
-import {
-  convertToMetricPrefix,
-  gasFee,
-  localFormat,
-  shortenAddress,
-} from '@/utils/libs';
+
 import Link from 'next/link';
 import { Tooltip } from '@reach/tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
-import useTranslation from 'next-translate/useTranslation';
+import Skeleton from '../skeleton/common/Skeleton';
 import Table from '../common/Table';
-import TimeStamp from '../common/TimeStamp';
+import {
+  convertToMetricPrefix,
+  formatTimestampToString,
+  gasFee,
+  getTimeAgoString,
+  localFormat,
+  nanoToMilli,
+  shortenAddress,
+} from '@/app/utils/libs';
 
-interface ListProps {
-  data: {
-    blocks: BlocksInfo[];
-    cursor: string;
-  };
-  totalCount: {
-    blocks: { count: string }[];
-  };
-  error: boolean;
-}
-
-const List = ({ data, totalCount, error }: ListProps) => {
-  const { t } = useTranslation();
+// Simulated absence of the translation function
+const t = (key: string, p?: any): string | undefined => {
+  p = {};
+  const simulateAbsence = true; // Set to true to simulate absence of t
+  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+};
+const List = ({
+  data,
+  totalCount,
+  countLoading,
+  apiUrl,
+  setUrl,
+  error,
+}: any) => {
+  // const t = useTranslations();
+  // const locale = useLocale();
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
-  const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
+  const errorMessage = t('noBlocks') || 'No blocks!';
   const [address, setAddress] = useState('');
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
@@ -40,14 +47,15 @@ const List = ({ data, totalCount, error }: ListProps) => {
     setAddress('');
   };
   const blocks = data?.blocks;
-  const start = blocks?.[0];
-  const end = blocks?.[blocks?.length - 1];
+  const start = data?.blocks?.[0];
+  const end = data?.blocks?.[data?.blocks?.length - 1];
   const count = totalCount?.blocks?.[0]?.count || 0;
   const cursor = data?.cursor;
   const toggleShowAge = () => setShowAge((s) => !s);
+  console.log({ count });
   const columns: any = [
     {
-      header: <span>{t ? t('blocks:blocks') : 'BLOCK'}</span>,
+      header: <span>{t('blocks') || 'BLOCK'}</span>,
       key: 'block_hash',
       cell: (row: BlocksInfo) => (
         <span>
@@ -84,7 +92,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
             >
               {showAge ? (
                 <>
-                  {t ? t('blocks:age') : 'AGE'}
+                  {t('age') || 'AGE'}
                   <Clock className="text-green-500 dark:text-green-250 ml-2" />
                 </>
               ) : (
@@ -97,14 +105,35 @@ const List = ({ data, totalCount, error }: ListProps) => {
       key: 'block_timestamp',
       cell: (row: BlocksInfo) => (
         <span>
-          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
+          <Tooltip
+            label={
+              showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''
+            }
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+          >
+            <span>
+              {!showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''}
+            </span>
+          </Tooltip>
         </span>
       ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
     {
-      header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,
+      header: <span>{t('txn') || 'TXN'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
@@ -124,7 +153,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.receipt') : 'RECEIPT'}</span>,
+      header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
@@ -139,7 +168,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="pl-1">{t ? t('blocks:miner') : 'AUTHOR'}</span>,
+      header: <span className="pl-1">{t ? t('miner') : 'AUTHOR'}</span>,
       key: 'author_account_id',
       cell: (row: BlocksInfo) => (
         <span>
@@ -163,7 +192,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasUsed') : 'GAS USED'}</span>,
+      header: <span>{t('block.gasUsed') || 'GAS USED'}</span>,
       key: 'gas_used',
       cell: (row: BlocksInfo) => (
         <span>
@@ -178,7 +207,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasLimit') : 'GAS LIMIT'}</span>,
+      header: <span>{t('block.gasLimit') || 'GAS LIMIT'}</span>,
       key: 'gas_limit',
       cell: (row: BlocksInfo) => (
         <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
@@ -189,7 +218,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasFee') : 'GAS FEE'}</span>,
+      header: <span>{t('block.gasFee') || 'GAS FEE'}</span>,
       key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>
@@ -206,54 +235,64 @@ const List = ({ data, totalCount, error }: ListProps) => {
     },
   ];
   return (
-    <>
-      <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
+    <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
+      <Suspense
+        fallback={
+          <div className="pl-6 max-w-lg w-full py-5 ">
+            <Skeleton className="pl-6 max-w-sm leading-7 h-4" />
+          </div>
+        }
+      >
         <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
-          {blocks && blocks.length > 0 && (
-            <p className="sm:w-full w-65">
-              {t
-                ? t('blocks:listing', {
+          <p className="sm:w-full w-65">
+            {data && (
+              <span>
+                {(t &&
+                  t('listing', {
                     from: start?.block_height
-                      ? localFormat && localFormat(start?.block_height)
-                      : start?.block_height ?? '',
+                      ? localFormat(String(start?.block_height))
+                      : '',
                     to: end?.block_height
-                      ? localFormat && localFormat(end?.block_height)
-                      : end?.block_height ?? '',
-                    count: localFormat && localFormat(count.toString()),
-                  })
-                : `Block #${
+                      ? localFormat(String(end?.block_height))
+                      : '',
+                    count: localFormat(String(count)),
+                  })) ||
+                  `Block #${
                     start?.block_height
-                      ? localFormat && localFormat(start?.block_height)
-                      : start?.block_height ?? ''
-                  } to ${
-                    '#' + end?.block_height
-                      ? localFormat && localFormat(end?.block_height)
-                      : end?.block_height ?? ''
-                  } (Total of ${
-                    localFormat && localFormat(count.toString())
-                  } blocks)`}{' '}
-            </p>
-          )}
+                      ? localFormat(String(start?.block_height))
+                      : ''
+                  } to #${
+                    end?.block_height
+                      ? localFormat(String(end?.block_height))
+                      : ''
+                  } (Total of ${localFormat(String(count))} blocks)`}
+              </span>
+            )}
+          </p>
         </div>
-        <Table
-          columns={columns}
-          data={blocks}
-          limit={25}
-          cursorPagination={true}
-          cursor={cursor}
-          page={page}
-          setPage={setPage}
-          Error={error}
-          ErrorText={
-            <ErrorMessage
-              icons={<FaInbox />}
-              message={errorMessage}
-              mutedText="Please try again later"
-            />
-          }
-        />
-      </div>
-    </>
+      </Suspense>
+      <Table
+        columns={columns}
+        data={blocks}
+        countLoading={countLoading}
+        count={count}
+        limit={25}
+        cursorPagination={true}
+        cursor={cursor}
+        apiUrl={apiUrl}
+        setUrl={setUrl}
+        page={page}
+        setPage={setPage}
+        Error={error}
+        ErrorText={
+          <ErrorMessage
+            icons={<FaInbox />}
+            message={errorMessage}
+            mutedText="Please try again later"
+          />
+        }
+      />
+    </div>
   );
 };
 export default List;
