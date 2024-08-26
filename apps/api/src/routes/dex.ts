@@ -50,7 +50,7 @@ const routes = (app: Router) => {
    * @param {number} pair.path.required - pair id
    * @param {string} a.query - maker account id
    * @param {string} cursor.query - next page cursor
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get('/pairs/:pair/txns', validator(schema.txns), pair.txns);

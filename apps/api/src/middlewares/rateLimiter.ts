@@ -44,7 +44,7 @@ const rateLimiter = catchAsync(
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
 
-    if (token === config.apiAccessKey) {
+    if (config.apiAccessKey && token === config.apiAccessKey) {
       return next();
     }
 
