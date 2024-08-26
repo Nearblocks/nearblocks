@@ -63,7 +63,9 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
               'action',
               action_receipt_actions.action_kind,
               'method',
-              action_receipt_actions.args ->> 'method_name'
+              action_receipt_actions.args ->> 'method_name',
+              'args',
+              action_receipt_actions.args ->> 'args_json'
             )
           )
         FROM
@@ -343,7 +345,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
               'action',
               action_receipt_actions.action_kind,
               'method',
-              action_receipt_actions.args ->> 'method_name'
+              action_receipt_actions.args ->> 'method_name',
+              'args',
+              action_receipt_actions.args ->> 'args_json'
             )
           )
         FROM
