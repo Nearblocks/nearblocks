@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,6 +17,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Overview from '@/components/Transactions/Overview';
 import LatestTransactions from '@/components/Transactions/Latest';
 import search from '@/utils/search';
+import { Spinner } from '@/components/common/Spinner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -93,11 +94,30 @@ const HomePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
 
   const stats = statsDetails?.stats?.[0];
   const charts = chartDetails;
   const blocks = blockDetails?.blocks || [];
   const txns = txnsDetails?.txns || [];
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setLoading(true);
+    };
+
+    const handleRouteChangeComplete = () => {
+      setLoading(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const SearchToast = () => {
     if (network === 'testnet') {
@@ -184,6 +204,7 @@ const HomePage = ({
         <ToastContainer />
         <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
           <div className="container mx-auto px-3 py-14 mb-10">
+            {loading && <Spinner />}
             <div className="flex flex-col lg:flex-row pb-5 lg:!items-center">
               <div className="relative lg:w-3/5 flex-col">
                 <h1 className="text-white dark:text-neargray-10 text-2xl pb-3 flex flex-col">
