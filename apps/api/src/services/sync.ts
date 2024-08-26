@@ -10,8 +10,8 @@ import redis from '#libs/redis';
 
 const EXPIRY = 5; // 5s
 const DATE_RANGE = 2; // 2d
-const BLOCK_RANGE = 300; // 5m
-const EVENT_RANGE = 60; // 1m
+const BLOCK_RANGE = 600; // 10m
+const EVENT_RANGE = 600; // 10m
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
@@ -24,7 +24,7 @@ const getLatestBlock = async () => {
   return redis.cache(
     'sync:block',
     async () => {
-      return await sql`
+      return sql`
         SELECT
           block_height,
           block_timestamp
@@ -44,14 +44,14 @@ const getBlock = (block: number) => {
   return redis.cache(
     `sync:block:${block}`,
     async () => {
-      return await sql`
+      return sql`
         SELECT
           block_height,
           block_timestamp
         FROM
           blocks
         WHERE
-          block_height = ${block}
+          block_height IN ${sql([block, +block - 1, +block - 2])}
       `;
     },
     EXPIRY,
@@ -62,7 +62,7 @@ const getSettings = async () => {
   return redis.cache(
     'sync:settings',
     async () => {
-      return await sql`
+      return sql`
         SELECT
           *
         FROM
@@ -77,7 +77,7 @@ const getLatestFTEvent = async () => {
   return redis.cache(
     'sync:ft',
     async () => {
-      return await sql`
+      return sql`
         SELECT
           block_height,
           block_timestamp
@@ -97,7 +97,7 @@ const getLatestNFTEvent = async () => {
   return redis.cache(
     'sync:nft',
     async () => {
-      return await sql`
+      return sql`
         SELECT
           block_height,
           block_timestamp
@@ -117,7 +117,7 @@ const getLatestStats = async () => {
   return redis.cache(
     `sync:stats`,
     async () => {
-      return await sql`
+      return sql`
         SELECT
           date
         FROM
