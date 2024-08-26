@@ -3,7 +3,6 @@ import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
 import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
-import logger from '#libs/logger';
 import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
@@ -127,7 +126,7 @@ const parse = catchAsync(
         EXPIRY * 5, // 5 mins
       );
     } catch (error) {
-      logger.error({ contractViewError: error });
+      // logger.error({ contractViewError: error });
     }
 
     try {
@@ -135,7 +134,7 @@ const parse = catchAsync(
         contract = await parser.parseContract(code.code_base64);
       }
     } catch (error) {
-      logger.error({ contractParseError: error });
+      // logger.error({ contractParseError: error });
     }
 
     try {
