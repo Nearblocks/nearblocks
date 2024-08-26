@@ -56,7 +56,7 @@ export default function ({ accountId, blockHeight, post, ownerId }: Props) {
           }
           const timeMs = parseFloat(res.body);
           const timeInSeconds = Math.floor(timeMs / 1000);
-          return setTime(timeAgo(timeInSeconds));
+          return setTime(timeAgo && timeAgo(timeInSeconds));
         });
       } catch (error) {
         console.error('Error fetching time:', error);

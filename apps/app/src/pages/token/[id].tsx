@@ -30,80 +30,80 @@ const tabs = ['transfers', 'holders', 'info', 'faq', 'comments'];
 
 type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
 
-export const getServerSideProps: GetServerSideProps<{
-  statsDetails: any;
-  tokenDetails: any;
-  transfersDetails: any;
-  holdersDetails: any;
-  syncDetails: any;
-  data: any;
-  dataCount: any;
-  error: boolean;
-  tab: string;
-  accountDetais: any;
-  contractDetails: any;
-  tokenFilterDetails: any;
-  latestBlocks: any;
-}> = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
     query: { id = '', a = '', tab = 'transfers', ...query },
   }: {
     query: { id?: string; a?: string; tab?: TabType } & Record<string, any>;
   } = context;
 
-  const urlMapping: Record<string, { api: string; count?: string }> = {
-    transfers: { api: `fts/${id}/txns`, count: `fts/${id}/txns/count` },
-    holders: { api: `fts/${id}/holders`, count: `fts/${id}/holders/count` },
-    info: { api: `fts/${id}` },
-    faq: { api: `fts/${id}/holders`, count: `fts/${id}/holders/count` },
-    comments: { api: `account/${id}/contract/deployments` },
+  const commonApiUrls = {
+    stats: 'stats',
+    token: id && `fts/${id}`,
+    sync: 'sync/status',
+    account: id && `account/${id}`,
+    tokenFilter: a && `account/${a}/inventory`,
+    latestBlocks: `blocks/latest?limit=1`,
+    transfersCount: id && `fts/${id}/txns/count`,
+    holdersCount: id && `fts/${id}/holders/count`,
   };
 
-  const apiUrls = urlMapping[tab as TabType];
-  if (!apiUrls) {
-    return { notFound: true };
-  }
-
-  if (tab === 'transfers' && a) {
-    query.a = a;
-  }
-
-  const fetchUrl = `${apiUrls.api}${
-    query ? `?${queryString.stringify(query)}` : ''
-  }`;
-  const countUrl =
-    apiUrls.count &&
-    `${apiUrls.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+  const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
+    transfers: { api: `fts/${id}/txns` },
+    holders: { api: `fts/${id}/holders` },
+    info: { api: `` },
+    faq: { api: `` },
+    comments: { api: '' },
+  };
 
   const fetchData = async (url: string | undefined) =>
     url ? await fetcher(url) : null;
 
   try {
+    // Fetch common data
     const [
       statsResult,
       tokenResult,
-      transfersResult,
-      holdersResult,
       syncResult,
-      dataResult,
-      dataCountResult,
       accountResult,
-      contractResult,
       tokenFilterResult,
       latestBlocksResult,
+      transfersResult,
+      holdersResult,
     ] = await Promise.allSettled([
-      fetchData('stats'),
-      fetchData(id && `fts/${id}`),
-      fetchData(id && `fts/${id}/txns/count`),
-      fetchData(id && `fts/${id}/holders/count`),
-      fetchData('sync/status'),
-      fetchData(fetchUrl),
-      fetchData(countUrl),
-      fetchData(id && `account/${id}`),
-      fetchData(id && `account/${id}/contract/deployments`),
-      fetchData(a && `account/${a}/inventory`),
-      fetchData(`blocks/latest?limit=1`),
+      fetchData(commonApiUrls.stats),
+      fetchData(commonApiUrls.token),
+      fetchData(commonApiUrls.sync),
+      fetchData(commonApiUrls.account),
+      fetchData(commonApiUrls.tokenFilter),
+      fetchData(commonApiUrls.latestBlocks),
+      fetchData(commonApiUrls.transfersCount),
+      fetchData(commonApiUrls.holdersCount),
     ]);
+
+    let dataResult = null;
+    let dataCountResult = null;
+    let contractResult = null;
+
+    if (tab !== 'comments') {
+      // Fetch tab-specific data
+      const tabApi = tabApiUrls[tab as TabType];
+      const fetchUrl = `${tabApi.api}${
+        query ? `?${queryString.stringify(query)}` : ''
+      }`;
+      const countUrl =
+        tabApi.count &&
+        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+
+      [dataResult, dataCountResult] = await Promise.allSettled([
+        fetchData(fetchUrl),
+        fetchData(countUrl),
+      ]);
+
+      if (tab === 'faq') {
+        contractResult = await fetchData(`account/${id}/contract/deployments`);
+      }
+    }
 
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
@@ -115,14 +115,14 @@ export const getServerSideProps: GetServerSideProps<{
         transfersDetails: getResult(transfersResult),
         holdersDetails: getResult(holdersResult),
         syncDetails: getResult(syncResult),
-        data: getResult(dataResult),
-        dataCount: getResult(dataCountResult),
-        error: dataResult.status === 'rejected',
-        tab,
         accountDetais: getResult(accountResult),
-        contractDetails: getResult(contractResult),
+        contractDetails: contractResult && getResult(contractResult),
         tokenFilterDetails: getResult(tokenFilterResult),
         latestBlocks: getResult(latestBlocksResult),
+        data: dataResult && getResult(dataResult),
+        dataCount: dataCountResult && getResult(dataCountResult),
+        error: dataResult && dataResult.status === 'rejected',
+        tab,
       },
     };
   } catch (error) {
@@ -134,14 +134,14 @@ export const getServerSideProps: GetServerSideProps<{
         transfersDetails: null,
         holdersDetails: null,
         syncDetails: null,
-        data: null,
-        dataCount: null,
-        error: true,
-        tab: 'transfers',
         accountDetais: null,
         contractDetails: null,
         tokenFilterDetails: null,
         latestBlocks: null,
+        data: null,
+        dataCount: null,
+        error: true,
+        tab: 'transfers',
       },
     };
   }
@@ -153,13 +153,12 @@ const TokenDetails = ({
   transfersDetails,
   holdersDetails,
   syncDetails,
-  data,
-  dataCount,
-  error,
-  tab,
   accountDetais,
   contractDetails,
   tokenFilterDetails,
+  data,
+  error,
+  tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id, a }: any = router.query;
@@ -205,13 +204,11 @@ const TokenDetails = ({
   const inventoryData = tokenFilterDetails?.inventory;
 
   const txns = data?.txns || [];
-  const count = dataCount?.txns?.[0]?.count;
   const txnCursor = data?.cursor;
   const account = accountDetais?.account?.[0];
   const contract = contractDetails?.deployments?.[0];
 
   const holder = data?.holders || [];
-  const holderCount = dataCount?.holders?.[0]?.count;
   const status = syncDetails?.status?.aggregates.ft_holders || {
     height: '0',
     sync: true,
@@ -331,7 +328,7 @@ const TokenDetails = ({
                   <TabPanel>
                     <Transfers
                       txns={txns}
-                      count={count}
+                      count={transfers}
                       error={error}
                       cursor={txnCursor}
                       tab={tab}
@@ -342,7 +339,7 @@ const TokenDetails = ({
                       token={token}
                       status={status}
                       holder={holder}
-                      count={holderCount}
+                      count={holders}
                       error={error}
                       tab={tab}
                     />
@@ -358,7 +355,7 @@ const TokenDetails = ({
                       contract={contract}
                       transfers={transfers}
                       holdersData={holder}
-                      holdersCount={holderCount}
+                      holdersCount={holders}
                       tab={tab}
                     />
                   </TabPanel>

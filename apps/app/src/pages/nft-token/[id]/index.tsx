@@ -24,8 +24,6 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const tabs = ['transfers', 'holders', 'inventory', 'comments'];
 
-type TabType = 'transfers' | 'holders' | 'inventory' | 'comments';
-
 export const getServerSideProps: GetServerSideProps<{
   tokenDetails: any;
   transfersDetails: any;
@@ -40,14 +38,14 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context) => {
   const {
     query: { id = '', tab = 'transfers', ...query },
-  }: { query: { id?: string; tab?: TabType } & Record<string, any> } = context;
+  }: { query: { id?: string; tab?: string } & Record<string, any> } = context;
 
-  const urlMapping: Record<
+  const tabApiUrls: Record<
     string,
     { api: string; count?: string; queryModifier?: () => void }
   > = {
-    transfers: { api: `nfts/${id}/txns`, count: `nfts/${id}/txns/count` },
-    holders: { api: `nfts/${id}/holders`, count: `nfts/${id}/holders/count` },
+    transfers: { api: `nfts/${id}/txns` },
+    holders: { api: `nfts/${id}/holders` },
     inventory: {
       api: `nfts/${id}/tokens`,
       count: `nfts/${id}/tokens/count`,
@@ -55,44 +53,64 @@ export const getServerSideProps: GetServerSideProps<{
         query.per_page = '24';
       },
     },
-    comments: { api: `account/${id}/contract/deployments` },
+    comments: { api: `` },
   };
 
-  const apiUrls = urlMapping[tab as TabType];
+  const commonApiUrls = {
+    stats: 'stats',
+    token: id && `nfts/${id}`,
+    sync: 'sync/status',
+    latestBlocks: `blocks/latest?limit=1`,
+    transfersCount: id && `nfts/${id}/txns/count`,
+    holdersCount: id && `nfts/${id}/holders/count`,
+  };
+
+  const apiUrls = tabApiUrls[tab as string];
   if (!apiUrls) {
     return { notFound: true };
   }
 
   apiUrls.queryModifier?.();
 
-  const fetchUrl = `${apiUrls.api}${
-    query ? `?${queryString.stringify(query)}` : ''
-  }`;
-  const countUrl = apiUrls.count && `${apiUrls.count}`;
-
   const fetchData = async (url: string | undefined) =>
     url ? await fetcher(url) : null;
 
   try {
+    // Fetch common data
     const [
+      statsResult,
       tokenResult,
+      syncResult,
+      latestBlocksResult,
       transfersResult,
       holdersResult,
-      syncResult,
-      dataResult,
-      dataCountResult,
-      statsResult,
-      latestBlocksResult,
     ] = await Promise.allSettled([
-      fetchData(id && `nfts/${id}`),
-      fetchData(id && `nfts/${id}/txns/count`),
-      fetchData(id && `nfts/${id}/holders/count`),
-      fetchData(`sync/status`),
-      fetchData(fetchUrl),
-      fetchData(countUrl),
-      fetchData(`stats`),
-      fetchData(`blocks/latest?limit=1`),
+      fetchData(commonApiUrls.stats),
+      fetchData(commonApiUrls.token),
+      fetchData(commonApiUrls.sync),
+      fetchData(commonApiUrls.latestBlocks),
+      fetchData(commonApiUrls.transfersCount),
+      fetchData(commonApiUrls.holdersCount),
     ]);
+
+    let dataResult = null;
+    let dataCountResult = null;
+
+    if (tab !== 'comments') {
+      // Fetch tab-specific data
+      const tabApi = tabApiUrls[tab as string];
+      const fetchUrl = `${tabApi.api}${
+        query ? `?${queryString.stringify(query)}` : ''
+      }`;
+      const countUrl =
+        tabApi.count &&
+        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+
+      [dataResult, dataCountResult] = await Promise.allSettled([
+        fetchData(fetchUrl),
+        fetchData(countUrl),
+      ]);
+    }
 
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
@@ -103,10 +121,10 @@ export const getServerSideProps: GetServerSideProps<{
         transfersDetails: getResult(transfersResult),
         holdersDetails: getResult(holdersResult),
         syncDetails: getResult(syncResult),
-        data: getResult(dataResult),
-        dataCount: getResult(dataCountResult),
-        error: dataResult.status === 'rejected',
-        tab,
+        data: dataResult && getResult(dataResult),
+        dataCount: dataCountResult && getResult(dataCountResult),
+        error: dataResult ? false : true,
+        tab: tab as string,
         statsDetails: getResult(statsResult),
         latestBlocks: getResult(latestBlocksResult),
       },
@@ -151,11 +169,9 @@ const NFToken = ({
   const holders = holdersDetails?.holders?.[0]?.count;
 
   const txns = data?.txns || [];
-  const count = dataCount?.txns?.[0]?.count;
   const txnCursor = data?.cursor;
 
   const holder = data?.holders || [];
-  const holderCount = dataCount?.holders?.[0]?.count;
   const status = syncDetails?.status?.aggregates.nft_holders || {
     height: '0',
     sync: true,
@@ -310,7 +326,7 @@ const NFToken = ({
                 <TabPanel>
                   <Transfers
                     txns={txns}
-                    count={count}
+                    count={transfers}
                     error={error}
                     cursor={txnCursor}
                     tab={tab}
@@ -321,7 +337,7 @@ const NFToken = ({
                     tokens={token}
                     status={status}
                     holder={holder}
-                    count={holderCount}
+                    count={holders}
                     error={error}
                     tab={tab}
                   />
