@@ -40,7 +40,7 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get('/txns', validator(schema.txns), nft.txns);
@@ -69,7 +69,7 @@ const routes = (app: Router) => {
    * @param {string} contract.path.required - contract id
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
@@ -93,7 +93,7 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
@@ -118,7 +118,7 @@ const routes = (app: Router) => {
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
@@ -159,7 +159,7 @@ const routes = (app: Router) => {
    * @param {string} token.query - token id
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 25, "default": 25}
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
    */
   route.get(

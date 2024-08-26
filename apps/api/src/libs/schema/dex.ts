@@ -20,7 +20,7 @@ const txns = z.object({
   a: z.string().optional(),
   cursor: z.string().optional(),
   pair: z.string(),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const txnsCount = z.object({
