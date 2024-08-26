@@ -7,7 +7,7 @@ import {
 import Skeleton from '../skeleton/common/Skeleton';
 import { gasPrice } from '@/utils/near';
 import { useEffect, useMemo, useState } from 'react';
-import { ChartInfo, StatusInfo } from '@/utils/types';
+import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
@@ -24,7 +24,7 @@ interface Props {
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [chartConfig, setChartConfig] = useState({});
+  const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
 
   const charts = chartsDetails?.charts;
 
@@ -55,8 +55,6 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
   }, [charts]);
 
   useEffect(() => {
-    // Factory function to create the tooltip formatter
-
     function fetchData() {
       const fetchedData = {
         chart: {
@@ -394,26 +392,25 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5 dark:bg-black-600">
             <div className="flex-1 py-5 lg:px-0">
-              <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm dark:bg-black-600">
-                {' '}
-                {t
-                  ? t('home:transactionHistory', { days: 14 })
-                  : 'NEAR TRANSACTION HISTORY IN 14 DAYS'}
-              </p>
+              {chartConfig && (
+                <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm dark:bg-black-600">
+                  {t
+                    ? t('home:transactionHistory', { days: 14 })
+                    : 'NEAR TRANSACTION HISTORY IN 14 DAYS'}
+                </p>
+              )}
               <div className="mt-1 h-28 dark:bg-black-600">
-                {!chartData || !chartConfig ? (
+                {!chartConfig ? (
                   <Skeleton className="h-28" />
                 ) : (
-                  chartData && (
-                    <iframe
-                      className="dark:bg-black-600"
-                      srcDoc={iframeSrc}
-                      style={{
-                        width: '100%',
-                        backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
-                      }}
-                    />
-                  )
+                  <iframe
+                    className="dark:bg-black-600"
+                    srcDoc={iframeSrc}
+                    style={{
+                      width: '100%',
+                      backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
+                    }}
+                  />
                 )}
               </div>
             </div>

@@ -215,7 +215,9 @@ const Txn = ({
       </div>
       {loading && <Spinner />}
       <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
-        <SponserdText />
+        <div className="min-h-[80px] md:min-h-[25px]">
+          <SponserdText />
+        </div>
       </div>
       <div className="relative container mx-auto px-3">
         <Fragment key="hash">
