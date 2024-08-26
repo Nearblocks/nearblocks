@@ -5,25 +5,31 @@ import {
   VerifyFunction,
 } from 'passport-http-bearer';
 
+import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 
 const bearerVerify: VerifyFunction = async (token, done) => {
-  const users = await userSql`
-    SELECT
-      u.*,
-      k.id as key_id
-    FROM
-      api__users u
-      LEFT JOIN api__keys k ON k.user_id = u.id
-    WHERE
-      k.token = ${token}
-  `;
+  try {
+    const users = await userSql`
+      SELECT
+        u.*,
+        k.id as key_id
+      FROM
+        api__users u
+        LEFT JOIN api__keys k ON k.user_id = u.id
+      WHERE
+        k.token = ${token}
+    `;
 
-  const user = users?.[0];
+    const user = users?.[0];
 
-  if (user) return done(null, user);
+    if (user) return done(null, user);
 
-  return done(null, false);
+    return done(null, false);
+  } catch (error) {
+    logger.error('Error during user authentication:', error);
+    return done(null, false);
+  }
 };
 
 export const anonymousStrategy = new AnonymousStrategy();

@@ -36,7 +36,7 @@ const keys = z.object({
   account: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const keysCount = z.object({
@@ -65,7 +65,7 @@ const txns = z.object({
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
   to: z.string().optional(),
 });
 
@@ -122,7 +122,7 @@ const ftTxns = z.object({
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const ftTxnsCount = z.object({
@@ -176,7 +176,7 @@ const nftTxns = z.object({
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const nftTxnsCount = z.object({
@@ -229,7 +229,7 @@ const stakeTxns = z.object({
   from: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
   page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
   to: z.string().optional(),
 });
 
@@ -256,7 +256,7 @@ const stakeTxnsCount = z.object({
 const activities = z.object({
   account: z.string(),
   cursor: z.string().optional(),
-  per_page: z.number().positive().max(25).optional().default(25),
+  per_page: z.number().positive().max(250).optional().default(25),
 });
 
 const activitiesCount = z.object({
