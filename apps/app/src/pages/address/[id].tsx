@@ -76,6 +76,17 @@ export const getServerSideProps: GetServerSideProps<{
 
   const address = id.toLowerCase();
 
+  const commonApiUrls = {
+    stats: 'stats',
+    account: id && `account/${address}`,
+    deployments: id && `account/${address}/contract/deployments`,
+    fts: id && `fts/${address}`,
+    nfts: id && `nfts/${address}`,
+    parse: id && `account/${address}/contract/parse`,
+    latestBlocks: `blocks/latest?limit=1`,
+    inventory: id && `account/${address}/inventory`,
+  };
+
   const urlMapping: Record<TabType, { api: string; count?: string }> = {
     txns: {
       api: `account/${address}/txns`,
@@ -93,21 +104,14 @@ export const getServerSideProps: GetServerSideProps<{
       api: `account/${address}/keys`,
       count: `account/${address}/keys/count`,
     },
-    contract: { api: `account/${address}/contract/deployments` },
-    comments: { api: `account/${address}/contract/deployments` },
+    contract: { api: `` },
+    comments: { api: `` },
   };
 
   const apiUrls = urlMapping[tab as TabType];
   if (!apiUrls) {
     return { notFound: true };
   }
-
-  const fetchUrl = `${apiUrls.api}${
-    query ? `?${queryString.stringify(query)}` : ''
-  }`;
-  const countUrl =
-    apiUrls.count &&
-    `${apiUrls.count}${query ? `?${queryString.stringify(query)}` : ''}`;
 
   const fetchData = async (url: string | undefined) =>
     url ? await fetcher(url) : null;
@@ -121,24 +125,39 @@ export const getServerSideProps: GetServerSideProps<{
       nftResult,
       parseResult,
       inventoryResult,
-      dataResult,
-      dataCountResult,
       latestBlocksResult,
     ] = await Promise.allSettled([
-      fetchData('stats'),
-      fetchData(id && `account/${id}`),
-      fetchData(id && `account/${id}/contract/deployments`),
-      fetchData(id && `fts/${id}`),
-      fetchData(id && `nfts/${id}`),
-      fetchData(id && `account/${id}/contract/parse`),
-      fetchData(id && `account/${id}/inventory`),
-      fetchData(fetchUrl),
-      fetchData(countUrl),
-      fetchData(`blocks/latest?limit=1`),
+      fetchData(commonApiUrls.stats),
+      fetchData(commonApiUrls.account),
+      fetchData(commonApiUrls.deployments),
+      fetchData(commonApiUrls.fts),
+      fetchData(commonApiUrls.nfts),
+      fetchData(commonApiUrls.parse),
+      fetchData(commonApiUrls.inventory),
+      fetchData(commonApiUrls.latestBlocks),
     ]);
 
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
+
+    let dataResult = null;
+    let dataCountResult = null;
+
+    if (tab !== 'comments') {
+      // Fetch tab-specific data
+      const tabApi = urlMapping[tab as TabType];
+      const fetchUrl = `${tabApi.api}${
+        query ? `?${queryString.stringify(query)}` : ''
+      }`;
+      const countUrl =
+        tabApi.count &&
+        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+
+      [dataResult, dataCountResult] = await Promise.allSettled([
+        fetchData(fetchUrl),
+        fetchData(countUrl),
+      ]);
+    }
 
     return {
       props: {
@@ -149,9 +168,9 @@ export const getServerSideProps: GetServerSideProps<{
         nftTokenDetails: getResult(nftResult),
         parseDetails: getResult(parseResult),
         inventoryDetails: getResult(inventoryResult),
-        data: getResult(dataResult),
-        dataCount: getResult(dataCountResult),
-        error: dataResult.status === 'rejected',
+        data: dataResult && getResult(dataResult),
+        dataCount: dataCountResult && getResult(dataCountResult),
+        error: !!(dataResult && dataResult.status === 'rejected'),
         tab,
         latestBlocks: getResult(latestBlocksResult),
       },
