@@ -559,7 +559,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     <>
       {tab === 'txns' ? (
         <>
-          {!txns ? (
+          {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
               <Skeleton className="h-4" />
             </div>
@@ -567,7 +567,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             <div className={`flex flex-col lg:flex-row pt-4`}>
               <div className="flex flex-col">
                 <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {Object.keys(txns).length > 0 &&
+                  {txns &&
+                    !error &&
                     `A total of${' '}
                   ${
                     count ? localFormat && localFormat(count.toString()) : 0
@@ -576,7 +577,9 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                 </p>
               </div>
               <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
-                <Filters filters={modifiedFilter} onClear={onAllClear} />
+                <div className="px-2 mb-4 md:mb-0">
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                </div>
                 <div className="flex items-center space-x-4">
                   {Object.keys(txns).length > 0 && (
                     <>

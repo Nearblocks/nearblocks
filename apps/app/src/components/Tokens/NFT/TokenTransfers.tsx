@@ -16,6 +16,7 @@ import Clock from '@/components/Icons/Clock';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import Skeleton from '@/components/skeleton/common/Skeleton';
 
 interface Props {
   data: {
@@ -343,17 +344,24 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
   ];
   return (
     <>
-      <div className={`flex flex-col lg:flex-row pt-4`}>
-        <div className="flex flex-col">
-          <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-            {txns &&
-              count &&
-              txns.length > 0 &&
-              `A total of ${localFormat && localFormat(count.toString())}${' '}
-                transactions found`}
-          </p>
+      {!count ? (
+        <div className="pl-3 max-w-sm py-5 h-[60px]">
+          <Skeleton className="h-4" />
         </div>
-      </div>
+      ) : (
+        <div className={`flex flex-col lg:flex-row pt-4`}>
+          <div className="flex flex-col">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+              {txns &&
+                !error &&
+                `A total of ${
+                  count ? localFormat && localFormat(count.toString()) : 0
+                }${' '}
+                transactions found`}
+            </p>
+          </div>
+        </div>
+      )}
       <Table
         columns={columns}
         data={txns}

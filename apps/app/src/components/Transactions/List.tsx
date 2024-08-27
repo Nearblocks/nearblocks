@@ -525,7 +525,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
             </p>
           </div>
           {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
-            <div className="lg:ml-auto px-6">
+            <div className="lg:ml-auto px-6 pb-1">
               <Filters filters={modifiedFilter} onClear={onAllClear} />
             </div>
           )}
