@@ -188,9 +188,15 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
     <div className="dark:bg-black-600 soft-shadow">
       {!status && (
         <div className="flex flex-wrap">
-          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
-            {t('outofSync')}
-          </div>
+          <span className="items-center justify-center text-center w-full border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm whitespace-normal sm:whitespace-nowrap">
+            {`${t('outofSync')}` + ' you may try '}
+            <span className="ml-1 font-semibold">
+              <Link className="underline" href={'https://lite.nearblocks.io'}>
+                Nearblocks lite
+              </Link>
+              .
+            </span>
+          </span>
         </div>
       )}
       <div className="container mx-auto">
