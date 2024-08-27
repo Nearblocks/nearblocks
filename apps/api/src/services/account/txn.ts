@@ -148,7 +148,9 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
                     0
                   ),
                   'fee',
-                  COALESCE(execution_outcomes.tokens_burnt, 0)
+                  COALESCE(execution_outcomes.tokens_burnt, 0),
+                  'args',
+                  action_receipt_actions.args ->> 'args_json'
                 )
               )
             FROM
