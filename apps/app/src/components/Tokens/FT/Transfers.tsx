@@ -25,7 +25,7 @@ interface Props {
   tab: string;
 }
 
-export default function Transfers({ txns, count, cursor, error, tab }: Props) {
+const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   const router = useRouter();
   const { t } = useTranslation();
   const [showAge, setShowAge] = useState(true);
@@ -359,7 +359,7 @@ export default function Transfers({ txns, count, cursor, error, tab }: Props) {
     <>
       {tab === 'transfers' ? (
         <>
-          {!txns ? (
+          {!count ? (
             <div className="pl-3 max-w-sm py-5 h-[60px]">
               <Skeleton className="h-4" />
             </div>
@@ -368,11 +368,10 @@ export default function Transfers({ txns, count, cursor, error, tab }: Props) {
               <div className="flex flex-col">
                 <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   {txns &&
-                    count &&
-                    txns.length > 0 &&
-                    `A total of ${localFormat(
-                      count?.toString(),
-                    )} transactions found`}
+                    !error &&
+                    `A total of ${
+                      count ? localFormat(count?.toString()) : 0
+                    } transactions found`}
                 </p>
               </div>
               {modifiedFilter && (
@@ -405,4 +404,5 @@ export default function Transfers({ txns, count, cursor, error, tab }: Props) {
       )}
     </>
   );
-}
+};
+export default Transfers;

@@ -333,7 +333,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
     <>
       {tab === 'transfers' ? (
         <>
-          {!txns ? (
+          {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
               <Skeleton className="h-4" />
             </div>
@@ -342,9 +342,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
               <div className="flex flex-col">
                 <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   {txns &&
-                    txns.length > 0 &&
+                    !error &&
                     `A total of ${
-                      localFormat && localFormat(count.toString())
+                      count ? localFormat && localFormat(count.toString()) : 0
                     } transactions found`}
                 </p>
               </div>

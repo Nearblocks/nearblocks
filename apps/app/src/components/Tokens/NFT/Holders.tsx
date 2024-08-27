@@ -113,7 +113,7 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
     <>
       {tab === 'holders' ? (
         <>
-          {!holder ? (
+          {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
               <Skeleton className="h-4" />
             </div>
@@ -136,9 +136,9 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
                 <div className="flex flex-col">
                   <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                     {holder &&
-                      Object.keys(holder).length > 0 &&
+                      !error &&
                       `A total of ${
-                        localFormat && localFormat(count.toString())
+                        count ? localFormat && localFormat(count.toString()) : 0
                       }${' '}
                 token holders found`}
                   </p>

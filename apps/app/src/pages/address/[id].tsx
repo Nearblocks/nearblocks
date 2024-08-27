@@ -216,7 +216,7 @@ const Address = ({
   const { ftBalanceOf, contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [isloading, setIsLoading] = useState(true);
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
-  const [ft, setFT] = useState<FtInfo>({} as FtInfo);
+  const [ft, setFT] = useState<FtInfo | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
@@ -316,6 +316,7 @@ const Address = ({
       const fts = inventoryData?.fts;
       if (!fts?.length) {
         if (fts?.length === 0) setIsLoading(false);
+        setFT(null);
         return;
       }
 
