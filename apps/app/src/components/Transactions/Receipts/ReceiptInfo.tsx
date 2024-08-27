@@ -1,10 +1,9 @@
 import Question from '@/components/Icons/Question';
-import { fetcher } from '@/hooks/useFetch';
+import useRpc from '@/hooks/useRpc';
 import { hexy } from '@/utils/hexy';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import {
   Action,
-  BlocksInfo,
   FunctionCallActionView,
   ReceiptsPropsInfo,
 } from '@/utils/types';
@@ -26,32 +25,26 @@ const ReceiptInfo = ({ receipt }: Props) => {
     setHash(hashes[index]);
   };
 
-  const [block, setBlock] = useState<BlocksInfo>({} as BlocksInfo);
+  const [block, setBlock] = useState<{ height: string } | null>(null);
+
   const [loading, setLoading] = useState(false);
+  const { getBlockDetails } = useRpc();
+
   useEffect(() => {
     const index = hashes.indexOf(pageHash as string);
 
     setTabIndex(index === -1 ? 0 : index);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageHash]);
+
   useEffect(() => {
     function fetchBlocks() {
       setLoading(true);
       if (receipt?.outcome?.blockHash) {
-        fetcher(`blocks/${receipt?.outcome.blockHash}`)
-          .then((res) => {
-            const resp = res?.blocks?.[0];
-            setBlock({
-              author_account_id: resp.author_account_id,
-              block_hash: resp.author_account_id,
-              block_height: resp.block_height,
-              block_timestamp: resp.block_timestamp,
-              chunks_agg: resp.chunks_agg,
-              gas_price: resp.gas_price,
-              prev_block_hash: resp.author_account_id,
-              receipts_agg: resp.receipts_agg,
-              transactions_agg: resp.transactions_agg,
-            });
+        getBlockDetails(receipt?.outcome.blockHash)
+          .then((resp: any) => {
+            console.log(resp?.header);
+            setBlock(resp?.header);
             setLoading(false);
           })
           .catch(() => {});
@@ -295,8 +288,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         className="text-green-500 dark:text-green-250"
                       >
                         {!loading &&
-                          block?.block_height &&
-                          localFormat(block?.block_height)}
+                          block?.height &&
+                          localFormat(block?.height)}
                       </Link>
                     )}
                   </td>

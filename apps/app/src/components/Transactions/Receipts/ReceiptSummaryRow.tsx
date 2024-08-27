@@ -1,5 +1,4 @@
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
-import { useFetch } from '@/hooks/useFetch';
 import { networkId } from '@/utils/config';
 import { convertToMetricPrefix, fiatValue, yoctoToNear } from '@/utils/libs';
 import {
@@ -16,11 +15,15 @@ interface Props {
   txn: TransactionInfo;
   receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const ReceiptSummaryRow = (props: Props) => {
-  const { receipt, txn } = props;
-  const { data: statsData } = useFetch('stats');
+  const { receipt, txn, statsData } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
   function formatActionKind(actionKind: string) {
@@ -118,7 +121,12 @@ const ReceiptSummaryRow = (props: Props) => {
         <>
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <Fragment key={rcpt?.receipt_id}>
-              <ReceiptSummaryRow receipt={rcpt} borderFlag={true} txn={txn} />
+              <ReceiptSummaryRow
+                receipt={rcpt}
+                borderFlag={true}
+                txn={txn}
+                statsData={statsData}
+              />
             </Fragment>
           ))}
         </>

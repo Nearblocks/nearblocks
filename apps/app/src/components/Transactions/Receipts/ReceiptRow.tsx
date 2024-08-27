@@ -1,5 +1,4 @@
 import Question from '@/components/Icons/Question';
-import { useFetch } from '@/hooks/useFetch';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
@@ -7,19 +6,34 @@ import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import TransactionActions from './TransactionActions';
 import ReceiptStatus from './ReceiptStatus';
+import { useEffect, useRef, useState } from 'react';
+import useRpc from '@/hooks/useRpc';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
+  loading: boolean;
 }
 
 const ReceiptRow = (props: Props) => {
-  const { receipt, borderFlag } = props;
+  const { receipt, borderFlag, loading } = props;
   const { t } = useTranslation();
+  const [block, setBlock] = useState<{ height: string } | null>(null);
+  const { getBlockDetails } = useRpc();
 
-  const { data: block, loading } = useFetch(
-    receipt?.block_hash && `blocks/${receipt?.block_hash}`,
-  );
+  const lastBlockHash = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
+      lastBlockHash.current = receipt.block_hash;
+
+      getBlockDetails(receipt.block_hash)
+        .then((resp: any) => {
+          setBlock(resp?.header);
+        })
+        .catch(() => {});
+    }
+  }, [receipt?.block_hash, getBlockDetails]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -72,17 +86,17 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.receipts.block.text.0') : 'Block'}
           </div>
-          {!receipt || loading ? (
+          {!block?.height || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
-          ) : block?.blocks[0]?.block_height ? (
+          ) : block?.height ? (
             <div className="w-full md:w-3/4 word-break">
               <Link
                 href={`/blocks/${receipt.block_hash}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
               >
-                {localFormat(block?.blocks[0]?.block_height)}
+                {localFormat(block?.height)}
               </Link>
             </div>
           ) : (
@@ -282,7 +296,7 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow receipt={rcpt} borderFlag />
+                <ReceiptRow receipt={rcpt} borderFlag loading={loading} />
               </div>
             </div>
           ))}

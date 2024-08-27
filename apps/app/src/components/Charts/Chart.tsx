@@ -191,7 +191,7 @@ const Chart = (props: Props) => {
           titleText = 'Near Daily Transactions Chart';
           yLabel = 'Transactions per Day';
           description =
-            'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
+            'The chart highlights the total number of transactions on Near blockchain with daily individual breakdown for total blocks and total new account seen.';
           break;
         case 'near-supply':
           titleText = 'Near Supply Growth Chart';
