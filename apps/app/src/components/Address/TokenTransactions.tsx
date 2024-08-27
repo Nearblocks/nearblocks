@@ -486,7 +486,7 @@ const TokenTransactions = ({
     <>
       {tab === 'tokentxns' ? (
         <>
-          {!txns ? (
+          {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
               <Skeleton className="h-4" />
             </div>
@@ -495,15 +495,17 @@ const TokenTransactions = ({
               <div className="flex flex-col">
                 <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   {txns &&
-                    txns.length > 0 &&
+                    !error &&
                     `A total of ${
-                      localFormat && localFormat(count.toString())
+                      count ? localFormat && localFormat(count.toString()) : 0
                     }${' '}
               transactions found`}
                 </p>
               </div>
               <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
-                <Filters filters={modifiedFilter} onClear={onAllClear} />
+                <div className="px-2 mb-4 md:mb-0">
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                </div>
                 <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
                   {txns && txns.length > 0 && (
                     <button className="hover:no-underline ">

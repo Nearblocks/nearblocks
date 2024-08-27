@@ -18,8 +18,8 @@ const Footer = () => {
                   <Image
                     src={
                       theme === 'dark'
-                        ? '/images/nb-black-on-bos_dark.svg'
-                        : '/images/nb-black-on-bos.svg'
+                        ? '/images/nearblocksblack_dark.svg'
+                        : '/images/nearblocksblack.svg'
                     }
                     className="block"
                     width="174"
