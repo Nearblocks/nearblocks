@@ -8,12 +8,12 @@ const Home: PageLayout = () => {
     <>
       <Meta
         description="Check real-time data on the NEAR blockchain"
-        title="Near Stateless Explorer | NearBlocks Lite"
+        title="Near RPC based Explorer | NearBlocks Lite"
       />
       <div className="relative container mx-auto">
         <div className="py-[58px] px-6 text-center">
           <h1 className="font-heading font-medium text-[48px] lg:text-[72px] tracking-[-1.08px] leading-[100%]">
-            Hello, I’m the Near stateless explorer
+            Hello, I’m the Near RPC based explorer
           </h1>
           <h2 className="font-heading font-normal text-[16px] lg:text-[20px] tracking-[0.3px] my-5 leading-[130%]">
             With me, you can check real-time data on the NEAR blockchain.

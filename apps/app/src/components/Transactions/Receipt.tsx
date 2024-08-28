@@ -8,10 +8,11 @@ import { isEmpty } from 'lodash';
 interface Props {
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
+  loading: boolean;
 }
 
 const Receipt = (props: Props) => {
-  const { rpcTxn, txn } = props;
+  const { rpcTxn, txn, loading } = props;
 
   const [receipt, setReceipt] = useState(null);
 
@@ -98,7 +99,7 @@ const Receipt = (props: Props) => {
           </div>
         </div>
       ) : (
-        <ReceiptRow receipt={receipt} />
+        <ReceiptRow receipt={receipt} loading={loading} />
       )}
     </div>
   );

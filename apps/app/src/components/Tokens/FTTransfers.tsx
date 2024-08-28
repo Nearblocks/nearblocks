@@ -48,9 +48,9 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
   const count = totalCount?.txns?.[0]?.count || 0;
 
   useEffect(() => {
-    const fetchTimeStamp = async (height: number) => {
+    const fetchTimeStamp = async (height: string) => {
       try {
-        const res = await getBlockDetails(height);
+        const res = await getBlockDetails(Number(height));
         const resp = res?.header;
         if (resp) {
           setTimeStamp(resp.timestamp_nanosec);
@@ -59,7 +59,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
         console.error('Error loading schema:', error);
       }
     };
-    if (typeof status.height === 'number' && status.height > 0) {
+    if (typeof status.height === 'string' && Number(status.height) > 0) {
       fetchTimeStamp(status.height);
     } else {
       console.log('Invalid height:', status.height);

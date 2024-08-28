@@ -52,16 +52,24 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
   let cursor = data?.cursor;
 
   useEffect(() => {
-    if (status?.height) {
-      getBlockDetails(status?.height)
-        .then((resp: any) => {
-          const timeStamp = resp?.header?.timestamp_nanosec;
-          setTimeStamp(timeStamp);
-        })
-        .catch(() => {});
+    const fetchTimeStamp = async (height: string) => {
+      try {
+        const res = await getBlockDetails(Number(height));
+        const resp = res?.header;
+        if (resp) {
+          setTimeStamp(resp.timestamp_nanosec);
+        }
+      } catch (error) {
+        console.error('Error loading schema:', error);
+      }
+    };
+    if (typeof status.height === 'string' && Number(status.height) > 0) {
+      fetchTimeStamp(status.height);
+    } else {
+      console.log('Invalid height:', status.height);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status?.height]);
+  }, [status.height]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 

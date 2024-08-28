@@ -76,7 +76,7 @@ export const MenuDropdown = ({ children, className }: MenuDropdownProps) => {
 export const MenuTitle = ({ children, className }: MenuTitleProps) => {
   return (
     <li
-      className={`font-semibold px-6 md:px-4 py-2 border-y text-green-500 dark:text-green-250 ${className}`}
+      className={`font-semibold px-6 md:px-4 pb-2 border-b text-green-500 dark:text-green-250 ${className}`}
     >
       {children}
     </li>

@@ -80,6 +80,25 @@ const Delegators = ({ accountId }: Props) => {
     }
   };
 
+  const getUptimeColorClass = (uptime: number) => {
+    if (uptime >= 90) {
+      return {
+        textColor: 'text-emerald-500',
+        bgColor: 'bg-emerald-50 dark:bg-emerald-500/[0.25] text-emerald-500',
+      };
+    } else if (uptime >= 80) {
+      return {
+        textColor: 'text-yellow-500',
+        bgColor: 'bg-yellow-50 dark:bg-yellow-500/[0.25] text-yellow-500',
+      };
+    } else {
+      return {
+        textColor: 'text-red-500',
+        bgColor: 'bg-red-50 text-red-500 dark:bg-red-500/[0.25]',
+      };
+    }
+  };
+
   const getStatus = (validator: ValidatorStatus) => {
     if (validator.currentEpoch) {
       if (validator.nextEpoch) {
@@ -123,6 +142,7 @@ const Delegators = ({ accountId }: Props) => {
       });
     }, 500),
   ).current;
+
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
@@ -154,11 +174,6 @@ const Delegators = ({ accountId }: Props) => {
       let validator = [...result?.current_validators];
       let epochInfo = validator.find((item) => item.account_id === poolId);
       setCurrentEpochInfo(epochInfo);
-      setLoading(false);
-    } else {
-      setCurrentEpochInfo(undefined);
-      setStatus(undefined);
-      setLoading(false);
     }
   }
 
@@ -484,7 +499,13 @@ const Delegators = ({ accountId }: Props) => {
                       <>
                         <div className="flex w-16">
                           {!isNaN(blocksProductivityRatio) && (
-                            <span className="w-full bg-emerald-50 dark:dark:bg-emerald-500/[0.25] text-emerald-500  whitespace-nowrap rounded-xl p-1 text-center">
+                            <span
+                              className={`w-full ${
+                                getUptimeColorClass(
+                                  blocksProductivityRatio * 100,
+                                ).bgColor
+                              }  whitespace-nowrap rounded-xl p-1 text-center`}
+                            >
                               {`${
                                 blocksProductivityRatio * 100 == 100
                                   ? 100
@@ -515,7 +536,13 @@ const Delegators = ({ accountId }: Props) => {
                       <>
                         <div className="flex w-16">
                           {!isNaN(chunksProductivityRatio) && (
-                            <span className="w-full bg-emerald-50 dark:dark:bg-emerald-500/[0.25] text-emerald-500 whitespace-nowrap rounded-xl p-1 text-center">
+                            <span
+                              className={`w-full  ${
+                                getUptimeColorClass(
+                                  chunksProductivityRatio * 100,
+                                ).bgColor
+                              } whitespace-nowrap rounded-xl p-1 text-center`}
+                            >
                               {`${
                                 chunksProductivityRatio * 100 == 100
                                   ? 100

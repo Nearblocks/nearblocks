@@ -284,13 +284,17 @@ const Txn = ({
                       txn={txn}
                       rpcTxn={rpcTxn}
                       statsData={statsData}
-                      loading={error || !data}
+                      loading={error || !rpcTxn}
                       isContract={contract}
                       price={price}
                     />
                   </TabPanel>
                   <TabPanel>
-                    <Receipt txn={txn} rpcTxn={rpcTxn} />
+                    <Receipt
+                      txn={txn}
+                      rpcTxn={rpcTxn}
+                      loading={error || !rpcTxn}
+                    />
                   </TabPanel>
                   <TabPanel>
                     <Execution txn={txn} rpcTxn={rpcTxn} />
@@ -302,7 +306,8 @@ const Txn = ({
                     <ReceiptSummary
                       txn={txn}
                       rpcTxn={rpcTxn}
-                      loading={error || !data}
+                      loading={error || !rpcTxn}
+                      statsData={statsData}
                     />
                   </TabPanel>
                   <TabPanel>
