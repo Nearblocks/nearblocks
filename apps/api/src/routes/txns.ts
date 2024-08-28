@@ -62,6 +62,15 @@ const routes = (app: Router) => {
    * @return 200 - success response
    */
   route.get('/:hash', validator(schema.item), txns.item);
+
+  /**
+   * GET /v1/txns/{hash}/full
+   * @summary Get txn info with receipts and execution outcomes
+   * @tags Txns
+   * @param {string} hash.path.required - txn hash
+   * @return 200 - success response
+   */
+  route.get('/:hash/full', validator(schema.full), txns.full);
 };
 
 export default routes;

@@ -117,7 +117,7 @@ const ftTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.string().optional(),
+  cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -171,7 +171,7 @@ const nftTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
-  cursor: z.string().optional(),
+  cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -255,7 +255,7 @@ const stakeTxnsCount = z.object({
 
 const activities = z.object({
   account: z.string(),
-  cursor: z.string().optional(),
+  cursor: z.string().length(35).optional(),
   per_page: z.number().positive().max(250).optional().default(25),
 });
 
