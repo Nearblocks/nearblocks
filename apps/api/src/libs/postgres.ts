@@ -26,7 +26,6 @@ export const writeSql = postgres(config.dbWriteUrl, {
   connection: {
     application_name: 'api-write',
   },
-  max: 60,
   ssl: ssl?.ca ? ssl : false,
 });
 

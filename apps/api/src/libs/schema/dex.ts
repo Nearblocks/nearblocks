@@ -18,7 +18,7 @@ const item = z.object({
 
 const txns = z.object({
   a: z.string().optional(),
-  cursor: z.string().optional(),
+  cursor: z.string().length(35).optional(),
   pair: z.string(),
   per_page: z.number().positive().max(250).optional().default(25),
 });
