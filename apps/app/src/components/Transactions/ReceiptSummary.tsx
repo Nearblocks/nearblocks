@@ -13,10 +13,15 @@ interface Props {
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
   loading: boolean;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const ReceiptSummary = (props: Props) => {
-  const { rpcTxn, txn, loading } = props;
+  const { rpcTxn, txn, loading, statsData } = props;
   const { t } = useTranslation();
   const [receipt, setReceipt] = useState<any>(null);
   function transactionReceipts(txn: RPCTransactionInfo) {
@@ -192,7 +197,11 @@ const ReceiptSummary = (props: Props) => {
                   </tr>
                 )}
                 {receipt?.id && (
-                  <ReceiptSummaryRow txn={txn} receipt={receipt} />
+                  <ReceiptSummaryRow
+                    txn={txn}
+                    receipt={receipt}
+                    statsData={statsData}
+                  />
                 )}{' '}
               </tbody>
             </table>
