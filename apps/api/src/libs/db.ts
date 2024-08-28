@@ -20,7 +20,6 @@ if (config.dbCa) {
 const db = new Pool({
   application_name: 'api',
   connectionString: config.dbUrl,
-  max: 60,
   ssl: ssl?.ca ? ssl : false,
 });
 

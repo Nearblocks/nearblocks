@@ -4,7 +4,7 @@ import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
-import { Count, Item, Latest, List } from '#libs/schema/txns';
+import { Count, Full, Item, Latest, List } from '#libs/schema/txns';
 import { getPagination, msToNsTime } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
@@ -526,4 +526,251 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   return res.status(200).json({ txns });
 });
 
-export default { count, item, latest, list };
+const full = catchAsync(async (req: RequestValidator<Full>, res: Response) => {
+  const hash = req.validator.data.hash;
+
+  const txnQuery = sql`
+    SELECT
+      t.transaction_hash,
+      t.included_in_block_hash,
+      t.block_timestamp,
+      t.signer_account_id,
+      t.receiver_account_id,
+      t.receipt_conversion_gas_burnt,
+      t.receipt_conversion_tokens_burnt,
+      (
+        SELECT
+          shard_id
+        FROM
+          chunks
+        WHERE
+          chunks.chunk_hash = t.included_in_chunk_hash
+      ) AS shard_id,
+      (
+        SELECT
+          JSON_BUILD_OBJECT('block_height', block_height)
+        FROM
+          blocks
+        WHERE
+          blocks.block_hash = t.included_in_block_hash
+      ) AS block,
+      (
+        SELECT
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'action',
+              action_receipt_actions.action_kind,
+              'method',
+              action_receipt_actions.args ->> 'method_name',
+              'args',
+              action_receipt_actions.args ->> 'args_json'
+            )
+          )
+        FROM
+          action_receipt_actions
+          JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
+        WHERE
+          receipts.receipt_id = t.converted_into_receipt_id
+      ) AS actions,
+      (
+        SELECT
+          JSON_BUILD_OBJECT(
+            'deposit',
+            COALESCE(SUM((args ->> 'deposit')::NUMERIC), 0),
+            'gas_attached',
+            COALESCE(SUM((args ->> 'gas')::NUMERIC), 0)
+          )
+        FROM
+          action_receipt_actions
+          JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
+        WHERE
+          receipts.receipt_id = t.converted_into_receipt_id
+      ) AS actions_agg,
+      (
+        SELECT
+          JSON_BUILD_OBJECT(
+            'status',
+            BOOL_AND(
+              CASE
+                WHEN status = 'SUCCESS_RECEIPT_ID'
+                OR status = 'SUCCESS_VALUE' THEN TRUE
+                ELSE FALSE
+              END
+            )
+          )
+        FROM
+          execution_outcomes
+        WHERE
+          execution_outcomes.receipt_id = t.converted_into_receipt_id
+      ) AS outcomes,
+      (
+        SELECT
+          JSON_BUILD_OBJECT(
+            'transaction_fee',
+            COALESCE(receipt_conversion_tokens_burnt, 0) + COALESCE(SUM(tokens_burnt), 0),
+            'gas_used',
+            COALESCE(receipt_conversion_gas_burnt, 0) + COALESCE(SUM(gas_burnt), 0)
+          )
+        FROM
+          execution_outcomes
+          JOIN receipts ON receipts.receipt_id = execution_outcomes.receipt_id
+        WHERE
+          receipts.originated_from_transaction_hash = t.transaction_hash
+      ) AS outcomes_agg,
+      wrap_receipts.receipts
+    FROM
+      transactions t
+      LEFT JOIN LATERAL (
+        SELECT
+          COALESCE(JSON_AGG(base_receipts), '[]') AS receipts
+        FROM
+          (
+            SELECT
+              receipt_id,
+              predecessor_account_id,
+              receiver_account_id,
+              receipt_kind,
+              ROW_TO_JSON(wrap_block) AS block,
+              ROW_TO_JSON(wrap_outcome) AS outcome,
+              wrap_fts.fts,
+              wrap_nfts.nfts
+            FROM
+              receipts
+              LEFT JOIN LATERAL (
+                SELECT
+                  block_hash,
+                  block_height,
+                  block_timestamp
+                FROM
+                  blocks
+                WHERE
+                  block_hash = receipts.included_in_block_hash
+              ) wrap_block ON TRUE
+              LEFT JOIN LATERAL (
+                SELECT
+                  gas_burnt,
+                  tokens_burnt,
+                  executor_account_id,
+                  CASE
+                    WHEN status = 'SUCCESS_RECEIPT_ID'
+                    OR status = 'SUCCESS_VALUE' THEN TRUE
+                    ELSE FALSE
+                  END AS status
+                FROM
+                  execution_outcomes
+                WHERE
+                  receipt_id = receipts.receipt_id
+              ) wrap_outcome ON TRUE
+              LEFT JOIN LATERAL (
+                SELECT
+                  COALESCE(JSON_AGG(base_fts), '[]') AS fts
+                FROM
+                  (
+                    SELECT
+                      event_index,
+                      affected_account_id,
+                      involved_account_id,
+                      delta_amount,
+                      cause,
+                      block_timestamp,
+                      ROW_TO_JSON(wrap_ft_meta) AS ft_meta
+                    FROM
+                      ft_events
+                      LEFT JOIN LATERAL (
+                        SELECT
+                          contract,
+                          name,
+                          symbol,
+                          icon,
+                          decimals
+                        FROM
+                          ft_meta
+                        WHERE
+                          contract = ft_events.contract_account_id
+                      ) wrap_ft_meta ON TRUE
+                    WHERE
+                      receipt_id = receipts.receipt_id
+                    ORDER BY
+                      event_index ASC
+                  ) AS base_fts
+              ) wrap_fts ON TRUE
+              LEFT JOIN LATERAL (
+                SELECT
+                  COALESCE(JSON_AGG(base_nfts), '[]') AS nfts
+                FROM
+                  (
+                    SELECT
+                      event_index,
+                      affected_account_id,
+                      involved_account_id,
+                      delta_amount,
+                      token_id,
+                      cause,
+                      block_timestamp,
+                      ROW_TO_JSON(wrap_nft_meta) AS nft_meta,
+                      ROW_TO_JSON(wrap_nft_token_meta) AS nft_token_meta
+                    FROM
+                      nft_events
+                      LEFT JOIN LATERAL (
+                        SELECT
+                          contract,
+                          name,
+                          symbol,
+                          icon,
+                          base_uri,
+                          reference
+                        FROM
+                          nft_meta
+                        WHERE
+                          contract = nft_events.contract_account_id
+                      ) wrap_nft_meta ON TRUE
+                      LEFT JOIN LATERAL (
+                        SELECT
+                          token,
+                          title,
+                          media,
+                          reference
+                        FROM
+                          nft_token_meta
+                        WHERE
+                          contract = nft_events.contract_account_id
+                          AND token = nft_events.token_id
+                      ) wrap_nft_token_meta ON TRUE
+                    WHERE
+                      receipt_id = receipts.receipt_id
+                    ORDER BY
+                      event_index ASC
+                  ) AS base_nfts
+              ) wrap_nfts ON TRUE
+            WHERE
+              originated_from_transaction_hash = t.transaction_hash
+            ORDER BY
+              id ASC
+          ) AS base_receipts
+      ) wrap_receipts ON TRUE
+  `;
+
+  if (hash.startsWith('0x')) {
+    const txns = await sql`
+      ${txnQuery}
+      JOIN receipts r ON r.originated_from_transaction_hash = t.transaction_hash
+      JOIN action_receipt_actions ara ON r.receipt_id = ara.receipt_id
+      WHERE
+        ara.nep518_rlp_hash = ${hash}
+      LIMIT
+        1
+    `;
+
+    return res.status(200).json({ txns });
+  }
+
+  const txns = await sql`
+    ${txnQuery}
+    WHERE
+      t.transaction_hash = ${hash}
+  `;
+
+  return res.status(200).json({ txns });
+});
+
+export default { count, full, item, latest, list };

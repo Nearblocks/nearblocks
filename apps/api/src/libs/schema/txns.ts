@@ -59,9 +59,14 @@ const item = z.object({
   hash: z.string(),
 });
 
+const full = z.object({
+  hash: z.string(),
+});
+
 export type List = z.infer<typeof list>;
 export type Count = z.infer<typeof count>;
 export type Latest = z.infer<typeof latest>;
 export type Item = z.infer<typeof item>;
+export type Full = z.infer<typeof full>;
 
-export default { count, item, latest, list };
+export default { count, full, item, latest, list };
