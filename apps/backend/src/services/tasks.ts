@@ -445,20 +445,7 @@ export const validatorsCheck = async (redis: Redis) => {
       );
     }
 
-    await Promise.all([
-      Promise.race([
-        fetchStakingPoolInfo(redis),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 25000),
-        ),
-      ]),
-      Promise.race([
-        fetchPoolInfo(redis),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 25000),
-        ),
-      ]),
-    ]);
+    await Promise.all([fetchStakingPoolInfo(redis), fetchPoolInfo(redis)]);
 
     await saveValidatorLists(redis);
   }
