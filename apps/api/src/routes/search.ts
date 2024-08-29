@@ -21,8 +21,8 @@ const routes = (app: Router) => {
   route.get('/', validator(schema.item), search.search);
 
   /**
-   * GET /v1/search/txn
-   * @summary Search txn by hash
+   * GET /v1/search/txns
+   * @summary Search txns by hash
    * @tags Search
    * @param {string} keyword.query.required - txn hash
    * @return 200 - success response
@@ -30,8 +30,8 @@ const routes = (app: Router) => {
   route.get('/txns', validator(schema.item), search.txns);
 
   /**
-   * GET /v1/search/block
-   * @summary Search block by hash / height
+   * GET /v1/search/blocks
+   * @summary Search blocks by hash / height
    * @tags Search
    * @param {[string,number]} keyword.query.required - block height / hash
    * @return 200 - success response
@@ -39,8 +39,8 @@ const routes = (app: Router) => {
   route.get('/blocks', validator(schema.item), search.blocks);
 
   /**
-   * GET /v1/search/account
-   * @summary Search account by id
+   * GET /v1/search/accounts
+   * @summary Search accounts by id
    * @tags Search
    * @param {string} keyword.query.required - account id
    * @return 200 - success response
@@ -48,8 +48,8 @@ const routes = (app: Router) => {
   route.get('/accounts', validator(schema.item), search.accounts);
 
   /**
-   * GET /v1/search/receipt
-   * @summary Search receipt by id
+   * GET /v1/search/receipts
+   * @summary Search receipts by id
    * @tags Search
    * @param {string} keyword.query.required - receipt id
    * @return 200 - success response
