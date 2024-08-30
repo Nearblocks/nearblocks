@@ -1,16 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDown from '../Icons/ArrowDown';
 import LoadingCircular from '../common/LoadingCircular';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const FormContact = () => {
-  const { t } = useTranslation();
+interface Props {
+  selectValue?: string;
+}
+
+const FormContact = ({ selectValue }: Props) => {
+  const { t } = useTranslation('contact');
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState('Partnership / Press');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (selectValue) {
+      setSubject(selectValue);
+    }
+  }, [selectValue]);
+
   const submitForm = async (event: any) => {
     event.preventDefault();
     try {
@@ -34,9 +47,11 @@ const FormContact = () => {
         setEmail('');
         setDescription('');
         setSubject('');
+        toast.success('Thank you!');
       }
     } catch (err) {
       console.log(err);
+      toast.error('Something went wrong!');
     } finally {
       setLoading(false);
     }
@@ -44,54 +59,55 @@ const FormContact = () => {
 
   return (
     <form onSubmit={submitForm}>
-      <p className="text-lg text-black dark:text-neargray-10 font-medium sm:mt-0 mt-10">
-        {t(`Contact Form:`)}
-      </p>
-      <div className="mt-10 flex flex-col gap-4">
-        <p className="font-semibold text-base">{t('Name')}</p>
+      <div className="flex flex-col gap-4 mt-5 rounded-md ">
+        <p className="font-semibold text-base">{t('form.name.label')}</p>
         <input
           id="name"
           placeholder="Enter name..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200   border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
           onChange={(e) => setName(e.target.value)}
           value={name}
           required
         />
-        <p className="font-semibold text-base">{t('Email')}</p>
+        <p className="font-semibold text-base">{t('form.email.label')}</p>
         <input
           id="email"
           type="email"
           placeholder="Enter email..."
           autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <p className="font-semibold text-base">{t('Subject')}</p>
-        <label className="relative md:flex">
-          <select
-            onChange={(e) => setSubject(e.target.value)}
-            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded outline-blue text-base appearance-none"
-            value={subject}
-          >
-            <option value="">Select subject</option>
-            <option value="Advertising">Advertising</option>
-            <option value="Partnership / Press">Partnership / Press </option>
-            <option value="Feature Request">Feature Request</option>
-            <option value="Issue / Fix / Bug">Issue / Fix / Bug</option>
-            <option value="API">API</option>
-          </select>
-          <ArrowDown className="absolute right-2 top-3 w-4 h-4 fill-current text-gray-500 pointer-events-none" />
-        </label>
-
-        <p className="font-semibold text-base mt-2">{t('Message')}</p>
+        {!selectValue && (
+          <>
+            <p className="font-semibold text-base">{t('form.subject.label')}</p>
+            <label className="relative md:flex">
+              <select
+                onChange={(e) => setSubject(e.target.value)}
+                className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base appearance-none"
+                value={subject}
+              >
+                <option selected disabled={true}>
+                  Select subject
+                </option>
+                <option value="Partnership / Press">Partnership / Press</option>
+                <option value="Feature Request">Feature Request</option>
+              </select>
+              <ArrowDown className="absolute right-2 top-3 w-4 h-4 fill-current text-gray-500 pointer-events-none" />
+            </label>
+          </>
+        )}
+        <p className="font-semibold text-base mt-2">
+          {t('form.message.label')}
+        </p>
         <textarea
           id="message"
           placeholder="Max characters (300 words)"
           autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base overflow-hidden"
           maxLength={300}
           rows={5}
           onChange={(e) => setDescription(e.target.value)}
@@ -103,7 +119,7 @@ const FormContact = () => {
           className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
           disabled={loading}
         >
-          {loading ? <LoadingCircular /> : t('Send Message')}
+          {loading ? <LoadingCircular /> : t('form.button')}
         </button>
       </div>
     </form>
