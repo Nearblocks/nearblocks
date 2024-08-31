@@ -1,5 +1,5 @@
 'use client';
-import Skeleton from '@/app/_components/skeleton/common/Skeleton';
+import Skeleton from '@/components/app/_components/skeleton/common/Skeleton';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -15,8 +15,7 @@ const tabs = [
   'comments',
 ];
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
-  p = {};
+const t = (key: string): string | undefined => {
   const simulateAbsence = true; // Set to true to simulate absence of t
   return simulateAbsence ? undefined : key; // Return undefined to simulate absence
 };

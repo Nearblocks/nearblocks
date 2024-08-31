@@ -16,7 +16,7 @@ interface Props {
   tab?: string;
 }
 
-const AccessKeysActions = ({ keys, count, error, tab }: Props) => {
+const AccessKeysActions = ({ keys, count, error }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -160,7 +160,7 @@ const AccessKeysActions = ({ keys, count, error, tab }: Props) => {
         </table>
       </div>
       {keys?.length > 0 && (
-        <Paginator count={count} limit={25} pageLimit={200} />
+        <Paginator page={1} count={count} limit={25} pageLimit={200} />
       )}
     </>
   );

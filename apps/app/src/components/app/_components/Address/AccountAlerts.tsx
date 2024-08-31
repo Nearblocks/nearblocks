@@ -80,7 +80,11 @@ export default function AccountAlerts({
     loadSchema();
   }, [loadSchema]);
 
-  if (!accountView && accountData?.deleted?.transaction_hash && !isAccountLoading) {
+  if (
+    !accountView &&
+    accountData?.deleted?.transaction_hash &&
+    !isAccountLoading
+  ) {
     return (
       <>
         <div className="block lg:flex lg:space-x-2">
@@ -105,7 +109,14 @@ export default function AccountAlerts({
     );
   }
 
-  if (accountView && isLocked && accountData && !accountData?.deleted?.transaction_hash && !contract && !isContractLoading) {
+  if (
+    accountView &&
+    isLocked &&
+    accountData &&
+    !accountData?.deleted?.transaction_hash &&
+    !contract &&
+    !isContractLoading
+  ) {
     return (
       <>
         <div className="block lg:flex lg:space-x-2">

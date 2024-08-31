@@ -17,7 +17,7 @@ import TokenImage from '../common/TokenImage';
 import TimeStamp from '../common/TimeStamp';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
-import { tokenAmount, yoctoToNear } from '@/app/utils/near';
+import { tokenAmount } from '@/app/utils/near';
 import { localFormat, truncateString } from '@/app/utils/libs';
 
 const initialForm = {
@@ -35,10 +35,10 @@ interface TokenTxnsProps {
 }
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
 const TokenTxnsActions = ({
   id,

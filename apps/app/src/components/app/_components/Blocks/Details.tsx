@@ -18,19 +18,19 @@ import { networkId } from '@/utils/config';
 interface Props {
   hash?: any;
   data: any;
-  loading: any;
+  loading?: any;
   price: any;
 }
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
 
 export default function Details(props: Props) {
-  const { hash, data, price, loading: isLoading } = props;
+  const { hash, data, price } = props;
   // const t = useTranslations();
 
   console.log({ propPrice: price?.stats[0]?.near_price });

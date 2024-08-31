@@ -22,13 +22,6 @@ interface Props {
 
 const TokenHoldings = (props: Props) => {
   /* eslint-disable @next/next/no-img-element */
-  const Loading = (props: { className: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 rounded shadow-sm animate-pulse ${props.className}`}
-      ></div>
-    );
-  };
 
   const nfts = props.data?.nfts || [];
 

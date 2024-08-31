@@ -20,11 +20,12 @@ import {
 } from '@/app/utils/libs';
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
+
 const List = ({
   data,
   totalCount,

@@ -9,7 +9,6 @@ import {
 } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -18,14 +17,14 @@ interface Props {
   showWhen: boolean;
 }
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
+
 const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
   console.log({ accessKey });
-  const { t } = useTranslation();
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
   console.log({ keyInfo });
   const { viewAccessKey } = useRpc();

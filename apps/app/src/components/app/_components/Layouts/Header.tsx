@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/legacy/image';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/stores/auth';
 
 import Collapse from '../Collapse';
@@ -152,10 +152,10 @@ const languages = [
 ];
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
 
 const Header = () => {

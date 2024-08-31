@@ -14,7 +14,7 @@ interface Props {
   columns: column[];
   data: any[];
   isPagination?: boolean;
-  count?: number;
+  count?: any;
   page: number;
   limit: number;
   pageLimit?: number;
@@ -238,10 +238,7 @@ const Table = (props: Props) => {
           setPage={props?.setPage}
         />
       ) : null}
-      {props?.cursorPagination &&
-      !props?.Error &&
-      props?.data?.length !== 0  
-      ? (
+      {props?.cursorPagination && !props?.Error && props?.data?.length !== 0 ? (
         // && props?.setUrl
         <CursorPaginator
           apiUrl={props?.apiUrl}

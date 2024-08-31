@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useRef, useState } from 'react';
 import CopyIcon from '../Icons/CopyIcon';

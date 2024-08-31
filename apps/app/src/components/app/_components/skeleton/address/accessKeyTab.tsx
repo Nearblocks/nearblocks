@@ -1,4 +1,4 @@
-import Skeleton from "../common/Skeleton";
+import Skeleton from '../common/Skeleton';
 
 export default function AccessKeyTabSkeleton() {
   return (
@@ -7,7 +7,16 @@ export default function AccessKeyTabSkeleton() {
         <thead className="bg-gray-100 dark:bg-black-300">
           <tr>
             {/* Repeat for all table headers */}
-            {['Txn Hash', 'Public key', 'Access', 'Contract', 'Method', 'Allowance', 'Action', 'When'].map((header, index) => (
+            {[
+              'Txn Hash',
+              'Public key',
+              'Access',
+              'Contract',
+              'Method',
+              'Allowance',
+              'Action',
+              'When',
+            ].map((header, index) => (
               <th
                 key={index}
                 scope="col"
@@ -23,7 +32,10 @@ export default function AccessKeyTabSkeleton() {
             <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
               {/* Repeat for all table columns */}
               {[...Array(8)].map((_, j) => (
-                <td key={j} className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                <td
+                  key={j}
+                  className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10"
+                >
                   <Skeleton className="w-full h-4" />
                 </td>
               ))}
@@ -32,5 +44,5 @@ export default function AccessKeyTabSkeleton() {
         </tbody>
       </table>
     </div>
-  )
+  );
 }

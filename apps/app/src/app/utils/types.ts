@@ -1608,6 +1608,7 @@ export type chartDataInfo = {
 };
 
 export type AccountDataInfo = {
+  account_id: any;
   amount: string;
   locked: string;
   code_hash: string;

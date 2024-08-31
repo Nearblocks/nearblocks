@@ -84,15 +84,15 @@ export function tokenAmount(amount: string, decimal: string, format: boolean) {
 
   return formattedValue;
 }
-
 export const txnMethod = (
   actions: { action: string; method: string }[],
-  t?: (key: string, p?: any) => string | undefined
+  t?: (key: string, p?: any) => string | undefined,
 ) => {
   const count = actions?.length || 0;
 
-  if (!count) return t('txns:unknownType') || 'Unknown';
-  if (count > 1) return t('txns:batchTxns') || 'Batch Transaction';
+  if (!count) return t ? t('txns:unknownType') || 'Unknown' : 'Unknown';
+  if (count > 1)
+    return t ? t('txns:batchTxns') || 'Batch Transaction' : 'Batch Transaction';
 
   const action = actions[0];
 

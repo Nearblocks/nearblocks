@@ -9,10 +9,10 @@ import useRpc from '@/app/hooks/useRpc';
 import Big from 'big.js';
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
 
 export default function AccountOverview({
@@ -26,7 +26,6 @@ export default function AccountOverview({
 }: any) {
   const { ftBalanceOf } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
-  const [isloading, setIsLoading] = useState(true);
 
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
@@ -34,10 +33,6 @@ export default function AccountOverview({
   useEffect(() => {
     const loadBalances = async () => {
       const fts = inventoryData?.fts;
-      if (!fts?.length) {
-        if (fts?.length === 0) setIsLoading(false);
-        return;
-      }
 
       let total = Big(0);
 
@@ -105,8 +100,6 @@ export default function AccountOverview({
         amount: total.toString(),
         tokens: [...pricedTokens, ...tokens],
       });
-
-      setIsLoading(false);
     };
 
     loadBalances().catch(console.log);

@@ -2,8 +2,7 @@ import React from 'react';
 import Skeleton from '../common/Skeleton';
 import { networkId } from '@/app/utils/config';
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
-  p = {};
+const t = (key: string): string | undefined => {
   const simulateAbsence = true; // Set to true to simulate absence of t
   return simulateAbsence ? undefined : key; // Return undefined to simulate absence
 };

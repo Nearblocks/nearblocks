@@ -8,12 +8,11 @@ const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 // Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
+const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true; // Set to true to simulate absence of t
-  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+  return simulateAbsence ? undefined : { key, p }; // Return undefined to simulate absence
 };
-
 export async function generateMetadata({} // params,
 : {
   params: { locale: string };
@@ -69,14 +68,8 @@ export default async function Blocks({
   // const t = await getTranslations({ locale: params.locale });
 
   // Fetch data for blocks and block count
-  const data = await getRequest(
-    'blocks',
-    { cursor: searchParams?.cursor },
-    { next: { revalidate: 0 } },
-  );
+  const data = await getRequest('blocks', { cursor: searchParams?.cursor });
   const dataCount = await getRequest('blocks/count');
-
-  console.log({ blockData: data });
 
   return (
     <>

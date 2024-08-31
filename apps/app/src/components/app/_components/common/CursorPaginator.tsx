@@ -2,7 +2,7 @@
 import { formatWithCommas } from '@/utils/libs';
 import { useRouter } from 'next/navigation';
 interface PaginatorProps {
-  apiUrl: string;
+  apiUrl?: string;
   page: number;
   setPage: (page: number) => void;
   // setUrl: (url: string) => void;
