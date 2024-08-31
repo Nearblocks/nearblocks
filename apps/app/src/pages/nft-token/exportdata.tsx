@@ -1,13 +1,11 @@
 import Layout from '@/components/Layouts';
-import Export from '@/components/skeleton/common/Export';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { appUrl, networkId } from '@/utils/config';
+import { appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
+import Export from '@/components/Export';
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
@@ -44,35 +42,10 @@ export const getServerSideProps: GetServerSideProps<{
 };
 
 const ExportData = () => {
-  const heightRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState({});
   const router = useRouter();
-  const components = useBosComponents();
   const { address } = router.query;
 
   const title = 'Export NFT Token Transactions Data | Nearblocks';
-
-  const updateOuterDivHeight = () => {
-    if (heightRef.current) {
-      const Height = heightRef.current.offsetHeight;
-      setHeight({ height: Height });
-    } else {
-      setHeight({});
-    }
-  };
-
-  useEffect(() => {
-    updateOuterDivHeight();
-    window.addEventListener('resize', updateOuterDivHeight);
-
-    return () => {
-      window.removeEventListener('resize', updateOuterDivHeight);
-    };
-  }, []);
-
-  const onChangeHeight = () => {
-    setHeight({});
-  };
 
   const onHandleDowload = (blobUrl: string, file: string): void => {
     const a: HTMLAnchorElement = document.createElement('a');
@@ -93,19 +66,11 @@ const ExportData = () => {
         <meta property="twitter:title" content={title} />
         <link rel="canonical" href={`${appUrl}/nft-token/exportdata`} />
       </Head>
-      <div style={height} className="relative">
-        <VmComponent
-          src={components?.exportData}
-          skeleton={<Export className="absolute" ref={heightRef} />}
-          defaultSkelton={<Export />}
-          onChangeHeight={onChangeHeight}
-          props={{
-            network: networkId,
-            id: address,
-            onHandleDowload: onHandleDowload,
-            exportType: 'NFT Token Transactions',
-          }}
-          loading={<Export className="absolute" ref={heightRef} />}
+      <div className="relative">
+        <Export
+          id={address}
+          onHandleDowload={onHandleDowload}
+          exportType={'NFT Token Transactions'}
         />
       </div>
     </>

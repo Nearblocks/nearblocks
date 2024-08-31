@@ -24,7 +24,6 @@ import useRpc from '@/hooks/useRpc';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
 import { nanoToMilli } from '@/utils/libs';
-import { Spinner } from '@/components/common/Spinner';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -121,7 +120,6 @@ const Txn = ({
   const [tabIndex, setTabIndex] = useState(0);
   const { transactionStatus } = useRpc();
   const txn = data?.txns?.[0];
-  const [loading, setLoading] = useState(false);
 
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
@@ -155,35 +153,6 @@ const Txn = ({
     [isContract],
   );
 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none rounded-lg',
@@ -213,7 +182,6 @@ const Txn = ({
           {t ? t('txns:txn.heading') : 'Transaction Details'}
         </h1>
       </div>
-      {loading && <Spinner />}
       <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
         <div className="min-h-[80px] md:min-h-[25px]">
           <SponserdText />

@@ -1,14 +1,12 @@
 import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { env } from 'next-runtime-env';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
 import QueryString from 'qs';
 import List from '@/components/Tokens/NFTList';
-import { Spinner } from '@/components/common/Spinner';
-import { useRouter } from 'next/router';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -76,38 +74,6 @@ const TopNFTTokens = ({
   dataCount,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20NEP-171%20Tokens&brand=near`;
 
   return (
@@ -154,7 +120,6 @@ const TopNFTTokens = ({
             </h1>
           </div>
         </div>
-        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48 ">
           <div className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">

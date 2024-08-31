@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { appUrl } from '@/utils/config';
-import { ReactElement, useEffect, useMemo, useState } from 'react';
+import { ReactElement, useMemo } from 'react';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Layout from '@/components/Layouts';
 import { Token } from '@/utils/types';
@@ -8,8 +8,7 @@ import { env } from 'next-runtime-env';
 import QueryString from 'qs';
 import fetcher from '@/utils/fetcher';
 import Detail from '@/components/Tokens/NFT/Detail';
-import { useRouter } from 'next/router';
-import { Spinner } from '@/components/common/Spinner';
+
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 export const getServerSideProps: GetServerSideProps<{
   tokenInfo: any;
@@ -91,38 +90,6 @@ const NFTokenInfo = ({
   id,
   tid,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const token: Token | null = tokenInfo?.tokens?.[0];
   const meta = useMemo(() => {
     const prefix = network === 'testnet' ? 'TESTNET ' : '';
@@ -141,6 +108,7 @@ const NFTokenInfo = ({
       description: description,
     };
   }, [token]);
+
   return (
     <>
       <Head>
@@ -154,7 +122,6 @@ const NFTokenInfo = ({
         <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
       </Head>
       <div className="relative">
-        {loading && <Spinner />}
         <Detail
           tokenInfo={tokenInfo}
           txnsList={txnsList}
