@@ -6,7 +6,6 @@ import FaInbox from '../Icons/FaInbox';
 import Paginator from '../common/Paginator';
 import { useRouter } from 'next/router';
 import AccessKeyRow from './AccessKeyRow';
-import { Spinner } from '../common/Spinner';
 import { AccountContractInfo } from '@/utils/types';
 
 interface Props {
@@ -164,11 +163,7 @@ const AccessKeys = ({ keys, count, error, tab }: Props) => {
           )}
         </>
       ) : (
-        <div className="w-full h-[500px]">
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 z-50">
-            <Spinner />
-          </div>
-        </div>
+        <div className="w-full h-[500px]"></div>
       )}
     </>
   );

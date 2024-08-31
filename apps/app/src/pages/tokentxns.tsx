@@ -1,15 +1,14 @@
 import Head from 'next/head';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
 import Transfers from '@/components/Tokens/FTTransfers';
-import { useRouter } from 'next/router';
-import { Spinner } from '@/components/common/Spinner';
+
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
@@ -86,42 +85,10 @@ const ToxenTxns = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
   const status = syncDetails?.status?.indexers?.events || {
     height: 0,
     sync: true,
   };
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20NEP-141%20Token%20Transfers&brand=near`;
 
@@ -157,7 +124,6 @@ const ToxenTxns = ({
             </h1>
           </div>
         </div>
-        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48 ">
           <div className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">
