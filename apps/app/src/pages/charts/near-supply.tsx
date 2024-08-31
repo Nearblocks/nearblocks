@@ -2,14 +2,12 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
 import Chart from '@/components/Charts/Chart';
-import { useRouter } from 'next/router';
-import { Spinner } from '@/components/common/Spinner';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
@@ -61,38 +59,6 @@ const NearSupplyChart = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('charts:nearSupply.heading'),
   )}&brand=near`;
@@ -137,7 +103,6 @@ const NearSupplyChart = ({
             </h1>
           </div>
         </div>
-        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-48">
           <div className="container mx-auto px-3 -mt-36">
             <div className="relative">

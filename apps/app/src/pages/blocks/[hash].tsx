@@ -1,12 +1,10 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
-import { Spinner } from '@/components/common/Spinner';
 import fetcher from '@/utils/fetcher';
 import { nanoToMilli } from '@/utils/libs';
 import Details from '@/components/Blocks/Detail';
@@ -91,38 +89,6 @@ const Block = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const blockHeight = Number(blockInfo?.blocks[0]?.block_height);
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
   return (
@@ -165,7 +131,6 @@ const Block = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/blocks/${hash}`} />
       </Head>
-      {loading && <Spinner />}
       <div className="relative container mx-auto px-3">
         <Details
           hash={hash}

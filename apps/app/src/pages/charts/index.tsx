@@ -2,12 +2,10 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Notice from '@/components/common/Notice';
 import { env } from 'next-runtime-env';
 import Chart from '@/components/Charts/Chart';
-import { useRouter } from 'next/router';
-import { Spinner } from '@/components/common/Spinner';
 import { GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
 
@@ -49,37 +47,6 @@ export const getServerSideProps: GetServerSideProps<{
 
 const Charts = () => {
   const { t } = useTranslation();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
     t('charts:heading'),
@@ -110,7 +77,6 @@ const Charts = () => {
         </div>
       </div>
       <div className="mx-auto px-3 -mt-48">
-        {loading && <Spinner />}
         <div className="container mx-auto px-3 -mt-36">
           <div className="relative">
             <Chart poweredBy={false} />

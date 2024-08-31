@@ -17,7 +17,6 @@ import Holders from '@/components/Tokens/FT/Holders';
 import Info from '@/components/Tokens/FT/Info';
 import FAQ from '@/components/Tokens/FT/FAQ';
 import TokenFilter from '@/components/Tokens/FT/TokenFilter';
-import { Spinner } from '@/components/common/Spinner';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
@@ -166,36 +165,6 @@ const TokenDetails = ({
   const [tabIndex, setTabIndex] = useState(0);
   const hashes = ['Transfers', 'Holders', 'Info', 'FAQ', 'Comments'];
   const components = useBosComponents();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const token: Token = tokenDetails?.contracts?.[0];
   const transfers = transfersDetails?.txns?.[0]?.count;
@@ -271,7 +240,6 @@ const TokenDetails = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/token/${id}}`} />
       </Head>
-      {loading && <Spinner />}
       <div className="relative container mx-auto px-3">
         <section>
           <Overview

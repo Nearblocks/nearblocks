@@ -3,6 +3,8 @@ import Header from './Header';
 import Footer from './Footer';
 import { useRouter } from 'next/router';
 import { BlocksInfo, Stats } from '@/utils/types';
+import useLoading from '@/hooks/useLoading';
+import { Spinner } from '../common/Spinner';
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,6 +20,7 @@ const Layout = ({
   latestBlocks,
 }: LayoutProps) => {
   const router = useRouter();
+  const { loading, setLoading } = useLoading();
   const className =
     router.pathname === '/404'
       ? 'bg-white dark:bg-black-300'
@@ -29,6 +32,7 @@ const Layout = ({
       <header>
         <Header statsDetails={statsDetails} latestBlocks={latestBlocks} />
       </header>
+      {loading && <Spinner loading={loading} setLoading={setLoading} />}
       <main>{children}</main>
       <Footer />
     </div>

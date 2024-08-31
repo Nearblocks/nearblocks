@@ -29,7 +29,6 @@ import NFTTransactions from '@/components/Address/NFTTransactions';
 import AccessKeys from '@/components/Address/AccessKeys';
 import Overview from '@/components/Address/Contract/Overview';
 import fetcher from '@/utils/fetcher';
-import { Spinner } from '@/components/common/Spinner';
 import { useFetch } from '@/hooks/useFetch';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
@@ -221,7 +220,7 @@ const Address = ({
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
-  const [loading, setLoading] = useState(false);
+
   const components = useBosComponents();
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
@@ -431,24 +430,6 @@ const Address = ({
     });
   };
 
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      setLoading(true);
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
@@ -513,7 +494,6 @@ const Address = ({
         />
       </Head>
       <div className="relative container mx-auto px-3">
-        {loading && <Spinner />}
         <div className="flex items-center justify-between flex-wrap pt-4">
           {!id ? (
             <div className="w-80 max-w-xs px-3 py-5">

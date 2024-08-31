@@ -13,7 +13,6 @@ import classNames from 'classnames';
 import Transfers from '@/components/Tokens/NFT/Transfers';
 import Holders from '@/components/Tokens/NFT/Holders';
 import Inventory from '@/components/Tokens/NFT/Inventory';
-import { Spinner } from '@/components/common/Spinner';
 import { VmComponent } from '@/components/vm/VmComponent';
 import Comment from '@/components/skeleton/common/Comment';
 import { useBosComponents } from '@/hooks/useBosComponents';
@@ -161,7 +160,6 @@ const NFToken = ({
   const router = useRouter();
   const { id } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
-  const [loading, setLoading] = useState(false);
   const components = useBosComponents();
 
   const token = tokenDetails?.contracts?.[0];
@@ -181,35 +179,6 @@ const NFToken = ({
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
   );
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    const handleRouteChangeStart = (url: string) => {
-      if (url !== router.asPath) {
-        timeout = setTimeout(() => {
-          setLoading(true);
-        }, 300);
-      }
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-    router.events.on('routeChangeError', handleRouteChangeComplete);
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      router.events.off('routeChangeError', handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const tokens = data?.tokens || [];
   const inventoryCount = dataCount?.tokens?.[0]?.count;
@@ -241,24 +210,6 @@ const NFToken = ({
     });
   };
 
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      setLoading(true);
-    };
-
-    const handleRouteChangeComplete = () => {
-      setLoading(false);
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-    };
-  }, [router]);
-
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
@@ -284,7 +235,6 @@ const NFToken = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}`} />
       </Head>
-      {loading && <Spinner />}
       <div className="relative container mx-auto px-3">
         <Overview
           token={token}
