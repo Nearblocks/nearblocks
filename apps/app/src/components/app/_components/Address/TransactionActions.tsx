@@ -6,7 +6,6 @@ import {
   yoctoToNear,
   truncateString,
 } from '@/utils/libs';
-import useTranslation from 'next-translate/useTranslation';
 import React, { useEffect, useState } from 'react';
 import TxnStatus from '../common/Status';
 import Link from 'next/link';
@@ -53,10 +52,8 @@ const TransactionActions = ({
   txns,
   count,
   error,
-  cursor,
-} //   tab,
-: TxnsProps) => {
-  const { t: originalT } = useTranslation();
+  cursor, //   tab,
+}: TxnsProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -126,6 +123,7 @@ const TransactionActions = ({
 
     const newQueryString = QueryString.stringify(queryParams);
     router.push(`${pathname}?${newQueryString}`);
+    router.refresh();
   };
 
   const onOrder = () => {
@@ -137,6 +135,7 @@ const TransactionActions = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
+    router.refresh();
   };
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -161,11 +160,13 @@ const TransactionActions = ({
       const { action, method, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
+      router.refresh();
     } else {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
+      router.refresh();
     }
   };
   const onAllClear = () => {
@@ -176,6 +177,7 @@ const TransactionActions = ({
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
+    router.refresh();
   };
 
   const columns: any = [
@@ -255,12 +257,12 @@ const TransactionActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={txnMethod(row.actions, originalT)}
+            label={txnMethod(row.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
-                {txnMethod(row.actions, originalT)}
+                {txnMethod(row.actions, t)}
               </span>
             </span>
           </Tooltip>

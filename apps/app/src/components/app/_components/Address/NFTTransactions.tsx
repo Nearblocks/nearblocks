@@ -1,5 +1,5 @@
 import { getRequest } from '@/app/utils/api';
-import TransactionActions from './TransactionActions';
+import NFTTransactionActions from './NFTTxnsActions';
 
 const NFTTransactions = async ({ id, queryParams }: any) => {
   const [data, count] = await Promise.all([
@@ -9,7 +9,7 @@ const NFTTransactions = async ({ id, queryParams }: any) => {
 
   return (
     <>
-      <TransactionActions
+      <NFTTransactionActions
         id={id}
         txns={data?.txns}
         count={count?.txns?.[0]?.count}

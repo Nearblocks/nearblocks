@@ -94,7 +94,7 @@ const Balance = ({
           <div className="h-full bg-white soft-shadow rounded-xl dark:bg-black-600">
             <div className="flex justify-between border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10">
               <h2 className="leading-6 text-sm font-semibold">
-                {t ? t('address:overview') : 'Overview'}
+                {t ?t('address:overview') : 'Overview'}
               </h2>
               {tokenData?.name && (
                 <div className="flex items-center text-xs bg-gray-100 dark:bg-black-200 dark:text-neargray-10 rounded-md px-2 py-1">

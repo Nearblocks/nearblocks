@@ -6,7 +6,7 @@ import { env } from 'next-runtime-env';
 import '../../public/common.css';
 // import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 import Head from 'next/head';
-import Layout from './_components/Layouts';
+import Layout from '@/components/app/_components/Layouts';
 // import { getMessages } from 'next-intl/server';
 
 // const VmInitializer = dynamic(() => import('./_components/vm/VmInitializer'), {

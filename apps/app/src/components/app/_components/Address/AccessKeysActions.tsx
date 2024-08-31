@@ -33,6 +33,7 @@ const AccessKeysActions = ({ keys, count, error, tab }: Props) => {
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
+    router.refresh();
   };
 
   return (

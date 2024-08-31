@@ -1,10 +1,10 @@
 'use client';
-import FaExternalLinkAlt from '@/app/_components/Icons/FaExternalLinkAlt';
-import AccessKeyTabSkeleton from '@/app/_components/skeleton/address/accessKeyTab';
-import NftTokenTxnsSkeleton from '@/app/_components/skeleton/address/nftTokenTxns';
-import TokenTxnsSkeleton from '@/app/_components/skeleton/address/tokenTransaction';
-import TransactionSkeleton from '@/app/_components/skeleton/address/transaction';
-import Skeleton from '@/app/_components/skeleton/common/Skeleton';
+import FaExternalLinkAlt from '@/components/app/_components/Icons/FaExternalLinkAlt';
+import AccessKeyTabSkeleton from '@/components/app/_components/skeleton/address/accessKeyTab';
+import NftTokenTxnsSkeleton from '@/components/app/_components/skeleton/address/nftTokenTxns';
+import TokenTxnsSkeleton from '@/components/app/_components/skeleton/address/tokenTransaction';
+import TransactionSkeleton from '@/components/app/_components/skeleton/address/transaction';
+import Skeleton from '@/components/app/_components/skeleton/common/Skeleton';
 import { networkId } from '@/app/utils/config';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';

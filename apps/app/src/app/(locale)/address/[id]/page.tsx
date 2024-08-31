@@ -1,18 +1,18 @@
-import Balance from '@/app/_components/Address/Balance';
-import Buttons from '@/app/_components/Address/Button';
-import BalanceSkeleton from '@/app/_components/skeleton/address/balance';
-import TabPanelGeneralSkeleton from '@/app/_components/skeleton/address/dynamicTab';
-import SponserdText from '@/app/_components/SponserdText';
+import Balance from '@/components/app/_components/Address/Balance';
+import Buttons from '@/components/app/_components/Address/Button';
+import BalanceSkeleton from '@/components/app/_components/skeleton/address/balance';
+import TabPanelGeneralSkeleton from '@/components/app/_components/skeleton/address/dynamicTab';
+import SponserdText from '@/components/app/_components/SponserdText';
 import { appUrl } from '@/app/utils/config';
-import Transactions from '@/app/_components/Address/Transactions';
+import Transactions from '@/components/app/_components/Address/Transactions';
 import { Suspense } from 'react';
-import TokenTransactions from '@/app/_components/Address/TokenTransactions';
-import NFTTransactions from '@/app/_components/Address/NFTTransactions';
+import TokenTransactions from '@/components/app/_components/Address/TokenTransactions';
+import NFTTransactions from '@/components/app/_components/Address/NFTTransactions';
 import Link from 'next/link';
 import { getRequest } from '@/app/utils/api';
 import classNames from 'classnames';
-import AccessKeys from '@/app/_components/Address/AccessKeys';
-import Overview from '@/app/_components/Address/Contract/Overview';
+import AccessKeys from '@/components/app/_components/Address/AccessKeys';
+import Overview from '@/components/app/_components/Address/Contract/Overview';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
@@ -122,7 +122,7 @@ export default async function ({
                 return (
                   <Link
                     key={name}
-                    href={`/addrs/${id}?tab=${name}&order=desc`}
+                    href={`/address/${id}?tab=${name}&order=desc`}
                     className={getClassName(name === tab)}
                   >
                     <h2>

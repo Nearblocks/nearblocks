@@ -46,6 +46,8 @@ export function dollarFormat(number: string) {
   return dollarFormattedNumber;
 }
 export function yoctoToNear(yocto: string, format: boolean) {
+  console.log({ yoctoToNear: yocto });
+  console.log({ yoctoToNear: format });
   const YOCTO_PER_NEAR = Big(10).pow(24).toString();
 
   const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
@@ -85,12 +87,12 @@ export function tokenAmount(amount: string, decimal: string, format: boolean) {
 
 export const txnMethod = (
   actions: { action: string; method: string }[],
-  t?: (key: string, options?: { count?: string | undefined }) => string,
+  t?: (key: string, p?: any) => string | undefined
 ) => {
   const count = actions?.length || 0;
 
-  if (!count) return t ? t('txns:unknownType') : 'Unknown';
-  if (count > 1) return t ? t('txns:batchTxns') : 'Batch Transaction';
+  if (!count) return t('txns:unknownType') || 'Unknown';
+  if (count > 1) return t('txns:batchTxns') || 'Batch Transaction';
 
   const action = actions[0];
 

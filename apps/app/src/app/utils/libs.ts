@@ -59,10 +59,10 @@ export function yoctoToNear(yocto: string, format: boolean) {
 }
 
 export function truncateString(str: string, maxLength: number, suffix: string) {
-  if (str.length <= maxLength) {
+  if (str?.length <= maxLength) {
     return str;
   }
-  return str.substring(0, maxLength) + suffix;
+  return str?.substring(0, maxLength) + suffix;
 }
 
 export function currency(number: string) {
@@ -151,6 +151,7 @@ export function formatCustomDate(inputDate: string) {
 }
 
 export function localFormat(number: string) {
+  console.log({ LocalFormatNumber: number });
   const bigNumber = Big(number);
   const formattedNumber = bigNumber
     .toFixed(5)

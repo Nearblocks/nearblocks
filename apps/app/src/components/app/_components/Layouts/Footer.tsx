@@ -3,20 +3,18 @@ import Link from 'next/link';
 import Image from 'next/legacy/image';
 import Arrow from '../Icons/Arrow';
 import { useTheme } from 'next-themes';
-// Simulated absence of the translation function
-const t = (key: string, p?: any): string | undefined => {
-  p = {};
-  const simulateAbsence = true; // Set to true to simulate absence of t
+
+const t = (key: string): string | undefined => {
+  const simulateAbsence = true; // Simulate the absence of translations
   return simulateAbsence ? undefined : key; // Return undefined to simulate absence
 };
 
 const Footer = () => {
-  // const t = useTranslations();
   const { theme } = useTheme();
   const currentDate = new Date();
 
   return (
-    <footer className="footer dark:bg-black-600  ">
+    <footer className="footer dark:bg-black-600">
       <div className="bg-bottom-right">
         <div className="bg-bottom-left">
           <div className="container mx-auto px-3 pb-32">
@@ -37,7 +35,8 @@ const Footer = () => {
                   />
                 </div>
                 <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
-                  {t('footer.description')}
+                  {t('footer.description') ||
+                    'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.'}
                 </p>
                 <div>
                   <a
@@ -93,7 +92,7 @@ const Footer = () => {
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/apis" legacyBehavior>
-                      <a>{t('footer.links.api')}</a>
+                      <a>{t('footer.links.api') || 'NEAR Indexer APIs'}</a>
                     </Link>
                   </li>
                   <li>
@@ -114,54 +113,59 @@ const Footer = () => {
               </div>
               <div className="">
                 <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
-                  {t('footer.links.explore')}
+                  {t('footer.links.explore') || 'Explore'}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200 ">
+                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/blocks" legacyBehavior>
-                      <a>{t('footer.links.latestBlocks')}</a>
+                      <a>{t('footer.links.latestBlocks') || 'Latest Blocks'}</a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/txns" legacyBehavior>
-                      <a>{t('footer.links.latestTxns')}</a>
+                      <a>
+                        {t('footer.links.latestTxns') || 'Latest Transactions'}
+                      </a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/charts" legacyBehavior>
-                      <a>{t('footer.links.charts')}</a>
+                      <a>{t('footer.links.charts') || 'Charts & Stats'}</a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/node-explorer" legacyBehavior>
-                      <a>{t('footer.links.nearValidator')}</a>
+                      <a>
+                        {t('footer.links.nearValidator') ||
+                          'NEAR Validator list'}
+                      </a>
                     </Link>
                   </li>
                 </ul>
               </div>
               <div className="">
                 <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
-                  {t('footer.links.company')}
+                  {t('footer.links.company') || 'Company'}
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/about" legacyBehavior>
-                      <a>{t('footer.links.about')}</a>
+                      <a>{t('footer.links.about') || 'About'}</a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/advertise" legacyBehavior>
-                      <a>{t('footer.links.advertise')}</a>
+                      <a>{t('footer.links.advertise') || 'Advertise'}</a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/contact" legacyBehavior>
-                      <a>{t('footer.links.contact')}</a>
+                      <a>{t('footer.links.contact') || 'Contact'}</a>
                     </Link>
                   </li>
                   <li>
                     <Link href="/terms-and-conditions" legacyBehavior>
-                      <a>{t('footer.links.terms')}</a>
+                      <a>{t('footer.links.terms') || 'Terms'}</a>
                     </Link>
                   </li>
                 </ul>
@@ -194,7 +198,10 @@ const Footer = () => {
               </Link>
             </div>
             <div>
-              <p className="text-gray-400 text-xs">{t('trademark')}</p>
+              <p className="text-gray-400 text-xs">
+                {t('trademark') ||
+                  'NearBlocks is operated full and on its own. NearBlocks is not associated to The NEAR Foundation and every licensed trademark displayed on this website belongs to their respective owners.'}
+              </p>
             </div>
           </div>
         </div>
@@ -202,4 +209,5 @@ const Footer = () => {
     </footer>
   );
 };
+
 export default Footer;

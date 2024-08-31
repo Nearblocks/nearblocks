@@ -1,5 +1,5 @@
-import ListSkeleton from '@/app/_components/skeleton/blocks/list';
-import Skeleton from '@/app/_components/skeleton/common/Skeleton';
+import ListSkeleton from '@/components/app/_components/skeleton/blocks/list';
+import Skeleton from '@/components/app/_components/skeleton/common/Skeleton';
 
 export default function Loading() {
   return (

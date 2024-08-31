@@ -1,5 +1,5 @@
-import List from '@/app/_components/Blocks/List';
-import ListSkeleton from '@/app/_components/skeleton/blocks/list';
+import List from '@/components/app/_components/Blocks/List';
+import ListSkeleton from '@/components/app/_components/skeleton/blocks/list';
 import { getRequest } from '@/app/utils/api';
 import { appUrl } from '@/app/utils/config';
 import { Suspense } from 'react';
@@ -69,7 +69,11 @@ export default async function Blocks({
   // const t = await getTranslations({ locale: params.locale });
 
   // Fetch data for blocks and block count
-  const data = await getRequest('blocks', { cursor: searchParams?.cursor });
+  const data = await getRequest(
+    'blocks',
+    { cursor: searchParams?.cursor },
+    { next: { revalidate: 0 } },
+  );
   const dataCount = await getRequest('blocks/count');
 
   console.log({ blockData: data });

@@ -1,4 +1,4 @@
-import HashLoading from '@/app/_components/skeleton/blocks/hash';
+import HashLoading from '@/components/app/_components/skeleton/blocks/hash';
 
 export default function Loading() {
   return (

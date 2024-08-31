@@ -1,12 +1,6 @@
-import Skeleton from '@/app/_components/skeleton/common/Skeleton';
+import Skeleton from '@/components/app/_components/skeleton/common/Skeleton';
 
-export default function TableSkeleton({
-  rows,
-  columns,
-}: {
-  row: number;
-  columns: number;
-}) {
+export default function ListSkeleton() {
   return (
     <>
       <div className="overflow-x-auto">
