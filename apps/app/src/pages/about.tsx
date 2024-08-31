@@ -84,7 +84,7 @@ const AboutPage = () => {
 AboutPage.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
-    latestBlocks={page?.props?.latestBlock}
+    latestBlocks={page?.props?.latestBlocks}
   >
     {page}
   </Layout>

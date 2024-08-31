@@ -686,14 +686,13 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                             setTheme(theme === 'light' ? 'dark' : 'light')
                           }
                         >
-                          <img
+                          <Image
                             src={`/images/${
                               theme === 'dark' ? 'moon.svg' : 'sun.svg'
                             }`}
                             width="14"
                             height="14"
                             alt="NearBlocks"
-                            // eslint-disable-next-line @next/next/no-img-element
                           />
                         </div>
                       </span>

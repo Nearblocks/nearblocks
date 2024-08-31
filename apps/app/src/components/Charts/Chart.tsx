@@ -8,8 +8,8 @@ import { Tooltip } from '@reach/tooltip';
 import { useTheme } from 'next-themes';
 import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
-import Image from 'next/image';
 import Skeleton from '../skeleton/common/Skeleton';
+import Image from 'next/legacy/image';
 
 interface Props {
   chartTypes?: string;
