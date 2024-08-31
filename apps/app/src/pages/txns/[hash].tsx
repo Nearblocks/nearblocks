@@ -143,7 +143,7 @@ const Txn = ({
         .catch(console.log);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, tabIndex]);
+  }, [txn]);
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,

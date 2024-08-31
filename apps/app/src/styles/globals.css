@@ -240,3 +240,24 @@ a {
   border: 2px solid #033f40;
   border-radius: 10px;
 }
+
+@keyframes slide-down {
+  0% {
+    max-height: 0;
+    overflow: hidden;
+  }
+  100% {
+    max-height: 500px; 
+    overflow: visible;
+    
+  }
+}
+
+.slide-down[data-reach-accordion-panel][data-state='open'] {
+  animation: slide-down 4s ease forwards;
+}
+
+.contact-accordian [data-reach-accordion-button][data-state='open'] .contact-icon {
+  transform: rotate(-180deg);
+  color: #31766a;
+}

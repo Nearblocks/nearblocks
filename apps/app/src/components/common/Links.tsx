@@ -1,12 +1,14 @@
 import { urlHostName } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
-import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import Image from 'next/legacy/image';
 
 const Links = (props: any) => {
   const { meta } = props;
   const twitter = urlHostName && urlHostName(meta?.twitter);
   const facebook = urlHostName && urlHostName(meta?.facebook);
   const telegram = urlHostName && urlHostName(meta?.telegram);
+  const { theme }: any = useTheme();
 
   return (
     <div className="flex space-x-4">
@@ -26,9 +28,12 @@ const Links = (props: any) => {
             <Image
               width={16}
               height={16}
-              src="/images/twitter_icon.svg"
+              src={
+                theme === 'dark'
+                  ? '/images/twitter_icon_black.svg'
+                  : '/images/twitter_icon.svg'
+              }
               alt="Twitter"
-              priority
             />
           </a>
         </Tooltip>
@@ -52,9 +57,12 @@ const Links = (props: any) => {
               width={16}
               height={16}
               className="w-4 h-4"
-              src="/images/facebook_icon.svg"
+              src={
+                theme === 'dark'
+                  ? '/images/facebook_icon_black.svg'
+                  : '/images/facebook_icon.svg'
+              }
               alt="Facebook"
-              priority
             />
           </a>
         </Tooltip>
@@ -74,7 +82,11 @@ const Links = (props: any) => {
               width={16}
               height={16}
               className="w-4 h-4"
-              src="/images/telegram_icon.svg"
+              src={
+                theme === 'dark'
+                  ? '/images/telegram_black.svg'
+                  : '/images/telegram.svg'
+              }
               alt="Telegram"
             />
           </a>
