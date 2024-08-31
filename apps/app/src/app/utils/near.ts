@@ -73,12 +73,12 @@ export function decodeArgs(args: string[]) {
 export function tokenAmount(amount: string, decimal: string, format: boolean) {
   if (amount === undefined || amount === null) return 'N/A';
   // @ts-ignore
-  const near = Big(amount).div(Big(10).pow(decimal));
+  const near = Big(amount)?.div(Big(10)?.pow(decimal));
 
   const formattedValue = format
-    ? near.toFixed(8).replace(/\.?0+$/, '')
+    ? near?.toFixed(8).replace(/\.?0+$/, '')
     : // @ts-ignore
-      near.toFixed(Big(decimal, 10)).replace(/\.?0+$/, '');
+      near?.toFixed(Big(decimal, 10))?.replace(/\.?0+$/, '');
 
   return formattedValue;
 }

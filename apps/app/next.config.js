@@ -8,7 +8,7 @@ const nextTranslate = require('next-translate-plugin');
 configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = nextTranslate({
   reactStrictMode: true,
   poweredByHeader: false,
   optimizeFonts: false,
@@ -41,6 +41,6 @@ const nextConfig = {
       },
     ];
   },
-};
+});
 
-module.exports = nextTranslate(nextConfig);
+module.exports = nextConfig;

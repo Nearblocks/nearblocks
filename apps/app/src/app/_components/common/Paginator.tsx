@@ -1,4 +1,3 @@
-import { useTranslations } from 'next-intl';
 import FaChevronLeft from '../Icons/FaChevronLeft';
 import FaChevronRight from '../Icons/FaChevronRight';
 interface PaginatorProps {
@@ -6,11 +5,16 @@ interface PaginatorProps {
   page: number;
   limit: number;
   pageLimit: number;
-  setPage: (page: number) => void;
+  setPage?: (page: number) => void;
   isLoading?: boolean;
 }
+// Simulated absence of the translation function
+const t = (key: string, p?: any): string | undefined => {
+  p = {};
+  const simulateAbsence = true; // Set to true to simulate absence of t
+  return simulateAbsence ? undefined : key; // Return undefined to simulate absence
+};
 const Paginator = (props: PaginatorProps) => {
-  const t = useTranslations('blocks');
   let pages: number;
   const {
     page,
@@ -59,7 +63,7 @@ const Paginator = (props: PaginatorProps) => {
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
             >
-              {t('pagination.first')}
+              {t('pagination.first') || 'First'}
             </button>
             <button
               type="button"
@@ -102,7 +106,7 @@ const Paginator = (props: PaginatorProps) => {
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
             >
-              {t('pagination.last')}
+              {t('pagination.last') || 'Last'}
             </button>
           </div>
         </div>

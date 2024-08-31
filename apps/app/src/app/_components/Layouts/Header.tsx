@@ -754,7 +754,6 @@ const Header = () => {
                             Testnet
                           </a>
                         </li>
-                        'common'
                       </ul>
                     </span>
                   </>

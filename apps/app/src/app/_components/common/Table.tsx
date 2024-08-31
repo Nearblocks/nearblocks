@@ -15,7 +15,7 @@ interface Props {
   columns: column[];
   data: any[];
   isPagination?: boolean;
-  count: number;
+  count?: number;
   page: number;
   limit: number;
   pageLimit?: number;
@@ -33,61 +33,61 @@ interface Props {
   ownerId?: string;
 }
 const Table = (props: Props) => {
-  if (props?.isLoading) {
-    return (
-      <>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
-            <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
-              <tr>
-                {props?.columns &&
-                  props?.columns?.map((column, index) => (
-                    <th key={index} scope="col" className={column?.thClassName}>
-                      {column?.header}
-                    </th>
-                  ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-              {[...Array(props?.limit)]?.map((_, index) => (
-                <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
-                  {props?.columns.map((column, colIndex) => (
-                    <td key={colIndex} className={column?.tdClassName}>
-                      <Skeleton className="h-4" />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {props?.isPagination &&
-        props?.page &&
-        props?.pageLimit &&
-        props?.setPage ? (
-          <Paginator
-            count={props?.count}
-            page={props?.page}
-            isLoading={props?.countLoading}
-            limit={props?.limit}
-            pageLimit={props?.pageLimit}
-            setPage={props?.setPage}
-          />
-        ) : null}
-        {props?.cursorPagination && props?.apiUrl ? (
-          // && props?.setUrl
-          <CursorPaginator
-            apiUrl={props?.apiUrl}
-            // setUrl={props?.setUrl}
-            cursor={props?.cursor}
-            page={props?.page}
-            setPage={props?.setPage}
-            isLoading={props?.isLoading}
-          />
-        ) : null}
-      </>
-    );
-  }
+  // if (props?.isLoading) {
+  //   return (
+  //     <>
+  //       <div className="overflow-x-auto">
+  //         <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+  //           <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
+  //             <tr>
+  //               {props?.columns &&
+  //                 props?.columns?.map((column, index) => (
+  //                   <th key={index} scope="col" className={column?.thClassName}>
+  //                     {column?.header}
+  //                   </th>
+  //                 ))}
+  //             </tr>
+  //           </thead>
+  //           <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
+  //             {[...Array(props?.limit)]?.map((_, index) => (
+  //               <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
+  //                 {props?.columns.map((column, colIndex) => (
+  //                   <td key={colIndex} className={column?.tdClassName}>
+  //                     <Skeleton className="h-4" />
+  //                   </td>
+  //                 ))}
+  //               </tr>
+  //             ))}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //       {props?.isPagination &&
+  //       props?.page &&
+  //       props?.pageLimit &&
+  //       props?.setPage ? (
+  //         <Paginator
+  //           count={props?.count}
+  //           page={props?.page}
+  //           isLoading={props?.countLoading}
+  //           limit={props?.limit}
+  //           pageLimit={props?.pageLimit}
+  //           setPage={props?.setPage}
+  //         />
+  //       ) : null}
+  //       {props?.cursorPagination && props?.apiUrl ? (
+  //         // && props?.setUrl
+  //         <CursorPaginator
+  //           apiUrl={props?.apiUrl}
+  //           // setUrl={props?.setUrl}
+  //           cursor={props?.cursor}
+  //           page={props?.page}
+  //           setPage={props?.setPage}
+  //           isLoading={props?.isLoading}
+  //         />
+  //       ) : null}
+  //     </>
+  //   );
+  // }
   return (
     <>
       {props?.isExpanded ? (
@@ -241,8 +241,8 @@ const Table = (props: Props) => {
       ) : null}
       {props?.cursorPagination &&
       !props?.Error &&
-      props?.data?.length !== 0 &&
-      props?.apiUrl ? (
+      props?.data?.length !== 0  
+      ? (
         // && props?.setUrl
         <CursorPaginator
           apiUrl={props?.apiUrl}

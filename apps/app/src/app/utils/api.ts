@@ -20,10 +20,8 @@ export const getRequest = async (
 
   try {
     console.log({ url });
-    const response = await fetch(url, {
-      headers,
-      next: { revalidate: 0 },
-    });
+    const response = await fetch(url, { headers });
+
     if (!response.ok) {
       return null;
     }

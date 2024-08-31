@@ -1,6 +1,8 @@
 import Details from '@/app/_components/Blocks/Details';
 import { getRequest } from '@/app/utils/api';
 import { nanoToMilli } from '@/app/utils/libs';
+import { Suspense } from 'react';
+import HashLoading from '@/app/_components/skeleton/blocks/hash';
 
 export default async function Hash({ params }: { params: { hash: string } }) {
   // Fetch both hashData and priceData concurrently
@@ -9,12 +11,14 @@ export default async function Hash({ params }: { params: { hash: string } }) {
   return (
     <>
       <div className="relative container mx-auto px-3">
-        <Details
-          hash={params.hash}
-          data={hashData}
-          loading={!hashData}
-          price={priceData}
-        />
+        <Suspense fallback={<HashLoading />}>
+          <Details
+            hash={params.hash}
+            data={hashData}
+            loading={!hashData}
+            price={priceData}
+          />
+        </Suspense>
       </div>
       <div className="py-8"></div>
     </>

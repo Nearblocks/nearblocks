@@ -11,9 +11,9 @@ export const networks: Record<NetworkId, Network> = {
 };
 
 export const networkId: NetworkId =
-  (env('NEXT_PUBLIC_NETWORK_ID') as NetworkId) || 'testnet';
+  (process.env.NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
 export const bosNetworkId: NetworkId =
-  (env('NEXT_PUBLIC_BOS_NETWORK') as NetworkId) || 'testnet';
+  (process.env.NEXT_PUBLIC_BOS_NETWORK as NetworkId) || 'testnet';
 
 export const network = networks[networkId];
 

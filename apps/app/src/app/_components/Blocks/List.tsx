@@ -39,6 +39,7 @@ const List = ({
   const [page, setPage] = useState(1);
   const errorMessage = t('noBlocks') || 'No blocks!';
   const [address, setAddress] = useState('');
+
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
     setAddress(id);
