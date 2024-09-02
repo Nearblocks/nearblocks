@@ -52,7 +52,7 @@ const price = catchAsync(
       SELECT
         near_price
       FROM
-        daily_stats
+        daily_stats_new
       WHERE
         date = ${date}
       LIMIT
