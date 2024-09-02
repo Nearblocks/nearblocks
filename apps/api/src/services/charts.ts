@@ -8,7 +8,7 @@ const list = catchAsync(async (_req: Request, res: Response) => {
     SELECT
       *
     FROM
-      daily_stats
+      daily_stats_new
     ORDER BY
       date ASC
   `;
@@ -23,7 +23,7 @@ const latest = catchAsync(async (_req: Request, res: Response) => {
       near_price,
       txns
     FROM
-      daily_stats
+      daily_stats_new
     ORDER BY
       date DESC
     LIMIT

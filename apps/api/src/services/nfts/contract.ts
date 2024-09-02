@@ -46,6 +46,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 const txns = catchAsync(
   async (req: RequestValidator<NftTxns>, res: Response) => {
     const contract = req.validator.data.contract;
+    const account = req.validator.data.a;
     const event = req.validator.data.event;
     const cursor = req.validator.data.cursor;
     const page = req.validator.data.page;
@@ -96,6 +97,7 @@ const txns = catchAsync(
             nft_events a
           WHERE
             contract_account_id = ${contract}
+            AND ${account ? sql`affected_account_id = ${account}` : true}
             AND ${event ? sql`cause = ${event}` : true}
             AND ${cursor
         ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`

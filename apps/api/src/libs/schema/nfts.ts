@@ -26,6 +26,7 @@ const item = z.object({
 });
 
 const nftTxns = z.object({
+  a: z.string().optional(),
   contract: z.string(),
   cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),

@@ -20,6 +20,18 @@ const routes = (app: Router) => {
   );
 
   route.get(
+    '/:account/txns-only/export',
+    validator(schema.txnsOnlyExport),
+    txn.txnsOnlyExport,
+  );
+
+  route.get(
+    '/:account/receipts/export',
+    validator(schema.receiptsExport),
+    txn.receiptsExport,
+  );
+
+  route.get(
     '/:account/ft-txns/export',
     validator(schema.ftTxnsExport),
     ft.txnsExport,

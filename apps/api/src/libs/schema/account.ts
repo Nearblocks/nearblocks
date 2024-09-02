@@ -101,6 +101,60 @@ const txnsExport = z.object({
   }),
 });
 
+const txnsOnly = z.object({
+  account: z.string(),
+  cursor: z.string().optional(),
+  from: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  per_page: z.number().positive().max(250).optional().default(25),
+  to: z.string().optional(),
+});
+
+const txnsOnlyCount = z.object({
+  account: z.string(),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+const txnsOnlyExport = z.object({
+  account: z.string(),
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+});
+
+const receipts = z.object({
+  account: z.string(),
+  action: z.nativeEnum(ActionKind).optional(),
+  cursor: z.string().optional(),
+  from: z.string().optional(),
+  method: z.string().optional(),
+  order: z.enum(['desc', 'asc']).optional().default('desc'),
+  per_page: z.number().positive().max(250).optional().default(25),
+  to: z.string().optional(),
+});
+
+const receiptsCount = z.object({
+  account: z.string(),
+  action: z.nativeEnum(ActionKind).optional(),
+  from: z.string().optional(),
+  method: z.string().optional(),
+  to: z.string().optional(),
+});
+
+const receiptsExport = z.object({
+  account: z.string(),
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+});
+
 const ftTxns = z.object({
   account: z.string(),
   after_date: z
@@ -275,6 +329,12 @@ export type KeysCount = z.infer<typeof keysCount>;
 export type Txns = z.infer<typeof txns>;
 export type TxnsCount = z.infer<typeof txnsCount>;
 export type TxnsExport = z.infer<typeof txnsExport>;
+export type TxnsOnly = z.infer<typeof txnsOnly>;
+export type TxnsOnlyCount = z.infer<typeof txnsOnlyCount>;
+export type TxnsOnlyExport = z.infer<typeof txnsOnlyExport>;
+export type Receipts = z.infer<typeof receipts>;
+export type ReceiptsCount = z.infer<typeof receiptsCount>;
+export type ReceiptsExport = z.infer<typeof receiptsExport>;
 export type FtTxns = z.infer<typeof ftTxns>;
 export type FtTxnsCount = z.infer<typeof ftTxnsCount>;
 export type FtTxnsExport = z.infer<typeof ftTxnsExport>;
@@ -303,10 +363,16 @@ export default {
   nftTxnsCount,
   nftTxnsExport,
   parse,
+  receipts,
+  receiptsCount,
+  receiptsExport,
   stakeTxns,
   stakeTxnsCount,
   tokens,
   txns,
   txnsCount,
   txnsExport,
+  txnsOnly,
+  txnsOnlyCount,
+  txnsOnlyExport,
 };
