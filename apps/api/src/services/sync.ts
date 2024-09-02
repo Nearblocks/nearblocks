@@ -16,7 +16,7 @@ const EVENT_RANGE = 600; // 10m
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
 const isEventInSync = (latest: string, current: string) =>
-  +latest.slice(0, 10) - +current.slice(0, 10) <= EVENT_RANGE;
+  +latest - +current <= EVENT_RANGE;
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
@@ -73,46 +73,6 @@ const getSettings = async () => {
   );
 };
 
-const getLatestFTEvent = async () => {
-  return redis.cache(
-    'sync:ft',
-    async () => {
-      return sql`
-        SELECT
-          block_height,
-          block_timestamp
-        FROM
-          ft_events
-        ORDER BY
-          block_timestamp DESC
-        LIMIT
-          1
-      `;
-    },
-    EXPIRY,
-  );
-};
-
-const getLatestNFTEvent = async () => {
-  return redis.cache(
-    'sync:nft',
-    async () => {
-      return sql`
-        SELECT
-          block_height,
-          block_timestamp
-        FROM
-          nft_events
-        ORDER BY
-          block_timestamp DESC
-        LIMIT
-          1
-      `;
-    },
-    EXPIRY,
-  );
-};
-
 const getLatestStats = async () => {
   return redis.cache(
     `sync:stats`,
@@ -121,7 +81,7 @@ const getLatestStats = async () => {
         SELECT
           date
         FROM
-          daily_stats
+          daily_stats_new
         ORDER BY
           date DESC
         LIMIT
@@ -135,8 +95,8 @@ const getLatestStats = async () => {
 const getBaseStatus = async () => {
   const latestBlock = await getLatestBlock();
 
-  const height = latestBlock?.[0].block_height;
-  const timestamp = latestBlock?.[0].block_timestamp;
+  const height = latestBlock?.[0]?.block_height;
+  const timestamp = latestBlock?.[0]?.block_timestamp;
 
   return { height, sync: isInSync(timestamp), timestamp };
 };
@@ -198,23 +158,23 @@ const getFTHoldersStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const [eventBlock, syncedBlock] = await Promise.all([
-    getLatestFTEvent(),
+  const [syncedBlock, latestBlock] = await Promise.all([
     getBlock(ftHoldersHeight),
+    getLatestBlock(),
   ]);
 
-  if (!eventBlock?.[0] || !syncedBlock?.[0]) {
-    logger.warn({ eventBlock, syncedBlock });
+  if (!syncedBlock?.[0] || !latestBlock?.[0]) {
+    logger.warn({ latestBlock, syncedBlock });
     return { height: ftHoldersHeight, sync: false, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
   const timestamp = syncedBlock[0].block_timestamp;
-  const eventTimestamp = eventBlock[0].block_timestamp;
+  const latestHeight = latestBlock[0].block_height;
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(eventTimestamp, timestamp),
+    sync: isInSync(timestamp) || isEventInSync(latestHeight, ftHoldersHeight),
     timestamp,
   };
 };
@@ -230,23 +190,23 @@ const getNFTHoldersStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const [eventBlock, syncedBlock] = await Promise.all([
-    getLatestNFTEvent(),
+  const [syncedBlock, latestBlock] = await Promise.all([
     getBlock(nftHoldersHeight),
+    getLatestBlock(),
   ]);
 
-  if (!eventBlock?.[0] || !syncedBlock?.[0]) {
-    logger.warn({ eventBlock, syncedBlock });
+  if (!syncedBlock?.[0] || !latestBlock?.[0]) {
+    logger.warn({ latestBlock, syncedBlock });
     return { height: nftHoldersHeight, sync: false, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
   const timestamp = syncedBlock[0].block_timestamp;
-  const eventTimestamp = eventBlock[0].block_timestamp;
+  const latestHeight = latestBlock[0].block_height;
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(eventTimestamp, timestamp),
+    sync: isInSync(timestamp) || isEventInSync(latestHeight, nftHoldersHeight),
     timestamp,
   };
 };

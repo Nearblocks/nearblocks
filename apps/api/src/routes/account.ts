@@ -153,6 +153,70 @@ const routes = (app: Router) => {
   route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
 
   /**
+   * GET /v1/account/{account}/txns-only
+   * @summary Get account txns without receipts by pagination
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:account/txns-only', validator(schema.txnsOnly), txn.txnsOnly);
+
+  /**
+   * GET /v1/account/{account}/txns-only/count
+   * @summary Get account txns without receipts count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/txns-only/count',
+    validator(schema.txnsOnlyCount),
+    txn.txnsOnlyCount,
+  );
+
+  /**
+   * GET /v1/account/{account}/receipts
+   * @summary Get account receipts by pagination
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} action.query - action kind
+   * @param {string} method.query - function call method
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   */
+  route.get('/:account/receipts', validator(schema.receipts), txn.receipts);
+
+  /**
+   * GET /v1/account/{account}/receipts/count
+   * @summary Get account receipts count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} action.query - action kind
+   * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @return 200 - success response
+   */
+  route.get(
+    '/:account/receipts/count',
+    validator(schema.receiptsCount),
+    txn.receiptsCount,
+  );
+
+  /**
    * GET /v1/account/{account}/ft-txns
    * @summary Get account token txns by pagination
    * @tags Account
