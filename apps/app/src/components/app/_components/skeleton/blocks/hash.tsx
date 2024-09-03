@@ -76,6 +76,30 @@ export default function HashLoading() {
             <Skeleton className="h-5 w-full max-w-lg" />
           </div>
         </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <Skeleton className="h-5" />
+          </div>
+          <div className="w-full md:w-3/4">
+            <Skeleton className="h-5 w-full max-w-lg" />
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <Skeleton className="h-5" />
+          </div>
+          <div className="w-full md:w-3/4">
+            <Skeleton className="h-5 w-full max-w-lg" />
+          </div>
+        </div>
+        <div className="flex flex-wrap p-4">
+          <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <Skeleton className="h-5" />
+          </div>
+          <div className="w-full md:w-3/4">
+            <Skeleton className="h-5 w-full max-w-lg" />
+          </div>
+        </div>
       </div>
     </>
   );

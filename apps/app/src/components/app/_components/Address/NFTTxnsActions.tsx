@@ -75,7 +75,7 @@ const NFTTransactionActions = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
@@ -95,7 +95,7 @@ const NFTTransactionActions = ({
 
     const newQueryString = QueryString.stringify(queryParams);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -110,13 +110,13 @@ const NFTTransactionActions = ({
       const { action, method, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
-      router.refresh();
+      // router.refresh();
     } else {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
-      router.refresh();
+      // router.refresh();
     }
   };
 
@@ -127,7 +127,7 @@ const NFTTransactionActions = ({
     const { cursor, event, p, involved, ...newQuery } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onHandleMouseOver = (e: any, id: string) => {

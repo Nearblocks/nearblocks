@@ -1,10 +1,10 @@
 import { getRequest } from '@/app/utils/api';
 import TokenTxnsActions from './TokenTxnsActions';
 
-const TokenTransactions = async ({ id, queryParams }: any) => {
+const TokenTransactions = async ({ id, searchParams }: any) => {
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/ft-txns`, queryParams),
-    getRequest(`account/${id}/ft-txns/count`, queryParams),
+    getRequest(`account/${id}/ft-txns`, searchParams),
+    getRequest(`account/${id}/ft-txns/count`, searchParams),
   ]);
 
   return (

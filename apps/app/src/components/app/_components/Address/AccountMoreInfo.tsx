@@ -26,7 +26,6 @@ export default function AccountMoreInfo({
   tokenData,
   deploymentData,
   nftTokenData,
-  loading = false,
 }: any) {
   const { contractCode, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
@@ -51,10 +50,10 @@ export default function AccountMoreInfo({
         ]);
         if (code && code?.code_base64) {
           setContract({
-            block_hash: code.block_hash,
-            block_height: code.block_height,
-            code_base64: code.code_base64,
-            hash: code.hash,
+            block_hash: code?.block_hash,
+            block_height: code?.block_height,
+            code_base64: code?.code_base64,
+            hash: code?.hash,
           });
         } else {
           setContract(null);
@@ -144,7 +143,7 @@ export default function AccountMoreInfo({
                   : 'N/A'}
               </div>
             </div>
-            {contract && contract?.hash && !loading ? (
+            {contract && contract?.hash ? (
               <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                 <div className="w-full mb-2 md:mb-0">Contract Locked:</div>
                 <div className="w-full break-words xl:mt-0 mt-2">
@@ -228,11 +227,11 @@ export default function AccountMoreInfo({
                     className="flex text-green-500 dark:text-green-250 hover:no-underline"
                   >
                     <span className="inline-block truncate max-w-[110px] mr-1">
-                      {nftTokenData.name}
+                      {nftTokenData?.name}
                     </span>
                     (
                     <span className="inline-block truncate max-w-[80px]">
-                      {nftTokenData.symbol}
+                      {nftTokenData?.symbol}
                     </span>
                     )
                   </Link>

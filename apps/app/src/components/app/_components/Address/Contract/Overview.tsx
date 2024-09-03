@@ -2,9 +2,9 @@ import { getRequest } from '@/app/utils/api';
 import OverviewActions from './OverviewActions';
 import { ContractCodeInfo } from '@/app/utils/types';
 
-const Overview = async ({ id, queryParams }: any) => {
+const Overview = async ({ id, searchParams }: any) => {
   const [data, parse] = await Promise.all([
-    getRequest(`account/${id}/contract/deployments`, queryParams),
+    getRequest(`account/${id}/contract/deployments`, searchParams),
     getRequest(`account/${id}/contract/parse`),
   ]);
 

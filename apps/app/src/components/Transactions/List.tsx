@@ -174,7 +174,11 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'pl-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-12',
     },
     {
-      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
+      header: (
+        <span suppressHydrationWarning={true}>
+          {t ? t('txns:hash') : 'TXN HASH'}
+        </span>
+      ),
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
@@ -201,7 +205,10 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     {
       header: (
         <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          <MenuButton
+            suppressHydrationWarning={true}
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
             {t ? t('txns:type') : 'METHOD'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
@@ -239,11 +246,12 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
+            suppressHydrationWarning={true}
             label={txnMethod(row?.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
-              <span className="block truncate">
+              <span suppressHydrationWarning={true} className="block truncate">
                 {txnMethod(row?.actions, t)}
               </span>
             </span>
@@ -255,7 +263,11 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       thClassName: 'px-1.5',
     },
     {
-      header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
+      header: (
+        <span suppressHydrationWarning={true}>
+          {t ? t('txns:depositValue') : 'DEPOSIT VALUE'}
+        </span>
+      ),
       key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
@@ -271,7 +283,11 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
+      header: (
+        <span suppressHydrationWarning={true}>
+          {t ? t('txns:txnFee') : 'TXN FEE'}
+        </span>
+      ),
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
@@ -289,7 +305,10 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     {
       header: (
         <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          <MenuButton
+            suppressHydrationWarning={true}
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
             {t ? t('txns:from') : 'FROM'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
@@ -371,7 +390,10 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     {
       header: (
         <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          <MenuButton
+            suppressHydrationWarning={true}
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
             {t ? t('txns:to') : 'To'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
@@ -439,7 +461,12 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-48',
     },
     {
-      header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
+      header: (
+        <span suppressHydrationWarning={true}>
+          {' '}
+          {t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}
+        </span>
+      ),
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
@@ -470,6 +497,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <button
+              suppressHydrationWarning={true}
               type="button"
               onClick={toggleShowAge}
               className="text-left text-xs w-full h-5 flex items-center font-semibold uppercase tracking-wider  text-green-500  dark:text-green-250 focus:outline-none whitespace-nowrap"
@@ -512,7 +540,10 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
         <div className={`flex flex-col lg:flex-row pt-4`}>
           <div className="flex flex-col">
-            <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+            <p
+              className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10"
+              suppressHydrationWarning={true}
+            >
               {count &&
                 txns?.length > 0 &&
                 `${

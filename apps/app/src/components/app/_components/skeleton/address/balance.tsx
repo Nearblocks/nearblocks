@@ -38,7 +38,7 @@ export default function BalanceSkeleton() {
                 {t('address:tokens') || 'Tokens:'}
               </div>
               <div className="w-full md:w-3/4 break-words -my-1 z-10">
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-8 w-full" />
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function BalanceSkeleton() {
               <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                 <div className="w-full mb-2 md:mb-0">Created At</div>
                 <div className="w-full break-words">
-                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-full" />
                 </div>
               </div>
             </div>

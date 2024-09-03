@@ -66,7 +66,7 @@ const TokenTxnsActions = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -84,7 +84,6 @@ const TokenTxnsActions = ({
   const onChange = (e: any) => {
     const name = e.target.name;
     const value = e.target.value;
-
     setForm((f) => ({ ...f, [name]: value }));
   };
 
@@ -105,7 +104,7 @@ const TokenTxnsActions = ({
 
     const newQueryString = QueryString.stringify(queryParams);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -120,12 +119,13 @@ const TokenTxnsActions = ({
       const { action, method, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
+      // router.refresh();
     } else {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
-      router.refresh();
+      // router.refresh();
     }
   };
 
@@ -136,7 +136,7 @@ const TokenTxnsActions = ({
     const { cursor, event, p, involved, ...newQuery } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const columns = [

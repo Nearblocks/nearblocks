@@ -71,7 +71,7 @@ export default async function ({
 }) {
   const parse = await getRequest(`account/${id}/contract/parse`);
 
-  const tab = searchParams?.tab;
+  const tab = searchParams?.tab || 'txns';
 
   console.log({ tab });
 
@@ -115,7 +115,7 @@ export default async function ({
               {tabs?.map(({ name, label }) => {
                 const hasContractTab =
                   parse?.contract?.[0]?.contract &&
-                  parse?.contract?.[0]?.contract?.methodNames.length > 0;
+                  parse?.contract?.[0]?.contract?.methodNames?.length > 0;
 
                 if (!hasContractTab && name === 'contract') return null;
 

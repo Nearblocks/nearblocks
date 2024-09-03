@@ -124,7 +124,7 @@ const TransactionActions = ({
 
     const newQueryString = QueryString.stringify(queryParams);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onOrder = () => {
@@ -136,7 +136,7 @@ const TransactionActions = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -161,13 +161,13 @@ const TransactionActions = ({
       const { action, method, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
-      router.refresh();
+      // router.refresh();
     } else {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
       const newQueryString = QueryString.stringify(newQuery);
       router.push(`${pathname}?${newQueryString}`);
-      router.refresh();
+      // router.refresh();
     }
   };
   const onAllClear = () => {
@@ -178,7 +178,7 @@ const TransactionActions = ({
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
+    // router.refresh();
   };
 
   const columns: any = [

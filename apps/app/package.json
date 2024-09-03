@@ -56,7 +56,6 @@
     "nearblock-trans-next-intl": "https://github.com/Nearblocks/translations.git#8de3a86b9dd4b4efce65e7ba5dd736d9764db3e2",
     "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",
     "next": "14.2.5",
-    "next-intl": "^3.17.3",
     "next-runtime-env": "1.x",
     "next-sitemap": "4.2.3",
     "next-themes": "^0.3.0",

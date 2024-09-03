@@ -1,10 +1,10 @@
 import { getRequest } from '@/app/utils/api';
 import AccessKeysActions from './AccessKeysActions';
 
-const AccessKeys = async ({ id, queryParams }: any) => {
+const AccessKeys = async ({ id, searchParams }: any) => {
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/keys`, queryParams),
-    getRequest(`account/${id}/keys/count`, queryParams),
+    getRequest(`account/${id}/keys`, searchParams),
+    getRequest(`account/${id}/keys/count`, searchParams),
   ]);
 
   return (

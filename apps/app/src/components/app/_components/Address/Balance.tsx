@@ -44,6 +44,7 @@ export default async function Balance({ id }: { id: string }) {
           spamTokens={spamTokens}
         />
         <AccountMoreInfo
+          id={id}
           accountData={accountData?.account?.[0]}
           tokenData={tokenDetails?.contracts?.[0]}
           deploymentData={deploymentData?.deployments?.[0]}
