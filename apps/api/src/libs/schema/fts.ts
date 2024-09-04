@@ -7,6 +7,17 @@ const list = z.object({
   page: z.number().positive().max(100).optional().default(1),
   per_page: z.number().positive().max(50).optional().default(50),
   search: z.string().optional(),
+  sort: z
+    .enum([
+      'name',
+      'price',
+      'change',
+      'volume',
+      'market_cap',
+      'onchain_market_cap',
+    ])
+    .optional()
+    .default('onchain_market_cap'),
 });
 
 const count = z.object({
