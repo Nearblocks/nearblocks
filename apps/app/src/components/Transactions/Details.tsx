@@ -136,7 +136,23 @@ const Details = (props: Props) => {
         row.style.display = 'none';
       }
     }
-  }, [logs]);
+  }, [logs, actions]);
+
+  const FailedReceipts = ({ data }: any) => {
+    const failedReceiptCount = (data?.receipts_outcome || []).filter(
+      (receipt: any) => receipt?.outcome?.status?.Failure,
+    ).length;
+
+    if (failedReceiptCount === 0) {
+      return null;
+    }
+
+    return (
+      <div className="inline-flex w-fit rounded-md text-left mx-1 text-red-500">
+        {`[ ${failedReceiptCount} failed receipts ]`}
+      </div>
+    );
+  };
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -200,7 +216,11 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words">
               {txn?.outcomes?.status !== undefined && (
-                <TxnStatus showLabel status={txn?.outcomes?.status} />
+                <TxnStatus
+                  showLabel
+                  status={txn?.outcomes?.status}
+                  showReceipt={<FailedReceipts data={rpcTxn} />}
+                />
               )}
               {errorMessage && (
                 <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded-md text-left px-2 py-1">
@@ -295,47 +315,45 @@ const Details = (props: Props) => {
           )}
         </div>
       </div>
-      {(actions?.length > 0 || logs?.length > 0) && (
-        <div
-          id="action-row"
-          className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
-        >
-          <div className="flex items-start flex-wrap p-4">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-              <Tooltip
-                label={'Highlighted events of the transaction'}
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              >
-                <div>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </div>
-              </Tooltip>
-              Transaction Actions
-            </div>
-            {loading ? (
-              <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full max-w-xl" />
+      <div
+        id="action-row"
+        className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+      >
+        <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+            <Tooltip
+              label={'Highlighted events of the transaction'}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            ) : (
-              <div className="w-full md:w-3/4">
-                <PerfectScrollbar>
-                  <div
-                    id="action-column"
-                    className="max-h-[194px] break-words space-y-2"
-                  >
-                    {logs?.map((event: TransactionLog, i: number) => (
-                      <EventLogs key={i} event={event} />
-                    ))}
-                    {actions?.map((action: any, i: number) => (
-                      <Actions key={i} action={action} />
-                    ))}
-                  </div>
-                </PerfectScrollbar>
-              </div>
-            )}
+            </Tooltip>
+            Transaction Actions
           </div>
+          {loading || (actions?.length === 0 && logs?.length === 0) ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4">
+              <PerfectScrollbar>
+                <div
+                  id="action-column"
+                  className="max-h-[194px] break-words space-y-2"
+                >
+                  {logs?.map((event: TransactionLog, i: number) => (
+                    <EventLogs key={i} event={event} />
+                  ))}
+                  {actions?.map((action: any, i: number) => (
+                    <Actions key={i} action={action} />
+                  ))}
+                </div>
+              </PerfectScrollbar>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">

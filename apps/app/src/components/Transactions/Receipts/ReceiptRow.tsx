@@ -8,6 +8,7 @@ import TransactionActions from './TransactionActions';
 import ReceiptStatus from './ReceiptStatus';
 import { useEffect, useRef, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
+import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -34,6 +35,14 @@ const ReceiptRow = (props: Props) => {
         .catch(() => {});
     }
   }, [receipt?.block_hash, getBlockDetails]);
+
+  const status = receipt?.outcome?.status;
+  const isSuccess =
+    status &&
+    (('SuccessValue' in status &&
+      status.SuccessValue !== null &&
+      status.SuccessValue !== undefined) ||
+      'SuccessReceiptId' in status);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -71,6 +80,32 @@ const ReceiptRow = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
               {receipt?.receipt_id ? receipt?.receipt_id : ''}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap items-start p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip
+              label={t('txns:txn.status.tooltip')}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <div>
+                  <Question className="w-4 h-4 fill-current mr-1" />
+                </div>
+              </div>
+            </Tooltip>
+            {t ? t('txns:txn.status.text.0') : 'Status'}
+          </div>
+          {!receipt || loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4 break-words">
+              {receipt?.outcome?.status !== undefined && (
+                <TxnsReceiptStatus showLabel status={isSuccess} />
+              )}
             </div>
           )}
         </div>

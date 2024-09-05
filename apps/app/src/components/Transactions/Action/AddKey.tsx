@@ -1,4 +1,4 @@
-import FaKey from '@/components/Icons/FaKey';
+import FaRight from '@/components/Icons/FaRight';
 import { shortenAddress, shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
@@ -9,7 +9,7 @@ const AddKey = (props: TransactionActionInfo) => {
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">
-        <FaKey className="inline-flex text-emerald-400 mr-1" />{' '}
+        <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
         {t ? t('txns:txn.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}
@@ -30,7 +30,7 @@ const AddKey = (props: TransactionActionInfo) => {
   if (props.args.access_key.permission.permission_kind) {
     return (
       <div className="py-1">
-        <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
+        <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
         {t ? t('txns:txn.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}{' '}
@@ -50,7 +50,7 @@ const AddKey = (props: TransactionActionInfo) => {
 
   return (
     <div className="py-1">
-      <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
+      <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
       {t ? t('txns:txn.actions.addKey.1') : 'Access key'} (
       <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
       {t ? t('txns:txn.actions.addKey.2') : 'added for'}

@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import TreeTxnsActions from './TreeTxnsActions';
 import TreeNode from './TreeNode';
 import { Tooltip } from '@reach/tooltip';
+import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 
 interface Props {
   txn: TransactionInfo;
@@ -12,6 +13,14 @@ interface Props {
 }
 const TreeReceiptDetails = (props: Props) => {
   const { receipt, txn, show } = props;
+
+  const status = receipt?.outcome?.status;
+  const isSuccess =
+    status &&
+    (('SuccessValue' in status &&
+      status.SuccessValue !== null &&
+      status.SuccessValue !== undefined) ||
+      'SuccessReceiptId' in status);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
@@ -39,6 +48,20 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                       Receipt
                     </div>
+                    <div className="w-full pl-3 py-2 flex items-center">
+                      Status:
+                      {!receipt ? (
+                        <div className="w-full md:w-3/4">
+                          <Loader wrapperClassName="flex w-full max-w-xl" />
+                        </div>
+                      ) : (
+                        <div className="w-full md:w-3/4 break-words ml-2">
+                          {receipt?.outcome?.status !== undefined && (
+                            <TxnsReceiptStatus showLabel status={isSuccess} />
+                          )}
+                        </div>
+                      )}
+                    </div>{' '}
                     <div className="w-full pl-3 py-2 flex items-center">
                       From:{' '}
                       <Tooltip

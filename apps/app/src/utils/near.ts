@@ -257,19 +257,22 @@ export function parseReceipt(
       id: outcome.id,
       predecessorId: transaction.signer_id,
       receiverId: transaction.receiver_id,
-      actions:
-        transaction.actions && transaction.actions.map(mapRpcActionToAction1),
+      actions: transaction.actions.map(mapRpcActionToAction1),
     };
+  }
+
+  let actions: any = [];
+
+  if ('Action' in receipt.receipt) {
+    actions = receipt.receipt.Action.actions.map(mapRpcActionToAction1);
+  } else if (Array.isArray(receipt.receipt)) {
+    actions = receipt.receipt.map((action) => mapRpcActionToAction1(action));
   }
   return {
     id: receipt.receipt_id,
     predecessorId: receipt.predecessor_id,
     receiverId: receipt.receiver_id,
-    actions:
-      'Action' in receipt.receipt
-        ? receipt.receipt.Action.actions &&
-          receipt.receipt.Action.actions.map(mapRpcActionToAction1)
-        : [],
+    actions: actions,
   };
 }
 
@@ -350,7 +353,7 @@ export function mapNonDelegateRpcActionToAction(
   return {
     kind: 'deleteAccount',
     args: {
-      beneficiaryId: rpcAction.DeleteAccount.beneficiary_id,
+      beneficiaryId: rpcAction.DeleteAccount?.beneficiary_id,
     },
   };
 }
@@ -807,6 +810,16 @@ export function mapRpcReceiptStatus(status: ExecutionStatusView) {
 }
 
 export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
+  if (rpcAction.action_kind) {
+    const normalizedAction = {
+      [rpcAction.action_kind]: {
+        ...rpcAction.args,
+      },
+    };
+
+    return mapNonDelegateRpcActionToAction(normalizedAction);
+  }
+
   if (typeof rpcAction === 'object' && 'Delegate' in rpcAction) {
     return {
       kind: 'delegateAction',

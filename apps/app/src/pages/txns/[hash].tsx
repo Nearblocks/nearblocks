@@ -9,10 +9,8 @@ import { useAuthStore } from '@/stores/auth';
 import SponserdText from '@/components/SponserdText';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '@/components/Icons/FileSlash';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Details from '@/components/Transactions/Details';
 import useHash from '@/hooks/useHash';
-import classNames from 'classnames';
 import Receipt from '@/components/Transactions/Receipt';
 import Execution from '@/components/Transactions/Execution';
 import Tree from '@/components/Transactions/Tree';
@@ -119,6 +117,10 @@ const Txn = ({
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [tabIndex, setTabIndex] = useState(0);
   const { transactionStatus } = useRpc();
+  const requestSignInWithWallet = useAuthStore(
+    (store) => store.requestSignInWithWallet,
+  );
+
   const txn = data?.txns?.[0];
 
   let title = t('txns:txn.metaTitle', { txn: hash });
@@ -135,6 +137,12 @@ const Txn = ({
   const onTab = (index: number) => setHash(hashes[index]);
 
   useEffect(() => {
+    if (txn?.outcomes?.status === null) {
+      router.replace(router.asPath);
+    }
+  }, [txn, router]);
+
+  useEffect(() => {
     if (txn) {
       transactionStatus(txn.transaction_hash, txn.signer_account_id)
         .then(setRpcTxn)
@@ -143,25 +151,20 @@ const Txn = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn]);
 
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
-
   const contract = useMemo(
     () =>
-      isContract.account?.[0]?.code_hash !== '11111111111111111111111111111111',
+      isContract?.account?.[0]?.code_hash !==
+      '11111111111111111111111111111111',
     [isContract],
   );
 
-  const getClassName = (selected: boolean) =>
-    classNames(
-      'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-3 focus:outline-none rounded-lg',
-      {
-        'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
-          !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
-      },
-    );
+  const buttonStyles = (selected: boolean) =>
+    `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
+      selected
+        ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+        : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200  rounded-lg hover:text-nearblue-600'
+    }`;
+
   return (
     <>
       <Head>
@@ -201,98 +204,99 @@ const Txn = ({
             </div>
           ) : (
             <>
-              <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
-                <TabList className={'flex flex-wrap'}>
-                  <Tab
-                    className={getClassName(hashes[0] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>{t('txns:txn.tabs.overview')}</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(hashes[1] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>{t('txns:txn.tabs.execution')}</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(hashes[2] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <div className="flex h-full">
-                      <h2>Enhanced Plan</h2>
-                      <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md ml-[4.7rem] -mt-4 px-1 ">
-                        NEW
-                      </div>
-                    </div>
-                  </Tab>
-                  <Tab
-                    className={getClassName(hashes[3] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Tree Plan</h2>
-                  </Tab>
-
-                  <Tab
-                    className={getClassName(hashes[4] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Receipt Summary</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(hashes[5] === hashes[tabIndex])}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>{t('txns:txn.tabs.comments')}</h2>
-                  </Tab>
-                </TabList>
-                <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                  <TabPanel>
-                    <Details
-                      txn={txn}
-                      rpcTxn={rpcTxn}
-                      statsData={statsData}
-                      loading={error || !rpcTxn}
-                      isContract={contract}
-                      price={price}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <Receipt
-                      txn={txn}
-                      rpcTxn={rpcTxn}
-                      loading={error || !rpcTxn}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <Execution txn={txn} rpcTxn={rpcTxn} />
-                  </TabPanel>
-                  <TabPanel>
-                    <Tree txn={txn} rpcTxn={rpcTxn} />
-                  </TabPanel>
-                  <TabPanel>
-                    <ReceiptSummary
-                      txn={txn}
-                      rpcTxn={rpcTxn}
-                      loading={error || !rpcTxn}
-                      statsData={statsData}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <VmComponent
-                      src={components?.commentsFeed}
-                      defaultSkelton={<Comment />}
-                      props={{
-                        network: network,
-                        path: `nearblocks.io/txns/${hash}`,
-                        limit: 10,
-                        requestSignInWithWallet,
-                      }}
-                      loading={<Comment />}
-                    />
-                  </TabPanel>
+              <div>
+                <button
+                  onClick={() => onTab(0)}
+                  className={buttonStyles(hashes[0] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">
+                    {t ? t('txns:txn.tabs.overview') : 'Overview'}
+                  </h2>
+                </button>
+                <button
+                  onClick={() => onTab(1)}
+                  className={buttonStyles(hashes[1] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">
+                    {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
+                  </h2>
+                </button>
+                <button
+                  onClick={() => onTab(2)}
+                  className={buttonStyles(hashes[2] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">{'Enhanced Plan'}</h2>
+                  <div className="absolute text-white bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -top-1.5 -right-1.5 px-1">
+                    NEW
+                  </div>
+                </button>{' '}
+                <button
+                  onClick={() => onTab(3)}
+                  className={buttonStyles(hashes[3] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">Tree Plan</h2>
+                </button>
+                <button
+                  onClick={() => onTab(4)}
+                  className={buttonStyles(hashes[4] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">Receipt Summary</h2>
+                </button>
+                <button
+                  onClick={() => onTab(5)}
+                  className={buttonStyles(hashes[5] === hashes[tabIndex])}
+                >
+                  <h2 className="p-2">
+                    {t ? t('txns:txn.tabs.comments') : 'Comments'}
+                  </h2>
+                </button>
+              </div>
+              <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+                <div className={`${tabIndex === 0 ? '' : 'hidden'} `}>
+                  <Details
+                    txn={txn}
+                    rpcTxn={rpcTxn}
+                    statsData={statsData}
+                    loading={error || !rpcTxn}
+                    isContract={contract}
+                    price={price}
+                  />
                 </div>
-              </Tabs>
+                <div className={`${tabIndex === 1 ? '' : 'hidden'} `}>
+                  <Receipt
+                    txn={txn}
+                    rpcTxn={rpcTxn}
+                    loading={error || !rpcTxn}
+                  />
+                </div>
+                <div className={`${tabIndex === 2 ? '' : 'hidden'} `}>
+                  <Execution txn={txn} rpcTxn={rpcTxn} />
+                </div>
+                <div className={`${tabIndex === 3 ? '' : 'hidden'} `}>
+                  <Tree txn={txn} rpcTxn={rpcTxn} />
+                </div>
+                <div className={`${tabIndex === 4 ? '' : 'hidden'} `}>
+                  <ReceiptSummary
+                    txn={txn}
+                    rpcTxn={rpcTxn}
+                    loading={error || !rpcTxn}
+                    statsData={statsData}
+                  />
+                </div>
+                <div className={`${tabIndex === 5 ? '' : 'hidden'} `}>
+                  <VmComponent
+                    src={components?.commentsFeed}
+                    defaultSkelton={<Comment />}
+                    props={{
+                      network: network,
+                      path: `nearblocks.io/txns/${hash}`,
+                      limit: 10,
+                      requestSignInWithWallet,
+                    }}
+                    loading={<Comment />}
+                  />
+                </div>
+              </div>
             </>
           )}
         </Fragment>
