@@ -70,7 +70,7 @@ const ExportData = () => {
         <Export
           id={address}
           onHandleDowload={onHandleDowload}
-          exportType={'NFT Token Transactions'}
+          exportType={'nfttokentransactions'}
         />
       </div>
     </>

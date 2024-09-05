@@ -85,14 +85,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let contractResult = null;
 
     if (tab !== 'comments') {
+      const queryWithA = a ? { ...query, a } : query;
+
       // Fetch tab-specific data
       const tabApi = tabApiUrls[tab as TabType];
       const fetchUrl = `${tabApi.api}${
-        query ? `?${queryString.stringify(query)}` : ''
+        queryWithA ? `?${queryString.stringify(queryWithA)}` : ''
       }`;
       const countUrl =
         tabApi.count &&
-        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+        `${tabApi.count}${
+          queryWithA ? `?${queryString.stringify(queryWithA)}` : ''
+        }`;
 
       [dataResult, dataCountResult] = await Promise.allSettled([
         fetchData(fetchUrl),

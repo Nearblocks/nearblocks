@@ -34,12 +34,14 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
+import Receipts from '@/components/Address/Receipts';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const tabs = [
   'txns',
+  'receipts',
   'tokentxns',
   'nfttokentxns',
   'accesskeys',
@@ -49,6 +51,7 @@ const tabs = [
 
 type TabType =
   | 'txns'
+  | 'receipts'
   | 'tokentxns'
   | 'nfttokentxns'
   | 'accesskeys'
@@ -88,8 +91,12 @@ export const getServerSideProps: GetServerSideProps<{
 
   const urlMapping: Record<TabType, { api: string; count?: string }> = {
     txns: {
-      api: `account/${address}/txns`,
-      count: `account/${address}/txns/count`,
+      api: `account/${address}/txns-only`,
+      count: `account/${address}/txns-only/count`,
+    },
+    receipts: {
+      api: `account/${address}/receipts`,
+      count: `account/${address}/receipts/count`,
     },
     tokentxns: {
       api: `account/${address}/ft-txns`,
@@ -401,7 +408,7 @@ const Address = ({
         const hasContractTab =
           contractInfo && contractInfo.methodNames.length > 0;
         let actualTabIndex = index;
-        if (!hasContractTab && index > 4) {
+        if (!hasContractTab && index > 5) {
           actualTabIndex = index - 1;
         }
         setTabIndex(actualTabIndex);
@@ -417,7 +424,7 @@ const Address = ({
     let actualTabName = tabs[index];
     let actualTabIndex = index;
 
-    if (!hasContractTab && index > 3) {
+    if (!hasContractTab && index > 4) {
       actualTabIndex = index;
       actualTabName = tabs[actualTabIndex + 1];
     }
@@ -545,22 +552,23 @@ const Address = ({
                   <TabList className="flex flex-wrap">
                     {[
                       { key: 0, label: t ? t('address:txns') : 'Transactions' },
+                      { key: 1, label: 'Receipts' },
                       {
-                        key: 1,
+                        key: 2,
                         label: t ? t('address:tokenTxns') : 'Token Txns',
                       },
                       {
-                        key: 2,
+                        key: 3,
                         label: t ? t('address:nftTokenTxns') : 'NFT Token Txns',
                       },
                       {
-                        key: 3,
+                        key: 4,
                         label: t ? t('address:accessKeys') : 'Access Keys',
                       },
                       ...(contractInfo && contractInfo.methodNames.length > 0
                         ? [
                             {
-                              key: 4,
+                              key: 5,
                               label: (
                                 <div className="flex h-full">
                                   <h2>Contract</h2>
@@ -571,13 +579,13 @@ const Address = ({
                               ),
                             },
                             {
-                              key: 5,
+                              key: 6,
                               label: t ? t('address:comments') : 'Comments',
                             },
                           ]
                         : [
                             {
-                              key: 4,
+                              key: 5,
                               label: t ? t('address:comments') : 'Comments',
                             },
                           ]),
@@ -594,6 +602,15 @@ const Address = ({
                   <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
                     <TabPanel>
                       <Transactions
+                        txns={txns}
+                        count={count}
+                        error={error}
+                        cursor={txnCursor}
+                        tab={tab}
+                      />
+                    </TabPanel>
+                    <TabPanel>
+                      <Receipts
                         txns={txns}
                         count={count}
                         error={error}

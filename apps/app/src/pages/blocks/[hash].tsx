@@ -90,6 +90,8 @@ const Block = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
   const blockHeight = Number(blockInfo?.blocks[0]?.block_height);
+  const blockHash = blockInfo?.blocks[0]?.block_hash;
+
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
   return (
     <>
@@ -98,38 +100,38 @@ const Block = ({
           {`${network === 'testnet' ? 'TESTNET' : ''} ${t(
             'blocks:block.metaTitle',
             {
-              block: hash,
+              block: blockHash,
             },
           )}`}
         </title>
         <meta
           name="title"
-          content={t('blocks:block.metaTitle', { block: hash })}
+          content={t('blocks:block.metaTitle', { block: blockHash })}
         />
         <meta
           name="description"
-          content={t('blocks:block.metaDescription', { block: hash })}
+          content={t('blocks:block.metaDescription', { block: blockHash })}
         />
         <meta
           property="og:title"
-          content={t('blocks:block.metaTitle', { block: hash })}
+          content={t('blocks:block.metaTitle', { block: blockHash })}
         />
         <meta
           property="og:description"
-          content={t('blocks:block.metaDescription', { block: hash })}
+          content={t('blocks:block.metaDescription', { block: blockHash })}
         />
         <meta
           property="twitter:title"
-          content={t('blocks:block.metaTitle', { block: hash })}
+          content={t('blocks:block.metaTitle', { block: blockHash })}
         />
         <meta
           property="twitter:description"
-          content={t('blocks:block.metaDescription', { block: hash })}
+          content={t('blocks:block.metaDescription', { block: blockHash })}
         />
         <meta property="og:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
-        <link rel="canonical" href={`${appUrl}/blocks/${hash}`} />
+        <link rel="canonical" href={`${appUrl}/blocks/${blockHash}`} />
       </Head>
       <div className="relative container mx-auto px-3">
         <Details

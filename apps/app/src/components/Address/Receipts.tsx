@@ -39,7 +39,7 @@ interface TxnsProps {
   tab: string;
 }
 
-const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
+const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = router.query;
@@ -48,7 +48,6 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const [showAge, setShowAge] = useState(true);
   const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
   const [address, setAddress] = useState('');
-
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const onChange = (e: any) => {
@@ -322,29 +321,29 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           </Menu>
         </>
       ),
-      key: 'signer_account_id',
+      key: 'predecessor_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.signer_account_id}
+            label={row.predecessor_account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span
               className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.signer_account_id === address
+                row?.predecessor_account_id === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
               }`}
             >
               <Link
-                href={`/address/${row.signer_account_id}`}
+                href={`/address/${row.predecessor_account_id}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.signer_account_id)
+                  onHandleMouseOver(e, row?.predecessor_account_id)
                 }
                 onMouseLeave={handleMouseLeave}
               >
-                {truncateString(row.signer_account_id, 15, '...')}
+                {truncateString(row.predecessor_account_id, 15, '...')}
               </Link>
             </span>
           </Tooltip>
@@ -357,11 +356,11 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       header: <span></span>,
       key: '',
       cell: (row: TransactionInfo) => {
-        return row.signer_account_id === row.receiver_account_id ? (
+        return row.predecessor_account_id === row.receiver_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
             {t ? t('txns:txnSelf') : 'SELF'}
           </span>
-        ) : id === row.signer_account_id ? (
+        ) : id === row.predecessor_account_id ? (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
             {t ? t('txns:txnOut') : 'OUT'}
           </span>
@@ -523,7 +522,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
   return (
     <>
-      {tab === 'txns' ? (
+      {tab === 'receipts' ? (
         <>
           {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
@@ -551,7 +550,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     <>
                       <button className="hover:no-underline">
                         <Link
-                          href={`/exportdata?address=${id}&type=transactions`}
+                          href={`/exportdata?address=${id}&type=receipts`}
                           className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
                         >
                           <p>CSV Export</p>
@@ -590,4 +589,4 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     </>
   );
 };
-export default Transactions;
+export default Receipts;

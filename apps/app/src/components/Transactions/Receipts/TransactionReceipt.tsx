@@ -23,7 +23,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);
   const lastFellowOutgoingReceipt = fellowOutgoingReceipts.at(-1);
   const filterRefundNestedReceipts =
-    receipt?.outcome.nestedReceipts &&
+    receipt?.outcome?.nestedReceipts &&
     receipt?.outcome.nestedReceipts.filter(
       (nestedReceipt: any) =>
         'outcome' in nestedReceipt && nestedReceipt.predecessorId !== 'system',
@@ -61,7 +61,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
-          {receipt?.actions.map((action: any, index: number) => (
+          {receipt?.actions?.map((action: any, index: number) => (
             <ReceiptKind
               key={`${action.kind}_${index}`}
               action={action}

@@ -43,9 +43,11 @@ export const getServerSideProps: GetServerSideProps<{
 
 const ExportData = () => {
   const router = useRouter();
-  const { address } = router.query as { address: string };
+  const { address, type } = router.query as { address: string; type: string };
 
-  const title = 'Export Transactions Data | Nearblocks';
+  const title = type
+    ? `Export ${type} Data | Nearblocks`
+    : ' Near Protocol Explorer | NearBlocks';
 
   const onHandleDowload = (blobUrl: string, file: string): void => {
     const a: HTMLAnchorElement = document.createElement('a');
@@ -70,7 +72,7 @@ const ExportData = () => {
         <Export
           id={address}
           onHandleDowload={onHandleDowload}
-          exportType={'Transactions'}
+          exportType={type}
         />
       </div>
     </>
