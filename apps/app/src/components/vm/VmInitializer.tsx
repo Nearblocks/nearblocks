@@ -36,6 +36,7 @@ import { useVmStore } from '@/stores/vm';
 import { networkId, bosNetworkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
+import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
 
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
@@ -78,6 +79,7 @@ export default function VmInitializer() {
             setupXDEFI(),
             setupNearMobileWallet(),
             setupMintbaseWallet(),
+            setupBitteWallet(),
           ],
         }),
         customElements: {
