@@ -7,6 +7,7 @@ import { Accordion } from '@reach/accordion';
 import ViewOrChange from './ViewOrChange';
 import { useAuthStore } from '@/stores/auth';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
+import ContractCode from './ContractCode';
 
 interface Props {
   contract: ContractCodeInfo;
@@ -21,7 +22,8 @@ interface Props {
 }
 
 const Overview = (props: Props) => {
-  const { contract, isLocked, schema, contractInfo, deployments } = props;
+  const { contract, isLocked, schema, contractInfo, deployments, accountId } =
+    props;
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -50,6 +52,12 @@ const Overview = (props: Props) => {
           className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
           selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
         >
+          Contract Code
+        </Tab>
+        <Tab
+          className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
+          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+        >
           Contract Methods
         </Tab>
       </TabList>
@@ -59,6 +67,9 @@ const Overview = (props: Props) => {
           isLocked={isLocked as boolean}
           data={deployments}
         />
+      </TabPanel>
+      <TabPanel>
+        <ContractCode accountId={accountId as string} />
       </TabPanel>
       {!schema && (
         <TabPanel>

@@ -195,6 +195,47 @@ const useRpc = () => {
   const transactionStatus = async (hash: any, signer: any) =>
     provider.txStatusReceipts(baseDecode(hash), signer);
 
+  const getContractMetadata = async (accountId: string) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: accountId,
+        method_name: 'contract_source_metadata',
+        args_base64: '',
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes('MethodResolveError(MethodNotFound)')
+      ) {
+        return null;
+      }
+      throw error;
+    }
+  };
+
+  const getVerifierData = async (
+    accountId: string,
+    verifierAccountId: string,
+  ) => {
+    try {
+      const resp = await provider.query({
+        request_type: 'call_function',
+        finality: 'optimistic',
+        account_id: verifierAccountId,
+        method_name: 'get_contract',
+        args_base64: encodeArgs({ account_id: accountId }),
+      });
+      const result = (resp as any).result;
+      return decodeArgs(result);
+    } catch (error) {
+      return null;
+    }
+  };
+
   return {
     getBlockDetails,
     contractCode,
@@ -210,6 +251,8 @@ const useRpc = () => {
     getFieldsByPool,
     ftMetadata,
     transactionStatus,
+    getContractMetadata,
+    getVerifierData,
   };
 };
 export default useRpc;
