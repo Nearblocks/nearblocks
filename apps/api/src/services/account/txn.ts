@@ -67,6 +67,9 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
       receipts.receipt_id,
       receipts.predecessor_account_id,
       receipts.receiver_account_id,
+      receipts.receipt_kind,
+      ROW_TO_JSON(bl) AS receipt_block,
+      ROW_TO_JSON(oc) AS receipt_outcome,
       tr.transaction_hash,
       tr.included_in_block_hash,
       tr.block_timestamp,
@@ -128,6 +131,31 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
         OFFSET
           ${cursor ? 0 : offset}
       ) AS tmp using (receipt_id)
+      LEFT JOIN LATERAL (
+        SELECT
+          block_hash,
+          block_height,
+          block_timestamp
+        FROM
+          blocks
+        WHERE
+          block_hash = receipts.included_in_block_hash
+      ) bl ON TRUE
+      LEFT JOIN LATERAL (
+        SELECT
+          gas_burnt,
+          tokens_burnt,
+          executor_account_id,
+          CASE
+            WHEN status = 'SUCCESS_RECEIPT_ID'
+            OR status = 'SUCCESS_VALUE' THEN TRUE
+            ELSE FALSE
+          END AS status
+        FROM
+          execution_outcomes
+        WHERE
+          receipt_id = receipts.receipt_id
+      ) oc ON TRUE
       INNER JOIN LATERAL (
         SELECT
           id,

@@ -11,7 +11,7 @@ const latest = z.object({
 });
 
 const item = z.object({
-  hash: z.string(),
+  hash: z.any(),
 });
 
 export type Item = z.infer<typeof item>;

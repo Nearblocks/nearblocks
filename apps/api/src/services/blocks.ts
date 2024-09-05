@@ -140,7 +140,15 @@ const latest = catchAsync(
 );
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
-  const hash = req.validator.data.hash;
+  const hashOrHeight = req.validator.data.hash;
+  const query =
+    hashOrHeight.length >= 43
+      ? sql`block_hash = ${hashOrHeight}`
+      : !isNaN(+hashOrHeight)
+      ? sql`block_height = ${+hashOrHeight}`
+      : false;
+
+  if (!query) return res.status(200).json({ blocks: [] });
 
   const blocks = await sql`
     SELECT
@@ -184,7 +192,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
     FROM
       blocks
     WHERE
-      block_hash = ${hash}
+      ${query}
     LIMIT
       1
   `;
