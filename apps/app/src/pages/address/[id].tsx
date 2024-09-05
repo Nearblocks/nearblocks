@@ -636,6 +636,7 @@ const Address = ({
                             contractInfo={contractInfo}
                             isLocked={isLocked}
                             deployments={contractData}
+                            accountId={accountData?.account_id}
                           />
                         ) : (
                           <div className="w-full h-[500px]"></div>

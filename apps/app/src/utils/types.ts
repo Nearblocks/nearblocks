@@ -1643,3 +1643,29 @@ export type ValidatorStatus = {
   nextEpoch: boolean;
   afterNextEpoch: boolean;
 };
+
+export type VerifierData = {
+  block_height?: number;
+  cid?: string;
+  code_hash?: string;
+  lang?: string;
+};
+
+export type VerifierStatus = 'verified' | 'mismatch' | 'pending';
+
+export type VerificationData = {
+  status: VerifierStatus;
+  data: VerifierData | null;
+};
+
+export type ContractMetadata = {
+  build_info?: {
+    build_command: string[];
+    build_environment: string;
+    contract_path: string;
+    source_code_snapshot: string;
+  };
+  link?: string;
+  standards?: { standard: string; version: string }[];
+  version?: string;
+};
