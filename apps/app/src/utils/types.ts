@@ -523,10 +523,9 @@ export type ActionPropsInfo = {
     from: string;
     to: string;
     action_kind: string;
-    args: {
-      [key: string]: string;
-    };
+    args: ArgsPropsInfo;
   };
+  receiver?: string;
 };
 export type ArgsPropsInfo = {
   access_key: {

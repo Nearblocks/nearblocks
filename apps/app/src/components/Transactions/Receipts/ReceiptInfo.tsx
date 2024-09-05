@@ -1,3 +1,4 @@
+import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/useRpc';
 import { hexy } from '@/utils/hexy';
@@ -9,6 +10,7 @@ import {
 } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
+import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
@@ -21,6 +23,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
+  const { t } = useTranslation();
   const onTab = (index: number) => {
     setHash(hashes[index]);
   };
@@ -43,7 +46,6 @@ const ReceiptInfo = ({ receipt }: Props) => {
       if (receipt?.outcome?.blockHash) {
         getBlockDetails(receipt?.outcome.blockHash)
           .then((resp: any) => {
-            console.log(resp?.header);
             setBlock(resp?.header);
             setLoading(false);
           })
@@ -91,7 +93,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
             readOnly
             rows={4}
             defaultValue={JSON.stringify(prettyArgs)}
-            className="block appearance-none outline-none w-fit border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
+            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
@@ -113,7 +115,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
         readOnly
         rows={4}
         defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
-        className="block appearance-none outline-none w-fit border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
+        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
@@ -172,6 +174,14 @@ const ReceiptInfo = ({ receipt }: Props) => {
     Big(receipt?.outcome?.tokensBurnt || '0')
       .plus(getRefund(receipt?.outcome?.nestedReceipts))
       .toString();
+
+  const status = receipt?.outcome?.status.type;
+  const isSuccess =
+    (status &&
+      status === 'successValue' &&
+      status !== null &&
+      status !== undefined) ||
+    status === 'successReceiptId';
 
   return (
     <div className="flex flex-col">
@@ -264,6 +274,26 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     Receipt
                   </td>
                   <td className="font-semibold py-2 pl-4">{receipt?.id}</td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip
+                      label={t('txns:txn.status.tooltip')}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    >
+                      <div>
+                        <div>
+                          <Question className="w-4 h-4 fill-current mr-1" />
+                        </div>
+                      </div>
+                    </Tooltip>
+                    {t ? t('txns:txn.status.text.0') : 'Status'}
+                  </td>
+                  <td className="font-semibold py-2 pl-4">
+                    {receipt?.outcome?.status !== undefined && (
+                      <TxnsReceiptStatus showLabel status={isSuccess} />
+                    )}
+                  </td>
                 </tr>
                 <tr>
                   <td
