@@ -2,7 +2,14 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react';
+import {
+  Fragment,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { useAuthStore } from '@/stores/auth';
@@ -116,6 +123,8 @@ const Txn = ({
   const [pageHash, setHash] = useHash();
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [tabIndex, setTabIndex] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { transactionStatus } = useRpc();
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -138,9 +147,19 @@ const Txn = ({
 
   useEffect(() => {
     if (txn?.outcomes?.status === null) {
-      router.replace(router.asPath);
+      const delay = Math.min(1000 * 2 ** retryCount, 15000);
+      timeoutRef.current = setTimeout(() => {
+        router.replace(router.asPath);
+        setRetryCount((prevCount) => prevCount + 1);
+      }, delay);
     }
-  }, [txn, router]);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [txn, router, retryCount]);
 
   useEffect(() => {
     if (txn) {

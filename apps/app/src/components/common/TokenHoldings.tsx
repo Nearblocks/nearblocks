@@ -155,7 +155,7 @@ const TokenHoldings = (props: Props) => {
                       {nfts.map((nft) => (
                         <div key={nft?.contract} className="dark:bg-black">
                           <Link
-                            href={`/nft-token/${nft?.contract}?a=${props.id}`}
+                            href={`/nft-token/${nft?.contract}`}
                             className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline"
                           >
                             <div>

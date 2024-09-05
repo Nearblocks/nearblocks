@@ -40,17 +40,22 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
     let text = '';
     let file = '';
     switch (exportType) {
-      case 'Transactions':
-        url = `account/${id}/txns/export?start=${startDate}&end=${endDate}`;
-        text = 'Receipts';
+      case 'transactions':
+        url = `account/${id}/txns-only/export?start=${startDate}&end=${endDate}`;
+        text = 'Transactions';
         file = `${id}_transactions_${startDate}_${endDate}.csv`;
         break;
-      case 'Token Transactions':
+      case 'receipts':
+        url = `account/${id}/receipts/export?start=${startDate}&end=${endDate}`;
+        text = 'Receipts';
+        file = `${id}_receipts_${startDate}_${endDate}.csv`;
+        break;
+      case 'tokentransactions':
         url = `account/${id}/ft-txns/export?start=${startDate}&end=${endDate}`;
         text = 'Token Transactions';
         file = `${id}_ft_transactions_${startDate}_${endDate}.csv`;
         break;
-      case 'NFT Token Transactions':
+      case 'nfttokentransactions':
         url = `account/${id}/nft-txns/export?start=${startDate}&end=${endDate}`;
         text = 'NFT Token Transactions';
         file = `${id}_nft_transactions_${startDate}_${endDate}.csv`;
