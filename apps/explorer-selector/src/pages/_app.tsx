@@ -22,7 +22,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <MetaTags
-        title="Explorer Selector"
+        title="Near Explorer Selector"
         description="Explore the NEAR Blockchain for transactions, addresses, tokens, prices and other information."
       />
       <VmInitializer />

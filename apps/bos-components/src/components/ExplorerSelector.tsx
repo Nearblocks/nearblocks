@@ -137,7 +137,9 @@ const NearExplorerButton = styled.a<{
   align-items: center;
   text-decoration: none;
   ${(props: any) =>
-    props.isLinkActive ? 'pointer-events: none' : 'pointer-events: auto'};
+    props.isLinkActive
+      ? 'pointer-events: none; background-color:rgb(227, 227, 224); opacity: 0.7; cursor: not-allowed;'
+      : 'pointer-events: auto'};
 
   .logo {
     height: 45px;
@@ -180,7 +182,7 @@ const Tag = styled.span`
 `;
 
 const Badge = styled.span`
-  font-size: 12px;
+  font-size: 20px;
   text-align: center;
   border-radius: 5px;
   background-color: rgba(76, 189, 187, 0.1);
@@ -318,6 +320,8 @@ export default function (props: Props) {
           );
         case 'transactions':
           return config.nearblocks + '/txns/' + selectUrlAfterSecondSlash(link);
+        case 'receipts':
+          return config.nearblocks + '/hash/' + selectUrlAfterSecondSlash(link);
         case 'stats':
           return config.nearblocks + '/charts';
 
@@ -374,6 +378,15 @@ export default function (props: Props) {
             : config.nearblocksLite +
                 '/txns/' +
                 selectUrlAfterSecondSlash(link);
+        case 'receipts':
+          return props?.network === 'testnet'
+            ? config.nearblocksLite +
+                '/hash/' +
+                selectUrlAfterSecondSlash(link) +
+                `?rpcUrl=https://archival-rpc.testnet.near.org`
+            : config.nearblocksLite +
+                '/hash/' +
+                selectUrlAfterSecondSlash(link);
         case 'blocks':
           return props?.network === 'testnet'
             ? config.nearblocksLite +
@@ -400,6 +413,8 @@ export default function (props: Props) {
           return true;
         case 'transactions':
           return true;
+        case 'receipts':
+          return false;
         case 'blocks':
           return false;
         case 'stats':
@@ -417,6 +432,8 @@ export default function (props: Props) {
         case 'accounts':
           return true;
         case 'transactions':
+          return true;
+        case 'receipts':
           return true;
         case 'blocks':
           return true;
@@ -436,6 +453,8 @@ export default function (props: Props) {
         case 'accounts':
           return true;
         case 'transactions':
+          return true;
+        case 'receipts':
           return true;
         case 'blocks':
           return true;
@@ -476,13 +495,27 @@ export default function (props: Props) {
       : address;
   }
 
+  function isNumericId(id: string): boolean {
+    return /^\d+$/.test(id);
+  }
+
   const path = props?.path || '';
+  const hasValidLink =
+    linkNearblocks(path) || linkNearblocksLite(path) || linkPikespeakai(path);
+
+  const isInvalidReceiptsPath =
+    getFirstPathSegment(path) === 'receipts' &&
+    isNumericId(selectUrlAfterSecondSlash(path));
+
   const href = getHref(path);
   const pikespeakHref = getPikespeakHref(path);
   const nearblocksLiteHref = getNearblocksLiteHref(path);
-  const hasLinkNearblocks = props?.path ? !linkNearblocks(path) : false;
-  const hasLinkNearblocksLite = props?.path ? !linkNearblocksLite(path) : false;
-  const hasLinkPeakspeak = props?.path ? !linkPikespeakai(path) : false;
+  const hasLinkNearblocks =
+    !isInvalidReceiptsPath && props?.path ? !linkNearblocks(path) : false;
+  const hasLinkNearblocksLite =
+    !isInvalidReceiptsPath && props?.path ? !linkNearblocksLite(path) : false;
+  const hasLinkPeakspeak =
+    !isInvalidReceiptsPath && props?.path ? !linkPikespeakai(path) : false;
 
   function onSelect(value: string) {
     setSelected(value);
@@ -497,8 +530,8 @@ export default function (props: Props) {
               <InnerSection>
                 <H1>NEAR Explorer Selector</H1>
                 {getFirstPathSegment(path) &&
-                  !hasLinkNearblocks &&
-                  !hasLinkNearblocks && (
+                  hasValidLink &&
+                  !isInvalidReceiptsPath && (
                     <H6>
                       You are searching for{' '}
                       {selectUrlAfterSecondSlash(path)
@@ -507,14 +540,16 @@ export default function (props: Props) {
                       ...
                     </H6>
                   )}
-                {selectUrlAfterSecondSlash(path) && (
-                  <Badge>{shortenHex(selectUrlAfterSecondSlash(path))}</Badge>
-                )}
+                {selectUrlAfterSecondSlash(path) &&
+                  !isInvalidReceiptsPath &&
+                  hasValidLink && (
+                    <Badge>{shortenHex(selectUrlAfterSecondSlash(path))}</Badge>
+                  )}
                 <H3>Choose from the available NEAR Explorers below</H3>
                 <LinkContainer isAvailable={config.pikespeakai !== null}>
                   <NearExplorerButton
                     href={
-                      !hasLinkNearblocksLite
+                      !hasLinkNearblocksLite && !isInvalidReceiptsPath
                         ? (nearblocksLiteHref && nearblocksLiteHref) ||
                           (config.nearblocksLite ?? '') + path
                         : config.nearblocksLite ?? ''
@@ -528,6 +563,7 @@ export default function (props: Props) {
                     }
                     isLinkActive={
                       !linkNearblocksLite(path) ||
+                      isInvalidReceiptsPath ||
                       config.nearblocksLite === null
                     }
                     onClick={() => {
@@ -553,7 +589,9 @@ export default function (props: Props) {
                           : true
                         : false
                     }
-                    isLinkActive={!linkNearblocks(path)}
+                    isLinkActive={
+                      !linkNearblocks(path) || isInvalidReceiptsPath
+                    }
                     onClick={() => {
                       onSelect('nearblocks');
                     }}
@@ -563,7 +601,7 @@ export default function (props: Props) {
                     <ImageTab
                       height="45px"
                       width="auto"
-                      src={'https://nearblocks.io/images/nb-black-on-bos.svg'}
+                      src={'https://nearblocks.io/images/nearblocksblack.svg'}
                       alt="Nearblocks"
                     ></ImageTab>
                     <ExplorerHead>Nearblocks</ExplorerHead>
