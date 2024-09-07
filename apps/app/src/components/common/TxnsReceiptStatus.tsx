@@ -3,7 +3,7 @@ import FaTimesCircle from '../Icons/FaTimesCircle';
 
 interface Props {
   status: any;
-  showLabel: boolean;
+  showLabel?: boolean;
 }
 
 const getOptions = (status: boolean) => {
@@ -13,7 +13,7 @@ const getOptions = (status: boolean) => {
         bg: 'bg-red-50 dark:bg-black',
         text: 'text-red-500',
         icon: FaTimesCircle,
-        label: 'Failure',
+        label: 'Fail',
       };
     default:
       return {
@@ -32,7 +32,7 @@ const TxnsReceiptStatus = (props: Props) => {
   const Icon = option.icon;
 
   return (
-    <div className="w-full md:w-3/4 break-words">
+    <div className="w-full md:w-3/4 break-words flex items-center">
       <span
         className={`inline-flex items-center text-xs rounded py-1 ${
           option.bg

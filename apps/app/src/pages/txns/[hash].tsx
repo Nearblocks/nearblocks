@@ -205,7 +205,7 @@ const Txn = ({
         </h1>
       </div>
       <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
-        <div className="min-h-[80px] md:min-h-[25px]">
+        <div className="min-h-[44px] md:min-h-[25px]">
           <SponserdText />
         </div>
       </div>
