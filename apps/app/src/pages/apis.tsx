@@ -138,7 +138,7 @@ const ApiPlan = () => {
       setLoading(false);
     }
   };
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=APIs&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=APIs&brand=near&basic=true`;
 
   const onGetStarted = async (plan: any) => {
     if (plan) {

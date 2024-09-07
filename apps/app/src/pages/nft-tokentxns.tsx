@@ -91,7 +91,7 @@ const NftToxenTxns = ({
     sync: true;
   } = syncDetails?.status?.indexers?.events;
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Latest%20Near%20NEP-171%20Token%20Transfers&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Latest%20Near%20NEP-171%20Token%20Transfers&brand=near&basic=true`;
 
   return (
     <>

@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 const AdvertisePage = () => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Advertise&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Advertise&brand=near&basic=true`;
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [selectedImage, setSelectedImage] = useState('');
   const { theme } = useTheme();

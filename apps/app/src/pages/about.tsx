@@ -45,9 +45,9 @@ export const getServerSideProps: GetServerSideProps<{
 
 const AboutPage = () => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     t('about:heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <Fragment>

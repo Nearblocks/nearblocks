@@ -59,9 +59,9 @@ const TxnVolumeChart = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     t('charts:txnVolume.heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>

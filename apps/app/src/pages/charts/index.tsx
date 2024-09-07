@@ -48,9 +48,9 @@ export const getServerSideProps: GetServerSideProps<{
 const Charts = () => {
   const { t } = useTranslation();
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURIComponent(
     t('charts:heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>

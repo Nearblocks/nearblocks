@@ -135,7 +135,7 @@ const Txn = ({
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
   const description = t('txns:txn.metaDescription', { txn: hash });
-  const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/og?transaction_hash=${hash}&network=${network}&brand=near&transaction=true`;
 
   useEffect(() => {
     const index = hashes.indexOf(pageHash as string);

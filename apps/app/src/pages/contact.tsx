@@ -51,9 +51,9 @@ export const getServerSideProps: GetServerSideProps<{
 };
 const Contact = () => {
   const { t } = useTranslation('contact');
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     t('heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
   const [selectedValue, setSelectedValue] = useState('0');
   const [showFormContact, setShowFormContact] = useState(false);
   const [isOpen, setIsOpen] = useState(true);

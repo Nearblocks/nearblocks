@@ -447,7 +447,7 @@ const Address = ({
       },
     );
 
-  const thumbnail = `${ogUrl}/thumbnail/account?address=${id}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/og?address=${id}&network=${network}&brand=near&account=true`;
 
   return (
     <>

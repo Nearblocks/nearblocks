@@ -68,7 +68,7 @@ const NodeExplorer = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const title = 'NEAR Validator List | Nearblocks';
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20Validator%20Explorer&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Near%20Protocol%20Validator%20Explorer&brand=near&basic=true`;
 
   return (
     <>

@@ -76,9 +76,9 @@ const Blocks = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURIComponent(
+  const thumbnail = `${ogUrl}/og?title=${encodeURIComponent(
     t('blocks:heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>

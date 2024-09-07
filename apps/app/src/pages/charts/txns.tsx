@@ -60,9 +60,9 @@ const TxnsChart = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     t('charts:txns.heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>

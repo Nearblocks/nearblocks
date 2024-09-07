@@ -74,7 +74,7 @@ const TopNFTTokens = ({
   dataCount,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20NEP-171%20Tokens&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Near%20Protocol%20NEP-171%20Tokens&brand=near&basic=true`;
 
   return (
     <>

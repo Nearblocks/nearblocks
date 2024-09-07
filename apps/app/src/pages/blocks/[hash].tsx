@@ -92,7 +92,7 @@ const Block = ({
   const blockHeight = Number(blockInfo?.blocks[0]?.block_height);
   const blockHash = blockInfo?.blocks[0]?.block_hash;
 
-  const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
+  const thumbnail = `${ogUrl}/og?block_height=${blockHeight}&brand=near&block=true`;
   return (
     <>
       <Head>

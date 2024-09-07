@@ -194,9 +194,9 @@ const TokenDetails = ({
   const description = token
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/token?token=${
+  const thumbnail = `${ogUrl}/og?token=${
     token?.name && encodeURI(token?.name)
-  }&network=${network}&brand=near`;
+  }&network=${network}&brand=near&token=true`;
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,

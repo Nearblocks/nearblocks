@@ -113,10 +113,10 @@ const NFTokenInfo = ({
     };
   }, [token]);
 
-  const thumbnail = `${ogUrl}/thumbnail/nft?token=${
+  const thumbnail = `${ogUrl}/og?nft=${
     (token?.title || token?.token) &&
     encodeURIComponent(token.title || token.token)
-  }&network=${network}&brand=near`;
+  }&network=${network}&brand=near&nft=true`;
 
   return (
     <>

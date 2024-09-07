@@ -148,7 +148,7 @@ const HomePage = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
-  const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
+  const thumbnail = `${ogUrl}/og?brand=near&home=true`;
 
   return (
     <>
