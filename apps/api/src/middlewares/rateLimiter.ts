@@ -124,12 +124,33 @@ const rateLimiter = catchAsync(
     const consumeCount = Math.ceil(+perPage / 25);
 
     try {
-      await rateLimit.consume(id, consumeCount);
-
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
+        const now = dayjs.utc().toISOString();
+        await userSql`
+          INSERT INTO
+            api_key_usages (user_id, key_id, TIME, count, plan_id)
+          VALUES
+            (
+              ${id},
+              ${keyId},
+              ${now},
+              1,
+              ${plan.id}
+            )
+          ON CONFLICT (user_id, key_id, TIME) DO
+          UPDATE
+          SET
+            count = api_key_usages.count + ${consumeCount}
+        `;
         await rateLimit.consume(tokenKey, consumeCount);
       }
+    } catch (error) {
+      logger.error(error);
+    }
+
+    try {
+      await rateLimit.consume(id, consumeCount);
 
       return next();
     } catch (error) {
@@ -168,11 +189,34 @@ const useFreePlan = async (
   const rateLimit = rateLimiterUnion(plan, baseUrl);
 
   try {
-    await rateLimit.consume(key, consumeCount);
-
     if (tokenKey) {
+      const [, keyId] = tokenKey.split('_');
+      const tokenKeyValue = parseInt(keyId, 10);
+      const now = dayjs.utc().toISOString();
+      await userSql`
+        INSERT INTO
+          api_key_usages (user_id, key_id, TIME, count, plan_id)
+        VALUES
+          (
+            ${key},
+            ${tokenKeyValue},
+            ${now},
+            ${consumeCount},
+            ${plan.id}
+          )
+        ON CONFLICT (user_id, key_id, TIME) DO
+        UPDATE
+        SET
+          count = api_key_usages.count + EXCLUDED.count
+      `;
       await rateLimit.consume(tokenKey, consumeCount);
     }
+  } catch (error) {
+    logger.error(error);
+  }
+
+  try {
+    await rateLimit.consume(key, consumeCount);
 
     return next();
   } catch (error) {
