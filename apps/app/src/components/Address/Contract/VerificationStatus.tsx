@@ -41,95 +41,93 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
 
   const totalVerifiers = verifiers.length;
 
-  return (
-    <>
-      {statusLoading ? (
-        <Loader wrapperClassName="w-full md:w-full my-4 " />
-      ) : (
-        <div className="flex flex-wrap p-4 ">
-          <div className="w-full flex items-center justify-between">
-            {selectedVerifier ? (
-              <div className="flex items-center">
-                {verificationData[selectedVerifier]?.status === 'verified' ? (
-                  <FaCheckCircle />
-                ) : verificationData[selectedVerifier]?.status ===
-                  'mismatch' ? (
-                  <FaTimesCircle />
-                ) : (
-                  <FaExclamationCircle />
-                )}
-                <span className="ml-2 font-bold">
-                  {verificationData[selectedVerifier]?.status === 'verified'
-                    ? 'Contract Source Code Verified'
-                    : verificationData[selectedVerifier]?.status === 'mismatch'
-                    ? 'Contract Source Code Mismatch'
-                    : 'Contract Source Code Verification Pending'}
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <span className="ml-2 font-bold">
-                  Please Select The Contract Verifier
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center space-x-4">
-              <span className="whitespace-nowrap">
-                Verified: {verifiedCount}/{totalVerifiers}
+  return statusLoading ? (
+    <Loader wrapperClassName="w-full md:w-full my-4 " />
+  ) : (
+    <div className="flex flex-wrap p-4 w-full">
+      {verifiers?.length > 0 && (
+        <div className="w-full flex items-center justify-between flex-wrap">
+          {selectedVerifier ? (
+            <div className="flex items-center">
+              {verificationData[selectedVerifier]?.status === 'verified' ? (
+                <FaCheckCircle />
+              ) : verificationData[selectedVerifier]?.status === 'mismatch' ? (
+                <FaTimesCircle />
+              ) : (
+                <FaExclamationCircle />
+              )}
+              <span className="ml-2 font-bold">
+                {verificationData[selectedVerifier]?.status === 'verified'
+                  ? 'Contract Source Code Verified'
+                  : verificationData[selectedVerifier]?.status === 'mismatch'
+                  ? 'Contract Source Code Mismatch'
+                  : 'Contract Source Code Verification Pending'}
               </span>
-              <div className="relative flex-shrink-0 w-auto">
-                <select
-                  value={selectedVerifier || ''}
-                  onChange={handleVerifierChange}
-                  className="appearance-none w-auto h-8 px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200 text-sm cursor-pointer"
-                >
-                  <option value="" disabled hidden>
-                    Select Contract Verifier
-                  </option>
-                  {verifiers.map((verifier) => (
-                    <option
-                      key={verifier}
-                      value={verifier}
-                      className="text-gray-600 dark:text-neargray-10 bg-white dark:bg-black-600"
-                    >
-                      &nbsp;&nbsp;{verifier}{' '}
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </option>
-                  ))}
-                </select>
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <ArrowDown className="w-4 h-4 fill-current text-gray-500" />
-                </span>
-              </div>
             </div>
-          </div>
-
-          {verificationData[selectedVerifier]?.status === 'pending' &&
-            !contractMetadata?.build_info && (
-              <div className="mt-4">
-                If you are the contract owner and want your source code to be
-                publicly available, please compile it in a reproducible
-                environment using cargo-near:{' '}
-                <Link
-                  href="https://github.com/near/cargo-near"
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  https://github.com/near/cargo-near
-                </Link>
-              </div>
-            )}
-          {verificationData[selectedVerifier]?.status === 'mismatch' && (
-            <div className="mt-4">
-              The contract code hash does not match. The source code snapshot in
-              the metadata does not reflect the current state of the contract.
+          ) : (
+            <div className="flex items-center">
+              <span className="ml-2 font-bold">
+                Please Select The Contract Verifier
+              </span>
             </div>
           )}
+          <div className="flex items-center space-x-4 w-full md:max-w-[350px] ">
+            {' '}
+            <span className="whitespace-nowrap">
+              Verified: {verifiedCount}/{totalVerifiers}
+            </span>
+            <div className="relative w-full">
+              {' '}
+              <select
+                value={selectedVerifier || ''}
+                onChange={handleVerifierChange}
+                className="appearance-none w-full h-8 px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200 text-sm cursor-pointer"
+              >
+                <option value="" disabled hidden>
+                  Select Contract Verifier
+                </option>
+                {verifiers.map((verifier) => (
+                  <option
+                    key={verifier}
+                    value={verifier}
+                    className="text-gray-600 dark:text-neargray-10 bg-white dark:bg-black-600"
+                  >
+                    &nbsp;&nbsp;{verifier}
+                  </option>
+                ))}
+              </select>
+              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <ArrowDown className="w-4 h-4 fill-current text-gray-500" />
+              </span>
+            </div>
+          </div>
         </div>
       )}
-    </>
+
+      {(verificationData[selectedVerifier]?.status === 'pending' ||
+        verifiers.length === 0) &&
+        !contractMetadata && (
+          <div className="mt-4">
+            If you are the contract owner and want your source code to be
+            publicly available, please compile it in a reproducible
+            environment(docker) using
+            <Link
+              href="https://github.com/near/cargo-near"
+              className="text-green-500 dark:text-green-250 hover:no-underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              &nbsp;cargo-near
+            </Link>
+          </div>
+        )}
+      {verificationData[selectedVerifier]?.status === 'mismatch' && (
+        <div className="mt-4">
+          The contract code hash does not match. The source code snapshot in the
+          metadata does not reflect the current state of the contract.
+        </div>
+      )}
+    </div>
   );
 };
 
