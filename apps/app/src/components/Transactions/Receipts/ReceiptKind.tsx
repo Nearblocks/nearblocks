@@ -126,6 +126,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
                   action={subaction}
                   isTxTypeActive={true}
                   receiver={receiver}
+                  receipt={receipt}
                 />
               ))}
           </div>
