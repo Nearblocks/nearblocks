@@ -9,6 +9,7 @@ import ReceiptStatus from './ReceiptStatus';
 import { useEffect, useRef, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
+import useHash from '@/hooks/useHash';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -21,8 +22,10 @@ const ReceiptRow = (props: Props) => {
   const { t } = useTranslation();
   const [block, setBlock] = useState<{ height: string } | null>(null);
   const { getBlockDetails } = useRpc();
+  const [pageHash] = useHash();
 
   const lastBlockHash = useRef<string | null>(null);
+  const rowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
@@ -52,9 +55,39 @@ const ReceiptRow = (props: Props) => {
     );
   };
 
+  const handleScroll = () => {
+    if (typeof window === 'undefined') return;
+
+    const hash = window.location.hash;
+    const parts = hash.split('#');
+    const id = parts.length > 2 ? parts[2] : null;
+
+    if (id && receipt?.receipt_id === id) {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          rowRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    handleScroll();
+    window.addEventListener('hashchange', handleScroll);
+
+    return () => {
+      window.removeEventListener('hashchange', handleScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receipt?.receipt_id, pageHash]);
+
   return (
     <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div
+        id={`${receipt?.receipt_id}`}
+        ref={rowRef}
         className={
           borderFlag
             ? ''

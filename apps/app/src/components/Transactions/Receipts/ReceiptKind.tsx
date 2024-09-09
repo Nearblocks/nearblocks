@@ -3,6 +3,7 @@ import { yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
 import RlpTransaction from './RlpTransaction';
 import useTranslation from 'next-translate/useTranslation';
+import FaTimesCircle from '@/components/Icons/FaTimesCircle';
 
 const backgroundColorClasses: Record<string, string> = {
   transfer: 'bg-green-50 dark:bg-green-200',
@@ -17,10 +18,9 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, onClick, isTxTypeActive, receiver } = props;
+  const { action, onClick, isTxTypeActive, receiver, receipt } = props;
   const { t } = useTranslation();
   const args = action?.args?.args;
-
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
       ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
@@ -45,12 +45,21 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     return pretty;
   }
 
+  const status = receipt?.outcome?.status;
+  const isSuccess =
+    status &&
+    (status.type === 'successValue' || status.type === 'successReceiptId');
+
   return (
     <div className="pb-3">
       <div
-        className={`p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center leading-5 cursor-pointer 
+        className={`relative p-2 mr-3 min-h-25 rounded-md inline-flex items-center justify-center leading-5 cursor-pointer 
         transition-all ease-in-out 
-        ${backgroundColorClasses[action.kind] || ''}`}
+        ${
+          !isSuccess
+            ? 'bg-red-50 dark:bg-black-200'
+            : backgroundColorClasses[action.kind] || ''
+        }`}
         onClick={onClick}
         role="button"
         tabIndex={0}
@@ -67,6 +76,11 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         {onClick ? (
           <div className="ml-2">{isTxTypeActive ? '-' : '+'}</div>
         ) : null}
+        {!isSuccess && (
+          <div className="absolute top-0 right-0 -mt-1 -mr-1">
+            <FaTimesCircle />
+          </div>
+        )}
       </div>
       {action?.kind === 'transfer' ? (
         <div className="inline-flex justify-center">

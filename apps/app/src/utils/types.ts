@@ -1499,6 +1499,7 @@ export type ReceiptKindInfo = {
   onClick?: any;
   isTxTypeActive: boolean;
   receiver: string;
+  receipt?: any;
 };
 export type CommentItem = {
   accountId: string;

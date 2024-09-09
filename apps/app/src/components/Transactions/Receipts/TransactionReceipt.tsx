@@ -68,6 +68,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
               onClick={switchActiveTxType}
               isTxTypeActive={isTxTypeActive}
               receiver={receipt.receiverId}
+              receipt={receipt}
             />
           ))}
         </div>

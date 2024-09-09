@@ -146,10 +146,12 @@ const Details = (props: Props) => {
     if (failedReceiptCount === 0) {
       return null;
     }
+    const receiptText =
+      failedReceiptCount === 1 ? 'failed receipt' : 'failed receipts';
 
     return (
-      <div className="inline-flex w-fit rounded-md text-left mx-1 text-red-500">
-        {`[ ${failedReceiptCount} failed receipts ]`}
+      <div className="inline-flex w-fit text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 ml-2 rounded text-left px-2 py-1">
+        {`${failedReceiptCount} ${receiptText}`}
       </div>
     );
   };
@@ -223,7 +225,7 @@ const Details = (props: Props) => {
                 />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded-md text-left px-2 py-1">
+                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}
@@ -315,45 +317,7 @@ const Details = (props: Props) => {
           )}
         </div>
       </div>
-      <div
-        id="action-row"
-        className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
-      >
-        <div className="flex items-start flex-wrap p-4">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-            <Tooltip
-              label={'Highlighted events of the transaction'}
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            >
-              <div>
-                <Question className="w-4 h-4 fill-current mr-1" />
-              </div>
-            </Tooltip>
-            Transaction Actions
-          </div>
-          {loading || (actions?.length === 0 && logs?.length === 0) ? (
-            <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xl" />
-            </div>
-          ) : (
-            <div className="w-full md:w-3/4">
-              <PerfectScrollbar>
-                <div
-                  id="action-column"
-                  className="max-h-[194px] break-words space-y-2"
-                >
-                  {logs?.map((event: TransactionLog, i: number) => (
-                    <EventLogs key={i} event={event} />
-                  ))}
-                  {actions?.map((action: any, i: number) => (
-                    <Actions key={i} action={action} />
-                  ))}
-                </div>
-              </PerfectScrollbar>
-            </div>
-          )}
-        </div>
-      </div>
+
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -770,6 +734,46 @@ const Details = (props: Props) => {
           )}
         </div>
       )}
+      <div
+        id="action-row"
+        className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+      >
+        <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+            <Tooltip
+              label={'Highlighted events of the transaction'}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </Tooltip>
+            Transaction Actions
+          </div>
+          {loading || (actions?.length === 0 && logs?.length === 0) ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4">
+              <PerfectScrollbar>
+                <div
+                  id="action-column"
+                  className="max-h-[194px] break-words space-y-2"
+                >
+                  {logs?.map((event: TransactionLog, i: number) => (
+                    <EventLogs key={i} event={event} />
+                  ))}
+                  {actions?.map((action: any, i: number) => (
+                    <Actions key={i} action={action} />
+                  ))}
+                </div>
+              </PerfectScrollbar>
+            </div>
+          )}
+        </div>
+      </div>
+
       <Accordion collapsible onChange={() => setMore((m) => !m)}>
         <AccordionItem>
           <AccordionPanel className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b">
