@@ -12,6 +12,7 @@ import CopyIcon from '@/components/Icons/CopyIcon';
 import { VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { verifierConfig } from '@/utils/config';
 
 type VerifiedDataProps = {
   verifierData: VerifierData;
@@ -53,13 +54,26 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       try {
         setFileDataLoading(true);
-        const cid = verifierData?.cid;
-        if (cid) {
-          const url = `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`;
+        let verifier = verifierConfig.find(
+          (config) => config.accountId === selectedVerifier,
+        );
 
-          const response = await fetch(url, {
+        if (!verifier) {
+          throw new Error('Verifier configuration not found.');
+        }
+
+        const cid = verifierData?.cid;
+
+        if (cid) {
+          const structureUrl: string = verifier?.fileStructureApiUrl(cid) || '';
+
+          const response = await fetch(structureUrl, {
             headers: { Accept: 'application/json' },
           });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch structure data');
+          }
 
           const data = await response.json();
 
@@ -67,15 +81,43 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
             .filter((item: FileItem) => item.type === 'file')
             .map((file: FileItem) => file.name);
 
+          if (!files || files.length === 0) {
+            throw new Error('No files found in the structure data');
+          }
+
           const fileContentsPromises = files.map(async (fileName: string) => {
-            const res = await fetch(
-              `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
-            );
-            const content = await res.text();
-            return { name: fileName, content };
+            try {
+              if (fileName) {
+                const sourceCodeUrl: string =
+                  verifier?.sourceCodeApiUrl(cid, fileName) || '';
+
+                const res = await fetch(sourceCodeUrl);
+
+                if (!res.ok) {
+                  throw new Error(
+                    `Failed to fetch file content for ${fileName}`,
+                  );
+                }
+
+                const content = await res.text();
+                return { name: fileName, content };
+              } else throw new Error('File name not found');
+            } catch (error) {
+              console.error(error);
+              return { name: fileName, content: null };
+            }
           });
 
           const fileData = await Promise.all(fileContentsPromises);
+
+          const successfulFiles = fileData.filter(
+            (file) => file.content !== null,
+          );
+
+          if (successfulFiles.length === 0) {
+            throw new Error(`Failed to fetch all files`);
+          }
+
           setFileData(fileData);
         }
       } catch (error) {
@@ -85,6 +127,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         setFileDataLoading(false);
       }
     };
+
     if (verifierData) fetchCode();
   }, [selectedVerifier, verifierData]);
 
@@ -192,9 +235,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                                 </span>
                               )}
                               <button
-                                ref={(el) =>
-                                  (copyButtonRefs.current[name] = el)
-                                }
+                                ref={(el) => {
+                                  copyButtonRefs.current[name] = el;
+                                }}
                                 type="button"
                                 className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 mr-2"
                               >
@@ -227,34 +270,45 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                         }}
                         className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0`}
                       >
-                        <SyntaxHighlighter
-                          language={verifierData?.lang || 'rust'}
-                          style={theme === 'dark' ? oneDark : oneLight}
-                          showLineNumbers
-                          lineNumberStyle={{
-                            backgroundColor: `${
-                              theme === 'dark' ? '#030712' : '#d1d5db'
-                            }`,
-                            padding: '0 10px 0 0',
-                            width: '5em',
-                            display: 'inline-block',
-                            margin: '0 5px 0 0',
-                          }}
-                          wrapLines={true}
-                          wrapLongLines={true}
-                          customStyle={{
-                            backgroundColor:
-                              theme === 'dark'
-                                ? 'var(--color-black-200)'
-                                : 'var(--color-gray-100)',
-                            borderColor:
-                              theme === 'dark' ? 'var(--color-black-200)' : '',
-                            padding: 0,
-                            margin: 0,
-                          }}
-                        >
-                          {content || 'No source code available'}
-                        </SyntaxHighlighter>
+                        {content ? (
+                          <SyntaxHighlighter
+                            language={verifierData?.lang || 'rust'}
+                            style={theme === 'dark' ? oneDark : oneLight}
+                            showLineNumbers={true}
+                            lineNumberStyle={{
+                              backgroundColor: `${
+                                theme === 'dark' ? '#030712' : '#d1d5db'
+                              }`,
+                              padding: '0 10px 0 0',
+                              width: '5em',
+                              minWidth: '5em',
+                              display: 'inline-block',
+                              margin: '0 5px 0 0',
+                            }}
+                            wrapLines={true}
+                            wrapLongLines={true}
+                            customStyle={{
+                              backgroundColor:
+                                theme === 'dark'
+                                  ? 'var(--color-black-200)'
+                                  : 'var(--color-gray-100)',
+                              borderColor:
+                                theme === 'dark'
+                                  ? 'var(--color-black-200)'
+                                  : '',
+                              padding: 0,
+                              margin: 0,
+                            }}
+                          >
+                            {content || 'No source code available'}
+                          </SyntaxHighlighter>
+                        ) : (
+                          <ErrorMessage
+                            icons={<FaInbox />}
+                            message={'Failed to fetch the file content'}
+                            mutedText="Please try again later"
+                          />
+                        )}
                       </div>
                     </div>
                   ))

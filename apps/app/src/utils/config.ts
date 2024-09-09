@@ -36,3 +36,16 @@ export const aurorablocksUrl: string =
   networkId === 'mainnet'
     ? 'https://aurora.exploreblocks.io'
     : 'https://aurora.exploreblocks.io';
+
+export const verifierConfig =
+  networkId === 'mainnet'
+    ? [
+        {
+          accountId: 'v2-verifier.sourcescan.near',
+          fileStructureApiUrl: (cid: string) =>
+            `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
+          sourceCodeApiUrl: (cid: string, fileName: string) =>
+            `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+        },
+      ]
+    : [];
