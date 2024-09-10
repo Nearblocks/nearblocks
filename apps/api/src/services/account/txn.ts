@@ -1006,7 +1006,8 @@ const receipts = catchAsync(
             FROM
               receipts r
             WHERE
-              r.predecessor_account_id = ${account}
+              r.receipt_kind = 'ACTION'
+              AND r.predecessor_account_id = ${account}
               AND ${cursors}
               AND ${actions}
             ORDER BY
@@ -1022,7 +1023,8 @@ const receipts = catchAsync(
             FROM
               receipts r
             WHERE
-              r.receiver_account_id = ${account}
+              r.receipt_kind = 'ACTION'
+              AND r.receiver_account_id = ${account}
               AND ${cursors}
               AND ${actions}
             ORDER BY
@@ -1043,7 +1045,8 @@ const receipts = catchAsync(
       FROM
         receipts r
       WHERE
-        r.predecessor_account_id = ${from ?? account}
+        r.receipt_kind = 'ACTION'
+        AND r.predecessor_account_id = ${from ?? account}
         AND r.receiver_account_id = ${to ?? account}
         AND ${cursors}
         AND ${actions}
@@ -1059,6 +1062,8 @@ const receipts = catchAsync(
         receipts.receipt_id,
         receipts.predecessor_account_id,
         receipts.receiver_account_id,
+        ROW_TO_JSON(bl) AS receipt_block,
+        ROW_TO_JSON(oc) AS receipt_outcome,
         tr.transaction_hash,
         tr.included_in_block_hash,
         tr.block_timestamp,
@@ -1071,6 +1076,31 @@ const receipts = catchAsync(
       FROM
         receipts
         INNER JOIN (${from || to ? intersect : union}) AS tmp using (receipt_id)
+        LEFT JOIN LATERAL (
+          SELECT
+            block_hash,
+            block_height,
+            block_timestamp
+          FROM
+            blocks
+          WHERE
+            block_hash = receipts.included_in_block_hash
+        ) bl ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT
+            gas_burnt,
+            tokens_burnt,
+            executor_account_id,
+            CASE
+              WHEN status = 'SUCCESS_RECEIPT_ID'
+              OR status = 'SUCCESS_VALUE' THEN TRUE
+              ELSE FALSE
+            END AS status
+          FROM
+            execution_outcomes
+          WHERE
+            receipt_id = receipts.receipt_id
+        ) oc ON TRUE
         INNER JOIN LATERAL (
           SELECT
             id,
@@ -1159,7 +1189,7 @@ const receipts = catchAsync(
             transactions.transaction_hash = receipts.originated_from_transaction_hash
         ) tr ON TRUE
       ORDER BY
-        tr.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
+        receipts.id ${sort}
     `;
 
     let nextCursor = txns?.[txns?.length - 1]?.id;
