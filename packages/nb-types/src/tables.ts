@@ -37,6 +37,7 @@ export interface TTables {
   stats: Stats;
   tps: TPS;
   transactions: Transaction;
+  validator_data: ValidatorData;
 }
 
 export type AccessKey = {
@@ -355,4 +356,21 @@ export type Transaction = {
   signer_account_id: string;
   status: ExecutionOutcomeStatus;
   transaction_hash: string;
+};
+
+export type ValidatorData = {
+  current_validators: JsonObject;
+  epoch_start_block: JsonObject;
+  epoch_stats_check: JsonObject;
+  genesis_config: JsonObject;
+  latest_block: JsonObject;
+  mapped_validators: JsonObject;
+  pool_ids: JsonObject;
+  protocol_config: JsonObject;
+  stake_proposals: JsonObject;
+  staking_pool_infos: JsonObject;
+  staking_pool_metadata: JsonObject;
+  validator_lists: JsonObject;
+  validator_telemetry: JsonObject;
+  validators_promise: JsonObject;
 };
