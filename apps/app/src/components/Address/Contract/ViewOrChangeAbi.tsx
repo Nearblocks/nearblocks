@@ -20,6 +20,7 @@ interface Props {
   index: number;
   method: any;
   schema: any;
+  connected?: boolean;
 }
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -39,7 +40,7 @@ const ViewOrChangeAbi = (props: Props) => {
   const { near } = useVmStore();
   const { id: contract } = router.query;
   const account = useAuthStore((store) => store.account);
-  const { index, method, schema } = props;
+  const { index, method, schema, connected } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -183,7 +184,7 @@ const ViewOrChangeAbi = (props: Props) => {
         </span>
         <ArrowRight className="contract-icon fill-gray-600" />
       </AccordionButton>
-      <AccordionPanel className="border dark:border-black-200 p-4 rounded slide-up slide-down">
+      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center dark:text-neargray-10">
             Arguments
@@ -292,7 +293,7 @@ const ViewOrChangeAbi = (props: Props) => {
             <button
               type="submit"
               onClick={onWrite}
-              disabled={loading}
+              disabled={loading || !connected}
               className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
             >
               Write

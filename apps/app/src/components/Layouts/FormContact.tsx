@@ -46,7 +46,6 @@ const FormContact = ({ selectValue }: Props) => {
         setName('');
         setEmail('');
         setDescription('');
-        setSubject('');
         toast.success('Thank you!');
       }
     } catch (err) {
