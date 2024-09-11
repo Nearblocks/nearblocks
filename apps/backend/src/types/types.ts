@@ -110,6 +110,15 @@ export interface ExpGenesisConfig {
   total_supply: string;
 }
 
+export interface GenesisConfig {
+  accountCount: string;
+  height: number;
+  minStakeRatio: number[];
+  protocolVersion: number;
+  timestamp: number;
+  totalSupply: string;
+}
+
 export interface CallFunctionResponse {
   block_hash: string;
   block_height: number;

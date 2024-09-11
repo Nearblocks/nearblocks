@@ -3,7 +3,7 @@ import { Response } from 'express';
 
 import catchAsync from '#libs/async';
 import { viewBlock } from '#libs/near';
-import redis from '#libs/redis';
+import sql from '#libs/postgres';
 import { List } from '#libs/schema/validators';
 import {
   calculateAPY,
@@ -25,23 +25,20 @@ import { RequestValidator } from '#types/types';
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const page = req.validator.data.page;
   const perPage = req.validator.data.per_page;
-  const [
-    combinedData,
-    currentValidators,
-    protocolConfig,
-    epochStatsCheck,
-    epochStartBlock,
-    latestBlock,
-    validatorTelemetry,
-  ] = await Promise.all([
-    redis.parse('validatorLists'),
-    redis.parse('currentValidators'),
-    redis.parse('protocolConfig'),
-    redis.parse('epochStatsCheck'),
-    redis.parse('epochStartBlock'),
-    redis.parse('latestBlock'),
-    redis.parse('validatorTelemetry'),
-  ]);
+  const data = await sql`
+    SELECT
+      *
+    FROM
+      validator_data
+  `;
+
+  const currentValidators = data?.[0]?.current_validators;
+  const epochStartBlock = data?.[0]?.epoch_start_block;
+  const epochStatsCheck = data?.[0]?.epoch_stats_check;
+  const latestBlock = data?.[0]?.latest_block;
+  const protocolConfig = data?.[0]?.protocol_config;
+  const combinedData = data?.[0]?.validator_lists;
+  const validatorTelemetry = data?.[0]?.validator_telemetry;
 
   if (combinedData && combinedData.length > 0) {
     const validatorPaginatedData = combinedData?.slice(
