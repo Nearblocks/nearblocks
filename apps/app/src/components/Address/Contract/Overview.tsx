@@ -98,17 +98,17 @@ const Overview = (props: Props) => {
             )}
           </div>
           {!schema && (
-            <p className="text-xs mx-5 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
-              Contracts with Near{' '}
+            <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+              {`Near ABI schema not found, We have provide a best effort “auto detect” facility to find successful methods and parameters from past transactions. If you are the contract owner please consider recompiling your contract with Near`}{' '}
               <a
                 className="text-green-500 dark:text-green-250"
                 target="_blank"
                 href="https://github.com/near/abi"
                 rel="noreferrer noopener nofollow"
               >
-                abi
-              </a>{' '}
-              {`will have their methods and parameters automatically shown. For other contracts we provide a best effort "auto detect" facility to find successful methods and parameters from past transactions.`}
+                ABI
+              </a>
+              .
             </p>
           )}
           {contractInfo?.methodNames?.length > 0 && (
@@ -118,7 +118,12 @@ const Overview = (props: Props) => {
               className="contract-accordian text-gray-600 px-4 pt-4 border-t"
             >
               {contractInfo?.methodNames?.map((method, index) => (
-                <ViewOrChange key={index} index={index} method={method} />
+                <ViewOrChange
+                  key={index}
+                  index={index}
+                  method={method}
+                  connected={signedIn}
+                />
               ))}
             </Accordion>
           )}
@@ -150,6 +155,19 @@ const Overview = (props: Props) => {
               </button>
             )}
           </div>
+          <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+            Methods and parameters are automatically shown from the embedded
+            Near{' '}
+            <a
+              className="text-green-500 dark:text-green-250"
+              target="_blank"
+              href="https://github.com/near/abi"
+              rel="noreferrer noopener nofollow"
+            >
+              ABI
+            </a>{' '}
+            {`Schema.`}
+          </p>
           <Accordion
             multiple
             collapsible
@@ -161,6 +179,7 @@ const Overview = (props: Props) => {
                 index={index}
                 method={func}
                 schema={schema}
+                connected={signedIn}
               />
             ))}
           </Accordion>

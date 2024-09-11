@@ -36,6 +36,7 @@ module.exports = {
     'rgx:^/about': ['about'],
     'rgx:^/terms-and-conditions': ['terms'],
     'rgx:^/contact': ['contact'],
+    'rgx:^/advertise': ['home'],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`nearblock-translations/${lang}/${ns}.json`).then((m) => m.default),
