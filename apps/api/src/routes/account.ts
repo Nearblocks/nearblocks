@@ -159,6 +159,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
    * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
@@ -173,6 +175,8 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
    * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
    */
   route.get(
@@ -190,6 +194,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
