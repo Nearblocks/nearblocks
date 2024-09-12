@@ -695,7 +695,7 @@ const txnsOnly = catchAsync(
             JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
             JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
           WHERE
-            receipts.originated_from_transaction_hash = transactions.transaction_hash
+            receipts.receipt_id = transactions.converted_into_receipt_id
         ) AS actions,
         (
           SELECT
