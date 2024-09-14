@@ -12,6 +12,7 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.651.1",
     "@braintree/sanitize-url": "7.0.1",
     "@near-wallet-selector/bitget-wallet": "8.9.13",
     "@near-wallet-selector/bitte-wallet": "8.9.13",

@@ -42,9 +42,10 @@ Configure the nearblocks Gateway by modifying the .env file. Customize settings 
 `NEXT_PUBLIC_OG_URL=https://meta.exploreblocks.io/api`
 `NEXT_PUBLIC_MAINNET_URL=https://nearblocks.io`
 `NEXT_PUBLIC_TESTNET_URL=https://testnet.nearblocks.io`
-`BREVO_URL=https://api.brevo.com/v3/smtp/email`
-`BREVO_API_KEY=`
-`BREVO_TO_EMAIL=`
+`AWS_ACCESS_KEY_ID=your-aws-access-key-id`
+`AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key`
+`AWS_REGION=your-aws-region`
+`AWS_SES_TO_EMAIL=recipient@example.com`
 `NEXT_PUBLIC_GTM_ID=GTM-P285ZPV2`
 
 ## Deployment
