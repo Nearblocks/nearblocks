@@ -150,6 +150,8 @@ const getEventStatus = async () => {
 const getFTHoldersStatus = async () => {
   const settings = await getSettings();
 
+  const eventsHeight = settings.find((item: Setting) => item.key === 'events')
+    ?.value?.sync;
   const ftHoldersHeight = settings.find(
     (item: Setting) => item.key === 'ft_holders',
   )?.value?.sync;
@@ -158,19 +160,19 @@ const getFTHoldersStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const [syncedBlock, latestBlock] = await Promise.all([
+  const [syncedBlock, latestEvent] = await Promise.all([
     getBlock(ftHoldersHeight),
-    getLatestBlock(),
+    getBlock(eventsHeight),
   ]);
 
-  if (!syncedBlock?.[0] || !latestBlock?.[0]) {
-    logger.warn({ latestBlock, syncedBlock });
+  if (!syncedBlock?.[0] || !latestEvent?.[0]) {
+    logger.warn({ latestEvent, syncedBlock });
     return { height: ftHoldersHeight, sync: false, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
   const timestamp = syncedBlock[0].block_timestamp;
-  const latestHeight = latestBlock[0].block_height;
+  const latestHeight = latestEvent[0].block_height;
 
   return {
     height,

@@ -486,11 +486,14 @@ export const validatorsTelemetryCheck = async () => {
 
   if (validators) {
     const poolIds = data?.pool_ids as unknown as string[];
+    const currentValidators = validators.current_validators ?? [];
+    const nextValidators = validators.next_validators ?? [];
+    const currentProposals = validators.current_proposals ?? [];
 
     const accountIds = [
-      ...validators.current_validators.map(({ account_id }) => account_id),
-      ...validators.next_validators.map(({ account_id }) => account_id),
-      ...validators.current_proposals.map(({ account_id }) => account_id),
+      ...currentValidators.map(({ account_id }) => account_id),
+      ...nextValidators.map(({ account_id }) => account_id),
+      ...currentProposals.map(({ account_id }) => account_id),
       ...(poolIds ?? []),
     ];
     const nodesInfo = await db('nodes')
