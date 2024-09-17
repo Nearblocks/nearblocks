@@ -21,7 +21,7 @@ interface Props {
   deployments: any;
 }
 
-const Overview = (props: Props) => {
+const ContractOverview = (props: Props) => {
   const { contract, isLocked, schema, contractInfo, deployments, accountId } =
     props;
 
@@ -188,4 +188,4 @@ const Overview = (props: Props) => {
     </Tabs>
   );
 };
-export default Overview;
+export default ContractOverview;

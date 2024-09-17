@@ -51,7 +51,7 @@ const TermsAndConditions = () => {
   return (
     <Fragment>
       <Head>
-        <title>{t('Terms of Service')}</title>
+        <title>{t('Terms of Service | Nearblocks')}</title>
         <meta name="title" content={t('Terms of Service')} />
         <meta name="description" content={t('home:metaDescription')} />
         <meta property="og:title" content={t('Terms of Service')} />

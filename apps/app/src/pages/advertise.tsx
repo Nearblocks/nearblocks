@@ -66,7 +66,7 @@ const AdvertisePage = () => {
   return (
     <Fragment>
       <Head>
-        <title>{t('Advertise on nearblocks.io')}</title>
+        <title>{t('Advertise on nearblocks.io | Nearblocks')}</title>
         <meta name="title" content={t('Advertise on nearblocks.io')} />
         <meta name="description" content={t('home:metaDescription')} />
         <meta property="og:title" content={t('Advertise on nearblocks.io')} />

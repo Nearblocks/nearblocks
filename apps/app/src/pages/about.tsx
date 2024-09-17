@@ -52,7 +52,7 @@ const AboutPage = () => {
   return (
     <Fragment>
       <Head>
-        <title>{t('About Nearblocks')}</title>
+        <title>{t('About NearBlocks | Nearblocks')}</title>
         <meta name="title" content={t('About Nearblocks')} />
         <meta name="description" content={t('home:metaDescription')} />
         <meta property="og:title" content={t('About Nearblocks')} />
