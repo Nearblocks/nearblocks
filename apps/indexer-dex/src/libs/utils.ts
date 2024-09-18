@@ -2,7 +2,7 @@ import { createRequire } from 'module';
 
 import Big from 'big.js';
 
-import { types } from 'nb-lake';
+import { ExecutionStatus } from 'nb-neardata';
 import { DexEventType, DexPairs } from 'nb-types';
 
 import config from '#config';
@@ -20,7 +20,7 @@ export const decodeArgs = <T>(args: string): T =>
 export const decodeSuccessValue = (value: string) =>
   Buffer.from(value, 'base64').toString();
 
-export const isExecutionSuccess = (status: types.ExecutionStatus) => {
+export const isExecutionSuccess = (status: ExecutionStatus) => {
   if ('SuccessValue' in status || 'SuccessReceiptId' in status) {
     return true;
   }

@@ -3,9 +3,14 @@ import { cleanEnv, str, url } from 'envalid';
 import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
+import { DataSource } from '#types/enum';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  DATA_SOURCE: str({
+    choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
+    default: DataSource.NEAR_LAKE,
+  }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -13,7 +18,6 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  RPC_URL: str(),
   S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
@@ -35,6 +39,7 @@ if (env.S3_ENDPOINT) {
 }
 
 const config: Config = {
+  dataSource: env.DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
@@ -43,7 +48,6 @@ const config: Config = {
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
   preloadSize: 10,
-  rpcUrl: env.RPC_URL,
   s3BucketName,
   s3Endpoint,
   s3RegionName: 'eu-central-1',
