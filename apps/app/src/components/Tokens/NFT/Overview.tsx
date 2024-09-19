@@ -29,9 +29,7 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
-  const spamTokensString = spamList && spamList.replace(/,\s*([}\]])/g, '$1');
-  const spamTokens: SpamToken =
-    spamTokensString && JSON.parse(spamTokensString);
+  const spamTokens: SpamToken = spamList;
 
   function isTokenSpam(tokenName: string) {
     if (spamTokens)
