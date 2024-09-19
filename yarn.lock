@@ -4028,6 +4028,11 @@
   resolved "https://registry.yarnpkg.com/@lmdb/lmdb-win32-x64/-/lmdb-win32-x64-2.8.5.tgz#8233e8762440b0f4632c47a09b1b6f23de8b934c"
   integrity sha512-4wvrf5BgnR8RpogHhtpCPJMKBmvyZPhhUtEwMJbXh0ni2BucpfF07jlmyM11zRqQ2XIq6PbC2j7W7UCCcm1rRQ==
 
+"@marsidev/react-turnstile@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@marsidev/react-turnstile/-/react-turnstile-1.0.2.tgz#d4ca03b6c31793bc73b3b99f5b991539a56f7f36"
+  integrity sha512-YkCtJVaCzZ1kcmhPsiFTmTXVughoNzEMRsNHcmTG0K5OdbCQfAG67Q6d5Ze+A72vrHbvVZkvcLgUbldeGcbRjQ==
+
 "@metamask/detect-provider@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@metamask/detect-provider/-/detect-provider-2.0.0.tgz#4bc2795e5e6f7d8b84b2e845058d2f222c99917d"
