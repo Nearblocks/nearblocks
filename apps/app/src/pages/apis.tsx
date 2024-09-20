@@ -442,7 +442,7 @@ const ApiPlan = () => {
             </div>
             <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
               <Link
-                href="/contact"
+                href="/contact?subject=apis"
                 className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10"
                 type="button"
               >

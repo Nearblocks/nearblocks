@@ -1,22 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDown from '../Icons/ArrowDown';
 import LoadingCircular from '../common/LoadingCircular';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { env } from 'next-runtime-env';
+import { Turnstile } from '@marsidev/react-turnstile';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
+import { useTheme } from 'next-themes';
 
 interface Props {
   selectValue?: string;
 }
 
+const siteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
+
 const FormContact = ({ selectValue }: Props) => {
+  const { theme } = useTheme();
   const { t } = useTranslation('contact');
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('Partnership / Press');
+  const [subject, setSubject] = useState('3');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<any>(null);
+  const [token, setToken] = useState<string>();
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   useEffect(() => {
     if (selectValue) {
@@ -26,6 +36,13 @@ const FormContact = ({ selectValue }: Props) => {
 
   const submitForm = async (event: any) => {
     event.preventDefault();
+    const subjectText = subject === '3' ? 'Partnership / Press' : subject;
+
+    if (status != 'solved' || !token) {
+      setStatus('error');
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await fetch('/api/contact', {
@@ -34,10 +51,11 @@ const FormContact = ({ selectValue }: Props) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name,
-          email,
-          subject,
-          description,
+          name: name,
+          email: email,
+          subject: subjectText,
+          description: description,
+          token: token,
         }),
       });
       if (!response.ok) {
@@ -46,6 +64,8 @@ const FormContact = ({ selectValue }: Props) => {
         setName('');
         setEmail('');
         setDescription('');
+        setStatus(null);
+        setToken('');
         toast.success('Thank you!');
       }
     } catch (err) {
@@ -92,8 +112,7 @@ const FormContact = ({ selectValue }: Props) => {
                 <option selected disabled={true}>
                   Select subject
                 </option>
-                <option value="Partnership / Press">Partnership / Press</option>
-                <option value="Feature Request">Feature Request</option>
+                <option value="3">Partnership / Press</option>
               </select>
               <ArrowDown className="absolute right-2 top-3 w-4 h-4 fill-current text-gray-500 pointer-events-none" />
             </label>
@@ -113,6 +132,25 @@ const FormContact = ({ selectValue }: Props) => {
           value={description}
           required
         />
+        <div className="flex">
+          <Turnstile
+            ref={turnstileRef}
+            options={{ theme: theme as any }}
+            siteKey={siteKey as string}
+            onError={() => setStatus('error')}
+            onExpire={() => setStatus('expired')}
+            onSuccess={(token) => {
+              setToken(token);
+              setStatus('solved');
+            }}
+            onWidgetLoad={(widgetId) => console.log('Widget loaded', widgetId)}
+          />
+          {status === 'error' && (
+            <span className="text-red-500 text-sm p-6">
+              * Please verify the captcha
+            </span>
+          )}
+        </div>
         <button
           type="submit"
           className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"

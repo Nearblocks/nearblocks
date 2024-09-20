@@ -24,7 +24,9 @@
         "NEXT_PUBLIC_USER_API_URL",
         "NEXT_PUBLIC_USER_DASHBOARD_URL",
         "NEXT_PUBLIC_API_URL",
-        "API_ACCESS_KEY"
+        "API_ACCESS_KEY",
+        "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+        "TURNSTILE_SECRET_KEY"
       ]
     },
     "lint": {
