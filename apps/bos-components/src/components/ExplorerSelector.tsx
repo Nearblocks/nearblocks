@@ -365,7 +365,7 @@ export default function (props: Props) {
             ? config.nearblocksLite +
                 '/address/' +
                 selectUrlAfterSecondSlash(link) +
-                `?rpcUrl=https://archival-rpc.testnet.near.org`
+                `?network=testnet`
             : config.nearblocksLite +
                 '/address/' +
                 selectUrlAfterSecondSlash(link);
@@ -374,7 +374,7 @@ export default function (props: Props) {
             ? config.nearblocksLite +
                 '/txns/' +
                 selectUrlAfterSecondSlash(link) +
-                `?rpcUrl=https://archival-rpc.testnet.near.org`
+                `?network=testnet`
             : config.nearblocksLite +
                 '/txns/' +
                 selectUrlAfterSecondSlash(link);
@@ -383,7 +383,7 @@ export default function (props: Props) {
             ? config.nearblocksLite +
                 '/hash/' +
                 selectUrlAfterSecondSlash(link) +
-                `?rpcUrl=https://archival-rpc.testnet.near.org`
+                `?network=testnet`
             : config.nearblocksLite +
                 '/hash/' +
                 selectUrlAfterSecondSlash(link);
@@ -392,7 +392,7 @@ export default function (props: Props) {
             ? config.nearblocksLite +
                 '/blocks/' +
                 selectUrlAfterSecondSlash(link) +
-                `?rpcUrl=https://archival-rpc.testnet.near.org`
+                `?network=testnet`
             : config.nearblocksLite +
                 '/blocks/' +
                 selectUrlAfterSecondSlash(link);

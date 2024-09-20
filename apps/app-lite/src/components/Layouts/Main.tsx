@@ -1,6 +1,10 @@
 import { ReactElement, ReactNode, useEffect } from 'react';
 
+import { Network } from 'nb-types';
+
 import Navbar from '@/components/Header/Navbar';
+import { getProviders } from '@/libs/rpc';
+import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 
 import Footer from '../Footer';
@@ -12,14 +16,21 @@ interface LayoutProps {
 
 const Layout = ({ children, hideSearch }: LayoutProps) => {
   const setRpc = useRpcStore((state) => state.setRpc);
+  const setNetwork = useNetworkStore((state) => state.setNetwork);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const rpcUrl = searchParams.get('rpcUrl');
+    const network = searchParams.get('network');
+
     if (rpcUrl) {
       setRpc(rpcUrl);
     }
-  }, [setRpc]);
+    if (network) {
+      setNetwork(network as Network);
+      setRpc(getProviders(network)?.[0]?.url);
+    }
+  }, [setRpc, setNetwork]);
 
   return (
     <div className="flex flex-col min-h-screen">

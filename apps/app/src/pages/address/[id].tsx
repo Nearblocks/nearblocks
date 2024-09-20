@@ -27,7 +27,6 @@ import queryString from 'qs';
 import TokenTransactions from '@/components/Address/TokenTransactions';
 import NFTTransactions from '@/components/Address/NFTTransactions';
 import AccessKeys from '@/components/Address/AccessKeys';
-import Overview from '@/components/Address/Contract/Overview';
 import fetcher from '@/utils/fetcher';
 import { useFetch } from '@/hooks/useFetch';
 import { VmComponent } from '@/components/vm/VmComponent';
@@ -35,6 +34,7 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
 import Receipts from '@/components/Address/Receipts';
+import ContractOverview from '@/components/Address/Contract/ContractOverview';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -644,7 +644,7 @@ const Address = ({
                     {contractInfo && contractInfo.methodNames.length > 0 && (
                       <TabPanel>
                         {tab === 'contract' ? (
-                          <Overview
+                          <ContractOverview
                             schema={schema}
                             contract={contract as ContractCodeInfo}
                             contractInfo={contractInfo}
