@@ -44,3 +44,6 @@ tsconfig.tsbuildinfo
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Sentry Config File
+.env.sentry-build-plugin

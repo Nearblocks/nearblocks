@@ -26,7 +26,10 @@
         "NEXT_PUBLIC_API_URL",
         "API_ACCESS_KEY",
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-        "TURNSTILE_SECRET_KEY"
+        "TURNSTILE_SECRET_KEY",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_RUNTIME",
+        "CI"
       ]
     },
     "lint": {
