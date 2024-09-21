@@ -93,15 +93,26 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-base:latest
           cache-to: type=inline
 
-      - name: Build and push (INDEXER EVENTS)
+      - name: Build and push (INDEXER DEX)
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: apps/indexer-events/Dockerfile
+          file: apps/indexer-dex/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/nearblocks/indexer-events:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-events:latest
+          tags: ghcr.io/nearblocks/indexer-dex:latest
+          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-dex:latest
+          cache-to: type=inline
+
+      - name: Build and push (EXPLORER SELECTOR)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/explorer-selector/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/nearblocks/explorer-selector:latest
+          cache-from: type=registry,ref=ghcr.io/nearblocks/explorer-selector:latest
           cache-to: type=inline
 
       - name: Build and push (AGGREGATES)
