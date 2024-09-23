@@ -42,6 +42,7 @@
     "@reach/dialog": "^0.18.0",
     "@reach/menu-button": "^0.18.0",
     "@reach/tooltip": "^0.18.0",
+    "@sentry/nextjs": "^8",
     "@web3-onboard/core": "2.21.2",
     "@web3-onboard/injected-wallets": "2.10.11",
     "@web3-onboard/ledger": "2.5.2",
