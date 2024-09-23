@@ -406,7 +406,10 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
     data?.validatorFullData?.length > 0 ? data?.validatorFullData : [];
 
   const ExpandedRow = (row: ValidatorEpochData) => {
-    const telemetry = data?.validatorTelemetry[row.accountId];
+    const telemetry = data?.validatorTelemetry
+      ? data?.validatorTelemetry[row?.accountId]
+      : null;
+
     const progress = row?.currentEpoch?.progress;
 
     const productivityRatio = progress
