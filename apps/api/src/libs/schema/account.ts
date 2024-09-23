@@ -1,16 +1,17 @@
 import { z } from 'zod';
 
 import dayjs from '#libs/dayjs';
+import { rpcProviders } from '#libs/near';
 import { ActionKind, EventKind } from '#types/enums';
 
 const item = z.object({
   account: z.string(),
-  rpc: z.string().url().optional(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const contract = z.object({
   account: z.string(),
-  rpc: z.string().url().optional(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const deployments = z.object({
@@ -19,7 +20,7 @@ const deployments = z.object({
 
 const parse = z.object({
   account: z.string(),
-  rpc: z.string().url().optional(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const action = z.object({
