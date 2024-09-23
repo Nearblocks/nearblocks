@@ -406,7 +406,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
     data?.validatorFullData?.length > 0 ? data?.validatorFullData : [];
 
   const ExpandedRow = (row: ValidatorEpochData) => {
-    const telemetry = data?.validatorTelemetry
+    const telemetry = Array.isArray(data?.validatorTelemetry)
       ? data?.validatorTelemetry[row?.accountId]
       : null;
 
