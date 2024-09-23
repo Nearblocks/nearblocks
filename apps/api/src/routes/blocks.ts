@@ -19,6 +19,7 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), blocks.list);
 
@@ -27,6 +28,7 @@ const routes = (app: Router) => {
    * @summary Get total blocks count
    * @tags Blocks
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/count', blocks.count);
 
@@ -36,6 +38,7 @@ const routes = (app: Router) => {
    * @tags Blocks
    * @param {number} limit.query - json:{"minimum": 1, "maximum": 10, "default": 10}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/latest', validator(schema.latest), blocks.latest);
 
@@ -45,6 +48,7 @@ const routes = (app: Router) => {
    * @tags Blocks
    * @param {string} hash.path.required - block hash
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:hash', validator(schema.item), blocks.item);
 };

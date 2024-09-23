@@ -16,6 +16,7 @@ const routes = (app: Router) => {
    * @summary Get validators
    * @tags Validators
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), validators.list);
 };

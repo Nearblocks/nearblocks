@@ -23,7 +23,7 @@ const swagger = (app: Application, dir: string) =>
       version: '1.0.0',
     },
     security: {
-      'Bearer Authentication': { scheme: 'bearer', type: 'http' },
+      BearerAuth: { scheme: 'bearer', type: 'http' },
     },
     servers: [
       { description: 'Mainnet', url: config.mainnetUrl },
