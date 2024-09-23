@@ -21,6 +21,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), ft.list);
 
@@ -30,6 +31,7 @@ const routes = (app: Router) => {
    * @tags FTs
    * @param {string} search.query - search keyword
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/count', validator(schema.count), ft.count);
 
@@ -41,6 +43,7 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/txns', validator(schema.txns), ft.txns);
 
@@ -49,6 +52,7 @@ const routes = (app: Router) => {
    * @summary Get token txns count
    * @tags FTs
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/txns/count', validator(schema.txnsCount), ft.txnsCount);
 
@@ -58,6 +62,7 @@ const routes = (app: Router) => {
    * @tags FTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract', validator(schema.item), contract.item);
 
@@ -70,6 +75,7 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract/txns', validator(schema.ftTxns), contract.txns);
 
@@ -79,6 +85,7 @@ const routes = (app: Router) => {
    * @tags FTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/txns/count',
@@ -94,6 +101,7 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
 
@@ -103,6 +111,7 @@ const routes = (app: Router) => {
    * @tags FTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/holders/count',

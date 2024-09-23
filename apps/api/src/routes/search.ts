@@ -17,6 +17,7 @@ const routes = (app: Router) => {
    * @tags Search
    * @param {string} keyword.query.required - txn hash / block height / account id / receipt id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.item), search.search);
 
@@ -26,6 +27,7 @@ const routes = (app: Router) => {
    * @tags Search
    * @param {string} keyword.query.required - txn hash
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/txns', validator(schema.item), search.txns);
 
@@ -35,6 +37,7 @@ const routes = (app: Router) => {
    * @tags Search
    * @param {[string,number]} keyword.query.required - block height / hash
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/blocks', validator(schema.item), search.blocks);
 
@@ -44,6 +47,7 @@ const routes = (app: Router) => {
    * @tags Search
    * @param {string} keyword.query.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/accounts', validator(schema.item), search.accounts);
 
@@ -53,6 +57,7 @@ const routes = (app: Router) => {
    * @tags Search
    * @param {string} keyword.query.required - receipt id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/receipts', validator(schema.item), search.receipts);
 };

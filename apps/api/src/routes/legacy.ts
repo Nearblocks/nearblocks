@@ -17,6 +17,7 @@ const routes = (app: Router) => {
    * @tags Legacy
    * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/total-supply', validator(schema.supply), legacy.total);
 
@@ -26,6 +27,7 @@ const routes = (app: Router) => {
    * @tags Legacy
    * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/circulating-supply', validator(schema.supply), legacy.supply);
 
@@ -35,6 +37,7 @@ const routes = (app: Router) => {
    * @tags Legacy
    * @param {string} period.query - json:{"enum": ["day", "week"], "default": "day"} - Data period
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/fees', validator(schema.fees), legacy.fees);
 

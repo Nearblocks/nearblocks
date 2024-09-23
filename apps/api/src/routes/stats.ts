@@ -16,6 +16,7 @@ const routes = (app: Router) => {
    * @summary Get stats
    * @tags Stats
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', stats.latest);
 
@@ -25,6 +26,7 @@ const routes = (app: Router) => {
    * @tags Stats
    * @param {string} date.query - date in yyyy-mm-dd format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/price', validator(schema.price), stats.price);
 };

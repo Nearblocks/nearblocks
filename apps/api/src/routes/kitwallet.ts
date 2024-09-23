@@ -16,6 +16,7 @@ const routes = (app: Router) => {
    * @summary Get all staking pools
    * @tags Kitwallet
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/stakingPools', kitwallet.pools);
 
@@ -25,6 +26,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/staking-deposits/:account',
@@ -38,6 +40,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} key.path.required - public key
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/publicKey/:key/accounts',
@@ -51,6 +54,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/activities',
@@ -64,6 +68,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/callReceivers',
@@ -77,6 +82,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/likelyTokens',
@@ -91,6 +97,7 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} fromBlockTimestamp.query - block timestamp
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/likelyTokensFromBlock',
@@ -104,6 +111,7 @@ const routes = (app: Router) => {
    * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/likelyNFTs',
@@ -118,6 +126,7 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} fromBlockTimestamp.query - block timestamp
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/account/:account/likelyNFTsFromBlock',

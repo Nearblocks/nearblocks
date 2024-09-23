@@ -22,6 +22,7 @@ const routes = (app: Router) => {
    * @param {string} sort.query - json:{"enum": ["volume", "txns", "makers"], "default": "volume"}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), dex.list);
 
@@ -31,6 +32,7 @@ const routes = (app: Router) => {
    * @tags DEX
    * @param {number} search.query - search keyword
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/count', validator(schema.count), dex.count);
 
@@ -40,6 +42,7 @@ const routes = (app: Router) => {
    * @tags DEX
    * @param {number} pair.path.required - pair id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/pairs/:pair', validator(schema.item), pair.item);
 
@@ -52,6 +55,7 @@ const routes = (app: Router) => {
    * @param {string} cursor.query - next page cursor
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/pairs/:pair/txns', validator(schema.txns), pair.txns);
 
@@ -62,6 +66,7 @@ const routes = (app: Router) => {
    * @param {number} pair.path.required - pair id
    * @param {string} a.query - maker account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/pairs/:pair/txns/count', validator(schema.txns), pair.txnsCount);
 
@@ -74,6 +79,7 @@ const routes = (app: Router) => {
    * @param {number} to.query.required - end timestamp
    * @param {number} limit.query.required - no of rows
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/pairs/:pair/charts', validator(schema.charts), pair.charts);
 };

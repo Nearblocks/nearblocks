@@ -14,6 +14,7 @@ const routes = (app: Router) => {
    * @summary Get charts data
    * @tags Charts
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', charts.list);
 
@@ -22,6 +23,7 @@ const routes = (app: Router) => {
    * @summary Get latest charts data
    * @tags Charts
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/latest', charts.latest);
 
@@ -30,6 +32,7 @@ const routes = (app: Router) => {
    * @summary Get txns per second by shards chart data
    * @tags Charts
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/tps', charts.tps);
 };

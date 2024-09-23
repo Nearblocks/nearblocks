@@ -23,6 +23,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account', validator(schema.item), account.item);
 
@@ -32,6 +33,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/contract', validator(schema.contract), account.contract);
 
@@ -41,6 +43,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/deployments',
@@ -54,6 +57,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/parse',
@@ -68,6 +72,7 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account
    * @param {string} method.path.required - method
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/:method',
@@ -81,6 +86,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/inventory',
@@ -94,6 +100,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/tokens', validator(schema.tokens), account.tokens);
 
@@ -106,6 +113,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/keys', validator(schema.keys), key.keys);
 
@@ -115,6 +123,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/keys/count', validator(schema.keysCount), key.keysCount);
 
@@ -134,6 +143,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns', validator(schema.txns), txn.txns);
 
@@ -149,6 +159,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
 
@@ -165,6 +176,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns-only', validator(schema.txnsOnly), txn.txnsOnly);
 
@@ -178,6 +190,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/txns-only/count',
@@ -200,6 +213,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/receipts', validator(schema.receipts), txn.receipts);
 
@@ -215,6 +229,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/receipts/count',
@@ -236,6 +251,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/ft-txns', validator(schema.ftTxns), ft.txns);
 
@@ -249,6 +265,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/ft-txns/count',
@@ -270,6 +287,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/nft-txns', validator(schema.nftTxns), nft.txns);
 
@@ -283,6 +301,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/nft-txns/count',
@@ -304,6 +323,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/stake-txns', validator(schema.stakeTxns), stake.txns);
 
@@ -317,6 +337,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/stake-txns/count',
@@ -332,6 +353,7 @@ const routes = (app: Router) => {
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/activities',
@@ -345,6 +367,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/activities/count',
