@@ -5,17 +5,26 @@ import {
   QueryResponseKind,
 } from 'near-api-js/lib/providers/provider.js';
 
+import { Network } from 'nb-types';
+
 import config from '#config';
 
-export const rpcProviders = [
-  'https://archival-rpc.mainnet.near.org',
-  'https://rpc.mainnet.near.org',
-  'https://beta.rpc.mainnet.near.org',
-  'https://free.rpc.fastnear.com',
-  'https://near.lava.build',
-  'https://near.lavenderfive.com/',
-  'https://near.drpc.org',
-] as const;
+export const rpcProviders =
+  config.network === Network.MAINNET
+    ? ([
+        'https://archival-rpc.mainnet.near.org',
+        'https://rpc.mainnet.near.org',
+        'https://beta.rpc.mainnet.near.org',
+        'https://free.rpc.fastnear.com',
+        'https://near.lava.build',
+        'https://near.lavenderfive.com/',
+        'https://near.drpc.org',
+      ] as const)
+    : ([
+        'https://archival-rpc.testnet.near.org',
+        'https://rpc.testnet.near.org',
+        'https://beta.rpc.testnet.near.org',
+      ] as const);
 
 export const getProvider = (url?: string) => {
   return new providers.JsonRpcProvider({ url: url ?? config.rpcUrl });
