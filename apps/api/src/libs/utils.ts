@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Big from 'big.js';
 import { decompress } from 'fzstd';
+import { providers } from 'near-api-js';
 import { format } from 'numerable';
 
 import logger from '#libs/logger';
@@ -109,8 +110,15 @@ export const sortByBNComparison = (aValue?: string, bValue?: string) => {
   return 0;
 };
 
-export const abiSchema = async (contract: string) => {
-  const response: ABIResponse = await callFunction(contract, '__contract_abi');
+export const abiSchema = async (
+  provider: providers.JsonRpcProvider,
+  contract: string,
+) => {
+  const response: ABIResponse = await callFunction(
+    provider,
+    contract,
+    '__contract_abi',
+  );
   const decompressed = decompress(new Uint8Array(response.result));
 
   return JSON.parse(Buffer.from(decompressed).toString());

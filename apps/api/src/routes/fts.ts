@@ -49,7 +49,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/fts/txns/count
-   * @summary Get token txns count
+   * @summary Get estimated token txns count
    * @tags FTs
    * @return 200 - success response
    * @security BearerAuth
@@ -81,7 +81,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/fts/{contract}/txns/count
-   * @summary Get token txns count
+   * @summary Get estimated token txns count
    * @tags FTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
@@ -107,7 +107,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/fts/{contract}/holders/count
-   * @summary Get token holders count
+   * @summary Get estimated token holders count
    * @tags FTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response

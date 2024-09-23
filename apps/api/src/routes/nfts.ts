@@ -50,7 +50,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/txns/count
-   * @summary Get nft txns count
+   * @summary Get estimated nft txns count
    * @tags NFTs
    * @return 200 - success response
    * @security BearerAuth
@@ -82,7 +82,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/{contract}/txns/count
-   * @summary Get nft txns count
+   * @summary Get estimated nft txns count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
@@ -108,7 +108,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/{contract}/holders/count
-   * @summary Get nft holders count
+   * @summary Get estimated nft holders count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
@@ -135,7 +135,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/{contract}/tokens/count
-   * @summary Get nft tokens count
+   * @summary Get estimated nft tokens count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
@@ -183,7 +183,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/{contract}/tokens/{token}/txns/count
-   * @summary Get nft token txns count
+   * @summary Get estimated nft token txns count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
