@@ -33,7 +33,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/txns/count
-   * @summary Get total txns count
+   * @summary Get estimated total txns count
    * @tags Txns
    * @param {string} block.query - block hash
    * @param {string} from.query - sender account id

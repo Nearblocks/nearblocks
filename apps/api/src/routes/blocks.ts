@@ -25,7 +25,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/blocks/count
-   * @summary Get total blocks count
+   * @summary Get estimated total blocks count
    * @tags Blocks
    * @return 200 - success response
    * @security BearerAuth

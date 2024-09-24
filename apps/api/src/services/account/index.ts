@@ -1,9 +1,12 @@
 import { Response } from 'express';
-import { AccessKeyInfoView } from 'near-api-js/lib/providers/provider.js';
+import {
+  AccessKeyInfoView,
+  QueryResponseKind,
+} from 'near-api-js/lib/providers/provider.js';
 import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
-import { viewAccessKeys, viewAccount, viewCode } from '#libs/near';
+import { getProvider, viewAccessKeys, viewAccount, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import {
@@ -22,6 +25,8 @@ const EXPIRY = 60; // 1 mins
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const account = req.validator.data.account;
+  const rpc = req.validator.data.rpc;
+  const provider = getProvider(rpc);
 
   const query = sql`
     SELECT
@@ -50,21 +55,15 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 
   const [actions, info] = await Promise.all([
     redis.cache(
-      `account:${account}:action`,
-      async () => {
-        try {
-          return await query;
-        } catch (error) {
-          return null;
-        }
-      },
+      `account:${account}:action:${rpc}`,
+      async () => query,
       EXPIRY * 1, // 1 mins
     ),
     redis.cache(
-      `account:${account}`,
+      `account:${account}:${rpc}`,
       async () => {
         try {
-          return await viewAccount(account);
+          return await viewAccount(provider, account);
         } catch (error) {
           return null;
         }
@@ -81,13 +80,15 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 const contract = catchAsync(
   async (req: RequestValidator<Contract>, res: Response) => {
     const account = req.validator.data.account;
+    const rpc = req.validator.data.rpc;
+    const provider = getProvider(rpc);
 
     const [contract, key] = await Promise.all([
       redis.cache(
-        `contract:${account}`,
+        `contract:${account}:${rpc}`,
         async () => {
           try {
-            return await viewCode(account);
+            return await viewCode(provider, account);
           } catch (error) {
             return null;
           }
@@ -95,8 +96,8 @@ const contract = catchAsync(
         EXPIRY * 5, // 5 mins
       ),
       redis.cache(
-        `contract:${account}:keys`,
-        async () => viewAccessKeys(account),
+        `contract:${account}:keys:${rpc}`,
+        async () => viewAccessKeys(provider, account),
         EXPIRY * 5, // 5 mins
       ),
     ]);
@@ -114,34 +115,47 @@ const contract = catchAsync(
 
 const parse = catchAsync(
   async (req: RequestValidator<Parse>, res: Response) => {
-    let code = null;
     let contract = null;
     let schema = null;
     const account = req.validator.data.account;
+    const rpc = req.validator.data.rpc;
+    const provider = getProvider(rpc);
 
-    try {
-      code = await redis.cache(
-        `contract:${account}`,
-        async () => viewCode(account),
+    [contract, schema] = await Promise.all([
+      redis.cache(
+        `contract:${account}:${rpc}`,
+        async () => {
+          try {
+            const code: QueryResponseKind & { code_base64?: string } =
+              await redis.cache(
+                `contract:${account}:${rpc}`,
+                async () => viewCode(provider, account),
+                EXPIRY * 5, // 5 mins
+              );
+
+            if (code?.code_base64) {
+              return await parser.parseContract(code.code_base64);
+            }
+
+            return null;
+          } catch (error) {
+            return null;
+          }
+        },
         EXPIRY * 5, // 5 mins
-      );
-    } catch (error) {
-      // logger.error({ contractViewError: error });
-    }
-
-    try {
-      if (code?.code_base64) {
-        contract = await parser.parseContract(code.code_base64);
-      }
-    } catch (error) {
-      // logger.error({ contractParseError: error });
-    }
-
-    try {
-      schema = await abiSchema(account);
-    } catch (error) {
-      // logger.error({ abiSchemaError: error });
-    }
+      ),
+      redis.cache(
+        `contract:${account}:abi:${rpc}`,
+        async () => {
+          try {
+            return await abiSchema(provider, account);
+          } catch (error) {
+            return null;
+          }
+        },
+        EXPIRY * 5, // 5 mins
+      ),
+    ]);
 
     return res.status(200).json({ contract: [{ contract, schema }] });
   },

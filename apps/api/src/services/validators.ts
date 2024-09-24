@@ -2,7 +2,7 @@ import Big from 'big.js';
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
-import { viewBlock } from '#libs/near';
+import { getProvider, viewBlock } from '#libs/near';
 import sql from '#libs/postgres';
 import { List } from '#libs/schema/validators';
 import {
@@ -23,8 +23,10 @@ import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
+  const rpc = req.validator.data.rpc;
   const page = req.validator.data.page;
   const perPage = req.validator.data.per_page;
+
   const data = await sql`
     SELECT
       *
@@ -137,10 +139,11 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     let lastEpochApy = '0';
 
     try {
-      const block = await viewBlock({ finality: 'final' });
+      const provider = getProvider(rpc);
+      const block = await viewBlock(provider, { finality: 'final' });
       const [prevEpoch, epoch] = await Promise.all([
-        viewBlock({ blockId: block.header.epoch_id }),
-        viewBlock({ blockId: block.header.next_epoch_id }),
+        viewBlock(provider, { blockId: block.header.epoch_id }),
+        viewBlock(provider, { blockId: block.header.next_epoch_id }),
       ]);
 
       lastEpochApy = calculateAPY(

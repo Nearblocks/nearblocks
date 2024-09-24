@@ -119,7 +119,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/keys/count
-   * @summary Get access keys count
+   * @summary Get estimated access keys count
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
@@ -149,7 +149,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/txns/count
-   * @summary Get account txns count
+   * @summary Get estimated account txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -182,7 +182,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/txns-only/count
-   * @summary Get account txns without receipts count
+   * @summary Get estimated account txns without receipts count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -219,7 +219,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/receipts/count
-   * @summary Get account receipts count
+   * @summary Get estimated account receipts count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -257,7 +257,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/ft-txns/count
-   * @summary Get account token txns count
+   * @summary Get estimated account token txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
@@ -293,7 +293,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/nft-txns/count
-   * @summary Get account nft txns count
+   * @summary Get estimated account nft txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
@@ -329,7 +329,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/stake-txns/count
-   * @summary Get account stake txns count
+   * @summary Get estimated account stake txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -363,7 +363,7 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/activities/count
-   * @summary Get account balance change activities count
+   * @summary Get estimated account balance change activities count
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
