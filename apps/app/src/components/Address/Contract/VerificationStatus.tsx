@@ -1,7 +1,6 @@
 import ArrowDown from '@/components/Icons/ArrowDown';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import FaExclamationCircle from '@/components/Icons/FaExclamationCircle';
-import FaTimesCircle from '@/components/Icons/FaTimesCircle';
 import { ContractMetadata, VerificationData } from '@/utils/types';
 import Link from 'next/link';
 import React from 'react';
@@ -13,6 +12,7 @@ type VerificationStatusProps = {
   verifiers: string[];
   verificationData: Record<string, VerificationData>;
   contractMetadata: ContractMetadata | null;
+  accountId: string | undefined;
 };
 
 const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -29,7 +29,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
   selectedVerifier,
   verifiers,
   verificationData,
-  contractMetadata,
+  accountId,
 }) => {
   const handleVerifierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedVerifier(e.target.value);
@@ -41,6 +41,27 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
 
   const totalVerifiers = verifiers.length;
 
+  const getVerificationText = () => {
+    if (verificationData[selectedVerifier]?.status === 'verified') {
+      return 'Contract Source Code Verified';
+    } else {
+      if (selectedVerifier.includes('v2-verifier.sourcescan.near')) {
+        return (
+          <>
+            Are you the contract owner?{' '}
+            <Link
+              href={`/verifyContract?accountId=${accountId}&selectedVerifier=${selectedVerifier}`}
+              className="text-green-500 dark:text-green-250 hover:no-underline"
+            >
+              Verify and Publish
+            </Link>{' '}
+            your contract source code today!
+          </>
+        );
+      } else return 'Contract Not Verified';
+    }
+  };
+
   return statusLoading ? (
     <Loader wrapperClassName="w-full md:w-full my-4 " />
   ) : (
@@ -51,18 +72,10 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
             <div className="flex items-center">
               {verificationData[selectedVerifier]?.status === 'verified' ? (
                 <FaCheckCircle />
-              ) : verificationData[selectedVerifier]?.status === 'mismatch' ? (
-                <FaTimesCircle />
               ) : (
                 <FaExclamationCircle />
               )}
-              <span className="ml-2 font-bold">
-                {verificationData[selectedVerifier]?.status === 'verified'
-                  ? 'Contract Source Code Verified'
-                  : verificationData[selectedVerifier]?.status === 'mismatch'
-                  ? 'Contract Source Code Mismatch'
-                  : 'Contract Source Code Verification Pending'}
-              </span>
+              <span className="ml-2 font-bold">{getVerificationText()}</span>
             </div>
           ) : (
             <div className="flex items-center">
@@ -101,30 +114,6 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
               </span>
             </div>
           </div>
-        </div>
-      )}
-
-      {(verificationData[selectedVerifier]?.status === 'pending' ||
-        verifiers.length === 0) &&
-        !contractMetadata && (
-          <div className="mt-4">
-            If you are the contract owner and want your source code to be
-            publicly available, please compile it in a reproducible
-            environment(docker) using
-            <Link
-              href="https://github.com/near/cargo-near"
-              className="text-green-500 dark:text-green-250 hover:no-underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              &nbsp;cargo-near
-            </Link>
-          </div>
-        )}
-      {verificationData[selectedVerifier]?.status === 'mismatch' && (
-        <div className="mt-4">
-          The contract code hash does not match. The source code snapshot in the
-          metadata does not reflect the current state of the contract.
         </div>
       )}
     </div>

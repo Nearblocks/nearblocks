@@ -1652,7 +1652,7 @@ export type VerifierData = {
   lang?: string;
 };
 
-export type VerifierStatus = 'verified' | 'mismatch' | 'pending';
+export type VerifierStatus = 'verified' | 'mismatch' | 'notVerified';
 
 export type VerificationData = {
   status: VerifierStatus;
@@ -1669,4 +1669,10 @@ export type ContractMetadata = {
   link?: string;
   standards?: { standard: string; version: string }[];
   version?: string;
+};
+
+export type ContractData = {
+  base64Code: string;
+  onChainCodeHash: string;
+  contractMetadata: ContractMetadata | null;
 };

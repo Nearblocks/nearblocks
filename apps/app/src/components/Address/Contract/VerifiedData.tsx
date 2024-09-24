@@ -17,6 +17,7 @@ import { verifierConfig } from '@/utils/config';
 type VerifiedDataProps = {
   verifierData: VerifierData;
   selectedVerifier: string;
+  base64Code: string;
 };
 
 type FileItem = {
@@ -27,6 +28,7 @@ type FileItem = {
 const VerifiedData: React.FC<VerifiedDataProps> = ({
   verifierData,
   selectedVerifier,
+  base64Code,
 }) => {
   const [showFullCode, setShowFullCode] = useState<{ [key: string]: boolean }>(
     {},
@@ -54,7 +56,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       try {
         setFileDataLoading(true);
-        let verifier = verifierConfig.find(
+        const verifier = verifierConfig.find(
           (config) => config.accountId === selectedVerifier,
         );
 
@@ -129,6 +131,10 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     };
 
     if (verifierData) fetchCode();
+    else {
+      setFileDataError(null);
+      setFileDataLoading(false);
+    }
   }, [selectedVerifier, verifierData]);
 
   useEffect(() => {
@@ -173,7 +179,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         return () => clipboard.destroy();
       });
     };
-    if (!fileDataError) handleFileViewerControls();
+    if (!fileDataError && fileData) handleFileViewerControls();
   }, [fileData, fileDataError]);
 
   const handleToggleCodeView = (fileName: string) => {
@@ -204,11 +210,16 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
         <div className="flex flex-wrap p-4">
           <div className="w-full">
-            <div className="flex items-center pb-2">
+            <div className="flex items-center">
               <FaCode className="mr-2 text-black-600 dark:text-neargray-10" />
-              <span className="font-bold">Contract Source Code</span>
+              <span className="font-bold">
+                {verifierData
+                  ? 'Contract Source Code'
+                  : 'Base64 Encoded Contract Code'}
+              </span>
             </div>
-            {fileDataLoading || !verifierData ? (
+
+            {fileDataLoading ? (
               <Loader wrapperClassName="w-full md:w-full my-4 " />
             ) : (
               <>
@@ -218,10 +229,10 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     message={fileDataError}
                     mutedText="Please try again later"
                   />
-                ) : (
+                ) : fileData && fileData.length > 0 ? (
                   fileData.map(({ name, content }, index) => (
-                    <div key={index} className="py-4">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={index} className="pb-4">
+                      <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center">{name}</div>
                         <div className="flex items-center">
                           <Tooltip
@@ -268,7 +279,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                         style={{
                           height: `${codeHeights[name] || 300}px`,
                         }}
-                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0`}
+                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0 `}
                       >
                         {content ? (
                           <SyntaxHighlighter
@@ -312,6 +323,19 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                       </div>
                     </div>
                   ))
+                ) : (
+                  <textarea
+                    readOnly
+                    rows={4}
+                    value={base64Code}
+                    className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+                    style={{
+                      height: '300px',
+                      overflowX: 'hidden',
+                      whiteSpace: 'pre-wrap',
+                      wordWrap: 'break-word',
+                    }}
+                  ></textarea>
                 )}
               </>
             )}
