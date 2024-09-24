@@ -55,13 +55,16 @@ export const syncData = async () => {
   }
 
   if (config.dataSource === DataSource.FAST_NEAR) {
-    const stream = streamBlock(startBlockHeight);
+    const stream = streamBlock(startBlockHeight, config.preloadSize);
 
     stream.on('data', async (message: types.StreamerMessage) => {
       await onMessage(message);
     });
 
-    stream.on('error', (error: Error) => logger.error(error));
+    stream.on('error', (error: Error) => {
+      logger.error(error);
+      process.exit();
+    });
   } else {
     for await (const message of stream(lakeConfig)) {
       await onMessage(message);
