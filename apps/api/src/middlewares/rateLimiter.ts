@@ -40,7 +40,7 @@ const rateLimiter = catchAsync(
     const id = (req.user as User)?.id;
     const keyId = (req.user as User)?.key_id;
     const date = dayjs.utc().toISOString();
-    // Bypass rate limiting for the near token
+    // Handle rate limit for app
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
 
