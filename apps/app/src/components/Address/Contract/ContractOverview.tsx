@@ -1,5 +1,12 @@
-import { ContractCodeInfo, ContractParseInfo, SchemaInfo } from '@/utils/types';
-import { useState } from 'react';
+import {
+  ContractCodeInfo,
+  ContractData,
+  ContractParseInfo,
+  SchemaInfo,
+  VerificationData,
+  VerifierStatus,
+} from '@/utils/types';
+import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Info from './Info';
 import { Tooltip } from '@reach/tooltip';
@@ -8,6 +15,8 @@ import ViewOrChange from './ViewOrChange';
 import { useAuthStore } from '@/stores/auth';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import ContractCode from './ContractCode';
+import useRpc from '@/hooks/useRpc';
+import { verifierConfig } from '@/utils/config';
 
 interface Props {
   contract: ContractCodeInfo;
@@ -20,6 +29,13 @@ interface Props {
   logOut?: () => void;
   deployments: any;
 }
+
+type OnChainResponse = {
+  hash?: string;
+  code_base64?: string;
+};
+
+const verifiers = verifierConfig.map((config) => config.accountId);
 
 const ContractOverview = (props: Props) => {
   const { contract, isLocked, schema, contractInfo, deployments, accountId } =
@@ -34,6 +50,101 @@ const ContractOverview = (props: Props) => {
   const [tab, setTab] = useState(0);
 
   const onTabChange = (index: number) => setTab(index);
+
+  const [contractData, setContractData] = useState<ContractData>({
+    onChainCodeHash: '',
+    base64Code: '',
+    contractMetadata: null,
+  });
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { contractCode, getContractMetadata, getVerifierData } = useRpc();
+  const [verificationData, setVerificationData] = useState<
+    Record<string, VerificationData>
+  >({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setStatusLoading(true);
+        setError(null);
+
+        const contractMetadataResponse = await getContractMetadata(
+          accountId as string,
+        );
+
+        const onChainResponse = await contractCode(accountId as string);
+
+        const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
+
+        const base64Code =
+          (onChainResponse as OnChainResponse)?.code_base64 || '';
+
+        setContractData({
+          onChainCodeHash: onChainHash,
+          base64Code: base64Code,
+          contractMetadata: contractMetadataResponse,
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch contract data');
+      }
+    };
+    if (accountId) fetchData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId]);
+
+  useEffect(() => {
+    const fetchVerifierData = async () => {
+      setStatusLoading(true);
+
+      try {
+        const verifierDataPromises = verifiers.map((verifierAccountId) =>
+          getVerifierData(accountId as string, verifierAccountId),
+        );
+
+        const verifierResponses = await Promise.all(verifierDataPromises);
+
+        const verificationData = verifiers.reduce<
+          Record<string, VerificationData>
+        >((acc, verifier, index) => {
+          const data = verifierResponses[index];
+          let status: VerifierStatus = 'notVerified';
+
+          if (
+            data &&
+            contractData?.onChainCodeHash &&
+            contractData?.contractMetadata
+          ) {
+            const hashMatches =
+              contractData?.onChainCodeHash === data.code_hash;
+            status = hashMatches
+              ? 'verified'
+              : contractData?.contractMetadata?.build_info
+              ? 'mismatch'
+              : 'notVerified';
+          }
+
+          acc[verifier] = {
+            status,
+            data,
+          };
+          return acc;
+        }, {});
+
+        setVerificationData(verificationData);
+      } catch (error) {
+        console.error('Error fetching or updating verifier data:', error);
+        setError('Failed to fetch verifier data');
+      } finally {
+        setStatusLoading(false);
+      }
+    };
+    if (contractData.onChainCodeHash) fetchVerifierData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId, contractData]);
 
   return (
     <Tabs
@@ -69,7 +180,13 @@ const ContractOverview = (props: Props) => {
         />
       </TabPanel>
       <TabPanel>
-        <ContractCode accountId={accountId as string} />
+        <ContractCode
+          error={error}
+          verificationData={verificationData}
+          contractData={contractData}
+          statusLoading={statusLoading}
+          accountId={accountId as string}
+        />
       </TabPanel>
       {!schema && (
         <TabPanel>
