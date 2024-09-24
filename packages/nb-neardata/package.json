@@ -1,6 +1,6 @@
 {
   "name": "nb-neardata",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -10,7 +10,6 @@
     "build": "tsc",
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
-  "dependencies": {},
   "devDependencies": {
     "axios": "1.6.2",
     "eslint-config-custom-node": "*",

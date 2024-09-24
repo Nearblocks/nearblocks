@@ -30,6 +30,7 @@ const SWAP_PATTERN = /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/;
 
 export const syncRefFinance = async (message: types.StreamerMessage) => {
   const pairIds = new Set<string>();
+  const block = message.block.header.height;
   const poolMap: Map<string, DexPairs> = new Map();
 
   const swaps = await Promise.all(
@@ -98,6 +99,7 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
                         if (!pool) {
                           logger.warn({
                             args,
+                            block,
                             logIndex,
                             method,
                             receipt: outcome.executionOutcome.id,
@@ -157,13 +159,18 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
 
   const pairMap = new Map(pairs.map((pair) => [pair.pool, pair]));
 
-  const events: DexEvents[] = await Promise.all(
+  const events = await Promise.all(
     swaps.map(async (swap, index) => {
       const pair = pairMap.get(swap.pool);
 
       if (!pair) {
-        logger.warn({ pairIds, pairMap, swap });
-        throw Error('no pair');
+        logger.warn({
+          block,
+          pairIds: [...pairIds],
+          pairMap: [...pairMap],
+          swap,
+        });
+        return;
       }
 
       const swapPair = getSwapPair(
@@ -201,21 +208,19 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
     }),
   );
 
-  await knex.transaction(async (trx) => {
-    if (poolMap.size) {
-      await knex('dex_pairs')
-        .insert([...poolMap.values()])
-        .onConflict(['contract', 'pool'])
-        .merge(['price_token', 'price_usd', 'updated_at']);
-    }
+  if (poolMap.size) {
+    await knex('dex_pairs')
+      .insert([...poolMap.values()])
+      .onConflict(['contract', 'pool'])
+      .merge(['price_token', 'price_usd', 'updated_at']);
+  }
 
-    if (events.length) {
-      await trx('dex_events')
-        .insert(events)
-        .onConflict(['event_index', 'timestamp'])
-        .ignore();
-    }
-  });
+  if (events.length) {
+    await knex('dex_events')
+      .insert(events.filter((e) => e !== undefined) as DexEvents[])
+      .onConflict(['event_index', 'timestamp'])
+      .ignore();
+  }
 };
 
 const getPool = (method: string, args: string, index: number) => {

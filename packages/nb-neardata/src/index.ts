@@ -18,14 +18,14 @@ interface CamelCaseObject {
 }
 
 const delay = 700;
-const retries = 100;
+const retries = 20;
 const endpoint = 'https://mainnet.neardata.xyz/v0/block';
 
 const camelCase = (str: string): string => {
   return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
 };
 
-const camelCaseKeys = <T>(obj: T): T => {
+export const camelCaseKeys = <T>(obj: T): T => {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
@@ -43,38 +43,46 @@ const camelCaseKeys = <T>(obj: T): T => {
   return newObj as T;
 };
 
-const fetch = async (height: number) => {
+const fetch = async (block: number) => {
   return await retry(
     async () => {
-      const response = await axios.get(`${endpoint}/${height}`);
-      const data: Message = response.data;
+      const response = await axios.get(`${endpoint}/${block}`, {
+        timeout: 5000,
+      });
 
-      const size = Buffer.byteLength(JSON.stringify(data), 'utf8');
-      logger.info({ block: height, size: `${(size / 1024).toFixed(2)}KB` });
-
-      return data;
+      return response.data;
     },
     { delay, retries },
   );
 };
 
-export const streamBlock = (start: number) => {
-  const highWaterMark = 10;
+export const streamBlock = (start: number, concurrency = 10) => {
+  const highWaterMark = concurrency * 2;
 
   const readable = new Readable({
     highWaterMark,
     objectMode: true,
     async read(this: BlockReadable) {
       const block = this.block || start;
+      const promises: Promise<Message>[] = [];
+
+      for (let i = 0; i < concurrency; i++) {
+        promises.push(fetch(block + i));
+      }
 
       try {
-        const data = await fetch(block);
+        const results = await Promise.all(promises);
 
-        if (!this.push(camelCaseKeys(data))) {
-          this.pause();
+        for (const result of results) {
+          if (result) {
+            if (!this.push(camelCaseKeys(result))) {
+              logger.warn(`paused: ${block}`);
+              this.pause();
+            }
+          }
         }
 
-        this.block = block + 1;
+        this.block = block + concurrency;
       } catch (error) {
         this.emit('error', error);
         this.push(null);
