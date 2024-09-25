@@ -208,6 +208,8 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
     }),
   );
 
+  const eventsFiltered = events.filter((e) => e) as DexEvents[];
+
   if (poolMap.size) {
     await knex('dex_pairs')
       .insert([...poolMap.values()])
@@ -215,9 +217,9 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
       .merge(['price_token', 'price_usd', 'updated_at']);
   }
 
-  if (events.length) {
+  if (eventsFiltered.length) {
     await knex('dex_events')
-      .insert(events.filter((e) => e !== undefined) as DexEvents[])
+      .insert(eventsFiltered)
       .onConflict(['event_index', 'timestamp'])
       .ignore();
   }
