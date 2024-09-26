@@ -211,7 +211,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.status.text.0') : 'Status'}
           </div>
-          {!txn?.outcomes?.status ? (
+          {loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>

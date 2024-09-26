@@ -104,7 +104,7 @@ const NodeExplorer = ({
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             NEAR Protocol Validator Explorer
           </h1>
-          <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+          <ul className="flex relative mb-2 pt-8 items-center text-gray-500 text-xs">
             <RpcMenu />
           </ul>
         </div>
