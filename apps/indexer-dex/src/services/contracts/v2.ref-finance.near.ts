@@ -87,39 +87,39 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
                   SWAP_METHODS.includes(method)
                 ) {
                   const logs = outcome.executionOutcome.outcome.logs;
+                  const logsFiltered = logs.filter((log) =>
+                    SWAP_PATTERN.test(log),
+                  );
 
-                  return logs.flatMap((log, index) => {
-                    if (SWAP_PATTERN.test(log)) {
-                      const match = log.match(SWAP_PATTERN);
+                  return logsFiltered.flatMap((log, index) => {
+                    const match = log.match(SWAP_PATTERN);
 
-                      if (match && BigInt(match[1]) && BigInt(match[3])) {
-                        const logIndex = Math.floor(index / 2);
-                        const pool = getPool(method, args, logIndex);
+                    if (match && BigInt(match[1]) && BigInt(match[3])) {
+                      const pool = getPool(method, args, index);
 
-                        if (!pool) {
-                          logger.warn({
-                            args,
-                            block,
-                            logIndex,
-                            method,
-                            receipt: outcome.executionOutcome.id,
-                          });
-                          throw Error('no pool');
-                        }
-
-                        pairIds.add(pool);
-
-                        return {
-                          amount0: match[1],
-                          amount1: match[3],
-                          maker,
-                          pool: String(pool),
+                      if (!pool) {
+                        logger.warn({
+                          args,
+                          block,
+                          index,
+                          method,
                           receipt: outcome.executionOutcome.id,
-                          timestamp: message.block.header.timestampNanosec,
-                          token0: match[2],
-                          token1: match[4],
-                        };
+                        });
+                        throw Error('no pool');
                       }
+
+                      pairIds.add(pool);
+
+                      return {
+                        amount0: match[1],
+                        amount1: match[3],
+                        maker,
+                        pool: String(pool),
+                        receipt: outcome.executionOutcome.id,
+                        timestamp: message.block.header.timestampNanosec,
+                        token0: match[2],
+                        token1: match[4],
+                      };
                     }
 
                     return [];
@@ -209,10 +209,11 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
   );
 
   const eventsFiltered = events.filter((e) => e) as DexEvents[];
+  const pairsSorted = [...poolMap.values()].sort((a, b) => +a.pool - +b.pool);
 
-  if (poolMap.size) {
+  if (pairsSorted.length) {
     await knex('dex_pairs')
-      .insert([...poolMap.values()])
+      .insert(pairsSorted)
       .onConflict(['contract', 'pool'])
       .merge(['price_token', 'price_usd', 'updated_at']);
   }
