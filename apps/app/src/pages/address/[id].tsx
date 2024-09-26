@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { appUrl } from '@/utils/config';
+import { appUrl, networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
 import Head from 'next/head';
@@ -35,9 +35,18 @@ import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
 import Receipts from '@/components/Address/Receipts';
 import ContractOverview from '@/components/Address/Contract/ContractOverview';
+import ListCheck from '@/components/Icons/ListCheck';
+import FaCheckCircle from '@/components/Icons/FaCheckCircle';
+import { useRpcStore } from '@/stores/rpc';
+import dynamic from 'next/dynamic';
+import { getCookieFromRequest } from '@/utils/libs';
+import { RpcProviders } from '@/utils/rpc';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
+  ssr: false,
+});
 
 const tabs = [
   'txns',
@@ -74,17 +83,19 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...query },
-  }: { query: { id?: string; tab?: TabType } } = context;
+    req,
+  }: { query: { id?: string; tab?: TabType }; req: any } = context;
 
   const address = id.toLowerCase();
+  const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
 
   const commonApiUrls = {
     stats: 'stats',
-    account: id && `account/${address}`,
-    deployments: id && `account/${address}/contract/deployments`,
+    account: id && `account/${address}?rpc=${rpcUrl}`,
+    deployments: id && `account/${address}/contract/deployments?rpc=${rpcUrl}`,
     fts: id && `fts/${address}`,
     nfts: id && `nfts/${address}`,
-    parse: id && `account/${address}/contract/parse`,
+    parse: id && `account/${address}/contract/parse?rpc=${rpcUrl}`,
     latestBlocks: `blocks/latest?limit=1`,
     inventory: id && `account/${address}/inventory`,
   };
@@ -227,6 +238,9 @@ const Address = ({
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const [rpcError, setRpcError] = useState(false);
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const components = useBosComponents();
   const { data: spamList } = useFetch(
@@ -258,6 +272,7 @@ const Address = ({
       if (!id) return;
 
       try {
+        setRpcError(false);
         const [code, keys, account]: any = await Promise.all([
           contractCode(id as string).catch((error: any) => {
             console.error(`Error fetching contract code for ${id}:`, error);
@@ -305,6 +320,7 @@ const Address = ({
         setIsLocked(locked);
       } catch (error) {
         // Handle errors appropriately
+        setRpcError(true);
         console.error('Error loading schema:', error);
       }
     };
@@ -312,7 +328,13 @@ const Address = ({
     loadSchema();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, rpcUrl]);
+
+  useEffect(() => {
+    if (rpcError) {
+      switchRpc();
+    }
+  }, [rpcError, switchRpc]);
 
   useEffect(() => {
     const loadBalances = async () => {
@@ -334,6 +356,7 @@ const Address = ({
           let sum = Big(0);
           let rpcAmount = Big(0);
           try {
+            setRpcError(false);
             let amount = await ftBalanceOf(ft.contract, id as string);
             if (amount) {
               rpcAmount = ft?.ft_meta?.decimals
@@ -342,6 +365,7 @@ const Address = ({
             }
           } catch (error) {
             console.log({ error });
+            setRpcError(true);
           }
 
           if (ft?.ft_meta?.price) {
@@ -396,7 +420,7 @@ const Address = ({
     loadBalances().catch(console.log);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, id]);
+  }, [inventoryData?.fts, id, rpcUrl]);
 
   useEffect(() => {
     if (tab) {
@@ -505,15 +529,46 @@ const Address = ({
             </div>
           ) : (
             <div className="flex md:flex-wrap w-full">
-              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
-                Near Account:&nbsp;
-                {id && (
-                  <span className="text-green-500 dark:text-green-250">
-                    @<span className="font-semibold">{id}</span>
-                  </span>
-                )}
-                <Buttons address={id as string} />
-              </h1>
+              <div className="flex justify-between md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
+                <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 ">
+                  Near Account:&nbsp;
+                  {id && (
+                    <span className="text-green-500 dark:text-green-250">
+                      @<span className="font-semibold">{id}</span>
+                    </span>
+                  )}
+                  <Buttons address={id as string} />
+                </h1>
+                <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+                  <RpcMenu />
+                  <li className="ml-3 max-md:mb-2">
+                    <span className="group flex w-full relative h-full">
+                      <a
+                        className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
+                        href="#"
+                      >
+                        <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
+                          <ListCheck className="h-4 dark:filter dark:invert" />
+                        </div>
+                      </a>
+                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-lg group-hover:block py-1 z-[99]">
+                        <li className="pb-2">
+                          <a
+                            className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
+                            href={`https://lite.nearblocks.io/address/${id}?network=${networkId}`}
+                            target="_blank"
+                          >
+                            Validate Account
+                            <span className="w-4 ml-3 dark:text-green-250">
+                              <FaCheckCircle />
+                            </span>
+                          </a>
+                        </li>
+                      </ul>
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
           <div className="container mx-auto pl-2 pb-6 text-nearblue-600">

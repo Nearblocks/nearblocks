@@ -585,3 +585,15 @@ export function jsonStringify(obj: any, replacer?: any, space?: any) {
     return null;
   }
 }
+
+export const getCookieFromRequest = (
+  cookieName: string,
+  req: any,
+): string | null => {
+  const cookies = req.headers.cookie || '';
+  const cookie = cookies
+    .split('; ')
+    .find((row: any) => row.startsWith(`${cookieName}=`));
+
+  return cookie ? cookie.split('=')[1] : null;
+};

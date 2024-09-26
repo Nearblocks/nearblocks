@@ -14,6 +14,7 @@ import Skeleton from '../skeleton/common/Skeleton';
 import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
+import { useRpcStore } from '@/stores/rpc';
 
 interface Props {
   accountId: string;
@@ -42,6 +43,8 @@ const Delegators = ({ accountId }: Props) => {
   const [searchResults, setSearchResults] = useState<DelegatorInfo[]>([]);
   const [status, setStatus] = useState<string>();
   const [count, setCount] = useState<number>();
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const start = (pagination.page - 1) * pagination.per_page;
 
@@ -149,6 +152,12 @@ const Delegators = ({ accountId }: Props) => {
     };
   }, [debouncedSearch]);
 
+  useEffect(() => {
+    if (error) {
+      switchRpc();
+    }
+  }, [error, switchRpc]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value: any = e.target.value;
     debouncedSearch(value);
@@ -204,7 +213,7 @@ const Delegators = ({ accountId }: Props) => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, pagination.page]);
+  }, [accountId, pagination.page, rpcUrl]);
 
   let data = searchResults!.length > 0 ? searchResults : delegators;
   let totalCount = searchResults!.length > 0 ? searchResults!.length : count;

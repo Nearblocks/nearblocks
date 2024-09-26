@@ -187,7 +187,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.hash.text.0') : 'Txn Hash'}
           </div>
-          {loading ? (
+          {!txn?.transaction_hash ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -211,7 +211,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.status.text.0') : 'Status'}
           </div>
-          {loading ? (
+          {!txn?.outcomes?.status ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -244,7 +244,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.block.text.0') : 'Block Height'}
           </div>
-          {loading ? (
+          {!txn?.included_in_block_hash ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-14" />
             </div>
@@ -275,16 +275,16 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.timestamp.text.0') : 'Timestamp'}
           </div>
-          {loading ? (
+          {!txn?.block_timestamp ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
           ) : txn ? (
             <div className="w-full md:w-3/4 break-words">
               {`${getTimeAgoString(
-                nanoToMilli(txn?.block_timestamp),
+                nanoToMilli(txn?.block_timestamp || '0'),
               )} (${convertToUTC(
-                nanoToMilli(txn?.block_timestamp),
+                nanoToMilli(txn?.block_timestamp || '0'),
                 true,
               )} +UTC)`}
             </div>
@@ -306,7 +306,7 @@ const Details = (props: Props) => {
             </Tooltip>
             Shard Number
           </div>
-          {loading ? (
+          {!txn?.shard_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
@@ -331,7 +331,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.from.text.0') : 'From'}
           </div>
-          {loading ? (
+          {!txn?.signer_account_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -362,7 +362,7 @@ const Details = (props: Props) => {
               ? t('txns:txn.to.text.0')
               : 'To'}
           </div>
-          {loading ? (
+          {!txn?.receiver_account_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -399,10 +399,10 @@ const Details = (props: Props) => {
             <div className="relative w-full md:w-3/4">
               <PerfectScrollbar>
                 <div className="max-h-[302px] break-words space-y-3">
-                  {fts?.map((ft: any) => (
+                  {fts?.map((ft: any, i: number) => (
                     <div
                       className="flex items-center flex-wrap break-all leading-7"
-                      key={ft?.key}
+                      key={i}
                     >
                       <FaRight className="inline-flex text-gray-400 text-xs" />
                       {ft?.cause === 'MINT' ? (
@@ -690,7 +690,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.fee.text.0') : 'Transaction fee'}
           </div>
-          {loading ? (
+          {!txn?.outcomes_agg?.transaction_fee ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -790,7 +790,7 @@ const Details = (props: Props) => {
                   </Tooltip>
                   {t('txns:txn.gas.text.0')}
                 </div>
-                {loading ? (
+                {!txn?.outcomes_agg?.gas_used ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xs" />
                   </div>
@@ -820,7 +820,8 @@ const Details = (props: Props) => {
                   </Tooltip>
                   {t('txns:txn.burnt.text.0')}
                 </div>
-                {loading ? (
+                {!txn?.receipt_conversion_tokens_burnt ||
+                !txn?.receipt_conversion_gas_burnt ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xs" />
                   </div>
