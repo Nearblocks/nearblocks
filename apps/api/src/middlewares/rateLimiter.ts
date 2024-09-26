@@ -12,7 +12,6 @@ import { Plan, User } from '#types/types';
 
 const CUSTOM_RATE_LIMIT_MESSAGE =
   'You have exceeded your API request limit. Please try again later or upgrade your plan for higher limits at https://nearblocks.io/apis.';
-
 const DEFAULT_PLAN: Plan = {
   id: -1,
   limit_per_day: 3666,
@@ -23,7 +22,6 @@ const DEFAULT_PLAN: Plan = {
   price_monthly: 0,
   title: 'Default Plan',
 };
-
 const FREE_PLAN: Plan = {
   id: -1,
   limit_per_day: 333,
@@ -34,6 +32,7 @@ const FREE_PLAN: Plan = {
   price_monthly: 0,
   title: 'Free Plan',
 };
+const KITWALLET_PATH = '/v1/kitwallet';
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -116,23 +115,13 @@ const useFreePlan = async (
   key: number | string,
   tokenKey: null | string = null,
 ) => {
-  const freePlan = await getFreePlan();
-
+  const baseUrl = req.baseUrl;
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   const perPage = req?.query?.per_page || 25;
   const consumeCount = Math.ceil(+perPage / 25);
 
-  let plan: Plan;
-
-  if (freePlan) {
-    plan = freePlan;
-  } else if (token && validateApiKey(token)) {
-    plan = DEFAULT_PLAN;
-  } else {
-    plan = FREE_PLAN;
-  }
-
+  const plan = await getPlan(baseUrl, token);
   const rateLimit = rateLimiterUnion(plan);
 
   try {
@@ -146,6 +135,24 @@ const useFreePlan = async (
   } catch (error) {
     return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
   }
+};
+
+const getPlan = async (baseUrl: string, token: string) => {
+  if (baseUrl === KITWALLET_PATH) {
+    return DEFAULT_PLAN;
+  }
+
+  const plan = await getFreePlan();
+
+  if (plan) {
+    return plan;
+  }
+
+  if (token && isValidToken(token)) {
+    return DEFAULT_PLAN;
+  }
+
+  return FREE_PLAN;
 };
 
 const getFreePlan = async () => {
@@ -167,7 +174,7 @@ const getFreePlan = async () => {
   }
 };
 
-const validateApiKey = (apiKey: string): boolean => {
+const isValidToken = (apiKey: string): boolean => {
   return /^[A-F0-9]{32}$/i.test(apiKey);
 };
 
