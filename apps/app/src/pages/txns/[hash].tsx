@@ -308,7 +308,7 @@ const Txn = ({
                   className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
                   href="#"
                 >
-                  <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded">
+                  <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
                     <ListCheck className="h-4 dark:filter dark:invert" />
                   </div>
                 </a>
