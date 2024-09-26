@@ -22,6 +22,7 @@ const routes = (app: Router) => {
    * @summary Get account info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
    * @security BearerAuth
    */
@@ -32,6 +33,7 @@ const routes = (app: Router) => {
    * @summary Get contract info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
    * @security BearerAuth
    */
@@ -56,6 +58,7 @@ const routes = (app: Router) => {
    * @summary Get parsed contract info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
    * @security BearerAuth
    */
