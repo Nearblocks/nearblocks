@@ -1,20 +1,15 @@
 import { ReactElement, ReactNode, useEffect } from 'react';
 
 import { Network } from 'nb-types';
-
-import Navbar from '@/components/Header/Navbar';
 import { getProviders } from '@/libs/rpc';
 import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 
-import Footer from '../Footer';
-
 interface LayoutProps {
   children: ReactNode;
-  hideSearch?: boolean;
 }
 
-const Layout = ({ children, hideSearch }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
   const setRpc = useRpcStore((state) => state.setRpc);
   const setNetwork = useNetworkStore((state) => state.setNetwork);
 
@@ -33,25 +28,14 @@ const Layout = ({ children, hideSearch }: LayoutProps) => {
   }, [setRpc, setNetwork]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="lg:pt-9">
-        <Navbar hideSearch={hideSearch} />
-      </header>
-      <main className="font-sans font-light text-text-body pb-9">
-        {children}
-      </main>
-      <footer className="pt-9 mt-auto">
-        <Footer />
-      </footer>
+    <div className="min-h-screen">
+      <main>{children}</main>
     </div>
   );
 };
 
 const MainLayout: React.FC<{
   children: ReactElement;
-  hideSearch?: boolean;
-}> = ({ children, hideSearch = false }) => (
-  <Layout hideSearch={hideSearch}>{children}</Layout>
-);
+}> = ({ children }) => <Layout>{children}</Layout>;
 
 export default MainLayout;

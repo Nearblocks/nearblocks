@@ -92,3 +92,4 @@ type inferBodyType<
 
 declare const Big;
 declare const ethers;
+declare const styled;

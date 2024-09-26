@@ -87,21 +87,21 @@ export const HomeStatsSkeleton = () => (
 
 export const HomeSkeleton = () => (
   <div className="relative container mx-auto">
-    <div className="py-[58px] px-6">
-      <h1 className="font-heading font-bold text-[40px] lg:text-[48px] tracking-[1px]">
-        <Skeleton inline loading>
-          Hello, I’m the Near stateless explorer
-        </Skeleton>
+    <div className="py-[58px] px-6 text-center">
+      <h1 className="font-heading font-bold text-[40px] lg:text-[48px] tracking-[-1.08px] leading-[115%]">
+        NEAR RPC based Explorer
       </h1>
-      <h2 className="font-heading font-medium text-[32px] lg:text-[40px] tracking-[0.4px] mt-[-3px]">
-        <Skeleton inline loading>
-          With me, you can check real-time data on the NEAR blockchain.
-        </Skeleton>
+      <h2 className="font-heading font-normal text-[16px] lg:text-[20px] tracking-[0.3px] my-5 leading-[130%]">
+        Here you can check the real-time data from any NEAR RPC node.
       </h2>
     </div>
-    <hr className="h-px border-0 border-b border-primary/20" />
-    <HomeChartSkeleton />
-    <HomeStatsSkeleton />
+    <div className="flex items-center justify-center w-full mt">
+      <div className="lg:w-1/2 flex items-center justify-center">
+        <Skeleton className="w-36" loading>
+          &nbsp;
+        </Skeleton>
+      </div>
+    </div>
   </div>
 );
 
