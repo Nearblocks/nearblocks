@@ -78,35 +78,41 @@ const FormContact = ({ selectValue }: Props) => {
 
   return (
     <form onSubmit={submitForm}>
-      <div className="flex flex-col gap-4 mt-5 rounded-md ">
-        <p className="font-semibold text-base">{t('form.name.label')}</p>
-        <input
-          id="name"
-          placeholder="Enter name..."
-          autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
-          onChange={(e) => setName(e.target.value)}
-          value={name}
-          required
-        />
-        <p className="font-semibold text-base">{t('form.email.label')}</p>
-        <input
-          id="email"
-          type="email"
-          placeholder="Enter email..."
-          autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <div className="flex flex-col gap-4 mt-4 rounded-md ">
+        <div>
+          <p className="font-semibold text-sm mb-1">{t('form.name.label')}</p>
+          <input
+            id="name"
+            placeholder="Enter name..."
+            autoComplete="off"
+            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm  w-full h-10"
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+            required
+          />
+        </div>
+        <div>
+          <p className="font-semibold text-sm mb-1">{t('form.email.label')}</p>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter email..."
+            autoComplete="off"
+            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm w-full h-10"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
         {!selectValue && (
-          <>
-            <p className="font-semibold text-base">{t('form.subject.label')}</p>
+          <div>
+            <p className="font-semibold text-sm mb-1">
+              {t('form.subject.label')}
+            </p>
             <label className="relative md:flex">
               <select
                 onChange={(e) => setSubject(e.target.value)}
-                className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base appearance-none"
+                className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm appearance-none h-10"
                 value={subject}
               >
                 <option selected disabled={true}>
@@ -116,22 +122,24 @@ const FormContact = ({ selectValue }: Props) => {
               </select>
               <ArrowDown className="absolute right-2 top-3 w-4 h-4 fill-current text-gray-500 pointer-events-none" />
             </label>
-          </>
+          </div>
         )}
-        <p className="font-semibold text-base mt-2">
-          {t('form.message.label')}
-        </p>
-        <textarea
-          id="message"
-          placeholder="Max characters (300 words)"
-          autoComplete="off"
-          className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base overflow-hidden"
-          maxLength={300}
-          rows={5}
-          onChange={(e) => setDescription(e.target.value)}
-          value={description}
-          required
-        />
+        <div>
+          <p className="font-semibold text-sm mb-1">
+            {t('form.message.label')}
+          </p>
+          <textarea
+            id="message"
+            placeholder="Max characters (300 words)"
+            autoComplete="off"
+            className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm overflow-hidden w-full"
+            maxLength={300}
+            rows={5}
+            onChange={(e) => setDescription(e.target.value)}
+            value={description}
+            required
+          />
+        </div>
         <div className="flex">
           <Turnstile
             ref={turnstileRef}
@@ -153,7 +161,7 @@ const FormContact = ({ selectValue }: Props) => {
         </div>
         <button
           type="submit"
-          className="text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
+          className="text-base text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
           disabled={loading}
         >
           {loading ? <LoadingCircular /> : t('form.button')}

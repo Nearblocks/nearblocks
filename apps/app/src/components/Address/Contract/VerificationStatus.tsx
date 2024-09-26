@@ -50,7 +50,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
           <>
             Are you the contract owner?{' '}
             <Link
-              href={`/verifyContract?accountId=${accountId}&selectedVerifier=${selectedVerifier}`}
+              href={`/verify-contract?accountId=${accountId}&selectedVerifier=${selectedVerifier}`}
               className="text-green-500 dark:text-green-250 hover:no-underline"
             >
               Verify and Publish
