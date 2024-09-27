@@ -34,6 +34,11 @@ const nextConfig = nextTranslate({
         destination: '/txns/:slug',
         permanent: true,
       },
+      {
+        source: '/block/:slug',
+        destination: '/blocks/:slug',
+        permanent: true,
+      },
     ];
   },
 });
