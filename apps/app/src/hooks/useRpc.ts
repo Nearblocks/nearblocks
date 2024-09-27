@@ -209,13 +209,7 @@ const useRpc = () => {
       const result = (resp as any).result;
       return decodeArgs(result);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('MethodResolveError(MethodNotFound)')
-      ) {
-        return null;
-      }
-      throw error;
+      return null;
     }
   };
 

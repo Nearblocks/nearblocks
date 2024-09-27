@@ -55,7 +55,7 @@ export const verifierConfig =
           fileStructureApiUrl: (cid: string) =>
             `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
           sourceCodeApiUrl: (cid: string, fileName: string) =>
-            `https://api.sourcescan.dev/ipfs/${cid}/src${fileName}`,
+            `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
           verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
         },
       ];

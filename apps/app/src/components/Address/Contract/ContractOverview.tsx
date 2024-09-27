@@ -17,6 +17,7 @@ import ViewOrChangeAbi from './ViewOrChangeAbi';
 import ContractCode from './ContractCode';
 import useRpc from '@/hooks/useRpc';
 import { verifierConfig } from '@/utils/config';
+import { useRpcStore } from '@/stores/rpc';
 
 interface Props {
   contract: ContractCodeInfo;
@@ -62,18 +63,27 @@ const ContractOverview = (props: Props) => {
   const [verificationData, setVerificationData] = useState<
     Record<string, VerificationData>
   >({});
+  const [rpcError, setRpcError] = useState(false);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+
+  useEffect(() => {
+    if (rpcError) {
+      switchRpc();
+    }
+  }, [rpcError, switchRpc]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setRpcError(false);
         setStatusLoading(true);
         setError(null);
+
+        const onChainResponse = await contractCode(accountId as string);
 
         const contractMetadataResponse = await getContractMetadata(
           accountId as string,
         );
-
-        const onChainResponse = await contractCode(accountId as string);
 
         const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
 
@@ -86,6 +96,7 @@ const ContractOverview = (props: Props) => {
           contractMetadata: contractMetadataResponse,
         });
       } catch (error) {
+        setRpcError(true);
         console.error('Error fetching data:', error);
         setError('Failed to fetch contract data');
       }

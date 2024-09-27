@@ -3,7 +3,9 @@ import LoadingCircular from '@/components/common/LoadingCircular';
 import ArrowDown from '@/components/Icons/ArrowDown';
 import FaInbox from '@/components/Icons/FaInbox';
 import useRpc from '@/hooks/useRpc';
+import { useRpcStore } from '@/stores/rpc';
 import { verifierConfig } from '@/utils/config';
+import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractMetadata } from '@/utils/types';
 import React, { useEffect, useState } from 'react';
 
@@ -30,28 +32,38 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [contractMetadata, setContractMetadata] = useState<ContractMetadata>();
   const [onChainCodeHash, setOnChainCodeHash] = useState<string | null>(null);
   const [verified, setVerified] = useState<boolean>(false);
+  const [rpcError, setRpcError] = useState(false);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const { contractCode, getContractMetadata, getVerifierData } = useRpc();
 
   useEffect(() => {
+    if (rpcError) {
+      switchRpc();
+    }
+  }, [rpcError, switchRpc]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
+        setRpcError(false);
         setLoading(true);
         setError(null);
+
+        const onChainResponse = await contractCode(accountId as string);
 
         const contractMetadataResponse = await getContractMetadata(
           accountId as string,
         );
-
-        const onChainResponse = await contractCode(accountId as string);
 
         const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
 
         setOnChainCodeHash(onChainHash);
         setContractMetadata(contractMetadataResponse);
       } catch (error) {
+        setRpcError(true);
         console.error('Error fetching data:', error);
-        setError('Failed to fetch contract metadata');
+        setError('Failed to fetch contract data');
       }
     };
     if (accountId) fetchData();
@@ -89,39 +101,6 @@ const Verifier: React.FC<ContractFormProps> = ({
     contractMetadata?.build_info?.source_code_snapshot &&
     contractMetadata?.standards &&
     contractMetadata.standards.length > 0;
-
-  const parseGitHubLink = (snapshot: string) => {
-    const regex =
-      /^(?:git\+https:\/\/github\.com\/([^\/]+\/[^\/]+)\.git\?rev=([a-f0-9]+)|https:\/\/github\.com\/([^\/]+\/[^\/]+)(?:\.git)?(?:\/tree\/([a-f0-9]+))?)$/;
-
-    const match = snapshot.match(regex);
-
-    if (match) {
-      const repoPath = match[1] || match[3];
-      const commitHash = match[2] || match[4];
-
-      const url = commitHash
-        ? `https://github.com/${repoPath}/tree/${commitHash}`
-        : `https://github.com/${repoPath}`;
-
-      return { url, text: commitHash };
-    }
-
-    return null;
-  };
-
-  const parseLink = (link: string) => {
-    try {
-      const url = new URL(link);
-
-      return {
-        url: link,
-        text: `${url.hostname}${url.pathname}`,
-      };
-    } catch {
-      return null;
-    }
-  };
 
   const getSourceCode = () => {
     const snapshot =
