@@ -8,6 +8,7 @@ import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import { verifierConfig } from '@/utils/config';
+import { parseGitHubLink, parseLink } from '@/utils/libs';
 
 type ContractCodeProps = {
   error: string | null;
@@ -30,40 +31,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     verifiers[0],
   );
 
-  const parseLink = (link: string) => {
-    try {
-      const url = new URL(link);
-
-      return {
-        url: link,
-        text: `${url.hostname}${url.pathname}`,
-      };
-    } catch {
-      return null;
-    }
-  };
-
   const parseBuildEnvironment = (buildEnvironment: string) => {
     const [text] = buildEnvironment.split('@');
 
     return text;
-  };
-
-  const parseGitHubLink = (snapshot: string) => {
-    const regex =
-      /^(?:git\+https:\/\/github\.com\/([^\/]+\/[^\/]+)(?:\.git)?\?rev=([a-f0-9]+)|https:\/\/github\.com\/([^\/]+\/[^\/]+)(?:\.git)?(?:\/tree\/([a-f0-9]+))?)$/;
-
-    const match = snapshot.match(regex);
-
-    const commitHash = match ? match[2] || match[4] : '';
-
-    const url = snapshot.substring(snapshot.indexOf('http'));
-
-    if (match && commitHash) return { url, text: commitHash };
-
-    if (url) return { url, text: snapshot };
-
-    return null;
   };
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

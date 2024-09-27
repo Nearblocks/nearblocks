@@ -45,7 +45,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
     if (verificationData[selectedVerifier]?.status === 'verified') {
       return 'Contract Source Code Verified';
     } else {
-      if (selectedVerifier.includes('v2-verifier.sourcescan.near')) {
+      if (selectedVerifier.includes('v2-verifier.sourcescan')) {
         return (
           <>
             Are you the contract owner?{' '}
