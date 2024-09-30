@@ -1,7 +1,5 @@
 import { createRequire } from 'module';
 
-import Big from 'big.js';
-
 import { ExecutionStatus } from 'nb-neardata';
 import { DexEventType, DexPairs } from 'nb-types';
 
@@ -9,6 +7,7 @@ import config from '#config';
 import { DexEventIndex } from '#types/enum';
 import { DexPairMeta, SwapPair } from '#types/types';
 
+import Big from './big.js';
 import knex from './knex.js';
 
 const require = createRequire(import.meta.url);

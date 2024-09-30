@@ -55,12 +55,19 @@ export const syncData = async () => {
   }
 
   if (config.dataSource === DataSource.FAST_NEAR) {
-    const stream = streamBlock(startBlockHeight, config.preloadSize);
-
-    stream.on('data', async (message: types.StreamerMessage) => {
-      await onMessage(message);
+    const stream = streamBlock({
+      network: config.network,
+      start: startBlockHeight,
     });
 
+    for await (const message of stream) {
+      await onMessage(message);
+    }
+
+    stream.on('end', () => {
+      logger.error('stream ended');
+      process.exit();
+    });
     stream.on('error', (error: Error) => {
       logger.error(error);
       process.exit();

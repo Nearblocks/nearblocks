@@ -6,7 +6,6 @@ Balance indexer collects the info about native NEAR token balance changes 📊 (
 
 ```
 DATABASE_URL=
-RPC_URL=
 NETWORK=mainnet
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -16,5 +15,6 @@ DATABASE_CA=
 DATABASE_CERT=
 DATABASE_KEY=
 BALANCE_START_BLOCK=
+BALANCE_DATA_SOURCE=   # NEAR_LAKE | FAST_NEAR
 SENTRY_DSN=
 ```
