@@ -92,12 +92,17 @@ export const getServerSideProps: GetServerSideProps<{
         price = priceData?.stats?.[0]?.near_price || null;
       }
     }
-    const [contractResult] = await Promise.allSettled([
-      fetcher(`account/${txn.receiver_account_id}`),
-    ]);
 
-    const isContract =
-      contractResult.status === 'fulfilled' ? contractResult.value : null;
+    let isContract = null;
+    if (txn?.receiver_account_id) {
+      const [contractResult] = await Promise.allSettled([
+        fetcher(`account/${txn?.receiver_account_id}`),
+      ]);
+
+      isContract =
+        contractResult.status === 'fulfilled' ? contractResult.value : null;
+    }
+
     return {
       props: {
         data,
