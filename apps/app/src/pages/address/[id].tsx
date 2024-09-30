@@ -427,7 +427,7 @@ const Address = ({
       const index = tabs.indexOf(tab as string);
       if (index !== -1) {
         const hasContractTab =
-          contractInfo && contractInfo.methodNames?.length > 0;
+          contractInfo && contractInfo?.methodNames?.length > 0;
         let actualTabIndex = index;
         if (!hasContractTab && index > 5) {
           actualTabIndex = index - 1;
@@ -441,7 +441,8 @@ const Address = ({
   const onTab = (index: number) => {
     const { id } = router.query;
 
-    const hasContractTab = contractInfo && contractInfo.methodNames?.length > 0;
+    const hasContractTab =
+      contractInfo && contractInfo?.methodNames?.length > 0;
     let actualTabName = tabs[index];
     let actualTabIndex = index;
 
@@ -617,7 +618,7 @@ const Address = ({
                         key: 4,
                         label: t ? t('address:accessKeys') : 'Access Keys',
                       },
-                      ...(contractInfo && contractInfo.methodNames?.length > 0
+                      ...(contractInfo && contractInfo?.methodNames?.length > 0
                         ? [
                             {
                               key: 5,
@@ -696,7 +697,7 @@ const Address = ({
                         tab={tab}
                       />
                     </TabPanel>
-                    {contractInfo && contractInfo.methodNames?.length > 0 && (
+                    {contractInfo && contractInfo?.methodNames?.length > 0 && (
                       <TabPanel>
                         {tab === 'contract' ? (
                           <ContractOverview

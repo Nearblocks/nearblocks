@@ -272,6 +272,12 @@ export type TransactionInfo = {
     deposit: string;
     gas_attached: string;
   };
+  receipt_outcome: {
+    gas_burnt: string;
+    tokens_burnt: string;
+    executor_account_id: string;
+    status: boolean;
+  };
   block: {
     block_height: string;
   };
@@ -290,6 +296,7 @@ export type TransactionInfo = {
   receiver_account_id: string;
   signer_account_id: string;
   transaction_hash: string;
+  receipt_id: string;
   receipts: InventoryInfo[];
   cause: string;
   affected_account_id: string;

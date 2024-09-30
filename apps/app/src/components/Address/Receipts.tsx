@@ -46,7 +46,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const [page, setPage] = useState(1);
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
+  const errorMessage = 'No receipts found!';
   const [address, setAddress] = useState('');
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -161,12 +161,37 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row.receipt_outcome.status} showLabel={false} />
         </>
       ),
       tdClassName:
         'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
+    {
+      header: <span>RECEIPT ID</span>,
+      key: 'receipt_id',
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            label={row.receipt_id}
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+          >
+            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
+              <Link
+                href={`/txns/${row.transaction_hash}#execution#${row.receipt_id}`}
+                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+              >
+                {row.receipt_id}
+              </Link>
+            </span>
+          </Tooltip>
+        </span>
+      ),
+      tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+    },
+
     {
       header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
       key: 'transaction_hash',
@@ -529,23 +554,25 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <Skeleton className="h-4" />
             </div>
           ) : (
-            <div className={`flex flex-col lg:flex-row pt-4`}>
-              <div className="flex flex-col">
-                <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+            <div
+              className={`flex flex-col lg:flex-row sm:items-center sm:justify-center`}
+            >
+              <div className="flex flex-col sm:items-center py-4">
+                <p className="leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10">
                   {txns &&
                     !error &&
                     `A total of${' '}
                   ${
                     count ? localFormat && localFormat(count.toString()) : 0
                   }${' '}
-                  transactions found`}
+                  receipts found`}
                 </p>
               </div>
-              <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
-                <div className="px-2 mb-4 md:mb-0">
+              <div className="flex flex-col px-4 text-sm text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
+                <div className="px-2 sm:mt-4">
                   <Filters filters={modifiedFilter} onClear={onAllClear} />
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 md:mb-0 mb-4 ml-2 md:ml-0">
                   {Object.keys(txns).length > 0 && (
                     <>
                       <button className="hover:no-underline">

@@ -150,8 +150,8 @@ const Details = (props: Props) => {
       failedReceiptCount === 1 ? 'failed receipt' : 'failed receipts';
 
     return (
-      <div className="inline-flex w-fit text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 ml-2 rounded text-left px-2 py-1">
-        {`${failedReceiptCount} ${receiptText}`}
+      <div className="inline-flex w-fit text-xs text-red-500 bg-red-50 dark:bg-black ml-2 rounded text-left px-2 py-1">
+        {`[${failedReceiptCount} ${receiptText}]`}
       </div>
     );
   };
