@@ -7,6 +7,7 @@ import dayjs from '#libs/dayjs';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
+import { redisClient } from '#libs/redis';
 import { SubscriptionStatus } from '#types/enums';
 import { Plan, User } from '#types/types';
 
@@ -39,7 +40,7 @@ const rateLimiter = catchAsync(
     const id = (req.user as User)?.id;
     const keyId = (req.user as User)?.key_id;
     const date = dayjs.utc().toISOString();
-    // Bypass rate limiting for the near token
+    // Handle rate limit for app
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
 
@@ -52,34 +53,49 @@ const rateLimiter = catchAsync(
     }
 
     let plans: Plan[] = [];
+    let selectedPlan: Plan;
 
-    try {
-      plans = await userSql<Plan[]>`
-        SELECT
-          p.*
-        FROM
-          api__plans p
-          INNER JOIN api__subscriptions s ON s.plan_id = p.id
-        WHERE
-          s.user_id = ${id}
-          AND p.type = 0
-          AND s.status IN (
-            ${SubscriptionStatus.ACTIVE},
-            ${SubscriptionStatus.TRIALING}
-          )
-          AND ${date} BETWEEN s.start_date AND s.end_date
-        ORDER BY
-          s.end_date DESC
-        LIMIT
-          1
-      `;
-    } catch (error) {
-      return next();
+    const cachedPlan = await redisClient.get(`user_plan:${id}`);
+    if (cachedPlan) {
+      selectedPlan = JSON.parse(cachedPlan);
+    } else {
+      try {
+        plans = await userSql<Plan[]>`
+          SELECT
+            p.*
+          FROM
+            api__plans p
+            INNER JOIN api__subscriptions s ON s.plan_id = p.id
+          WHERE
+            s.user_id = ${id}
+            AND p.type = 0
+            AND s.status IN (
+              ${SubscriptionStatus.ACTIVE},
+              ${SubscriptionStatus.TRIALING}
+            )
+            AND ${date} BETWEEN s.start_date AND s.end_date
+          ORDER BY
+            s.end_date DESC
+          LIMIT
+            1
+        `;
+
+        selectedPlan = plans?.[0];
+
+        if (selectedPlan) {
+          await redisClient.set(
+            `user_plan:${id}`,
+            JSON.stringify(selectedPlan),
+            'EX',
+            86400,
+          );
+        }
+      } catch (error) {
+        return next();
+      }
     }
 
-    const plan = plans?.[0];
-
-    if (!plan) {
+    if (!selectedPlan) {
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
         return await useFreePlan(req, res, next, id, tokenKey);
@@ -88,7 +104,7 @@ const rateLimiter = catchAsync(
       return await useFreePlan(req, res, next, id);
     }
 
-    const rateLimit = rateLimiterUnion(plan);
+    const rateLimit = rateLimiterUnion(selectedPlan);
 
     const perPage = req?.query?.per_page || 25;
     const consumeCount = Math.ceil(+perPage / 25);
@@ -122,6 +138,9 @@ const useFreePlan = async (
   const consumeCount = Math.ceil(+perPage / 25);
 
   const plan = await getPlan(baseUrl, token);
+
+  await redisClient.set(`user_plan:${key}`, JSON.stringify(plan), 'EX', 86400);
+
   const rateLimit = rateLimiterUnion(plan);
 
   try {
@@ -157,6 +176,10 @@ const getPlan = async (baseUrl: string, token: string) => {
 
 const getFreePlan = async () => {
   try {
+    const cachedFreePlan = await redisClient.get('free_plan');
+    if (cachedFreePlan) {
+      return JSON.parse(cachedFreePlan);
+    }
     const plans = await userSql<Plan[]>`
       SELECT
         *
@@ -166,7 +189,13 @@ const getFreePlan = async () => {
         id = 1
     `;
 
-    return plans?.[0];
+    const freePlan = plans?.[0];
+
+    if (freePlan) {
+      await redisClient.set('free_plan', JSON.stringify(freePlan), 'EX', 86400);
+    }
+
+    return freePlan;
   } catch (error) {
     logger.error('Free plan not available, applying default rate limit.');
 
