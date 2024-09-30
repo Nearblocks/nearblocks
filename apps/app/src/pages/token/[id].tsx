@@ -21,6 +21,8 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
+import dynamic from 'next/dynamic';
+import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -28,6 +30,13 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const tabs = ['transfers', 'holders', 'info', 'faq', 'comments'];
 
 type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
+
+const VmInitializer = dynamic(
+  () => import('../../components/vm/VmInitializer'),
+  {
+    ssr: false,
+  },
+);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
@@ -163,6 +172,7 @@ const TokenDetails = ({
   error,
   tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  useBosLoaderInitializer();
   const router = useRouter();
   const { id, a }: any = router.query;
   const { t } = useTranslation();
@@ -244,6 +254,7 @@ const TokenDetails = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/token/${id}}`} />
       </Head>
+      <VmInitializer />
       <div className="relative container mx-auto px-3">
         <section>
           <Overview
