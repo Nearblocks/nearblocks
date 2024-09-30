@@ -25,43 +25,43 @@ const nextConfig = {
         source: '/api/nodes',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/node/telemetry'
-            : 'https://api3-testnet.nearblocks.io/v1/node/telemetry',
+            ? 'https://api.nearblocks.io/v1/node/telemetry'
+            : 'https://api-testnet.nearblocks.io/v1/node/telemetry',
       },
       {
         source: '/api/circulating-supply',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply',
+            ? 'https://api.nearblocks.io/v1/legacy/circulating-supply'
+            : 'https://api-testnet.nearblocks.io/v1/legacy/circulating-supply',
       },
       {
         source: '/api/circulating-supply-in-near',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply?unit=near'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply?unit=near',
+            ? 'https://api.nearblocks.io/v1/legacy/circulating-supply?unit=near'
+            : 'https://api-testnet.nearblocks.io/v1/legacy/circulating-supply?unit=near',
       },
       {
         source: '/api/fees-of-previous-day-utc',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=day'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=day',
+            ? 'https://api.nearblocks.io/v1/legacy/fees?pediod=day'
+            : 'https://api-testnet.nearblocks.io/v1/legacy/fees?pediod=day',
       },
       {
         source: '/api/fees-of-previous-7-days-utc',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=week'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=week',
+            ? 'https://api.nearblocks.io/v1/legacy/fees?pediod=week'
+            : 'https://api-testnet.nearblocks.io/v1/legacy/fees?pediod=week',
       },
       {
         source: '/api/ping',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/ping'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/ping',
+            ? 'https://api.nearblocks.io/v1/legacy/ping'
+            : 'https://api-testnet.nearblocks.io/v1/legacy/ping',
       },
       {
         source: '/api/:path*',

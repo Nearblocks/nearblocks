@@ -1,6 +1,4 @@
-import { env } from 'next-runtime-env';
-
-const baseURL = env('NEXT_PUBLIC_API_URL');
+const baseURL = process.env.API_URL;
 const accessKey = process.env.API_ACCESS_KEY;
 
 const fetcher = async (url: string, options = {} as any) => {

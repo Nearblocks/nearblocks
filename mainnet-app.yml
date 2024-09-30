@@ -23,7 +23,8 @@ services:
       NEXT_PUBLIC_GTM_ID: GTM-P285ZPV2
       NEXT_PUBLIC_USER_API_URL: https://api.exploreblocks.io/api/
       NEXT_PUBLIC_USER_DASHBOARD_URL: https://dash.nearblocks.io/
-      NEXT_PUBLIC_API_URL: https://api3.nearblocks.io/v1/
+      NEXT_PUBLIC_API_URL: https://api.nearblocks.io/v1/
+      API_URL: https://api.nearblocks.io/v1/
       API_ACCESS_KEY: ${API_ACCESS_KEY}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}

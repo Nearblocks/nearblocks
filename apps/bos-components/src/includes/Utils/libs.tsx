@@ -17,7 +17,7 @@ export default function () {
       case 'mainnet':
         return {
           nodeUrl: 'https://rpc.mainnet.near.org',
-          backendUrl: 'https://api3.nearblocks.io/v1/',
+          backendUrl: 'https://api.nearblocks.io/v1/',
           rpcUrl: 'https://beta.rpc.mainnet.near.org',
           appUrl: 'https://nearblocks.io/',
           aurorablocksUrl: 'https://aurora.exploreblocks.io',
@@ -25,7 +25,7 @@ export default function () {
       case 'testnet':
         return {
           nodeUrl: 'https://rpc.testnet.near.org',
-          backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
+          backendUrl: 'https://api-testnet.nearblocks.io/v1/',
           rpcUrl: 'https://archival-rpc.testnet.near.org/',
           appUrl: 'https://testnet.nearblocks.io/',
           aurorablocksUrl: 'https://aurora.exploreblocks.io',
