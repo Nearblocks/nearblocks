@@ -7,7 +7,10 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing balance indexer...');
+    logger.info(
+      { data_source: config.dataSource, network: config.network },
+      'initializing balance indexer...',
+    );
     logger.info('syncing balance data...');
     await syncData();
   } catch (error) {

@@ -1,6 +1,7 @@
 import { stream, types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
+import { streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -13,6 +14,7 @@ import { storeChunks } from '#services/chunk';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 import { storeTransactions } from '#services/transaction';
+import { DataSource } from '#types/enum';
 
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
@@ -29,16 +31,45 @@ if (config.s3Endpoint) {
 export const syncData = async () => {
   const block = await knex('blocks').orderBy('block_height', 'desc').first();
 
-  if (!lakeConfig.startBlockHeight && block) {
-    const next = +block.block_height - config.delta;
+  if (config.dataSource === DataSource.FAST_NEAR) {
+    let startBlockHeight = config.startBlockHeight;
 
-    logger.info(`last synced block: ${block.block_height}`);
-    logger.info(`syncing from block: ${next}`);
-    lakeConfig.startBlockHeight = next;
-  }
+    if (!startBlockHeight && block) {
+      const next = +block.block_height - config.delta / 2;
+      startBlockHeight = next;
+      logger.info(`last synced block: ${block.block_height}`);
+      logger.info(`syncing from block: ${next}`);
+    }
 
-  for await (const message of stream(lakeConfig)) {
-    await onMessage(message);
+    const stream = streamBlock({
+      limit: config.preloadSize / 2,
+      network: config.network,
+      start: startBlockHeight || config.genesisHeight,
+    });
+
+    for await (const message of stream) {
+      await onMessage(message);
+    }
+
+    stream.on('end', () => {
+      logger.error('stream ended');
+      process.exit();
+    });
+    stream.on('error', (error: Error) => {
+      logger.error(error);
+      process.exit();
+    });
+  } else {
+    if (!lakeConfig.startBlockHeight && block) {
+      const next = +block.block_height - config.delta;
+      lakeConfig.startBlockHeight = next;
+      logger.info(`last synced block: ${block.block_height}`);
+      logger.info(`syncing from block: ${next}`);
+    }
+
+    for await (const message of stream(lakeConfig)) {
+      await onMessage(message);
+    }
   }
 };
 

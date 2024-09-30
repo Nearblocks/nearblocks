@@ -10,6 +10,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   delta: number;
+  genesisHeight: number;
   NEAR_TOKEN: string;
   network: Network;
   preloadSize: number;
