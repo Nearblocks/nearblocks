@@ -17,11 +17,20 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import Comment from '@/components/skeleton/common/Comment';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { useAuthStore } from '@/stores/auth';
+import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
+import dynamic from 'next/dynamic';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 const tabs = ['transfers', 'holders', 'inventory', 'comments'];
+
+const VmInitializer = dynamic(
+  () => import('../../../components/vm/VmInitializer'),
+  {
+    ssr: false,
+  },
+);
 
 export const getServerSideProps: GetServerSideProps<{
   tokenDetails: any;
@@ -157,6 +166,7 @@ const NFToken = ({
   error,
   tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  useBosLoaderInitializer();
   const router = useRouter();
   const { id } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
@@ -235,6 +245,7 @@ const NFToken = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/nft-token/${id}`} />
       </Head>
+      <VmInitializer />
       <div className="relative container mx-auto px-3">
         <Overview
           token={token}

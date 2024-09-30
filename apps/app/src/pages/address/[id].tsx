@@ -38,15 +38,23 @@ import ContractOverview from '@/components/Address/Contract/ContractOverview';
 import ListCheck from '@/components/Icons/ListCheck';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import { useRpcStore } from '@/stores/rpc';
-import dynamic from 'next/dynamic';
 import { getCookieFromRequest } from '@/utils/libs';
 import { RpcProviders } from '@/utils/rpc';
+import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
+import dynamic from 'next/dynamic';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
   ssr: false,
 });
+
+const VmInitializer = dynamic(
+  () => import('../../components/vm/VmInitializer'),
+  {
+    ssr: false,
+  },
+);
 
 const tabs = [
   'txns',
@@ -226,6 +234,7 @@ const Address = ({
   error,
   tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  useBosLoaderInitializer();
   const router = useRouter();
   const [tabIndex, setTabIndex] = useState(0);
   const { id } = router.query;
@@ -522,6 +531,7 @@ const Address = ({
           href={`${appUrl}/address/${accountData?.account_id}`}
         />
       </Head>
+      <VmInitializer />
       <div className="relative container mx-auto px-3">
         <div className="flex items-center justify-between flex-wrap pt-4">
           {!id ? (
