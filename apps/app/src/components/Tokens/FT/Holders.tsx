@@ -2,7 +2,6 @@ import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
 import { HoldersPropsInfo, Token } from '../../../utils/types';
 import {
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
   serialNumber,
@@ -14,6 +13,7 @@ import { useRouter } from 'next/router';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import dayjs from '../../../utils/dayjs';
 
 interface Props {
   token: Token;
@@ -152,8 +152,8 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
                     {`${status?.height && localFormat(status.height)}`}
                   </span>
                   {status?.timestamp &&
-                    `(${getTimeAgoString(
-                      nanoToMilli(status?.timestamp),
+                    `(${dayjs().to(
+                      dayjs(nanoToMilli(status?.timestamp)),
                     )}).`}{' '}
                   Holders data will be delayed.
                 </div>

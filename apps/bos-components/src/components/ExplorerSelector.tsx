@@ -298,8 +298,8 @@ export default function (props: Props) {
         : 'https://nearblocks.io',
     nearblocksLite:
       props?.network === 'testnet'
-        ? 'https://lite.nearblocks.io'
-        : 'https://lite.nearblocks.io',
+        ? 'https://validate.nearblocks.io/'
+        : 'https://validate.nearblocks.io/',
     pikespeakai: props?.network === 'testnet' ? null : 'https://pikespeak.ai',
   };
 

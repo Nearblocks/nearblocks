@@ -111,7 +111,7 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="https://lite.nearblocks.io/" legacyBehavior>
+                    <Link href="https://validate.nearblocks.io/" legacyBehavior>
                       <a className="flex">
                         NEAR Validate
                         <span>

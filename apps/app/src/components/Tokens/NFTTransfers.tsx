@@ -3,7 +3,7 @@ import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
+import { localFormat, nanoToMilli } from '@/utils/libs';
 import useRpc from '@/hooks/useRpc';
 import TxnStatus from '@/components/common/Status';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
@@ -13,6 +13,7 @@ import Clock from '@/components/Icons/Clock';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import dayjs from '../../utils/dayjs';
 
 interface ListProps {
   data: {
@@ -408,7 +409,7 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
               <span className="font-bold mx-0.5">
                 {status?.height && localFormat(status?.height.toString())}
               </span>
-              {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))}).`}
+              {`(${timestamp && dayjs().to(dayjs(nanoToMilli(timestamp)))}).`}
               Non-Fungible token transfers data will be delayed.
             </div>
           )}
