@@ -34,6 +34,7 @@ const FREE_PLAN: Plan = {
   title: 'Free Plan',
 };
 const KITWALLET_PATH = '/v1/kitwallet';
+const SEARCH_PATH = '/v1/search';
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -157,7 +158,7 @@ const useFreePlan = async (
 };
 
 const getPlan = async (baseUrl: string, token: string) => {
-  if (baseUrl === KITWALLET_PATH) {
+  if (baseUrl === KITWALLET_PATH || SEARCH_PATH) {
     return DEFAULT_PLAN;
   }
 
