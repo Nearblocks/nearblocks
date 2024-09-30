@@ -23,7 +23,6 @@ export const rpcProviders =
     : ([
         'https://archival-rpc.testnet.near.org',
         'https://rpc.testnet.near.org',
-        'https://beta.rpc.testnet.near.org',
       ] as const);
 
 export const getProvider = (url?: string) => {

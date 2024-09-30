@@ -87,7 +87,7 @@ export function getConfig(network: string) {
       return {
         nodeUrl: 'https://rpc.testnet.near.org',
         backendUrl: 'https://api3-testnet.nearblocks.io/v1/',
-        rpcUrl: 'https://beta.rpc.testnet.near.org/',
+        rpcUrl: 'https://archival-rpc.testnet.near.org/',
         appUrl: 'https://testnet.nearblocks.io/',
       };
     default:

@@ -16,7 +16,7 @@ const CUSTOM_RATE_LIMIT_MESSAGE =
 const DEFAULT_PLAN: Plan = {
   id: -1,
   limit_per_day: 3666,
-  limit_per_minute: 60,
+  limit_per_minute: 20,
   limit_per_month: 110000,
   limit_per_second: 1,
   price_annually: 0,

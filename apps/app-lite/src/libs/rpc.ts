@@ -53,10 +53,6 @@ export const getProviders = (netwrok: string) => {
           name: 'NEAR',
           url: 'https://rpc.testnet.near.org',
         },
-        {
-          name: 'NEAR (Beta)',
-          url: 'https://beta.rpc.testnet.near.org',
-        },
       ];
 };
 
