@@ -7,9 +7,15 @@ import {
 
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
+import { redisClient } from '#libs/redis';
 
 const bearerVerify: VerifyFunction = async (token, done) => {
   try {
+    const cachedUser = await redisClient.get(`api_key:${token}`);
+    if (cachedUser) {
+      return done(null, JSON.parse(cachedUser));
+    }
+
     const users = await userSql`
       SELECT
         u.*,
@@ -23,11 +29,20 @@ const bearerVerify: VerifyFunction = async (token, done) => {
 
     const user = users?.[0];
 
-    if (user) return done(null, user);
+    if (user) {
+      await redisClient.set(
+        `api_key:${token}`,
+        JSON.stringify(user),
+        'EX',
+        86400,
+      );
+
+      return done(null, user);
+    }
 
     return done(null, false);
   } catch (error) {
-    logger.error('Error during user authentication:', error);
+    logger.error(error);
     return done(null, false);
   }
 };
