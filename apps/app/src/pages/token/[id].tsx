@@ -36,29 +36,45 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     query: { id?: string; a?: string; tab?: TabType } & Record<string, any>;
   } = context;
 
-  const commonApiUrls = {
-    stats: 'stats',
-    token: id && `fts/${id}`,
-    sync: 'sync/status',
-    account: id && `account/${id}`,
-    tokenFilter: a && `account/${a}/inventory`,
-    latestBlocks: `blocks/latest?limit=1`,
-    transfersCount: id && `fts/${id}/txns/count`,
-    holdersCount: id && `fts/${id}/holders/count`,
-  };
-
-  const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
-    transfers: { api: `fts/${id}/txns` },
-    holders: { api: `fts/${id}/holders` },
-    info: { api: `` },
-    faq: { api: `` },
-    comments: { api: '' },
-  };
-
-  const fetchData = async (url: string | undefined) =>
-    url ? await fetcher(url) : null;
-
+  const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
   try {
+    if (isHexAddress(id)) {
+      const response = await fetcher(`fts/hex/${id}`);
+
+      if (response && response[0]?.contract) {
+        const address = response[0].contract;
+
+        return {
+          redirect: {
+            destination: `/token/${address}`,
+            permanent: false,
+          },
+        };
+      }
+    }
+
+    const commonApiUrls = {
+      stats: 'stats',
+      token: id && `fts/${id}`,
+      sync: 'sync/status',
+      account: id && `account/${id}`,
+      tokenFilter: a && `account/${a}/inventory`,
+      latestBlocks: `blocks/latest?limit=1`,
+      transfersCount: id && `fts/${id}/txns/count`,
+      holdersCount: id && `fts/${id}/holders/count`,
+    };
+
+    const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
+      transfers: { api: `fts/${id}/txns` },
+      holders: { api: `fts/${id}/holders` },
+      info: { api: `` },
+      faq: { api: `` },
+      comments: { api: '' },
+    };
+
+    const fetchData = async (url: string | undefined) =>
+      url ? await fetcher(url) : null;
+
     // Fetch common data
     const [
       statsResult,

@@ -230,6 +230,7 @@ export type FTMeta = {
   livecoinwatch_id: null | string;
   market_cap: null | string;
   name: string;
+  nep518_hex_address: null | string;
   price: null | string;
   price_btc: null | string;
   price_eth: null | string;

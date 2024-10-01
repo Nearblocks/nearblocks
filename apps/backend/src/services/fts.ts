@@ -12,7 +12,7 @@ import knex from '#libs/knex';
 // import lcw from '#libs/lcw';
 import { ftMeta, ftTotalSupply } from '#libs/near';
 import ref from '#libs/ref';
-import { tokenAmount } from '#libs/utils';
+import { accountToHex, tokenAmount } from '#libs/utils';
 
 type RawResp = {
   rows: ContractResp[];
@@ -112,6 +112,8 @@ const updateMeta = async (contract: string) => {
   try {
     const meta = await ftMeta(contract);
 
+    const hexAddress = accountToHex(contract);
+
     if (meta?.name && meta?.symbol) {
       return knex('ft_meta')
         .insert({
@@ -119,6 +121,7 @@ const updateMeta = async (contract: string) => {
           decimals: meta.decimals,
           icon: meta.icon,
           name: meta.name,
+          nep518_hex_address: hexAddress,
           reference: meta.reference,
           reference_hash: meta.reference_hash,
           refreshed_at: dayjs.utc().toISOString(),
@@ -249,4 +252,45 @@ export const updateMarketSearch = async (meta: FTMeta) => {
   } catch (error) {
     //
   }
+};
+
+export const addHexAddress = async () => {
+  const batchSize = 10;
+  let hasMoreTokens = true;
+
+  while (hasMoreTokens) {
+    const tokensWithoutHex = await knex<FTMeta>('ft_meta')
+      .select('contract')
+      .where(function () {
+        this.whereNull('nep518_hex_address').orWhere('nep518_hex_address', '');
+      })
+      .limit(batchSize);
+
+    if (tokensWithoutHex.length === 0) {
+      hasMoreTokens = false;
+      break;
+    }
+
+    await Promise.all(
+      tokensWithoutHex.map(async (token) => {
+        try {
+          const hexAddress = accountToHex(token.contract);
+
+          await knex('ft_meta').where('contract', token.contract).update({
+            nep518_hex_address: hexAddress,
+            updated_at: dayjs.utc().toISOString(),
+          });
+
+          console.log(`Updated hex address for token: ${token.contract}`);
+        } catch (error) {
+          console.error(
+            `Failed to update hex address for token: ${token.contract}`,
+            error,
+          );
+        }
+      }),
+    );
+  }
+
+  console.log('Hex address update complete.');
 };

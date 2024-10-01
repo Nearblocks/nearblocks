@@ -118,6 +118,16 @@ const routes = (app: Router) => {
     validator(schema.holdersCount),
     contract.holdersCount,
   );
+
+  /**
+   * GET /v1/fts/hex/:hex
+   * @summary Convert ERC20 address to NEP141 address
+   * @tags FTs
+   * @param {string} hex.path.required - contract address in ERC20 standard
+   * @return 200 - success response
+   * @security BearerAuth
+   */
+  route.get('/hex/:hex', validator(schema.hex), contract.hex);
 };
 
 export default routes;
