@@ -1421,6 +1421,7 @@ const receiptsExport = catchAsync(
         receipts.receipt_id,
         receipts.predecessor_account_id,
         receipts.receiver_account_id,
+        ROW_TO_JSON(oc) AS receipt_outcome,
         tr.transaction_hash,
         tr.included_in_block_hash,
         tr.block_timestamp,
@@ -1448,6 +1449,18 @@ const receiptsExport = catchAsync(
           LIMIT
             5000
         ) AS tmp using (receipt_id)
+        LEFT JOIN LATERAL (
+          SELECT
+            CASE
+              WHEN status = 'SUCCESS_RECEIPT_ID'
+              OR status = 'SUCCESS_VALUE' THEN TRUE
+              ELSE FALSE
+            END AS status
+          FROM
+            execution_outcomes
+          WHERE
+            receipt_id = receipts.receipt_id
+        ) oc ON TRUE
         LEFT JOIN LATERAL (
           SELECT
             transaction_hash,
@@ -1534,6 +1547,7 @@ const receiptsExport = catchAsync(
     const stringifier = stringify({
       columns: [
         { header: 'Status', key: 'status' },
+        { header: 'Receipt', key: 'receipt' },
         { header: 'Txn Hash', key: 'hash' },
         { header: 'Method', key: 'method' },
         { header: 'Deposit Value', key: 'deposit' },
@@ -1553,7 +1567,7 @@ const receiptsExport = catchAsync(
     stringifier.pipe(res);
 
     txns.forEach((txn) => {
-      const status = txn.outcomes.status;
+      const status = txn.receipt_outcome.status;
       const action = txn.actions?.[0]?.action;
       const method = txn.actions?.[0]?.method ?? 'Unknown';
 
@@ -1565,6 +1579,7 @@ const receiptsExport = catchAsync(
         hash: txn.transaction_hash,
         method:
           !action || action === ActionKind.FUNCTION_CALL ? method : action,
+        receipt: txn.receipt_id,
         status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
         timestamp: dayjs(+nsToMsTime(txn.block_timestamp)).format(
           'YYYY-MM-DD HH:mm:ss',
