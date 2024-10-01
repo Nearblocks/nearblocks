@@ -142,7 +142,7 @@ const NFTTransactions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.transaction_hash}
+            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
@@ -257,7 +257,7 @@ const NFTTransactions = ({
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          {row.involved_account_id === row.affected_account_id ? (
+          {row?.involved_account_id === row?.affected_account_id ? (
             <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
               {t ? t('txns:txnSelf') : 'SELF'}
             </span>
@@ -318,14 +318,14 @@ const NFTTransactions = ({
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => (
         <>
-          {row.involved_account_id ? (
+          {row?.involved_account_id ? (
             <Tooltip
-              label={row.involved_account_id}
+              label={row?.involved_account_id}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             >
               <span>
                 <Link
-                  href={`/address/${row.involved_account_id}`}
+                  href={`/address/${row?.involved_account_id}`}
                   className={`text-green-500 dark:text-green-250 hover:no-underline p-0.5 px-1 border rounded-md whitespace-nowrap ${
                     row?.involved_account_id === address
                       ? ' bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
@@ -336,7 +336,7 @@ const NFTTransactions = ({
                   }
                   onMouseLeave={handleMouseLeave}
                 >
-                  {truncateString(row.involved_account_id, 15, '...')}
+                  {truncateString(row?.involved_account_id, 15, '...')}
                 </Link>
               </span>
             </Tooltip>
@@ -450,7 +450,7 @@ const NFTTransactions = ({
 
           <button type="button" onClick={onOrder} className="px-2">
             <div className="text-nearblue-600 font-semibold">
-              <SortIcon order={router.query.order as string} />
+              <SortIcon order={router?.query?.order as string} />
             </div>
           </button>
         </div>

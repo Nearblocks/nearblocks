@@ -21,17 +21,18 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
   const { t } = useTranslation();
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
   const { viewAccessKey } = useRpc();
-  const createdTime = accessKey.created?.block_timestamp
-    ? nanoToMilli(accessKey.created?.block_timestamp)
+  const createdTime = accessKey?.created?.block_timestamp
+    ? nanoToMilli(accessKey?.created?.block_timestamp)
     : '';
-  const deletedTime = accessKey.deleted?.block_timestamp
-    ? nanoToMilli(accessKey.deleted?.block_timestamp)
+  const deletedTime = accessKey?.deleted?.block_timestamp
+    ? nanoToMilli(accessKey?.deleted?.block_timestamp)
     : '';
 
-  const txn = createdTime > deletedTime ? accessKey.created : accessKey.deleted;
+  const txn =
+    createdTime > deletedTime ? accessKey?.created : accessKey?.deleted;
 
   const action =
-    accessKey.deleted?.transaction_hash && createdTime <= deletedTime
+    accessKey?.deleted?.transaction_hash && createdTime <= deletedTime
       ? 'Deleted'
       : 'Created';
 
@@ -95,8 +96,11 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
   }
 
   useEffect(() => {
-    if (accessKey.public_key && accessKey.permission_kind === 'FUNCTION_CALL') {
-      viewAccessKey(accessKey.account_id, accessKey.public_key)
+    if (
+      accessKey?.public_key &&
+      accessKey?.permission_kind === 'FUNCTION_CALL'
+    ) {
+      viewAccessKey(accessKey?.account_id, accessKey?.public_key)
         .then(setKeyInfo)
         .catch(() => {});
     }
@@ -105,7 +109,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
 
   return (
     <>
-      <tr key={accessKey.public_key} className="hover:bg-blue-900/5">
+      <tr key={accessKey?.public_key} className="hover:bg-blue-900/5">
         <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip
@@ -127,16 +131,16 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
           <Tooltip
-            label={accessKey.public_key}
+            label={accessKey?.public_key}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
           >
             <span className="truncate max-w-[120px] inline-block align-bottom ">
-              {accessKey.public_key}
+              {accessKey?.public_key}
             </span>
           </Tooltip>
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-center text-center">
-          {accessKey.permission_kind === 'FUNCTION_CALL' ? (
+          {accessKey?.permission_kind === 'FUNCTION_CALL' ? (
             <div className="bg-blue-900/10 rounded px-4 h-6 flex items-center justify-center text-center text-xs">
               Limited
             </div>
@@ -154,13 +158,13 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
-              {keyInfo?.permission?.FunctionCall?.method_names.length > 0
+              {keyInfo?.permission?.FunctionCall?.method_names?.length > 0
                 ? keyInfo?.permission?.FunctionCall?.method_names.map(
                     (method) => {
                       return <div key={method}>{showMethod(method)} </div>;
                     },
                   )
-                : accessKey.permission_kind === 'FUNCTION_CALL'
+                : accessKey?.permission_kind === 'FUNCTION_CALL'
                 ? 'Any'
                 : 'Full Access'}
             </div>

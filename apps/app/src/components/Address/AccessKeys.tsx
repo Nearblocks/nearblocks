@@ -94,7 +94,7 @@ const AccessKeys = ({ keys, count, error, tab }: Props) => {
                       </button>
                       <button type="button" onClick={onOrder} className="px-2">
                         <div className="text-nearblue-600  dark:text-neargray-10 font-semibold">
-                          <SortIcon order={router.query.order as string} />
+                          <SortIcon order={router?.query?.order as string} />
                         </div>
                       </button>
                     </div>
@@ -150,7 +150,7 @@ const AccessKeys = ({ keys, count, error, tab }: Props) => {
                   keys &&
                   keys.map((key: any) => (
                     <AccessKeyRow
-                      key={key.account_id + key.public_key}
+                      key={key?.account_id + key?.public_key}
                       accessKey={key}
                       showWhen={showWhen}
                     />
