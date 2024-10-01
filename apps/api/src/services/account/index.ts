@@ -167,45 +167,39 @@ const deployments = catchAsync(
 
     const deployments = await sql`
       SELECT
-        transaction_hash,
-        block_timestamp,
-        receipt_predecessor_account_id
+        t.transaction_hash,
+        t.block_timestamp,
+        r.predecessor_account_id as receipt_predecessor_account_id
       FROM
         (
-          SELECT
-            t.transaction_hash as transaction_hash,
-            t.block_timestamp as block_timestamp,
-            a.receipt_predecessor_account_id as receipt_predecessor_account_id,
-            ROW_NUMBER() OVER (
-              ORDER BY
-                t.block_timestamp ASC
-            ) as rank,
-            COUNT(*) OVER () as total
-          FROM
-            action_receipt_actions a
-            JOIN receipts r ON r.receipt_id = a.receipt_id
-            JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
-          WHERE
-            a.receipt_receiver_account_id = ${account}
-            AND a.action_kind = 'DEPLOY_CONTRACT'
-            AND EXISTS (
-              SELECT
-                1
-              FROM
-                execution_outcomes e
-              WHERE
-                e.receipt_id = a.receipt_id
-                AND (
-                  e.status = 'SUCCESS_RECEIPT_ID'
-                  OR e.status = 'SUCCESS_VALUE'
-                )
-            )
-        ) tmp
-      WHERE
-        rank = 1
-        OR rank = total
-      ORDER BY
-        block_timestamp ASC
+          (
+            SELECT
+              receipt_id
+            FROM
+              deployed_contracts
+            WHERE
+              contract = ${account}
+            ORDER BY
+              block_timestamp ASC
+            LIMIT
+              1
+          )
+          UNION
+          (
+            SELECT
+              receipt_id
+            FROM
+              deployed_contracts
+            WHERE
+              contract = ${account}
+            ORDER BY
+              block_timestamp DESC
+            LIMIT
+              1
+          )
+        ) c
+        JOIN receipts r ON r.receipt_id = c.receipt_id
+        JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
     `;
 
     return res.status(200).json({ deployments });
