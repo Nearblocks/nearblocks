@@ -33,7 +33,6 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
-import Receipts from '@/components/Address/Receipts';
 import ContractOverview from '@/components/Address/Contract/ContractOverview';
 import ListCheck from '@/components/Icons/ListCheck';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
@@ -45,6 +44,10 @@ import { RpcProviders } from '@/utils/rpc';
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
+  ssr: false,
+});
+
+const Receipts = dynamic(() => import('../../components/Address/Receipts'), {
   ssr: false,
 });
 
@@ -556,7 +559,7 @@ const Address = ({
                         <li className="pb-2">
                           <a
                             className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                            href={`https://lite.nearblocks.io/address/${id}?network=${networkId}`}
+                            href={`https://validate.nearblocks.io/address/${id}?network=${networkId}`}
                             target="_blank"
                           >
                             Validate Account

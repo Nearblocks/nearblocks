@@ -131,7 +131,7 @@ const TokenTransactions = ({
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -143,15 +143,15 @@ const TokenTransactions = ({
       cell: (row: TransactionInfo) => (
         <span className="relative">
           <Tooltip
-            label={row.transaction_hash}
+            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
               <Link
-                href={`/txns/${row.transaction_hash}`}
+                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 font-medium"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Link>
             </span>
           </Tooltip>
@@ -260,7 +260,7 @@ const TokenTransactions = ({
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          {row.involved_account_id === row.affected_account_id ? (
+          {row?.involved_account_id === row?.affected_account_id ? (
             <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
               {t ? t('txns:txnSelf') : 'SELF'}
             </span>
@@ -321,9 +321,9 @@ const TokenTransactions = ({
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.involved_account_id ? (
+          {row?.involved_account_id ? (
             <Tooltip
-              label={row.involved_account_id}
+              label={row?.involved_account_id}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
             >
               <span
@@ -334,14 +334,14 @@ const TokenTransactions = ({
                 }`}
               >
                 <Link
-                  href={`/address/${row.involved_account_id}`}
+                  href={`/address/${row?.involved_account_id}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
                   onMouseOver={(e) =>
                     onHandleMouseOver(e, row?.involved_account_id)
                   }
                   onMouseLeave={handleMouseLeave}
                 >
-                  {truncateString(row.involved_account_id, 15, '...')}
+                  {truncateString(row?.involved_account_id, 15, '...')}
                 </Link>
               </span>
             </Tooltip>
@@ -457,7 +457,7 @@ const TokenTransactions = ({
           </Tooltip>
           <button type="button" onClick={onOrder} className="px-2">
             <div className="text-nearblue-600 font-semibold">
-              <SortIcon order={router.query.order as string} />
+              <SortIcon order={router?.query?.order as string} />
             </div>
           </button>
         </div>
@@ -507,7 +507,7 @@ const TokenTransactions = ({
                   <Filters filters={modifiedFilter} onClear={onAllClear} />
                 </div>
                 <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-                  {txns && txns.length > 0 && (
+                  {txns && txns?.length > 0 && (
                     <button className="hover:no-underline ">
                       <Link
                         href={`/token/exportdata?address=${id}`}

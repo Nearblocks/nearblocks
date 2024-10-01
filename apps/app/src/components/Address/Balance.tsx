@@ -246,12 +246,12 @@ const Balance = ({
                       accountData?.deleted?.transaction_hash &&
                       !isAccountLoading
                         ? convertToUTC(
-                            nanoToMilli(accountData.deleted.block_timestamp),
+                            nanoToMilli(accountData?.deleted?.block_timestamp),
                             false,
                           )
                         : accountData?.created?.transaction_hash
                         ? convertToUTC(
-                            nanoToMilli(accountData.created.block_timestamp),
+                            nanoToMilli(accountData?.created?.block_timestamp),
                             false,
                           )
                         : accountData?.code_hash
@@ -278,19 +278,19 @@ const Balance = ({
                   </div>
                   <div className="w-full md:w-3/4 break-words">
                     <Link
-                      href={`/address/${deploymentData.receipt_predecessor_account_id}`}
+                      href={`/address/${deploymentData?.receipt_predecessor_account_id}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
                     >
                       {shortenAddress(
-                        deploymentData.receipt_predecessor_account_id ?? '',
+                        deploymentData?.receipt_predecessor_account_id ?? '',
                       )}
                     </Link>
                     {' at txn  '}
                     <Link
-                      href={`/txns/${deploymentData.transaction_hash}`}
+                      href={`/txns/${deploymentData?.transaction_hash}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
                     >
-                      {shortenAddress(deploymentData.transaction_hash ?? '')}
+                      {shortenAddress(deploymentData?.transaction_hash ?? '')}
                     </Link>
                   </div>
                 </div>
@@ -312,17 +312,17 @@ const Balance = ({
                         className="flex text-green-500 dark:text-green-250 hover:no-underline"
                       >
                         <span className="inline-block truncate max-w-[110px] mr-1">
-                          {tokenData.name}
+                          {tokenData?.name}
                         </span>
                         (
                         <span className="inline-block truncate max-w-[80px]">
-                          {tokenData.symbol}
+                          {tokenData?.symbol}
                         </span>
                         )
                       </Link>
-                      {tokenData.price && (
+                      {tokenData?.price && (
                         <div className="text-nearblue-600 dark:text-neargray-10 ml-1">
-                          (@ ${localFormat(tokenData.price)})
+                          (@ ${localFormat(tokenData?.price)})
                         </div>
                       )}
                     </div>
@@ -346,11 +346,11 @@ const Balance = ({
                         className="flex text-green-500 dark:text-green-250 hover:no-underline"
                       >
                         <span className="inline-block truncate max-w-[110px] mr-1">
-                          {nftTokenData.name}
+                          {nftTokenData?.name}
                         </span>
                         (
                         <span className="inline-block truncate max-w-[80px]">
-                          {nftTokenData.symbol}
+                          {nftTokenData?.symbol}
                         </span>
                         )
                       </Link>

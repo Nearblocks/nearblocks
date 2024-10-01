@@ -129,7 +129,7 @@ const ContractOverview = (props: Props) => {
             contractData?.contractMetadata
           ) {
             const hashMatches =
-              contractData?.onChainCodeHash === data.code_hash;
+              contractData?.onChainCodeHash === data?.code_hash;
             status = hashMatches
               ? 'verified'
               : contractData?.contractMetadata?.build_info

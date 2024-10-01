@@ -162,7 +162,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -174,15 +174,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.transaction_hash}
+            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
               <Link
-                href={`/txns/${row.transaction_hash}`}
+                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Link>
             </span>
           </Tooltip>
@@ -233,12 +233,12 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={txnMethod(row.actions, t)}
+            label={txnMethod(row?.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
-                {txnMethod(row.actions, t)}
+                {txnMethod(row?.actions, t)}
               </span>
             </span>
           </Tooltip>
@@ -252,9 +252,9 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.actions_agg?.deposit
-            ? yoctoToNear(row.actions_agg?.deposit, true)
-            : row.actions_agg?.deposit ?? ''}{' '}
+          {row?.actions_agg?.deposit
+            ? yoctoToNear(row?.actions_agg?.deposit, true)
+            : row?.actions_agg?.deposit ?? ''}{' '}
           Ⓝ
         </span>
       ),
@@ -268,8 +268,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.outcomes_agg?.transaction_fee
-            ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
+          {row?.outcomes_agg?.transaction_fee
+            ? yoctoToNear(row?.outcomes_agg?.transaction_fee, true)
             : ''}{' '}
           Ⓝ
         </span>
@@ -326,7 +326,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.signer_account_id}
+            label={row?.signer_account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span
@@ -337,14 +337,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               }`}
             >
               <Link
-                href={`/address/${row.signer_account_id}`}
+                href={`/address/${row?.signer_account_id}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 onMouseOver={(e) =>
                   onHandleMouseOver(e, row?.signer_account_id)
                 }
                 onMouseLeave={handleMouseLeave}
               >
-                {truncateString(row.signer_account_id, 15, '...')}
+                {row?.signer_account_id &&
+                  truncateString(row?.signer_account_id, 15, '...')}
               </Link>
             </span>
           </Tooltip>
@@ -357,11 +358,11 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       header: <span></span>,
       key: '',
       cell: (row: TransactionInfo) => {
-        return row.signer_account_id === row.receiver_account_id ? (
+        return row?.signer_account_id === row?.receiver_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
             {t ? t('txns:txnSelf') : 'SELF'}
           </span>
-        ) : id === row.signer_account_id ? (
+        ) : id === row?.signer_account_id ? (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
             {t ? t('txns:txnOut') : 'OUT'}
           </span>
@@ -419,7 +420,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.receiver_account_id}
+            label={row?.receiver_account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span
@@ -430,14 +431,14 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               }`}
             >
               <Link
-                href={`/address/${row.receiver_account_id}`}
+                href={`/address/${row?.receiver_account_id}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 onMouseOver={(e) =>
                   onHandleMouseOver(e, row?.receiver_account_id)
                 }
                 onMouseLeave={handleMouseLeave}
               >
-                {truncateString(row.receiver_account_id, 15, '...')}
+                {truncateString(row?.receiver_account_id, 15, '...')}
               </Link>
             </span>
           </Tooltip>
@@ -452,11 +453,11 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            href={`/blocks/${row.included_in_block_hash}`}
+            href={`/blocks/${row?.included_in_block_hash}`}
             className="text-green-500  dark:text-green-250 hover:no-underline"
           >
-            {row.block?.block_height
-              ? localFormat(row.block?.block_height)
+            {row?.block?.block_height
+              ? localFormat(row?.block?.block_height)
               : ''}
           </Link>
         </span>
