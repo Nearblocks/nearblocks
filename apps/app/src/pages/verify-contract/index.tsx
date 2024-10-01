@@ -5,23 +5,63 @@ import { useRouter } from 'next/router';
 import { appUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import Verifier from '@/components/Address/Contract/Verifier';
+import fetcher from '@/utils/fetcher';
+import { GetServerSideProps } from 'next';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID') || '';
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
+export const getServerSideProps: GetServerSideProps<{
+  statsDetails: any;
+  latestBlocks: any;
+}> = async () => {
+  try {
+    const [statsResult, latestBlocksResult] = await Promise.allSettled([
+      fetcher(`stats`),
+      fetcher(`blocks/latest?limit=1`),
+    ]);
+
+    const statsDetails =
+      statsResult.status === 'fulfilled' ? statsResult.value : null;
+    const latestBlocks =
+      latestBlocksResult.status === 'fulfilled'
+        ? latestBlocksResult.value
+        : null;
+
+    return {
+      props: {
+        statsDetails,
+        latestBlocks,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return {
+      props: {
+        data: null,
+        dataCount: null,
+        error: true,
+        apiUrl: '',
+        statsDetails: null,
+        latestBlocks: null,
+      },
+    };
+  }
+};
 
 const VerifyContract = () => {
   const router = useRouter();
   const { accountId, selectedVerifier } = router.query;
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=VerifyContract&brand=near`;
+  const thumbnail = `${ogUrl}/thumbnail/basic?title=Verify-contract&brand=near`;
 
   return (
     <>
       <Head>
         <title>{`${
           network === 'testnet' ? 'TESTNET ' : ''
-        }Verify Contract`}</title>
-        <meta name="title" content="Verify Contract" />
+        }Verify Contract | Nearblocks`}</title>
+        <meta name="title" content="Verify Contract | Nearblocks" />
         <meta
           name="description"
           content="Verify a smart contract on the blockchain."
@@ -31,14 +71,14 @@ const VerifyContract = () => {
           property="og:description"
           content="Verify a smart contract on the blockchain."
         />
-        <meta property="twitter:title" content="Verify Contract" />
+        <meta property="twitter:title" content="Verify Contract | Nearblocks" />
         <meta
           property="twitter:description"
           content="Verify a smart contract on the blockchain."
         />
         <meta property="og:image" content={thumbnail} />
         <meta property="twitter:image" content={thumbnail} />
-        <link rel="canonical" href={`${appUrl}/verifyContract`} />
+        <link rel="canonical" href={`${appUrl}/verify-contract`} />
       </Head>
       <div className="h-80"></div>
       <div className="container mx-auto px-3 md:px-14 flex flex-col items-center mt-[-300px]">
@@ -60,6 +100,13 @@ const VerifyContract = () => {
   );
 };
 
-VerifyContract.getLayout = (page: ReactElement) => <Layout>{page}</Layout>;
+VerifyContract.getLayout = (page: ReactElement) => (
+  <Layout
+    statsDetails={page?.props?.statsDetails}
+    latestBlocks={page?.props?.latestBlocks}
+  >
+    {page}
+  </Layout>
+);
 
 export default VerifyContract;

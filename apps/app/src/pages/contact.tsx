@@ -128,7 +128,7 @@ const Contact = () => {
           </div>
         </AccordionButton>
         <AccordionPanel
-          className={`text-sm text-left text-black dark:text-neargray-10 px-3 slide-down ${className}`}
+          className={`text-sm text-left  text-neargray-600 dark:text-neargray-10 px-3 slide-down ${className}`}
         >
           <div className="py-3 mr-3">{description}</div>
         </AccordionPanel>
@@ -295,18 +295,18 @@ const Contact = () => {
       </Head>
       <ToastContainer />
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
-      <div className="container mx-auto px-3 md:px-14 flex flex-col items-start md:py-16 mt-[-300px]">
+      <div className="container mx-auto px-3 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
         <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
           {`Contact NearBlocks`}
         </h1>
         <div className="text-neargray-600 dark:text-neargray-10 pt-4 pb-8 gap-6 w-full soft-shadow rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">
-          <p className="text-lg pl-8 text-black dark:text-neargray-10 pb-4 font-medium sm:mt-0 mt-10 mb-4 border-b dark:border-slate-800">
+          <p className="text-lg px-10 text-neargray-600 dark:text-neargray-10 pb-4 font-medium sm:mt-0 mt-8 mb-4 border-b dark:border-slate-800">
             {t(`form.heading`)}
           </p>
           <div className="flex flex-col mx-auto px-10 ">
-            <div className="col-span-5 text-[#066a9c] dark:text-[#6ab5db]  border-[#9ccee7] dark:border-[#044f75] bg-[#cde6f3] dark:bg-[#011a27] border rounded-lg p-4">
-              <p className="text-base font-bold">{t(`info.heading`)}</p>
-              <div className="mt-6 flex flex-col gap-8 mb-4">
+            <div className="col-span-5 text-green dark:text-neargreen-200 soft-shadow bg-nearblue dark:bg-gray-950 border rounded-lg p-4">
+              <p className="text-sm font-bold">{t(`info.heading`)}</p>
+              <div className="my-4 flex flex-col gap-4">
                 {[
                   {
                     id: Math.random(),
@@ -325,26 +325,26 @@ const Contact = () => {
                   },
                 ].map((item, index) => (
                   <div key={item.id}>
-                    <div className="flex ml-5">
+                    <div className="flex ml-5 text-sm ">
                       {index + 1}.
                       <div className="ml-1">
-                        <p className="font-bold text-base">{item.title}</p>
-                        <p className="text-sm mt-3">{item.description}</p>
+                        <p className="font-bold text-sm">{item.title}</p>
+                        <p className="text-sm mt-1">{item.description}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="col-span-6">
+            <div className="col-span-6 ">
               <div className="mt-8">
-                <label className="text-black dark:text-neargray-10">
-                  Subject<span className="text-red-500"> * </span>
+                <label className=" text-neargray-600 dark:text-neargray-10 text-sm font-semibold">
+                  Subject
                 </label>
-                <div className="flex w-full h-11 mt-2 mb-2">
+                <div className="flex w-full h-10 mt-2 mb-2 ">
                   <span className="relative md:flex overflow-hidden">
                     <select
-                      className="w-96 max-w-full h-full block text-sm px-3 truncate rounded-md border bg-white dark:bg-black-600 dark:border-black-200 cursor-pointer focus:outline-none appearance-none text-black dark:text-neargray-10"
+                      className="w-96 max-w-full h-full block text-sm px-3 truncate rounded-md border bg-white dark:bg-black-600 dark:border-black-200 cursor-pointer focus:outline-none appearance-none text-neargray-600 dark:text-neargray-10"
                       onChange={handleChange}
                       value={selectedValue}
                       name="Please Select Your Message Subject"
@@ -365,7 +365,7 @@ const Contact = () => {
                   </span>
                 </div>
                 {selectedValue === '0' && (
-                  <div className="text-black dark:text-neargray-10">
+                  <div className=" text-neargray-600 dark:text-neargray-10">
                     <span className="font-semibold text-sm">Note:</span>
                     <span className="text-sm ml-1">
                       Selecting an incorrect subject could result in a delayed
@@ -378,7 +378,7 @@ const Contact = () => {
               {selectedValue === '1' && isOpen && (
                 <>
                   <Accordion collapsible className="contact-accordian">
-                    <div className="text-base text-black dark:text-neargray-10 my-5">
+                    <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Introduction
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
@@ -396,7 +396,7 @@ const Contact = () => {
                         />
                       ))}
                     </div>
-                    <div className="text-base text-black dark:text-neargray-10 my-5">
+                    <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Transactions
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
@@ -414,7 +414,7 @@ const Contact = () => {
                         />
                       ))}
                     </div>
-                    <div className="text-base text-black dark:text-neargray-10 my-5">
+                    <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Features & Services
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
@@ -439,7 +439,7 @@ const Contact = () => {
                         />
                       ))}
                     </div>
-                    <div className="text-base text-black dark:text-neargray-10 my-5">
+                    <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Additional Support
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">

@@ -184,7 +184,7 @@ const Verifier: React.FC<ContractFormProps> = ({
           className="w-full text-center bg-nearblue dark:bg-gray-950 p-4 text-green dark:text-neargreen-200 text-sm soft-shadow rounded-xl"
           role="alert"
         >
-          <p className="font-bold text-base">
+          <p className="font-bold text-sm">
             Important Verification Instructions
           </p>
           <p>
@@ -230,13 +230,13 @@ const Verifier: React.FC<ContractFormProps> = ({
             {!error && (
               <div className="flex flex-col rounded-md gap-4">
                 <div>
-                  <p className="font-semibold text-base mb-1">Standards</p>
+                  <p className="font-semibold text-sm mb-1">Standard</p>
                   {loading || apiLoading ? (
                     <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                   ) : (
                     <>
                       <input
-                        id="standards"
+                        id="standard"
                         value={
                           contractMetadata?.standards
                             ?.map(
@@ -245,12 +245,12 @@ const Verifier: React.FC<ContractFormProps> = ({
                             )
                             .join('&nbsp') || ''
                         }
-                        className="px-3 py-1.5 text-base border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                        className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                         disabled
                       />
                       {!contractMetadata?.standards && (
                         <p className="text-red-500 text-xs mt-1">
-                          Standards are required
+                          Standard is required
                         </p>
                       )}
                     </>
@@ -258,30 +258,28 @@ const Verifier: React.FC<ContractFormProps> = ({
                 </div>
 
                 <div>
-                  <p className="font-semibold text-base mb-1">
-                    Contract Address
-                  </p>
+                  <p className="font-semibold text-sm mb-1">Contract Address</p>
                   {loading || apiLoading ? (
                     <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                   ) : (
                     <input
                       id="address"
                       value={accountId}
-                      className="px-3 py-1.5 text-base border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                      className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                       disabled
                     />
                   )}
                 </div>
 
                 <div>
-                  <p className="font-semibold text-base mb-1">Language</p>
+                  <p className="font-semibold text-sm mb-1">Language</p>
                   {loading || apiLoading ? (
                     <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                   ) : (
                     <div className="relative">
                       <select
                         id="language"
-                        className="px-3 py-1.5 text-base border dark:border-black-200  w-full rounded h-10 bg-white dark:bg-black-600 dark:text-neargray-10 outline-none cursor-pointer appearance-none"
+                        className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-white dark:bg-black-600 dark:text-neargray-10 outline-none cursor-pointer appearance-none"
                       >
                         <option value="rust">Rust</option>
                         <option value="javascript" disabled>
@@ -294,7 +292,7 @@ const Verifier: React.FC<ContractFormProps> = ({
                 </div>
 
                 <div>
-                  <p className="font-semibold text-base mb-1">
+                  <p className="font-semibold text-sm mb-1">
                     Build Environment
                   </p>
                   {loading || apiLoading ? (
@@ -306,7 +304,7 @@ const Verifier: React.FC<ContractFormProps> = ({
                         value={
                           contractMetadata?.build_info?.build_environment || ''
                         }
-                        className="px-3 py-1.5 text-base border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                        className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                         disabled
                       />
                       {!contractMetadata?.build_info?.build_environment && (
@@ -319,7 +317,7 @@ const Verifier: React.FC<ContractFormProps> = ({
                 </div>
 
                 <div>
-                  <p className="font-semibold text-base mb-1">Source Code</p>
+                  <p className="font-semibold text-sm mb-1">Source Code</p>
                   {loading || apiLoading ? (
                     <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                   ) : (
@@ -327,7 +325,7 @@ const Verifier: React.FC<ContractFormProps> = ({
                       <input
                         id="sourceCode"
                         value={getSourceCode() || ''}
-                        className="px-3 py-1.5 text-base border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                        className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                         disabled
                       />
                       {!contractMetadata?.build_info?.source_code_snapshot && (
@@ -345,7 +343,7 @@ const Verifier: React.FC<ContractFormProps> = ({
               <div className="w-full max-w-3xl flex justify-center items-center text-center mt-4">
                 <button
                   type="submit"
-                  className={`text-lg text-white border border-green-900/10 font-normal px-3 py-1.5 dark:text-neargray-10 rounded w-fit ${
+                  className={`text-base text-white border border-green-900/10 font-normal px-3 py-1.5 dark:text-neargray-10 rounded w-fit ${
                     allFieldsExist && !verified
                       ? 'hover:bg-green-400 hover:dark:bg-green-200 hover:shadow-md dark:hover:shadow-green-250/50 hover:shadow-green-600/50 bg-green-500 dark:bg-green-250 '
                       : 'disabled:bg-neargray-800 disabled:dark:bg-black-200 disabled:text-nearblue-600 disabled:dark:text-neargray-10 cursor-not-allowed'
