@@ -1,4 +1,5 @@
 import Big from 'big.js';
+import { ethers } from 'ethers';
 
 import { logger } from 'nb-logger';
 
@@ -40,3 +41,9 @@ export const tokenAmount = (amount: string, decimal: number) => {
 
   return Big(amount).div(Big(10).pow(+decimal)).toFixed();
 };
+
+export function accountToHex(accountId: string): string {
+  const hash = ethers.id(accountId);
+  const hexAddress = '0x' + hash.slice(26);
+  return hexAddress;
+}
