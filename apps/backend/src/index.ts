@@ -42,7 +42,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'latest-block' }, // every 10s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes' }, // every 10s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes-telemetry' }, // every 10s
-  { cron: '* * * * *', name: 'ft-meta-hex-address' }, // every minute
+  // { cron: '* * * * *', name: 'ft-meta-hex-address' }, // every minute
 ];
 
 const bree = new Bree({ errorHandler, jobs, logger, root });
