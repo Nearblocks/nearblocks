@@ -210,7 +210,9 @@ const TokenDetails = ({
   const description = token
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
-  const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/og?token=${
+    token?.name && encodeURI(token?.name)
+  }&network=${network}&brand=near&token=true`;
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -256,6 +258,7 @@ const TokenDetails = ({
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={description} />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/token/${id}}`} />

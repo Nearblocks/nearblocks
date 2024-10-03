@@ -472,7 +472,7 @@ const Address = ({
       },
     );
 
-  const thumbnail = `${ogUrl}/thumbnail/account?address=${id}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/og?address=${id}&network=${network}&brand=near&account=true`;
 
   return (
     <>
@@ -518,6 +518,7 @@ const Address = ({
           })}
         />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link

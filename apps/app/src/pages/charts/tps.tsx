@@ -57,9 +57,9 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const Tps = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     'Near Transactions per Second Chart',
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>
@@ -92,6 +92,7 @@ const Tps = ({
         />
 
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/tps`} />

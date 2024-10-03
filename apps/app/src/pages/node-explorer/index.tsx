@@ -81,7 +81,7 @@ const NodeExplorer = ({
   const router = useRouter();
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const title = 'NEAR Validator List | Nearblocks';
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20Validator%20Explorer&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Near%20Protocol%20Validator%20Explorer&brand=near&basic=true`;
 
   useEffect(() => {
     router.replace(router.asPath);
@@ -96,7 +96,9 @@ const NodeExplorer = ({
         <meta property="og:title" content={title} />
         <meta property="twitter:title" content={title} />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">

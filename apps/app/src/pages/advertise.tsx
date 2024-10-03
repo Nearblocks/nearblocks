@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 const AdvertisePage = () => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=Advertise&brand=near`;
+  const thumbnail = `${ogUrl}/og?title=Advertise&brand=near&basic=true`;
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [selectedImage, setSelectedImage] = useState('');
   const { theme } = useTheme();
@@ -80,7 +80,9 @@ const AdvertisePage = () => {
           content={t('home:metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
+        <meta property="og:image:secure_url" content={thumbnail} />
+        <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/advertise`} />
       </Head>
       <div className="container mx-auto herobg flex flex-col items-center p-4.5 lg:!py-16 px-6">

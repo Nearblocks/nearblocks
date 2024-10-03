@@ -159,7 +159,7 @@ const Txn = ({
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
   const description = t('txns:txn.metaDescription', { txn: hash });
-  const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
+  const thumbnail = `${ogUrl}/og?transaction_hash=${hash}&network=${network}&brand=near&transaction=true`;
 
   useEffect(() => {
     const index = hashes.indexOf(pageHash as string);
@@ -295,6 +295,7 @@ const Txn = ({
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={description} />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />

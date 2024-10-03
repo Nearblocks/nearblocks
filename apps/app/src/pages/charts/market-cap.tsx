@@ -59,9 +59,9 @@ const MarketCapChart = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
+  const thumbnail = `${ogUrl}/og?title=${encodeURI(
     t('charts:marketCap.heading'),
-  )}&brand=near`;
+  )}&brand=near&basic=true`;
 
   return (
     <>
@@ -86,6 +86,7 @@ const MarketCapChart = ({
           content={t('charts:marketCap.metaDescription')}
         />
         <meta property="og:image" content={thumbnail} />
+        <meta name="twitter:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/charts/market-cap`} />
