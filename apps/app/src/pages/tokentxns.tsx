@@ -8,6 +8,7 @@ import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
 import Transfers from '@/components/Tokens/FTTransfers';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -19,24 +20,35 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-}> = async ({ query }) => {
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all', ...qs },
+  }: {
+    query: {
+      query?: string;
+      keyword?: string;
+      filter?: string;
+    };
+  } = context;
   const apiUrl = 'fts/txns';
-  const fetchUrl = `${apiUrl}?${queryString.stringify(query)}`;
+  const fetchUrl = `${apiUrl}?${queryString.stringify(qs)}`;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
 
   try {
-    const [
-      dataResult,
-      dataCountResult,
-      syncResult,
-      statsResult,
-      latestBlocksResult,
-    ] = await Promise.allSettled([
+    const [dataResult, dataCountResult, syncResult] = await Promise.allSettled([
       fetcher(fetchUrl),
       fetcher('fts/txns/count'),
       fetcher('sync/status'),
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
     ]);
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -45,12 +57,6 @@ export const getServerSideProps: GetServerSideProps<{
       syncResult.status === 'fulfilled' ? syncResult.value : null;
     const error =
       dataResult.status === 'rejected' || dataCountResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
 
     return {
       props: {
@@ -60,6 +66,8 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -73,6 +81,8 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -145,6 +155,8 @@ ToxenTxns.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

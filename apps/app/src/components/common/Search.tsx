@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
 import { toast } from 'react-toastify';
@@ -16,7 +17,6 @@ import { networkId } from '@/utils/config';
 import ArrowDown from '../Icons/ArrowDown';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
-import search from '@/utils/search';
 
 export const SearchToast = () => {
   if (networkId === 'testnet') {
@@ -24,7 +24,7 @@ export const SearchToast = () => {
       <div>
         No results. Try on{' '}
         <Link href="https://nearblocks.io">
-          <a className="text-green-500">Mainnet</a>
+          <span className="text-green-500">Mainnet</span>
         </Link>
       </div>
     );
@@ -34,7 +34,7 @@ export const SearchToast = () => {
     <div>
       No results. Try on{' '}
       <Link href="https://testnet.nearblocks.io">
-        <a className="text-green-500">Testnet</a>
+        <span className="text-green-500">Testnet</span>
       </Link>
     </div>
   );
@@ -55,12 +55,18 @@ export const redirect = (route: any) => {
   }
 };
 
-const Search = ({ header = false }) => {
+const Search = ({
+  header = false,
+  result = {} as any,
+  redirectResult = {} as any,
+}) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const [keyword, setKeyword] = useState('');
-  const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('all');
+
+  const query = router?.query?.query;
+  const q = typeof query === 'string' ? query.replace(/[\s,]/g, '') : '';
 
   const homeSearch = router.pathname === '/';
 
@@ -71,9 +77,40 @@ const Search = ({ header = false }) => {
     result?.receipts?.length > 0;
 
   useEffect(() => {
-    if (filter && keyword) {
-      search(keyword, filter).then((data: any) => setResult(data || {}));
+    const redirects = (route: any) => {
+      switch (route?.type) {
+        case 'block':
+          return router.push(`/blocks/${route?.path}`);
+        case 'txn':
+        case 'receipt':
+          return router.push(`/txns/${route?.path}`);
+        case 'address':
+          return router.push(`/address/${route?.path}`);
+        default:
+          return toast.error(SearchToast);
+      }
+    };
+
+    if (q) {
+      redirects(redirectResult);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, redirectResult]);
+
+  useEffect(() => {
+    if (filter && keyword) {
+      const { query, ...currentQuery } = router.query;
+      const newQuery = {
+        ...currentQuery,
+        keyword: keyword,
+        filter: filter,
+      };
+      router.push({
+        pathname: router.pathname,
+        query: newQuery,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, keyword]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,17 +134,19 @@ const Search = ({ header = false }) => {
     const text = (
       document.getElementsByClassName('search')[0] as HTMLInputElement
     ).value;
-    const query = text.replace(/[\s,]/g, '');
+    const qs = text.replace(/[\s,]/g, '');
 
-    if (!query) return toast.error(SearchToast);
+    const { query, keyword, ...currentQuery } = router.query;
+    const newQuery = {
+      ...currentQuery,
+      query: qs,
+      filter: filter,
+    };
 
-    const route = await search(query, filter, true);
-
-    if (route) {
-      return redirect(route);
-    }
-
-    return toast.error(SearchToast);
+    return router.push({
+      pathname: router.pathname,
+      query: newQuery,
+    });
   };
 
   return (

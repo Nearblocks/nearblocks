@@ -21,6 +21,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -31,9 +32,24 @@ type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
-    query: { id = '', a = '', tab = 'transfers', ...query },
+    query: {
+      id = '',
+      a = '',
+      tab = 'transfers',
+      keyword = '',
+      query = '',
+      filter = 'all',
+      ...qs
+    },
   }: {
-    query: { id?: string; a?: string; tab?: TabType } & Record<string, any>;
+    query: {
+      id?: string;
+      a?: string;
+      tab?: TabType;
+      query?: string;
+      keyword?: string;
+      filter?: string;
+    } & Record<string, any>;
   } = context;
 
   const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
@@ -52,6 +68,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       }
     }
+
+    const key = keyword?.replace(/[\s,]/g, '');
+    const q = query?.replace(/[\s,]/g, '');
 
     const commonApiUrls = {
       stats: 'stats',
@@ -72,36 +91,39 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       comments: { api: '' },
     };
 
-    const fetchData = async (url: string | undefined) =>
+    const fetchCommonData = async (url: string | undefined) =>
       url ? await fetcher(url) : null;
 
     // Fetch common data
     const [
-      statsResult,
       tokenResult,
       syncResult,
       accountResult,
       tokenFilterResult,
-      latestBlocksResult,
       transfersResult,
       holdersResult,
     ] = await Promise.allSettled([
-      fetchData(commonApiUrls.stats),
-      fetchData(commonApiUrls.token),
-      fetchData(commonApiUrls.sync),
-      fetchData(commonApiUrls.account),
-      fetchData(commonApiUrls.tokenFilter),
-      fetchData(commonApiUrls.latestBlocks),
-      fetchData(commonApiUrls.transfersCount),
-      fetchData(commonApiUrls.holdersCount),
+      fetchCommonData(commonApiUrls.token),
+      fetchCommonData(commonApiUrls.sync),
+      fetchCommonData(commonApiUrls.account),
+      fetchCommonData(commonApiUrls.tokenFilter),
+      fetchCommonData(commonApiUrls.transfersCount),
+      fetchCommonData(commonApiUrls.holdersCount),
     ]);
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     let dataResult = null;
     let dataCountResult = null;
     let contractResult = null;
 
     if (tab !== 'comments') {
-      const queryWithA = a ? { ...query, a } : query;
+      const queryWithA = a ? { ...qs, a } : qs;
 
       // Fetch tab-specific data
       const tabApi = tabApiUrls[tab as TabType];
@@ -115,12 +137,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }`;
 
       [dataResult, dataCountResult] = await Promise.allSettled([
-        fetchData(fetchUrl),
-        fetchData(countUrl),
+        fetchCommonData(fetchUrl),
+        fetchCommonData(countUrl),
       ]);
 
       if (tab === 'faq') {
-        contractResult = await fetchData(`account/${id}/contract/deployments`);
+        contractResult = await fetchCommonData(
+          `account/${id}/contract/deployments`,
+        );
       }
     }
 
@@ -129,7 +153,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        statsDetails: getResult(statsResult),
+        statsDetails: statsDetails,
         tokenDetails: getResult(tokenResult),
         transfersDetails: getResult(transfersResult),
         holdersDetails: getResult(holdersResult),
@@ -137,11 +161,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         accountDetais: getResult(accountResult),
         contractDetails: contractResult && getResult(contractResult),
         tokenFilterDetails: getResult(tokenFilterResult),
-        latestBlocks: getResult(latestBlocksResult),
+        latestBlocks: latestBlocks,
         data: dataResult && getResult(dataResult),
         dataCount: dataCountResult && getResult(dataCountResult),
         error: dataResult && dataResult.status === 'rejected',
         tab,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -161,6 +187,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         dataCount: null,
         error: true,
         tab: 'transfers',
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -379,6 +407,8 @@ TokenDetails.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

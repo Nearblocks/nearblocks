@@ -155,7 +155,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, ...rest } = queryParams;
+    const { cursor, order, p, keyword, query, filter, ...rest } = queryParams;
     return rest;
   }
 
