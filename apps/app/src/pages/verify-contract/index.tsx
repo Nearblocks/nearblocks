@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { appUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import Verifier from '@/components/Address/Contract/Verifier';
-import fetcher from '@/utils/fetcher';
 import { GetServerSideProps } from 'next';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID') || '';
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -14,36 +14,40 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
-  try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
+  try {
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
-    console.error('Error fetching transactions:', error);
+    console.error('Error fetching charts:', error);
     return {
       props: {
-        data: null,
-        dataCount: null,
-        error: true,
-        apiUrl: '',
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -104,6 +108,8 @@ VerifyContract.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

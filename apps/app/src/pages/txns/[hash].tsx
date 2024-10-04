@@ -40,6 +40,7 @@ import {
 } from '@/utils/near';
 import { useRpcStore } from '@/stores/rpc';
 import dynamic from 'next/dynamic';
+import { fetchData } from '@/utils/fetchData';
 
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
   ssr: false,
@@ -55,30 +56,30 @@ export const getServerSideProps: GetServerSideProps<{
   isContract: any;
   price: any;
   latestBlocks: any;
+  searchResultDetails: any;
+  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { hash = '' },
-  } = context;
+    query: { hash = '', keyword = '', query = '', filter = 'all' },
+  }: any = context;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
 
   try {
-    const [dataResult, statsDataResult, latestBlocksResult] =
-      await Promise.allSettled([
-        fetcher(`txns/${hash}`),
-        fetcher(`stats`),
-        fetcher(`blocks/latest?limit=1`),
-      ]);
+    const [dataResult] = await Promise.allSettled([fetcher(`txns/${hash}`)]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
-    const statsData =
-      statsDataResult.status === 'fulfilled' ? statsDataResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
-
     const error = dataResult.status === 'rejected';
 
     const txn = data?.txns?.[0];
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     let price: number | null = null;
     if (txn?.block_timestamp) {
@@ -107,10 +108,12 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         data,
         error,
-        statsData,
+        statsData: statsDetails,
         isContract,
         price,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -123,6 +126,8 @@ export const getServerSideProps: GetServerSideProps<{
         isContract: false,
         price: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -465,6 +470,8 @@ Txn.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsData}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

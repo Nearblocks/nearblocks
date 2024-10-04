@@ -17,6 +17,7 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import Comment from '@/components/skeleton/common/Comment';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import { useAuthStore } from '@/stores/auth';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -34,10 +35,27 @@ export const getServerSideProps: GetServerSideProps<{
   tab: string;
   statsDetails: any;
   latestBlocks: any;
+  searchRedirectDetails: any;
+  searchResultDetails: any;
 }> = async (context) => {
   const {
-    query: { id = '', tab = 'transfers', ...query },
-  }: { query: { id?: string; tab?: string } & Record<string, any> } = context;
+    query: {
+      id = '',
+      tab = 'transfers',
+      query = '',
+      filter = 'all',
+      keyword = '',
+      ...qs
+    },
+  }: {
+    query: {
+      id?: string;
+      tab?: string;
+      query?: string;
+      keyword?: string;
+      filter?: string;
+    } & Record<string, any>;
+  } = context;
 
   const tabApiUrls: Record<
     string,
@@ -49,17 +67,18 @@ export const getServerSideProps: GetServerSideProps<{
       api: `nfts/${id}/tokens`,
       count: `nfts/${id}/tokens/count`,
       queryModifier: () => {
-        query.per_page = '24';
+        qs.per_page = '24';
       },
     },
     comments: { api: `` },
   };
 
+  const q = query?.replace(/[\s,]/g, '');
+  const key = keyword?.replace(/[\s,]/g, '');
+
   const commonApiUrls = {
-    stats: 'stats',
     token: id && `nfts/${id}`,
     sync: 'sync/status',
-    latestBlocks: `blocks/latest?limit=1`,
     transfersCount: id && `nfts/${id}/txns/count`,
     holdersCount: id && `nfts/${id}/holders/count`,
   };
@@ -71,26 +90,18 @@ export const getServerSideProps: GetServerSideProps<{
 
   apiUrls.queryModifier?.();
 
-  const fetchData = async (url: string | undefined) =>
+  const fetchCommonData = async (url: string | undefined) =>
     url ? await fetcher(url) : null;
 
   try {
     // Fetch common data
-    const [
-      statsResult,
-      tokenResult,
-      syncResult,
-      latestBlocksResult,
-      transfersResult,
-      holdersResult,
-    ] = await Promise.allSettled([
-      fetchData(commonApiUrls.stats),
-      fetchData(commonApiUrls.token),
-      fetchData(commonApiUrls.sync),
-      fetchData(commonApiUrls.latestBlocks),
-      fetchData(commonApiUrls.transfersCount),
-      fetchData(commonApiUrls.holdersCount),
-    ]);
+    const [tokenResult, syncResult, transfersResult, holdersResult] =
+      await Promise.allSettled([
+        fetchCommonData(commonApiUrls.token),
+        fetchCommonData(commonApiUrls.sync),
+        fetchCommonData(commonApiUrls.transfersCount),
+        fetchCommonData(commonApiUrls.holdersCount),
+      ]);
 
     let dataResult = null;
     let dataCountResult = null;
@@ -99,20 +110,27 @@ export const getServerSideProps: GetServerSideProps<{
       // Fetch tab-specific data
       const tabApi = tabApiUrls[tab as string];
       const fetchUrl = `${tabApi.api}${
-        query ? `?${queryString.stringify(query)}` : ''
+        qs ? `?${queryString.stringify(qs)}` : ''
       }`;
       const countUrl =
         tabApi.count &&
-        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
+        `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
 
       [dataResult, dataCountResult] = await Promise.allSettled([
-        fetchData(fetchUrl),
-        fetchData(countUrl),
+        fetchCommonData(fetchUrl),
+        fetchCommonData(countUrl),
       ]);
     }
 
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
@@ -124,8 +142,10 @@ export const getServerSideProps: GetServerSideProps<{
         dataCount: dataCountResult && getResult(dataCountResult),
         error: dataResult ? false : true,
         tab: tab as string,
-        statsDetails: getResult(statsResult),
-        latestBlocks: getResult(latestBlocksResult),
+        statsDetails: statsDetails,
+        latestBlocks: latestBlocks,
+        searchRedirectDetails,
+        searchResultDetails,
       },
     };
   } catch (error) {
@@ -142,6 +162,8 @@ export const getServerSideProps: GetServerSideProps<{
         tab: 'transfers',
         statsDetails: null,
         latestBlocks: null,
+        searchRedirectDetails: null,
+        searchResultDetails: null,
       },
     };
   }
@@ -328,6 +350,8 @@ NFToken.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

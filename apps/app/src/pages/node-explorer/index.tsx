@@ -12,6 +12,7 @@ import { useRpcStore } from '@/stores/rpc';
 import { RpcProviders } from '@/utils/rpc';
 import { useRouter } from 'next/router';
 import { getCookieFromRequest } from '@/utils/libs';
+import { fetchData } from '@/utils/fetchData';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
@@ -20,42 +21,44 @@ const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
 
 export const getServerSideProps: GetServerSideProps<{
   data: any;
-  totalSupply: any;
   latestBlock: any;
   error: boolean;
   statsDetails: any;
+  searchRedirectDetails: any;
+  searchResultDetails: any;
 }> = async (context) => {
-  const { query, req } = context;
+  const {
+    query: { keyword = '', query = '', filter = 'all', ...qs },
+    req,
+  }: any = context;
+
+  const q = query?.replace(/[\s,]/g, '');
+  const key = keyword?.replace(/[\s,]/g, '');
 
   const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
 
-  const fetchUrl = `validators?${queryString.stringify(query)}&rpc=${rpcUrl}`;
-  const totalSupplyUrl = `stats`;
-  const latestBlockUrl = `blocks/latest?limit=1`;
+  const fetchUrl = `validators?${queryString.stringify(qs)}&rpc=${rpcUrl}`;
   try {
-    const [dataResult, totalSupplyResult, latestBlockResult, statsResult] =
-      await Promise.allSettled([
-        fetcher(fetchUrl),
-        fetcher(totalSupplyUrl),
-        fetcher(latestBlockUrl),
-        fetcher(`stats`),
-      ]);
+    const [dataResult] = await Promise.allSettled([fetcher(fetchUrl)]);
+
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
-    const totalSupply =
-      totalSupplyResult.status === 'fulfilled' ? totalSupplyResult.value : null;
-    const latestBlock =
-      latestBlockResult.status === 'fulfilled' ? latestBlockResult.value : null;
     const error = dataResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         data,
-        totalSupply,
-        latestBlock,
+        latestBlock: latestBlocks,
         error,
         statsDetails,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -63,10 +66,11 @@ export const getServerSideProps: GetServerSideProps<{
     return {
       props: {
         data: null,
-        totalSupply: null,
         error: true,
         latestBlock: null,
         statsDetails: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -74,7 +78,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 const NodeExplorer = ({
   data,
-  totalSupply,
+  statsDetails,
   latestBlock,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -113,7 +117,7 @@ const NodeExplorer = ({
         <div className="relative">
           <NodeList
             data={data}
-            totalSupply={totalSupply}
+            totalSupply={statsDetails}
             latestBlock={latestBlock}
             error={error}
           />
@@ -126,6 +130,8 @@ NodeExplorer.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlock}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

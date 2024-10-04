@@ -23,6 +23,7 @@ import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import TimeStamp from '../common/TimeStamp';
+import TableSummary from '../common/TableSummary';
 
 const initialForm = {
   action: '',
@@ -176,7 +177,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             label={row?.receipt_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
+            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
                 href={`/txns/${row?.transaction_hash}#execution#${row?.receipt_id}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
@@ -201,10 +202,18 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
+            <span
+              className={`truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap border rounded-md ${
+                row?.transaction_hash === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
               <Link
                 href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                onMouseOver={(e) => onHandleMouseOver(e, row?.transaction_hash)}
+                onMouseLeave={handleMouseLeave}
               >
                 {row?.transaction_hash}
               </Link>
@@ -539,7 +548,8 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, ...rest } = queryParams;
+    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
+      queryParams;
     return rest;
   }
 
@@ -554,43 +564,37 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <Skeleton className="h-4" />
             </div>
           ) : (
-            <div
-              className={`flex flex-col lg:flex-row sm:items-center sm:justify-center`}
-            >
-              <div className="flex flex-col sm:items-center py-4">
-                <p className="leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10">
-                  {txns &&
-                    !error &&
-                    `A total of${' '}
-                  ${
-                    count ? localFormat && localFormat(count.toString()) : 0
-                  }${' '}
-                  receipts found`}
-                </p>
-              </div>
-              <div className="flex flex-col px-4 text-sm text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
-                <div className="px-2 sm:mt-4">
-                  <Filters filters={modifiedFilter} onClear={onAllClear} />
-                </div>
-                <div className="flex items-center space-x-4 md:mb-0 mb-4 ml-2 md:ml-0">
-                  {Object.keys(txns).length > 0 && (
-                    <>
-                      <button className="hover:no-underline">
-                        <Link
-                          href={`/exportdata?address=${id}&type=receipts`}
-                          className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
-                        >
-                          <p>CSV Export</p>
-                          <span className="ml-2">
-                            <Download />
-                          </span>
-                        </Link>
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            <TableSummary
+              text={
+                txns &&
+                !error &&
+                `A total of${' '}
+                    ${
+                      count ? localFormat && localFormat(count.toString()) : 0
+                    }${' '}
+                    receipts found`
+              }
+              filters={
+                <Filters filters={modifiedFilter} onClear={onAllClear} />
+              }
+              linkToDowload={
+                Object.keys(txns).length > 0 && (
+                  <>
+                    <button className="hover:no-underline">
+                      <Link
+                        href={`/exportdata?address=${id}&type=receipts`}
+                        className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                      >
+                        <p>CSV Export</p>
+                        <span className="ml-2">
+                          <Download />
+                        </span>
+                      </Link>
+                    </button>
+                  </>
+                )
+              }
+            />
           )}
           <Table
             columns={columns}

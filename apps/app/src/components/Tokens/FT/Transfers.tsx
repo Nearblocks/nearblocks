@@ -349,7 +349,8 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, ...rest } = queryParams;
+    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
+      queryParams;
     return rest;
   }
 

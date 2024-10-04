@@ -4,30 +4,36 @@ import { useRouter } from 'next/router';
 import { ReactElement } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import fetcher from '@/utils/fetcher';
 import Export from '@/components/Export';
+import { fetchData } from '@/utils/fetchData';
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
-  try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
+  try {
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -36,6 +42,8 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -81,6 +89,8 @@ ExportData.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

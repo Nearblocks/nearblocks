@@ -13,31 +13,41 @@ import {
 } from '@reach/accordion';
 import ArrowDown from '@/components/Icons/ArrowDown';
 import { GetServerSideProps } from 'next';
-import fetcher from '@/utils/fetcher';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { fetchData } from '@/utils/fetchData';
+
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
   try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
+
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -46,10 +56,13 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
 };
+
 const Contact = () => {
   const router = useRouter();
   const { subject } = router.query;
@@ -482,6 +495,8 @@ Contact.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

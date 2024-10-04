@@ -8,6 +8,7 @@ import { env } from 'next-runtime-env';
 import QueryString from 'qs';
 import fetcher from '@/utils/fetcher';
 import Detail from '@/components/Tokens/NFT/Detail';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 export const getServerSideProps: GetServerSideProps<{
@@ -19,40 +20,39 @@ export const getServerSideProps: GetServerSideProps<{
   tid: string;
   statsDetails: any;
   latestBlocks: any;
+  searchRedirectDetails: any;
+  searchResultDetails: any;
 }> = async (context) => {
   const {
-    query: { id, tid, ...query },
+    query: { id, tid, query = '', filter = 'all', keyword = '', ...qs },
   }: any = context;
   const apiUrl = `nfts/${id}/tokens/${tid}`;
-  const fetchUrl = query
-    ? `${apiUrl}/txns?${QueryString.stringify(query)}`
+  const fetchUrl = qs
+    ? `${apiUrl}/txns?${QueryString.stringify(qs)}`
     : `${apiUrl}/txns`;
+  const q = query?.replace(/[\s,]/g, '');
+  const key = keyword?.replace(/[\s,]/g, '');
+
   try {
-    const [
-      tokenData,
-      txnsListResult,
-      txnsCountResult,
-      statsResult,
-      latestBlocksResult,
-    ] = await Promise.allSettled([
-      fetcher(apiUrl),
-      fetcher(fetchUrl),
-      fetcher(`${apiUrl}/txns/count`),
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+    const [tokenData, txnsListResult, txnsCountResult] =
+      await Promise.allSettled([
+        fetcher(apiUrl),
+        fetcher(fetchUrl),
+        fetcher(`${apiUrl}/txns/count`),
+      ]);
     const tokenInfo = tokenData.status === 'fulfilled' ? tokenData.value : null;
     const txnsList =
       txnsListResult.status === 'fulfilled' ? txnsListResult.value : null;
     const txnsCount =
       txnsCountResult.status === 'fulfilled' ? txnsCountResult.value : null;
     const error = txnsListResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
@@ -64,6 +64,8 @@ export const getServerSideProps: GetServerSideProps<{
         tid,
         statsDetails,
         latestBlocks,
+        searchRedirectDetails,
+        searchResultDetails,
       },
     };
   } catch (error) {
@@ -78,6 +80,8 @@ export const getServerSideProps: GetServerSideProps<{
         tid: null,
         statsDetails: null,
         latestBlocks: null,
+        searchRedirectDetails: null,
+        searchResultDetails: null,
       },
     };
   }
@@ -138,6 +142,8 @@ NFTokenInfo.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

@@ -8,6 +8,7 @@ import { env } from 'next-runtime-env';
 import { appUrl } from '@/utils/config';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
+import { fetchData } from '@/utils/fetchData';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
@@ -18,31 +19,35 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  searchResultDetails: any;
+  searchRedirectDetails: any;
 }> = async (context) => {
-  const { query } = context;
+  const {
+    query: { keyword = '', filter = 'all', query = '', ...qs },
+  }: any = context;
+
   const apiUrl = 'blocks';
-  const fetchUrl = query
-    ? `blocks?${queryString.stringify(query)}`
-    : `${apiUrl}`;
+  const fetchUrl = qs ? `blocks?${queryString.stringify(qs)}` : `${apiUrl}`;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
 
   try {
-    const [dataResult, dataCountResult, statsResult, latestBlocksResult] =
-      await Promise.allSettled([
-        fetcher(fetchUrl),
-        fetcher('blocks/count'),
-        fetcher(`stats`),
-        fetcher(`blocks/latest?limit=1`),
-      ]);
+    const [dataResult, dataCountResult] = await Promise.allSettled([
+      fetcher(fetchUrl),
+      fetcher('blocks/count'),
+    ]);
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
     const error = dataResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
@@ -52,6 +57,8 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl,
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -64,6 +71,8 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl: '',
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -124,6 +133,8 @@ Blocks.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

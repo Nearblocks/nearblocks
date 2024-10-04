@@ -2,10 +2,7 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import React, { ReactElement, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { ReactElement } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Banner from '@/components/Banner';
@@ -16,7 +13,7 @@ import fetcher from '@/utils/fetcher';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Overview from '@/components/Transactions/Overview';
 import LatestTransactions from '@/components/Transactions/Latest';
-import search from '@/utils/search';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -27,37 +24,41 @@ export const getServerSideProps: GetServerSideProps<{
   blockDetails: any;
   txnsDetails: any;
   latestBlocks: any;
+  searchRedirectDetails: any;
+  searchResultDetails: any;
   error: boolean;
-}> = async () => {
+}> = async (context) => {
+  const {
+    query: { query = '', keyword = '', filter = 'all' },
+  }: {
+    query: { query?: string; keyword?: string; filter?: string };
+    req: any;
+  } = context;
+
+  const q = query?.replace(/[\s,]/g, '');
+  const key = keyword?.replace(/[\s,]/g, '');
+
   try {
-    const [
-      statsResult,
-      chartResult,
-      blockResult,
-      txnsResult,
-      latestBlocksResult,
-    ] = await Promise.allSettled([
-      fetcher(`stats`),
+    const [chartResult, blockResult, txnsResult] = await Promise.allSettled([
       fetcher(`charts/latest`),
       fetcher(`blocks/latest`),
       fetcher(`txns/latest`),
-      fetcher(`blocks/latest?limit=1`),
     ]);
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
     const chartDetails =
       chartResult.status === 'fulfilled' ? chartResult.value : null;
     const blockDetails =
       blockResult.status === 'fulfilled' ? blockResult.value : null;
     const txnsDetails =
       txnsResult.status === 'fulfilled' ? txnsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
 
-    const error: boolean = statsResult.status === 'rejected';
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+      error,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
@@ -66,11 +67,13 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails,
         txnsDetails,
         latestBlocks,
+        searchRedirectDetails,
+        searchResultDetails,
         error,
       },
     };
   } catch (error) {
-    console.error('Error fetching blocks:', error);
+    console.error('Error fetching data:', error);
     return {
       props: {
         statsDetails: null,
@@ -78,6 +81,8 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails: null,
         txnsDetails: null,
         latestBlocks: null,
+        searchRedirectDetails: null,
+        searchResultDetails: null,
         error: true,
       },
     };
@@ -89,65 +94,15 @@ const HomePage = ({
   chartDetails,
   blockDetails,
   txnsDetails,
+  searchRedirectDetails,
+  searchResultDetails,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter();
   const { t } = useTranslation();
   const stats = statsDetails?.stats?.[0];
   const charts = chartDetails;
   const blocks = blockDetails?.blocks || [];
   const txns = txnsDetails?.txns || [];
-
-  const SearchToast = () => {
-    if (network === 'testnet') {
-      return (
-        <div>
-          No results. Try on{' '}
-          <Link href={env('NEXT_PUBLIC_MAINNET_URL') || ''} legacyBehavior>
-            <a className="text-green-500">Mainnet</a>
-          </Link>
-        </div>
-      );
-    }
-
-    return (
-      <div>
-        No results. Try on{' '}
-        <Link href={env('NEXT_PUBLIC_TESTNET_URL') || ''} legacyBehavior>
-          <a className="text-green-500">Testnet</a>
-        </Link>
-      </div>
-    );
-  };
-
-  const { query }: any = router.query;
-  const q = query?.replace(/[\s,]/g, '');
-
-  useEffect(() => {
-    const redirect = (route: any) => {
-      switch (route?.type) {
-        case 'block':
-          return router.push(`/blocks/${route?.path}`);
-        case 'txn':
-        case 'receipt':
-          return router.push(`/txns/${route?.path}`);
-        case 'address':
-          return router.push(`/address/${route?.path}`);
-        default:
-          return toast.error(SearchToast);
-      }
-    };
-    const fetchData = () => {
-      if (q) {
-        search(q, 'all', true).then((data: any) => {
-          redirect(data);
-        });
-      }
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q]);
-
   const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
 
   return (
@@ -180,7 +135,6 @@ const HomePage = ({
         />
       </Head>
       <div>
-        <ToastContainer />
         <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
           <div className="container mx-auto px-3 py-14 mb-10">
             <div className="flex flex-col lg:flex-row pb-5 lg:!items-center">
@@ -189,7 +143,10 @@ const HomePage = ({
                   {t('home:heroTitle')}
                 </h1>
                 <div className="h-12" suppressHydrationWarning={true}>
-                  <Search />
+                  <Search
+                    result={searchResultDetails}
+                    redirectResult={searchRedirectDetails}
+                  />
                 </div>
                 <div className="text-white"></div>
                 <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
