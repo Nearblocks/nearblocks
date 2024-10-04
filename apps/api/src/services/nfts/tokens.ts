@@ -29,7 +29,7 @@ const list = catchAsync(
         tm.copies,
         tm.extra,
         tm.reference,
-        JSON_BUILD_OBJECT('owner', nft.affected_account_id) AS asset
+        JSON_BUILD_OBJECT('owner', nft.account) AS asset
       FROM
         nft_token_meta tm
         INNER JOIN (
@@ -47,15 +47,13 @@ const list = catchAsync(
         ) AS tmp using (contract, token)
         INNER JOIN LATERAL (
           SELECT
-            affected_account_id
+            account
           FROM
-            nft_events
+            nft_holders
           WHERE
-            contract_account_id = tm.contract
-            AND token_id = tm.token
-            AND delta_amount = 1
-          ORDER BY
-            event_index DESC
+            contract = tm.contract
+            AND token = tm.token
+            AND quantity > 0
           LIMIT
             1
         ) nft ON TRUE
@@ -112,7 +110,7 @@ const item = catchAsync(
           'reference',
           meta.reference
         ) AS nft,
-        JSON_BUILD_OBJECT('owner', nft.affected_account_id) AS asset
+        JSON_BUILD_OBJECT('owner', nft.account) AS asset
       FROM
         nft_token_meta tm
         INNER JOIN LATERAL (
@@ -128,17 +126,15 @@ const item = catchAsync(
           WHERE
             contract = tm.contract
         ) meta ON TRUE
-        INNER JOIN LATERAL (
+        LEFT JOIN LATERAL (
           SELECT
-            affected_account_id
+            account
           FROM
-            nft_events
+            nft_holders
           WHERE
-            contract_account_id = tm.contract
-            AND token_id = tm.token
-            AND delta_amount = 1
-          ORDER BY
-            event_index DESC
+            contract = tm.contract
+            AND token = tm.token
+            AND quantity > 0
           LIMIT
             1
         ) nft ON TRUE
