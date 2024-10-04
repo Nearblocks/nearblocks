@@ -6,6 +6,7 @@ import { BlocksInfo, Stats } from '@/utils/types';
 import useLoading from '@/hooks/useLoading';
 import { Spinner } from '../common/Spinner';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface LayoutProps {
   children: ReactNode;
