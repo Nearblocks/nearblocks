@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import Question from '../Icons/Question';
 import SwitchButton from '../SwitchButton';
 import { yoctoToNear } from '@/utils/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import { useTheme } from 'next-themes';
-import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
 import Skeleton from '../skeleton/common/Skeleton';
 import Image from 'next/legacy/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   chartTypes?: string;
@@ -22,7 +22,7 @@ interface Props {
 
 const Chart = (props: Props) => {
   const { chartTypes, poweredBy, chartsData } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { theme } = useTheme();
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
@@ -40,58 +40,56 @@ const Chart = (props: Props) => {
   const charts = [
     {
       link: '/charts/near-price',
-      text: t ? t('charts:nearPrice.heading') : 'Near Daily Price (USD) Chart',
+      text: t ? t('nearPrice.heading') : 'Near Daily Price (USD) Chart',
       image: `/images/charts/near-price.svg`,
       image_dark: `/images/charts/near-price_dark.svg`,
       exclude: `${networkId}` === 'testnet',
     },
     {
       link: '/charts/market-cap',
-      text: t
-        ? t('charts:marketCap.heading')
-        : 'Near Market Capitalization Chart',
+      text: t ? t('marketCap.heading') : 'Near Market Capitalization Chart',
       image: `/images/charts/market-cap.svg`,
       image_dark: `/images/charts/market-cap_dark.svg`,
       exclude: `${networkId}` === 'testnet',
     },
     {
       link: '/charts/near-supply',
-      text: t ? t('charts:nearSupply.heading') : 'Near Supply Growth Chart',
+      text: t ? t('nearSupply.heading') : 'Near Supply Growth Chart',
       image: `/images/charts/near-supply.svg`,
       image_dark: `/images/charts/near-supply_dark.svg`,
       exclude: false,
     },
     {
       link: '/charts/txns',
-      text: t ? t('charts:txns.heading') : 'Near Daily Transactions Chart',
+      text: t ? t('txns.heading') : 'Near Daily Transactions Chart',
       image: `/images/charts/txns.svg`,
       image_dark: `/images/charts/txns_dark.svg`,
       exclude: false,
     },
     {
       link: '/charts/blocks',
-      text: t ? t('charts:blocks.heading') : 'New Blocks',
+      text: t ? t('blocks.heading') : 'New Blocks',
       image: `/images/charts/blocks.svg`,
       image_dark: `/images/charts/blocks_dark.svg`,
       exclude: false,
     },
     {
       link: '/charts/addresses',
-      text: t ? t('charts:addresses.heading') : 'Near Unique Accounts Chart',
+      text: t ? t('addresses.heading') : 'Near Unique Accounts Chart',
       image: `/images/charts/addresses.svg`,
       image_dark: `/images/charts/addresses_dark.svg`,
       exclude: false,
     },
     {
       link: '/charts/txn-fee',
-      text: t ? t('charts:txnFee.heading') : 'Transaction Fee Chart',
+      text: t ? t('txnFee.heading') : 'Transaction Fee Chart',
       image: `/images/charts/txn-fee.svg`,
       image_dark: `/images/charts/txn-fee_dark.svg`,
       exclude: `${networkId}` === 'testnet',
     },
     {
       link: '/charts/txn-volume',
-      text: t ? t('charts:txnVolume.heading') : 'Transaction Volume Chart',
+      text: t ? t('txnVolume.heading') : 'Transaction Volume Chart',
       image: `/images/charts/txn-volume.svg`,
       image_dark: `/images/charts/txn-volume_dark.svg`,
       exclude: `${networkId}` === 'testnet',
@@ -523,7 +521,7 @@ const Chart = (props: Props) => {
             </div>
           </div>
           <h2 className="mb-4 px-2 text-lg text-gray-700 dark:text-neargray-10">
-            {t('charts:otherHeading')}
+            {t('otherHeading')}
           </h2>
         </>
       )}

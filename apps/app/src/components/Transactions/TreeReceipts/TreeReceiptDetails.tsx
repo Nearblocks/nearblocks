@@ -1,10 +1,10 @@
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
-import Link from 'next/link';
 import { Fragment } from 'react';
 import TreeTxnsActions from './TreeTxnsActions';
 import TreeNode from './TreeNode';
 import { Tooltip } from '@reach/tooltip';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   txn: TransactionInfo;

@@ -1,4 +1,5 @@
 import useRpc from '@/hooks/useRpc';
+import { Link } from '@/i18n/routing';
 import {
   formatTimestampToString,
   getTimeAgoString,
@@ -8,8 +9,7 @@ import {
 } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
   const { viewAccessKey } = useRpc();
   const createdTime = accessKey?.created?.block_timestamp

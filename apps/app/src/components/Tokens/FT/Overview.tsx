@@ -8,7 +8,6 @@ import {
   nanoToMilli,
 } from '@/utils/libs';
 import Big from 'big.js';
-import Link from 'next/link';
 import { useFetch } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
 import Skeleton from '@/components/skeleton/common/Skeleton';
@@ -17,6 +16,7 @@ import WarningIcon from '@/components/Icons/WarningIcon';
 import Question from '@/components/Icons/Question';
 import Links from '@/components/common/Links';
 import { useRouter } from 'next/router';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   stats: StatusInfo;

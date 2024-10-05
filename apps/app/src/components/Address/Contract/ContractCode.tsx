@@ -1,6 +1,5 @@
 import Question from '@/components/Icons/Question';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import { useState } from 'react';
 import VerifiedData from './VerifiedData';
 import VerificationStatus from './VerificationStatus';
@@ -9,6 +8,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import { verifierConfig } from '@/utils/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
+import { Link } from '@/i18n/routing';
 
 type ContractCodeProps = {
   error: string | null;

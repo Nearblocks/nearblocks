@@ -7,15 +7,15 @@ import {
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
-import Link from 'next/link';
 import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import { gasPrice } from '@/utils/near';
-import useTranslation from 'next-translate/useTranslation';
 import { BlocksInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import ListCheck from '../Icons/ListCheck';
 import FaCheckCircle from '../Icons/FaCheckCircle';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   hash: string;
@@ -26,7 +26,7 @@ interface Props {
 
 const Details = (props: Props) => {
   const { hash, blockInfo, price, error } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   interface Props {
     children?: string;
@@ -53,9 +53,9 @@ const Details = (props: Props) => {
         <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
           {t ? (
             <>
-              {t('blocks:block.heading.0')}
+              {t('block.heading.0')}
               <span key={1} className="font-semibold pl-1">
-                {t('blocks:block.heading.1', {
+                {t('block.heading.1', {
                   block: block?.block_height
                     ? localFormat(block?.block_height.toString())
                     : '',
@@ -120,14 +120,12 @@ const Details = (props: Props) => {
           <div className="bg-white text-sm text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:divide-black-200 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
             {networkId === 'testnet' && (
               <div className="flex flex-wrap p-4 text-red-500">
-                {t
-                  ? t('blocks:testnetNotice')
-                  : '[ This is a Testnet block only ]'}
+                {t ? t('testnetNotice') : '[ This is a Testnet block only ]'}
               </div>
             )}
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.height') : 'Block Height'}
+                {t ? t('block.height') : 'Block Height'}
               </div>
               <div className="w-full md:w-3/4 font-semibold break-words">
                 {block?.block_height
@@ -137,7 +135,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.hash') : 'Hash'}
+                {t ? t('block.hash') : 'Hash'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.block_hash}
@@ -146,7 +144,7 @@ const Details = (props: Props) => {
 
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.timestamp') : 'Timestamp'}
+                {t ? t('block.timestamp') : 'Timestamp'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.block_timestamp &&
@@ -160,14 +158,14 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.transactions.0') : 'Transactions'}
+                {t ? t('block.transactions.0') : 'Transactions'}
               </div>
               {block?.transactions_agg?.count && (
                 <div className="w-full md:w-3/4 break-words">
                   {t ? (
                     <>
                       <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                        {t('blocks:block.transactions.1', {
+                        {t('block.transactions.1', {
                           txns: block?.transactions_agg?.count
                             ? localFormat(
                                 block?.transactions_agg?.count?.toString(),
@@ -176,7 +174,7 @@ const Details = (props: Props) => {
                         })}
                       </LinkWrapper>
                       &nbsp;
-                      {t('blocks:block.transactions.2', {
+                      {t('block.transactions.2', {
                         receipts: block?.receipts_agg?.count
                           ? localFormat(block?.receipts_agg?.count?.toString())
                           : block?.receipts_agg?.count?.toString() ?? '',
@@ -205,7 +203,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.author') : 'Author'}
+                {t ? t('block.author') : 'Author'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
@@ -218,7 +216,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.gasUsed') : 'GAS Used'}
+                {t ? t('block.gasUsed') : 'GAS Used'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasUsed
@@ -228,7 +226,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.gasLimit') : 'Gas Limit'}
+                {t ? t('block.gasLimit') : 'Gas Limit'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasLimit
@@ -238,7 +236,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.gasPrice') : 'GAS Price'}
+                {t ? t('block.gasPrice') : 'GAS Price'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.gas_price
@@ -248,7 +246,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.gasFee') : 'Gas Fee'}
+                {t ? t('block.gasFee') : 'Gas Fee'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasUsed && block?.gas_price
@@ -259,7 +257,7 @@ const Details = (props: Props) => {
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t ? t('blocks:block.parenthash') : 'Parent Hash'}
+                {t ? t('block.parenthash') : 'Parent Hash'}
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
@@ -273,7 +271,7 @@ const Details = (props: Props) => {
             {networkId === 'mainnet' && price && (
               <div className="flex flex-wrap p-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                  {t ? t('blocks:block.price') : 'Price'}
+                  {t ? t('block.price') : 'Price'}
                 </div>
                 <div className="w-full md:w-3/4 break-words">
                   {price ? `$${dollarFormat(price)} / Ⓝ` : 'N/A'}

@@ -6,11 +6,11 @@ import Clock from '@/components/Icons/Clock';
 import FaInbox from '@/components/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 interface Props {
   txns: any;
@@ -21,8 +21,8 @@ interface Props {
 }
 
 const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
-  const { t } = useTranslation();
-  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
+  const t = useTranslations();
+  const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);

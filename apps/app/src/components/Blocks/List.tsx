@@ -7,13 +7,13 @@ import {
   localFormat,
   shortenAddress,
 } from '@/utils/libs';
-import Link from 'next/link';
 import { Tooltip } from '@reach/tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
-import useTranslation from 'next-translate/useTranslation';
 import Table from '../common/Table';
 import TimeStamp from '../common/TimeStamp';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface ListProps {
   data: {
@@ -27,10 +27,10 @@ interface ListProps {
 }
 
 const List = ({ data, totalCount, error }: ListProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
-  const errorMessage = t ? t('blocks:noBlocks') : 'No blocks!';
+  const errorMessage = t ? t('noBlocks') : 'No blocks!';
   const [address, setAddress] = useState('');
 
   const onHandleMouseOver = (e: any, id: string) => {
@@ -51,7 +51,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
 
   const columns: any = [
     {
-      header: <span>{t ? t('blocks:blocks') : 'BLOCK'}</span>,
+      header: <span>{t ? t('blocks') : 'BLOCK'}</span>,
       key: 'block_hash',
       cell: (row: BlocksInfo) => (
         <span>
@@ -88,7 +88,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
             >
               {showAge ? (
                 <>
-                  {t ? t('blocks:age') : 'AGE'}
+                  {t ? t('age') : 'AGE'}
                   <Clock className="text-green-500 dark:text-green-250 ml-2" />
                 </>
               ) : (
@@ -108,7 +108,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
     {
-      header: <span>{t ? t('blocks:txn') : 'TXN'}</span>,
+      header: <span>{t ? t('txn') : 'TXN'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
@@ -128,7 +128,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.receipt') : 'RECEIPT'}</span>,
+      header: <span>{t ? t('block.receipt') : 'RECEIPT'}</span>,
       key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
@@ -143,7 +143,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="pl-1">{t ? t('blocks:miner') : 'AUTHOR'}</span>,
+      header: <span className="pl-1">{t ? t('miner') : 'AUTHOR'}</span>,
       key: 'author_account_id',
       cell: (row: BlocksInfo) => (
         <span>
@@ -167,7 +167,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasUsed') : 'GAS USED'}</span>,
+      header: <span>{t ? t('block.gasUsed') : 'GAS USED'}</span>,
       key: 'gas_used',
       cell: (row: BlocksInfo) => (
         <span>
@@ -182,7 +182,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasLimit') : 'GAS LIMIT'}</span>,
+      header: <span>{t ? t('block.gasLimit') : 'GAS LIMIT'}</span>,
       key: 'gas_limit',
       cell: (row: BlocksInfo) => (
         <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
@@ -193,7 +193,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('blocks:block.gasFee') : 'GAS FEE'}</span>,
+      header: <span>{t ? t('block.gasFee') : 'GAS FEE'}</span>,
       key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>
@@ -216,7 +216,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
           {blocks && blocks.length > 0 && (
             <p className="sm:w-full w-65">
               {t
-                ? t('blocks:listing', {
+                ? t('listing', {
                     from: start?.block_height
                       ? localFormat && localFormat(start?.block_height)
                       : start?.block_height ?? '',

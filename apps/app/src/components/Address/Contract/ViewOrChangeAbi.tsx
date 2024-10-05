@@ -13,8 +13,8 @@ import ArrowRight from '@/components/Icons/ArrowRight';
 import { Tooltip } from '@reach/tooltip';
 import CloseCircle from '@/components/Icons/CloseCircle';
 import Question from '@/components/Icons/Question';
-import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   index: number;

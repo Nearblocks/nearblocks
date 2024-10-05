@@ -1,8 +1,5 @@
-import Link from 'next/link';
 import Image from 'next/legacy/image';
-import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
 import { useAuthStore } from '@/stores/auth';
 import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
@@ -15,6 +12,9 @@ import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
+import { useTranslations } from 'next-intl';
+import { Link, routing, usePathname } from '@/i18n/routing';
+import NextLink from 'next/link';
 
 const menus = [
   {
@@ -78,10 +78,6 @@ const menus = [
 ];
 
 const languages = [
-  {
-    title: 'English',
-    locale: 'en',
-  },
   {
     title: '한국어',
     locale: 'kr',
@@ -151,8 +147,8 @@ const Header = ({
 }: Props) => {
   /* eslint-disable @next/next/no-img-element */
 
-  const router = useRouter();
-  const { t } = useTranslation('common');
+  const pathname = usePathname();
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const requestSignInWithWallet = useAuthStore(
@@ -180,13 +176,29 @@ const Header = ({
     return true;
   }, [block]);
 
-  const showSearch = router.pathname !== '/';
+  const showSearch = pathname !== '/';
   const userLoading = false;
 
   const onSignOut = () => {
     logOut();
   };
   const nearPrice = stats?.near_price ?? '';
+
+  type LinkProps = Omit<typeof Link, 'locale'> & {
+    href: string;
+    locale: any;
+    children: any;
+    className: any;
+  };
+
+  const IntlLink: React.FC<LinkProps> = (props) => {
+    if (!routing?.locales?.includes(props.locale)) {
+      console.error(`Invalid locale: ${props.locale}`);
+      return null;
+    }
+
+    return <Link {...props} />;
+  };
   return (
     <div className="dark:bg-black-600 soft-shadow">
       {!status && (
@@ -338,14 +350,13 @@ const Header = ({
                           <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
                             {menu.submenu.map((submenu) => (
                               <li key={submenu.id}>
-                                <ActiveLink href={submenu.link}>
-                                  <a
-                                    className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                                    onClick={() => setOpen(false)}
-                                  >
-                                    {t(submenu.title)}
-                                  </a>
-                                </ActiveLink>
+                                <Link
+                                  className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
+                                  href={submenu.link}
+                                  onClick={() => setOpen(false)}
+                                >
+                                  {t(submenu.title)}
+                                </Link>
                               </li>
                             ))}
                           </ul>
@@ -366,7 +377,7 @@ const Header = ({
                                   activeClassName="text-green-500 dark:text-green-250"
                                 >
                                   <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
-                                    {t(submenu.title)}
+                                    <span>{t(submenu.title)}</span>
                                   </a>
                                 </ActiveLink>
                               </li>
@@ -405,13 +416,25 @@ const Header = ({
                       )}
                     >
                       <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
+                        <li>
+                          <NextLink
+                            className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
+                            href={{
+                              pathname: pathname,
+                            }}
+                          >
+                            English
+                          </NextLink>
+                        </li>
                         {languages.map((language) => (
                           <li key={language.locale}>
-                            <ActiveLink href="#" locale={language.locale}>
-                              <a className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
-                                {language.title}
-                              </a>
-                            </ActiveLink>
+                            <IntlLink
+                              className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
+                              href={pathname}
+                              locale={language?.locale}
+                            >
+                              {language.title}
+                            </IntlLink>
                           </li>
                         ))}
                       </ul>
@@ -425,13 +448,23 @@ const Header = ({
                         <ArrowDown className="fill-current w-4 h-4 ml-2" />
                       </a>
                       <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                        <li>
+                          <NextLink
+                            className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
+                            href={pathname}
+                          >
+                            English
+                          </NextLink>
+                        </li>
                         {languages.map((language) => (
                           <li key={language.locale}>
-                            <ActiveLink href="#" locale={language.locale}>
-                              <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
-                                {language.title}
-                              </a>
-                            </ActiveLink>
+                            <IntlLink
+                              className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4"
+                              href={pathname}
+                              locale={language?.locale}
+                            >
+                              {language.title}
+                            </IntlLink>
                           </li>
                         ))}
                       </ul>

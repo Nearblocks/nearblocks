@@ -2,8 +2,8 @@ import { hexy } from '@/utils/hexy';
 import { yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
 import RlpTransaction from './RlpTransaction';
-import useTranslation from 'next-translate/useTranslation';
 import FaTimesCircle from '@/components/Icons/FaTimesCircle';
+import { useTranslations } from 'next-intl';
 
 const backgroundColorClasses: Record<string, string> = {
   transfer: 'bg-green-50 dark:bg-green-200',
@@ -19,7 +19,7 @@ const backgroundColorClasses: Record<string, string> = {
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
   const { action, onClick, isTxTypeActive, receiver, receipt } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
   const args = action?.args?.args;
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
@@ -66,7 +66,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
       >
         {action?.kind !== 'functionCall' &&
           action?.kind !== 'delegateAction' &&
-          t(`txns:${action?.kind}`)}
+          t(`${action?.kind}`)}
         {action?.kind === 'delegateAction' ? (
           <div className="inline-flex text-sm">{`Delegate`}</div>
         ) : null}

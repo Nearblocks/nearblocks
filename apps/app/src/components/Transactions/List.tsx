@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { txnMethod } from '../../utils/near';
-import Link from 'next/link';
 import TxnStatus from '../common/Status';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
@@ -17,11 +16,12 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import Table from '../common/Table';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
 import Filters from '../common/Filters';
 import Filter from '../Icons/Filter';
 import { useRouter } from 'next/router';
 import TimeStamp from '../common/TimeStamp';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 
 interface ListProps {
   txnsData: {
@@ -42,13 +42,15 @@ const initialForm = {
 };
 
 const List = ({ txnsData, txnsCount, error }: ListProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
-  const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
+  const errorMessage = t ? t('noTxns') : ' No transactions found!';
 
   const count = txnsCount?.txns[0]?.count;
   const txns = txnsData?.txns;
@@ -75,8 +77,8 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     setPage(1);
 
     const { action, method, from, to } = form;
-    const { pathname, query } = router;
-    const { cursor, p, ...updatedQuery } = query;
+    const { query } = router;
+    const { cursor, p, locale, ...updatedQuery } = query;
 
     const queryParams = {
       ...(action && { action }),
@@ -87,21 +89,23 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
     const finalQuery = { ...updatedQuery, ...queryParams };
 
-    router.push({ pathname, query: finalQuery });
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname, query: finalQuery });
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { name } = e.currentTarget;
 
     setPage(1);
-    const { cursor, p, ...restQuery } = router.query;
+    const { cursor, p, locale, ...restQuery } = router.query;
 
     if (name === 'type') {
       setForm((prev) => ({ ...prev, action: '', method: '' }));
-      const { action, method, ...newQuery } = restQuery;
+      const { action, method, locale, ...newQuery } = restQuery;
 
-      router.push({
-        pathname: router.pathname,
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname: pathname,
         query: newQuery,
       });
       return;
@@ -109,8 +113,9 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
 
-      router.push({
-        pathname: router.pathname,
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname: pathname,
         query: newQuery,
       });
     }
@@ -121,21 +126,34 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   const onAllClear = () => {
     setForm(initialForm);
 
-    const { cursor, action, method, from, to, block, order, p, ...newQuery } =
-      router.query;
+    const {
+      cursor,
+      action,
+      method,
+      from,
+      to,
+      block,
+      order,
+      p,
+      locale,
+      ...newQuery
+    } = router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };
 
   const onOrder = () => {
-    const { pathname, query } = router;
-    const { cursor, p, order, ...updatedQuery } = query;
+    const { query } = router;
+    const { cursor, p, order, locale, ...updatedQuery } = query;
     const currentOrder = order ?? 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    router.push({
+
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
       pathname: pathname,
       query: {
         ...updatedQuery,
@@ -155,7 +173,8 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, keyword, query, filter, ...rest } = queryParams;
+    const { cursor, order, p, locale, keyword, query, filter, ...rest } =
+      queryParams;
     return rest;
   }
 
@@ -174,7 +193,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'pl-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-12',
     },
     {
-      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
+      header: <span>{t ? t('hash') : 'TXN HASH'}</span>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
@@ -202,7 +221,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       header: (
         <Menu>
           <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t ? t('txns:type') : 'METHOD'}
+            {t ? t('type') : 'METHOD'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
           <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
@@ -220,7 +239,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="type"
@@ -228,7 +247,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -255,7 +274,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       thClassName: 'px-1.5',
     },
     {
-      header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
+      header: <span>{t ? t('depositValue') : 'DEPOSIT VALUE'}</span>,
       key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
@@ -271,7 +290,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
+      header: <span>{t ? t('txnFee') : 'TXN FEE'}</span>,
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
@@ -290,7 +309,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       header: (
         <Menu>
           <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t ? t('txns:from') : 'FROM'}
+            {t ? t('from') : 'FROM'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
           <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
@@ -300,9 +319,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                 value={form.from}
                 onChange={onChange}
                 placeholder={
-                  t
-                    ? t('txns:filter.placeholder')
-                    : 'Search by address e.g. Ⓝ..'
+                  t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                 }
                 className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600  dark:text-neargray-10 text-xs"
               />
@@ -312,7 +329,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 dark:text-black h-7 text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="from"
@@ -320,7 +337,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -372,7 +389,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
       header: (
         <Menu>
           <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t ? t('txns:to') : 'To'}
+            {t ? t('to') : 'To'}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
           <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
@@ -382,9 +399,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                 value={form.to}
                 onChange={onChange}
                 placeholder={
-                  t
-                    ? t('txns:filter.placeholder')
-                    : 'Search by address e.g. Ⓝ..'
+                  t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                 }
                 className="border dark:border-black-200  rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
               />
@@ -394,7 +409,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 dark:text-black text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="to"
@@ -402,7 +417,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -439,7 +454,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
         'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-48',
     },
     {
-      header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
+      header: <span>{t ? t('blockHeight') : ' BLOCK HEIGHT'}</span>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
@@ -476,10 +491,10 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
             >
               {showAge
                 ? t
-                  ? t('txns:age')
+                  ? t('age')
                   : 'AGE'
                 : t
-                ? t('txns:ageDT')
+                ? t('ageDT')
                 : 'DATE TIME (UTC)'}
               {showAge && (
                 <Clock className="text-green-500 dark:text-green-250 ml-2" />
@@ -517,7 +532,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                 txns?.length > 0 &&
                 `${
                   t
-                    ? t('txns:listing', {
+                    ? t('listing', {
                         count: localFormat ? localFormat(count.toString()) : '',
                       })
                     : `More than > ${count} transactions found`

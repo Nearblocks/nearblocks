@@ -2,6 +2,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import Table from '@/components/common/Table';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
   holderPercentage,
@@ -11,7 +12,6 @@ import {
 } from '@/utils/libs';
 import { HoldersPropsInfo, Token } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 interface Props {

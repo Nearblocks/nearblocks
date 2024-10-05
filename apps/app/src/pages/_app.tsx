@@ -8,6 +8,8 @@ import type { NextPageWithLayout } from '@/utils/types';
 import Script from 'next/script';
 import { env } from 'next-runtime-env';
 import { ThemeProvider } from 'next-themes';
+import { NextIntlClientProvider } from 'next-intl';
+import { NextRouter } from 'next/router';
 
 const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
   ssr: false,
@@ -15,10 +17,14 @@ const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
+  router: NextRouter;
 };
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+export default function App({
+  Component,
+  pageProps,
+  router,
+}: AppPropsWithLayout) {
   useBosLoaderInitializer();
-
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
@@ -33,8 +39,14 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       `}
       </Script>
       <ThemeProvider attribute="class" enableSystem={false}>
-        <VmInitializer />
-        {getLayout(<Component {...pageProps} />)}
+        <NextIntlClientProvider
+          locale={(router.query?.locale as string) ?? 'en'}
+          messages={pageProps?.messages}
+          timeZone="Europe/Vienna"
+        >
+          <VmInitializer />
+          {getLayout(<Component {...pageProps} />)}
+        </NextIntlClientProvider>
       </ThemeProvider>
     </>
   );

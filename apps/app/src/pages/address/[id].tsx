@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { appUrl, networkId } from '@/utils/config';
-import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
 import Head from 'next/head';
 import { ReactElement, useEffect, useState } from 'react';
@@ -33,7 +32,6 @@ import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
-import ContractOverview from '@/components/Address/Contract/ContractOverview';
 import ListCheck from '@/components/Icons/ListCheck';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import { useRpcStore } from '@/stores/rpc';
@@ -41,6 +39,9 @@ import dynamic from 'next/dynamic';
 import { getCookieFromRequest } from '@/utils/libs';
 import { RpcProviders } from '@/utils/rpc';
 import { fetchData } from '@/utils/fetchData';
+import { useTranslations } from 'next-intl';
+import ContractOverview from '@/components/Address/Contract/ContractOverview';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -86,6 +87,7 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlocks: any;
   searchResultDetails: any;
   searchRedirectDetails: any;
+  messages: any;
 }> = async (context) => {
   const {
     query: {
@@ -193,6 +195,20 @@ export const getServerSideProps: GetServerSideProps<{
   const getResult = (result: PromiseSettledResult<any>) =>
     result.status === 'fulfilled' ? result.value : null;
 
+  const locale = context?.params?.locale;
+  const [commonMessages, addressMessages, txnsMessages] = await Promise.all([
+    import(`nearblocks-trans-next-intl/${locale || 'en'}/common.json`),
+    import(`nearblocks-trans-next-intl/${locale || 'en'}/address.json`),
+    import(`nearblocks-trans-next-intl/${locale || 'en'}/txns.json`),
+  ]);
+
+  // Combine all messages into a single object
+  const messages = {
+    ...commonMessages.default,
+    ...addressMessages.default,
+    ...txnsMessages.default,
+  };
+
   let dataResult = null;
   let dataCountResult = null;
 
@@ -232,6 +248,7 @@ export const getServerSideProps: GetServerSideProps<{
       latestBlocks: latestBlocks,
       searchResultDetails,
       searchRedirectDetails,
+      messages,
     },
   };
 };
@@ -250,9 +267,11 @@ const Address = ({
   tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const [tabIndex, setTabIndex] = useState(0);
   const { id } = router.query;
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { ftBalanceOf, contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [isloading, setIsLoading] = useState(true);
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
@@ -462,8 +481,6 @@ const Address = ({
   }, [tab]);
 
   const onTab = (index: number) => {
-    const { id } = router.query;
-
     const hasContractTab =
       contractInfo && contractInfo?.methodNames?.length > 0;
     let actualTabName = tabs[index];
@@ -476,9 +493,12 @@ const Address = ({
 
     setTabIndex(actualTabIndex);
 
-    router.push({
-      pathname: router.pathname,
-      query: { id, tab: actualTabName },
+    const updatedQuery = { tab: actualTabName };
+
+    // @ts-ignore: Unreachable code error
+    intlRouter.replace({
+      pathname,
+      query: updatedQuery,
     });
   };
 
@@ -499,41 +519,41 @@ const Address = ({
       <Head>
         <title>
           {`${network === 'testnet' ? 'TESTNET ' : ''}
-         ${t('address:metaTitle', { address: accountData?.account_id ?? '' })}`}
+         ${t('metaTitle', { address: accountData?.account_id ?? '' })}`}
         </title>
         <meta
           name="title"
-          content={t('address:metaTitle', {
+          content={t('metaTitle', {
             address: accountData?.account_id ?? '',
           })}
         />
         <meta
           name="description"
-          content={t('address:metaDescription', {
+          content={t('metaDescription', {
             address: accountData?.account_id ?? '',
           })}
         />
         <meta
           property="og:title"
-          content={t('address:metaTitle', {
+          content={t('metaTitle', {
             address: accountData?.account_id ?? '',
           })}
         />
         <meta
           property="og:description"
-          content={t('address:metaDescription', {
+          content={t('metaDescription', {
             address: accountData?.account_id ?? '',
           })}
         />
         <meta
           property="twitter:title"
-          content={t('address:metaTitle', {
+          content={t('metaTitle', {
             address: accountData?.account_id ?? '',
           })}
         />
         <meta
           property="twitter:description"
-          content={t('address:metaDescription', {
+          content={t('metaDescription', {
             address: accountData?.account_id ?? '',
           })}
         />
@@ -627,19 +647,19 @@ const Address = ({
                 <Tabs onSelect={onTab} selectedIndex={tabIndex}>
                   <TabList className="flex flex-wrap">
                     {[
-                      { key: 0, label: t ? t('address:txns') : 'Transactions' },
+                      { key: 0, label: t ? t('txns') : 'Transactions' },
                       { key: 1, label: 'Receipts' },
                       {
                         key: 2,
-                        label: t ? t('address:tokenTxns') : 'Token Txns',
+                        label: t ? t('tokenTxns') : 'Token Txns',
                       },
                       {
                         key: 3,
-                        label: t ? t('address:nftTokenTxns') : 'NFT Token Txns',
+                        label: t ? t('nftTokenTxns') : 'NFT Token Txns',
                       },
                       {
                         key: 4,
-                        label: t ? t('address:accessKeys') : 'Access Keys',
+                        label: t ? t('accessKeys') : 'Access Keys',
                       },
                       ...(contractInfo && contractInfo?.methodNames?.length > 0
                         ? [
@@ -656,13 +676,13 @@ const Address = ({
                             },
                             {
                               key: 6,
-                              label: t ? t('address:comments') : 'Comments',
+                              label: t ? t('comments') : 'Comments',
                             },
                           ]
                         : [
                             {
                               key: 5,
-                              label: t ? t('address:comments') : 'Comments',
+                              label: t ? t('comments') : 'Comments',
                             },
                           ]),
                     ].map(({ key, label }) => (

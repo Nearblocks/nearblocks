@@ -1,23 +1,23 @@
 import FaArrowAltCircleRight from '@/components/Icons/FaArrowAltCircleRight';
 import { shortenAddress, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import useTranslation from 'next-translate/useTranslation';
 import TreeNode from '../TreeNode';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 const Transfer = (props: TransactionActionInfo) => {
   const { args, receiver, action } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <>
       <div className="py-1">
         <FaArrowAltCircleRight className="inline-flex text-green-400 mr-1" />{' '}
-        {t ? t('txns:txn.actions.transfer.0') : 'Transferred'}
+        {t ? t('txn.actions.transfer.0') : 'Transferred'}
         <span className="font-bold ml-1">
           {args.deposit ? yoctoToNear(args.deposit, true) : args.deposit ?? ''}{' '}
           Ⓝ
         </span>{' '}
-        {t ? t('txns:txn.actions.transfer.1') : 'to'}
+        {t ? t('txn.actions.transfer.1') : 'to'}
         <Link
           href={`/address/${receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"

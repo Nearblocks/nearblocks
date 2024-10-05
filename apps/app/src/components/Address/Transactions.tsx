@@ -7,11 +7,9 @@ import {
 } from '@/utils/libs';
 import { txnMethod } from '@/utils/near';
 import { TransactionInfo } from '@/utils/types';
-import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import TxnStatus from '../common/Status';
-import Link from 'next/link';
 import { Tooltip } from '@reach/tooltip';
 import Filter from '../Icons/Filter';
 import Skeleton from '../skeleton/common/Skeleton';
@@ -24,6 +22,8 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import TimeStamp from '../common/TimeStamp';
 import TableSummary from '../common/TableSummary';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 
 const initialForm = {
   action: '',
@@ -41,13 +41,15 @@ interface TxnsProps {
 }
 
 const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const { id } = router.query;
   const [page, setPage] = useState(1);
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
+  const errorMessage = t ? t('noTxns') : ' No transactions found!';
   const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -81,8 +83,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     setPage(1);
 
     const { action, method, from, to } = form;
-    const { pathname, query } = router;
-    const { cursor, p, ...updatedQuery } = query;
+    const { query } = router;
+    const { cursor, p, locale, id, ...updatedQuery } = query;
 
     const queryParams = {
       ...(action && { action }),
@@ -92,18 +94,19 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     };
 
     const finalQuery = { ...updatedQuery, ...queryParams };
-
-    router.push({ pathname, query: finalQuery });
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname, query: finalQuery });
   };
 
   const onOrder = () => {
     const currentOrder = router.query.order || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
-    router.push({
-      pathname: router.pathname,
+    const { id, locale, ...rest } = router.query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: {
-        ...router.query,
+        ...rest,
         order: newOrder,
       },
     });
@@ -123,14 +126,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     const { name } = e.currentTarget;
 
     setPage(1);
-    const { cursor, p, ...restQuery } = router.query;
+    const { cursor, p, locale, id, ...restQuery } = router.query;
 
     if (name === 'type') {
       setForm((prev) => ({ ...prev, action: '', method: '' }));
       const { action, method, ...newQuery } = restQuery;
 
-      router.push({
-        pathname: router.pathname,
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname: pathname,
         query: newQuery,
       });
       return;
@@ -138,8 +142,9 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       setForm((f) => ({ ...f, [name]: '' }));
       const { [name]: _, ...newQuery } = restQuery;
 
-      router.push({
-        pathname: router.pathname,
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname: pathname,
         query: newQuery,
       });
     }
@@ -148,11 +153,22 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const onAllClear = () => {
     setForm(initialForm);
 
-    const { cursor, action, p, method, from, to, block, ...newQuery } =
-      router.query;
+    const {
+      cursor,
+      action,
+      p,
+      method,
+      from,
+      to,
+      block,
+      locale,
+      id,
+      ...newQuery
+    } = router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };
@@ -170,7 +186,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
+      header: <span>{t ? t('hash') : 'TXN HASH'}</span>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
@@ -197,7 +213,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       header: (
         <Menu>
           <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t ? t('txns:type') : 'METHOD'}{' '}
+            {t ? t('type') : 'METHOD'}{' '}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
           <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -215,7 +231,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="type"
@@ -223,7 +239,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -249,7 +265,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t ? t('txns:depositValue') : 'DEPOSIT VALUE'}</span>,
+      header: <span>{t ? t('depositValue') : 'DEPOSIT VALUE'}</span>,
       key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
@@ -265,7 +281,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
+      header: <span>{t ? t('txnFee') : 'TXN FEE'}</span>,
       key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
@@ -285,7 +301,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         <>
           <Menu>
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t ? t('txns:from') : 'FROM'}{' '}
+              {t ? t('from') : 'FROM'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -295,9 +311,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   value={form.from}
                   onChange={onChange}
                   placeholder={
-                    t
-                      ? t('txns:filter.placeholder')
-                      : 'Search by address e.g. Ⓝ..'
+                    t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
                   className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 />
@@ -307,7 +321,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                    {t ? t('txns:filter.filter') : 'Filter'}
+                    {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
                     name="from"
@@ -315,7 +329,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     onClick={onClear}
                     className="flex-1 rounded bg-gray-300 text-xs h-7"
                   >
-                    {t ? t('txns:filter.clear') : 'Clear'}
+                    {t ? t('filter.clear') : 'Clear'}
                   </button>
                 </div>
               </form>
@@ -361,15 +375,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       cell: (row: TransactionInfo) => {
         return row?.signer_account_id === row?.receiver_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
-            {t ? t('txns:txnSelf') : 'SELF'}
+            {t ? t('txnSelf') : 'SELF'}
           </span>
         ) : id === row?.signer_account_id ? (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
-            {t ? t('txns:txnOut') : 'OUT'}
+            {t ? t('txnOut') : 'OUT'}
           </span>
         ) : (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen dark:bg-green-500/[0.15] dark:text-neargreen-300 dark:border dark:border-green-400/75 text-white text-xs font-semibold">
-            {t ? t('txns:txnIn') : 'IN'}
+            {t ? t('txnIn') : 'IN'}
           </span>
         );
       },
@@ -379,7 +393,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         <>
           <Menu>
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t ? t('txns:to') : 'To'}{' '}
+              {t ? t('to') : 'To'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
@@ -389,9 +403,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   value={form.to}
                   onChange={onChange}
                   placeholder={
-                    t
-                      ? t('txns:filter.placeholder')
-                      : 'Search by address e.g. Ⓝ..'
+                    t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
                   className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 />
@@ -401,7 +413,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                    {t ? t('txns:filter.filter') : 'Filter'}
+                    {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
                     name="to"
@@ -409,7 +421,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     onClick={onClear}
                     className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                   >
-                    {t ? t('txns:filter.clear') : 'Clear'}
+                    {t ? t('filter.clear') : 'Clear'}
                   </button>
                 </div>
               </form>
@@ -449,7 +461,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      header: <span>{t ? t('txns:blockHeight') : ' BLOCK HEIGHT'}</span>,
+      header: <span>{t ? t('blockHeight') : ' BLOCK HEIGHT'}</span>,
       key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
@@ -486,10 +498,10 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             >
               {showAge
                 ? t
-                  ? t('txns:age')
+                  ? t('age')
                   : 'AGE'
                 : t
-                ? t('txns:ageDT')
+                ? t('ageDT')
                 : 'DATE TIME (UTC)'}
               {showAge && (
                 <Clock className="text-green-500 dark:text-green-250 ml-2" />
@@ -517,7 +529,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
+    const { cursor, order, p, tab, locale, keyword, query, filter, ...rest } =
       queryParams;
     return rest;
   }

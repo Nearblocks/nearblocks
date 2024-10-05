@@ -7,10 +7,8 @@ import {
   serialNumber,
 } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
-import Link from 'next/link';
 import { fetcher } from '@/hooks/useFetch';
 import { useRouter } from 'next/router';
-import useTranslation from 'next-translate/useTranslation';
 import { Tooltip } from '@reach/tooltip';
 import debounce from 'lodash/debounce';
 import TokenImage from '@/components/common/TokenImage';
@@ -21,6 +19,8 @@ import SortIcon from '@/components/Icons/SortIcon';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 
 const initialForm = {
   search: '',
@@ -43,14 +43,16 @@ interface Props {
 }
 
 const List = ({ data, tokensCount, error }: Props) => {
-  const { t } = useTranslation('token');
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const { page, search }: any = router.query;
   const pagination = { page: page ? Number(page) : 1, per_page: 50 };
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [value, setValue] = useState<undefined | string>(undefined);
-  const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
+  const errorMessage = t ? t('fts.top.empty') : 'No tokens found!';
   const [isOpen, setIsOpen] = useState(false);
   const containerRef: any = useRef(null);
   const [form, setForm] = useState(initialForm);
@@ -106,9 +108,10 @@ const List = ({ data, tokensCount, error }: Props) => {
   };
 
   const onFilter = () => {
-    const { pathname, query } = router;
-    const { page, ...updatedQuery } = query;
-    router.push({ pathname, query: { ...updatedQuery, ...form, page: 1 } });
+    const { query } = router;
+    const { page, locale, ...updatedQuery } = query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname, query: { ...updatedQuery, ...form, page: 1 } });
   };
 
   useEffect(() => {
@@ -125,14 +128,16 @@ const List = ({ data, tokensCount, error }: Props) => {
       if (selectedIndex > -1) {
         const selectedToken = searchResults[selectedIndex];
         if (selectedToken) {
-          router.push(`/token/${selectedToken.contract}`);
+          // @ts-ignore: Unreachable code error
+          intlRouter.push(`/token/${selectedToken.contract}`);
         }
       } else {
         if (value) {
           onFilter();
           setSelectedIndex(-1);
         } else if (Object.keys(router.query).length > 0) {
-          router.push(`/tokens`);
+          // @ts-ignore: Unreachable code error
+          intlRouter.push(`/tokens`);
         }
       }
     }
@@ -157,13 +162,16 @@ const List = ({ data, tokensCount, error }: Props) => {
   const onOrder = (sortKey: string) => {
     setSorting((state) => {
       const {
-        pathname,
-        query: { order, ...updatedQuery },
+        query: { order, locale, ...updatedQuery },
       } = router;
       const newOrder: 'asc' | 'desc' =
         (order ?? 'desc') === 'asc' ? 'desc' : 'asc';
       const newState: Sorting = { ...state, sort: sortKey, order: newOrder };
-      router.push({ pathname, query: { ...updatedQuery, order: newOrder } });
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname,
+        query: { ...updatedQuery, order: newOrder },
+      });
       return newState;
     });
   };
@@ -181,7 +189,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('token:fts.top.token') : 'TOKEN'}</span>,
+      header: <span>{t ? t('fts.top.token') : 'TOKEN'}</span>,
       key: 'name',
       cell: (row: Token) => (
         <>
@@ -211,7 +219,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('token:fts.top.price') : 'PRICE'}</span>,
+      header: <span>{t ? t('fts.top.price') : 'PRICE'}</span>,
       key: 'price',
       cell: (row: Token) => (
         <span>
@@ -230,7 +238,7 @@ const List = ({ data, tokensCount, error }: Props) => {
     {
       header: (
         <span className=" whitespace-nowrap">
-          {t ? t('token:fts.top.change') : 'CHANGE'} (%)
+          {t ? t('fts.top.change') : 'CHANGE'} (%)
         </span>
       ),
       key: 'change_24',
@@ -257,7 +265,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         'px-6 py-2 w-60 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('token:fts.top.volume') : 'VOLUME'} (24H)</span>,
+      header: <span>{t ? t('fts.top.volume') : 'VOLUME'} (24H)</span>,
       key: 'volume_24h',
       cell: (row: Token) => (
         <span>

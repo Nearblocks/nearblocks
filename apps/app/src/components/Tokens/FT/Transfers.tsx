@@ -1,9 +1,7 @@
 import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
 import { useState } from 'react';
 import { localFormat } from '@/utils/libs';
-import Link from 'next/link';
 import Big from 'big.js';
 import { tokenAmount } from '@/utils/near';
 import TxnStatus from '@/components/common/Status';
@@ -16,6 +14,8 @@ import Filters from '@/components/common/Filters';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 
 interface Props {
   txns: TransactionInfo[];
@@ -27,9 +27,11 @@ interface Props {
 
 const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   const router = useRouter();
-  const { t } = useTranslation();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
+  const t = useTranslations();
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);
 
@@ -46,10 +48,11 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   };
 
   const onAllClear = () => {
-    const { cursor, a, p, ...newQuery } = router.query;
+    const { cursor, a, p, locale, ...newQuery } = router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };
@@ -207,7 +210,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       cell: (row: TransactionInfo) =>
         row?.involved_account_id === row?.affected_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
-            {t ? t('txns:txnSelf') : 'Self'}
+            {t ? t('txnSelf') : 'Self'}
           </span>
         ) : (
           <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
@@ -326,11 +329,11 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
             >
               {showAge ? (
                 <>
-                  {t ? t('token:fts.age') : 'AGE'}
+                  {t ? t('fts.age') : 'AGE'}
                   <Clock className="text-green-500 dark:text-green-250 ml-2" />
                 </>
               ) : (
-                <> {t ? t('token:fts.ageDT') : 'DATE TIME (UTC)'}</>
+                <> {t ? t('fts.ageDT') : 'DATE TIME (UTC)'}</>
               )}
             </button>
           </Tooltip>
@@ -349,7 +352,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
+    const { cursor, order, p, tab, locale, keyword, query, filter, ...rest } =
       queryParams;
     return rest;
   }

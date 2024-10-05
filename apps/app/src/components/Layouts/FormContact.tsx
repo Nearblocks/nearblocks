@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
 import ArrowDown from '../Icons/ArrowDown';
 import LoadingCircular from '../common/LoadingCircular';
 import { toast } from 'react-toastify';
@@ -8,6 +7,7 @@ import { env } from 'next-runtime-env';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   selectValue?: string;
@@ -17,7 +17,7 @@ const siteKey = env('NEXT_PUBLIC_TURNSTILE_SITE_KEY');
 
 const FormContact = ({ selectValue }: Props) => {
   const { theme } = useTheme();
-  const { t } = useTranslation('contact');
+  const t = useTranslations();
 
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');

@@ -2,13 +2,13 @@ import FaCode from '@/components/Icons/FaCode';
 import { hexy } from '@/utils/hexy';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import useTranslation from 'next-translate/useTranslation';
 import TreeNode from '../TreeNode';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 const FunctionCall = (props: TransactionActionInfo) => {
   const { args, receiver, action } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
@@ -49,9 +49,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
     <>
       <div className="py-1">
         <FaCode className="inline-flex text-yellow-500 mr-1" />
-        {t ? t('txns:txn.actions.functionCall.0') : 'Called method'}
+        {t ? t('txn.actions.functionCall.0') : 'Called method'}
         <span className="font-bold ml-1">{args?.method_name}</span>{' '}
-        {t ? t('txns:txn.actions.functionCall.1') : 'in contract'}
+        {t ? t('txn.actions.functionCall.1') : 'in contract'}
         <Link
           href={`/address/${receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"

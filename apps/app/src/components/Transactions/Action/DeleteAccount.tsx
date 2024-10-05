@@ -1,6 +1,6 @@
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
-import Link from 'next/link';
 
 const DeleteAccount = (props: ActionPropsInfo) => {
   const FaRight = (props: { className: string }) => {

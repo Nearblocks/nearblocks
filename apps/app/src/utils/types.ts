@@ -1615,6 +1615,7 @@ export type chartDataInfo = {
 };
 
 export type AccountDataInfo = {
+  account_id: string;
   amount: string;
   locked: string;
   code_hash: string;
