@@ -1,5 +1,4 @@
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import { HoldersPropsInfo, Token } from '../../../utils/types';
 import {
   getTimeAgoString,
@@ -14,6 +13,7 @@ import { useRouter } from 'next/router';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   token: Token;

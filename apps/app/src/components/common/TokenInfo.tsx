@@ -5,10 +5,10 @@ import {
   tokenAmount,
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
 import TokenImage from './TokenImage';
+import { Link } from '@/i18n/routing';
 
 const TokenInfo = (props: TokenInfoProps) => {
   const { contract, amount, decimals } = props;

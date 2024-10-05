@@ -1,11 +1,9 @@
 import { localFormat, truncateString } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
-import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import TxnStatus from '../common/Status';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import Filter from '../Icons/Filter';
 import Clock from '../Icons/Clock';
@@ -19,6 +17,8 @@ import FaInbox from '../Icons/FaInbox';
 import TokenImage from '../common/TokenImage';
 import dynamic from 'next/dynamic';
 import TableSummary from '../common/TableSummary';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 
 const initialForm = {
   event: '',
@@ -42,14 +42,16 @@ const NFTTransactions = ({
   cursor,
   tab,
 }: NftTokenTxnsProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const { id } = router.query;
   const [page, setPage] = useState(1);
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
   const [address, setAddress] = useState('');
-  const errorMessage = t ? t('txns:noTxns') : ' No transactions found!';
+  const errorMessage = t ? t('noTxns') : ' No transactions found!';
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const onChange = (e: any) => {
@@ -62,11 +64,13 @@ const NFTTransactions = ({
   const onOrder = () => {
     const currentOrder = router.query.order || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    const { id, locale, ...rest } = router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: {
-        ...router.query,
+        ...rest,
         order: newOrder,
       },
     });
@@ -78,8 +82,8 @@ const NFTTransactions = ({
     setPage(1);
 
     const { event, involved } = form;
-    const { pathname, query } = router;
-    const { cursor, p, ...updatedQuery } = query;
+    const { query } = router;
+    const { cursor, p, locale, id, ...updatedQuery } = query;
 
     const queryParams = {
       ...(event && { event: event.toUpperCase() }),
@@ -88,19 +92,21 @@ const NFTTransactions = ({
 
     const finalQuery = { ...updatedQuery, ...queryParams };
 
-    router.push({ pathname, query: finalQuery });
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname, query: finalQuery });
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { name } = e.currentTarget;
-    const { cursor, p, ...restQuery } = router.query;
+    const { cursor, p, locale, id, ...restQuery } = router.query;
 
     setPage(1);
     setForm((f) => ({ ...f, [name]: '' }));
     const { [name]: _, ...newQuery } = restQuery;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };
@@ -108,10 +114,12 @@ const NFTTransactions = ({
   const onAllClear = () => {
     setForm(initialForm);
 
-    const { cursor, event, p, involved, ...newQuery } = router.query;
+    const { cursor, event, p, involved, locale, id, ...newQuery } =
+      router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };
@@ -138,7 +146,7 @@ const NFTTransactions = ({
         'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <>{t ? t('txns:hash') : 'TXN HASH'}</>,
+      header: <>{t ? t('hash') : 'TXN HASH'}</>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
@@ -165,7 +173,7 @@ const NFTTransactions = ({
       header: (
         <Menu>
           <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none">
-            {t ? t('txns:type') : 'METHOD'}{' '}
+            {t ? t('type') : 'METHOD'}{' '}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
           <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -183,7 +191,7 @@ const NFTTransactions = ({
                   className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="event"
@@ -191,7 +199,7 @@ const NFTTransactions = ({
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -260,15 +268,15 @@ const NFTTransactions = ({
         <>
           {row?.involved_account_id === row?.affected_account_id ? (
             <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
-              {t ? t('txns:txnSelf') : 'SELF'}
+              {t ? t('txnSelf') : 'SELF'}
             </span>
           ) : Number(row?.delta_amount) < 0 ? (
             <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
-              {t ? t('txns:txnOut') : 'OUT'}
+              {t ? t('txnOut') : 'OUT'}
             </span>
           ) : (
             <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-neargreen dark:bg-green-500/[0.15] dark:text-neargreen-300 dark:border dark:border-green-400/75 text-white text-xs font-semibold">
-              {t ? t('txns:txnIn') : 'IN'}
+              {t ? t('txnIn') : 'IN'}
             </span>
           )}
         </>
@@ -289,9 +297,7 @@ const NFTTransactions = ({
                 value={form.involved}
                 onChange={onChange}
                 placeholder={
-                  t
-                    ? t('txns:filter.placeholder')
-                    : 'Search by address e.g. Ⓝ..'
+                  t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                 }
                 className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
               />
@@ -301,7 +307,7 @@ const NFTTransactions = ({
                   className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('txns:filter.filter') : 'Filter'}
+                  {t ? t('filter.filter') : 'Filter'}
                 </button>
                 <button
                   name="involved"
@@ -309,7 +315,7 @@ const NFTTransactions = ({
                   onClick={onClear}
                   className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                 >
-                  {t ? t('txns:filter.clear') : 'Clear'}
+                  {t ? t('filter.clear') : 'Clear'}
                 </button>
               </div>
             </form>
@@ -438,10 +444,10 @@ const NFTTransactions = ({
             >
               {showAge
                 ? t
-                  ? t('txns:age')
+                  ? t('age')
                   : 'AGE'
                 : t
-                ? t('txns:ageDT')
+                ? t('ageDT')
                 : 'DATE TIME (UTC)'}
               {showAge && (
                 <Clock className="text-green-500 dark:text-green-250 ml-2" />
@@ -470,8 +476,18 @@ const NFTTransactions = ({
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
+    const {
+      cursor,
+      order,
+      p,
+      tab,
+      locale,
+      keyword,
+      query,
+      filter,
+      id,
+      ...rest
+    } = queryParams;
     return rest;
   }
 

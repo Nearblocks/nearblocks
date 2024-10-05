@@ -1,6 +1,7 @@
 import Error from '@/components/Error';
 import Layout from '@/components/Layouts';
 import { fetchData } from '@/utils/fetchData';
+import { pick } from 'lodash';
 import { GetStaticProps, GetStaticPropsContext } from 'next';
 import { ReactElement } from 'react';
 
@@ -11,6 +12,7 @@ export const getStaticProps: GetStaticProps<{
   searchRedirectDetails: any;
 }> = async (context: GetStaticPropsContext) => {
   const { params } = context;
+  const currentLocale = context?.params?.locale || 'en';
 
   const keyword: any = params?.keyword ?? '';
   const query: any = params?.query ?? '';
@@ -27,12 +29,23 @@ export const getStaticProps: GetStaticProps<{
       searchRedirectDetails,
     } = await fetchData(q, key, filter);
 
+    const [notFoundMessages, commonMessages] = await Promise.all([
+      import(`nearblocks-trans-next-intl/${currentLocale}/404.json`),
+      import(`nearblocks-trans-next-intl/${currentLocale}/common.json`),
+    ]);
+
+    const messages = {
+      ...pick(notFoundMessages.default, NotFound.messages),
+      ...commonMessages.default,
+    };
+
     return {
       props: {
         statsDetails,
         latestBlocks,
         searchResultDetails,
         searchRedirectDetails,
+        messages,
       },
     };
   } catch (error) {
@@ -44,6 +57,7 @@ export const getStaticProps: GetStaticProps<{
         latestBlocks: null,
         searchResultDetails: null,
         searchRedirectDetails: null,
+        messages: null,
       },
     };
   }
@@ -61,5 +75,7 @@ NotFound.getLayout = (page: ReactElement) => (
     {page}
   </Layout>
 );
+
+NotFound.messages = ['404', 'common'];
 
 export default NotFound;

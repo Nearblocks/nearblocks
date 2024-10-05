@@ -1,7 +1,12 @@
-import Link, { LinkProps } from 'next/link';
-import { useRouter } from 'next/router';
+import { Link, usePathname } from '@/i18n/routing';
 import React, { Children, ReactElement, ReactNode } from 'react';
 import { UrlObject } from 'url';
+
+type LinkProps = Omit<typeof Link, 'locale'> & {
+  locale?: any;
+  className?: any;
+  legacyBehavior?: boolean;
+};
 
 interface ActiveLinkProps extends LinkProps {
   children: ReactNode;
@@ -15,11 +20,12 @@ const ActiveLink = ({
   activeClassName,
   inActiveClassName,
   href,
+  legacyBehavior,
   ...props
 }: ActiveLinkProps) => {
-  const { asPath } = useRouter();
+  const asPath = usePathname();
 
-  const child = Children.only(children) as ReactElement<any>;
+  const child = Children?.only(children) as ReactElement<any>;
   const childClassName = child?.props?.className || ' ';
 
   const hrefString = typeof href === 'string' ? href : href.pathname || '';

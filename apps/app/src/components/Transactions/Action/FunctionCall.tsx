@@ -1,7 +1,7 @@
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 
 const FunctionCall = (props: ActionPropsInfo) => {
   const FaRight = (props: { className: string }) => {

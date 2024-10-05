@@ -1,16 +1,16 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-import useTranslation from 'next-translate/useTranslation';
 import Comment from '../common/Comment';
 import Info from './Info';
 import FAQ from './FAQ';
+import { useTranslations } from 'next-intl';
 interface Props {
   className?: string;
   pageTab?: string;
 }
 const Overview = forwardRef(
   ({ className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
-    const { t } = useTranslation('token');
+    const t = useTranslations();
 
     const buttonStyles = (hash: string) =>
       `relative text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none ${

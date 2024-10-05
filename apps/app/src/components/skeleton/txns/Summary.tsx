@@ -1,8 +1,8 @@
-import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../common/Skeleton';
+import { useTranslations } from 'next-intl';
 
 const Summary = () => {
-  const { t } = useTranslation('txns');
+  const t = useTranslations();
 
   return (
     <div className="relative overflow-x-auto rounded-xl">
@@ -25,7 +25,7 @@ const Summary = () => {
               scope="col"
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
             >
-              {t ? t('txns:txn.receipts.from.text.0') : 'From'}
+              {t ? t('txn.receipts.from.text.0') : 'From'}
             </th>
             <th
               scope="col"
@@ -35,7 +35,7 @@ const Summary = () => {
               scope="col"
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
             >
-              {t ? t('txns:txn.receipts.to.text.0') : 'To'}
+              {t ? t('txn.receipts.to.text.0') : 'To'}
             </th>
             <th
               scope="col"

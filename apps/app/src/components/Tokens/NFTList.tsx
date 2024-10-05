@@ -1,16 +1,16 @@
 import { Sorting, Token } from '@/utils/types';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { fetcher } from '@/hooks/useFetch';
 import { localFormat, serialNumber } from '@/utils/libs';
 import { useRouter } from 'next/router';
-import useTranslation from 'next-translate/useTranslation';
 import { debounce } from 'lodash';
 import TokenImage from '@/components/common/TokenImage';
 import SortIcon from '@/components/Icons/SortIcon';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { useTranslations } from 'next-intl';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 const initialSorting: Sorting = {
   sort: 'txns_day',
   order: 'desc',
@@ -31,8 +31,10 @@ interface Props {
 }
 
 const List = ({ data, tokensCount, error }: Props) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const { page, search }: any = router.query;
   const pagination = { page: page ? Number(page) : 1, per_page: 50 };
   const [searchResults, setSearchResults] = useState<Token[]>([]);
@@ -42,7 +44,7 @@ const List = ({ data, tokensCount, error }: Props) => {
   const containerRef: any = useRef(null);
   const [form, setForm] = useState(initialForm);
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
-  const errorMessage = t ? t('token:fts.top.empty') : 'No tokens found!';
+  const errorMessage = t ? t('fts.top.empty') : 'No tokens found!';
 
   const tokens = data?.tokens;
   const count = tokensCount?.tokens[0]?.count || 0;
@@ -94,9 +96,10 @@ const List = ({ data, tokensCount, error }: Props) => {
   };
 
   const onFilter = () => {
-    const { pathname, query } = router;
-    const { page, ...updatedQuery } = query;
-    router.push({ pathname, query: { ...updatedQuery, ...form, page: 1 } });
+    const { query } = router;
+    const { page, locale, ...updatedQuery } = query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname, query: { ...updatedQuery, ...form, page: 1 } });
   };
 
   useEffect(() => {
@@ -113,14 +116,16 @@ const List = ({ data, tokensCount, error }: Props) => {
       if (selectedIndex > -1) {
         const selectedToken = searchResults[selectedIndex];
         if (selectedToken) {
-          router.push(`/nft-token/${selectedToken.contract}`);
+          // @ts-ignore: Unreachable code error
+          intlRouter.push(`/nft-token/${selectedToken.contract}`);
         }
       } else {
         if (value) {
           onFilter();
           setSelectedIndex(-1);
         } else if (Object.keys(router.query).length > 0) {
-          router.push(`/nft-tokens`);
+          // @ts-ignore: Unreachable code error
+          intlRouter.push(`/nft-tokens`);
         }
       }
     }
@@ -146,13 +151,16 @@ const List = ({ data, tokensCount, error }: Props) => {
   const onOrder = (sortKey: string) => {
     setSorting((state) => {
       const {
-        pathname,
-        query: { order, ...updatedQuery },
+        query: { order, locale, ...updatedQuery },
       } = router;
       const newOrder: 'asc' | 'desc' =
         (order ?? 'desc') === 'asc' ? 'desc' : 'asc';
       const newState: Sorting = { ...state, sort: sortKey, order: newOrder };
-      router.push({ pathname, query: { ...updatedQuery, order: newOrder } });
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname,
+        query: { ...updatedQuery, order: newOrder },
+      });
       return newState;
     });
   };

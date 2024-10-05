@@ -1,6 +1,7 @@
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/useRpc';
+import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/hexy';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import {
@@ -10,8 +11,7 @@ import {
 } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
-import useTranslation from 'next-translate/useTranslation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
@@ -23,7 +23,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const onTab = (index: number) => {
     setHash(hashes[index]);
   };
@@ -278,7 +278,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={t('txns:txn.status.tooltip')}
+                      label={t('txn.status.tooltip')}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                     >
                       <div>
@@ -287,7 +287,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         </div>
                       </div>
                     </Tooltip>
-                    {t ? t('txns:txn.status.text.0') : 'Status'}
+                    {t ? t('txn.status.text.0') : 'Status'}
                   </td>
                   <td className="font-semibold py-2 pl-4">
                     {receipt?.outcome?.status !== undefined && (

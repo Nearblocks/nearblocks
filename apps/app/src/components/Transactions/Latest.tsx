@@ -1,8 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { TransactionInfo } from '@/utils/types';
 import {
@@ -13,6 +11,8 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   txns: TransactionInfo[];
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const LatestTransactions = ({ txns, error }: Props) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <>
@@ -28,12 +28,12 @@ const LatestTransactions = ({ txns, error }: Props) => {
         <PerfectScrollbar>
           {!txns && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('home:error') : ' Error!'}
+              {t ? t('error') : ' Error!'}
             </div>
           )}
           {!error && txns?.length === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('home:noTxns') : ' No transactions found!'}
+              {t ? t('noTxns') : ' No transactions found!'}
             </div>
           )}
           {error && txns?.length === 0 && (
@@ -92,7 +92,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
                         TX
                       </div>
                       <div className="overflow-hidden pl-2">
-                        <div className="text-green-500 dark:text-green-250 text-sm  ">
+                        <div className="text-green-500 dark:text-green-250 text-sm">
                           <Link
                             href={`/txns/${txn?.transaction_hash}`}
                             className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
@@ -114,7 +114,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                       <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('home:txnFrom') : 'From'}{' '}
+                        {t ? t('txnFrom') : 'From'}{' '}
                         <Link
                           href={`/address/${txn?.signer_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
@@ -123,7 +123,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
                         </Link>
                       </div>
                       <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('home:txnTo') : 'To'}{' '}
+                        {t ? t('txnTo') : 'To'}{' '}
                         <Link
                           href={`/address/${txn?.receiver_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"

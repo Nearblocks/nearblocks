@@ -1,8 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { BlocksInfo } from '@/utils/types';
 import {
@@ -12,6 +10,8 @@ import {
   nanoToMilli,
 } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   blocks: BlocksInfo[];
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const LatestBlocks = ({ blocks, error }: Props) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <>
@@ -27,12 +27,12 @@ const LatestBlocks = ({ blocks, error }: Props) => {
         <PerfectScrollbar>
           {!blocks && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('home:error') : 'Error!'}
+              {t ? t('error') : 'Error!'}
             </div>
           )}
           {!error && blocks?.length === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('home:noBlocks') : 'No blocks found'}
+              {t ? t('noBlocks') : 'No blocks found'}
             </div>
           )}
           {error && blocks?.length === 0 && (
@@ -115,13 +115,13 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1  text-sm whitespace-nowrap dark:text-green-250 truncate">
                       <span className="dark:text-white">
-                        {t ? t('home:blockMiner') : 'Author'}&nbsp;
+                        {t ? t('blockMiner') : 'Author'}&nbsp;
                       </span>
                       <Link
                         href={`/address/${block?.author_account_id}`}
                         className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                       >
-                        {block?.author_account_id}
+                        <span>{block?.author_account_id}</span>
                       </Link>
                       <div className="text-nearblue-700 text-sm ">
                         {block?.transactions_agg?.count
@@ -158,11 +158,10 @@ const LatestBlocks = ({ blocks, error }: Props) => {
       )}
       {blocks && blocks?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
-          <Link
-            href="/blocks"
-            className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white dark:text-sm text-xs py-3 rounded w-full focus:outline-none hover:no-underline"
-          >
-            View all blocks
+          <Link href="/blocks">
+            <span className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white dark:text-sm text-xs py-3 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
+              View all blocks
+            </span>
           </Link>
         </div>
       )}

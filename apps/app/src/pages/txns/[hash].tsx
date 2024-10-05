@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { appUrl, networkId } from '@/utils/config';
-import useTranslation from 'next-translate/useTranslation';
 import {
   Fragment,
   ReactElement,
@@ -41,6 +40,8 @@ import {
 import { useRpcStore } from '@/stores/rpc';
 import dynamic from 'next/dynamic';
 import { fetchData } from '@/utils/fetchData';
+import { useTranslations } from 'next-intl';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
   ssr: false,
@@ -58,6 +59,7 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlocks: any;
   searchResultDetails: any;
   searchRedirectDetails: any;
+  messages: any;
 }> = async (context) => {
   const {
     query: { hash = '', keyword = '', query = '', filter = 'all' },
@@ -104,6 +106,17 @@ export const getServerSideProps: GetServerSideProps<{
         contractResult.status === 'fulfilled' ? contractResult.value : null;
     }
 
+    const locale = context?.params?.locale;
+    const [commonMessages, txnsMessages] = await Promise.all([
+      import(`nearblocks-trans-next-intl/${locale || 'en'}/common.json`),
+      import(`nearblocks-trans-next-intl/${locale || 'en'}/txns.json`),
+    ]);
+
+    const messages = {
+      ...commonMessages.default,
+      ...txnsMessages.default,
+    };
+
     return {
       props: {
         data,
@@ -114,6 +127,7 @@ export const getServerSideProps: GetServerSideProps<{
         latestBlocks,
         searchResultDetails,
         searchRedirectDetails,
+        messages,
       },
     };
   } catch (error) {
@@ -128,6 +142,7 @@ export const getServerSideProps: GetServerSideProps<{
         latestBlocks: null,
         searchResultDetails: null,
         searchRedirectDetails: null,
+        messages: null,
       },
     };
   }
@@ -141,9 +156,11 @@ const Txn = ({
   price,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const { t } = useTranslation();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
+  const t = useTranslations();
   const components = useBosComponents();
-  const { hash } = router.query;
+  const { hash }: any = router?.query;
   const [pageHash, setHash] = useHash();
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
@@ -161,9 +178,9 @@ const Txn = ({
 
   const txn = data?.txns?.[0];
 
-  let title = t('txns:txn.metaTitle', { txn: hash });
+  let title = t('txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
-  const description = t('txns:txn.metaDescription', { txn: hash });
+  const description = t('txn.metaDescription', { txn: hash });
   const thumbnail = `${ogUrl}/thumbnail/txn?transaction_hash=${hash}&network=${network}&brand=near`;
 
   useEffect(() => {
@@ -178,7 +195,7 @@ const Txn = ({
     if (txn?.outcomes?.status === null || data === null || error) {
       const delay = Math.min(1000 * 2 ** retryCount.current, 150000);
       timeoutRef.current = setTimeout(() => {
-        router.replace(router.asPath);
+        intlRouter.replace(pathname);
         retryCount.current += 1;
       }, delay);
     }
@@ -307,7 +324,7 @@ const Txn = ({
       <div className="md:flex items-center justify-between container mx-auto px-3">
         <div className="flex justify-between dark:text-neargray-10 border-b w-full px-2 pt-3 dark:border-black-200">
           <h1 className="py-2 space-x-2 text-xl leading-8 text-nearblue-600">
-            {t ? t('txns:txn.heading') : 'Transaction Details'}
+            {t ? t('txn.heading') : 'Transaction Details'}
           </h1>
 
           <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
@@ -369,7 +386,7 @@ const Txn = ({
                     className={buttonStyles(hashes[0] === hashes[tabIndex])}
                   >
                     <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.overview') : 'Overview'}
+                      {t ? t('txn.tabs.overview') : 'Overview'}
                     </h2>
                   </button>
                   <button
@@ -377,7 +394,7 @@ const Txn = ({
                     className={buttonStyles(hashes[1] === hashes[tabIndex])}
                   >
                     <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
+                      {t ? t('txn.tabs.execution') : 'Execution Plan'}
                     </h2>
                   </button>
                   <button
@@ -406,7 +423,7 @@ const Txn = ({
                     className={buttonStyles(hashes[5] === hashes[tabIndex])}
                   >
                     <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.comments') : 'Comments'}
+                      {t ? t('txn.tabs.comments') : 'Comments'}
                     </h2>
                   </button>
                 </div>

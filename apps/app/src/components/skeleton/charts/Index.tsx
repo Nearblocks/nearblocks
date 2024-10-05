@@ -1,7 +1,7 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   className?: string;
@@ -63,7 +63,7 @@ const charts = [
   },
 ];
 const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
-  const { t } = useTranslation('charts');
+  const t = useTranslations();
   return (
     <div ref={ref} className={`w-full z-10 ${props.className}`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

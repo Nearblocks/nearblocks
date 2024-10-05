@@ -1,7 +1,7 @@
 import TokenInfo from '@/components/common/TokenInfo';
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { DepositPropsInfo } from '@/utils/types';
-import Link from 'next/link';
 
 const Deposit = (props: DepositPropsInfo) => {
   const FaRight = (props: { className: string }) => {

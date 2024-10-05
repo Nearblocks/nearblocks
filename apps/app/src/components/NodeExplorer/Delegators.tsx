@@ -3,7 +3,6 @@ import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
 import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
 import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import useRpc from '@/hooks/useRpc';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -15,6 +14,7 @@ import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import { useRpcStore } from '@/stores/rpc';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   accountId: string;

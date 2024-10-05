@@ -3,11 +3,11 @@ import { hexy } from '@/utils/hexy';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 import RlpTransaction from '../RlpTransaction';
-import useTranslation from 'next-translate/useTranslation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 const FunctionCall = (props: TransactionActionInfo) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { args, receiver } = props;
 
   function displayArgs(args: any) {
@@ -37,9 +37,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
   return (
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
-      {t ? t('txns:txn.actions.functionCall.0') : 'Called method'}
+      {t ? t('txn.actions.functionCall.0') : 'Called method'}
       <span className="font-bold ml-1">{args?.method_name}</span>{' '}
-      {t ? t('txns:txn.actions.functionCall.1') : 'in contract'}
+      {t ? t('txn.actions.functionCall.1') : 'in contract'}
       <Link
         href={`/address/${receiver}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"

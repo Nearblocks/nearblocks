@@ -1,6 +1,7 @@
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import {
   convertToUTC,
   dollarFormat,
@@ -16,7 +17,6 @@ import {
   HoldersPropsInfo,
   Token,
 } from '@/utils/types';
-import Link from 'next/link';
 
 interface Props {
   id: string;

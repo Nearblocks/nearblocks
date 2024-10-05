@@ -1,7 +1,6 @@
 import { shortenAddress } from '@/utils/libs';
 import { SpamToken, Token, TransactionInfo } from '@/utils/types';
 import { useState } from 'react';
-import Link from 'next/link';
 import {
   Accordion,
   AccordionButton,
@@ -16,6 +15,7 @@ import ArrowUp from '@/components/Icons/ArrowUp';
 import ArrowDown from '@/components/Icons/ArrowDown';
 import Question from '@/components/Icons/Question';
 import TokenTransfers from './TokenTransfers';
+import { Link } from '@/i18n/routing';
 interface Props {
   id: string;
   tid?: string;

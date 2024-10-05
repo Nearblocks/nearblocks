@@ -1,8 +1,6 @@
 import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import useRpc from '@/hooks/useRpc';
 import TxnStatus from '@/components/common/Status';
@@ -13,6 +11,8 @@ import Clock from '@/components/Icons/Clock';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface ListProps {
   data: {
@@ -32,9 +32,9 @@ interface ListProps {
 const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { getBlockDetails } = useRpc();
-  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [address, setAddress] = useState('');
   const [timestamp, setTimeStamp] = useState('');
 
@@ -57,19 +57,19 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
         const res = await getBlockDetails(Number(height));
         const resp = res?.header;
         if (resp) {
-          setTimeStamp(resp.timestamp_nanosec);
+          setTimeStamp(resp?.timestamp_nanosec);
         }
       } catch (error) {
         console.error('Error loading schema:', error);
       }
     };
-    if (typeof status.height === 'string' && Number(status.height) > 0) {
-      fetchTimeStamp(status.height);
+    if (typeof status?.height === 'string' && Number(status?.height) > 0) {
+      fetchTimeStamp(status?.height);
     } else {
-      console.log('Invalid height:', status.height);
+      console.log('Invalid height:', status?.height);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status.height]);
+  }, [status?.height]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
 

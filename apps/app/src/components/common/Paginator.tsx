@@ -1,7 +1,8 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import FaChevronLeft from '../Icons/FaChevronLeft';
 import FaChevronRight from '../Icons/FaChevronRight';
 import { useRouter } from 'next/router';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 interface PaginatorProps {
   count: number;
   limit: number;
@@ -9,12 +10,14 @@ interface PaginatorProps {
   shallow?: boolean;
 }
 const Paginator = (props: PaginatorProps) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations();
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const { page } = router.query;
   const currentPage = page ? Number(page) : 1;
   let pages: number;
-  const { count, limit, shallow, pageLimit = 200 } = props;
+  const { count, limit, pageLimit = 200 } = props;
   if (count > 0) {
     pages = Math.ceil(count / limit);
   } else {
@@ -25,46 +28,38 @@ const Paginator = (props: PaginatorProps) => {
   const onPrev = () => {
     if (currentPage <= 1) return;
     const newPage = currentPage - 1;
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: newPage },
-      },
-      undefined,
-      { shallow: shallow },
-    );
+    const { locale, id, ...rest } = router.query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
+      query: { ...rest, page: newPage },
+    });
   };
   const onNext = () => {
     if (currentPage >= pages) return;
     const newPage = currentPage + 1;
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: newPage },
-      },
-      undefined,
-      { shallow: shallow },
-    );
+    const { locale, id, ...rest } = router.query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
+      query: { ...rest, page: newPage },
+    });
   };
   const onFirst = () => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: 1 },
-      },
-      undefined,
-      { shallow: shallow },
-    );
+    const { locale, id, ...rest } = router.query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
+      query: { ...rest, page: 1 },
+    });
   };
   const onLast = () => {
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { ...router.query, page: pages },
-      },
-      undefined,
-      { shallow: shallow },
-    );
+    const { locale, id, ...rest } = router.query;
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
+      query: { ...rest, page: pages },
+    });
   };
   return (
     <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4 rounded-b-xl">

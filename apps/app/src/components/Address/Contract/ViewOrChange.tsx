@@ -11,11 +11,11 @@ import ArrowRight from '@/components/Icons/ArrowRight';
 import { Tooltip } from '@reach/tooltip';
 import Question from '@/components/Icons/Question';
 import CloseCircle from '@/components/Icons/CloseCircle';
-import Link from 'next/link';
 import { useVmStore } from '@/stores/vm';
 import { useRouter } from 'next/router';
 import { fetcher } from '@/hooks/useFetch';
 import { useAuthStore } from '@/stores/auth';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   connected?: boolean;

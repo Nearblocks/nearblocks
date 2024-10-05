@@ -7,9 +7,7 @@ import {
 } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 import { useState } from 'react';
-import Link from 'next/link';
 import { Tooltip } from '@reach/tooltip';
-import useTranslation from 'next-translate/useTranslation';
 import TxnStatus from '@/components/common/Status';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import Clock from '@/components/Icons/Clock';
@@ -17,6 +15,8 @@ import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   data: {
@@ -37,7 +37,7 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
   const count = txnsCount?.txns[0]?.count;
   const txns: TransactionInfo[] = data?.txns;
   let cursor = data?.cursor;
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const onHandleMouseOver = (e: any, id: string) => {
