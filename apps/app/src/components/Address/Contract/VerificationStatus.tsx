@@ -1,8 +1,8 @@
 import ArrowDown from '@/components/Icons/ArrowDown';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import FaExclamationCircle from '@/components/Icons/FaExclamationCircle';
+import { Link } from '@/i18n/routing';
 import { ContractMetadata, VerificationData } from '@/utils/types';
-import Link from 'next/link';
 import React from 'react';
 
 type VerificationStatusProps = {

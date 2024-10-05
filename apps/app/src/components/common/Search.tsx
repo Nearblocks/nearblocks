@@ -2,8 +2,7 @@
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
 import { toast } from 'react-toastify';
-import Router, { useRouter } from 'next/router';
-import useTranslation from 'next-translate/useTranslation';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   Combobox,
@@ -17,6 +16,8 @@ import { networkId } from '@/utils/config';
 import ArrowDown from '../Icons/ArrowDown';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
+import { useTranslations } from 'next-intl';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 
 export const SearchToast = () => {
   if (networkId === 'testnet') {
@@ -40,35 +41,22 @@ export const SearchToast = () => {
   );
 };
 
-export const redirect = (route: any) => {
-  switch (route?.type) {
-    case 'block':
-      return Router.push(`/blocks/${route?.path}`);
-    case 'txn':
-      return Router.push(`/txns/${route?.path}`);
-    case 'receipt':
-      return Router.push(`/txns/${route?.path}`);
-    case 'address':
-      return Router.push(`/address/${route?.path}`);
-    default:
-      return toast.error(SearchToast);
-  }
-};
-
 const Search = ({
   header = false,
   result = {} as any,
   redirectResult = {} as any,
 }) => {
   const router = useRouter();
-  const { t } = useTranslation('common');
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
+  const t = useTranslations();
   const [keyword, setKeyword] = useState('');
   const [filter, setFilter] = useState('all');
 
   const query = router?.query?.query;
   const q = typeof query === 'string' ? query.replace(/[\s,]/g, '') : '';
 
-  const homeSearch = router.pathname === '/';
+  const homeSearch = pathname === '/[locale]' || '/';
 
   const showResults =
     result?.blocks?.length > 0 ||
@@ -76,37 +64,39 @@ const Search = ({
     result?.accounts?.length > 0 ||
     result?.receipts?.length > 0;
 
-  useEffect(() => {
-    const redirects = (route: any) => {
-      switch (route?.type) {
-        case 'block':
-          return router.push(`/blocks/${route?.path}`);
-        case 'txn':
-        case 'receipt':
-          return router.push(`/txns/${route?.path}`);
-        case 'address':
-          return router.push(`/address/${route?.path}`);
-        default:
-          return toast.error(SearchToast);
-      }
-    };
+  const redirect = (route: any) => {
+    switch (route?.type) {
+      case 'block':
+        return intlRouter.push(`/blocks/${route?.path}`);
+      case 'txn':
+        return intlRouter.push(`/txns/${route?.path}`);
+      case 'receipt':
+        return intlRouter.push(`/txns/${route?.path}`);
+      case 'address':
+        return intlRouter.push(`/address/${route?.path}`);
+      default:
+        return toast.error(SearchToast);
+    }
+  };
 
+  useEffect(() => {
     if (q) {
-      redirects(redirectResult);
+      redirect(redirectResult);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, redirectResult]);
 
   useEffect(() => {
     if (filter && keyword) {
-      const { query, ...currentQuery } = router.query;
+      const { query, locale, ...currentQuery } = router.query;
       const newQuery = {
         ...currentQuery,
         keyword: keyword,
         filter: filter,
       };
-      router.push({
-        pathname: router.pathname,
+      // @ts-ignore: Unreachable code error
+      intlRouter.push({
+        pathname: pathname,
         query: newQuery,
       });
     }
@@ -136,15 +126,16 @@ const Search = ({
     ).value;
     const qs = text.replace(/[\s,]/g, '');
 
-    const { query, keyword, ...currentQuery } = router.query;
+    const { query, keyword, locale, ...currentQuery } = router.query;
     const newQuery = {
       ...currentQuery,
       query: qs,
       filter: filter,
     };
 
-    return router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    return intlRouter.push({
+      pathname: pathname,
       query: newQuery,
     });
   };

@@ -1,15 +1,15 @@
 import { networkId } from '@/utils/config';
 import Skeleton from '../common/Skeleton';
 import React, { Ref, forwardRef } from 'react';
-import useTranslation from 'next-translate/useTranslation';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 interface Props {
   className?: string;
 }
 const Overview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
-    const { t } = useTranslation('home');
+    const t = useTranslations('home');
     const { theme } = useTheme();
     return (
       <div ref={ref} className={`w-full z-10 ${className}`}>

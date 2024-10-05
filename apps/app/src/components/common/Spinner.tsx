@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 
 interface SpinnerProps {
@@ -9,7 +9,8 @@ interface SpinnerProps {
 export const Spinner = ({ loading, setLoading }: SpinnerProps) => {
   const [isClient, setIsClient] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
-  const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsClient(true);
@@ -45,7 +46,7 @@ export const Spinner = ({ loading, setLoading }: SpinnerProps) => {
     setLoading(false);
 
     const timeout = setTimeout(() => {
-      router.replace(router.asPath, undefined, { shallow: true });
+      intlRouter.replace(pathname);
     }, 100);
 
     return () => clearTimeout(timeout);

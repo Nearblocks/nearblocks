@@ -4,8 +4,8 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Menu, MenuItems, MenuButton, MenuPopover } from '@reach/menu-button';
 import ArrowDown from '../Icons/ArrowDown';
-import Link from 'next/link';
 import Big from 'big.js';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   id?: string;

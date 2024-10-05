@@ -3,11 +3,11 @@ import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 import FaHourglassStart from '../Icons/FaHourglassStart';
-import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   txn: TransactionInfo;
@@ -22,7 +22,7 @@ interface Props {
 
 const ReceiptSummary = (props: Props) => {
   const { rpcTxn, txn, loading, statsData } = props;
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [receipt, setReceipt] = useState<any>(null);
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
@@ -139,7 +139,7 @@ const ReceiptSummary = (props: Props) => {
                     scope="col"
                     className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
                   >
-                    {t ? t('txns:txn.receipts.from.text.0') : 'From'}
+                    {t ? t('txn.receipts.from.text.0') : 'From'}
                   </th>
                   <th
                     scope="col"
@@ -149,7 +149,7 @@ const ReceiptSummary = (props: Props) => {
                     scope="col"
                     className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
                   >
-                    {t ? t('txns:txn.receipts.to.text.0') : 'To'}
+                    {t ? t('txn.receipts.to.text.0') : 'To'}
                   </th>
                   <th
                     scope="col"

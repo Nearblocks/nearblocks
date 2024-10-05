@@ -138,6 +138,16 @@ a {
   margin-top: 170px;
 }
 
+.globalErrorBg {
+  background: url('../../public/images/leaf.jpg') no-repeat;
+  mix-blend-mode: multiply;
+  height: 80vh;
+  background-position: center bottom;
+  background-size: cover;
+  width: 100%;
+  margin-top: 170px;
+}
+
 .errorContent {
   top: 50px;
 }

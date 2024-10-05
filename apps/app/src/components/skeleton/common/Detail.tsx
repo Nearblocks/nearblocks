@@ -1,10 +1,10 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from './Skeleton';
-import useTranslation from 'next-translate/useTranslation';
 import Summary from '../txns/Summary';
 import Execution from '../txns/Execution';
 import Tree from '../txns/Tree';
 import Comment from './Comment';
+import { useTranslations } from 'next-intl';
 interface Props {
   network: string;
   txns?: boolean;
@@ -13,7 +13,7 @@ interface Props {
 }
 const Detail = forwardRef(
   ({ network, txns, className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
-    const { t } = useTranslation('txns');
+    const t = useTranslations();
 
     const buttonStyles = (hash: string) =>
       `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-[0.95rem] focus:outline-none ${
@@ -34,13 +34,11 @@ const Detail = forwardRef(
         {txns === true && (
           <div className="mr-3.5">
             <div className={buttonStyles('overview')}>
-              <h2 className="p-2">
-                {t ? t('txns:txn.tabs.overview') : 'Overview'}
-              </h2>
+              <h2 className="p-2">{t ? t('txn.tabs.overview') : 'Overview'}</h2>
             </div>
             <div className={buttonStyles('execution')}>
               <h2 className="p-2">
-                {t ? t('txns:txn.tabs.execution') : 'Execution Plan'}
+                {t ? t('txn.tabs.execution') : 'Execution Plan'}
               </h2>
             </div>
             <div className={buttonStyles('enhanced')}>
@@ -56,9 +54,7 @@ const Detail = forwardRef(
               <h2 className="p-2">Receipt Summary</h2>
             </div>
             <div className={buttonStyles('comments')}>
-              <h2 className="p-2">
-                {t ? t('txns:txn.tabs.comments') : 'Comments'}
-              </h2>
+              <h2 className="p-2">{t ? t('txn.tabs.comments') : 'Comments'}</h2>
             </div>
           </div>
         )}

@@ -1,11 +1,11 @@
 import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 import Big from 'big.js';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { dollarFormat, localFormat } from '@/utils/libs';
 import useRpc from '@/hooks/useRpc';
 import FaAddressBook from '@/components/Icons/FaAddressBook';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   id: string;

@@ -8,17 +8,17 @@ import {
 import { tokenAmount } from '@/utils/near';
 import { useEffect, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
 import Big from 'big.js';
 import TxnStatus from '@/components/common/Status';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import Clock from '@/components/Icons/Clock';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
-import useTranslation from 'next-translate/useTranslation';
 import Table from '@/components/common/Table';
 import TokenImage from '@/components/common/TokenImage';
 import useRpc from '@/hooks/useRpc';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface ListProps {
   data: {
@@ -36,10 +36,10 @@ interface ListProps {
 }
 
 const Transfers = ({ data, totalCount, error, status }: ListProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
-  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
+  const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [address, setAddress] = useState('');
   const { getBlockDetails } = useRpc();
   const [timestamp, setTimeStamp] = useState('');
@@ -88,7 +88,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
         'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t ? t('token:fts.hash') : 'HASH'}</span>,
+      header: <span>{t ? t('fts.hash') : 'HASH'}</span>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <Tooltip
@@ -372,10 +372,10 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
             >
               {showAge
                 ? t
-                  ? t('token:fts.age')
+                  ? t('fts.age')
                   : 'AGE'
                 : t
-                ? t('token:fts.ageDT')
+                ? t('fts.ageDT')
                 : 'DATE TIME (UTC)'}
               {showAge && (
                 <Clock className="text-green-500 dark:text-green-250 ml-2" />

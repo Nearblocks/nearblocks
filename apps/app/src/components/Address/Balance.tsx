@@ -12,12 +12,12 @@ import {
 import WarningIcon from '../Icons/WarningIcon';
 import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 import TokenHoldings from '../common/TokenHoldings';
-import Link from 'next/link';
 import { networkId } from '@/utils/config';
-import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { useRouter } from 'next/router';
 import TokenImage from '../common/TokenImage';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 const Balance = ({
   accountData,
@@ -39,7 +39,7 @@ const Balance = ({
 }: any) => {
   const router = useRouter();
   const { id } = router.query;
-  const { t } = useTranslation();
+  const t = useTranslations();
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
 
@@ -94,7 +94,7 @@ const Balance = ({
           <div className="h-full bg-white soft-shadow rounded-xl dark:bg-black-600">
             <div className="flex justify-between border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10">
               <h2 className="leading-6 text-sm font-semibold">
-                {t ? t('address:overview') : 'Overview'}
+                {t ? t('overview') : 'Overview'}
               </h2>
               {tokenData?.name && (
                 <div className="flex items-center text-xs bg-gray-100 dark:bg-black-200 dark:text-neargray-10 rounded-md px-2 py-1">
@@ -117,7 +117,7 @@ const Balance = ({
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex flex-wrap py-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                  {t ? t('address:balance') : 'Balance'}:
+                  {t ? t('balance') : 'Balance'}:
                 </div>
                 {loading ? (
                   <Skeleton className="h-4 w-32" />
@@ -134,7 +134,7 @@ const Balance = ({
                 statsData?.near_price && (
                   <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                     <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      {t ? t('address:value') : 'Value:'}
+                      {t ? t('value') : 'Value:'}
                     </div>
                     {loading ? (
                       <Skeleton className="h-4 w-32" />
@@ -163,7 +163,7 @@ const Balance = ({
                 )}
               <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                  {t ? t('address:tokens') : 'Tokens:'}
+                  {t ? t('tokens') : 'Tokens:'}
                 </div>
                 <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
@@ -182,13 +182,13 @@ const Balance = ({
         <div className="w-full">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
             <h2 className="leading-6 border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
-              {t ? t('address:moreInfo') : 'Account information'}
+              {t ? t('moreInfo') : 'Account information'}
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex justify-between">
                 <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
-                    Staked {t ? t('address:balance') : 'Balance'}:
+                    Staked {t ? t('balance') : 'Balance'}:
                   </div>
                   {loading ? (
                     <div className="w-full break-words">
@@ -204,7 +204,7 @@ const Balance = ({
                 </div>
                 <div className="flex ml-4  xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
-                    {t ? t('address:storageUsed') : 'Storage Used'}:
+                    {t ? t('storageUsed') : 'Storage Used'}:
                   </div>
                   {loading ? (
                     <div className="w-full break-words">

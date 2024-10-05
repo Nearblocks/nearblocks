@@ -1,15 +1,15 @@
 import FaUser from '@/components/Icons/FaUser';
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import useTranslation from 'next-translate/useTranslation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const DeleteAccount = (props: TransactionActionInfo) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <div className="py-1">
       <FaUser className="inline-flex text-red-400 mr-1" />
-      {t ? t('txns:txn.actions.deleteAccount.0') : 'Delete account'} (
+      {t ? t('txn.actions.deleteAccount.0') : 'Delete account'} (
       <Link
         href={`/address/${props.receiver}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
@@ -17,9 +17,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         {shortenAddress(props.receiver)}
       </Link>
       ){' '}
-      {t
-        ? t('txns:txn.actions.deleteAccount.1')
-        : 'and transfer remaining funds to'}
+      {t ? t('txn.actions.deleteAccount.1') : 'and transfer remaining funds to'}
       <Link
         href={`/address/${props.args.beneficiary_id}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline"

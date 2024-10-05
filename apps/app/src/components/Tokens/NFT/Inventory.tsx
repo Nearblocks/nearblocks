@@ -3,9 +3,9 @@ import Paginator from '@/components/common/Paginator';
 import { NFTImage } from '@/components/common/TokenImage';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { Token } from '@/utils/types';
-import Link from 'next/link';
 
 interface Props {
   token: Token;

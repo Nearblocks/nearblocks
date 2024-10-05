@@ -7,6 +7,7 @@ import Paginator from '../common/Paginator';
 import { useRouter } from 'next/router';
 import AccessKeyRow from './AccessKeyRow';
 import { AccountContractInfo } from '@/utils/types';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 
 interface Props {
   keys: AccountContractInfo[];
@@ -17,17 +18,21 @@ interface Props {
 
 const AccessKeys = ({ keys, count, error, tab }: Props) => {
   const router = useRouter();
+  const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const [showWhen, setShowWhen] = useState(true);
   const toggleShowWhen = () => setShowWhen((s) => !s);
 
   const onOrder = () => {
     const currentOrder = router.query.order || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    const { id, locale, ...rest } = router.query;
 
-    router.push({
-      pathname: router.pathname,
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({
+      pathname: pathname,
       query: {
-        ...router.query,
+        ...rest,
         order: newOrder,
       },
     });

@@ -1,7 +1,7 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   chartTypes: string;
@@ -56,7 +56,7 @@ const charts = [
 ];
 const Index = forwardRef(
   ({ chartTypes, className }: Props, ref: Ref<HTMLDivElement>) => {
-    const { t } = useTranslation('charts');
+    const t = useTranslations();
     return (
       <div ref={ref} className={`w-full z-10 ${className}`}>
         {chartTypes && (
@@ -75,7 +75,7 @@ const Index = forwardRef(
               </div>
             </div>
             <h2 className="mb-4 px-2 text-lg opacity-70 text-gray-700 dark:text-neargray-10">
-              {t('charts:otherHeading')}
+              {t('otherHeading')}
             </h2>
           </>
         )}

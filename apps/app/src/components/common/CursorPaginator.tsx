@@ -1,3 +1,4 @@
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 import { formatWithCommas } from '@/utils/libs';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -9,8 +10,12 @@ interface PaginatorProps {
 
 const CursorPaginator = (props: PaginatorProps) => {
   const router = useRouter();
-  const { setPage, page, cursor } = props;
+  const intlRouter = useIntlRouter();
+  const { locale, id, ...rest } = router.query;
+  const { setPage, cursor } = props;
   const [loading, setLoading] = useState(false);
+  const actualPath = usePathname();
+  const page = rest.p || 1;
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -33,38 +38,39 @@ const CursorPaginator = (props: PaginatorProps) => {
     if (initialLoad.current) {
       initialLoad.current = false;
       const {
-        pathname,
-        query: { cursor, p, ...updatedQuery },
+        query: { cursor, p, locale, ...updatedQuery },
       } = router;
 
-      if (cursor && p) {
-        router.replace({
-          pathname: pathname,
+      if (p) {
+        // @ts-ignore: Unreachable code error
+        intlRouter.replace({
+          pathname: actualPath,
           query: updatedQuery,
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const handleNextPage = () => {
     if (loading) return;
+
     setLoading(true);
-    setPage(page + 1);
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        cursor,
-        p: page + 1,
-      },
-    });
+    setPage(Number(page) + 1);
+    const updatedQuery = {
+      ...rest,
+      cursor: cursor || '',
+      p: Number(page) + 1,
+    };
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname: actualPath, query: updatedQuery });
   };
 
   const onFirst = () => {
-    const { pathname, query } = router;
-    const { cursor, p, ...updatedQuery } = query;
+    const { cursor, p, ...updatedQuery } = rest;
     setPage(1);
-    router.push({ pathname, query: updatedQuery });
+    // @ts-ignore: Unreachable code error
+    intlRouter.push({ pathname: actualPath, query: updatedQuery });
   };
 
   return (

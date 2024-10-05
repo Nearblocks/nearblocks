@@ -1,6 +1,6 @@
 import TokenInfo from '@/components/common/TokenInfo';
+import { Link } from '@/i18n/routing';
 import { EventPropsInfo } from '@/utils/types';
-import Link from 'next/link';
 
 const Swap = (props: EventPropsInfo) => {
   const FaRight = (props: { className: string }) => {

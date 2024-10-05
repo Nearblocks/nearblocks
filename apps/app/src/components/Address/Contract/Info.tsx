@@ -1,9 +1,8 @@
-import Link from 'next/link';
-
 import { Tooltip } from '@reach/tooltip';
 import Question from '@/components/Icons/Question';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
 import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   contract: ContractCodeInfo;

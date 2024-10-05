@@ -1,10 +1,12 @@
 const path = require('path');
 const { configureRuntimeEnv } = require('next-runtime-env/build/configure');
-const nextTranslate = require('next-translate-plugin');
+
+const withNextIntl = require('next-intl/plugin')();
+
 configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
-const nextConfig = nextTranslate({
+const nextConfig = withNextIntl({
   reactStrictMode: true,
   poweredByHeader: false,
   optimizeFonts: false,
@@ -49,6 +51,7 @@ module.exports = nextConfig;
 
 const { withSentryConfig } = require('@sentry/nextjs');
 
+// Skip all paths that should not be internationalized
 module.exports = withSentryConfig(module.exports, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options

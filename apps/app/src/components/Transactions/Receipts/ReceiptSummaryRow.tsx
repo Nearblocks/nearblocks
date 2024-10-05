@@ -8,10 +8,10 @@ import {
   TransactionInfo,
 } from '@/utils/types';
 import Big from 'big.js';
-import Link from 'next/link';
 import { Fragment } from 'react';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import { Tooltip } from '@reach/tooltip';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   txn: TransactionInfo;
