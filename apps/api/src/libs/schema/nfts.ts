@@ -7,6 +7,10 @@ const list = z.object({
   page: z.number().positive().max(100).optional().default(1),
   per_page: z.number().positive().max(50).optional().default(50),
   search: z.string().optional(),
+  sort: z
+    .enum(['name', 'holders', 'tokens', 'txns_day'])
+    .optional()
+    .default('txns_day'),
 });
 
 const count = z.object({
