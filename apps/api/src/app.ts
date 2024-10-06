@@ -39,7 +39,7 @@ app.use(helmet());
 passport.use(bearerStrategy);
 passport.use(anonymousStrategy);
 
-app.set('trust proxy', true);
+app.set('trust proxy', 2);
 app.get('/ip', (req, res) => res.send(req.ip));
 
 app.use('/v1', routes());
