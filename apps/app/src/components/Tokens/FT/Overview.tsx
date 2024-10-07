@@ -3,7 +3,6 @@ import { useState } from 'react';
 import {
   dollarFormat,
   dollarNonCentFormat,
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
@@ -17,6 +16,7 @@ import WarningIcon from '@/components/Icons/WarningIcon';
 import Question from '@/components/Icons/Question';
 import Links from '@/components/common/Links';
 import { useRouter } from 'next/router';
+import dayjs from '../../../utils/dayjs';
 
 interface Props {
   stats: StatusInfo;
@@ -285,8 +285,8 @@ export default function Overview({
                                   {status?.height && localFormat(status.height)}
                                 </span>
                                 {status?.timestamp &&
-                                  `(${getTimeAgoString(
-                                    nanoToMilli(status?.timestamp),
+                                  `(${dayjs().to(
+                                    dayjs(nanoToMilli(status?.timestamp)),
                                   )}).`}
                                 Holders data will be delayed.
                               </span>
