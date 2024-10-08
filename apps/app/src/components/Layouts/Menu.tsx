@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import React, { ReactNode } from 'react';
 import Check from '../Icons/Check';
+import { Link } from '@/i18n/routing';
 
 type MenuProps = {
   children: ReactNode;

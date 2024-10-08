@@ -1,3 +1,4 @@
+'use client';
 import useRpc from '@/hooks/useRpc';
 import { Link } from '@/i18n/routing';
 import {
@@ -68,14 +69,14 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
       case 'AddKey':
         return (
           <div className="py-1 flex items-center text-xs">
-            Access Key Created
+            Acces Key Created
           </div>
         );
       case 'DELETE_KEY':
       case 'DeleteKey':
         return (
           <div className="bg-red-50 py-1 flex items-center text-xs">
-            Access Key Deleted
+            Acces Key Deleted
           </div>
         );
       case 'DELETE_ACCOUNT':
@@ -152,13 +153,13 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo &&
-            Object.keys(keyInfo).length !== 0 &&
+            Object?.keys(keyInfo)?.length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo && keyInfo?.permission && (
             <div className="flex flex-col ">
-              {keyInfo?.permission?.FunctionCall?.method_names?.length > 0
+              {keyInfo?.permission?.FunctionCall?.method_names.length > 0
                 ? keyInfo?.permission?.FunctionCall?.method_names.map(
                     (method) => {
                       return <div key={method}>{showMethod(method)} </div>;

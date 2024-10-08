@@ -8,7 +8,6 @@ import {
   timeAgo,
   yoctoToNear,
 } from '@/utils/libs';
-import Link from 'next/link';
 import ArrowDown from '../Icons/ArrowDown';
 import Question from '../Icons/Question';
 import ErrorMessage from '../common/ErrorMessage';
@@ -19,6 +18,7 @@ import { useTheme } from 'next-themes';
 import Table from '../common/Table';
 import Big from 'big.js';
 import Image from 'next/image';
+import { Link } from '@/i18n/routing';
 
 const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
   const { theme } = useTheme();
