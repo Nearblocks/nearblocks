@@ -15,39 +15,67 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   try {
     const { type } = req.query;
     const query = userSql<Campaign[]>`
-      SELECT
-        c.*
-      FROM
-        campaign__ads c
-        JOIN (
+      WITH
+        valid_ads AS (
+          SELECT
+            *
+          FROM
+            campaign__ads
+          WHERE
+            is_approved = TRUE
+            AND is_active = TRUE
+            AND api_subscription_id IN (
+              SELECT
+                id
+              FROM
+                api__subscriptions
+              WHERE
+                status = 'active'
+            )
+            AND text IS NULL
+        ),
+        rand_selection AS (
           SELECT
             CEIL(
               RANDOM() * (
                 SELECT
                   MAX(id)
                 FROM
-                  campaign__ads
+                  valid_ads
               )
             ) AS rand_id
-        ) r ON c.id >= r.rand_id
-      WHERE
-        c.is_approved = TRUE
-        AND c.is_active = TRUE
-        AND c.api_subscription_id IN (
-          SELECT
-            id
-          FROM
-            api__subscriptions
-          WHERE
-            status = 'active'
         )
-        AND c.text IS NULL
+      SELECT
+        *
+      FROM
+        valid_ads
+      WHERE
+        id >= (
+          SELECT
+            rand_id
+          FROM
+            rand_selection
+        )
+        OR id <= (
+          SELECT
+            rand_id
+          FROM
+            rand_selection
+        )
       ORDER BY
-        c.id
+        CASE
+          WHEN id >= (
+            SELECT
+              rand_id
+            FROM
+              rand_selection
+          ) THEN 1
+          ELSE 2
+        END,
+        id
       LIMIT
         1;
     `;
-
     const result = await query;
     const ad = result[0];
 
@@ -86,39 +114,67 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
 const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
   try {
     const query = userSql<Campaign[]>`
-      SELECT
-        c.*
-      FROM
-        campaign__ads c
-        JOIN (
+      WITH
+        valid_ads AS (
+          SELECT
+            *
+          FROM
+            campaign__ads
+          WHERE
+            is_approved = TRUE
+            AND is_active = TRUE
+            AND api_subscription_id IN (
+              SELECT
+                id
+              FROM
+                api__subscriptions
+              WHERE
+                status = 'active'
+            )
+            AND text IS NOT NULL
+        ),
+        rand_selection AS (
           SELECT
             CEIL(
               RANDOM() * (
                 SELECT
                   MAX(id)
                 FROM
-                  campaign__ads
+                  valid_ads
               )
             ) AS rand_id
-        ) r ON c.id >= r.rand_id
-      WHERE
-        c.is_approved = TRUE
-        AND c.is_active = TRUE
-        AND c.api_subscription_id IN (
-          SELECT
-            id
-          FROM
-            api__subscriptions
-          WHERE
-            status = 'active'
         )
-        AND c.text IS NOT NULL
+      SELECT
+        *
+      FROM
+        valid_ads
+      WHERE
+        id >= (
+          SELECT
+            rand_id
+          FROM
+            rand_selection
+        )
+        OR id <= (
+          SELECT
+            rand_id
+          FROM
+            rand_selection
+        )
       ORDER BY
-        c.id
+        CASE
+          WHEN id >= (
+            SELECT
+              rand_id
+            FROM
+              rand_selection
+          ) THEN 1
+          ELSE 2
+        END,
+        id
       LIMIT
         1;
     `;
-
     const result = await query;
     const ad = result[0];
 
