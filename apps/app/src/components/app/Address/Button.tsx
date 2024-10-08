@@ -1,12 +1,12 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useRef, useState } from 'react';
-import CopyIcon from './CopyIcon';
-import QrCode from '../common/QrCode';
+import CopyIcon from '../Icons/CopyIcon';
 import Clipboard from 'clipboard';
-import QRCodeIcon from './QRCodeIcon';
+import QRCodeIcon from '../Icons/QRCodeIcon';
 import { DialogOverlay, DialogContent } from '@reach/dialog';
-import CloseCircle from './CloseCircle';
+import CloseCircle from '../Icons/CloseCircle';
+import QrCode from '../common/QrCode';
 
 interface Props {
   address: string;

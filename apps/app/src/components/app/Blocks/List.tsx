@@ -18,12 +18,7 @@ import {
   shortenAddress,
 } from '@/utils/app/libs';
 import { Link } from '@/i18n/routing';
-
-const t = (key: string, p?: any): any => {
-  p = {};
-  const simulateAbsence = true;
-  return simulateAbsence ? undefined : { key, p };
-};
+import { useTranslations } from 'next-intl';
 
 const List = ({
   data,
@@ -35,6 +30,7 @@ const List = ({
 }: any) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
+  const t = useTranslations();
   const errorMessage = t('noBlocks') || 'No blocks!';
   const [address, setAddress] = useState('');
 

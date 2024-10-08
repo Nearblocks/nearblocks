@@ -1,6 +1,7 @@
 'use client';
 import classNames from 'classnames';
 import { useSearchParams } from 'next/navigation';
+import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -13,8 +14,7 @@ const tabs = [
   { name: 'accesskeys', message: 'accessKeys', label: 'Access Keys' },
   { name: 'contract', message: 'contract', label: 'Contract' },
 ];
-
-export default function TabSkeletion() {
+export default function AddressLoading() {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const tab = searchParams?.get('tab');
@@ -30,6 +30,7 @@ export default function TabSkeletion() {
     );
   return (
     <>
+      <BalanceSkeleton />
       <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">

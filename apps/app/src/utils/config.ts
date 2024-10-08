@@ -19,8 +19,8 @@ export const network = networks[networkId];
 
 export const apiUrl: string =
   networkId === 'mainnet'
-    ? 'https://api.nearblocks.io/v1/'
-    : 'https://api-testnet.nearblocks.io/v1/';
+    ? 'https://api3.nearblocks.io/v1/'
+    : 'https://api3-testnet.nearblocks.io/v1/';
 
 export const appUrl =
   env('NEXT_PUBLIC_NETWORK_ID') === 'mainnet'
@@ -29,8 +29,8 @@ export const appUrl =
 
 export const docsUrl: string =
   networkId === 'mainnet'
-    ? 'https://api.nearblocks.io/api-docs'
-    : 'https://api-testnet.nearblocks.io/api-docs';
+    ? 'https://api3.nearblocks.io/api-docs'
+    : 'https://api3-testnet.nearblocks.io/api-docs';
 
 export const aurorablocksUrl: string =
   networkId === 'mainnet'
