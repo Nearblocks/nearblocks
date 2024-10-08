@@ -375,3 +375,23 @@ export type ValidatorData = {
   validator_telemetry: JsonObject;
   validators_promise: JsonObject;
 };
+
+export type Campaign = {
+  api_subscription_id: number;
+  click_count: number;
+  desktop_image_center: null | string;
+  desktop_image_right: null | string;
+  icon: null | string;
+  id: number;
+  impression_count: number;
+  is_active: boolean;
+  is_approved: boolean;
+  link_name: null | string;
+  mobile_image: null | string;
+  site_name: null | string;
+  start_date: null | string;
+  text: null | string;
+  title: string;
+  url: null | string;
+  user_id: number;
+};
