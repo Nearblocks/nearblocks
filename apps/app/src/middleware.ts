@@ -6,6 +6,7 @@ const routes = [
   '',
   'blocks',
   'address',
+  'testing',
   'token',
   'charts',
   'txns',
@@ -33,6 +34,7 @@ export default async function middleware(request: NextRequest) {
   const [, locale] = request.nextUrl.pathname.split('/');
 
   if (!routes?.includes(locale)) {
+    console.log('if condition');
     return NextResponse.rewrite(new URL('/404', request.url));
   }
 
@@ -44,6 +46,7 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/((?!api|_next|_vercel|.*\\..*).*)',
-    '/(kr|en|id|zh-cn|zh-hk|ua|ru|es|vi|ph|fr|jp|th|it)/:path*',
+    '/(en|kr|id|zh-cn|zh-hk|ua|ru|es|vi|ph|fr|jp|th|it)/:path*',
+    '/([\\w-]+)?/address/(.+)',
   ],
 };

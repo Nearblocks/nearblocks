@@ -180,29 +180,26 @@ const Verifier: React.FC<ContractFormProps> = ({
   return (
     <div>
       <>
-        {/* <div
+        <div
           className="w-full text-center bg-nearblue dark:bg-gray-950 p-4 text-green dark:text-neargreen-200 text-sm soft-shadow rounded-xl"
           role="alert"
         >
-          <p className="font-bold text-sm">
-            Important Verification Instructions
-          </p>
+          <p className="font-bold text-sm">Verification Instructions</p>
           <p>
-            If you are the contract owner and wish to verify the contract, you
-            need to make your source code publicly available. You can compile it
-            in a reproducible environment (e.g., Docker) using&nbsp;
+            If you are the contract owner and wish to verify your smart
+            contract, you need to make your source code publicly available. For
+            detailed instructions, check out the &nbsp;
             <a
-              href="https://github.com/near/cargo-near"
-              className="text-green-500 dark:text-green-250 hover:no-underline"
+              href="https://github.com/SourceScan/verification-guide"
+              className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              cargo-near
+              verification guide
             </a>
             .
           </p>
-          <p>This ensures that your contract adheres to NEP standards.</p>
-        </div> */}
+        </div>
 
         {(success !== null || verified) && !error && (
           <div

@@ -1,5 +1,4 @@
 'use client';
-import NextLink from 'next/link';
 import Image from 'next/legacy/image';
 import React, { Suspense, useMemo, useState } from 'react';
 import { useAuthStore } from '@/stores/auth';
@@ -11,8 +10,6 @@ import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
-import Rpc from '../Icons/Rpc';
-import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 import { networkId } from '@/utils/app/config';
 import { BlocksInfo, Stats } from '@/utils/types';
@@ -93,6 +90,7 @@ const menus = [
 ];
 
 const languages = [
+  { title: 'English', locale: 'en' },
   {
     title: '한국어',
     locale: 'kr',
@@ -166,9 +164,6 @@ const Header = ({
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
 
-  const RpcMenu = dynamic(() => import('./RpcMenu'), {
-    ssr: false,
-  });
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const status = useMemo(() => {
@@ -428,14 +423,6 @@ const Header = ({
                       )}
                     >
                       <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
-                        <li>
-                          <NextLink
-                            className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                            href={pathname}
-                          >
-                            English
-                          </NextLink>
-                        </li>
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <IntlLink
@@ -458,14 +445,6 @@ const Header = ({
                         <ArrowDown className="fill-current w-4 h-4 ml-2" />
                       </a>
                       <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
-                        <li>
-                          <NextLink
-                            className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                            href={pathname}
-                          >
-                            English
-                          </NextLink>
-                        </li>
                         {languages.map((language) => (
                           <li key={language.locale}>
                             <IntlLink
@@ -590,45 +569,7 @@ const Header = ({
                     />
                   </span>
                 </li>
-                {/* rpc start */}
-                <li>
-                  <>
-                    <Collapse
-                      trigger={({ show, onClick }) => (
-                        <a
-                          className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline"
-                          href="#"
-                          onClick={onClick}
-                        >
-                          <Rpc className="h-5 text-black-200 dark:text-white" />
-                          <ArrowDown
-                            className={`fill-current transition-transform w-5 h-5 ${
-                              show && 'transform rotate-180'
-                            }`}
-                          />
-                        </a>
-                      )}
-                    >
-                      <ul className="border-l-2 border-green-500 dark:text-green-250 md:hidden ml-4">
-                        <RpcMenu />
-                      </ul>
-                    </Collapse>
-                    <span className="group hidden md:flex w-full relative h-full">
-                      <a
-                        className={`hidden md:flex items-center justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 px-0 mr-3`}
-                        href="#"
-                      >
-                        <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded">
-                          <Rpc className="h-5 text-neargray-600 dark:filter dark:invert" />
-                        </div>
-                      </a>
-                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
-                        <RpcMenu />
-                      </ul>
-                    </span>
-                  </>
-                </li>
-                {/* rpc end */}
+
                 <li>
                   <>
                     <Collapse

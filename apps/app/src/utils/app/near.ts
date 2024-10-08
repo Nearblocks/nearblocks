@@ -88,9 +88,9 @@ export const txnMethod = (
 ) => {
   const count = actions?.length || 0;
 
-  if (!count) return t ? t('txns:unknownType') || 'Unknown' : 'Unknown';
+  if (!count) return t ? t('unknownType') || 'Unknown' : 'Unknown';
   if (count > 1)
-    return t ? t('txns:batchTxns') || 'Batch Transaction' : 'Batch Transaction';
+    return t ? t('batchTxns') || 'Batch Transaction' : 'Batch Transaction';
 
   const action = actions[0];
 

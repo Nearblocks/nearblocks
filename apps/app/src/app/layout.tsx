@@ -1,9 +1,7 @@
 import '@/styles/globals.css';
 import { ThemeProvider } from 'next-themes';
 import Script from 'next/script';
-import { env } from 'next-runtime-env';
 import '../../public/common.css';
-import Head from 'next/head';
 import { Manrope } from 'next/font/google';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
@@ -26,7 +24,7 @@ export default async function RootLayout({
 
   return (
     <html className={manrope.className} suppressHydrationWarning lang="en">
-      <Head>
+      <head>
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -46,7 +44,7 @@ export default async function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
         <script async src="/__ENV.js" />
-      </Head>
+      </head>
       <body className="overflow-x-hidden dark:bg-black-300">
         <Script async id="gtm">
           {`
@@ -54,9 +52,7 @@ export default async function RootLayout({
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${env(
-              'NEXT_PUBLIC_GTM_ID',
-            )}');
+            })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
           `}
         </Script>
         <ThemeProvider attribute="class" enableSystem={false}>
