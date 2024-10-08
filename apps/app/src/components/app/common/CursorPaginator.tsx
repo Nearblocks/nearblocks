@@ -1,5 +1,5 @@
 'use client';
-import { useIntlRouter } from '@/i18n/routing';
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 import { formatWithCommas } from '@/utils/libs';
 import { useSearchParams } from 'next/navigation';
 interface PaginatorProps {
@@ -10,6 +10,7 @@ interface PaginatorProps {
 const CursorPaginator = (props: PaginatorProps) => {
   const { cursor, isLoading } = props;
   const intlRouter = useIntlRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page') || '1';
 
@@ -20,7 +21,7 @@ const CursorPaginator = (props: PaginatorProps) => {
       params.set('page', String(Number(page) + 1));
       params.set('cursor', `${cursor}`);
 
-      const newUrl = `${currentUrl?.pathname}?${params?.toString()}`;
+      const newUrl = `${pathname}?${params?.toString()}`;
 
       intlRouter.push(newUrl);
     }
@@ -33,7 +34,7 @@ const CursorPaginator = (props: PaginatorProps) => {
     params.delete('cursor');
     params.delete('page');
 
-    const newUrl = `${currentUrl.pathname}?${params.toString()}`;
+    const newUrl = `${pathname}?${params.toString()}`;
 
     intlRouter.replace(newUrl);
   };

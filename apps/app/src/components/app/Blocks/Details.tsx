@@ -44,6 +44,7 @@ export default function Details(props: Props) {
   const block: BlocksInfo | null = data?.blocks?.[0];
   const gasUsed = block?.chunks_agg?.gas_used ?? '';
   const gasLimit = block?.chunks_agg?.gas_limit ?? '';
+
   return (
     <>
       <div className="md:flex items-center justify-between">

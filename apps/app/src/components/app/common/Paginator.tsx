@@ -1,9 +1,9 @@
 'use client';
-import useTranslation from 'next-translate/useTranslation';
 import FaChevronLeft from '../Icons/FaChevronLeft';
 import FaChevronRight from '../Icons/FaChevronRight';
 import { useSearchParams } from 'next/navigation';
 import { useIntlRouter, usePathname } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 interface PaginatorProps {
   count: number;
   limit: number;
@@ -14,7 +14,7 @@ interface PaginatorProps {
   setPage?: any;
 }
 const Paginator = (props: PaginatorProps) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations();
   const intlRouter = useIntlRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
