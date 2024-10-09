@@ -37,8 +37,7 @@ const FREE_PLAN: Plan = {
 const KITWALLET_PATH = '/v1/kitwallet';
 const SEARCH_PATH = '/v1/search';
 
-const IPS = config.ips ? config.ips.split(',') : [];
-const SUBNETS = config.subnets ? config.subnets.split(',') : [];
+const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -139,9 +138,6 @@ const rateLimiter = catchAsync(
 );
 
 const checkIPInSubnets = (ipAddress: string): boolean => {
-  if (IPS.includes(ipAddress)) {
-    return true;
-  }
   for (const subnet of SUBNETS) {
     if (ip.cidrSubnet(subnet).contains(ipAddress)) {
       return true;
