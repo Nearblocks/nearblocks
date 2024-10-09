@@ -23,7 +23,10 @@ const routes = (app: Router) => {
    * GET /v1/track/impression/:campaignId
    * @return 200 - success response
    */
-  route.get('/campaigns/track/impression/:campaignId', campaigns.trackImpression);
+  route.get(
+    '/campaigns/track/impression/:campaignId',
+    campaigns.trackImpression,
+  );
 
   /**
    * GET /v1/track/click/:campaignId
