@@ -8,19 +8,22 @@ const routes = (app: Router) => {
   app.use('/', route);
 
   /**
-   * GET /v1/approved-campaigns
+   * @ignore
+   * GET /v1/campaigns
    * @return 200 - success response
    */
   route.get('/campaigns', campaigns.getApprovedAds);
 
   /**
-   * GET /v1/approved-campaigns/text-ads
+   * @ignore
+   * GET /v1/campaigns/text-ads
    * @return 200 - success response
    */
   route.get('/campaigns/text-ads', campaigns.getApprovedTextAds);
 
   /**
-   * GET /v1/track/impression/:campaignId
+   * @ignore
+   * GET /v1/campaigns/track/impression/:campaignId
    * @return 200 - success response
    */
   route.get(
@@ -29,7 +32,8 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/track/click/:campaignId
+   * @ignore
+   * GET /v1/campaigns/track/click/:campaignId
    * @return 200 - success response
    */
   route.get('/campaigns/track/click/:campaignId', campaigns.trackClick);
