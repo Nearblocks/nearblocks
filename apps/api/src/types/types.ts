@@ -20,6 +20,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbWriteUrl: string;
+  ips: string;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryRows: number;
@@ -37,6 +38,7 @@ export type Config = {
   redisUrl: string;
   rpcUrl: string;
   sentryDsn?: string;
+  subnets: string;
   testnetUrl: string;
   userDbUrl: string;
 };
