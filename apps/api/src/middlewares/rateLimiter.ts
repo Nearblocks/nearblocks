@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import ip from 'ip';
 import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 
 import config from '#config';
@@ -36,11 +37,22 @@ const FREE_PLAN: Plan = {
 const KITWALLET_PATH = '/v1/kitwallet';
 const SEARCH_PATH = '/v1/search';
 
+const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
+
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = (req.user as User)?.id;
     const keyId = (req.user as User)?.key_id;
     const date = dayjs.utc().toISOString();
+
+    const reqIp = req.ip;
+
+    const ipAddress: string =
+      reqIp && reqIp.startsWith('::ffff:') ? reqIp.slice(7) : reqIp || '';
+
+    if (checkIPInSubnets(ipAddress)) {
+      return next();
+    }
     // Handle rate limit for app
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -124,6 +136,16 @@ const rateLimiter = catchAsync(
     }
   },
 );
+
+const checkIPInSubnets = (ipAddress: string): boolean => {
+  for (const subnet of SUBNETS) {
+    if (ip.cidrSubnet(subnet).contains(ipAddress)) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 const useFreePlan = async (
   req: Request,
