@@ -84,11 +84,11 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const desktopImage =
     type === 'center' ? ad.mobile_image : ad.desktop_image_right;
 
-  const desktopUrl = config.awsPublicUrl + '/' + desktopImage;
-  const mobileUrl = config.awsPublicUrl + '/' + ad.mobile_image;
+  const desktopUrl = config.campaignsPublicUrl + '/' + desktopImage;
+  const mobileUrl = config.campaignsPublicUrl + '/' + ad.mobile_image;
 
-  const impressionUrl = `${baseUrl}/v1/track/impression/${ad.id}`;
-  const clickUrl = `${baseUrl}/v1/track/click/${ad.id}`;
+  const impressionUrl = `${baseUrl}/v1/campaigns/track/impression/${ad.id}`;
+  const clickUrl = `${baseUrl}/v1/campaigns/track/click/${ad.id}`;
 
   const adCode = `<a href="${clickUrl}" rel="nofollow">
                           <img class="ad-image rounded-lg" src="${desktopUrl}" alt="Advertisement">
@@ -175,14 +175,14 @@ const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
     return res.status(204).send();
   }
 
-  const clickUrl = `${baseUrl}/v1/track/click/${ad.id}`;
-  const impressionUrl = `${baseUrl}/v1/track/impression/${ad.id}`;
+  const clickUrl = `${baseUrl}/v1/campaigns/track/click/${ad.id}`;
+  const impressionUrl = `${baseUrl}/v1/campaigns/track/impression/${ad.id}`;
   let adCode = `<div class="ad-text-content" style="font-size: 14px;font-family: Manrope, sans-serif; text-align: left;">
                           <p><b>Sponsored: </b>
                           <img src="${impressionUrl}" style="display:none">`;
 
   if (ad.icon) {
-    const iconUrl = config.awsPublicUrl + '/' + ad.icon;
+    const iconUrl = config.campaignsPublicUrl + '/' + ad.icon;
     adCode += `<img src="${iconUrl}" alt="Icon" class="ad-icon" style="display: inline;"> `;
   }
 
