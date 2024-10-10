@@ -60,9 +60,9 @@ const ViewOrChangeAbi = (props: Props) => {
       const curFeild = flds.find((fld) => fld.id === id);
 
       if (curFeild) {
-        const name = e.target.name;
-        const value = e.target.value;
-        const rest = flds.filter((fld) => fld.id !== id);
+        const name = e?.target?.name;
+        const value = e?.target?.value;
+        const rest = flds && flds?.filter((fld) => fld?.id !== id);
 
         return sortFields([...rest, { ...curFeild, [name]: value }]);
       }
@@ -71,7 +71,7 @@ const ViewOrChangeAbi = (props: Props) => {
     });
 
   const onOptionChange = (key: string) => (e: any) =>
-    setOptions((optns) => ({ ...optns, [key]: e.target.value }));
+    setOptions((optns) => ({ ...optns, [key]: e?.target?.value }));
 
   const onRead = async () => {
     setLoading(true);
@@ -138,37 +138,41 @@ const ViewOrChangeAbi = (props: Props) => {
   useEffect(() => {
     const resolveTypeSchema = (typeSchema: any) => {
       if (typeSchema['$ref']) {
-        const refParts = typeSchema['$ref'].split('/');
+        const refParts = typeSchema['$ref']?.split('/');
         const definition =
-          schema.body.root_schema.definitions[refParts[refParts.length - 1]];
-        return definition.type;
+          schema?.body?.root_schema?.definitions[
+            refParts[refParts?.length - 1]
+          ];
+        return definition?.type;
       }
-      return typeSchema.type;
+      return typeSchema?.type;
     };
 
     const argsAbi = method?.params?.args || [];
-    if (argsAbi.length > 0) {
-      const newFields = argsAbi.map(
-        (argName: {
-          name: string;
-          type_schema: { $ref: string; type: string };
-        }) => {
-          return {
-            id: uniqueId(),
-            name: argName.name,
-            type: resolveTypeSchema(argName.type_schema),
-            value: '',
-            placeholder: '',
-          };
-        },
-      );
+    if (argsAbi?.length > 0) {
+      const newFields =
+        argsAbi &&
+        argsAbi?.map(
+          (argName: {
+            name: string;
+            type_schema: { $ref: string; type: string };
+          }) => {
+            return {
+              id: uniqueId(),
+              name: argName.name,
+              type: resolveTypeSchema(argName?.type_schema),
+              value: '',
+              placeholder: '',
+            };
+          },
+        );
 
       setFields(newFields);
       setHideQuery(false);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method?.params?.args, schema.body.root_schema.definitions]);
+  }, [method?.params?.args, schema?.body?.root_schema?.definitions]);
 
   return (
     <AccordionItem
@@ -201,25 +205,25 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
         </div>
         {fields.map((field: FieldType) => (
-          <div key={field.id} className="flex max-w-xl items-center">
+          <div key={field?.id} className="flex max-w-xl items-center">
             <div className="sm:grid grid-cols-9 gap-2">
               <input
                 name="name"
-                value={field.name}
-                onChange={onChange(field.id)}
+                value={field?.name}
+                onChange={onChange(field?.id)}
                 placeholder="Argument name"
                 className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
               />
               <select
                 name="type"
-                value={field.type}
-                onChange={onChange(field.id)}
+                value={field?.type}
+                onChange={onChange(field?.id)}
                 className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
               >
                 <option value="" disabled>
                   Type
                 </option>
-                {inputTypes.map((type) => (
+                {inputTypes?.map((type) => (
                   <option value={type} key={type}>
                     {capitalize(type)}
                   </option>
@@ -227,14 +231,14 @@ const ViewOrChangeAbi = (props: Props) => {
               </select>
               <input
                 name="value"
-                value={field.value}
-                onChange={onChange(field.id)}
-                placeholder={field.placeholder || 'Argument value'}
+                value={field?.value}
+                onChange={onChange(field?.id)}
+                placeholder={field?.placeholder || 'Argument value'}
                 className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
               />
             </div>
             <button
-              onClick={onRemove(field.id)}
+              onClick={onRemove(field?.id)}
               className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
             >
               <CloseCircle className="text-white fill-white w-4 h-4" />

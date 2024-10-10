@@ -45,6 +45,7 @@ const Delegators = ({ accountId }: Props) => {
   const [count, setCount] = useState<number>();
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
 
   const start = (pagination.page - 1) * pagination.per_page;
 
@@ -154,12 +155,18 @@ const Delegators = ({ accountId }: Props) => {
 
   useEffect(() => {
     if (error) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setError(true);
+        setAllRpcProviderError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [error, switchRpc]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value: any = e.target.value;
+    const value: any = e?.target?.value;
     debouncedSearch(value);
   };
 
@@ -215,8 +222,8 @@ const Delegators = ({ accountId }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, pagination.page, rpcUrl]);
 
-  let data = searchResults!.length > 0 ? searchResults : delegators;
-  let totalCount = searchResults!.length > 0 ? searchResults!.length : count;
+  let data = searchResults!?.length > 0 ? searchResults : delegators;
+  let totalCount = searchResults!?.length > 0 ? searchResults!?.length : count;
 
   const columns = [
     {
@@ -225,14 +232,14 @@ const Delegators = ({ accountId }: Props) => {
       cell: (row: DelegatorInfo) => (
         <>
           <Tooltip
-            label={row.account_id}
+            label={row?.account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <Link
-              href={`/address/${row.account_id}`}
+              href={`/address/${row?.account_id}`}
               className="text-green-500 dark:text-green-250 hover:no-underline"
             >
-              {row.account_id}
+              {row?.account_id}
             </Link>
           </Tooltip>
         </>
@@ -248,7 +255,7 @@ const Delegators = ({ accountId }: Props) => {
       cell: (row: DelegatorInfo) => (
         <span>
           {formatWithCommas(
-            Number(yoctoToNear(row.staked_balance, false)).toFixed(0),
+            Number(yoctoToNear(row?.staked_balance, false))?.toFixed(0),
           ) + '  Ⓝ'}
         </span>
       ),
@@ -263,7 +270,7 @@ const Delegators = ({ accountId }: Props) => {
       cell: (row: DelegatorInfo) => (
         <span>
           {formatWithCommas(
-            Number(yoctoToNear(row.unstaked_balance, false)).toFixed(0),
+            Number(yoctoToNear(row?.unstaked_balance, false))?.toFixed(0),
           ) + '  Ⓝ'}
         </span>
       ),
@@ -293,9 +300,8 @@ const Delegators = ({ accountId }: Props) => {
                       (count || currentEpochInfo) &&
                       status && (
                         <span
-                          className={`w-18 ${
-                            getStatusColorClass(status).bgColor
-                          } rounded-xl p-1 text-center sm:ml-0 ml-2`}
+                          className={`w-18 ${getStatusColorClass(status)
+                            ?.bgColor} rounded-xl p-1 text-center sm:ml-0 ml-2`}
                         >
                           <span>{status}</span>
                         </span>
@@ -527,9 +533,9 @@ const Delegators = ({ accountId }: Props) => {
                         <span className="flex ml-2">
                           {!isNaN(blocksProductivityRatio) &&
                             `${formatWithCommas(
-                              currentEpochInfo.num_produced_blocks.toString(),
+                              currentEpochInfo?.num_produced_blocks?.toString(),
                             )} produced / ${formatWithCommas(
-                              currentEpochInfo.num_expected_blocks.toString(),
+                              currentEpochInfo?.num_expected_blocks?.toString(),
                             )} expected`}
                         </span>
                       </>
@@ -564,9 +570,9 @@ const Delegators = ({ accountId }: Props) => {
                         <span className="flex ml-2">
                           {!isNaN(chunksProductivityRatio) &&
                             `${formatWithCommas(
-                              currentEpochInfo.num_produced_chunks.toString(),
+                              currentEpochInfo?.num_produced_chunks?.toString(),
                             )} produced / ${formatWithCommas(
-                              currentEpochInfo.num_expected_chunks.toString(),
+                              currentEpochInfo?.num_expected_chunks?.toString(),
                             )} expected`}
                         </span>
                       </>
@@ -593,7 +599,7 @@ const Delegators = ({ accountId }: Props) => {
                 <>
                   <div className="flex flex-col">
                     <div className="leading-7">
-                      {`${formatWithCommas(count.toString())} Delegator${
+                      {`${formatWithCommas(count?.toString())} Delegator${
                         count === 1 ? '' : 's'
                       } found`}
                     </div>

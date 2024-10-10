@@ -32,14 +32,14 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
   accountId,
 }) => {
   const handleVerifierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedVerifier(e.target.value);
+    setSelectedVerifier(e?.target?.value);
   };
 
   const verifiedCount = verifiers.filter(
     (verifier) => verificationData[verifier]?.status === 'verified',
-  ).length;
+  )?.length;
 
-  const totalVerifiers = verifiers.length;
+  const totalVerifiers = verifiers?.length;
 
   const getVerificationText = () => {
     if (verificationData[selectedVerifier]?.status === 'verified') {

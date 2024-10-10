@@ -16,7 +16,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
     let pretty: any = '';
     const decoded = Buffer.from(args, 'base64');
     try {
-      const parsed = JSON.parse(decoded.toString());
+      const parsed = JSON.parse(decoded?.toString());
       if (parsed) {
         pretty = parsed;
       } else {
@@ -26,9 +26,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
       pretty = hexy(decoded, { format: 'twos' });
     }
 
-    if (pretty && typeof pretty === 'object' && pretty.msg) {
+    if (pretty && typeof pretty === 'object' && pretty?.msg) {
       try {
-        const msgObj = JSON.parse(pretty.msg);
+        const msgObj = JSON.parse(pretty?.msg);
         pretty.msg = msgObj;
       } catch (error) {
         console.error('Error parsing JSON in "msg" property:', error);

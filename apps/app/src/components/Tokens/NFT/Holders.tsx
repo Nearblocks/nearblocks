@@ -30,7 +30,7 @@ interface Props {
 const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
   const errorMessage = 'No token holders found!';
   const router = useRouter();
-  const currentPage = Number(router.query.page) || 1;
+  const currentPage = Number(router?.query?.page) || 1;
 
   const columns: any = [
     {
@@ -127,7 +127,7 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
                   </span>
                   {status?.timestamp &&
                     `(${getTimeAgoString(
-                      nanoToMilli(status.timestamp),
+                      nanoToMilli(status?.timestamp),
                     )}).`}{' '}
                   Holders data will be delayed.
                 </div>
@@ -138,7 +138,9 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
                     {holder &&
                       !error &&
                       `A total of ${
-                        count ? localFormat && localFormat(count.toString()) : 0
+                        count
+                          ? localFormat && localFormat(count?.toString())
+                          : 0
                       }${' '}
                 token holders found`}
                   </p>

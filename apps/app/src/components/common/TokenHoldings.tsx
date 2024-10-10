@@ -30,24 +30,24 @@ const TokenHoldings = (props: Props) => {
     );
   };
 
-  const nfts = props.data?.nfts || [];
+  const nfts = props?.data?.nfts || [];
 
-  if (props.loading || props.inventoryLoading) {
+  if (props?.loading || props?.inventoryLoading) {
     return <Loading className="flex w-full h-8" />;
   }
 
-  if (!props.ft?.tokens?.length && !nfts?.length) {
+  if (!props?.ft?.tokens?.length && !nfts?.length) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>
       </select>
     );
   }
-  const ftAmount = props.ft?.amount ?? 0;
+  const ftAmount = props?.ft?.amount ?? 0;
 
   function isTokenSpam(tokenName: string) {
-    if (props.spamTokens) {
-      for (const spamToken of props.spamTokens) {
+    if (props?.spamTokens) {
+      for (const spamToken of props?.spamTokens) {
         const cleanedToken = spamToken.replace(/^\*/, '');
         if (tokenName.endsWith(cleanedToken)) {
           return true;
@@ -64,7 +64,7 @@ const TokenHoldings = (props: Props) => {
             ? '$' + dollarFormat(ftAmount)
             : ''}
           <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
-            {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
+            {(props?.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
         </span>
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
@@ -74,16 +74,16 @@ const TokenHoldings = (props: Props) => {
           <div className="dark:bg-black">
             <PerfectScrollbar>
               <div className="max-h-60 dark:bg-black">
-                {props.ft?.tokens?.length > 0 && (
+                {props?.ft?.tokens?.length > 0 && (
                   <>
                     <div className="bg-gray-50 dark:bg-black-200 font-semibold px-3 py-2">
                       Tokens{' '}
                       <span className="font-normal">
-                        ({props.ft?.tokens?.length})
+                        ({props?.ft?.tokens?.length})
                       </span>
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
-                      {props.ft?.tokens?.map((token, index) => (
+                      {props?.ft?.tokens?.map((token, index) => (
                         <div key={token?.contract} className="dark:bg-black">
                           <Link
                             href={`/token/${token?.contract}?a=${props.id}`}
@@ -132,12 +132,12 @@ const TokenHoldings = (props: Props) => {
                                   <div>
                                     {token?.amountUsd
                                       ? '$' + dollarFormat(token?.amountUsd)
-                                      : '$' + (token.amountUsd ?? '')}
+                                      : '$' + (token?.amountUsd ?? '')}
                                   </div>
                                   <div className="text-gray-400">
                                     {token?.ft_meta?.price
                                       ? '@' +
-                                        Big(token?.ft_meta?.price).toString()
+                                        Big(token?.ft_meta?.price)?.toString()
                                       : '@' + (token?.ft_meta?.price ?? '')}
                                   </div>
                                 </div>
@@ -158,7 +158,7 @@ const TokenHoldings = (props: Props) => {
                       <span className="font-normal">({nfts?.length})</span>
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
-                      {nfts.map((nft) => (
+                      {nfts?.map((nft) => (
                         <div key={nft?.contract} className="dark:bg-black">
                           <Link
                             href={`/nft-token/${nft?.contract}`}

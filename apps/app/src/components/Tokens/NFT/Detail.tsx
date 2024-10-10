@@ -48,7 +48,7 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
 
   function isTokenSpam(tokenName: string) {
     if (spamTokens)
-      for (const spamToken of spamTokens.blacklist) {
+      for (const spamToken of spamTokens?.blacklist) {
         const cleanedToken = spamToken.replace(/^\*/, '');
         if (tokenName.endsWith(cleanedToken)) {
           return true;

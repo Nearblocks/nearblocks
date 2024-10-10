@@ -17,27 +17,27 @@ const BurrowContract = (props: EventPropsInfo) => {
   let parsedEvent: ParsedEvent | {} = {};
 
   try {
-    parsedEvent = JSON.parse(props.event.logs.replace('EVENT_JSON:', ''));
+    parsedEvent = JSON.parse(props?.event?.logs?.replace('EVENT_JSON:', ''));
   } catch (error) {
     console.log(error);
   }
 
   if ('event' in parsedEvent) {
-    switch (parsedEvent.event) {
+    switch (parsedEvent?.event) {
       case 'deposit_to_reserve':
-        return <DepositToReserve event={parsedEvent.data} />;
+        return <DepositToReserve event={parsedEvent?.data} />;
       case 'deposit':
-        return <Deposit event={parsedEvent.data} />;
+        return <Deposit event={parsedEvent?.data} />;
       case 'withdraw_succeeded':
-        return <WithdrawSucceeded event={parsedEvent.data} />;
+        return <WithdrawSucceeded event={parsedEvent?.data} />;
       case 'increase_collateral':
-        return <IncreaseCollateral event={parsedEvent.data} />;
+        return <IncreaseCollateral event={parsedEvent?.data} />;
       case 'decrease_collateral':
-        return <DescreaseCollateral event={parsedEvent.data} />;
+        return <DescreaseCollateral event={parsedEvent?.data} />;
       case 'borrow':
-        return <Borrow event={parsedEvent.data} />;
+        return <Borrow event={parsedEvent?.data} />;
       case 'repay':
-        return <Repay event={parsedEvent.data} />;
+        return <Repay event={parsedEvent?.data} />;
       default:
         return null;
     }

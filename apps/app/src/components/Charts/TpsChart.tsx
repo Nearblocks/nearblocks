@@ -102,35 +102,36 @@ const TpsChart = (props: Props) => {
         [shard: number]: any[];
       } = {};
       let totalTransactions: any[] = [];
-      data.charts.forEach((dataPoint: chartDataInfo) => {
-        let totalTxns = 0;
-        dataPoint.shards.forEach((shard: any) => {
-          if (!seriesByShard[shard.shard]) {
-            seriesByShard[shard.shard] = [];
-          }
-          seriesByShard[shard.shard].push([
-            new Date(parseInt(dataPoint.date) * 1000).valueOf(),
-            shard.txns,
+      data &&
+        data?.charts?.forEach((dataPoint: chartDataInfo) => {
+          let totalTxns = 0;
+          dataPoint?.shards?.forEach((shard: any) => {
+            if (!seriesByShard[shard?.shard]) {
+              seriesByShard[shard?.shard] = [];
+            }
+            seriesByShard[shard?.shard]?.push([
+              new Date(parseInt(dataPoint?.date) * 1000)?.valueOf(),
+              shard?.txns,
+            ]);
+            totalTxns += shard?.txns;
+          });
+          totalTransactions?.push([
+            new Date(parseInt(dataPoint?.date) * 1000)?.valueOf(),
+            totalTxns,
           ]);
-          totalTxns += shard.txns;
         });
-        totalTransactions.push([
-          new Date(parseInt(dataPoint.date) * 1000).valueOf(),
-          totalTxns,
-        ]);
-      });
 
-      const series = Object.keys(seriesByShard).map((shard) => ({
+      const series = Object?.keys(seriesByShard)?.map((shard) => ({
         name: `Shard ${shard}`,
         type: 'line',
-        data: seriesByShard[parseInt(shard)].reverse(),
+        data: seriesByShard[parseInt(shard)]?.reverse(),
       }));
 
       data &&
-        series.push({
+        series?.push({
           name: 'Total Transactions',
           type: 'line',
-          data: totalTransactions.reverse(),
+          data: totalTransactions?.reverse(),
         });
       setChartTpsData(series);
     }

@@ -11,7 +11,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     const decoded = Buffer.from(args, 'base64');
 
     try {
-      const parsed = JSON.parse(decoded.toString());
+      const parsed = JSON.parse(decoded?.toString());
       if (parsed) {
         pretty = JSON.stringify(parsed, null, 2);
       } else {
@@ -33,7 +33,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     }
 
     if (Array.isArray(SuccessValue) || typeof SuccessValue === 'string') {
-      if (SuccessValue.length === 0) {
+      if (SuccessValue?.length === 0) {
         return 'Empty Result';
       }
     }
@@ -53,14 +53,14 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
       <textarea
         readOnly
         rows={4}
-        defaultValue={JSON.stringify(status.Failure, null, 2)}
+        defaultValue={JSON.stringify(status?.Failure, null, 2)}
         className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
       ></textarea>
     );
   }
 
   if (status && 'SuccessReceiptId' in status) {
-    return status.SuccessReceiptId;
+    return status?.SuccessReceiptId;
   }
 
   return '';

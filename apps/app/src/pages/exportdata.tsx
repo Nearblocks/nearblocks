@@ -67,7 +67,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 const ExportData = () => {
   const router = useRouter();
-  const { address, type } = router.query as { address: string; type: string };
+  const { address, type } = router?.query as { address: string; type: string };
 
   const title = type
     ? `Export ${type} Data | Nearblocks`
@@ -93,11 +93,13 @@ const ExportData = () => {
         <link rel="canonical" href={`${appUrl}/exportdata`} />
       </Head>
       <div className="relative">
-        <Export
-          id={address}
-          onHandleDowload={onHandleDowload}
-          exportType={type}
-        />
+        {address && type && (
+          <Export
+            id={address}
+            onHandleDowload={onHandleDowload}
+            exportType={type}
+          />
+        )}
       </div>
     </>
   );

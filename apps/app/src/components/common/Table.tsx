@@ -77,7 +77,7 @@ const Table = (props: Props) => {
   }
   return (
     <>
-      {props.isExpanded ? (
+      {props?.isExpanded ? (
         <div className={`bg-gray-50 dark:bg-black-600 overflow-x-auto`}>
           <table
             className={
@@ -86,23 +86,23 @@ const Table = (props: Props) => {
           >
             <thead>
               <tr>
-                {props?.columns.map((column: column, index: number) => (
-                  <th key={index} scope="col" className={column.thClassName}>
-                    {column.header}
+                {props?.columns?.map((column: column, index: number) => (
+                  <th key={index} scope="col" className={column?.thClassName}>
+                    {column?.header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {(props.Error || props.data?.length === 0) && (
+              {(props?.Error || props?.data?.length === 0) && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.ErrorText}
                   </td>
                 </tr>
               )}
-              {props.data &&
-                props.data.map((row, rowIndex: number) => (
+              {props?.data &&
+                props?.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
                     <tr key={`expandRow-${rowIndex}`} className="h-[57px]">
                       {props.columns.map((column: column, colIndex: number) => (
@@ -122,7 +122,7 @@ const Table = (props: Props) => {
                         className="h-[25px] hover:bg-blue-900/5"
                       >
                         <td
-                          colSpan={props.columns.length}
+                          colSpan={props?.columns?.length}
                           className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
                         >
                           {row?.warning}
@@ -139,46 +139,48 @@ const Table = (props: Props) => {
           <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
             <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
-                {props.columns &&
-                  props?.columns.map((column: column, index: number) => (
-                    <th key={index} scope="col" className={column.thClassName}>
-                      {column.header}
+                {props?.columns &&
+                  props?.columns?.map((column: column, index: number) => (
+                    <th key={index} scope="col" className={column?.thClassName}>
+                      {column?.header}
                     </th>
                   ))}
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
-              {(props.Error || props.data?.length === 0) && (
+              {(props?.Error || props?.data?.length === 0) && (
                 <tr className="h-[57px]">
                   <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
                     {props.ErrorText}
                   </td>
                 </tr>
               )}
-              {props.data &&
-                props.data.map((row, rowIndex: number) => (
+              {props?.data &&
+                props?.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
                     <tr
                       key={`row-${rowIndex}`}
                       className="hover:bg-blue-900/5 h-[57px]"
                     >
-                      {props.columns.map((column: column, colIndex: number) => (
-                        <td
-                          key={`col-${colIndex}`}
-                          className={column.tdClassName}
-                        >
-                          {column.cell
-                            ? column.cell(row, rowIndex)
-                            : row[column.key]}
-                        </td>
-                      ))}
+                      {props?.columns.map(
+                        (column: column, colIndex: number) => (
+                          <td
+                            key={`col-${colIndex}`}
+                            className={column?.tdClassName}
+                          >
+                            {column.cell
+                              ? column.cell(row, rowIndex)
+                              : row[column?.key]}
+                          </td>
+                        ),
+                      )}
                     </tr>
-                    {row.isExpanded ||
-                    (props.expanded &&
-                      props.expanded.length > 0 &&
-                      props.expanded.includes(row.index))
-                      ? props.renderRowSubComponent &&
-                        props.renderRowSubComponent(row)
+                    {row?.isExpanded ||
+                    (props?.expanded &&
+                      props?.expanded?.length > 0 &&
+                      props?.expanded?.includes(row?.index))
+                      ? props?.renderRowSubComponent &&
+                        props?.renderRowSubComponent(row)
                       : null}
                     {row?.showWarning && (
                       <tr
@@ -186,7 +188,7 @@ const Table = (props: Props) => {
                         className="h-[25px] hover:bg-blue-900/5"
                       >
                         <td
-                          colSpan={props.columns.length}
+                          colSpan={props?.columns?.length}
                           className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
                         >
                           {row?.warning}
@@ -199,27 +201,27 @@ const Table = (props: Props) => {
           </table>
         </div>
       )}
-      {props.isPagination &&
-      !props.Error &&
-      props.data?.length !== 0 &&
-      props.pageLimit &&
-      props.count ? (
+      {props?.isPagination &&
+      !props?.Error &&
+      props?.data?.length !== 0 &&
+      props?.pageLimit &&
+      props?.count ? (
         <Paginator
-          count={props.count}
-          limit={props.limit}
-          pageLimit={props.pageLimit}
-          shallow={props.shallow}
+          count={props?.count}
+          limit={props?.limit}
+          pageLimit={props?.pageLimit}
+          shallow={props?.shallow}
         />
       ) : null}
-      {props.cursorPagination &&
-      !props.Error &&
-      props.data?.length !== 0 &&
-      props.page &&
-      props.setPage ? (
+      {props?.cursorPagination &&
+      !props?.Error &&
+      props?.data?.length !== 0 &&
+      props?.page &&
+      props?.setPage ? (
         <CursorPaginator
-          page={props.page}
-          setPage={props.setPage}
-          cursor={props.cursor}
+          page={props?.page}
+          setPage={props?.setPage}
+          cursor={props?.cursor}
         />
       ) : null}
     </>

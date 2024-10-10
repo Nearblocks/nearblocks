@@ -25,10 +25,10 @@ const DeleteAccount = (props: ActionPropsInfo) => {
       <span className="font-bold px-1">
         Delete Account{' '}
         <Link
-          href={`/address/${props.action.to}`}
+          href={`/address/${props?.action?.to}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1"
         >
-          {shortenAddress(props.action.to)}
+          {shortenAddress(props?.action?.to)}
         </Link>
       </span>
     </div>

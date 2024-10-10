@@ -22,9 +22,9 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const t = useTranslations();
   const args = action?.args?.args;
   const modifiedData =
-    action?.args?.methodName === 'submit' && receiver.includes('aurora')
-      ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
-      : action?.args.args_base64 || action?.args.args;
+    action?.args?.methodName === 'submit' && receiver?.includes('aurora')
+      ? { tx_bytes_b64: action?.args?.args_base64 || action?.args?.args }
+      : action?.args?.args_base64 || action?.args?.args;
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
@@ -32,7 +32,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     let pretty = '';
     const decoded = Buffer.from(args, 'base64');
     try {
-      const parsed = JSON.parse(decoded.toString());
+      const parsed = JSON.parse(decoded?.toString());
       if (parsed) {
         pretty = JSON.stringify(parsed, null, 2);
       } else {
@@ -48,7 +48,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const status = receipt?.outcome?.status;
   const isSuccess =
     status &&
-    (status.type === 'successValue' || status.type === 'successReceiptId');
+    (status?.type === 'successValue' || status?.type === 'successReceiptId');
 
   return (
     <div className="pb-3">
@@ -58,7 +58,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         ${
           !isSuccess
             ? 'bg-red-50 dark:bg-black-200'
-            : backgroundColorClasses[action.kind] || ''
+            : backgroundColorClasses[action?.kind] || ''
         }`}
         onClick={onClick}
         role="button"
@@ -115,20 +115,21 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
           )
         ) : action?.kind === 'delegateAction' ? (
           <div className="pt-2">
-            {[...action.args.actions]
-              .sort(
-                (actionA, actionB) =>
-                  actionA.delegateIndex - actionB.delegateIndex,
-              )
-              .map((subaction) => (
-                <ReceiptKind
-                  key={subaction.delegateIndex}
-                  action={subaction}
-                  isTxTypeActive={true}
-                  receiver={receiver}
-                  receipt={receipt}
-                />
-              ))}
+            {action?.args?.actions &&
+              [...action?.args?.actions]
+                ?.sort(
+                  (actionA, actionB) =>
+                    actionA?.delegateIndex - actionB?.delegateIndex,
+                )
+                ?.map((subaction) => (
+                  <ReceiptKind
+                    key={subaction.delegateIndex}
+                    action={subaction}
+                    isTxTypeActive={true}
+                    receiver={receiver}
+                    receipt={receipt}
+                  />
+                ))}
           </div>
         ) : null
       ) : null}

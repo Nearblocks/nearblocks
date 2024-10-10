@@ -40,22 +40,22 @@ export function dollarFormat(number: string) {
   const formattedNumber = bigNumber.toFixed(2);
 
   // Add comma as a thousands separator
-  const parts = formattedNumber.split('.');
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const parts = formattedNumber && formattedNumber.split('.');
+  if (parts) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-  const dollarFormattedNumber = `${parts.join('.')}`;
+  const dollarFormattedNumber = parts && `${parts.join('.')}`;
 
   return dollarFormattedNumber;
 }
 export function yoctoToNear(yocto: string, format: boolean) {
-  const YOCTO_PER_NEAR = Big(10).pow(24).toString();
+  const YOCTO_PER_NEAR = Big(10).pow(24)?.toString();
 
-  const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
+  const near = Big(yocto).div(YOCTO_PER_NEAR)?.toString();
 
   return format ? localFormat(near) : near;
 }
 export function gasPrice(yacto: string) {
-  const near = Big(yoctoToNear(yacto, false)).mul(Big(10).pow(12)).toString();
+  const near = Big(yoctoToNear(yacto, false)).mul(Big(10).pow(12))?.toString();
 
   return `${localFormat(near)} Ⓝ / Tgas`;
 }
@@ -63,13 +63,13 @@ export function gasPrice(yacto: string) {
 export function encodeArgs(args: object) {
   if (!args || typeof args === 'undefined') return '';
 
-  return Buffer.from(JSON.stringify(args)).toString('base64');
+  return Buffer.from(JSON.stringify(args))?.toString('base64');
 }
 
 export function decodeArgs(args: string[]) {
   if (!args || typeof args === 'undefined') return {};
   // @ts-ignore
-  return JSON.parse(Buffer.from(args, 'base64').toString());
+  return JSON.parse(Buffer.from(args, 'base64')?.toString());
 }
 
 export function tokenAmount(amount: string, decimal: string, format: boolean) {
@@ -96,17 +96,17 @@ export const txnMethod = (
 
   const action = actions[0];
 
-  if (action.action === 'FUNCTION_CALL') {
-    return action.method;
+  if (action?.action === 'FUNCTION_CALL') {
+    return action?.method;
   }
 
-  return action.action;
+  return action?.action;
 };
 
 export function price(amount: string, decimal: string, price: string) {
   // @ts-ignore
   const nearAmount = Big(amount).div(Big(10).pow(decimal));
-  return dollarFormat(nearAmount.mul(Big(price || 0)).toString());
+  return dollarFormat(nearAmount?.mul(Big(price || 0))?.toString());
 }
 
 export function tokenPercentage(
@@ -128,12 +128,12 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
 
   const outcomes = txn?.receipts_outcome || [];
 
-  for (let i = 0; i < outcomes.length; i++) {
+  for (let i = 0; i < outcomes?.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 
-    if (logs.length > 0) {
-      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
+    if (logs?.length > 0) {
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
         contract: outcome?.outcome?.executor_id || '',
         logs: log,
       }));
@@ -167,7 +167,7 @@ export function txnActions(txn: RPCTransactionInfo) {
   const txActions = [];
   const receipts = txn?.receipts || [];
 
-  for (let i = 0; i < receipts.length; i++) {
+  for (let i = 0; i < receipts?.length; i++) {
     const receipt = receipts[i];
     const from = receipt?.predecessor_id;
     const to = receipt?.receiver_id;
@@ -177,7 +177,7 @@ export function txnActions(txn: RPCTransactionInfo) {
     if (Array.isArray(receipt?.receipt)) {
       const actions = receipt.receipt;
 
-      for (let j = 0; j < actions.length; j++) {
+      for (let j = 0; j < actions?.length; j++) {
         const action = actions[j];
 
         txActions.push({ from, to, ...action });
@@ -185,7 +185,7 @@ export function txnActions(txn: RPCTransactionInfo) {
     } else {
       const actions = receipt?.receipt?.Action?.actions || [];
 
-      for (let j = 0; j < actions.length; j++) {
+      for (let j = 0; j < actions?.length; j++) {
         const action = mapRpcActionToAction(actions[j]);
 
         txActions.push({ from, to, ...action });
@@ -199,7 +199,7 @@ export function txnActions(txn: RPCTransactionInfo) {
 export function valueFromObj(obj: Obj): string | undefined {
   const keys = obj && Object.keys(obj);
 
-  for (let i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys?.length; i++) {
     const key = keys[i];
     const value = obj[key];
 
@@ -256,24 +256,24 @@ export function parseReceipt(
 ) {
   if (!receipt) {
     return {
-      id: outcome.id,
-      predecessorId: transaction.signer_id,
-      receiverId: transaction.receiver_id,
-      actions: transaction.actions.map(mapRpcActionToAction1),
+      id: outcome?.id,
+      predecessorId: transaction?.signer_id,
+      receiverId: transaction?.receiver_id,
+      actions: transaction?.actions?.map(mapRpcActionToAction1),
     };
   }
 
   let actions: any = [];
 
-  if ('Action' in receipt.receipt) {
-    actions = receipt.receipt.Action.actions.map(mapRpcActionToAction1);
-  } else if (Array.isArray(receipt.receipt)) {
-    actions = receipt.receipt.map((action) => mapRpcActionToAction1(action));
+  if ('Action' in receipt?.receipt) {
+    actions = receipt?.receipt?.Action?.actions?.map(mapRpcActionToAction1);
+  } else if (Array.isArray(receipt?.receipt)) {
+    actions = receipt?.receipt?.map((action) => mapRpcActionToAction1(action));
   }
   return {
-    id: receipt.receipt_id,
-    predecessorId: receipt.predecessor_id,
-    receiverId: receipt.receiver_id,
+    id: receipt?.receipt_id,
+    predecessorId: receipt?.predecessor_id,
+    receiverId: receipt?.receiver_id,
     actions: actions,
   };
 }
@@ -290,32 +290,32 @@ export function mapNonDelegateRpcActionToAction(
   if ('DeployContract' in rpcAction) {
     return {
       kind: 'deployContract',
-      args: rpcAction.DeployContract,
+      args: rpcAction?.DeployContract,
     };
   }
   if ('FunctionCall' in rpcAction) {
     return {
       kind: 'functionCall',
       args: {
-        methodName: rpcAction.FunctionCall.method_name,
-        args: rpcAction.FunctionCall.args,
-        deposit: rpcAction.FunctionCall.deposit,
-        gas: rpcAction.FunctionCall.gas,
+        methodName: rpcAction?.FunctionCall?.method_name,
+        args: rpcAction?.FunctionCall?.args,
+        deposit: rpcAction?.FunctionCall?.deposit,
+        gas: rpcAction?.FunctionCall?.gas,
       },
     };
   }
   if ('Transfer' in rpcAction) {
     return {
       kind: 'transfer',
-      args: rpcAction.Transfer,
+      args: rpcAction?.Transfer,
     };
   }
   if ('Stake' in rpcAction) {
     return {
       kind: 'stake',
       args: {
-        publicKey: rpcAction.Stake.public_key,
-        stake: rpcAction.Stake.stake,
+        publicKey: rpcAction?.Stake?.public_key,
+        stake: rpcAction?.Stake?.stake,
       },
     };
   }
@@ -323,22 +323,22 @@ export function mapNonDelegateRpcActionToAction(
     return {
       kind: 'addKey',
       args: {
-        publicKey: rpcAction.AddKey.public_key,
+        publicKey: rpcAction?.AddKey?.public_key,
         accessKey: {
-          nonce: rpcAction.AddKey.access_key.nonce,
+          nonce: rpcAction?.AddKey?.access_key?.nonce,
           permission:
-            rpcAction.AddKey.access_key.permission === 'FullAccess'
+            rpcAction?.AddKey?.access_key?.permission === 'FullAccess'
               ? {
                   type: 'fullAccess',
                 }
               : {
                   type: 'functionCall',
                   contractId:
-                    rpcAction.AddKey.access_key.permission.FunctionCall
-                      .receiver_id,
+                    rpcAction?.AddKey?.access_key?.permission?.FunctionCall
+                      ?.receiver_id,
                   methodNames:
-                    rpcAction.AddKey.access_key.permission.FunctionCall
-                      .method_names,
+                    rpcAction?.AddKey?.access_key?.permission?.FunctionCall
+                      ?.method_names,
                 },
         },
       },
@@ -348,14 +348,14 @@ export function mapNonDelegateRpcActionToAction(
     return {
       kind: 'deleteKey',
       args: {
-        publicKey: rpcAction.DeleteKey.public_key,
+        publicKey: rpcAction?.DeleteKey?.public_key,
       },
     };
   }
   return {
     kind: 'deleteAccount',
     args: {
-      beneficiaryId: rpcAction.DeleteAccount?.beneficiary_id,
+      beneficiaryId: rpcAction?.DeleteAccount?.beneficiary_id,
     },
   };
 }
@@ -374,7 +374,7 @@ export function mapRpcInvalidAccessKeyError(error: RPCInvalidAccessKeyError) {
     };
   }
   if ('AccessKeyNotFound' in error) {
-    const { account_id, public_key } = error.AccessKeyNotFound;
+    const { account_id, public_key } = error?.AccessKeyNotFound;
     return {
       type: 'accessKeyNotFound',
       accountId: account_id,
@@ -382,7 +382,7 @@ export function mapRpcInvalidAccessKeyError(error: RPCInvalidAccessKeyError) {
     };
   }
   if ('ReceiverMismatch' in error) {
-    const { ak_receiver, tx_receiver } = error.ReceiverMismatch;
+    const { ak_receiver, tx_receiver } = error?.ReceiverMismatch;
     return {
       type: 'receiverMismatch',
       akReceiver: ak_receiver,
@@ -390,7 +390,7 @@ export function mapRpcInvalidAccessKeyError(error: RPCInvalidAccessKeyError) {
     };
   }
   if ('MethodNameMismatch' in error) {
-    const { method_name } = error.MethodNameMismatch;
+    const { method_name } = error?.MethodNameMismatch;
     return {
       type: 'methodNameMismatch',
       methodName: method_name,
@@ -416,7 +416,7 @@ export function mapRpcCompilationError(error: RPCCompilationError) {
   if ('CodeDoesNotExist' in error) {
     return {
       type: 'codeDoesNotExist',
-      accountId: error.CodeDoesNotExist.account_id,
+      accountId: error.CodeDoesNotExist?.account_id,
     };
   }
   if ('PrepareError' in error) {
@@ -427,13 +427,13 @@ export function mapRpcCompilationError(error: RPCCompilationError) {
   if ('WasmerCompileError' in error) {
     return {
       type: 'wasmerCompileError',
-      msg: error.WasmerCompileError.msg,
+      msg: error?.WasmerCompileError?.msg,
     };
   }
   if ('UnsupportedCompiler' in error) {
     return {
       type: 'unsupportedCompiler',
-      msg: error.UnsupportedCompiler.msg,
+      msg: error?.UnsupportedCompiler?.msg,
     };
   }
   return UNKNOWN_ERROR;
@@ -444,13 +444,13 @@ export function mapRpcFunctionCallError(error: RPCFunctionCallError) {
   if ('CompilationError' in error) {
     return {
       type: 'compilationError',
-      error: mapRpcCompilationError(error.CompilationError),
+      error: mapRpcCompilationError(error?.CompilationError),
     };
   }
   if ('LinkError' in error) {
     return {
       type: 'linkError',
-      msg: error.LinkError.msg,
+      msg: error?.LinkError?.msg,
     };
   }
   if ('MethodResolveError' in error) {
@@ -481,7 +481,7 @@ export function mapRpcFunctionCallError(error: RPCFunctionCallError) {
   if ('ExecutionError' in error) {
     return {
       type: 'executionError',
-      error: error.ExecutionError,
+      error: error?.ExecutionError,
     };
   }
   return UNKNOWN_ERROR;
@@ -494,41 +494,41 @@ export function mapRpcNewReceiptValidationError(
   if ('InvalidPredecessorId' in error) {
     return {
       type: 'invalidPredecessorId',
-      accountId: error.InvalidPredecessorId.account_id,
+      accountId: error?.InvalidPredecessorId?.account_id,
     };
   }
   if ('InvalidReceiverId' in error) {
     return {
       type: 'invalidReceiverId',
-      accountId: error.InvalidReceiverId.account_id,
+      accountId: error?.InvalidReceiverId?.account_id,
     };
   }
   if ('InvalidSignerId' in error) {
     return {
       type: 'invalidSignerId',
-      accountId: error.InvalidSignerId.account_id,
+      accountId: error?.InvalidSignerId?.account_id,
     };
   }
   if ('InvalidDataReceiverId' in error) {
     return {
       type: 'invalidDataReceiverId',
-      accountId: error.InvalidDataReceiverId.account_id,
+      accountId: error?.InvalidDataReceiverId?.account_id,
     };
   }
   if ('ReturnedValueLengthExceeded' in error) {
     return {
       type: 'returnedValueLengthExceeded',
-      length: error.ReturnedValueLengthExceeded.length,
-      limit: error.ReturnedValueLengthExceeded.limit,
+      length: error?.ReturnedValueLengthExceeded?.length,
+      limit: error?.ReturnedValueLengthExceeded?.limit,
     };
   }
   if ('NumberInputDataDependenciesExceeded' in error) {
     return {
       type: 'numberInputDataDependenciesExceeded',
       numberOfInputDataDependencies:
-        error.NumberInputDataDependenciesExceeded
-          .number_of_input_data_dependencies,
-      limit: error.NumberInputDataDependenciesExceeded.limit,
+        error?.NumberInputDataDependenciesExceeded
+          ?.number_of_input_data_dependencies,
+      limit: error?.NumberInputDataDependenciesExceeded?.limit,
     };
   }
   if ('ActionsValidation' in error) {
@@ -555,137 +555,137 @@ export function mapRpcReceiptActionError(error: ActionError) {
   if ('DelegateActionSenderDoesNotMatchTxReceiver' in kind) {
     return {
       type: 'delegateActionSenderDoesNotMatchTxReceiver',
-      receiverId: kind.DelegateActionSenderDoesNotMatchTxReceiver.receiver_id,
-      senderId: kind.DelegateActionSenderDoesNotMatchTxReceiver.sender_id,
+      receiverId: kind?.DelegateActionSenderDoesNotMatchTxReceiver?.receiver_id,
+      senderId: kind?.DelegateActionSenderDoesNotMatchTxReceiver?.sender_id,
     };
   }
   if ('DelegateActionAccessKeyError' in kind) {
     return {
       type: 'delegateActionAccessKeyError',
-      error: mapRpcInvalidAccessKeyError(kind.DelegateActionAccessKeyError),
+      error: mapRpcInvalidAccessKeyError(kind?.DelegateActionAccessKeyError),
     };
   }
   if ('DelegateActionInvalidNonce' in kind) {
     return {
       type: 'delegateActionInvalidNonce',
-      akNonce: kind.DelegateActionInvalidNonce.ak_nonce,
-      delegateNonce: kind.DelegateActionInvalidNonce.delegate_nonce,
+      akNonce: kind?.DelegateActionInvalidNonce?.ak_nonce,
+      delegateNonce: kind?.DelegateActionInvalidNonce?.delegate_nonce,
     };
   }
   if ('DelegateActionNonceTooLarge' in kind) {
     return {
       type: 'delegateActionNonceTooLarge',
-      delegateNonce: kind.DelegateActionNonceTooLarge.delegate_nonce,
-      upperBound: kind.DelegateActionNonceTooLarge.upper_bound,
+      delegateNonce: kind?.DelegateActionNonceTooLarge?.delegate_nonce,
+      upperBound: kind?.DelegateActionNonceTooLarge?.upper_bound,
     };
   }
   if ('AccountAlreadyExists' in kind) {
     return {
       type: 'accountAlreadyExists',
-      accountId: kind.AccountAlreadyExists.account_id,
+      accountId: kind?.AccountAlreadyExists?.account_id,
     };
   }
   if ('AccountDoesNotExist' in kind) {
     return {
       type: 'accountDoesNotExist',
-      accountId: kind.AccountDoesNotExist.account_id,
+      accountId: kind?.AccountDoesNotExist?.account_id,
     };
   }
   if ('CreateAccountOnlyByRegistrar' in kind) {
     return {
       type: 'createAccountOnlyByRegistrar',
-      accountId: kind.CreateAccountOnlyByRegistrar.account_id,
+      accountId: kind?.CreateAccountOnlyByRegistrar?.account_id,
       registrarAccountId:
-        kind.CreateAccountOnlyByRegistrar.registrar_account_id,
-      predecessorId: kind.CreateAccountOnlyByRegistrar.predecessor_id,
+        kind?.CreateAccountOnlyByRegistrar?.registrar_account_id,
+      predecessorId: kind?.CreateAccountOnlyByRegistrar?.predecessor_id,
     };
   }
   if ('CreateAccountNotAllowed' in kind) {
     return {
       type: 'createAccountNotAllowed',
-      accountId: kind.CreateAccountNotAllowed.account_id,
-      predecessorId: kind.CreateAccountNotAllowed.predecessor_id,
+      accountId: kind?.CreateAccountNotAllowed?.account_id,
+      predecessorId: kind?.CreateAccountNotAllowed?.predecessor_id,
     };
   }
   if ('ActorNoPermission' in kind) {
     return {
       type: 'actorNoPermission',
-      accountId: kind.ActorNoPermission.account_id,
-      actorId: kind.ActorNoPermission.actor_id,
+      accountId: kind?.ActorNoPermission?.account_id,
+      actorId: kind?.ActorNoPermission?.actor_id,
     };
   }
   if ('DeleteKeyDoesNotExist' in kind) {
     return {
       type: 'deleteKeyDoesNotExist',
-      accountId: kind.DeleteKeyDoesNotExist.account_id,
-      publicKey: kind.DeleteKeyDoesNotExist.public_key,
+      accountId: kind?.DeleteKeyDoesNotExist?.account_id,
+      publicKey: kind?.DeleteKeyDoesNotExist?.public_key,
     };
   }
   if ('AddKeyAlreadyExists' in kind) {
     return {
       type: 'addKeyAlreadyExists',
-      accountId: kind.AddKeyAlreadyExists.account_id,
-      publicKey: kind.AddKeyAlreadyExists.public_key,
+      accountId: kind?.AddKeyAlreadyExists?.account_id,
+      publicKey: kind?.AddKeyAlreadyExists?.public_key,
     };
   }
   if ('DeleteAccountStaking' in kind) {
     return {
       type: 'deleteAccountStaking',
-      accountId: kind.DeleteAccountStaking.account_id,
+      accountId: kind?.DeleteAccountStaking?.account_id,
     };
   }
   if ('LackBalanceForState' in kind) {
     return {
       type: 'lackBalanceForState',
-      accountId: kind.LackBalanceForState.account_id,
-      amount: kind.LackBalanceForState.amount,
+      accountId: kind?.LackBalanceForState?.account_id,
+      amount: kind?.LackBalanceForState?.amount,
     };
   }
   if ('TriesToUnstake' in kind) {
     return {
       type: 'triesToUnstake',
-      accountId: kind.TriesToUnstake.account_id,
+      accountId: kind?.TriesToUnstake?.account_id,
     };
   }
   if ('TriesToStake' in kind) {
     return {
       type: 'triesToStake',
-      accountId: kind.TriesToStake.account_id,
-      stake: kind.TriesToStake.stake,
-      locked: kind.TriesToStake.locked,
-      balance: kind.TriesToStake.balance,
+      accountId: kind?.TriesToStake?.account_id,
+      stake: kind?.TriesToStake?.stake,
+      locked: kind?.TriesToStake?.locked,
+      balance: kind?.TriesToStake?.balance,
     };
   }
   if ('InsufficientStake' in kind) {
     return {
       type: 'insufficientStake',
-      accountId: kind.InsufficientStake.account_id,
-      stake: kind.InsufficientStake.stake,
-      minimumStake: kind.InsufficientStake.minimum_stake,
+      accountId: kind?.InsufficientStake?.account_id,
+      stake: kind?.InsufficientStake?.stake,
+      minimumStake: kind?.InsufficientStake?.minimum_stake,
     };
   }
   if ('FunctionCallError' in kind) {
     return {
       type: 'functionCallError',
-      error: mapRpcFunctionCallError(kind.FunctionCallError),
+      error: mapRpcFunctionCallError(kind?.FunctionCallError),
     };
   }
   if ('NewReceiptValidationError' in kind) {
     return {
       type: 'newReceiptValidationError',
-      error: mapRpcNewReceiptValidationError(kind.NewReceiptValidationError),
+      error: mapRpcNewReceiptValidationError(kind?.NewReceiptValidationError),
     };
   }
   if ('OnlyImplicitAccountCreationAllowed' in kind) {
     return {
       type: 'onlyImplicitAccountCreationAllowed',
-      accountId: kind.OnlyImplicitAccountCreationAllowed.account_id,
+      accountId: kind?.OnlyImplicitAccountCreationAllowed?.account_id,
     };
   }
   if ('DeleteAccountWithLargeState' in kind) {
     return {
       type: 'deleteAccountWithLargeState',
-      accountId: kind.DeleteAccountWithLargeState.account_id,
+      accountId: kind?.DeleteAccountWithLargeState?.account_id,
     };
   }
   return UNKNOWN_ERROR;
@@ -696,39 +696,39 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   if ('InvalidAccessKeyError' in error) {
     return {
       type: 'invalidAccessKeyError',
-      error: mapRpcInvalidAccessKeyError(error.InvalidAccessKeyError),
+      error: mapRpcInvalidAccessKeyError(error?.InvalidAccessKeyError),
     };
   }
   if ('InvalidSignerId' in error) {
     return {
       type: 'invalidSignerId',
-      signerId: error.InvalidSignerId.signer_id,
+      signerId: error?.InvalidSignerId?.signer_id,
     };
   }
   if ('SignerDoesNotExist' in error) {
     return {
       type: 'signerDoesNotExist',
-      signerId: error.SignerDoesNotExist.signer_id,
+      signerId: error?.SignerDoesNotExist?.signer_id,
     };
   }
   if ('InvalidNonce' in error) {
     return {
       type: 'invalidNonce',
-      transactionNonce: error.InvalidNonce.tx_nonce,
-      akNonce: error.InvalidNonce.ak_nonce,
+      transactionNonce: error?.InvalidNonce?.tx_nonce,
+      akNonce: error?.InvalidNonce?.ak_nonce,
     };
   }
   if ('NonceTooLarge' in error) {
     return {
       type: 'nonceTooLarge',
-      transactionNonce: error.NonceTooLarge.tx_nonce,
-      upperBound: error.NonceTooLarge.upper_bound,
+      transactionNonce: error?.NonceTooLarge?.tx_nonce,
+      upperBound: error?.NonceTooLarge?.upper_bound,
     };
   }
   if ('InvalidReceiverId' in error) {
     return {
       type: 'invalidReceiverId',
-      receiverId: error.InvalidReceiverId.receiver_id,
+      receiverId: error?.InvalidReceiverId?.receiver_id,
     };
   }
   if ('InvalidSignature' in error) {
@@ -739,16 +739,16 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   if ('NotEnoughBalance' in error) {
     return {
       type: 'notEnoughBalance',
-      signerId: error.NotEnoughBalance.signer_id,
-      balance: error.NotEnoughBalance.balance,
-      cost: error.NotEnoughBalance.cost,
+      signerId: error?.NotEnoughBalance?.signer_id,
+      balance: error?.NotEnoughBalance?.balance,
+      cost: error?.NotEnoughBalance?.cost,
     };
   }
   if ('LackBalanceForState' in error) {
     return {
       type: 'lackBalanceForState',
-      signerId: error.LackBalanceForState.signer_id,
-      amount: error.LackBalanceForState.amount,
+      signerId: error?.LackBalanceForState?.signer_id,
+      amount: error?.LackBalanceForState?.amount,
     };
   }
   if ('CostOverflow' in error) {
@@ -774,8 +774,8 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   if ('TransactionSizeExceeded' in error) {
     return {
       type: 'transactionSizeExceeded',
-      size: error.TransactionSizeExceeded.size,
-      limit: error.TransactionSizeExceeded.limit,
+      size: error?.TransactionSizeExceeded?.size,
+      limit: error?.TransactionSizeExceeded?.limit,
     };
   }
   return UNKNOWN_ERROR;
@@ -786,13 +786,13 @@ export function mapRpcReceiptError(error: TxExecutionError) {
   if ('ActionError' in error) {
     return {
       type: 'action',
-      error: mapRpcReceiptActionError(error.ActionError),
+      error: mapRpcReceiptActionError(error?.ActionError),
     };
   }
   if ('InvalidTxError' in error) {
     return {
       type: 'transaction',
-      error: mapRpcReceiptInvalidTxError(error.InvalidTxError),
+      error: mapRpcReceiptInvalidTxError(error?.InvalidTxError),
     };
   }
   return UNKNOWN_ERROR;
@@ -800,21 +800,21 @@ export function mapRpcReceiptError(error: TxExecutionError) {
 
 export function mapRpcReceiptStatus(status: ExecutionStatusView) {
   if ('SuccessValue' in status) {
-    return { type: 'successValue', value: status.SuccessValue };
+    return { type: 'successValue', value: status?.SuccessValue };
   }
   if ('SuccessReceiptId' in status) {
-    return { type: 'successReceiptId', receiptId: status.SuccessReceiptId };
+    return { type: 'successReceiptId', receiptId: status?.SuccessReceiptId };
   }
   if ('Failure' in status) {
-    return { type: 'failure', error: mapRpcReceiptError(status.Failure) };
+    return { type: 'failure', error: mapRpcReceiptError(status?.Failure) };
   }
   return { type: 'unknown' };
 }
 
 export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
-  if (rpcAction.action_kind) {
+  if (rpcAction?.action_kind) {
     const normalizedAction = {
-      [rpcAction.action_kind]: {
+      [rpcAction?.action_kind]: {
         ...rpcAction.args,
       },
     };
@@ -826,14 +826,14 @@ export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
     return {
       kind: 'delegateAction',
       args: {
-        actions: rpcAction.Delegate.delegate_action.actions.map(
+        actions: rpcAction?.Delegate?.delegate_action?.actions?.map(
           (subaction: NonDelegateActionView, index: number) => ({
             ...mapNonDelegateRpcActionToAction(subaction),
             delegateIndex: index,
           }),
         ),
-        receiverId: rpcAction.Delegate.delegate_action.receiver_id,
-        senderId: rpcAction.Delegate.delegate_action.sender_id,
+        receiverId: rpcAction?.Delegate?.delegate_action?.receiver_id,
+        senderId: rpcAction?.Delegate?.delegate_action?.sender_id,
       },
     };
   }
@@ -842,12 +842,12 @@ export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
 
 export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
   return {
-    blockHash: outcome.block_hash,
-    tokensBurnt: outcome.outcome.tokens_burnt,
-    gasBurnt: outcome.outcome.gas_burnt,
-    status: mapRpcReceiptStatus(outcome.outcome.status),
-    logs: outcome.outcome.logs,
-    receiptIds: outcome.outcome.receipt_ids,
+    blockHash: outcome?.block_hash,
+    tokensBurnt: outcome?.outcome?.tokens_burnt,
+    gasBurnt: outcome?.outcome?.gas_burnt,
+    status: mapRpcReceiptStatus(outcome?.outcome?.status),
+    logs: outcome?.outcome?.logs,
+    receiptIds: outcome?.outcome?.receipt_ids,
   };
 }
 
@@ -856,8 +856,8 @@ export const calculateGasUsed = (
   txnTokensBurnt: string,
 ) => {
   return receiptsOutcome
-    .map((receipt) => receipt.outcome.gas_burnt)
-    .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
+    ?.map((receipt) => receipt?.outcome?.gas_burnt)
+    ?.reduce((acc, fee) => Big(acc)?.add(fee)?.toString(), txnTokensBurnt);
 };
 export function calculateTotalGas(actions: Action | any) {
   let totalGas = 0;
@@ -869,7 +869,7 @@ export function calculateTotalGas(actions: Action | any) {
       actionType === 'Delegate' &&
       action[actionType]?.delegate_action?.actions
     ) {
-      action[actionType].delegate_action.actions.forEach(
+      action[actionType]?.delegate_action?.actions.forEach(
         (nestedAction: Action) => {
           extractGas(nestedAction);
         },
@@ -895,13 +895,13 @@ export function calculateTotalDeposit(actions: Action | any) {
       actionType === 'Delegate' &&
       action[actionType]?.delegate_action?.actions
     ) {
-      action[actionType].delegate_action.actions.forEach(
+      action[actionType]?.delegate_action?.actions?.forEach(
         (nestedAction: Action) => {
           extractDeposit(nestedAction);
         },
       );
-    } else if (action[actionType] && action[actionType].deposit) {
-      totalDeposit += Number(action[actionType].deposit);
+    } else if (action[actionType] && action[actionType]?.deposit) {
+      totalDeposit += Number(action[actionType]?.deposit);
     }
   }
 
@@ -916,6 +916,6 @@ export const txnFee = (
   txnTokensBurnt: string,
 ) => {
   return receiptsOutcome
-    .map((receipt) => receipt.outcome.tokens_burnt)
-    .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
+    .map((receipt) => receipt?.outcome?.tokens_burnt)
+    ?.reduce((acc, fee) => Big(acc)?.add(fee)?.toString(), txnTokensBurnt);
 };

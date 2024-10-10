@@ -57,7 +57,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
   let cursor = txnsData?.cursor;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e?.target;
     if (name === 'type') {
       if (isAction(value)) {
         setForm((prev) => ({ ...prev, action: value, method: '' }));
@@ -228,7 +228,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
             <form onSubmit={onFilter} className="flex flex-col">
               <input
                 name="type"
-                value={form.action || form.method}
+                value={form?.action || form?.method}
                 onChange={onChange}
                 placeholder="Search by method"
                 className="border dark:border-black-200  rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
@@ -316,7 +316,7 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
             <form onSubmit={onFilter}>
               <input
                 name="from"
-                value={form.from}
+                value={form?.from}
                 onChange={onChange}
                 placeholder={
                   t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
@@ -533,13 +533,15 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
                 `${
                   t
                     ? t('listing', {
-                        count: localFormat ? localFormat(count.toString()) : '',
+                        count: localFormat
+                          ? localFormat(count?.toString())
+                          : '',
                       })
                     : `More than > ${count} transactions found`
                 }`}
             </p>
           </div>
-          {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
+          {modifiedFilter && Object.keys(modifiedFilter)?.length > 0 && (
             <div className="lg:ml-auto px-6 pb-1">
               <Filters filters={modifiedFilter} onClear={onAllClear} />
             </div>

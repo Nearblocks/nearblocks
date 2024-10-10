@@ -20,7 +20,7 @@ const Deposit = (props: DepositPropsInfo) => {
       </svg>
     );
   };
-  const log = props.event?.[0];
+  const log = props?.event?.[0];
 
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
@@ -29,14 +29,14 @@ const Deposit = (props: DepositPropsInfo) => {
       <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">Deposit </span>
 
-      <TokenInfo contract={log.token_id} amount={log.amount} decimals={18} />
+      <TokenInfo contract={log?.token_id} amount={log?.amount} decimals={18} />
       <span className="font-bold text-gray px-1">
         From{' '}
         <Link
-          href={`/address/${log.account_id}`}
+          href={`/address/${log?.account_id}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
         >
-          {shortenAddress(log.account_id)}
+          {shortenAddress(log?.account_id)}
         </Link>
       </span>
       <span className="font-bold text-gray px-1">

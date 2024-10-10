@@ -42,7 +42,9 @@ const Details = (props: Props) => {
     </Link>
   );
 
-  const block: BlocksInfo | null = blockInfo?.blocks?.[0];
+  const block: BlocksInfo | null = Array.isArray(blockInfo?.blocks)
+    ? blockInfo?.blocks?.[0]
+    : null;
 
   const gasUsed = block?.chunks_agg?.gas_used ?? '';
   const gasLimit = block?.chunks_agg?.gas_limit ?? '';
@@ -57,7 +59,7 @@ const Details = (props: Props) => {
               <span key={1} className="font-semibold pl-1">
                 {t('block.heading.1', {
                   block: block?.block_height
-                    ? localFormat(block?.block_height.toString())
+                    ? localFormat(block?.block_height?.toString())
                     : '',
                 })}
               </span>
@@ -68,7 +70,7 @@ const Details = (props: Props) => {
               <span key={1} className="font-semibold">
                 #
                 {block?.block_height
-                  ? localFormat(block?.block_height.toString())
+                  ? localFormat(block?.block_height?.toString())
                   : ''}
               </span>
             </>
@@ -129,7 +131,7 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 font-semibold break-words">
                 {block?.block_height
-                  ? localFormat(block?.block_height.toString())
+                  ? localFormat(block?.block_height?.toString())
                   : block?.block_height ?? ''}
               </div>
             </div>
@@ -186,14 +188,14 @@ const Details = (props: Props) => {
                       <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
                         {block?.transactions_agg?.count
                           ? localFormat(
-                              block?.transactions_agg?.count.toString(),
+                              block?.transactions_agg?.count?.toString(),
                             )
-                          : block?.transactions_agg?.count.toString() ??
+                          : block?.transactions_agg?.count?.toString() ??
                             '' + ' transactions'}
                       </LinkWrapper>
                       ) + `and $
                       {block?.receipts_agg?.count
-                        ? localFormat(block?.receipts_agg?.count.toString())
+                        ? localFormat(block?.receipts_agg?.count?.toString())
                         : block?.receipts_agg?.count ?? ''}{' '}
                       receipts`
                     </>
@@ -220,7 +222,7 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasUsed
-                  ? convertToMetricPrefix(gasUsed.toString()) + 'gas'
+                  ? convertToMetricPrefix(gasUsed?.toString()) + 'gas'
                   : ''}
               </div>
             </div>
@@ -230,7 +232,7 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasLimit
-                  ? convertToMetricPrefix(gasLimit.toString()) + 'gas'
+                  ? convertToMetricPrefix(gasLimit?.toString()) + 'gas'
                   : ''}
               </div>
             </div>
@@ -240,7 +242,7 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.gas_price
-                  ? gasPrice(block?.gas_price.toString())
+                  ? gasPrice(block?.gas_price?.toString())
                   : block?.gas_price ?? ''}
               </div>
             </div>
@@ -250,7 +252,7 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {gasUsed && block?.gas_price
-                  ? gasFee(gasUsed.toString(), block?.gas_price.toString()) +
+                  ? gasFee(gasUsed?.toString(), block?.gas_price?.toString()) +
                     ' Ⓝ'
                   : ''}
               </div>

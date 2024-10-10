@@ -66,8 +66,9 @@ const ReceiptSummary = (props: Props) => {
       });
 
     const collectReceipts = (receiptHash: any) => {
-      const receipt = receiptsByIdMap?.get(receiptHash);
-      const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
+      const receipt = receiptsByIdMap && receiptsByIdMap?.get(receiptHash);
+      const receiptOutcome =
+        receiptOutcomesByIdMap && receiptOutcomesByIdMap?.get(receiptHash);
 
       return {
         ...receipt,
@@ -192,7 +193,7 @@ const ReceiptSummary = (props: Props) => {
                       </td>
                     </tr>
                   ))}
-                {receipt?.actions?.length === 0 && (
+                {receipt && receipt?.actions?.length === 0 && (
                   <tr className="h-[57px]">
                     <td
                       colSpan={100}
@@ -200,7 +201,7 @@ const ReceiptSummary = (props: Props) => {
                     >
                       <ErrorMessage
                         icons={<FaInbox />}
-                        message="No access keys"
+                        message="No receipts found"
                         mutedText="Please try again later"
                       />
                     </td>

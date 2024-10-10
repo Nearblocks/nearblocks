@@ -60,7 +60,7 @@ export const fetcher = (url: string, options: AxiosRequestConfig = {}) => {
       attempt: 1,
       ...options,
     })
-    .then((res) => res.data)
+    .then((res) => res?.data)
     .catch((error) => {
       throw error;
     });

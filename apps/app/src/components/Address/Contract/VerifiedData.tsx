@@ -79,15 +79,17 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
 
           const data = await response.json();
 
-          const files = data?.structure
-            .filter((item: FileItem) => item.type === 'file')
-            .map((file: FileItem) => file.name);
+          const files =
+            data &&
+            data?.structure
+              .filter((item: FileItem) => item?.type === 'file')
+              .map((file: FileItem) => file?.name);
 
-          if (!files || files.length === 0) {
+          if (!files || files?.length === 0) {
             throw new Error('No files found in the structure data');
           }
 
-          const fileContentsPromises = files.map(async (fileName: string) => {
+          const fileContentsPromises = files?.map(async (fileName: string) => {
             try {
               if (fileName) {
                 const sourceCodeUrl: string =
@@ -229,7 +231,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     message={fileDataError}
                     mutedText="Please try again later"
                   />
-                ) : fileData && fileData.length > 0 ? (
+                ) : fileData && fileData?.length > 0 ? (
                   fileData.map(({ name, content }, index) => (
                     <div key={index} className="pb-4">
                       <div className="flex items-center justify-between mb-1">
