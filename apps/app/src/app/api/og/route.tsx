@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   const title = url.searchParams.get('title') || 'Near blocks';
   const basic = url.searchParams.has('basic');
   const account = url.searchParams.has('account');
-  const block = url.searchParams.has('block');
+  const blockHash = url.searchParams.has('blockHash');
   const token = url.searchParams.has('token');
   const nft = url.searchParams.has('nft');
 
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
     svgString = thumbnailBasicSvg(brandConfig);
   } else if (account) {
     svgString = thumbnailAccountSvg(brandConfig);
-  } else if (block) {
+  } else if (blockHash) {
     svgString = thumbnailBlockSvg(brandConfig);
   } else if (token) {
     svgString = thumbnailTokenSvg(brandConfig);
@@ -77,7 +77,7 @@ export async function GET(request: Request) {
     : null;
 
   let titleText = title;
-  if (block && blockHeight) {
+  if (blockHash) {
     titleText = `${
       brand.charAt(0).toUpperCase() + brand.slice(1)
     } Block Height`;
@@ -167,7 +167,7 @@ export async function GET(request: Request) {
           >
             <div>{titleText}</div>
 
-            {block && blockHeight && (
+            {blockHash && blockHeight && (
               <div
                 style={{
                   marginTop: '10px',
