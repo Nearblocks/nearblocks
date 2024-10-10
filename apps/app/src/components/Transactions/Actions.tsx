@@ -33,8 +33,16 @@ const Actions = (props: ActionPropsInfo) => {
         const delegateAction: DelegateActionView | any =
           props.action?.args?.delegate_action?.actions &&
           props.action?.args?.delegate_action?.actions?.map(
-            (txn: ActionType | any) => mapRpcActionToAction(txn),
+            (txn: ActionType | any) => {
+              const action = mapRpcActionToAction(txn);
+              return {
+                ...action,
+                from: props.action?.from,
+                to: props.action?.to,
+              };
+            },
           );
+
         return (
           delegateAction &&
           delegateAction.map((subAction: Action | any, i: number) => (

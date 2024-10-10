@@ -7,7 +7,10 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing events indexer...');
+    logger.info(
+      { data_source: config.dataSource, network: config.network },
+      'initializing events indexer...',
+    );
     logger.info('syncing events data...');
     await syncData();
   } catch (error) {

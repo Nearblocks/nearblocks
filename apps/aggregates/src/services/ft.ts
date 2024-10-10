@@ -24,7 +24,7 @@ const syncHolders = async (): Promise<boolean> => {
       return true;
     }
 
-    const [settings, first, last] = await Promise.all([
+    const [settings, first, event] = await Promise.all([
       knex('settings').where('key', TABLE).first(),
       knex
         .select('block_height')
@@ -32,15 +32,11 @@ const syncHolders = async (): Promise<boolean> => {
         .orderBy('block_height', 'asc')
         .limit(1)
         .first(),
-      knex
-        .select('block_height')
-        .from('ft_events')
-        .orderBy('block_height', 'desc')
-        .limit(1)
-        .first(),
+      knex('settings').where('key', 'events').first(),
     ]);
 
     const synced = settings?.value?.sync;
+    const last = event?.value?.sync;
 
     if (!first || !last) {
       logger.warn(`${TABLE}: retrying... ${JSON.stringify({ first, last })}`);
@@ -50,7 +46,7 @@ const syncHolders = async (): Promise<boolean> => {
     }
 
     const start = synced ? +synced + 1 : +first.block_height;
-    let end = +last.block_height - 1;
+    let end = +last - 1;
     const diff = end - start;
     const limit = getLimit(start);
 

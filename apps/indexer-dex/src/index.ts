@@ -9,7 +9,10 @@ import { syncData } from '#services/stream';
 (async () => {
   try {
     if (config.network === Network.MAINNET) {
-      logger.info({ network: config.network }, 'initializing dex indexer...');
+      logger.info(
+        { data_source: config.dataSource, network: config.network },
+        'initializing dex indexer...',
+      );
       logger.info('syncing dex data...');
       await syncData();
     }

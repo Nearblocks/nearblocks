@@ -585,3 +585,45 @@ export function jsonStringify(obj: any, replacer?: any, space?: any) {
     return null;
   }
 }
+
+export const getCookieFromRequest = (
+  cookieName: string,
+  req: any,
+): string | null => {
+  const cookies = req.headers.cookie || '';
+  const cookie = cookies
+    .split('; ')
+    .find((row: any) => row.startsWith(`${cookieName}=`));
+
+  return cookie ? cookie.split('=')[1] : null;
+};
+
+export const parseGitHubLink = (snapshot: string) => {
+  const regex =
+    /^(?:git\+https:\/\/github\.com\/([^\/]+\/[^\/]+)(?:\.git)?\?rev=([a-f0-9]+)|https:\/\/github\.com\/([^\/]+\/[^\/]+)(?:\.git)?(?:\/tree\/([a-f0-9]+))?)$/;
+
+  const match = snapshot.match(regex);
+
+  const commitHash = match ? match[2] || match[4] : '';
+
+  const url = snapshot.substring(snapshot.indexOf('http'));
+
+  if (match && commitHash) return { url, text: commitHash };
+
+  if (url) return { url, text: snapshot };
+
+  return null;
+};
+
+export const parseLink = (link: string) => {
+  try {
+    const url = new URL(link);
+
+    return {
+      url: link,
+      text: `${url.hostname}${url.pathname}`,
+    };
+  } catch {
+    return null;
+  }
+};

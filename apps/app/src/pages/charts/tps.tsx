@@ -7,29 +7,34 @@ import { env } from 'next-runtime-env';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
 import TpsCharts from '@/components/Charts/TpsChart';
+import { fetchData } from '@/utils/fetchData';
 
 export const getServerSideProps: GetServerSideProps<{
   data: any;
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
   try {
-    const [dataResult, statsResult, latestBlocksResult] =
-      await Promise.allSettled([
-        fetcher('charts/tps'),
-        fetcher(`stats`),
-        fetcher(`blocks/latest?limit=1`),
-      ]);
+    const [dataResult] = await Promise.allSettled([fetcher('charts/tps')]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const error = dataResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
@@ -37,6 +42,8 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -47,6 +54,8 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -126,6 +135,8 @@ Tps.getLayout = (page: ReactElement) => (
     notice={<Notice />}
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

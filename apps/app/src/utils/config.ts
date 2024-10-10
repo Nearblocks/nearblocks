@@ -19,8 +19,8 @@ export const network = networks[networkId];
 
 export const apiUrl: string =
   networkId === 'mainnet'
-    ? 'https://api3.nearblocks.io/v1/'
-    : 'https://api3-testnet.nearblocks.io/v1/';
+    ? 'https://api.nearblocks.io/v1/'
+    : 'https://api-testnet.nearblocks.io/v1/';
 
 export const appUrl =
   env('NEXT_PUBLIC_NETWORK_ID') === 'mainnet'
@@ -29,10 +29,33 @@ export const appUrl =
 
 export const docsUrl: string =
   networkId === 'mainnet'
-    ? 'https://api3.nearblocks.io/api-docs'
-    : 'https://api3-testnet.nearblocks.io/api-docs';
+    ? 'https://api.nearblocks.io/api-docs'
+    : 'https://api-testnet.nearblocks.io/api-docs';
 
 export const aurorablocksUrl: string =
   networkId === 'mainnet'
     ? 'https://aurora.exploreblocks.io'
     : 'https://aurora.exploreblocks.io';
+
+export const verifierConfig =
+  networkId === 'mainnet'
+    ? [
+        {
+          accountId: 'v2-verifier.sourcescan.near',
+          fileStructureApiUrl: (cid: string) =>
+            `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
+          sourceCodeApiUrl: (cid: string, fileName: string) =>
+            `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+          verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
+        },
+      ]
+    : [
+        {
+          accountId: 'v2-verifier.sourcescan.testnet',
+          fileStructureApiUrl: (cid: string) =>
+            `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
+          sourceCodeApiUrl: (cid: string, fileName: string) =>
+            `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+          verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
+        },
+      ];

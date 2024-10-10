@@ -6,9 +6,11 @@ import { baseDecode } from 'borsh';
 
 const useRpc = () => {
   const rpcUrl: any = useRpcStore((state) => state.rpc);
-  const provider = new providers.JsonRpcProvider(rpcUrl);
+  const jsonProviders = [new providers.JsonRpcProvider({ url: rpcUrl })];
 
-  const getBlockDetails = async (blockId: number) => {
+  const provider = new providers.FailoverRpcProvider(jsonProviders);
+
+  const getBlockDetails = async (blockId: number | string) => {
     try {
       const block = await provider.block({ blockId });
       return block;
@@ -193,7 +195,7 @@ const useRpc = () => {
   };
 
   const transactionStatus = async (hash: any, signer: any) =>
-    provider.txStatusReceipts(baseDecode(hash), signer);
+    provider.txStatusReceipts(baseDecode(hash), signer, 'NONE');
 
   const getContractMetadata = async (accountId: string) => {
     try {
@@ -207,13 +209,7 @@ const useRpc = () => {
       const result = (resp as any).result;
       return decodeArgs(result);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('MethodResolveError(MethodNotFound)')
-      ) {
-        return null;
-      }
-      throw error;
+      return null;
     }
   };
 

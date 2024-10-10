@@ -1,10 +1,12 @@
 import { stream, types } from 'nb-lake';
 import { logger } from 'nb-logger';
+import { streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeEvents } from '#services/events';
+import { DataSource } from '#types/enum';
 
 const fetchBlocks = async (block: number, limit: number) => {
   try {
@@ -40,16 +42,45 @@ export const syncData = async () => {
   const settings = await knex('settings').where({ key: eventsKey }).first();
   const latestBlock = settings?.value?.sync;
 
-  if (!lakeConfig.startBlockHeight && latestBlock) {
-    const next = +latestBlock - config.delta;
+  if (config.dataSource === DataSource.FAST_NEAR) {
+    let startBlockHeight = config.startBlockHeight;
 
-    logger.info(`last synced block: ${latestBlock}`);
-    logger.info(`syncing from block: ${next}`);
-    lakeConfig.startBlockHeight = next;
-  }
+    if (!startBlockHeight && latestBlock) {
+      const next = +latestBlock - config.delta / 2;
+      startBlockHeight = next;
+      logger.info(`last synced block: ${latestBlock}`);
+      logger.info(`syncing from block: ${next}`);
+    }
 
-  for await (const message of stream(lakeConfig)) {
-    await onMessage(message);
+    const stream = streamBlock({
+      limit: config.preloadSize / 2,
+      network: config.network,
+      start: startBlockHeight || config.genesisHeight,
+    });
+
+    for await (const message of stream) {
+      await onMessage(message);
+    }
+
+    stream.on('end', () => {
+      logger.error('stream ended');
+      process.exit();
+    });
+    stream.on('error', (error: Error) => {
+      logger.error(error);
+      process.exit();
+    });
+  } else {
+    if (!lakeConfig.startBlockHeight && latestBlock) {
+      const next = +latestBlock - config.delta;
+      lakeConfig.startBlockHeight = next;
+      logger.info(`last synced block: ${latestBlock}`);
+      logger.info(`syncing from block: ${next}`);
+    }
+
+    for await (const message of stream(lakeConfig)) {
+      await onMessage(message);
+    }
   }
 };
 

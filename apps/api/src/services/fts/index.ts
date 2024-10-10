@@ -7,39 +7,47 @@ import { Count, List, Txns } from '#libs/schema/fts';
 import { getPagination } from '#libs/utils';
 import { RequestValidator } from '#types/types';
 
+const orderBy = (sort: string) => {
+  switch (sort) {
+    case 'price':
+      return 'price';
+    case 'change':
+      return 'change_24';
+    case 'volume':
+      return 'volume_24h';
+    case 'market_cap':
+      return 'market_cap';
+    default:
+      return 'onchain_market_cap';
+  }
+};
+
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
   const search = req.validator.data.search;
+  const sort = req.validator.data.sort;
   const { limit, offset } = getPagination(page, per_page);
 
   const tokens = await sql`
-    SELECT DISTINCT
-      contract,
-      (price)::NUMERIC * (total_supply)::NUMERIC AS onchain_market_cap,
-      name,
-      symbol,
-      decimals,
-      icon,
-      reference,
-      price,
-      change_24,
-      market_cap,
-      volume_24h
+    SELECT
+      *
     FROM
-      ft_meta ${search
+      ft_list
+    WHERE
+      ${search
       ? sql`
-          WHERE
-            contract ILIKE ${search + '%'}
-            OR symbol ILIKE ${search + '%'}
-            OR name ILIKE ${search + '%'}
+          contract ILIKE ${search + '%'}
+          OR symbol ILIKE ${search + '%'}
+          OR name ILIKE ${search + '%'}
         `
-      : sql``}
+      : true}
     ORDER BY
-      onchain_market_cap ${order === 'desc'
+      ${sql(orderBy(sort))} ${order === 'desc'
       ? sql`DESC NULLS LAST`
-      : sql`ASC NULLS FIRST`}
+      : sql`ASC NULLS FIRST`},
+      symbol ASC
     LIMIT
       ${limit}
     OFFSET
@@ -57,14 +65,15 @@ const count = catchAsync(
       SELECT
         COUNT(contract)
       FROM
-        ft_meta ${search
+        ft_meta
+      WHERE
+        ${search
         ? sql`
-            WHERE
-              contract ILIKE ${search + '%'}
-              OR symbol ILIKE ${search + '%'}
-              OR name ILIKE ${search + '%'}
+            contract ILIKE ${search + '%'}
+            OR symbol ILIKE ${search + '%'}
+            OR name ILIKE ${search + '%'}
           `
-        : sql``}
+        : true}
     `;
 
     return res.status(200).json({ tokens });

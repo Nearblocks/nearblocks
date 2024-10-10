@@ -10,6 +10,8 @@ import {
 import Big from 'big.js';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
+import { Tooltip } from '@reach/tooltip';
 
 interface Props {
   txn: TransactionInfo;
@@ -26,9 +28,11 @@ const ReceiptSummaryRow = (props: Props) => {
   const { receipt, txn, statsData } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
+
   function formatActionKind(actionKind: string) {
     return actionKind.replace(/([a-z])([A-Z])/g, '$1 $2');
   }
+
   const getGasAttached = (actions: Action[]): string => {
     const gasAttached = actions
       .map((action) => action.args)
@@ -51,11 +55,36 @@ const ReceiptSummaryRow = (props: Props) => {
 
   let gasAttached = receipt?.actions ? getGasAttached(receipt?.actions) : '0';
 
+  const status = receipt?.outcome?.status;
+  const isSuccess =
+    status &&
+    (('SuccessValue' in status &&
+      status.SuccessValue !== null &&
+      status.SuccessValue !== undefined) ||
+      'SuccessReceiptId' in status);
+
   return (
     <>
       {receipt &&
         receipt?.actions?.map((action: any, i: number) => (
           <tr key={action.args?.method_name + i}>
+            <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
+              <TxnsReceiptStatus status={isSuccess} />
+            </td>
+            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
+              <Tooltip
+                label={receipt.id}
+                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+              >
+                <Link
+                  className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
+                  href={`#execution#${receipt.id}`}
+                >
+                  {' '}
+                  {receipt.id}
+                </Link>
+              </Tooltip>
+            </td>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               {formatActionKind(action.action_kind)}
             </td>

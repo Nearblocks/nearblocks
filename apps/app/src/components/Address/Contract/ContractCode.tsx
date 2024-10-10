@@ -1,166 +1,40 @@
 import Question from '@/components/Icons/Question';
-import useRpc from '@/hooks/useRpc';
-import { shortenHex } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import VerifiedData from './VerifiedData';
 import VerificationStatus from './VerificationStatus';
-import {
-  ContractMetadata,
-  VerificationData,
-  VerifierData,
-  VerifierStatus,
-} from '@/utils/types';
+import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
-
-type OnChainResponse = {
-  hash?: string;
-};
-
-type ContractData = {
-  onChainCodeHash: string;
-  contractMetadata: ContractMetadata | null;
-};
+import { verifierConfig } from '@/utils/config';
+import { parseGitHubLink, parseLink } from '@/utils/libs';
 
 type ContractCodeProps = {
+  error: string | null;
+  verificationData: Record<string, VerificationData>;
+  contractData: ContractData;
+  statusLoading: boolean;
   accountId: string;
 };
 
-const verifiers = ['v2-verifier.sourcescan.near']; // Add more verifier account IDs as needed
+const verifiers = verifierConfig.map((config) => config.accountId);
 
-const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
-  const [contractData, setContractData] = useState<ContractData>({
-    onChainCodeHash: '',
-    contractMetadata: null,
-  });
-  const [statusLoading, setStatusLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { contractCode, getContractMetadata, getVerifierData } = useRpc();
-  const [verificationData, setVerificationData] = useState<
-    Record<string, VerificationData>
-  >({});
-
+const ContractCode: React.FC<ContractCodeProps> = ({
+  error,
+  verificationData,
+  contractData,
+  statusLoading,
+  accountId,
+}) => {
   const [selectedVerifier, setSelectedVerifier] = useState<string>(
     verifiers[0],
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setStatusLoading(true);
-        setError(null);
-
-        const contractMetadataResponse = await getContractMetadata(
-          accountId as string,
-        );
-
-        const onChainResponse = await contractCode(accountId as string);
-
-        const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
-
-        setContractData({
-          onChainCodeHash: onChainHash,
-          contractMetadata: contractMetadataResponse,
-        });
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch contract data.');
-      }
-    };
-    if (accountId) fetchData();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId]);
-
-  useEffect(() => {
-    const fetchVerifierData = async () => {
-      setStatusLoading(true);
-
-      try {
-        const verifierDataPromises = verifiers.map((verifierAccountId) =>
-          getVerifierData(accountId as string, verifierAccountId),
-        );
-
-        const verifierResponses = await Promise.all(verifierDataPromises);
-
-        const verificationData = verifiers.reduce<
-          Record<string, VerificationData>
-        >((acc, verifier, index) => {
-          const data = verifierResponses[index];
-          let status: VerifierStatus = 'pending';
-
-          if (
-            data &&
-            contractData?.onChainCodeHash &&
-            contractData?.contractMetadata
-          ) {
-            const hashMatches =
-              contractData?.onChainCodeHash === data.code_hash;
-            status = hashMatches
-              ? 'verified'
-              : contractData?.contractMetadata?.build_info
-              ? 'mismatch'
-              : 'pending';
-          }
-
-          acc[verifier] = {
-            status,
-            data,
-          };
-          return acc;
-        }, {});
-        setVerificationData(verificationData);
-      } catch (error) {
-        console.error('Error fetching or updating verifier data:', error);
-        setError('Failed to fetch verifier data.');
-      } finally {
-        setStatusLoading(false);
-      }
-    };
-    if (contractData.onChainCodeHash) fetchVerifierData();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, contractData]);
-
   const parseBuildEnvironment = (buildEnvironment: string) => {
-    const match = buildEnvironment.match(/^(.+):(.+)@sha256:(.+)$/);
-    if (match) {
-      const [_, imageName, imageTag, digest] = match;
-      return {
-        name: `${imageName}:${imageTag}`,
-        url: `https://hub.docker.com/layers/${imageName}/${imageTag}/images/sha256-${digest}`,
-      };
-    }
-    return { name: 'Unknown', url: '#' };
-  };
+    const [text] = buildEnvironment.split('@');
 
-  const parseSourceCodeLink = (link: string) => {
-    const match = link.match(/\/([^\/]+)\/([^\/]+)\/tree\/([^\/]+)$/);
-    if (match) {
-      const [_, owner, repo, branch] = match;
-      return {
-        text: `${owner}/${repo}/${shortenHex(branch)}`,
-        url: link,
-      };
-    }
-    return { text: 'Unknown', url: link };
-  };
-
-  const parseSnapshot = (snapshot: string) => {
-    snapshot = snapshot.replace(/^git\+/, '');
-    const match = snapshot.match(
-      /https:\/\/github.com\/([^\/]+)\/([^\/]+)\.git\?rev=([^\/]+)$/,
-    );
-    if (match) {
-      const [_, owner, repo, commit] = match;
-      return {
-        text: `${owner}/${repo}/${shortenHex(commit)}`,
-        url: snapshot,
-      };
-    }
-    return { text: 'Unknown', url: snapshot };
+    return text;
   };
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -182,11 +56,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
           />
         )}
         {(verificationData[selectedVerifier]?.status === 'verified' ||
-          verificationData[selectedVerifier]?.status === 'pending') &&
+          verifiers.length === 0) &&
           contractData?.contractMetadata &&
           !error && (
             <div className="flex flex-wrap">
-              <div className="w-full md:w-1/2 pr-2">
+              <div className="w-full lg:w-1/2">
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
@@ -230,7 +104,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
                       contractData?.contractMetadata?.standards?.map(
                         (std, index) => (
                           <div key={index}>
-                            {std.standard} : v{std.version}
+                            {std.standard}:v{std.version}
                           </div>
                         ),
                       )
@@ -240,84 +114,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap p-4">
-                  <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                    <Tooltip
-                      label={'The environment in which the contract was built'}
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                    >
-                      <div>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </div>
-                    </Tooltip>
-                    Build Environment
-                  </div>
-                  <div className="w-full md:w-3/4 break-words">
-                    {!contractData?.contractMetadata ? (
-                      <Loader wrapperClassName="w-full" />
-                    ) : contractData?.contractMetadata?.build_info
-                        ?.build_environment ? (
-                      <Link
-                        href={
-                          parseBuildEnvironment(
-                            contractData?.contractMetadata?.build_info
-                              ?.build_environment,
-                          ).url
-                        }
-                        className="text-green-500 dark:text-green-250 hover:no-underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {
-                          parseBuildEnvironment(
-                            contractData?.contractMetadata?.build_info
-                              ?.build_environment,
-                          ).name
-                        }
-                      </Link>
-                    ) : (
-                      'N/A'
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full md:w-1/2 pr-2">
-                <div className="flex flex-wrap p-4">
-                  <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                    <Tooltip
-                      label={'Link to the source code of the contract'}
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                    >
-                      <div>
-                        <Question className="w-4 h-4 fill-current mr-1" />
-                      </div>
-                    </Tooltip>
-                    Source Code
-                  </div>
-                  <div className="w-full md:w-3/4 break-words">
-                    {!contractData?.contractMetadata ? (
-                      <Loader wrapperClassName="w-full" />
-                    ) : contractData?.contractMetadata?.link ? (
-                      <Link
-                        href={contractData?.contractMetadata?.link}
-                        className="text-green-500 dark:text-green-250 hover:no-underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {
-                          parseSourceCodeLink(
-                            contractData?.contractMetadata?.link,
-                          ).text
-                        }
-                      </Link>
-                    ) : (
-                      'N/A'
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap p-4">
+                <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       label={
@@ -335,25 +132,60 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
                     {!contractData?.contractMetadata ? (
                       <Loader wrapperClassName="w-full" />
                     ) : contractData?.contractMetadata?.build_info
-                        ?.source_code_snapshot ? (
-                      <Link
-                        href={
-                          parseSnapshot(
-                            contractData?.contractMetadata?.build_info
-                              ?.source_code_snapshot,
-                          ).url
-                        }
-                        className="text-green-500 dark:text-green-250 hover:no-underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {
-                          parseSnapshot(
-                            contractData?.contractMetadata?.build_info
-                              ?.source_code_snapshot,
-                          ).text
-                        }
-                      </Link>
+                        ?.source_code_snapshot ||
+                      contractData?.contractMetadata?.link ? (
+                      (() => {
+                        const snapshot =
+                          contractData?.contractMetadata?.link ||
+                          contractData?.contractMetadata?.build_info
+                            ?.source_code_snapshot;
+
+                        const parsedLink = snapshot?.includes('github')
+                          ? parseGitHubLink(snapshot)
+                          : parseLink(snapshot ?? '');
+
+                        return parsedLink ? (
+                          <Link
+                            href={parsedLink.url}
+                            className="text-green-500 dark:text-green-250 hover:no-underline break-words"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {parsedLink.text}
+                          </Link>
+                        ) : (
+                          'N/A'
+                        );
+                      })()
+                    ) : (
+                      'N/A'
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full lg:w-1/2 pl-2">
+                <div className="flex flex-wrap p-4">
+                  <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+                    <Tooltip
+                      label={'The environment in which the contract was built'}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip>
+                    Build Environment
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    {!contractData?.contractMetadata ? (
+                      <Loader wrapperClassName="w-full" />
+                    ) : contractData?.contractMetadata?.build_info
+                        ?.build_environment ? (
+                      parseBuildEnvironment(
+                        contractData?.contractMetadata?.build_info
+                          ?.build_environment,
+                      )
                     ) : (
                       'N/A'
                     )}
@@ -389,7 +221,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
                               )
                             : 'N/A'
                         }
-                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y"
+                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y "
                       />
                     )}
                   </div>
@@ -397,28 +229,30 @@ const ContractCode: React.FC<ContractCodeProps> = ({ accountId }) => {
               </div>
             </div>
           )}
-        {!error && (
-          <div>
-            <VerificationStatus
-              statusLoading={statusLoading}
-              setSelectedVerifier={setSelectedVerifier}
-              selectedVerifier={selectedVerifier}
-              verifiers={verifiers}
-              verificationData={verificationData}
-              contractMetadata={contractData?.contractMetadata}
-            />
+        {!error &&
+          !(verifiers?.length === 0 && contractData?.contractMetadata) && (
+            <div>
+              <VerificationStatus
+                statusLoading={statusLoading}
+                setSelectedVerifier={setSelectedVerifier}
+                selectedVerifier={selectedVerifier}
+                verifiers={verifiers}
+                verificationData={verificationData}
+                contractMetadata={contractData?.contractMetadata}
+                accountId={accountId}
+              />
 
-            {!statusLoading &&
-              verificationData[selectedVerifier]?.status === 'verified' && (
+              {!statusLoading && (
                 <VerifiedData
                   verifierData={
                     verificationData[selectedVerifier]?.data as VerifierData
                   }
                   selectedVerifier={selectedVerifier}
+                  base64Code={contractData.base64Code}
                 />
               )}
-          </div>
-        )}
+            </div>
+          )}
       </div>
     </div>
   );

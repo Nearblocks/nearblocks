@@ -5,31 +5,37 @@ import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
 import { env } from 'next-runtime-env';
 import { GetServerSideProps } from 'next';
-import fetcher from '@/utils/fetcher';
+import { fetchData } from '@/utils/fetchData';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
-  try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
+  try {
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -38,6 +44,8 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -51,7 +59,7 @@ const TermsAndConditions = () => {
   return (
     <Fragment>
       <Head>
-        <title>{t('Terms of Service')}</title>
+        <title>{t('Terms of Service | Nearblocks')}</title>
         <meta name="title" content={t('Terms of Service')} />
         <meta name="description" content={t('home:metaDescription')} />
         <meta property="og:title" content={t('Terms of Service')} />
@@ -457,6 +465,8 @@ TermsAndConditions.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

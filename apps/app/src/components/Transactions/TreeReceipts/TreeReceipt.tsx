@@ -38,14 +38,14 @@ const TreeReceipt = (props: Props) => {
           } !border-2 !border-solid !border-green-600 dark:!border-green-250 dark:text-green-250 !rounded-lg cursor-pointer`}
         >
           {!isSuccess && (
-            <p className="absolute text-red-500 bg-red-50 dark:bg-black top-0 right-0 text-[8px] inline-flex items-center rounded-md -mt-2 -mr-4 px-1">
-              <FaTimesCircle /> <a className="ml-1">Failure</a>
+            <p className="absolute text-red-500 bg-red-50 dark:bg-black top-0 right-0 text-xs inline-flex items-center rounded -mt-3 -mr-5  px-2 py-1">
+              <FaTimesCircle /> <a className="ml-[6px]">Fail</a>
             </p>
           )}
           {receipt?.actions.map((action: any, index: number) => (
             <p
               key={index}
-              className="flex flex-col dark:divide-black-200 divide-gray-200 divide-y p-2"
+              className="flex flex-col dark:divide-black-200 divide-gray-200 divide-y p-0.5"
             >
               {formatActionKind(action.action_kind)}
               {action.args?.method_name && <p>({action.args?.method_name})</p>}

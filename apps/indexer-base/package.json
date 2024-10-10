@@ -33,6 +33,7 @@
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
+    "nb-neardata": "*",
     "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",

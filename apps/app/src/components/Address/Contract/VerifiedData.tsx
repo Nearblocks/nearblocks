@@ -12,10 +12,12 @@ import CopyIcon from '@/components/Icons/CopyIcon';
 import { VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import { verifierConfig } from '@/utils/config';
 
 type VerifiedDataProps = {
   verifierData: VerifierData;
   selectedVerifier: string;
+  base64Code: string;
 };
 
 type FileItem = {
@@ -26,6 +28,7 @@ type FileItem = {
 const VerifiedData: React.FC<VerifiedDataProps> = ({
   verifierData,
   selectedVerifier,
+  base64Code,
 }) => {
   const [showFullCode, setShowFullCode] = useState<{ [key: string]: boolean }>(
     {},
@@ -53,13 +56,26 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       try {
         setFileDataLoading(true);
-        const cid = verifierData?.cid;
-        if (cid) {
-          const url = `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`;
+        const verifier = verifierConfig.find(
+          (config) => config.accountId === selectedVerifier,
+        );
 
-          const response = await fetch(url, {
+        if (!verifier) {
+          throw new Error('Verifier configuration not found.');
+        }
+
+        const cid = verifierData?.cid;
+
+        if (cid) {
+          const structureUrl: string = verifier?.fileStructureApiUrl(cid) || '';
+
+          const response = await fetch(structureUrl, {
             headers: { Accept: 'application/json' },
           });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch structure data');
+          }
 
           const data = await response.json();
 
@@ -67,15 +83,43 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
             .filter((item: FileItem) => item.type === 'file')
             .map((file: FileItem) => file.name);
 
+          if (!files || files.length === 0) {
+            throw new Error('No files found in the structure data');
+          }
+
           const fileContentsPromises = files.map(async (fileName: string) => {
-            const res = await fetch(
-              `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
-            );
-            const content = await res.text();
-            return { name: fileName, content };
+            try {
+              if (fileName) {
+                const sourceCodeUrl: string =
+                  verifier?.sourceCodeApiUrl(cid, fileName) || '';
+
+                const res = await fetch(sourceCodeUrl);
+
+                if (!res.ok) {
+                  throw new Error(
+                    `Failed to fetch file content for ${fileName}`,
+                  );
+                }
+
+                const content = await res.text();
+                return { name: fileName, content };
+              } else throw new Error('File name not found');
+            } catch (error) {
+              console.error(error);
+              return { name: fileName, content: null };
+            }
           });
 
           const fileData = await Promise.all(fileContentsPromises);
+
+          const successfulFiles = fileData.filter(
+            (file) => file.content !== null,
+          );
+
+          if (successfulFiles.length === 0) {
+            throw new Error(`Failed to fetch all files`);
+          }
+
           setFileData(fileData);
         }
       } catch (error) {
@@ -85,7 +129,12 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         setFileDataLoading(false);
       }
     };
+
     if (verifierData) fetchCode();
+    else {
+      setFileDataError(null);
+      setFileDataLoading(false);
+    }
   }, [selectedVerifier, verifierData]);
 
   useEffect(() => {
@@ -130,7 +179,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         return () => clipboard.destroy();
       });
     };
-    if (!fileDataError) handleFileViewerControls();
+    if (!fileDataError && fileData) handleFileViewerControls();
   }, [fileData, fileDataError]);
 
   const handleToggleCodeView = (fileName: string) => {
@@ -161,11 +210,16 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
         <div className="flex flex-wrap p-4">
           <div className="w-full">
-            <div className="flex items-center pb-2">
+            <div className="flex items-center">
               <FaCode className="mr-2 text-black-600 dark:text-neargray-10" />
-              <span className="font-bold">Contract Source Code</span>
+              <span className="font-bold">
+                {verifierData
+                  ? 'Contract Source Code'
+                  : 'Base64 Encoded Contract Code'}
+              </span>
             </div>
-            {fileDataLoading || !verifierData ? (
+
+            {fileDataLoading ? (
               <Loader wrapperClassName="w-full md:w-full my-4 " />
             ) : (
               <>
@@ -175,10 +229,10 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     message={fileDataError}
                     mutedText="Please try again later"
                   />
-                ) : (
+                ) : fileData && fileData.length > 0 ? (
                   fileData.map(({ name, content }, index) => (
-                    <div key={index} className="py-4">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={index} className="pb-4">
+                      <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center">{name}</div>
                         <div className="flex items-center">
                           <Tooltip
@@ -192,9 +246,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                                 </span>
                               )}
                               <button
-                                ref={(el) =>
-                                  (copyButtonRefs.current[name] = el)
-                                }
+                                ref={(el) => {
+                                  copyButtonRefs.current[name] = el;
+                                }}
                                 type="button"
                                 className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 mr-2"
                               >
@@ -225,39 +279,63 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                         style={{
                           height: `${codeHeights[name] || 300}px`,
                         }}
-                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0`}
+                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0 `}
                       >
-                        <SyntaxHighlighter
-                          language={verifierData?.lang || 'rust'}
-                          style={theme === 'dark' ? oneDark : oneLight}
-                          showLineNumbers
-                          lineNumberStyle={{
-                            backgroundColor: `${
-                              theme === 'dark' ? '#030712' : '#d1d5db'
-                            }`,
-                            padding: '0 10px 0 0',
-                            width: '5em',
-                            display: 'inline-block',
-                            margin: '0 5px 0 0',
-                          }}
-                          wrapLines={true}
-                          wrapLongLines={true}
-                          customStyle={{
-                            backgroundColor:
-                              theme === 'dark'
-                                ? 'var(--color-black-200)'
-                                : 'var(--color-gray-100)',
-                            borderColor:
-                              theme === 'dark' ? 'var(--color-black-200)' : '',
-                            padding: 0,
-                            margin: 0,
-                          }}
-                        >
-                          {content || 'No source code available'}
-                        </SyntaxHighlighter>
+                        {content ? (
+                          <SyntaxHighlighter
+                            language={verifierData?.lang || 'rust'}
+                            style={theme === 'dark' ? oneDark : oneLight}
+                            showLineNumbers={true}
+                            lineNumberStyle={{
+                              backgroundColor: `${
+                                theme === 'dark' ? '#030712' : '#d1d5db'
+                              }`,
+                              padding: '0 10px 0 0',
+                              width: '5em',
+                              minWidth: '5em',
+                              display: 'inline-block',
+                              margin: '0 5px 0 0',
+                            }}
+                            wrapLines={true}
+                            wrapLongLines={true}
+                            customStyle={{
+                              backgroundColor:
+                                theme === 'dark'
+                                  ? 'var(--color-black-200)'
+                                  : 'var(--color-gray-100)',
+                              borderColor:
+                                theme === 'dark'
+                                  ? 'var(--color-black-200)'
+                                  : '',
+                              padding: 0,
+                              margin: 0,
+                            }}
+                          >
+                            {content || 'No source code available'}
+                          </SyntaxHighlighter>
+                        ) : (
+                          <ErrorMessage
+                            icons={<FaInbox />}
+                            message={'Failed to fetch the file content'}
+                            mutedText="Please try again later"
+                          />
+                        )}
                       </div>
                     </div>
                   ))
+                ) : (
+                  <textarea
+                    readOnly
+                    rows={4}
+                    value={base64Code}
+                    className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+                    style={{
+                      height: '300px',
+                      overflowX: 'hidden',
+                      whiteSpace: 'pre-wrap',
+                      wordWrap: 'break-word',
+                    }}
+                  ></textarea>
                 )}
               </>
             )}

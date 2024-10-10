@@ -7,6 +7,17 @@ const list = z.object({
   page: z.number().positive().max(100).optional().default(1),
   per_page: z.number().positive().max(50).optional().default(50),
   search: z.string().optional(),
+  sort: z
+    .enum([
+      'name',
+      'price',
+      'change',
+      'volume',
+      'market_cap',
+      'onchain_market_cap',
+    ])
+    .optional()
+    .default('onchain_market_cap'),
 });
 
 const count = z.object({
@@ -56,6 +67,10 @@ const holdersCount = z.object({
   contract: z.string(),
 });
 
+const hex = z.object({
+  hex: z.string(),
+});
+
 export type List = z.infer<typeof list>;
 export type Count = z.infer<typeof count>;
 export type Txns = z.infer<typeof txns>;
@@ -65,11 +80,13 @@ export type FtTxns = z.infer<typeof ftTxns>;
 export type FtTxnsCount = z.infer<typeof ftTxnsCount>;
 export type Holders = z.infer<typeof holders>;
 export type HoldersCount = z.infer<typeof holdersCount>;
+export type Hex = z.infer<typeof hex>;
 
 export default {
   count,
   ftTxns,
   ftTxnsCount,
+  hex,
   holders,
   holdersCount,
   item,

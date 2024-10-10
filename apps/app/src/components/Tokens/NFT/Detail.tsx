@@ -32,13 +32,11 @@ interface Props {
 const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [isVisible, setIsVisible] = useState(true);
+  const token: Token = tokenInfo?.tokens?.[0];
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
-  const token: Token = tokenInfo?.tokens?.[0];
-  const spamTokensString = spamList && spamList.replace(/,\s*([}\]])/g, '$1');
-  const spamTokens: SpamToken =
-    spamTokensString && JSON.parse(spamTokensString);
+  const spamTokens: SpamToken = spamList;
 
   const toggleItem = (index: number) => {
     if (indices.includes(index)) {

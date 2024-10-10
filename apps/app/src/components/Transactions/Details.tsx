@@ -146,10 +146,12 @@ const Details = (props: Props) => {
     if (failedReceiptCount === 0) {
       return null;
     }
+    const receiptText =
+      failedReceiptCount === 1 ? 'failed receipt' : 'failed receipts';
 
     return (
-      <div className="inline-flex w-fit rounded-md text-left mx-1 text-red-500">
-        {`[ ${failedReceiptCount} failed receipts ]`}
+      <div className="inline-flex w-fit text-xs text-red-500 bg-red-50 dark:bg-black ml-2 rounded text-left px-2 py-1">
+        {`[${failedReceiptCount} ${receiptText}]`}
       </div>
     );
   };
@@ -185,7 +187,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.hash.text.0') : 'Txn Hash'}
           </div>
-          {loading ? (
+          {!txn?.transaction_hash ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -223,7 +225,7 @@ const Details = (props: Props) => {
                 />
               )}
               {errorMessage && (
-                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded-md text-left px-2 py-1">
+                <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded text-left px-2 py-1">
                   {errorMessage}
                 </div>
               )}
@@ -242,7 +244,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.block.text.0') : 'Block Height'}
           </div>
-          {loading ? (
+          {!txn?.included_in_block_hash ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-14" />
             </div>
@@ -273,16 +275,16 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.timestamp.text.0') : 'Timestamp'}
           </div>
-          {loading ? (
+          {!txn?.block_timestamp ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
           ) : txn ? (
             <div className="w-full md:w-3/4 break-words">
               {`${getTimeAgoString(
-                nanoToMilli(txn?.block_timestamp),
+                nanoToMilli(txn?.block_timestamp || '0'),
               )} (${convertToUTC(
-                nanoToMilli(txn?.block_timestamp),
+                nanoToMilli(txn?.block_timestamp || '0'),
                 true,
               )} +UTC)`}
             </div>
@@ -304,7 +306,7 @@ const Details = (props: Props) => {
             </Tooltip>
             Shard Number
           </div>
-          {loading ? (
+          {!txn?.shard_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-sm" />
             </div>
@@ -315,45 +317,7 @@ const Details = (props: Props) => {
           )}
         </div>
       </div>
-      <div
-        id="action-row"
-        className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
-      >
-        <div className="flex items-start flex-wrap p-4">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-            <Tooltip
-              label={'Highlighted events of the transaction'}
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            >
-              <div>
-                <Question className="w-4 h-4 fill-current mr-1" />
-              </div>
-            </Tooltip>
-            Transaction Actions
-          </div>
-          {loading || (actions?.length === 0 && logs?.length === 0) ? (
-            <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xl" />
-            </div>
-          ) : (
-            <div className="w-full md:w-3/4">
-              <PerfectScrollbar>
-                <div
-                  id="action-column"
-                  className="max-h-[194px] break-words space-y-2"
-                >
-                  {logs?.map((event: TransactionLog, i: number) => (
-                    <EventLogs key={i} event={event} />
-                  ))}
-                  {actions?.map((action: any, i: number) => (
-                    <Actions key={i} action={action} />
-                  ))}
-                </div>
-              </PerfectScrollbar>
-            </div>
-          )}
-        </div>
-      </div>
+
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -367,7 +331,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.from.text.0') : 'From'}
           </div>
-          {loading ? (
+          {!txn?.signer_account_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -398,7 +362,7 @@ const Details = (props: Props) => {
               ? t('txns:txn.to.text.0')
               : 'To'}
           </div>
-          {loading ? (
+          {!txn?.receiver_account_id ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xl" />
             </div>
@@ -435,10 +399,10 @@ const Details = (props: Props) => {
             <div className="relative w-full md:w-3/4">
               <PerfectScrollbar>
                 <div className="max-h-[302px] break-words space-y-3">
-                  {fts?.map((ft: any) => (
+                  {fts?.map((ft: any, i: number) => (
                     <div
                       className="flex items-center flex-wrap break-all leading-7"
-                      key={ft?.key}
+                      key={i}
                     >
                       <FaRight className="inline-flex text-gray-400 text-xs" />
                       {ft?.cause === 'MINT' ? (
@@ -726,7 +690,7 @@ const Details = (props: Props) => {
             </Tooltip>
             {t ? t('txns:txn.fee.text.0') : 'Transaction fee'}
           </div>
-          {loading ? (
+          {!txn?.outcomes_agg?.transaction_fee ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -770,6 +734,46 @@ const Details = (props: Props) => {
           )}
         </div>
       )}
+      <div
+        id="action-row"
+        className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+      >
+        <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+            <Tooltip
+              label={'Highlighted events of the transaction'}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </Tooltip>
+            Transaction Actions
+          </div>
+          {loading || (actions?.length === 0 && logs?.length === 0) ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4">
+              <PerfectScrollbar>
+                <div
+                  id="action-column"
+                  className="max-h-[194px] break-words space-y-2"
+                >
+                  {logs?.map((event: TransactionLog, i: number) => (
+                    <EventLogs key={i} event={event} />
+                  ))}
+                  {actions?.map((action: any, i: number) => (
+                    <Actions key={i} action={action} />
+                  ))}
+                </div>
+              </PerfectScrollbar>
+            </div>
+          )}
+        </div>
+      </div>
+
       <Accordion collapsible onChange={() => setMore((m) => !m)}>
         <AccordionItem>
           <AccordionPanel className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b">
@@ -786,7 +790,7 @@ const Details = (props: Props) => {
                   </Tooltip>
                   {t('txns:txn.gas.text.0')}
                 </div>
-                {loading ? (
+                {!txn?.outcomes_agg?.gas_used ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xs" />
                   </div>
@@ -816,7 +820,8 @@ const Details = (props: Props) => {
                   </Tooltip>
                   {t('txns:txn.burnt.text.0')}
                 </div>
-                {loading ? (
+                {!txn?.receipt_conversion_tokens_burnt ||
+                !txn?.receipt_conversion_gas_burnt ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xs" />
                   </div>

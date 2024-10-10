@@ -1,16 +1,19 @@
 import { types } from 'nb-lake';
 import { DexPairs, Network } from 'nb-types';
 
+import { DataSource } from './enum.js';
+
 export type Config = {
+  dataSource: DataSource;
   dbCa: string;
   dbCert: string;
   dbKey: string;
   dbUrl: string;
   delta: number;
+  genesisHeight: number;
   NEAR_TOKEN: string;
   network: Network;
   preloadSize: number;
-  rpcUrl: string;
   s3BucketName: string;
   s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;

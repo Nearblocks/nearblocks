@@ -27,12 +27,13 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), txns.list);
 
   /**
    * GET /v1/txns/count
-   * @summary Get total txns count
+   * @summary Get estimated total txns count
    * @tags Txns
    * @param {string} block.query - block hash
    * @param {string} from.query - sender account id
@@ -42,6 +43,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/count', validator(schema.count), txns.count);
 
@@ -51,6 +53,7 @@ const routes = (app: Router) => {
    * @tags Txns
    * @param {number} limit.query - json:{"minimum": 1, "maximum": 10, "default": 10}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/latest', validator(schema.latest), txns.latest);
 
@@ -60,6 +63,7 @@ const routes = (app: Router) => {
    * @tags Txns
    * @param {string} hash.path.required - txn hash
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:hash', validator(schema.item), txns.item);
 
@@ -69,6 +73,7 @@ const routes = (app: Router) => {
    * @tags Txns
    * @param {string} hash.path.required - txn hash
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:hash/full', validator(schema.full), txns.full);
 };

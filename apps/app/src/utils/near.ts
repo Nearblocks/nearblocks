@@ -1,6 +1,8 @@
 import {
+  Action,
   ActionError,
   ActionType,
+  ExecutionOutcomeWithIdView,
   ExecutionStatusView,
   FailedToFindReceipt,
   InvalidTxError,
@@ -848,3 +850,72 @@ export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
     receiptIds: outcome.outcome.receipt_ids,
   };
 }
+
+export const calculateGasUsed = (
+  receiptsOutcome: ExecutionOutcomeWithIdView[],
+  txnTokensBurnt: string,
+) => {
+  return receiptsOutcome
+    .map((receipt) => receipt.outcome.gas_burnt)
+    .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
+};
+export function calculateTotalGas(actions: Action | any) {
+  let totalGas = 0;
+
+  function extractGas(action: any) {
+    const actionType = Object.keys(action)[0];
+
+    if (
+      actionType === 'Delegate' &&
+      action[actionType]?.delegate_action?.actions
+    ) {
+      action[actionType].delegate_action.actions.forEach(
+        (nestedAction: Action) => {
+          extractGas(nestedAction);
+        },
+      );
+    } else if (action[actionType] && action[actionType].gas) {
+      totalGas += Number(action[actionType].gas);
+    }
+  }
+
+  actions.forEach((action: Action) => {
+    extractGas(action);
+  });
+
+  return totalGas;
+}
+export function calculateTotalDeposit(actions: Action | any) {
+  let totalDeposit = 0;
+
+  function extractDeposit(action: any) {
+    const actionType = Object.keys(action)[0];
+
+    if (
+      actionType === 'Delegate' &&
+      action[actionType]?.delegate_action?.actions
+    ) {
+      action[actionType].delegate_action.actions.forEach(
+        (nestedAction: Action) => {
+          extractDeposit(nestedAction);
+        },
+      );
+    } else if (action[actionType] && action[actionType].deposit) {
+      totalDeposit += Number(action[actionType].deposit);
+    }
+  }
+
+  actions.forEach((action: Action) => {
+    extractDeposit(action);
+  });
+
+  return totalDeposit;
+}
+export const txnFee = (
+  receiptsOutcome: ExecutionOutcomeWithIdView[],
+  txnTokensBurnt: string,
+) => {
+  return receiptsOutcome
+    .map((receipt) => receipt.outcome.tokens_burnt)
+    .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
+};

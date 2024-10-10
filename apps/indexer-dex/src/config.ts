@@ -3,6 +3,7 @@ import { cleanEnv, str, url } from 'envalid';
 import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
+import { DataSource } from '#types/enum';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
@@ -10,14 +11,18 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  DEX_DATA_SOURCE: str({
+    choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
+    default: DataSource.NEAR_LAKE,
+  }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  RPC_URL: str(),
   S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 
+const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
 let s3Endpoint: null | types.EndpointConfig = null;
 const s3BucketName =
   env.NETWORK === Network.MAINNET
@@ -35,15 +40,16 @@ if (env.S3_ENDPOINT) {
 }
 
 const config: Config = {
+  dataSource: env.DEX_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  delta: 100,
+  delta: 500,
+  genesisHeight,
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
-  preloadSize: 10,
-  rpcUrl: env.RPC_URL,
+  preloadSize: 50,
   s3BucketName,
   s3Endpoint,
   s3RegionName: 'eu-central-1',

@@ -115,6 +115,16 @@ const ReceiptSummary = (props: Props) => {
                 <tr>
                   <th
                     scope="col"
+                    className="pl-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                  ></th>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                  >
+                    Receipt
+                  </th>
+                  <th
+                    scope="col"
                     className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
                   >
                     Action

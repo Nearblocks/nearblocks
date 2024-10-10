@@ -1,14 +1,17 @@
 import { z } from 'zod';
 
 import dayjs from '#libs/dayjs';
+import { rpcProviders } from '#libs/near';
 import { ActionKind, EventKind } from '#types/enums';
 
 const item = z.object({
   account: z.string(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const contract = z.object({
   account: z.string(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const deployments = z.object({
@@ -17,6 +20,7 @@ const deployments = z.object({
 
 const parse = z.object({
   account: z.string(),
+  rpc: z.enum(rpcProviders).optional(),
 });
 
 const action = z.object({
@@ -103,6 +107,20 @@ const txnsExport = z.object({
 
 const txnsOnly = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   cursor: z.string().optional(),
   from: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
@@ -112,6 +130,20 @@ const txnsOnly = z.object({
 
 const txnsOnlyCount = z.object({
   account: z.string(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   from: z.string().optional(),
   to: z.string().optional(),
 });
@@ -129,6 +161,20 @@ const txnsOnlyExport = z.object({
 const receipts = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   cursor: z.string().optional(),
   from: z.string().optional(),
   method: z.string().optional(),
@@ -140,6 +186,20 @@ const receipts = z.object({
 const receiptsCount = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
+  before_date: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
+      { message: 'Invalid date' },
+    ),
   from: z.string().optional(),
   method: z.string().optional(),
   to: z.string().optional(),

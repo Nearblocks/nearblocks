@@ -2,8 +2,8 @@ import Big from 'big.js';
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
-import { viewBlock } from '#libs/near';
-import redis from '#libs/redis';
+import { getProvider, viewBlock } from '#libs/near';
+import sql from '#libs/postgres';
 import { List } from '#libs/schema/validators';
 import {
   calculateAPY,
@@ -23,25 +23,24 @@ import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
+  const rpc = req.validator.data.rpc;
   const page = req.validator.data.page;
   const perPage = req.validator.data.per_page;
-  const [
-    combinedData,
-    currentValidators,
-    protocolConfig,
-    epochStatsCheck,
-    epochStartBlock,
-    latestBlock,
-    validatorTelemetry,
-  ] = await Promise.all([
-    redis.parse('validatorLists'),
-    redis.parse('currentValidators'),
-    redis.parse('protocolConfig'),
-    redis.parse('epochStatsCheck'),
-    redis.parse('epochStartBlock'),
-    redis.parse('latestBlock'),
-    redis.parse('validatorTelemetry'),
-  ]);
+
+  const data = await sql`
+    SELECT
+      *
+    FROM
+      validator_data
+  `;
+
+  const currentValidators = data?.[0]?.current_validators;
+  const epochStartBlock = data?.[0]?.epoch_start_block;
+  const epochStatsCheck = data?.[0]?.epoch_stats_check;
+  const latestBlock = data?.[0]?.latest_block;
+  const protocolConfig = data?.[0]?.protocol_config;
+  const combinedData = data?.[0]?.validator_lists;
+  const validatorTelemetry = data?.[0]?.validator_telemetry;
 
   if (combinedData && combinedData.length > 0) {
     const validatorPaginatedData = combinedData?.slice(
@@ -140,10 +139,11 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     let lastEpochApy = '0';
 
     try {
-      const block = await viewBlock({ finality: 'final' });
+      const provider = getProvider(rpc);
+      const block = await viewBlock(provider, { finality: 'final' });
       const [prevEpoch, epoch] = await Promise.all([
-        viewBlock({ blockId: block.header.epoch_id }),
-        viewBlock({ blockId: block.header.next_epoch_id }),
+        viewBlock(provider, { blockId: block.header.epoch_id }),
+        viewBlock(provider, { blockId: block.header.next_epoch_id }),
       ]);
 
       lastEpochApy = calculateAPY(

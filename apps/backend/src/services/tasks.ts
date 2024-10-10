@@ -4,8 +4,8 @@ import {
   EpochValidatorInfo,
   validatorApi,
 } from 'nb-near';
-import { Redis } from 'nb-redis';
 import {
+  ProtocolConfig,
   ValidatorEpochData,
   ValidatorPoolInfo,
   ValidatorTelemetry,
@@ -14,33 +14,33 @@ import {
 import config from '#config';
 import db from '#libs/knex';
 import RPC from '#libs/near';
-import { DAY, HOUR, MINUTE, validator } from '#libs/utils';
+import { validator } from '#libs/utils';
 import {
   CachedTimestampMap,
   ExpGenesisConfig,
   ExpProtocolConfig,
+  GenesisConfig,
   PoolMetadataAccountInfo,
 } from '#types/types';
 
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
-export const latestBlockCheck = async (redis: Redis) => {
+export const latestBlockCheck = async () => {
   const { data } = await RPC.query({ finality: 'final' }, 'block');
 
   if (data.result) {
     const latestBlock = data.result as BlockResult;
-    await redis.stringify(
-      `latestBlock`,
-      {
+    await db('validator_data').update(
+      'latest_block',
+      JSON.stringify({
         height: latestBlock?.header?.height,
         timestamp: latestBlock?.header?.timestamp,
-      },
-      MINUTE,
+      }),
     );
   }
 };
 
-export const protocolConfigCheck = async (redis: Redis) => {
+export const protocolConfigCheck = async () => {
   const { data } = await RPC.query(
     { finality: 'final' },
     'EXPERIMENTAL_protocol_config',
@@ -50,9 +50,9 @@ export const protocolConfigCheck = async (redis: Redis) => {
     const protocolConfig = data.result as ExpProtocolConfig;
 
     if (protocolConfig) {
-      await redis.stringify(
-        'protocolConfig',
-        {
+      await db('validator_data').update(
+        'protocol_config',
+        JSON.stringify({
           epochLength: protocolConfig.epoch_length,
           maxNumberOfSeats:
             protocolConfig.num_block_producer_seats +
@@ -61,14 +61,13 @@ export const protocolConfigCheck = async (redis: Redis) => {
               0,
             ),
           version: protocolConfig.protocol_version,
-        },
-        HOUR,
+        }),
       );
     }
   }
 };
 
-export const genesisProtocolInfoFetch = async (redis: Redis) => {
+export const genesisProtocolInfoFetch = async () => {
   const [{ data }, genesisAccount] = await Promise.all([
     RPC.query({ finality: 'final' }, 'EXPERIMENTAL_genesis_config'),
     db('accounts').count('account_id').whereNull('created_by_receipt_id'),
@@ -78,22 +77,21 @@ export const genesisProtocolInfoFetch = async (redis: Redis) => {
     const genesisAccountCount = genesisAccount[0].count;
     const genesisProtocolConfig = data.result as ExpGenesisConfig;
 
-    await redis.stringify(
-      'genesisConfig',
-      {
+    await db('validator_data').update(
+      'genesis_config',
+      JSON.stringify({
         accountCount: genesisAccountCount,
         height: genesisProtocolConfig.genesis_height,
         minStakeRatio: genesisProtocolConfig.minimum_stake_ratio,
         protocolVersion: genesisProtocolConfig.protocol_version,
         timestamp: new Date(genesisProtocolConfig.genesis_time).valueOf(),
         totalSupply: genesisProtocolConfig.total_supply,
-      },
-      DAY,
+      }),
     );
   }
 };
 
-export const poolIdsCheck = async (redis: Redis) => {
+export const poolIdsCheck = async () => {
   const network = config.network;
   const address =
     network === 'mainnet'
@@ -107,15 +105,18 @@ export const poolIdsCheck = async (redis: Redis) => {
     return data.account_id;
   });
 
-  await redis.stringify('poolIds', accounts, DAY);
+  await db('validator_data').update('pool_ids', JSON.stringify(accounts));
 };
 
-const getValidators = async (redis: Redis) => {
+const getValidators = async () => {
   const { data } = await RPC.query([null], 'validators');
 
   if (data.result) {
     const validator = data.result as EpochValidatorInfo;
-    await redis.stringify('validatorsPromise', validator, DAY);
+    await db('validator_data').update(
+      'validators_promise',
+      JSON.stringify(validator),
+    );
 
     return validator;
   }
@@ -181,10 +182,9 @@ const mapValidators = (
   return [...validatorsMap.values()];
 };
 
-const fetchStakingPoolInfo = async (redis: Redis) => {
-  const validators = (await redis.parse(
-    'mappedValidators',
-  )) as ValidatorEpochData[];
+const fetchStakingPoolInfo = async () => {
+  const data = await db('validator_data').select('mapped_validators').first();
+  const validators = data?.mapped_validators as unknown as ValidatorEpochData[];
 
   if (validators && validators.length > 0) {
     const mappings = {
@@ -229,30 +229,27 @@ const fetchStakingPoolInfo = async (redis: Redis) => {
         valueMap: new Map([...mappings.valueMap]),
       };
 
-      await redis.stringify(
-        'stakingPoolStakeProposalsFromContract',
-        Array.from(mappingsnew.valueMap.entries()),
-        DAY,
+      await db('validator_data').update(
+        'stake_proposals',
+        JSON.stringify(Array.from(mappingsnew.valueMap.entries())),
       );
-      await saveValidatorLists(redis);
+      await saveValidatorLists();
     }
   }
 };
 
-export const updateStakingPoolStake = async (redis: Redis) => {
-  const stakingPoolStakeProposalsFromContract = await redis.parse(
-    'stakingPoolStakeProposalsFromContract',
-  );
+export const updateStakingPoolStake = async () => {
+  const data = await db('validator_data').select('stake_proposals').first();
+  const stakeProposals = data?.stake_proposals;
 
-  if (!stakingPoolStakeProposalsFromContract) {
-    await fetchStakingPoolInfo(redis);
+  if (!stakeProposals) {
+    await fetchStakingPoolInfo();
   }
 };
 
-const fetchPoolInfo = async (redis: Redis) => {
-  const validators = (await redis.parse(
-    'mappedValidators',
-  )) as ValidatorEpochData[];
+const fetchPoolInfo = async () => {
+  const data = await db('validator_data').select('mapped_validators').first();
+  const validators = data?.mapped_validators as unknown as ValidatorEpochData[];
 
   if (validators && validators.length > 0) {
     const mappings = {
@@ -317,52 +314,45 @@ const fetchPoolInfo = async (redis: Redis) => {
       const mappingsnew = {
         valueMap: new Map([...mappings.valueMap]),
       };
-      await redis.stringify(
-        'stakingPoolInfos',
-        Array.from(mappingsnew.valueMap.entries()),
-        DAY,
+      await db('validator_data').update(
+        'staking_pool_infos',
+        JSON.stringify(Array.from(mappingsnew.valueMap.entries())),
       );
-      await saveValidatorLists(redis);
+      await saveValidatorLists();
     }
   }
 };
 
-export const updatePoolInfoMap = async (redis: Redis) => {
-  const stakingPoolInfos = await redis.parse('stakingPoolInfos');
+export const updatePoolInfoMap = async () => {
+  const data = await db('validator_data').select('staking_pool_infos').first();
+  const stakingPoolInfos = data?.staking_pool_infos;
 
   if (!stakingPoolInfos) {
-    await fetchPoolInfo(redis);
+    await fetchPoolInfo();
   }
 };
 
-const saveValidatorLists = async (redis: Redis) => {
-  const mappedValidators = (await redis.parse(
-    'mappedValidators',
-  )) as ValidatorEpochData[];
+const saveValidatorLists = async () => {
+  const data = await db('validator_data').select('*').first();
+  const mappedValidators =
+    data?.mapped_validators as unknown as ValidatorEpochData[];
 
   if (mappedValidators.length > 0) {
-    const stakingPoolStakeProposalsFromContract = (await redis.parse(
-      'stakingPoolStakeProposalsFromContract',
-    )) as CachedTimestampMap<string>;
+    const stakeProposals =
+      data?.stake_proposals as unknown as CachedTimestampMap<string>;
 
-    const stakingPoolMetadataInfo = await redis.parse(
-      'stakingPoolMetadataInfo',
-    );
+    const stakingPoolMetadata = data?.staking_pool_metadata as unknown as {
+      [key: string]: PoolMetadataAccountInfo;
+    }[];
 
     let stakingPoolStakeProposals = new Map();
 
-    if (
-      stakingPoolStakeProposalsFromContract &&
-      Array.isArray(stakingPoolStakeProposalsFromContract)
-    ) {
-      stakingPoolStakeProposals = new Map(
-        stakingPoolStakeProposalsFromContract,
-      );
+    if (stakeProposals && Array.isArray(stakeProposals)) {
+      stakingPoolStakeProposals = new Map(stakeProposals);
     }
 
-    const stakingPoolInfos = (await redis.parse(
-      'stakingPoolInfos',
-    )) as CachedTimestampMap<ValidatorPoolInfo>;
+    const stakingPoolInfos =
+      data?.staking_pool_infos as unknown as CachedTimestampMap<ValidatorPoolInfo>;
 
     let stakingPoolInfosData = new Map();
 
@@ -371,11 +361,8 @@ const saveValidatorLists = async (redis: Redis) => {
     }
 
     const combined = mappedValidators.map((validator, index: number) => {
-      const metaInfo = stakingPoolMetadataInfo
-        ? stakingPoolMetadataInfo.find(
-            (item: { [key: string]: PoolMetadataAccountInfo }) =>
-              validator.accountId in item,
-          )
+      const metaInfo = stakingPoolMetadata
+        ? stakingPoolMetadata.find((item) => validator.accountId in item)
         : null;
 
       return {
@@ -392,29 +379,32 @@ const saveValidatorLists = async (redis: Redis) => {
       };
     });
 
-    await redis.stringify('validatorLists', combined, DAY);
+    await db('validator_data').update(
+      'validator_lists',
+      JSON.stringify(combined),
+    );
   }
 };
 
-export const validatorsCheck = async (redis: Redis) => {
-  const validators = (await getValidators(redis)) as EpochValidatorInfo;
+export const validatorsCheck = async () => {
+  const validators = (await getValidators()) as EpochValidatorInfo;
 
   if (validators) {
-    const poolIds = await redis.parse('poolIds');
-    const genesisConfig = await redis.parse('genesisConfig');
-    const protocolConfig = await redis.parse('protocolConfig');
+    const datas = await db('validator_data').select('*').first();
+    const poolIds = datas?.pool_ids as unknown as string[];
+    const genesisConfig = datas?.genesis_config as unknown as GenesisConfig;
+    const protocolConfig = datas?.protocol_config as unknown as ProtocolConfig;
 
     const mappedValidators = mapValidators(validators, poolIds ?? []);
 
-    await redis.stringify('mappedValidators', mappedValidators, DAY);
-
-    await redis.stringify(
-      'currentValidators',
-      validators.current_validators,
-      DAY,
+    await db('validator_data').update(
+      'mapped_validators',
+      JSON.stringify(mappedValidators),
     );
-
-    await redis.stringify('nextValidators', validators.next_validators, DAY);
+    await db('validator_data').update(
+      'current_validators',
+      JSON.stringify(validators.current_validators),
+    );
 
     if (genesisConfig && protocolConfig) {
       const seatPrice = await validatorApi.findSeatPrice(
@@ -423,7 +413,10 @@ export const validatorsCheck = async (redis: Redis) => {
         genesisConfig.minStakeRatio,
         protocolConfig.version,
       );
-      await redis.stringify('epochStatsCheck', seatPrice.toString(), DAY);
+      await db('validator_data').update(
+        'epoch_stats_check',
+        JSON.stringify(seatPrice.toString()),
+      );
     }
 
     const { data } = await RPC.query(
@@ -434,24 +427,23 @@ export const validatorsCheck = async (redis: Redis) => {
     const epochStartBlocks = data.result as BlockResult;
 
     if (epochStartBlocks) {
-      await redis.stringify(
-        'epochStartBlock',
-        {
+      await db('validator_data').update(
+        'epoch_start_block',
+        JSON.stringify({
           height: epochStartBlocks.header.height,
           timestamp: epochStartBlocks.header.timestamp,
           total_supply: epochStartBlocks.header.total_supply,
-        },
-        DAY,
+        }),
       );
     }
 
-    await Promise.all([fetchStakingPoolInfo(redis), fetchPoolInfo(redis)]);
+    await Promise.all([fetchStakingPoolInfo(), fetchPoolInfo()]);
 
-    await saveValidatorLists(redis);
+    await saveValidatorLists();
   }
 };
 
-export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
+export const stakingPoolMetadataCheck = async () => {
   const VALIDATOR_DESCRIPTION_QUERY_AMOUNT = 100;
   let currentIndex = 0;
   const stakingPoolsDescriptions = [];
@@ -482,25 +474,26 @@ export const stakingPoolMetadataInfoCheck = async (redis: Redis) => {
     }
   }
 
-  await redis.stringify(
-    'stakingPoolMetadataInfo',
-    stakingPoolsDescriptions,
-    DAY,
+  await db('validator_data').update(
+    'staking_pool_metadata',
+    JSON.stringify(stakingPoolsDescriptions),
   );
 };
 
-export const validatorsTelemetryCheck = async (redis: Redis) => {
-  const validators = (await redis.parse(
-    'validatorsPromise',
-  )) as EpochValidatorInfo;
+export const validatorsTelemetryCheck = async () => {
+  const data = await db('validator_data').select('*').first();
+  const validators = data?.mapped_validators as unknown as EpochValidatorInfo;
 
   if (validators) {
-    const poolIds = await redis.parse('poolIds');
+    const poolIds = data?.pool_ids as unknown as string[];
+    const currentValidators = validators.current_validators ?? [];
+    const nextValidators = validators.next_validators ?? [];
+    const currentProposals = validators.current_proposals ?? [];
 
     const accountIds = [
-      ...validators.current_validators.map(({ account_id }) => account_id),
-      ...validators.next_validators.map(({ account_id }) => account_id),
-      ...validators.current_proposals.map(({ account_id }) => account_id),
+      ...currentValidators.map(({ account_id }) => account_id),
+      ...nextValidators.map(({ account_id }) => account_id),
+      ...currentProposals.map(({ account_id }) => account_id),
       ...(poolIds ?? []),
     ];
     const nodesInfo = await db('nodes')
@@ -541,6 +534,9 @@ export const validatorsTelemetryCheck = async (redis: Redis) => {
       {},
     );
 
-    await redis.stringify('validatorTelemetry', nodes, DAY);
+    await db('validator_data').update(
+      'validator_telemetry',
+      JSON.stringify(nodes),
+    );
   }
 };

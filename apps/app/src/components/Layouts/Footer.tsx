@@ -65,6 +65,23 @@ const Footer = () => {
                       alt="Github"
                     />
                   </a>
+                  <a
+                    href="https://t.me/nearblocks"
+                    target="_blank"
+                    className="ml-2"
+                    rel="noreferrer nofollow noopener"
+                  >
+                    <Image
+                      src={
+                        theme === 'dark'
+                          ? '/images/telegram_black.svg'
+                          : '/images/nearblocks-telegram.svg'
+                      }
+                      width={24}
+                      height={24}
+                      alt="Telegram"
+                    />
+                  </a>
                 </div>
               </div>
               <div className="hidden lg:!block"></div>
@@ -84,18 +101,19 @@ const Footer = () => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
+                    <Link href="/advertise" legacyBehavior>
+                      <a>{t('footer.links.advertise')}</a>
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/apis" legacyBehavior>
                       <a>{t('footer.links.api')}</a>
                     </Link>
                   </li>
                   <li>
-                    <Link href="https://nearsend.io" legacyBehavior>
-                      <a
-                        className="flex"
-                        target="_blank"
-                        rel="noreferrer nofollow noopener"
-                      >
-                        Near Token Bulksender
+                    <Link href="https://lite.nearblocks.io/" legacyBehavior>
+                      <a className="flex">
+                        NEAR Validate
                         <span>
                           <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
                         </span>
@@ -141,11 +159,7 @@ const Footer = () => {
                       <a>{t('footer.links.about')}</a>
                     </Link>
                   </li>
-                  <li>
-                    <Link href="/advertise" legacyBehavior>
-                      <a>{t('footer.links.advertise')}</a>
-                    </Link>
-                  </li>
+
                   <li>
                     <Link href="/contact" legacyBehavior>
                       <a>{t('footer.links.contact')}</a>
@@ -154,6 +168,17 @@ const Footer = () => {
                   <li>
                     <Link href="/terms-and-conditions" legacyBehavior>
                       <a>{t('footer.links.terms')}</a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="https://status.nearblocks.io/" legacyBehavior>
+                      <a
+                        className="flex"
+                        target="_blank"
+                        rel="noreferrer nofollow noopener"
+                      >
+                        Status
+                      </a>
                     </Link>
                   </li>
                 </ul>

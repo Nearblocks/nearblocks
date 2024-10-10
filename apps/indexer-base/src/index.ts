@@ -8,7 +8,10 @@ import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing base indexer...');
+    logger.info(
+      { data_source: config.dataSource, network: config.network },
+      'initializing base indexer...',
+    );
     logger.info('syncing genesis data...');
     await syncGenesis();
     logger.info('syncing blockchain data...');

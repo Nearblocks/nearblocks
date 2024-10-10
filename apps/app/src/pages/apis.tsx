@@ -16,31 +16,37 @@ import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useTheme } from 'next-themes';
 import { GetServerSideProps } from 'next';
-import fetcher from '@/utils/fetcher';
+import { fetchData } from '@/utils/fetchData';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
-  try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
+  try {
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -49,11 +55,12 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
 };
-
 const ApiPlan = () => {
   const router = useRouter();
   const { status } = router.query;
@@ -442,7 +449,7 @@ const ApiPlan = () => {
             </div>
             <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
               <Link
-                href="/contact"
+                href="/contact?subject=apis"
                 className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10"
                 type="button"
               >
@@ -593,6 +600,8 @@ ApiPlan.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

@@ -3,9 +3,14 @@ import { types } from 'near-lake-framework';
 
 import { Network } from 'nb-types';
 
+import { DataSource } from '#types/enum';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  BASE_DATA_SOURCE: str({
+    choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
+    default: DataSource.NEAR_LAKE,
+  }),
   BASE_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
@@ -46,6 +51,7 @@ if (env.S3_ENDPOINT) {
 
 const config: Config = {
   cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
+  dataSource: env.BASE_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,

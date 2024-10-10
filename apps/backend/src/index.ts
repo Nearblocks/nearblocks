@@ -32,16 +32,18 @@ const jobs: Bree.JobOptions[] = [
   { cron: '* * * * *', name: 'ft-market-search' }, // every minute
   { cron: '*/5 * * * * *', hasSeconds: true, name: 'ft-total-supply' }, // every 5s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nft-meta' }, // every 10s
+  { cron: '*/5 * * * *', name: 'refresh-views', timeout: '45s' }, // every 5m
   // { cron: '*/5 * * * * *', hasSeconds: true, name: 'events' }, // every 5s
   { cron: '*/10 * * * *', name: 'pool-id' }, // every 10 minute
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'pool-info' }, // every 10s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'staking-pool' }, // every 10s
-  { cron: '*/10 * * * *', name: 'staking-pool-meta' }, // every 10 minute
-  { cron: '0 0 * * *', name: 'genesis-config' }, // every day
-  { cron: '0 * * * *', name: 'protocol-config' }, // every hour
-  { cron: '* * * * * *', hasSeconds: true, name: 'latest-block' }, // every second
+  { cron: '*/10 * * * *', name: 'staking-pool-meta', timeout: '10s' }, // every 10 minute
+  { cron: '0 0 * * *', name: 'genesis-config', timeout: '10s' }, // every day
+  { cron: '0 * * * *', name: 'protocol-config', timeout: '10s' }, // every hour
+  { cron: '*/10 * * * * *', hasSeconds: true, name: 'latest-block' }, // every 10s
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes' }, // every 10s
-  { cron: '*/5 * * * * *', hasSeconds: true, name: 'nodes-telemetry' }, // every 5s
+  { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes-telemetry' }, // every 10s
+  // { cron: '* * * * *', name: 'ft-meta-hex-address' }, // every minute
 ];
 
 const bree = new Bree({ errorHandler, jobs, logger, root });

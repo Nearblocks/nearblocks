@@ -1,50 +1,64 @@
 import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { env } from 'next-runtime-env';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import queryString from 'qs';
 import fetcher from '@/utils/fetcher';
 import NodeList from '@/components/NodeExplorer/NodeList';
+import dynamic from 'next/dynamic';
+import { useRpcStore } from '@/stores/rpc';
+import { RpcProviders } from '@/utils/rpc';
+import { useRouter } from 'next/router';
+import { getCookieFromRequest } from '@/utils/libs';
+import { fetchData } from '@/utils/fetchData';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
+  ssr: false,
+});
 
 export const getServerSideProps: GetServerSideProps<{
   data: any;
-  totalSupply: any;
   latestBlock: any;
   error: boolean;
   statsDetails: any;
+  searchRedirectDetails: any;
+  searchResultDetails: any;
 }> = async (context) => {
-  const { query } = context;
-  const fetchUrl = `validators?${queryString.stringify(query)}`;
-  const totalSupplyUrl = `stats`;
-  const latestBlockUrl = `blocks/latest?limit=1`;
+  const {
+    query: { keyword = '', query = '', filter = 'all', ...qs },
+    req,
+  }: any = context;
+
+  const q = query?.replace(/[\s,]/g, '');
+  const key = keyword?.replace(/[\s,]/g, '');
+
+  const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
+
+  const fetchUrl = `validators?${queryString.stringify(qs)}&rpc=${rpcUrl}`;
   try {
-    const [dataResult, totalSupplyResult, latestBlockResult, statsResult] =
-      await Promise.allSettled([
-        fetcher(fetchUrl),
-        fetcher(totalSupplyUrl),
-        fetcher(latestBlockUrl),
-        fetcher(`stats`),
-      ]);
+    const [dataResult] = await Promise.allSettled([fetcher(fetchUrl)]);
+
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
-    const totalSupply =
-      totalSupplyResult.status === 'fulfilled' ? totalSupplyResult.value : null;
-    const latestBlock =
-      latestBlockResult.status === 'fulfilled' ? latestBlockResult.value : null;
     const error = dataResult.status === 'rejected';
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         data,
-        totalSupply,
-        latestBlock,
+        latestBlock: latestBlocks,
         error,
         statsDetails,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -52,10 +66,11 @@ export const getServerSideProps: GetServerSideProps<{
     return {
       props: {
         data: null,
-        totalSupply: null,
         error: true,
         latestBlock: null,
         statsDetails: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -63,12 +78,19 @@ export const getServerSideProps: GetServerSideProps<{
 
 const NodeExplorer = ({
   data,
-  totalSupply,
+  statsDetails,
   latestBlock,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
   const title = 'NEAR Validator List | Nearblocks';
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20Validator%20Explorer&brand=near`;
+
+  useEffect(() => {
+    router.replace(router.asPath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcUrl]);
 
   return (
     <>
@@ -82,17 +104,20 @@ const NodeExplorer = ({
         <link rel="canonical" href={`${appUrl}/node-explorer`} />
       </Head>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
-        <div className="container mx-auto px-3">
+        <div className="container mx-auto px-3 flex justify-between items-center">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
             NEAR Protocol Validator Explorer
           </h1>
+          <ul className="flex relative mb-2 pt-8 items-center text-gray-500 text-xs">
+            <RpcMenu />
+          </ul>
         </div>
       </div>
       <div className="container mx-auto px-3 -mt-48">
         <div className="relative">
           <NodeList
             data={data}
-            totalSupply={totalSupply}
+            totalSupply={statsDetails}
             latestBlock={latestBlock}
             error={error}
           />
@@ -105,6 +130,8 @@ NodeExplorer.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlock}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

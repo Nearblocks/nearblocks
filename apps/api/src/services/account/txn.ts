@@ -560,6 +560,24 @@ const txnsOnly = catchAsync(
     const cursor = req.validator.data.cursor;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
@@ -567,6 +585,12 @@ const txnsOnly = catchAsync(
 
     const cursors = cursor
       ? sql`t.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true;
+    const after = afterTimestamp
+      ? sql`t.block_timestamp >= ${afterTimestamp}`
+      : true;
+    const before = beforeTimestamp
+      ? sql`t.block_timestamp < ${beforeTimestamp}`
       : true;
     const sort = order === 'desc' ? sql`DESC` : sql`ASC`;
     const union = sql`
@@ -583,6 +607,8 @@ const txnsOnly = catchAsync(
             WHERE
               t.signer_account_id = ${account}
               AND ${cursors}
+              AND ${after}
+              AND ${before}
             ORDER BY
               t.id ${sort}
             LIMIT
@@ -598,6 +624,8 @@ const txnsOnly = catchAsync(
             WHERE
               t.receiver_account_id = ${account}
               AND ${cursors}
+              AND ${after}
+              AND ${before}
             ORDER BY
               t.id ${sort}
             LIMIT
@@ -618,6 +646,8 @@ const txnsOnly = catchAsync(
         t.signer_account_id = ${from || account}
         AND t.receiver_account_id = ${to || account}
         AND ${cursors}
+        AND ${after}
+        AND ${before}
       ORDER BY
         t.id ${sort}
       LIMIT
@@ -665,7 +695,7 @@ const txnsOnly = catchAsync(
             JOIN receipts ON receipts.receipt_id = action_receipt_actions.receipt_id
             JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
           WHERE
-            receipts.originated_from_transaction_hash = transactions.transaction_hash
+            receipts.receipt_id = transactions.converted_into_receipt_id
         ) AS actions,
         (
           SELECT
@@ -730,13 +760,31 @@ const txnsOnlyCount = catchAsync(
     const account = req.validator.data.account;
     const from = req.validator.data.from;
     const to = req.validator.data.to;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
     }
 
     const useFormat = true;
-    const bindings = { account, from, to };
+    const bindings = { account, afterTimestamp, beforeTimestamp, from, to };
     const rawQuery = (options: RawQueryParams) => `
       SELECT
         ${options.select}
@@ -756,6 +804,8 @@ const txnsOnlyCount = catchAsync(
             )
           `
       }
+      AND ${afterTimestamp ? `t.block_timestamp >= :afterTimestamp` : true}
+      AND ${beforeTimestamp ? `t.block_timestamp < :beforeTimestamp` : true}
     `;
 
     const { query, values } = keyBinder(
@@ -970,6 +1020,24 @@ const receipts = catchAsync(
     const cursor = req.validator.data.cursor;
     const per_page = req.validator.data.per_page;
     const order = req.validator.data.order;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
@@ -977,6 +1045,12 @@ const receipts = catchAsync(
 
     const cursors = cursor
       ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+      : true;
+    const after = afterTimestamp
+      ? sql`r.included_in_block_timestamp >= ${afterTimestamp}`
+      : true;
+    const before = beforeTimestamp
+      ? sql`r.included_in_block_timestamp < ${beforeTimestamp}`
       : true;
     const sort = order === 'desc' ? sql`DESC` : sql`ASC`;
     const actions =
@@ -1006,9 +1080,12 @@ const receipts = catchAsync(
             FROM
               receipts r
             WHERE
-              r.predecessor_account_id = ${account}
+              r.receipt_kind = 'ACTION'
+              AND r.predecessor_account_id = ${account}
               AND ${cursors}
               AND ${actions}
+              AND ${after}
+              AND ${before}
             ORDER BY
               r.id ${sort}
             LIMIT
@@ -1022,9 +1099,12 @@ const receipts = catchAsync(
             FROM
               receipts r
             WHERE
-              r.receiver_account_id = ${account}
+              r.receipt_kind = 'ACTION'
+              AND r.receiver_account_id = ${account}
               AND ${cursors}
               AND ${actions}
+              AND ${after}
+              AND ${before}
             ORDER BY
               r.id ${sort}
             LIMIT
@@ -1043,10 +1123,13 @@ const receipts = catchAsync(
       FROM
         receipts r
       WHERE
-        r.predecessor_account_id = ${from ?? account}
+        r.receipt_kind = 'ACTION'
+        AND r.predecessor_account_id = ${from ?? account}
         AND r.receiver_account_id = ${to ?? account}
         AND ${cursors}
         AND ${actions}
+        AND ${after}
+        AND ${before}
       ORDER BY
         r.id ${sort}
       LIMIT
@@ -1059,6 +1142,8 @@ const receipts = catchAsync(
         receipts.receipt_id,
         receipts.predecessor_account_id,
         receipts.receiver_account_id,
+        ROW_TO_JSON(bl) AS receipt_block,
+        ROW_TO_JSON(oc) AS receipt_outcome,
         tr.transaction_hash,
         tr.included_in_block_hash,
         tr.block_timestamp,
@@ -1071,6 +1156,31 @@ const receipts = catchAsync(
       FROM
         receipts
         INNER JOIN (${from || to ? intersect : union}) AS tmp using (receipt_id)
+        LEFT JOIN LATERAL (
+          SELECT
+            block_hash,
+            block_height,
+            block_timestamp
+          FROM
+            blocks
+          WHERE
+            block_hash = receipts.included_in_block_hash
+        ) bl ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT
+            gas_burnt,
+            tokens_burnt,
+            executor_account_id,
+            CASE
+              WHEN status = 'SUCCESS_RECEIPT_ID'
+              OR status = 'SUCCESS_VALUE' THEN TRUE
+              ELSE FALSE
+            END AS status
+          FROM
+            execution_outcomes
+          WHERE
+            receipt_id = receipts.receipt_id
+        ) oc ON TRUE
         INNER JOIN LATERAL (
           SELECT
             id,
@@ -1159,7 +1269,7 @@ const receipts = catchAsync(
             transactions.transaction_hash = receipts.originated_from_transaction_hash
         ) tr ON TRUE
       ORDER BY
-        tr.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
+        receipts.id ${sort}
     `;
 
     let nextCursor = txns?.[txns?.length - 1]?.id;
@@ -1177,6 +1287,24 @@ const receiptsCount = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterDate = req.validator.data.after_date;
+    const beforeDate = req.validator.data.before_date;
+    let afterTimestamp: null | string = null;
+    let beforeTimestamp: null | string = null;
+
+    if (afterDate) {
+      afterTimestamp = msToNsTime(
+        dayjs(afterDate, 'YYYY-MM-DD', true)
+          .add(1, 'day')
+          .startOf('day')
+          .valueOf(),
+      );
+    }
+    if (beforeDate) {
+      beforeTimestamp = msToNsTime(
+        dayjs(beforeDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+    }
 
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
@@ -1186,6 +1314,8 @@ const receiptsCount = catchAsync(
     const bindings = {
       account,
       action,
+      afterTimestamp,
+      beforeTimestamp,
       from,
       method,
       to,
@@ -1211,6 +1341,8 @@ const receiptsCount = catchAsync(
               )
             `
         }
+        AND ${afterTimestamp ? `t.block_timestamp >= :afterTimestamp` : true}
+        AND ${beforeTimestamp ? `t.block_timestamp < :beforeTimestamp` : true}
         AND ${
           action || method
             ? `EXISTS (
@@ -1289,6 +1421,7 @@ const receiptsExport = catchAsync(
         receipts.receipt_id,
         receipts.predecessor_account_id,
         receipts.receiver_account_id,
+        ROW_TO_JSON(oc) AS receipt_outcome,
         tr.transaction_hash,
         tr.included_in_block_hash,
         tr.block_timestamp,
@@ -1316,6 +1449,18 @@ const receiptsExport = catchAsync(
           LIMIT
             5000
         ) AS tmp using (receipt_id)
+        LEFT JOIN LATERAL (
+          SELECT
+            CASE
+              WHEN status = 'SUCCESS_RECEIPT_ID'
+              OR status = 'SUCCESS_VALUE' THEN TRUE
+              ELSE FALSE
+            END AS status
+          FROM
+            execution_outcomes
+          WHERE
+            receipt_id = receipts.receipt_id
+        ) oc ON TRUE
         LEFT JOIN LATERAL (
           SELECT
             transaction_hash,
@@ -1402,6 +1547,7 @@ const receiptsExport = catchAsync(
     const stringifier = stringify({
       columns: [
         { header: 'Status', key: 'status' },
+        { header: 'Receipt', key: 'receipt' },
         { header: 'Txn Hash', key: 'hash' },
         { header: 'Method', key: 'method' },
         { header: 'Deposit Value', key: 'deposit' },
@@ -1421,7 +1567,7 @@ const receiptsExport = catchAsync(
     stringifier.pipe(res);
 
     txns.forEach((txn) => {
-      const status = txn.outcomes.status;
+      const status = txn.receipt_outcome.status;
       const action = txn.actions?.[0]?.action;
       const method = txn.actions?.[0]?.method ?? 'Unknown';
 
@@ -1433,6 +1579,7 @@ const receiptsExport = catchAsync(
         hash: txn.transaction_hash,
         method:
           !action || action === ActionKind.FUNCTION_CALL ? method : action,
+        receipt: txn.receipt_id,
         status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
         timestamp: dayjs(+nsToMsTime(txn.block_timestamp)).format(
           'YYYY-MM-DD HH:mm:ss',

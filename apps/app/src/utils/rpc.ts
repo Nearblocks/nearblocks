@@ -16,10 +16,6 @@ export const RpcProviders =
           url: 'https://beta.rpc.mainnet.near.org',
         },
         {
-          name: 'fast-near web4',
-          url: 'https://rpc.web4.near.page',
-        },
-        {
           name: 'FASTNEAR Free',
           url: 'https://free.rpc.fastnear.com',
         },
@@ -35,10 +31,6 @@ export const RpcProviders =
           name: 'dRPC',
           url: 'https://near.drpc.org',
         },
-        {
-          name: 'OMNIA',
-          url: 'https://endpoints.omniatech.io/v1/near/mainnet/public',
-        },
       ]
     : [
         {
@@ -48,9 +40,5 @@ export const RpcProviders =
         {
           name: 'NEAR',
           url: 'https://rpc.testnet.near.org',
-        },
-        {
-          name: 'NEAR (Beta)',
-          url: 'https://beta.rpc.testnet.near.org',
         },
       ];

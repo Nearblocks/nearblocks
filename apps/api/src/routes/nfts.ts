@@ -22,6 +22,7 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/', validator(schema.list), nft.list);
 
@@ -31,6 +32,7 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} search.query - search keyword
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/count', validator(schema.count), nft.count);
 
@@ -42,14 +44,16 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/txns', validator(schema.txns), nft.txns);
 
   /**
    * GET /v1/nfts/txns/count
-   * @summary Get nft txns count
+   * @summary Get estimated nft txns count
    * @tags NFTs
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/txns/count', validator(schema.txnsCount), nft.txnsCount);
 
@@ -59,6 +63,7 @@ const routes = (app: Router) => {
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract', validator(schema.item), contract.item);
 
@@ -71,15 +76,17 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
 
   /**
    * GET /v1/nfts/{contract}/txns/count
-   * @summary Get nft txns count
+   * @summary Get estimated nft txns count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/txns/count',
@@ -95,15 +102,17 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
 
   /**
    * GET /v1/nfts/{contract}/holders/count
-   * @summary Get nft holders count
+   * @summary Get estimated nft holders count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/holders/count',
@@ -120,16 +129,18 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
 
   /**
    * GET /v1/nfts/{contract}/tokens/count
-   * @summary Get nft tokens count
+   * @summary Get estimated nft tokens count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/tokens/count',
@@ -144,6 +155,7 @@ const routes = (app: Router) => {
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/tokens/:token',
@@ -161,6 +173,7 @@ const routes = (app: Router) => {
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/tokens/:token/txns',
@@ -170,11 +183,12 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/nfts/{contract}/tokens/{token}/txns/count
-   * @summary Get nft token txns count
+   * @summary Get estimated nft token txns count
    * @tags NFTs
    * @param {string} contract.path.required - contract id
    * @param {string} token.query - token id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:contract/tokens/:token/txns/count',

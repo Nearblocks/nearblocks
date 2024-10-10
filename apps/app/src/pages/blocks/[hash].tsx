@@ -8,6 +8,7 @@ import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
 import { nanoToMilli } from '@/utils/libs';
 import Details from '@/components/Blocks/Detail';
+import { fetchData } from '@/utils/fetchData';
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
@@ -18,27 +19,30 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  searchResultDetails: any;
+  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { hash },
+    query: { hash, keyword = '', query = '', filter = 'all' },
   }: any = context;
 
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
   try {
-    const [blockInfoResult, statsResult, latestBlocksResult] =
-      await Promise.allSettled([
-        fetcher(`blocks/${hash}`),
-        fetcher(`stats`),
-        fetcher(`blocks/latest?limit=1`),
-      ]);
+    const [blockInfoResult] = await Promise.allSettled([
+      fetcher(`blocks/${hash}`),
+    ]);
+
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     const blockInfo =
       blockInfoResult.status === 'fulfilled' ? blockInfoResult.value : null;
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
 
     const error = blockInfoResult.status === 'rejected';
 
@@ -65,6 +69,8 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -77,6 +83,8 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -149,6 +157,8 @@ Block.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

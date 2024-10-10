@@ -1,10 +1,12 @@
 import { stream, types } from 'nb-lake';
 import { logger } from 'nb-logger';
+import { streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncRefFinance } from '#services/contracts/v2.ref-finance.near';
+import { DataSource } from '#types/enum';
 
 const fetchBlocks = async (block: number, limit: number) => {
   try {
@@ -39,19 +41,41 @@ if (config.s3Endpoint) {
 export const syncData = async () => {
   const settings = await knex('settings').where({ key: dexKey }).first();
   const latestBlock = settings?.value?.sync;
+  let startBlockHeight = config.startBlockHeight;
 
   if (latestBlock) {
     const next = +latestBlock - config.delta;
 
-    if (next > lakeConfig.startBlockHeight) {
+    if (next > startBlockHeight) {
       logger.info(`last synced block: ${latestBlock}`);
       logger.info(`syncing from block: ${next}`);
+      startBlockHeight = next;
       lakeConfig.startBlockHeight = next;
     }
   }
 
-  for await (const message of stream(lakeConfig)) {
-    await onMessage(message);
+  if (config.dataSource === DataSource.FAST_NEAR) {
+    const stream = streamBlock({
+      network: config.network,
+      start: startBlockHeight,
+    });
+
+    for await (const message of stream) {
+      await onMessage(message);
+    }
+
+    stream.on('end', () => {
+      logger.error('stream ended');
+      process.exit();
+    });
+    stream.on('error', (error: Error) => {
+      logger.error(error);
+      process.exit();
+    });
+  } else {
+    for await (const message of stream(lakeConfig)) {
+      await onMessage(message);
+    }
   }
 };
 

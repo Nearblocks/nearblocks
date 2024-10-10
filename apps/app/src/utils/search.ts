@@ -1,4 +1,4 @@
-import { fetcher } from '@/hooks/useFetch';
+import fetcher from './fetcher';
 
 const getRoute = (filter: string) => {
   switch (filter) {
@@ -25,7 +25,7 @@ const search = async (
       keyword = keyword.toLowerCase();
     }
 
-    const resp = await fetcher(`/search/${route}?keyword=${keyword}`);
+    const resp = await fetcher(`search/${route}?keyword=${keyword}`);
 
     const data = {
       blocks: [],

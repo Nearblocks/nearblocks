@@ -19,6 +19,7 @@ import FaInbox from '../Icons/FaInbox';
 import Table from '../common/Table';
 import TokenImage from '../common/TokenImage';
 import TimeStamp from '../common/TimeStamp';
+import TableSummary from '../common/TableSummary';
 
 const initialForm = {
   event: '',
@@ -131,7 +132,7 @@ const TokenTransactions = ({
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
         </>
       ),
       tdClassName:
@@ -143,15 +144,15 @@ const TokenTransactions = ({
       cell: (row: TransactionInfo) => (
         <span className="relative">
           <Tooltip
-            label={row.transaction_hash}
+            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
               <Link
-                href={`/txns/${row.transaction_hash}`}
+                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 font-medium"
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Link>
             </span>
           </Tooltip>
@@ -260,7 +261,7 @@ const TokenTransactions = ({
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          {row.involved_account_id === row.affected_account_id ? (
+          {row?.involved_account_id === row?.affected_account_id ? (
             <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
               {t ? t('txns:txnSelf') : 'SELF'}
             </span>
@@ -321,9 +322,9 @@ const TokenTransactions = ({
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => (
         <span>
-          {row.involved_account_id ? (
+          {row?.involved_account_id ? (
             <Tooltip
-              label={row.involved_account_id}
+              label={row?.involved_account_id}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
             >
               <span
@@ -334,14 +335,14 @@ const TokenTransactions = ({
                 }`}
               >
                 <Link
-                  href={`/address/${row.involved_account_id}`}
+                  href={`/address/${row?.involved_account_id}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
                   onMouseOver={(e) =>
                     onHandleMouseOver(e, row?.involved_account_id)
                   }
                   onMouseLeave={handleMouseLeave}
                 >
-                  {truncateString(row.involved_account_id, 15, '...')}
+                  {truncateString(row?.involved_account_id, 15, '...')}
                 </Link>
               </span>
             </Tooltip>
@@ -457,7 +458,7 @@ const TokenTransactions = ({
           </Tooltip>
           <button type="button" onClick={onOrder} className="px-2">
             <div className="text-nearblue-600 font-semibold">
-              <SortIcon order={router.query.order as string} />
+              <SortIcon order={router?.query?.order as string} />
             </div>
           </button>
         </div>
@@ -476,7 +477,8 @@ const TokenTransactions = ({
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, ...rest } = queryParams;
+    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
+      queryParams;
     return rest;
   }
 
@@ -491,38 +493,35 @@ const TokenTransactions = ({
               <Skeleton className="h-4" />
             </div>
           ) : (
-            <div className={`flex flex-col lg:flex-row pt-4`}>
-              <div className="flex flex-col">
-                <p className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {txns &&
-                    !error &&
-                    `A total of ${
-                      count ? localFormat && localFormat(count.toString()) : 0
-                    }${' '}
-              transactions found`}
-                </p>
-              </div>
-              <div className="flex flex-col px-4 text-sm mb-4 text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto  lg:items-center lg:justify-between">
-                <div className="px-2 mb-4 md:mb-0">
-                  <Filters filters={modifiedFilter} onClear={onAllClear} />
-                </div>
-                <span className="text-xs text-nearblue-600 dark:text-neargray-10 self-stretch lg:self-auto px-2">
-                  {txns && txns.length > 0 && (
-                    <button className="hover:no-underline ">
-                      <Link
-                        href={`/token/exportdata?address=${id}`}
-                        className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
-                      >
-                        <p>CSV Export</p>
-                        <span className="ml-2">
-                          <Download />
-                        </span>
-                      </Link>
-                    </button>
-                  )}
-                </span>
-              </div>
-            </div>
+            <TableSummary
+              text={
+                txns &&
+                !error &&
+                `A total of ${
+                  count ? localFormat && localFormat(count.toString()) : 0
+                }${' '}
+                transactions found`
+              }
+              filters={
+                <Filters filters={modifiedFilter} onClear={onAllClear} />
+              }
+              linkToDowload={
+                txns &&
+                txns?.length > 0 && (
+                  <button className="hover:no-underline ">
+                    <Link
+                      href={`/token/exportdata?address=${id}`}
+                      className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                    >
+                      <p>CSV Export</p>
+                      <span className="ml-2">
+                        <Download />
+                      </span>
+                    </Link>
+                  </button>
+                )
+              }
+            />
           )}
           <Table
             columns={columns}

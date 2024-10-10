@@ -8,31 +8,41 @@ import Skeleton from '@/components/skeleton/common/Skeleton';
 import Buttons from '@/components/Address/Buttons';
 import Delegators from '@/components/NodeExplorer/Delegators';
 import { GetServerSideProps } from 'next';
-import fetcher from '@/utils/fetcher';
+import dynamic from 'next/dynamic';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
+  ssr: false,
+});
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
-  try {
-    const [statsResult, latestBlocksResult] = await Promise.allSettled([
-      fetcher(`stats`),
-      fetcher(`blocks/latest?limit=1`),
-    ]);
+  searchResultDetails: any;
+  searchRedirectDetails: any;
+}> = async (context) => {
+  const {
+    query: { keyword = '', query = '', filter = 'all' },
+  }: any = context;
 
-    const statsDetails =
-      statsResult.status === 'fulfilled' ? statsResult.value : null;
-    const latestBlocks =
-      latestBlocksResult.status === 'fulfilled'
-        ? latestBlocksResult.value
-        : null;
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
+
+  try {
+    const {
+      statsDetails,
+      latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    } = await fetchData(q, key, filter);
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        searchResultDetails,
+        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -41,6 +51,8 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        searchResultDetails: null,
+        searchRedirectDetails: null,
       },
     };
   }
@@ -70,31 +82,33 @@ const Delegator = () => {
         <link rel="canonical" href={`${appUrl}/node-explorer/${id}`} />
       </Head>
       <div className="container relative mx-auto p-3">
-        <div className="md:flex justify-between">
+        <div className="flex justify-between items-center">
           {!id ? (
             <div className="w-80 max-w-xs px-3 py-5">
               <Skeleton className="h-7" />
             </div>
           ) : (
-            <div className="md:flex-wrap">
-              <div className="break-words py-4 px-2">
+            <>
+              <div className="break-all py-4 px-2">
                 <span className="py-5 text-xl text-gray-700 leading-8 dark:text-neargray-10 mr-1">
                   <span className="whitespace-nowrap">
                     Near Validator:&nbsp;
                   </span>
-                  {id && (
-                    <span className="text-center items-center">
-                      <span className="text-green-500 dark:text-green-250">
-                        @<span className="font-semibold">{id}</span>
-                      </span>
-                      <span className="ml-2">
-                        <Buttons address={id} />
-                      </span>
+                  <span className="text-center items-center">
+                    <span className="text-green-500 dark:text-green-250">
+                      @<span className="font-semibold">{id}</span>
                     </span>
-                  )}
+                    <span className="ml-2">
+                      <Buttons address={id} />
+                    </span>
+                  </span>
                 </span>
               </div>
-            </div>
+
+              <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+                <RpcMenu />
+              </ul>
+            </>
           )}
         </div>
         <div>

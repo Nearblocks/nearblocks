@@ -60,7 +60,9 @@ const TokenHoldings = (props: Props) => {
     <Menu>
       <MenuButton className="w-full h-8 text-sm px-2 rounded border dark:border-black-200 outline-none flex items-center justify-between cursor-pointer">
         <span>
-          {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
+          {ftAmount !== null && ftAmount !== undefined
+            ? '$' + dollarFormat(ftAmount)
+            : ''}
           <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
             {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
           </span>
@@ -99,6 +101,10 @@ const TokenHoldings = (props: Props) => {
                                     width={16}
                                     height={16}
                                     className="w-4 h-4"
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        '/images/tokenplaceholder.svg';
+                                    }}
                                     /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
@@ -170,6 +176,10 @@ const TokenHoldings = (props: Props) => {
                                     width={16}
                                     height={16}
                                     className="w-4 h-4"
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        '/images/tokenplaceholder.svg';
+                                    }}
                                     /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>

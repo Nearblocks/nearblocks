@@ -1,5 +1,12 @@
-import { ContractCodeInfo, ContractParseInfo, SchemaInfo } from '@/utils/types';
-import { useState } from 'react';
+import {
+  ContractCodeInfo,
+  ContractData,
+  ContractParseInfo,
+  SchemaInfo,
+  VerificationData,
+  VerifierStatus,
+} from '@/utils/types';
+import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Info from './Info';
 import { Tooltip } from '@reach/tooltip';
@@ -8,6 +15,9 @@ import ViewOrChange from './ViewOrChange';
 import { useAuthStore } from '@/stores/auth';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import ContractCode from './ContractCode';
+import useRpc from '@/hooks/useRpc';
+import { verifierConfig } from '@/utils/config';
+import { useRpcStore } from '@/stores/rpc';
 
 interface Props {
   contract: ContractCodeInfo;
@@ -21,7 +31,14 @@ interface Props {
   deployments: any;
 }
 
-const Overview = (props: Props) => {
+type OnChainResponse = {
+  hash?: string;
+  code_base64?: string;
+};
+
+const verifiers = verifierConfig.map((config) => config.accountId);
+
+const ContractOverview = (props: Props) => {
   const { contract, isLocked, schema, contractInfo, deployments, accountId } =
     props;
 
@@ -34,6 +51,111 @@ const Overview = (props: Props) => {
   const [tab, setTab] = useState(0);
 
   const onTabChange = (index: number) => setTab(index);
+
+  const [contractData, setContractData] = useState<ContractData>({
+    onChainCodeHash: '',
+    base64Code: '',
+    contractMetadata: null,
+  });
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { contractCode, getContractMetadata, getVerifierData } = useRpc();
+  const [verificationData, setVerificationData] = useState<
+    Record<string, VerificationData>
+  >({});
+  const [rpcError, setRpcError] = useState(false);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+
+  useEffect(() => {
+    if (rpcError) {
+      switchRpc();
+    }
+  }, [rpcError, switchRpc]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setRpcError(false);
+        setStatusLoading(true);
+        setError(null);
+
+        const onChainResponse = await contractCode(accountId as string);
+
+        const contractMetadataResponse = await getContractMetadata(
+          accountId as string,
+        );
+
+        const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
+
+        const base64Code =
+          (onChainResponse as OnChainResponse)?.code_base64 || '';
+
+        setContractData({
+          onChainCodeHash: onChainHash,
+          base64Code: base64Code,
+          contractMetadata: contractMetadataResponse,
+        });
+      } catch (error) {
+        setRpcError(true);
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch contract data');
+      }
+    };
+    if (accountId) fetchData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId]);
+
+  useEffect(() => {
+    const fetchVerifierData = async () => {
+      setStatusLoading(true);
+
+      try {
+        const verifierDataPromises = verifiers.map((verifierAccountId) =>
+          getVerifierData(accountId as string, verifierAccountId),
+        );
+
+        const verifierResponses = await Promise.all(verifierDataPromises);
+
+        const verificationData = verifiers.reduce<
+          Record<string, VerificationData>
+        >((acc, verifier, index) => {
+          const data = verifierResponses[index];
+          let status: VerifierStatus = 'notVerified';
+
+          if (
+            data &&
+            contractData?.onChainCodeHash &&
+            contractData?.contractMetadata
+          ) {
+            const hashMatches =
+              contractData?.onChainCodeHash === data?.code_hash;
+            status = hashMatches
+              ? 'verified'
+              : contractData?.contractMetadata?.build_info
+              ? 'mismatch'
+              : 'notVerified';
+          }
+
+          acc[verifier] = {
+            status,
+            data,
+          };
+          return acc;
+        }, {});
+
+        setVerificationData(verificationData);
+      } catch (error) {
+        console.error('Error fetching or updating verifier data:', error);
+        setError('Failed to fetch verifier data');
+      } finally {
+        setStatusLoading(false);
+      }
+    };
+    if (contractData.onChainCodeHash) fetchVerifierData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId, contractData]);
 
   return (
     <Tabs
@@ -69,7 +191,13 @@ const Overview = (props: Props) => {
         />
       </TabPanel>
       <TabPanel>
-        <ContractCode accountId={accountId as string} />
+        <ContractCode
+          error={error}
+          verificationData={verificationData}
+          contractData={contractData}
+          statusLoading={statusLoading}
+          accountId={accountId as string}
+        />
       </TabPanel>
       {!schema && (
         <TabPanel>
@@ -98,17 +226,17 @@ const Overview = (props: Props) => {
             )}
           </div>
           {!schema && (
-            <p className="text-xs mx-5 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
-              Contracts with Near{' '}
+            <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+              {`Near ABI schema not found, We have provide a best effort “auto detect” facility to find successful methods and parameters from past transactions. If you are the contract owner please consider recompiling your contract with Near`}{' '}
               <a
                 className="text-green-500 dark:text-green-250"
                 target="_blank"
                 href="https://github.com/near/abi"
                 rel="noreferrer noopener nofollow"
               >
-                abi
-              </a>{' '}
-              {`will have their methods and parameters automatically shown. For other contracts we provide a best effort "auto detect" facility to find successful methods and parameters from past transactions.`}
+                ABI
+              </a>
+              .
             </p>
           )}
           {contractInfo?.methodNames?.length > 0 && (
@@ -118,7 +246,12 @@ const Overview = (props: Props) => {
               className="contract-accordian text-gray-600 px-4 pt-4 border-t"
             >
               {contractInfo?.methodNames?.map((method, index) => (
-                <ViewOrChange key={index} index={index} method={method} />
+                <ViewOrChange
+                  key={index}
+                  index={index}
+                  method={method}
+                  connected={signedIn}
+                />
               ))}
             </Accordion>
           )}
@@ -150,6 +283,19 @@ const Overview = (props: Props) => {
               </button>
             )}
           </div>
+          <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+            Methods and parameters are automatically shown from the embedded
+            Near{' '}
+            <a
+              className="text-green-500 dark:text-green-250"
+              target="_blank"
+              href="https://github.com/near/abi"
+              rel="noreferrer noopener nofollow"
+            >
+              ABI
+            </a>{' '}
+            {`Schema.`}
+          </p>
           <Accordion
             multiple
             collapsible
@@ -161,6 +307,7 @@ const Overview = (props: Props) => {
                 index={index}
                 method={func}
                 schema={schema}
+                connected={signedIn}
               />
             ))}
           </Accordion>
@@ -169,4 +316,4 @@ const Overview = (props: Props) => {
     </Tabs>
   );
 };
-export default Overview;
+export default ContractOverview;

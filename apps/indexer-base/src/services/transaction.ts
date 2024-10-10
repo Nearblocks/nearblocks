@@ -25,10 +25,16 @@ export const storeTransactions = async (
 
   if (transactions.length) {
     await retry(async () => {
-      await knex('transactions')
-        .insert(transactions)
-        .onConflict(['transaction_hash'])
-        .ignore();
+      const batchSize = 1000;
+
+      for (let i = 0; i < transactions.length; i += batchSize) {
+        const batch = transactions.slice(i, i + batchSize);
+
+        await knex('transactions')
+          .insert(batch)
+          .onConflict(['transaction_hash'])
+          .ignore();
+      }
     });
   }
 };

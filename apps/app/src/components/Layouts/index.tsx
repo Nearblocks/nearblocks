@@ -5,12 +5,16 @@ import { useRouter } from 'next/router';
 import { BlocksInfo, Stats } from '@/utils/types';
 import useLoading from '@/hooks/useLoading';
 import { Spinner } from '../common/Spinner';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface LayoutProps {
   children: ReactNode;
   notice?: ReactNode;
   statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
+  searchResultDetails?: any;
+  searchRedirectDetails?: any;
 }
 
 const Layout = ({
@@ -18,6 +22,8 @@ const Layout = ({
   notice,
   statsDetails,
   latestBlocks,
+  searchResultDetails,
+  searchRedirectDetails,
 }: LayoutProps) => {
   const router = useRouter();
   const { loading, setLoading } = useLoading();
@@ -30,9 +36,15 @@ const Layout = ({
     <div className={className}>
       {notice}
       <header>
-        <Header statsDetails={statsDetails} latestBlocks={latestBlocks} />
+        <Header
+          statsDetails={statsDetails}
+          latestBlocks={latestBlocks}
+          searchResultDetails={searchResultDetails}
+          searchRedirectDetails={searchRedirectDetails}
+        />
       </header>
       {loading && <Spinner loading={loading} setLoading={setLoading} />}
+      <ToastContainer />
       <main>{children}</main>
       <Footer />
     </div>

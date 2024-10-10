@@ -209,7 +209,7 @@ const ViewOrChange = (props: Props) => {
         </span>
         <ArrowRight className="contract-icon fill-gray-600" />
       </AccordionButton>
-      <AccordionPanel className="border dark:border-black-200 p-4 rounded slide-up slide-down">
+      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center dark:text-neargray-10">
             Arguments

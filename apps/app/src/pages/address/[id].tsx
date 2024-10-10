@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { appUrl } from '@/utils/config';
+import { appUrl, networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Layout from '@/components/Layouts';
 import Head from 'next/head';
@@ -27,17 +27,30 @@ import queryString from 'qs';
 import TokenTransactions from '@/components/Address/TokenTransactions';
 import NFTTransactions from '@/components/Address/NFTTransactions';
 import AccessKeys from '@/components/Address/AccessKeys';
-import Overview from '@/components/Address/Contract/Overview';
 import fetcher from '@/utils/fetcher';
 import { useFetch } from '@/hooks/useFetch';
 import { VmComponent } from '@/components/vm/VmComponent';
 import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
-import Receipts from '@/components/Address/Receipts';
+import ContractOverview from '@/components/Address/Contract/ContractOverview';
+import ListCheck from '@/components/Icons/ListCheck';
+import FaCheckCircle from '@/components/Icons/FaCheckCircle';
+import { useRpcStore } from '@/stores/rpc';
+import dynamic from 'next/dynamic';
+import { getCookieFromRequest } from '@/utils/libs';
+import { RpcProviders } from '@/utils/rpc';
+import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
+const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
+  ssr: false,
+});
+
+const Receipts = dynamic(() => import('../../components/Address/Receipts'), {
+  ssr: false,
+});
 
 const tabs = [
   'txns',
@@ -71,21 +84,42 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   tab: string;
   latestBlocks: any;
+  searchResultDetails: any;
+  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { id = '', tab = 'txns', ...query },
-  }: { query: { id?: string; tab?: TabType } } = context;
+    query: {
+      id = '',
+      tab = 'txns',
+      keyword = '',
+      query = '',
+      filter = 'all',
+      ...qs
+    },
+    req,
+  }: {
+    query: {
+      id?: string;
+      query?: string;
+      keyword?: string;
+      filter?: string;
+      tab?: TabType;
+    };
+    req: any;
+  } = context;
 
   const address = id.toLowerCase();
+  const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
+
+  const key = keyword?.replace(/[\s,]/g, '');
+  const q = query?.replace(/[\s,]/g, '');
 
   const commonApiUrls = {
-    stats: 'stats',
-    account: id && `account/${address}`,
-    deployments: id && `account/${address}/contract/deployments`,
+    account: id && `account/${address}?rpc=${rpcUrl}`,
+    deployments: id && `account/${address}/contract/deployments?rpc=${rpcUrl}`,
     fts: id && `fts/${address}`,
     nfts: id && `nfts/${address}`,
-    parse: id && `account/${address}/contract/parse`,
-    latestBlocks: `blocks/latest?limit=1`,
+    parse: id && `account/${address}/contract/parse?rpc=${rpcUrl}`,
     inventory: id && `account/${address}/inventory`,
   };
 
@@ -110,8 +144,8 @@ export const getServerSideProps: GetServerSideProps<{
       api: `account/${address}/keys`,
       count: `account/${address}/keys/count`,
     },
-    contract: { api: `` },
-    comments: { api: `` },
+    contract: { api: '' },
+    comments: { api: '' },
   };
 
   const apiUrls = urlMapping[tab as TabType];
@@ -119,87 +153,87 @@ export const getServerSideProps: GetServerSideProps<{
     return { notFound: true };
   }
 
-  const fetchData = async (url: string | undefined) =>
-    url ? await fetcher(url) : null;
-
-  try {
-    const [
-      statsResult,
-      accountResult,
-      deploymentResult,
-      ftsResult,
-      nftResult,
-      parseResult,
-      inventoryResult,
-      latestBlocksResult,
-    ] = await Promise.allSettled([
-      fetchData(commonApiUrls.stats),
-      fetchData(commonApiUrls.account),
-      fetchData(commonApiUrls.deployments),
-      fetchData(commonApiUrls.fts),
-      fetchData(commonApiUrls.nfts),
-      fetchData(commonApiUrls.parse),
-      fetchData(commonApiUrls.inventory),
-      fetchData(commonApiUrls.latestBlocks),
-    ]);
-
-    const getResult = (result: PromiseSettledResult<any>) =>
-      result.status === 'fulfilled' ? result.value : null;
-
-    let dataResult = null;
-    let dataCountResult = null;
-
-    if (tab !== 'comments') {
-      // Fetch tab-specific data
-      const tabApi = urlMapping[tab as TabType];
-      const fetchUrl = `${tabApi.api}${
-        query ? `?${queryString.stringify(query)}` : ''
-      }`;
-      const countUrl =
-        tabApi.count &&
-        `${tabApi.count}${query ? `?${queryString.stringify(query)}` : ''}`;
-
-      [dataResult, dataCountResult] = await Promise.allSettled([
-        fetchData(fetchUrl),
-        fetchData(countUrl),
-      ]);
+  const fetchCommonData = async (url: string | undefined) => {
+    try {
+      if (url) {
+        const response = await fetcher(url);
+        return response;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching ${url}:`, error);
+      return null;
     }
+  };
 
-    return {
-      props: {
-        statsDetails: getResult(statsResult),
-        accountDetails: getResult(accountResult),
-        contractData: getResult(deploymentResult),
-        tokenDetails: getResult(ftsResult),
-        nftTokenDetails: getResult(nftResult),
-        parseDetails: getResult(parseResult),
-        inventoryDetails: getResult(inventoryResult),
-        data: dataResult && getResult(dataResult),
-        dataCount: dataCountResult && getResult(dataCountResult),
-        error: !!(dataResult && dataResult.status === 'rejected'),
-        tab,
-        latestBlocks: getResult(latestBlocksResult),
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching blocks:', error);
-    return {
-      props: {
-        statsDetails: null,
-        accountDetails: null,
-        contractData: null,
-        tokenDetails: null,
-        nftTokenDetails: null,
-        parseDetails: null,
-        inventoryDetails: null,
-        data: null,
-        dataCount: null,
-        error: true,
-        tab: 'txns',
-        latestBlocks: null,
-      },
-    };
+  // Use Promise.allSettled but track the results better
+  const [
+    accountResult,
+    deploymentResult,
+    ftsResult,
+    nftResult,
+    parseResult,
+    inventoryResult,
+  ] = await Promise.allSettled([
+    fetchCommonData(commonApiUrls.account),
+    fetchCommonData(commonApiUrls.deployments),
+    fetchCommonData(commonApiUrls.fts),
+    fetchCommonData(commonApiUrls.nfts),
+    fetchCommonData(commonApiUrls.parse),
+    fetchCommonData(commonApiUrls.inventory),
+  ]);
+
+  const {
+    statsDetails,
+    latestBlocks,
+    searchResultDetails,
+    searchRedirectDetails,
+  } = await fetchData(q, key, filter);
+
+  const getResult = (result: PromiseSettledResult<any>) =>
+    result.status === 'fulfilled' ? result.value : null;
+
+  let dataResult = null;
+  let dataCountResult = null;
+
+  if (tab !== 'comments') {
+    // Fetch tab-specific data with reduced overhead
+    const tabApi = urlMapping[tab as TabType];
+    const fetchUrl = `${tabApi.api}${
+      qs ? `?${queryString.stringify(qs)}` : ''
+    }`;
+    const countUrl =
+      tabApi.count &&
+      `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
+
+    // Fetch data in parallel but limit the number of calls
+    const tabResults = await Promise.allSettled([
+      fetchCommonData(fetchUrl),
+      fetchCommonData(countUrl),
+    ]);
+    dataResult = getResult(tabResults[0]);
+    dataCountResult = getResult(tabResults[1]);
   }
+
+  // Return props with better error handling
+  return {
+    props: {
+      statsDetails: statsDetails,
+      accountDetails: getResult(accountResult),
+      contractData: getResult(deploymentResult),
+      tokenDetails: getResult(ftsResult),
+      nftTokenDetails: getResult(nftResult),
+      parseDetails: getResult(parseResult),
+      inventoryDetails: getResult(inventoryResult),
+      data: dataResult,
+      dataCount: dataCountResult,
+      error: !dataResult, // Set error to true only if dataResult is null
+      tab,
+      latestBlocks: latestBlocks,
+      searchResultDetails,
+      searchRedirectDetails,
+    },
+  };
 };
 
 const Address = ({
@@ -227,15 +261,15 @@ const Address = ({
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const [rpcError, setRpcError] = useState(false);
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const components = useBosComponents();
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
-  const spamTokensString = spamList && spamList.replace(/,\s*([}\]])/g, '$1');
-  const spamTokens: SpamToken =
-    spamTokensString && JSON.parse(spamTokensString);
-
+  const spamTokens: SpamToken = spamList;
   const contractInfo = parseDetails?.contract?.[0]?.contract;
   const schema = parseDetails?.contract?.[0]?.schema;
   const statsData = statsDetails?.stats?.[0];
@@ -261,6 +295,7 @@ const Address = ({
       if (!id) return;
 
       try {
+        setRpcError(false);
         const [code, keys, account]: any = await Promise.all([
           contractCode(id as string).catch((error: any) => {
             console.error(`Error fetching contract code for ${id}:`, error);
@@ -308,6 +343,7 @@ const Address = ({
         setIsLocked(locked);
       } catch (error) {
         // Handle errors appropriately
+        setRpcError(true);
         console.error('Error loading schema:', error);
       }
     };
@@ -315,7 +351,13 @@ const Address = ({
     loadSchema();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, rpcUrl]);
+
+  useEffect(() => {
+    if (rpcError) {
+      switchRpc();
+    }
+  }, [rpcError, switchRpc]);
 
   useEffect(() => {
     const loadBalances = async () => {
@@ -337,6 +379,7 @@ const Address = ({
           let sum = Big(0);
           let rpcAmount = Big(0);
           try {
+            setRpcError(false);
             let amount = await ftBalanceOf(ft.contract, id as string);
             if (amount) {
               rpcAmount = ft?.ft_meta?.decimals
@@ -345,6 +388,7 @@ const Address = ({
             }
           } catch (error) {
             console.log({ error });
+            setRpcError(true);
           }
 
           if (ft?.ft_meta?.price) {
@@ -399,14 +443,14 @@ const Address = ({
     loadBalances().catch(console.log);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, id]);
+  }, [inventoryData?.fts, id, rpcUrl]);
 
   useEffect(() => {
     if (tab) {
       const index = tabs.indexOf(tab as string);
       if (index !== -1) {
         const hasContractTab =
-          contractInfo && contractInfo.methodNames.length > 0;
+          contractInfo && contractInfo?.methodNames?.length > 0;
         let actualTabIndex = index;
         if (!hasContractTab && index > 5) {
           actualTabIndex = index - 1;
@@ -420,7 +464,8 @@ const Address = ({
   const onTab = (index: number) => {
     const { id } = router.query;
 
-    const hasContractTab = contractInfo && contractInfo.methodNames.length > 0;
+    const hasContractTab =
+      contractInfo && contractInfo?.methodNames?.length > 0;
     let actualTabName = tabs[index];
     let actualTabIndex = index;
 
@@ -508,15 +553,46 @@ const Address = ({
             </div>
           ) : (
             <div className="flex md:flex-wrap w-full">
-              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
-                Near Account:&nbsp;
-                {id && (
-                  <span className="text-green-500 dark:text-green-250">
-                    @<span className="font-semibold">{id}</span>
-                  </span>
-                )}
-                <Buttons address={id as string} />
-              </h1>
+              <div className="flex justify-between md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
+                <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 ">
+                  Near Account:&nbsp;
+                  {id && (
+                    <span className="text-green-500 dark:text-green-250">
+                      @<span className="font-semibold">{id}</span>
+                    </span>
+                  )}
+                  <Buttons address={id as string} />
+                </h1>
+                <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+                  <RpcMenu />
+                  <li className="ml-3 max-md:mb-2">
+                    <span className="group flex w-full relative h-full">
+                      <a
+                        className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
+                        href="#"
+                      >
+                        <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
+                          <ListCheck className="h-4 dark:filter dark:invert" />
+                        </div>
+                      </a>
+                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-lg group-hover:block py-1 z-[99]">
+                        <li className="pb-2">
+                          <a
+                            className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
+                            href={`https://validate.nearblocks.io/address/${id}?network=${networkId}`}
+                            target="_blank"
+                          >
+                            Validate Account
+                            <span className="w-4 ml-3 dark:text-green-250">
+                              <FaCheckCircle />
+                            </span>
+                          </a>
+                        </li>
+                      </ul>
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
           <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
@@ -565,7 +641,7 @@ const Address = ({
                         key: 4,
                         label: t ? t('address:accessKeys') : 'Access Keys',
                       },
-                      ...(contractInfo && contractInfo.methodNames.length > 0
+                      ...(contractInfo && contractInfo?.methodNames?.length > 0
                         ? [
                             {
                               key: 5,
@@ -644,10 +720,10 @@ const Address = ({
                         tab={tab}
                       />
                     </TabPanel>
-                    {contractInfo && contractInfo.methodNames.length > 0 && (
+                    {contractInfo && contractInfo?.methodNames?.length > 0 && (
                       <TabPanel>
                         {tab === 'contract' ? (
-                          <Overview
+                          <ContractOverview
                             schema={schema}
                             contract={contract as ContractCodeInfo}
                             contractInfo={contractInfo}
@@ -700,6 +776,8 @@ Address.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    searchResultDetails={page?.props?.searchResultDetails}
+    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

@@ -391,7 +391,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
             </div>
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5 dark:bg-black-600">
-            <div className="flex-1 py-5 lg:px-0">
+            <div className="flex-1 py-4 lg:px-0">
               {chartConfig && (
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm dark:bg-black-600">
                   {t

@@ -1,4 +1,5 @@
 export type Options = {
+  delay?: number;
   exponential?: boolean;
   retries?: number;
 };
@@ -18,6 +19,7 @@ export const retry = async <A>(
   func: (context: Context) => A | Promise<A>,
   options: Options = {},
 ): Promise<A> => {
+  const delay = options?.delay || 50;
   const exponential = options?.exponential || false;
   let retries = options?.retries || 5;
   retries = retries < 1 ? 5 : retries;
@@ -31,7 +33,7 @@ export const retry = async <A>(
       if (exponential) {
         Math.pow(2, attempt) * 100 + Math.random() * 100;
       } else {
-        await sleep(50);
+        await sleep(delay);
       }
 
       if (retries === attempt) {

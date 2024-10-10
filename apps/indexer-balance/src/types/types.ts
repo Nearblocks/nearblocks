@@ -3,15 +3,16 @@ import { Network, StateChangeCauseView, StateChangeValueView } from 'nb-types';
 
 export type Config = {
   cacheExpiry: number;
+  dataSource: string;
   dbCa: string;
   dbCert: string;
   dbKey: string;
   dbUrl: string;
   delta: number;
+  genesisHeight: number;
   insertLimit: number;
   network: Network;
   preloadSize: number;
-  rpcUrl: string;
   s3BucketName: string;
   s3Endpoint: null | types.EndpointConfig;
   s3RegionName: string;

@@ -22,7 +22,9 @@ const routes = (app: Router) => {
    * @summary Get account info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account', validator(schema.item), account.item);
 
@@ -31,7 +33,9 @@ const routes = (app: Router) => {
    * @summary Get contract info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/contract', validator(schema.contract), account.contract);
 
@@ -41,6 +45,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/deployments',
@@ -53,7 +58,9 @@ const routes = (app: Router) => {
    * @summary Get parsed contract info
    * @tags Account
    * @param {string} account.path.required - account id
+   * @param {string} rpc.query - rpc url to use
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/parse',
@@ -68,6 +75,7 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account
    * @param {string} method.path.required - method
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/contract/:method',
@@ -81,6 +89,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/inventory',
@@ -94,6 +103,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/tokens', validator(schema.tokens), account.tokens);
 
@@ -106,15 +116,17 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/keys', validator(schema.keys), key.keys);
 
   /**
    * GET /v1/account/{account}/keys/count
-   * @summary Get access keys count
+   * @summary Get estimated access keys count
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/keys/count', validator(schema.keysCount), key.keysCount);
 
@@ -134,12 +146,13 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns', validator(schema.txns), txn.txns);
 
   /**
    * GET /v1/account/{account}/txns/count
-   * @summary Get account txns count
+   * @summary Get estimated account txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -149,6 +162,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
 
@@ -159,21 +173,27 @@ const routes = (app: Router) => {
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
    * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/txns-only', validator(schema.txnsOnly), txn.txnsOnly);
 
   /**
    * GET /v1/account/{account}/txns-only/count
-   * @summary Get account txns without receipts count
+   * @summary Get estimated account txns without receipts count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
    * @param {string} to.query - receiver account id
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/txns-only/count',
@@ -190,16 +210,19 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/receipts', validator(schema.receipts), txn.receipts);
 
   /**
    * GET /v1/account/{account}/receipts/count
-   * @summary Get account receipts count
+   * @summary Get estimated account receipts count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -209,6 +232,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/receipts/count',
@@ -230,12 +254,13 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/ft-txns', validator(schema.ftTxns), ft.txns);
 
   /**
    * GET /v1/account/{account}/ft-txns/count
-   * @summary Get account token txns count
+   * @summary Get estimated account token txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
@@ -243,6 +268,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/ft-txns/count',
@@ -264,12 +290,13 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/nft-txns', validator(schema.nftTxns), nft.txns);
 
   /**
    * GET /v1/account/{account}/nft-txns/count
-   * @summary Get account nft txns count
+   * @summary Get estimated account nft txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
@@ -277,6 +304,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/nft-txns/count',
@@ -298,12 +326,13 @@ const routes = (app: Router) => {
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:account/stake-txns', validator(schema.stakeTxns), stake.txns);
 
   /**
    * GET /v1/account/{account}/stake-txns/count
-   * @summary Get account stake txns count
+   * @summary Get estimated account stake txns count
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
@@ -311,6 +340,7 @@ const routes = (app: Router) => {
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/stake-txns/count',
@@ -326,6 +356,7 @@ const routes = (app: Router) => {
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/activities',
@@ -335,10 +366,11 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/account/{account}/activities/count
-   * @summary Get account balance change activities count
+   * @summary Get estimated account balance change activities count
    * @tags Account
    * @param {string} account.path.required - account id
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get(
     '/:account/activities/count',

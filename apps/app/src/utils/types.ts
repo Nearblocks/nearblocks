@@ -272,6 +272,12 @@ export type TransactionInfo = {
     deposit: string;
     gas_attached: string;
   };
+  receipt_outcome: {
+    gas_burnt: string;
+    tokens_burnt: string;
+    executor_account_id: string;
+    status: boolean;
+  };
   block: {
     block_height: string;
   };
@@ -290,6 +296,7 @@ export type TransactionInfo = {
   receiver_account_id: string;
   signer_account_id: string;
   transaction_hash: string;
+  receipt_id: string;
   receipts: InventoryInfo[];
   cause: string;
   affected_account_id: string;
@@ -1499,6 +1506,7 @@ export type ReceiptKindInfo = {
   onClick?: any;
   isTxTypeActive: boolean;
   receiver: string;
+  receipt?: any;
 };
 export type CommentItem = {
   accountId: string;
@@ -1651,7 +1659,7 @@ export type VerifierData = {
   lang?: string;
 };
 
-export type VerifierStatus = 'verified' | 'mismatch' | 'pending';
+export type VerifierStatus = 'verified' | 'mismatch' | 'notVerified';
 
 export type VerificationData = {
   status: VerifierStatus;
@@ -1668,4 +1676,10 @@ export type ContractMetadata = {
   link?: string;
   standards?: { standard: string; version: string }[];
   version?: string;
+};
+
+export type ContractData = {
+  base64Code: string;
+  onChainCodeHash: string;
+  contractMetadata: ContractMetadata | null;
 };

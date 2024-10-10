@@ -3,6 +3,10 @@ const path = require('path');
 const { env } = require('next-runtime-env');
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
+const mainnetApiUrl =
+  env('NEXT_PUBLIC_MAINNET_API_URL') || 'https://api.nearblocks.io/v1';
+const testnetApiUrl =
+  env('NEXT_PUBLIC_TESTNET_API_URL') || 'https://api.nearblocks.io/v1';
 configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
@@ -25,50 +29,43 @@ const nextConfig = {
         source: '/api/nodes',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/node/telemetry'
-            : 'https://api3-testnet.nearblocks.io/v1/node/telemetry',
+            ? `${mainnetApiUrl}/node/telemetry`
+            : `${testnetApiUrl}/node/telemetry`,
       },
       {
         source: '/api/circulating-supply',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply',
+            ? `${mainnetApiUrl}/legacy/circulating-supply`
+            : `${testnetApiUrl}/legacy/circulating-supply`,
       },
       {
         source: '/api/circulating-supply-in-near',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/circulating-supply?unit=near'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/circulating-supply?unit=near',
+            ? `${mainnetApiUrl}/legacy/circulating-supply?unit=near`
+            : `${testnetApiUrl}/legacy/circulating-supply?unit=near`,
       },
       {
         source: '/api/fees-of-previous-day-utc',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=day'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=day',
+            ? `${mainnetApiUrl}/legacy/fees?pediod=day`
+            : `${testnetApiUrl}/legacy/fees?pediod=day`,
       },
       {
         source: '/api/fees-of-previous-7-days-utc',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/fees?pediod=week'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/fees?pediod=week',
+            ? `${mainnetApiUrl}/legacy/fees?pediod=week`
+            : `${testnetApiUrl}/legacy/fees?pediod=week`,
       },
       {
         source: '/api/ping',
         destination:
           network === 'mainnet'
-            ? 'https://api3.nearblocks.io/v1/legacy/ping'
-            : 'https://api3-testnet.nearblocks.io/v1/legacy/ping',
-      },
-      {
-        source: '/api/:path*',
-        destination:
-          network === 'mainnet'
-            ? 'https://legacy.explorer.near.org/api/:path*'
-            : 'https://legacy.explorer.testnet.near.org/api/:path*',
+            ? `${mainnetApiUrl}/legacy/ping`
+            : `${testnetApiUrl}/legacy/ping`,
       },
     ];
   },

@@ -29,6 +29,7 @@
     "nb-lake": "*",
     "nb-logger": "*",
     "nb-near": "*",
+    "nb-neardata": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",

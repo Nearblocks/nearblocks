@@ -17,6 +17,7 @@ const routes = (app: Router) => {
    * @tags Access Keys
    * @param {string} key.path.required - public key
    * @return 200 - success response
+   * @security BearerAuth
    */
   route.get('/:key', validator(schema.item), keys.item);
 };

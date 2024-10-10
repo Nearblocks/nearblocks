@@ -37,6 +37,7 @@ export interface TTables {
   stats: Stats;
   tps: TPS;
   transactions: Transaction;
+  validator_data: ValidatorData;
 }
 
 export type AccessKey = {
@@ -229,6 +230,7 @@ export type FTMeta = {
   livecoinwatch_id: null | string;
   market_cap: null | string;
   name: string;
+  nep518_hex_address: null | string;
   price: null | string;
   price_btc: null | string;
   price_eth: null | string;
@@ -355,4 +357,37 @@ export type Transaction = {
   signer_account_id: string;
   status: ExecutionOutcomeStatus;
   transaction_hash: string;
+};
+
+export type ValidatorData = {
+  current_validators: JsonObject;
+  epoch_start_block: JsonObject;
+  epoch_stats_check: JsonObject;
+  genesis_config: JsonObject;
+  latest_block: JsonObject;
+  mapped_validators: JsonObject;
+  pool_ids: JsonObject;
+  protocol_config: JsonObject;
+  stake_proposals: JsonObject;
+  staking_pool_infos: JsonObject;
+  staking_pool_metadata: JsonObject;
+  validator_lists: JsonObject;
+  validator_telemetry: JsonObject;
+  validators_promise: JsonObject;
+};
+
+export type Campaign = {
+  api_subscription_id: number;
+  desktop_image_center: null | string;
+  desktop_image_right: null | string;
+  icon: null | string;
+  id: number;
+  is_active: boolean;
+  is_approved: boolean;
+  link_name: null | string;
+  mobile_image: null | string;
+  site_name: null | string;
+  text: null | string;
+  title: string;
+  url: null | string;
 };
