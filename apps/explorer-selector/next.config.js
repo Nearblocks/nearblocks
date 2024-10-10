@@ -50,15 +50,15 @@ const nextConfig = {
         source: '/api/fees-of-previous-day-utc',
         destination:
           network === 'mainnet'
-            ? `${mainnetApiUrl}/legacy/fees?pediod=day`
-            : `${testnetApiUrl}/legacy/fees?pediod=day`,
+            ? `${mainnetApiUrl}/legacy/fees?period=day`
+            : `${testnetApiUrl}/legacy/fees?period=day`,
       },
       {
         source: '/api/fees-of-previous-7-days-utc',
         destination:
           network === 'mainnet'
-            ? `${mainnetApiUrl}/legacy/fees?pediod=week`
-            : `${testnetApiUrl}/legacy/fees?pediod=week`,
+            ? `${mainnetApiUrl}/legacy/fees?period=week`
+            : `${testnetApiUrl}/legacy/fees?period=week`,
       },
       {
         source: '/api/ping',
