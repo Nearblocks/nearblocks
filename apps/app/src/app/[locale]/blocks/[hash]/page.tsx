@@ -6,20 +6,20 @@ import { getRequest } from '@/utils/app/api';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 export default async function Hash({
-  params,
+  params: { hash, locale },
 }: {
   params: { hash: string; locale: string };
 }) {
-  unstable_setRequestLocale(params?.locale);
+  unstable_setRequestLocale(locale);
 
-  const [hashData, priceData] = await fetchHashAndPriceData(params.hash);
+  const [hashData, priceData] = await fetchHashAndPriceData(hash);
 
   return (
     <>
       <div className="relative container mx-auto px-3">
         <Suspense fallback={<HashLoading />}>
           <Details
-            hash={params.hash}
+            hash={hash}
             data={hashData}
             loading={!hashData}
             price={priceData}
