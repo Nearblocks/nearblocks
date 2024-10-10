@@ -3,31 +3,23 @@ import SponserdText from '@/components/app/SponserdText';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import ListCheck from '@/components/Icons/ListCheck';
 import { appUrl, networkId } from '@/utils/app/config';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { unstable_setRequestLocale } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
-  params,
+  params: { id, locale },
 }: {
-  params: { hash: string; locale: string };
+  params: { id: string; locale: string };
 }) {
-  unstable_setRequestLocale(params?.locale);
+  unstable_setRequestLocale(locale);
 
-  const t = await getTranslations({ locale: params.locale });
+  const thumbnail = `${ogUrl}/api/og?account=true&address=${id}`;
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURIComponent(
-    t('block.heading', { block: params.hash }) || 'Latest Near Protocol Blocks',
-  )}&brand=near`;
-
-  const metaTitle =
-    t('block.metaTitle', { block: params.hash }) ||
-    'All Near Latest Protocol Blocks | NearBlocks';
-  const metaDescription =
-    t('block.metaDescription', { block: params.hash }) ||
-    'All Near (Ⓝ Blocks that are included in Near blockchain. The timestamp, author, gas used, gas price and included transactions are shown.';
+  const metaTitle = `Near Account ${id} | NearBlocks`;
+  const metaDescription = `Near Account ${id} page allows users to view transactions, balances, token holdings and transfers.`;
 
   return {
     title: `${network === 'testnet' ? 'TESTNET ' : ''}${metaTitle}`,
@@ -43,7 +35,7 @@ export async function generateMetadata({
       images: [thumbnail],
     },
     alternates: {
-      canonical: `${appUrl}/blocks/${params.hash}`,
+      canonical: `${appUrl}/address/${id}`,
     },
   };
 }

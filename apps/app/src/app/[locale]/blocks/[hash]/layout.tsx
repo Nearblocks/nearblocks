@@ -1,28 +1,29 @@
+import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
+import { Metadata } from 'next';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
-  params,
+  params: { hash, locale },
 }: {
   params: { hash: string; locale: string };
-}) {
-  unstable_setRequestLocale(params?.locale);
+}): Promise<Metadata> {
+  unstable_setRequestLocale(locale);
 
-  const t = await getTranslations({ locale: params.locale });
+  const t = await getTranslations({ locale });
 
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURIComponent(
-    t('heading') || 'Latest Near Protocol Blocks',
-  )}&brand=near`;
+  const hashData = await getRequest(`blocks/${hash}`);
+  const blockHeight = hashData?.blocks[0]?.block_height;
 
-  const metaTitle =
-    t('block.metaTitle', { block: params.hash }) ||
-    'All Near Latest Protocol Blocks | NearBlocks';
-  const metaDescription =
-    t('block.metaDescription', { block: params.hash }) ||
-    'All Near (Ⓝ Blocks that are included in Near blockchain. The timestamp, author, gas used, gas price and included transactions are shown.';
+  const metaTitle = t('block.metaTitle', { block: hash });
+  const metaDescription = t('block.metaDescription', { block: hash });
+
+  const ogImageUrl = `${ogUrl}/api/og?block=true&block_height=${encodeURIComponent(
+    blockHeight,
+  )}&title=${encodeURIComponent(metaTitle)}`;
 
   return {
     title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
@@ -30,20 +31,22 @@ export async function generateMetadata({
     openGraph: {
       title: metaTitle,
       description: metaDescription,
-      images: [thumbnail],
-    },
-    twitter: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [thumbnail],
+      images: [
+        {
+          url: ogImageUrl.toString(),
+          width: 720,
+          height: 405,
+          alt: metaTitle,
+        },
+      ],
     },
     alternates: {
-      canonical: `${appUrl}/blocks/${params.hash}`,
+      canonical: `${appUrl}/blocks/${hash}`,
     },
   };
 }
 
-export default async function HaseLayout({
+export default async function HashLayout({
   children,
 }: {
   children: React.ReactNode;
