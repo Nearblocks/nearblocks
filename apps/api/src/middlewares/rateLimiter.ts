@@ -37,7 +37,12 @@ const FREE_PLAN: Plan = {
 const KITWALLET_PATH = '/v1/kitwallet';
 const SEARCH_PATH = '/v1/search';
 
-const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
+const SUBNETS = [
+  '10.0.0.0/8',
+  '172.16.0.0/12',
+  '192.168.0.0/16',
+  '193.70.74.48',
+];
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
