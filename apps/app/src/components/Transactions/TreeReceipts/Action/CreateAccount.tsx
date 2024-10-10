@@ -15,10 +15,10 @@ const CreateAccount = (props: TransactionActionInfo) => {
         <FaUser className="inline-flex text-emerald-400 mr-1" />{' '}
         {t ? t('txn.actions.createAccount.0') : 'New account'} (
         <Link
-          href={`/address/${props.receiver}`}
+          href={`/address/${props?.receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
         >
-          {shortenAddress(props.receiver)}
+          {shortenAddress(props?.receiver)}
         </Link>
         ) {t ? t('txn.actions.createAccount.1') : 'created'}
       </div>

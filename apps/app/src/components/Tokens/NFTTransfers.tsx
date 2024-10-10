@@ -406,7 +406,7 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
               Non-Fungible token transfers are out of sync. Last synced block
               was
               <span className="font-bold mx-0.5">
-                {status?.height && localFormat(status?.height.toString())}
+                {status?.height && localFormat(status?.height?.toString())}
               </span>
               {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))}).`}
               Non-Fungible token transfers data will be delayed.
@@ -416,7 +416,7 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
             <div className="flex flex-col">
               <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                 {tokens &&
-                  tokens.length > 0 &&
+                  tokens?.length > 0 &&
                   count &&
                   `A total of ${localFormat(count?.toString())}${' '}
                   transactions found`}

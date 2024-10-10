@@ -137,7 +137,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       header: <span>From</span>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <>
             {row?.affected_account_id ? (
               <Tooltip
@@ -223,7 +223,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       header: <span>To</span>,
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
@@ -298,7 +298,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           {row?.delta_amount
             ? localFormat(
                 tokenAmount(
-                  Big(row.delta_amount).abs().toString(),
+                  Big(row?.delta_amount)
+                    ?.abs()
+                    ?.toString(),
                   row?.ft?.decimals,
                   true,
                 ),
@@ -374,7 +376,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   {txns &&
                     !error &&
                     `A total of ${
-                      count ? localFormat(count?.toString()) : 0
+                      count && txns?.length > 0
+                        ? localFormat(count?.toString())
+                        : 0
                     } transactions found`}
                 </p>
               </div>

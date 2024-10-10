@@ -14,7 +14,8 @@ const Transfer = (props: TransactionActionInfo) => {
       <FaArrowAltCircleRight className="inline-flex text-green-400 mr-1" />{' '}
       {t ? t('txn.actions.transfer.0') : 'Transferred'}
       <span className="font-bold ml-1">
-        {args.deposit ? yoctoToNear(args.deposit, true) : args.deposit ?? ''} Ⓝ
+        {args?.deposit ? yoctoToNear(args?.deposit, true) : args?.deposit ?? ''}{' '}
+        Ⓝ
       </span>{' '}
       {t ? t('txn.actions.transfer.1') : 'to'}
       <Link

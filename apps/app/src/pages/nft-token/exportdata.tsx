@@ -66,7 +66,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 const ExportData = () => {
   const router = useRouter();
-  const { address } = router.query;
+  const { address } = router?.query;
 
   const title = 'Export NFT Token Transactions Data | Nearblocks';
 
@@ -90,11 +90,13 @@ const ExportData = () => {
         <link rel="canonical" href={`${appUrl}/nft-token/exportdata`} />
       </Head>
       <div className="relative">
-        <Export
-          id={address}
-          onHandleDowload={onHandleDowload}
-          exportType={'nfttokentransactions'}
-        />
+        {address && (
+          <Export
+            id={address}
+            onHandleDowload={onHandleDowload}
+            exportType={'nfttokentransactions'}
+          />
+        )}
       </div>
     </>
   );

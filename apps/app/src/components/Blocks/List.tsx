@@ -42,9 +42,10 @@ const List = ({ data, totalCount, error }: ListProps) => {
     setAddress('');
   };
   const blocks = data?.blocks;
-  const start = blocks?.[0];
+  const start = Array.isArray(blocks) ? blocks?.[0] : null;
   const end = blocks?.[blocks?.length - 1];
-  const count = totalCount?.blocks?.[0]?.count || 0;
+  const count =
+    (Array.isArray(totalCount?.blocks) && totalCount?.blocks?.[0]?.count) || 0;
   const cursor = data?.cursor;
 
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -213,7 +214,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
     <>
       <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
         <div className="leading-7 pl-6 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
-          {blocks && blocks.length > 0 && (
+          {blocks && blocks?.length > 0 && (
             <p className="sm:w-full w-65">
               {t
                 ? t('listing', {
@@ -223,7 +224,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
                     to: end?.block_height
                       ? localFormat && localFormat(end?.block_height)
                       : end?.block_height ?? '',
-                    count: localFormat && localFormat(count.toString()),
+                    count: localFormat && localFormat(count?.toString()),
                   })
                 : `Block #${
                     start?.block_height
@@ -234,7 +235,7 @@ const List = ({ data, totalCount, error }: ListProps) => {
                       ? localFormat && localFormat(end?.block_height)
                       : end?.block_height ?? ''
                   } (Total of ${
-                    localFormat && localFormat(count.toString())
+                    localFormat && localFormat(count?.toString())
                   } blocks)`}{' '}
             </p>
           )}

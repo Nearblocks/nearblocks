@@ -57,7 +57,7 @@ const Balance = ({
                     {`This account was deleted on ${
                       accountData?.deleted?.transaction_hash
                         ? convertToUTC(
-                            nanoToMilli(accountData.deleted.block_timestamp),
+                            nanoToMilli(accountData?.deleted?.block_timestamp),
                             false,
                           )
                         : ''

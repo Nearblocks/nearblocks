@@ -71,10 +71,9 @@ export const getServerSideProps: GetServerSideProps<{
   try {
     const [dataResult] = await Promise.allSettled([fetcher(`txns/${hash}`)]);
 
-    const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
-    const error = dataResult.status === 'rejected';
-
-    const txn = data?.txns?.[0];
+    const data = dataResult?.status === 'fulfilled' ? dataResult?.value : null;
+    const error = dataResult?.status === 'rejected';
+    const txn = Array.isArray(data?.txns) && data?.txns?.[0];
 
     const {
       statsDetails,
@@ -85,10 +84,11 @@ export const getServerSideProps: GetServerSideProps<{
 
     let price: number | null = null;
     if (txn?.block_timestamp) {
-      const timestamp = new Date(nanoToMilli(txn.block_timestamp));
+      const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
       const currentDate = new Date();
-      const currentDt = currentDate.toISOString().split('T')[0];
-      const blockDt = timestamp.toISOString().split('T')[0];
+      const currentDt =
+        currentDate && currentDate?.toISOString()?.split('T')[0];
+      const blockDt = timestamp && timestamp?.toISOString()?.split('T')[0];
 
       if (currentDt > blockDt) {
         const priceData = await fetcher(`stats/price?date=${blockDt}`);
@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps<{
       ]);
 
       isContract =
-        contractResult.status === 'fulfilled' ? contractResult.value : null;
+        contractResult?.status === 'fulfilled' ? contractResult?.value : null;
     }
 
     const locale = context?.params?.locale;
@@ -165,6 +165,7 @@ const Txn = ({
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
   const [rpcError, setRpcError] = useState(false);
+  const [allRpcProviderError, setAllRpcProviderError] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -176,7 +177,7 @@ const Txn = ({
     (store) => store.requestSignInWithWallet,
   );
 
-  const txn = data?.txns?.[0];
+  const txn = Array.isArray(data?.txns) && data?.txns?.[0];
 
   let title = t('txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
@@ -210,7 +211,13 @@ const Txn = ({
 
   useEffect(() => {
     if (rpcError) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        setAllRpcProviderError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [rpcError, switchRpc]);
 
@@ -221,8 +228,8 @@ const Txn = ({
       try {
         setRpcError(false);
         const res = await transactionStatus(
-          txn.transaction_hash,
-          txn.signer_account_id,
+          txn?.transaction_hash,
+          txn?.signer_account_id,
         );
         setRpcTxn(res);
       } catch {
@@ -240,41 +247,41 @@ const Txn = ({
         try {
           setRpcError(false);
           const txnExists: any = await transactionStatus(hash, 'bowen');
-          const status = txnExists.status?.Failure ? false : true;
+          const status = txnExists?.status?.Failure ? false : true;
           let block: any = {};
 
           if (txnExists) {
             block = await getBlockDetails(
-              txnExists.transaction_outcome.block_hash,
+              txnExists?.transaction_outcome?.block_hash,
             );
           }
 
           const modifiedTxns = {
-            transaction_hash: txnExists.transaction_outcome.id,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
+            transaction_hash: txnExists?.transaction_outcome.id,
+            included_in_block_hash: txnExists?.transaction_outcome.block_hash,
             outcomes: { status: status },
-            block: { block_height: block?.header.height },
-            block_timestamp: block?.header.timestamp_nanosec,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
+            block: { block_height: block?.header?.height },
+            block_timestamp: block?.header?.timestamp_nanosec,
+            receiver_account_id: txnExists?.transaction?.receiver_id,
+            signer_account_id: txnExists?.transaction?.signer_id,
             receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
+              txnExists?.transaction_outcome?.outcome?.gas_burnt?.toString(),
             receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
+              txnExists?.transaction_outcome?.outcome?.tokens_burnt,
             actions_agg: {
-              deposit: calculateTotalDeposit(txnExists?.transaction.actions),
-              gas_attached: calculateTotalGas(txnExists?.transaction.actions),
+              deposit: calculateTotalDeposit(txnExists?.transaction?.actions),
+              gas_attached: calculateTotalGas(txnExists?.transaction?.actions),
             },
             outcomes_agg: {
               transaction_fee: txnFee(
                 (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
                   [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
+                txnExists?.transaction_outcome?.outcome?.tokens_burnt ?? '0',
               ),
               gas_used: calculateGasUsed(
                 (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
                   [],
-                txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
+                txnExists?.transaction_outcome?.outcome?.gas_burnt ?? '0',
               ),
             },
           };
@@ -366,13 +373,12 @@ const Txn = ({
       <div className="relative container mx-auto px-3">
         {/* <RpcMenu /> */}
         <Fragment key="hash">
-          {rpcError && error ? (
+          {rpcError && (error || allRpcProviderError) ? (
             <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage
                   icons={<FileSlash />}
-                  message="Sorry, we are unable to locate this transaction hash. Please try using a
-        different RPC."
+                  message={`Sorry, we are unable to locate this transaction hash. Please try again later.`}
                   mutedText={hash || ''}
                 />
               </div>

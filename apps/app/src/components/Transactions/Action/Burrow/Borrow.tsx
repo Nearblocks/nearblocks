@@ -21,7 +21,7 @@ const Borrow = (props: DepositPropsInfo) => {
     );
   };
 
-  const log = props.event?.[0];
+  const log = props?.event?.[0];
 
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 

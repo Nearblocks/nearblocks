@@ -19,7 +19,7 @@ const Links = (props: any) => {
         >
           <a
             href={
-              !twitter ? `https://twitter.com/${meta.twitter}` : meta.twitter
+              !twitter ? `https://twitter.com/${meta?.twitter}` : meta?.twitter
             }
             target="_blank"
             rel="noopener noreferrer nofollow"
@@ -46,7 +46,7 @@ const Links = (props: any) => {
           <a
             href={
               !facebook
-                ? `https://facebook.com/${meta.facebook}`
+                ? `https://facebook.com/${meta?.facebook}`
                 : meta.facebook
             }
             target="_blank"
@@ -73,7 +73,7 @@ const Links = (props: any) => {
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
         >
           <a
-            href={!telegram ? `https://t.me/${meta.telegram}` : meta.telegram}
+            href={!telegram ? `https://t.me/${meta?.telegram}` : meta?.telegram}
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="flex"
@@ -98,7 +98,7 @@ const Links = (props: any) => {
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
         >
           <a
-            href={`https://www.coingecko.com/en/coins/${meta.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
+            href={`https://www.coingecko.com/en/coins/${meta?.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="flex"

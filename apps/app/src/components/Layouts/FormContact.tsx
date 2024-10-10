@@ -86,7 +86,7 @@ const FormContact = ({ selectValue }: Props) => {
             placeholder="Enter name..."
             autoComplete="off"
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm  w-full h-10"
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => setName(e?.target?.value)}
             value={name}
             required
           />
@@ -100,7 +100,7 @@ const FormContact = ({ selectValue }: Props) => {
             autoComplete="off"
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm w-full h-10"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e?.target?.value)}
             required
           />
         </div>
@@ -111,7 +111,7 @@ const FormContact = ({ selectValue }: Props) => {
             </p>
             <label className="relative md:flex">
               <select
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => setSubject(e?.target?.value)}
                 className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm appearance-none h-10"
                 value={subject}
               >

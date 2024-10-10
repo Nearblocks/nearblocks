@@ -60,7 +60,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
   let statusInfo;
 
   if (receipt?.outcome?.status?.type === 'successValue') {
-    if (receipt?.outcome?.status?.value.length === 0) {
+    if (receipt?.outcome?.status?.value?.length === 0) {
       statusInfo = (
         <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
           Empty result
@@ -72,7 +72,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
       let prettyArgs: object | string;
       try {
-        const parsedJSONArgs = JSON.parse(decodedArgs.toString());
+        const parsedJSONArgs = JSON.parse(decodedArgs?.toString());
         if (parsedJSONArgs !== null) {
           prettyArgs =
             typeof parsedJSONArgs === 'boolean'
@@ -83,7 +83,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
         }
       } catch {
         prettyArgs = Array.from(decodedArgs)
-          .map((byte: any) => byte.toString(16).padStart(2, '0'))
+          .map((byte: any) => byte?.toString(16).padStart(2, '0'))
           .join('');
       }
 
@@ -128,7 +128,9 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   const getDeposit = (actions: Action[]): string =>
     actions
-      .map((action) => ('deposit' in action.args ? action.args.deposit : '0'))
+      ?.map((action) =>
+        'deposit' in action?.args ? action?.args?.deposit : '0',
+      )
       .reduce(
         (acc, deposit) =>
           Big(acc || '0')
@@ -139,19 +141,19 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   const getGasAttached = (actions: Action[]): string => {
     const gasAttached = actions
-      .map((action) => action.args)
+      ?.map((action) => action?.args)
       .filter(
         (args): args is FunctionCallActionView['FunctionCall'] => 'gas' in args,
       );
 
-    if (gasAttached.length === 0) {
+    if (gasAttached?.length === 0) {
       return '0';
     }
 
-    return gasAttached.reduce(
+    return gasAttached?.reduce(
       (acc, args) =>
         Big(acc || '0')
-          .plus(args.gas)
+          .plus(args?.gas)
           .toString(),
       '0',
     );
@@ -159,13 +161,14 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   const getRefund = (receipts: any[]): string =>
     receipts
-      .filter(
-        (receipt) => 'outcome' in receipt && receipt.predecessorId === 'system',
+      ?.filter(
+        (receipt) =>
+          'outcome' in receipt && receipt?.predecessorId === 'system',
       )
       .reduce(
         (acc, receipt) =>
           Big(acc || '0')
-            .plus(getDeposit(receipt.actions))
+            .plus(getDeposit(receipt?.actions))
             .toString(),
         '0',
       );
@@ -175,7 +178,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
       .plus(getRefund(receipt?.outcome?.nestedReceipts))
       .toString();
 
-  const status = receipt?.outcome?.status.type;
+  const status = receipt?.outcome?.status?.type;
   const isSuccess =
     (status &&
       status === 'successValue' &&

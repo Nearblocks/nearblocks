@@ -66,9 +66,9 @@ const List = ({ data, tokensCount, error }: Props) => {
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
-      containerRef.current &&
-      event.target &&
-      !containerRef.current.contains(event.target)
+      containerRef?.current &&
+      event?.target &&
+      !containerRef?.current?.contains(event?.target)
     ) {
       setIsOpen(false);
       setSelectedIndex(-1);
@@ -83,9 +83,9 @@ const List = ({ data, tokensCount, error }: Props) => {
   }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    if (!value || value.trim() === '') {
+    const name = e?.target?.name;
+    const value = e?.target?.value;
+    if (!value || value?.trim() === '') {
       setSearchResults([]);
       setValue(undefined);
       return;
@@ -123,7 +123,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         if (value) {
           onFilter();
           setSelectedIndex(-1);
-        } else if (Object.keys(router.query).length > 0) {
+        } else if (Object.keys(router.query)?.length > 0) {
           // @ts-ignore: Unreachable code error
           intlRouter.push(`/nft-tokens`);
         }
@@ -134,7 +134,7 @@ const List = ({ data, tokensCount, error }: Props) => {
       if (e.key === 'ArrowDown') {
         setSelectedIndex((prevIndex) => {
           const nextIndex =
-            prevIndex < searchResults.length - 1 ? prevIndex + 1 : -1;
+            prevIndex < searchResults?.length - 1 ? prevIndex + 1 : -1;
           return nextIndex;
         });
       } else if (e.key === 'ArrowUp') {
@@ -265,7 +265,7 @@ const List = ({ data, tokensCount, error }: Props) => {
           <p className="pl-3">
             {tokens?.length > 0 &&
               count > 0 &&
-              `A total of ${localFormat && localFormat(count.toString())}${' '}
+              `A total of ${localFormat && localFormat(count?.toString())}${' '}
               NEP-171 Token Contracts found`}
           </p>
           <div className="flex w-full h-10 sm:w-80 mr-2" ref={containerRef}>

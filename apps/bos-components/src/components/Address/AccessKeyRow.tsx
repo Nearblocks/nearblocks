@@ -79,14 +79,14 @@ export default function ({ network, t, accessKey, showWhen, ownerId }: Props) {
       case 'AddKey':
         return (
           <div className="py-1 flex items-center text-xs">
-            Acces Key Created
+            Access Key Created
           </div>
         );
       case 'DELETE_KEY':
       case 'DeleteKey':
         return (
           <div className="bg-red-50 py-1 flex items-center text-xs">
-            Acces Key Deleted
+            Access Key Deleted
           </div>
         );
       case 'DELETE_ACCOUNT':

@@ -18,30 +18,38 @@ import TreeNode from './TreeNode';
 const TreeTxnsActions = (props: TransActionProps) => {
   const { action, receiver } = props;
 
-  switch (action.action_kind) {
+  switch (action?.action_kind) {
     case 'ADD_KEY':
     case 'AddKey':
-      return <AddKey args={action.args} receiver={receiver} action={action} />;
+      return <AddKey args={action?.args} receiver={receiver} action={action} />;
     case 'CREATE_ACCOUNT':
     case 'CreateAccount':
       return (
-        <CreateAccount args={action.args} receiver={receiver} action={action} />
+        <CreateAccount
+          args={action?.args}
+          receiver={receiver}
+          action={action}
+        />
       );
     case 'DELETE_ACCOUNT':
     case 'DeleteAccount':
       return (
-        <DeleteAccount args={action.args} receiver={receiver} action={action} />
+        <DeleteAccount
+          args={action?.args}
+          receiver={receiver}
+          action={action}
+        />
       );
     case 'DELETE_KEY':
     case 'DeleteKey':
       return (
-        <DeleteKey args={action.args} receiver={receiver} action={action} />
+        <DeleteKey args={action?.args} receiver={receiver} action={action} />
       );
     case 'DEPLOY_CONTRACT':
     case 'DeployContract':
       return (
         <DeployContract
-          args={action.args}
+          args={action?.args}
           receiver={receiver}
           action={action}
         />
@@ -49,15 +57,15 @@ const TreeTxnsActions = (props: TransActionProps) => {
     case 'FUNCTION_CALL':
     case 'FunctionCall':
       return (
-        <FunctionCall args={action.args} receiver={receiver} action={action} />
+        <FunctionCall args={action?.args} receiver={receiver} action={action} />
       );
     case 'STAKE':
     case 'Stake':
-      return <Stake args={action.args} receiver={receiver} action={action} />;
+      return <Stake args={action?.args} receiver={receiver} action={action} />;
     case 'TRANSFER':
     case 'Transfer':
       return (
-        <Transfer args={action.args} receiver={receiver} action={action} />
+        <Transfer args={action?.args} receiver={receiver} action={action} />
       );
     case 'Delegate':
     case 'DELEGATE':
@@ -67,9 +75,9 @@ const TreeTxnsActions = (props: TransActionProps) => {
           mapRpcActionToAction(txn),
         );
       function filterObject(obj: any) {
-        if (obj && obj.action_kind) {
+        if (obj && obj?.action_kind) {
           return {
-            action_kind: obj.action_kind,
+            action_kind: obj?.action_kind,
           };
         } else {
           return {
@@ -92,7 +100,7 @@ const TreeTxnsActions = (props: TransActionProps) => {
       );
 
     default:
-      return <div>{action.action_kind}</div>;
+      return <div>{action?.action_kind}</div>;
   }
 };
 

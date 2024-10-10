@@ -149,7 +149,7 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
                 <div className="w-full text-center bg-nearblue dark:bg-black-200 rounded-t-xl px-5 py-4 text-green dark:text-green-250 text-sm">
                   Holders count is out of sync. Last synced block is
                   <span className="font-bold mx-0.5">
-                    {`${status?.height && localFormat(status.height)}`}
+                    {`${status?.height && localFormat(status?.height)}`}
                   </span>
                   {status?.timestamp &&
                     `(${getTimeAgoString(
@@ -164,7 +164,7 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
                     {holder &&
                       !error &&
                       `A total of ${
-                        count ? localFormat(count.toString()) : 0
+                        count ? localFormat(count?.toString()) : 0
                       }${' '}
                   token holders found`}
                   </p>

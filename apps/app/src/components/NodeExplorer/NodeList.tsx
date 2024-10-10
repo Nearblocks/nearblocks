@@ -288,8 +288,8 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
         return (
           <div>
             {row?.poolInfo?.delegatorsCount !== undefined &&
-            row.poolInfo.delegatorsCount !== null
-              ? formatWithCommas(row.poolInfo.delegatorsCount.toString())
+            row?.poolInfo?.delegatorsCount !== null
+              ? formatWithCommas(row?.poolInfo?.delegatorsCount?.toString())
               : 'N/A'}
           </div>
         );
@@ -304,17 +304,17 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
       key: 'stake',
       cell: (row: ValidatorEpochData) => (
         <span>
-          {(row.currentEpoch?.stake ??
+          {(row?.currentEpoch?.stake ??
             row.nextEpoch?.stake ??
-            row.afterNextEpoch?.stake ??
-            row.contractStake) &&
+            row?.afterNextEpoch?.stake ??
+            row?.contractStake) &&
             formatWithCommas(
               Number(
                 yoctoToNear(
-                  row.currentEpoch?.stake ??
-                    row.nextEpoch?.stake ??
-                    row.afterNextEpoch?.stake ??
-                    `${row.contractStake}` ??
+                  row?.currentEpoch?.stake ??
+                    row?.nextEpoch?.stake ??
+                    row?.afterNextEpoch?.stake ??
+                    `${row?.contractStake}` ??
                     '0',
                   false,
                 ),
@@ -887,7 +887,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                     {data?.elapsedTimeData &&
                     elapsedTime &&
                     convertTimestampToTime
-                      ? convertTimestampToTime(elapsedTime.toString())
+                      ? convertTimestampToTime(elapsedTime?.toString())
                       : ''}
                   </div>
                 </div>
@@ -899,7 +899,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                     {data?.totalSeconds &&
                     timeRemaining &&
                     convertTimestampToTime
-                      ? convertTimestampToTime(timeRemaining.toString())
+                      ? convertTimestampToTime(timeRemaining?.toString())
                       : ''}
                   </div>
                 </div>
@@ -952,7 +952,7 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
               <div className="flex flex-col">
                 <div className="leading-7 pl-3 px-3 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
                   {validatorEpochData &&
-                    validatorEpochData.length > 0 &&
+                    validatorEpochData?.length > 0 &&
                     `${data?.total || 0}${' '}
                   Validators found`}
                 </div>
