@@ -7,6 +7,7 @@ import { Config } from '#types/types';
 const env = cleanEnv(process.env, {
   API_ACCESS_KEY: str(),
   API_URL: str({ default: 'https://api.nearblocks.io' }),
+  CAMPAIGNS_PUBLIC_URL: str({ default: '' }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -35,6 +36,7 @@ const env = cleanEnv(process.env, {
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
   apiUrl: env.API_URL,
+  campaignsPublicUrl: env.CAMPAIGNS_PUBLIC_URL,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
