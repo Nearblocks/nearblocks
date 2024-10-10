@@ -30,15 +30,18 @@ const ReceiptSummaryRow = (props: Props) => {
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   function formatActionKind(actionKind: string) {
-    return actionKind.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return actionKind && actionKind?.replace(/([a-z])([A-Z])/g, '$1 $2');
   }
 
   const getGasAttached = (actions: Action[]): string => {
-    const gasAttached = actions
-      .map((action) => action.args)
-      .filter(
-        (args): args is FunctionCallActionView['FunctionCall'] => 'gas' in args,
-      );
+    const gasAttached =
+      actions &&
+      actions
+        .map((action) => action.args)
+        .filter(
+          (args): args is FunctionCallActionView['FunctionCall'] =>
+            'gas' in args,
+        );
 
     if (gasAttached.length === 0) {
       return '0';
@@ -59,37 +62,37 @@ const ReceiptSummaryRow = (props: Props) => {
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
-      status.SuccessValue !== null &&
-      status.SuccessValue !== undefined) ||
+      status?.SuccessValue !== null &&
+      status?.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
   return (
     <>
       {receipt &&
         receipt?.actions?.map((action: any, i: number) => (
-          <tr key={action.args?.method_name + i}>
+          <tr key={action?.args?.method_name + i}>
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
             </td>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <Tooltip
-                label={receipt.id}
+                label={receipt?.id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
-                  href={`#execution#${receipt.id}`}
+                  href={`#execution#${receipt?.id}`}
                 >
                   {' '}
-                  {receipt.id}
+                  {receipt?.id}
                 </Link>
               </Tooltip>
             </td>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
-              {formatActionKind(action.action_kind)}
+              {formatActionKind(action?.action_kind)}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
-              {action.args?.method_name}
+              {action?.args?.method_name}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
               {receipt?.predecessor_id ? (
@@ -128,13 +131,13 @@ const ReceiptSummaryRow = (props: Props) => {
 
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <span>
-                {action.args?.deposit
-                  ? yoctoToNear(action.args?.deposit, true)
-                  : action.args?.deposit ?? '0'}{' '}
+                {action?.args?.deposit
+                  ? yoctoToNear(action?.args?.deposit, true)
+                  : action?.args?.deposit ?? '0'}{' '}
                 Ⓝ
                 {currentPrice && networkId === 'mainnet'
                   ? ` ($${fiatValue(
-                      yoctoToNear(action.args?.deposit ?? 0, false),
+                      yoctoToNear(action?.args?.deposit ?? 0, false),
                       currentPrice,
                     )})`
                   : ''}

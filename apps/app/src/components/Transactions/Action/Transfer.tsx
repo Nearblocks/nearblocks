@@ -25,25 +25,25 @@ const Transfer = (props: ActionPropsInfo) => {
       <span className="font-bold px-1">
         Transfer{' '}
         <span className="font-normal pl-1">
-          {yoctoToNear(props.action.args.deposit, true)} Ⓝ
+          {yoctoToNear(props?.action?.args?.deposit, true)} Ⓝ
         </span>
       </span>
       <span className="font-bold text-gray px-1">
         From{' '}
         <Link
-          href={`/address/${props.action.from}`}
+          href={`/address/${props?.action?.from}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
         >
-          {shortenAddress(props.action.from)}
+          {shortenAddress(props?.action?.from)}
         </Link>
       </span>
       <span className="font-bold text-gray px-1">
         To{' '}
         <Link
-          href={`/address/${props.action.to}`}
+          href={`/address/${props?.action?.to}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
         >
-          {shortenAddress(props.action.to)}
+          {shortenAddress(props?.action?.to)}
         </Link>
       </span>
     </div>

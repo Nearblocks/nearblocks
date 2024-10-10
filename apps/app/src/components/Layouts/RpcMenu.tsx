@@ -21,8 +21,8 @@ const RpcMenu = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        dropdownRef?.current &&
+        !dropdownRef?.current.contains(event?.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -47,13 +47,13 @@ const RpcMenu = () => {
           className={`h-full max-md:!w-24 md:w-28 pl-3 pr-6 md:!px-7 py-1 truncate cursor-pointer focus:outline-none appearance-none`}
           onClick={toggleDropdown}
         >
-          {RpcProviders.find((provider) => provider.url === rpcUrl)?.name}
+          {RpcProviders?.find((provider) => provider.url === rpcUrl)?.name}
         </button>
         <ArrowDown className="absolute right-2.5 top-2 w-4 h-4 fill-current pointer-events-none" />
       </span>
       <div className="absolute py-1 z-10 left-0 top-full">
         <ul className=" hidden group-hover:block  w-36 bg-white dark:bg-black-600 border border-gray-300 dark:border-black-200 rounded-md soft-shadow">
-          {RpcProviders.map((provider) => (
+          {RpcProviders?.map((provider) => (
             <li
               key={provider.url}
               className={`flex justify-between items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-black-500 hover:text-green-400 dark:hover:text-green-250 dark:text-neargray-10 ${
@@ -61,11 +61,11 @@ const RpcMenu = () => {
                   ? 'bg-gray-100 dark:bg-black-500 text-green-500 dark:!text-green-250'
                   : ''
               }`}
-              onClick={() => handleSelect(provider.url)}
+              onClick={() => handleSelect(provider?.url)}
             >
               {' '}
-              <span className="">{provider.name}</span>
-              {provider.url === rpcUrl && (
+              <span className="">{provider?.name}</span>
+              {provider?.url === rpcUrl && (
                 <Check className="w-3 mr-2 text-green-500 dark:text-green-250" />
               )}
             </li>

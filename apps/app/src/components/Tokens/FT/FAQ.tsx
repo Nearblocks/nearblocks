@@ -202,8 +202,8 @@ const FAQ = ({
                       </Link>
                     )}
                     . Since the creation of {name}, there has been{' '}
-                    {transfers ? localFormat(transfers.toString()) : 0} on-chain
-                    transfers.
+                    {transfers ? localFormat(transfers?.toString()) : 0}{' '}
+                    on-chain transfers.
                   </div>
                 </div>
               </div>

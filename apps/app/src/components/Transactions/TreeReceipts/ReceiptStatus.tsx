@@ -11,7 +11,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     const decoded = Buffer.from(args, 'base64');
 
     try {
-      const parsed = JSON.parse(decoded.toString());
+      const parsed = JSON.parse(decoded?.toString());
       if (parsed) {
         pretty = JSON.stringify(parsed, null, 2);
       } else {
@@ -33,7 +33,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     }
 
     if (Array.isArray(SuccessValue) || typeof SuccessValue === 'string') {
-      if (SuccessValue.length === 0) {
+      if (SuccessValue?.length === 0) {
         return 'Empty Result';
       }
     }

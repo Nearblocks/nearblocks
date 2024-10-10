@@ -107,50 +107,50 @@ const Chart = (props: Props) => {
     try {
       const chartTypeMappings = {
         txns: (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txns),
-          date: stat.date,
-          blocks: stat.blocks,
-          addresses: stat.active_accounts,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.txns),
+          date: stat?.date,
+          blocks: stat?.blocks,
+          addresses: stat?.active_accounts,
         }),
         'market-cap': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.market_cap),
-          date: stat.date,
-          price: Number(stat.near_price),
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.market_cap),
+          date: stat?.date,
+          price: Number(stat?.near_price),
         }),
         'near-supply': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(yoctoToNear(stat.total_supply, false)),
-          date: stat.date,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(yoctoToNear(stat?.total_supply, false)),
+          date: stat?.date,
         }),
         blocks: (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.blocks),
-          date: stat.date,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.blocks),
+          date: stat?.date,
         }),
         addresses: (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.active_accounts),
-          date: stat.date,
-          addresses: stat.active_accounts,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.active_accounts),
+          date: stat?.date,
+          addresses: stat?.active_accounts,
         }),
         'txn-fee': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_fee_usd),
-          date: stat.date,
-          fee: stat.txn_fee,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.txn_fee_usd),
+          date: stat?.date,
+          fee: stat?.txn_fee,
         }),
         'txn-volume': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_volume_usd),
-          date: stat.date,
-          volume: stat.txn_volume,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.txn_volume_usd),
+          date: stat?.date,
+          volume: stat?.txn_volume,
         }),
         'near-price': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.near_price),
-          date: stat.date,
+          x: new Date(stat?.date)?.valueOf(),
+          y: Number(stat?.near_price),
+          date: stat?.date,
         }),
       };
 
@@ -168,10 +168,12 @@ const Chart = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, chartTypes]);
 
-  const replaceWithNull = chartData.map((item: any) => ({
-    ...item,
-    y: item.y === 0 ? null : item.y,
-  }));
+  const replaceWithNull =
+    chartData &&
+    chartData?.map((item: any) => ({
+      ...item,
+      y: item.y === 0 ? null : item.y,
+    }));
 
   useEffect(() => {
     const fetchData = () => {

@@ -30,7 +30,7 @@ const Withdraw = (props: EventPropsInfo) => {
       text-xs"
       />
       <span className="font-bold px-1">Burn </span>
-      <TokenInfo contract={props.event.contract} amount={log[1]} />
+      <TokenInfo contract={props?.event?.contract} amount={log[1]} />
     </div>
   );
 };

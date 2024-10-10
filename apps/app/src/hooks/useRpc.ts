@@ -194,8 +194,11 @@ const useRpc = () => {
     }
   };
 
-  const transactionStatus = async (hash: any, signer: any) =>
-    provider.txStatusReceipts(baseDecode(hash), signer, 'NONE');
+  const transactionStatus = async (hash: any, signer: any) => {
+    const decodedHash = baseDecode(hash);
+    const uint8ArrayHash = new Uint8Array(decodedHash);
+    return provider.txStatusReceipts(uint8ArrayHash, signer, 'NONE');
+  };
 
   const getContractMetadata = async (accountId: string) => {
     try {

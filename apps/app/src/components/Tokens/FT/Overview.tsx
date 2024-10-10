@@ -48,7 +48,7 @@ export default function Overview({
 
   function isTokenSpam(tokenName: string) {
     if (spamTokens)
-      for (const spamToken of spamTokens.blacklist) {
+      for (const spamToken of spamTokens?.blacklist) {
         const cleanedToken = spamToken.replace(/^\*/, '');
         if (tokenName.endsWith(cleanedToken)) {
           return true;
@@ -254,7 +254,7 @@ export default function Overview({
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Transfers:
                   </div>
-                  {!transfers ? (
+                  {!transfers || !token ? (
                     <div className="w-32">
                       <Skeleton className="h-4" />
                     </div>
@@ -282,7 +282,8 @@ export default function Overview({
                                 Holders count is out of sync. Last synced block
                                 is
                                 <span className="font-bold mx-0.5">
-                                  {status?.height && localFormat(status.height)}
+                                  {status?.height &&
+                                    localFormat(status?.height)}
                                 </span>
                                 {status?.timestamp &&
                                   `(${getTimeAgoString(

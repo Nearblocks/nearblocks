@@ -28,7 +28,7 @@ const WrapDeposit = (props: EventPropsInfo) => {
       <FaRight className="inline-flex text-gray-400 text-xs" />
       <span className="font-bold px-1">Mint </span>
 
-      <TokenInfo contract={props.event.contract} amount={log[1]} />
+      <TokenInfo contract={props?.event?.contract} amount={log[1]} />
     </div>
   );
 };
