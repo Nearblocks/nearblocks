@@ -35,7 +35,7 @@ const FREE_PLAN: Plan = {
   title: 'Free Plan',
 };
 const KITWALLET_PATH = '/v1/kitwallet';
-const SEARCH_PATH = '/v1/search';
+const LEGACY_PATH = '/v1/legacy';
 
 const SUBNETS = [
   '10.0.0.0/8',
@@ -61,6 +61,11 @@ const rateLimiter = catchAsync(
     // Handle rate limit for app
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
+
+    if (req.baseUrl === LEGACY_PATH) {
+      logger.info('LEGACY_PATH');
+      return next();
+    }
 
     if (config.apiAccessKey && token === config.apiAccessKey) {
       return next();
@@ -185,7 +190,7 @@ const useFreePlan = async (
 };
 
 const getPlan = async (baseUrl: string, token: string) => {
-  if (baseUrl === KITWALLET_PATH || SEARCH_PATH) {
+  if (baseUrl === KITWALLET_PATH) {
     return DEFAULT_PLAN;
   }
 
