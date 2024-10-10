@@ -6,7 +6,7 @@ const network = env('NEXT_PUBLIC_NETWORK_ID');
 const mainnetApiUrl =
   env('NEXT_PUBLIC_MAINNET_API_URL') || 'https://api.nearblocks.io/v1';
 const testnetApiUrl =
-  env('NEXT_PUBLIC_TESTNET_API_URL') || 'https://api.nearblocks.io/v1';
+  env('NEXT_PUBLIC_TESTNET_API_URL') || 'https://api-testnet.nearblocks.io/v1';
 configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
@@ -32,6 +32,7 @@ const nextConfig = {
             ? `${mainnetApiUrl}/node/telemetry`
             : `${testnetApiUrl}/node/telemetry`,
       },
+      /*
       {
         source: '/api/circulating-supply',
         destination:
@@ -39,6 +40,7 @@ const nextConfig = {
             ? `${mainnetApiUrl}/legacy/circulating-supply`
             : `${testnetApiUrl}/legacy/circulating-supply`,
       },
+*/
       {
         source: '/api/circulating-supply-in-near',
         destination:

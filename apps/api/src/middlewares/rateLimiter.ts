@@ -35,14 +35,8 @@ const FREE_PLAN: Plan = {
   title: 'Free Plan',
 };
 const KITWALLET_PATH = '/v1/kitwallet';
-const LEGACY_PATH = '/v1/legacy';
 
-const SUBNETS = [
-  '10.0.0.0/8',
-  '172.16.0.0/12',
-  '192.168.0.0/16',
-  '193.70.74.48/32',
-];
+const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -61,11 +55,6 @@ const rateLimiter = catchAsync(
     // Handle rate limit for app
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
-
-    if (req.baseUrl === LEGACY_PATH) {
-      logger.info('LEGACY_PATH');
-      return next();
-    }
 
     if (config.apiAccessKey && token === config.apiAccessKey) {
       return next();
