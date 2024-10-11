@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy Docker Images
 
 on:
   push:
@@ -7,11 +7,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      updated_services: ${{ steps.check_updates.outputs.updated_services }}
+    strategy:
+      matrix:
+        service:
+          [
+            api,
+            app,
+            app-lite,
+            backend,
+            indexer-balance,
+            indexer-base,
+            indexer-events,
+            indexer-dex,
+            explorer-selector,
+            aggregates,
+          ]
+      fail-fast: false
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up QEMU
@@ -33,58 +47,40 @@ jobs:
         id: slug
         run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
 
-      - name: Build and push images
-        id: build_push
-        run: |
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-          updated_services=()
-          for service in "${services[@]}"; do
-            echo "Building $service..."
-            if docker buildx build \
-              --file apps/$service/Dockerfile \
-              --platform linux/amd64,linux/arm64 \
-              --push \
-              --tag ghcr.io/nearblocks/$service:latest \
-              --tag ghcr.io/nearblocks/$service:${{ steps.slug.outputs.sha8 }} \
-              --cache-from type=registry,ref=ghcr.io/nearblocks/$service:latest \
-              --cache-to type=inline \
-              .; then
-              echo "$service was updated"
-              updated_services+=("$service")
-            else
-              echo "Error building $service"
-              exit 1
-            fi
-          done
-          echo "updated_services=${updated_services[*]}" >> $GITHUB_OUTPUT
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/nearblocks/${{ matrix.service }}:latest
+            ghcr.io/nearblocks/${{ matrix.service }}:${{ steps.slug.outputs.sha8 }}
+          cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
+          cache-to: type=inline
 
       - name: Check for updates
         id: check_updates
         run: |
-          updated_services="${{ steps.build_push.outputs.updated_services }}"
-          if [ -n "$updated_services" ]; then
-            echo "updated_services=$updated_services" >> $GITHUB_OUTPUT
+          if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
+            echo "${{ matrix.service }}=${{ steps.slug.outputs.sha8 }}" >> $GITHUB_OUTPUT
           else
-            echo "No services were updated"
+            echo "${{ matrix.service }} build failed"
           fi
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: needs.build.outputs.updated_services
-
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get short SHA
-        id: slug
-        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: 'v1.31.1'
+          version: 'v1.28.0'
 
       - name: Configure kubectl
         run: |
@@ -93,33 +89,39 @@ jobs:
 
       - name: Update Kubernetes deployments
         run: |
-          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
-          for service in "${updated_services[@]}"; do
-            echo "Updating deployment for $service"
-            kubectl set image deployment/$service $service=ghcr.io/nearblocks/$service:${{ steps.slug.outputs.sha8 }} -n nearblocks
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          for service in "${services[@]}"; do
+            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+              echo "Updating deployment for $service"
+              kubectl set image deployment/$service $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }} -n nearblocks
+            else
+              echo "Skipping deployment for $service (no updates)"
+            fi
           done
 
       - name: Verify rollout
         run: |
-          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
-          failed_services=()
-          for service in "${updated_services[@]}"; do
-            echo "Verifying rollout for $service"
-            if ! kubectl rollout status deployment/$service -n nearblocks --timeout=300s; then
-              echo "Rollout failed for $service"
-              failed_services+=("$service")
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          for service in "${services[@]}"; do
+            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+              echo "Verifying rollout for $service"
+              kubectl rollout status deployment/$service -n nearblocks --timeout=300s
             fi
           done
-          if [ ${#failed_services[@]} -ne 0 ]; then
-            echo "The following services failed to rollout: ${failed_services[*]}"
-            exit 1
-          fi
 
       - name: Rollback failed deployments
         if: failure()
         run: |
-          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
-          for service in "${updated_services[@]}"; do
-            echo "Attempting rollback for $service"
-            kubectl rollout undo deployment/$service -n nearblocks
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          for service in "${services[@]}"; do
+            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+              echo "Attempting rollback for $service"
+              kubectl rollout undo deployment/$service -n nearblocks
+            fi
           done
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed. Manual intervention may be required."
+          # Add your preferred notification method here (e.g., Slack, email)
