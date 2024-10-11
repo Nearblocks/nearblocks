@@ -99,7 +99,7 @@ jobs:
             if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
               echo "Updating deployment for $deployment_name"
-              kubectl set image deployment/$deployment_name $deployment_name=ghcr.io/nearblocks/$service:$service_sha
+              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
             else
               echo "Skipping deployment for testnet-$service (no updates)"
             fi
