@@ -43,10 +43,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get short SHA
-        id: slug
-        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
-
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v5
@@ -57,17 +53,23 @@ jobs:
           push: true
           tags: |
             ghcr.io/nearblocks/${{ matrix.service }}:latest
-            ghcr.io/nearblocks/${{ matrix.service }}:${{ steps.slug.outputs.sha8 }}
+            ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
 
-      - name: Set image digest output
-        id: set_output
+      - name: Set image output
+        id: set_image_output
+        run: echo "${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Check for updates
+        id: check_updates
         run: |
+          echo "IMAGE_CHANGED=true" >> $GITHUB_ENV
           if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
-            echo "${{ matrix.service }}=ghcr.io/nearblocks/${{ matrix.service }}@$(echo ${{ steps.docker_build.outputs.digest }} | awk -F'@' '{print $2}')" >> $GITHUB_OUTPUT
+            echo "${{ matrix.service }}=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            echo "${{ matrix.service }} build failed" >> $GITHUB_OUTPUT
+            echo "No changes detected for ${{ matrix.service }}."
+            echo "${{ matrix.service }}=false" >> $GITHUB_OUTPUT
           fi
 
   deploy:
@@ -87,66 +89,92 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
           echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
 
-      - name: Update Kubernetes deployments
+      - name: Deploy to testnet
         run: |
-          declare -A namespaces=(["testnet"]="nearblocks-testnet")
+          # Set context to the testnet namespace
+          kubectl config set-context --current --namespace=nearblocks-testnet
+
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
 
-          for net in mainnet testnet; do
-            echo "Switching to namespace ${namespaces[$net]}"
-            kubectl config set-context --current --namespace=${namespaces[$net]}
+          for service in "${services[@]}"; do
+            service_changed=${{ needs.build.outputs[service] }}
             
-            for service in "${services[@]}"; do
-              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-                deployment_name="$net-$service"
-                echo "Updating deployment for $deployment_name in ${namespaces[$net]}"
-                kubectl set image deployment/$deployment_name $service=${{ needs.build.outputs[service] }}
-              else
-                echo "Skipping deployment for $net-$service (no updates)"
-              fi
-            done
+            if [[ "$service_changed" != "false" ]]; then
+              deployment_name="testnet-$service"
+              echo "Updating deployment for $deployment_name"
+              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
+            else
+              echo "Skipping deployment for testnet-$service (no updates)"
+            fi
           done
 
-      - name: Verify rollout
+      - name: Verify rollout for testnet
         run: |
-          declare -A namespaces=(["testnet"]="nearblocks-testnet")
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)   
-          for net in mainnet testnet; do
-            echo "Verifying rollouts in namespace ${namespaces[$net]}"
-            kubectl config set-context --current --namespace=${namespaces[$net]}
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          for service in "${services[@]}"; do
+            service_changed=${{ needs.build.outputs[service] }}
             
-            for service in "${services[@]}"; do
-              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-                deployment_name="$net-$service"
-                echo "Verifying rollout for $deployment_name in ${namespaces[$net]}"
-                if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
-                  echo "Rollout failed for $deployment_name in ${namespaces[$net]}"
-                  failed_rollouts+=("$deployment_name in ${namespaces[$net]}")
-                fi
+            if [[ "$service_changed" != "false" ]]; then
+              deployment_name="testnet-$service"
+              echo "Verifying rollout for $deployment_name"
+              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+                echo "Rollout failed for $deployment_name"
+                failed_rollouts+=("$deployment_name")
               fi
-            done
+            fi
           done
 
       - name: Rollback failed deployments
         if: failure()
         run: |
-          declare -A namespaces=(["testnet"]="nearblocks-testnet")
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
 
-          for net in mainnet testnet; do
-            echo "Checking for failed deployments in namespace ${namespaces[$net]}"
-            kubectl config set-context --current --namespace=${namespaces[$net]}
+          for service in "${services[@]}"; do
+            service_changed=${{ needs.build.outputs[service] }}
             
-            for service in "${services[@]}"; do
-              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-                deployment_name="$net-$service"
-                echo "Attempting rollback for $deployment_name in ${namespaces[$net]}"
-                kubectl rollout undo deployment/$deployment_name
-              fi
-            done
+            if [[ "$service_changed" != "false" ]]; then
+              deployment_name="testnet-$service"
+              echo "Attempting rollback for $deployment_name"
+              kubectl rollout undo deployment/$deployment_name
+            fi
           done
 
       - name: Notify on failure
         if: failure()
         run: |
           echo "Deployment failed. Manual intervention may be required."
+
+      # - name: Deploy to mainnet
+      #   run: |
+      #     # Set context to the mainnet namespace
+      #     kubectl config set-context --current --namespace=nearblocks
+
+      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+
+      #     for service in "${services[@]}"; do
+      #       service_changed=${{ needs.build.outputs[service] }}
+
+      #       if [[ "$service_changed" != "false" ]]; then
+      #         deployment_name="mainnet-$service"
+      #         echo "Updating deployment for $deployment_name"
+      #         kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
+      #       else
+      #         echo "Skipping deployment for mainnet-$service (no updates)"
+      #       fi
+      #     done
+
+      # - name: Verify rollout for mainnet
+      #   run: |
+      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+      #     for service in "${services[@]}"; do
+      #       service_changed=${{ needs.build.outputs[service] }}
+
+      #       if [[ "$service_changed" != "false" ]]; then
+      #         deployment_name="mainnet-$service"
+      #         echo "Verifying rollout for $deployment_name"
+      #         if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+      #           echo "Rollout failed for $deployment_name"
+      #           failed_rollouts+=("$deployment_name")
+      #         fi
+      #       fi
+      #     done
