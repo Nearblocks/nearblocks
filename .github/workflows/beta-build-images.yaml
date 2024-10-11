@@ -8,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      image_digest: ${{ steps.docker_build.outputs.digest }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,9 +42,6 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
 
-      - name: Save image digest
-        run: echo "IMAGE_DIGEST=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_ENV
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
       - name: Update Kubernetes deployments
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app@${{ env.IMAGE_DIGEST }} -n nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app@${{ needs.build.outputs.image_digest }} -n nearblocks-testnet
 
       - name: Verify rollout
         run: |
