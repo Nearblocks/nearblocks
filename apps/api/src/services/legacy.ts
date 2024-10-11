@@ -11,6 +11,7 @@ import { RequestValidator } from '#types/types';
 const supply = catchAsync(
   async (req: RequestValidator<Supply>, res: Response) => {
     const unit = req.validator.data.unit;
+    const format = req.validator.data.format;
 
     const { rows } = await db.query(
       `
@@ -23,8 +24,19 @@ const supply = catchAsync(
       `,
     );
 
+    let circulatingSupply = rows?.[0]?.circulating_supply;
     if (unit === 'near') {
-      return res.send((+yoctoToNear(rows?.[0]?.circulating_supply)).toFixed());
+      circulatingSupply = (+yoctoToNear(circulatingSupply)).toFixed();
+
+      if (format === 'coingecko') {
+        return res.status(200).json({ result: circulatingSupply });
+      }
+
+      return res.send(circulatingSupply);
+    }
+
+    if (format === 'coingecko') {
+      return res.status(200).json({ result: circulatingSupply });
     }
 
     return res.status(200).json({
@@ -37,6 +49,7 @@ const supply = catchAsync(
 const total = catchAsync(
   async (req: RequestValidator<Supply>, res: Response) => {
     const unit = req.validator.data.unit;
+    const format = req.validator.data.format;
 
     const { rows } = await db.query(
       `
@@ -51,8 +64,20 @@ const total = catchAsync(
       `,
     );
 
+    let totalSupply = rows?.[0]?.total_supply;
+
     if (unit === 'near') {
-      return res.send((+yoctoToNear(rows?.[0]?.total_supply)).toFixed());
+      totalSupply = (+yoctoToNear(totalSupply)).toFixed();
+
+      if (format === 'coingecko') {
+        return res.status(200).json({ result: totalSupply });
+      }
+
+      return res.send(totalSupply);
+    }
+
+    if (format === 'coingecko') {
+      return res.status(200).json({ result: totalSupply });
     }
 
     return res.status(200).json({
