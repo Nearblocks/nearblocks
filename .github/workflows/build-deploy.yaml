@@ -89,39 +89,62 @@ jobs:
 
       - name: Update Kubernetes deployments
         run: |
+          declare -A namespaces=(["testnet"]="nearblocks-testnet")
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-          for service in "${services[@]}"; do
-            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-              echo "Updating deployment for $service"
-              kubectl set image deployment/$service $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }} -n nearblocks
-            else
-              echo "Skipping deployment for $service (no updates)"
-            fi
+
+          for net in mainnet testnet; do
+            echo "Switching to namespace ${namespaces[$net]}"
+            kubectl config set-context --current --namespace=${namespaces[$net]}
+            
+            for service in "${services[@]}"; do
+              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+                deployment_name="$net-$service"
+                echo "Updating deployment for $deployment_name in ${namespaces[$net]}"
+                kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
+              else
+                echo "Skipping deployment for $net-$service (no updates)"
+              fi
+            done
           done
 
       - name: Verify rollout
         run: |
+          declare -A namespaces=(["testnet"]="nearblocks-testnet")
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-          for service in "${services[@]}"; do
-            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-              echo "Verifying rollout for $service"
-              kubectl rollout status deployment/$service -n nearblocks --timeout=300s
-            fi
+
+          for net in mainnet testnet; do
+            echo "Verifying rollouts in namespace ${namespaces[$net]}"
+            kubectl config set-context --current --namespace=${namespaces[$net]}
+            
+            for service in "${services[@]}"; do
+              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+                deployment_name="$net-$service"
+                echo "Verifying rollout for $deployment_name in ${namespaces[$net]}"
+                kubectl rollout status deployment/$deployment_name --timeout=300s
+              fi
+            done
           done
 
       - name: Rollback failed deployments
         if: failure()
         run: |
+          declare -A namespaces=(["testnet"]="nearblocks-testnet")
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-          for service in "${services[@]}"; do
-            if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
-              echo "Attempting rollback for $service"
-              kubectl rollout undo deployment/$service -n nearblocks
-            fi
+
+          for net in mainnet testnet; do
+            echo "Checking for failed deployments in namespace ${namespaces[$net]}"
+            kubectl config set-context --current --namespace=${namespaces[$net]}
+            
+            for service in "${services[@]}"; do
+              if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
+                deployment_name="$net-$service"
+                echo "Attempting rollback for $deployment_name in ${namespaces[$net]}"
+                kubectl rollout undo deployment/$deployment_name
+              fi
+            done
           done
 
       - name: Notify on failure
         if: failure()
         run: |
           echo "Deployment failed. Manual intervention may be required."
-          # Add your preferred notification method here (e.g., Slack, email)
