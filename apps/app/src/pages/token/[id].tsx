@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { appUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { env } from 'next-runtime-env';
 import useTranslation from 'next-translate/useTranslation';
@@ -210,8 +210,6 @@ const TokenDetails = ({
   const router = useRouter();
   const { id, a }: any = router.query;
   const { t } = useTranslation();
-  const [tabIndex, setTabIndex] = useState(0);
-  const hashes = ['Transfers', 'Holders', 'Info', 'FAQ', 'Comments'];
   const components = useBosComponents();
 
   const token: Token = tokenDetails?.contracts?.[0];
@@ -244,17 +242,7 @@ const TokenDetails = ({
     (store) => store.requestSignInWithWallet,
   );
 
-  useEffect(() => {
-    if (tab) {
-      const index = tabs.indexOf(tab as string);
-      if (index !== -1) {
-        setTabIndex(index);
-      }
-    }
-  }, [tab]);
-
   const onTab = (index: number) => {
-    setTabIndex(index);
     const { id } = router.query;
     const newQuery = { id, tab: tabs[index] };
     router.push({
@@ -307,34 +295,47 @@ const TokenDetails = ({
           )}
           <div className="block lg:flex lg:space-x-2 mb-4">
             <div className="w-full">
-              <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
+              <Tabs
+                onSelect={(index) => onTab(index)}
+                selectedIndex={tabs.indexOf(tab)}
+              >
                 <TabList className={'flex flex-wrap'}>
                   <Tab
-                    className={getClassName(hashes[0] === hashes[tabIndex])}
+                    className={getClassName(
+                      tabs[0] === tabs[tabs.indexOf(tab)],
+                    )}
                     selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                   >
                     <h2>{t('token:fts.ft.transfers')}</h2>
                   </Tab>
                   <Tab
-                    className={getClassName(hashes[1] === hashes[tabIndex])}
+                    className={getClassName(
+                      tabs[1] === tabs[tabs.indexOf(tab)],
+                    )}
                     selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                   >
                     <h2>{t('token:fts.ft.holders')}</h2>
                   </Tab>
                   <Tab
-                    className={getClassName(hashes[2] === hashes[tabIndex])}
+                    className={getClassName(
+                      tabs[2] === tabs[tabs.indexOf(tab)],
+                    )}
                     selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                   >
                     <h2>Info</h2>
                   </Tab>
                   <Tab
-                    className={getClassName(hashes[3] === hashes[tabIndex])}
+                    className={getClassName(
+                      tabs[3] === tabs[tabs.indexOf(tab)],
+                    )}
                     selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                   >
                     <h2>FAQ</h2>
                   </Tab>
                   <Tab
-                    className={getClassName(hashes[4] === hashes[tabIndex])}
+                    className={getClassName(
+                      tabs[4] === tabs[tabs.indexOf(tab)],
+                    )}
                     selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                   >
                     <h2>Comments</h2>

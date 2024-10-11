@@ -68,7 +68,12 @@ const ContractOverview = (props: Props) => {
 
   useEffect(() => {
     if (rpcError) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [rpcError, switchRpc]);
 

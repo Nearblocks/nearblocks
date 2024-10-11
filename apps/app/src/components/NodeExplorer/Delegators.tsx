@@ -154,7 +154,12 @@ const Delegators = ({ accountId }: Props) => {
 
   useEffect(() => {
     if (error) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [error, switchRpc]);
 
