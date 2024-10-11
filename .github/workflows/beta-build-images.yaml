@@ -39,8 +39,8 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
 
-      - name: Extract image digest
-        run: echo "IMAGE_DIGEST=$(docker inspect ghcr.io/nearblocks/app:beta --format='{{index .RepoDigests 0}}' | sed 's/.*@//')" >> $GITHUB_ENV
+      - name: Save image digest
+        run: echo "IMAGE_DIGEST=${{ steps.docker_build.outputs.digest }}" >> $GITHUB_ENV
 
   deploy:
     needs: build
@@ -68,4 +68,4 @@ jobs:
       - name: Verify rollout
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl rollout status deployment
+          kubectl rollout status deployment/testnet-app-beta -n nearblocks-testnet --timeout=300s
