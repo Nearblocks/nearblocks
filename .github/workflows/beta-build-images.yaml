@@ -37,3 +37,41 @@ jobs:
           tags: ghcr.io/nearblocks/app:beta
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
+
+      - name: Update Kubernetes deployments
+        run: |
+          namespaces=(nearblocks-testnet)
+          for namespace in "${namespaces[@]}"; do
+            echo "Switching to namespace $namespace"
+            kubectl config use-context github-actions-$namespace
+            echo "Updating deployment for app-beta in $namespace"
+            kubectl set image deployment/app-beta app-beta=ghcr.io/nearblocks/app-beta:beta }} -n $namespace
+          done
+
+      - name: Verify rollout
+        run: |
+          namespaces=(nearblocks-testnet)
+          services=(app-beta)
+          for namespace in "${namespaces[@]}"; do
+            echo "Verifying rollouts in namespace $namespace"
+            kubectl config use-context github-actions-$namespace
+            echo "Verifying rollout for app-beta in $namespace"
+            kubectl rollout status deployment/app-beta -n $namespace --timeout=300s
+          done
