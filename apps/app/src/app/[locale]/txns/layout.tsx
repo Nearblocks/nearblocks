@@ -12,9 +12,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   unstable_setRequestLocale(locale);
 
-  const metaTitle = 'Latest Near Protocol Blocks';
+  const metaTitle = 'All Latest Near Protocol Transactions | NearBlocks';
   const metaDescription =
-    'All Near (Ⓝ Blocks that are included in Near blockchain. The timestamp, author, gas used, gas price and included transactions are shown.';
+    'All Latest Near Protocol transactions confirmed on Near Blockchain. The list consists of transactions from sending Near and the transactions details for each transaction.';
 
   const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
@@ -36,12 +36,12 @@ export async function generateMetadata({
       ],
     },
     alternates: {
-      canonical: `${appUrl}/blocks`,
+      canonical: `${appUrl}/txns`,
     },
   };
 }
 
-export default async function BlockLayout({
+export default async function TxnsLayout({
   children,
 }: {
   children: React.ReactNode;
