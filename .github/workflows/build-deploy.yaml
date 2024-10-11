@@ -122,7 +122,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
