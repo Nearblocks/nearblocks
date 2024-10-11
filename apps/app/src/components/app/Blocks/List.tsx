@@ -242,7 +242,7 @@ const List = ({
             {data && (
               <span>
                 {(t &&
-                  t('listing', {
+                  t('block.listing', {
                     from: start?.block_height
                       ? localFormat(String(start?.block_height))
                       : '',

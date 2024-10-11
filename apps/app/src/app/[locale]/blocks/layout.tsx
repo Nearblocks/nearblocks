@@ -1,7 +1,6 @@
-import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
 import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
@@ -13,17 +12,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   unstable_setRequestLocale(locale);
 
-  const t = await getTranslations({ locale });
+  const metaTitle = 'Latest Near Protocol Blocks';
+  const metaDescription =
+    'All Near (Ⓝ Blocks that are included in Near blockchain. The timestamp, author, gas used, gas price and included transactions are shown.';
 
-  const hashData = await getRequest(`blocks/${hash}`);
-  const blockHeight = hashData?.blocks[0]?.block_height;
-
-  const metaTitle = t('block.metaTitle', { block: hash });
-  const metaDescription = t('block.metaDescription', { block: hash });
-
-  const ogImageUrl = `${ogUrl}/api/og?blockHash=true&block_height=${encodeURIComponent(
-    blockHeight,
-  )}&title=${encodeURIComponent(metaTitle)}`;
+  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+    metaTitle,
+  )}`;
 
   return {
     title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
