@@ -115,7 +115,7 @@ const Search = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSave = useCallback(
-    debounce((nextValue) => setKeyword(nextValue), 500),
+    debounce((nextValue) => setKeyword(nextValue), 300),
     [],
   );
 
