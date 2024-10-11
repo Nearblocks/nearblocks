@@ -61,25 +61,13 @@ jobs:
         id: set_image_output
         run: |
           if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
-            echo "${{ matrix.service }}=${{ github.sha }}" >> $GITHUB_ENV
+            echo "${{ matrix.service }}=${{ github.sha }}" >> $GITHUB_OUTPUT
           else
-            echo "${{ matrix.service }}=false" >> $GITHUB_ENV
+            echo "${{ matrix.service }}=false" >> $GITHUB_OUTPUT
           fi
 
-      # Set individual outputs for each service
-      - name: Set outputs for services
-        id: set_outputs
-        run: |
-          echo "api=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "app=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "app-lite=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "backend=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "indexer-balance=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "indexer-base=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "indexer-events=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "indexer-dex=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "explorer-selector=${{ github.sha }}" >> $GITHUB_OUTPUT
-          echo "aggregates=${{ github.sha }}" >> $GITHUB_OUTPUT
+    outputs:
+      matrix-result: ${{ toJSON(steps.set_image_output.outputs) }}
 
   deploy:
     needs: build
@@ -106,85 +94,13 @@ jobs:
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
 
           for service in "${services[@]}"; do
-            service_sha=${{ needs.build.outputs[service] }}
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
             
-            if [[ "$service_sha" != "false" ]]; then
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
               echo "Updating deployment for $deployment_name"
-              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
+              kubectl set image deployment/$deployment_name $deployment_name=ghcr.io/nearblocks/$service:$service_sha
             else
               echo "Skipping deployment for testnet-$service (no updates)"
             fi
           done
-
-      - name: Verify rollout for testnet
-        run: |
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-          for service in "${services[@]}"; do
-            service_sha=${{ needs.build.outputs[service] }}
-            
-            if [[ "$service_sha" != "false" ]]; then
-              deployment_name="testnet-$service"
-              echo "Verifying rollout for $deployment_name"
-              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
-                echo "Rollout failed for $deployment_name"
-                failed_rollouts+=("$deployment_name")
-              fi
-            fi
-          done
-
-      - name: Rollback failed deployments
-        if: failure()
-        run: |
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-
-          for service in "${services[@]}"; do
-            service_sha=${{ needs.build.outputs[service] }}
-            
-            if [[ "$service_sha" != "false" ]]; then
-              deployment_name="testnet-$service"
-              echo "Attempting rollback for $deployment_name"
-              kubectl rollout undo deployment/$deployment_name
-            fi
-          done
-
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "Deployment failed. Manual intervention may be required."
-
-      # Uncomment the following lines to deploy to mainnet
-      # - name: Update Kubernetes deployments for mainnet
-      #   run: |
-      #     # Set context to the mainnet namespace
-      #     kubectl config set-context --current --namespace=nearblocks
-
-      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-
-      #     for service in "${services[@]}"; do
-      #       service_sha=${{ needs.build.outputs[service] }}
-      #       
-      #       if [[ "$service_sha" != "false" ]]; then
-      #         deployment_name="mainnet-$service"
-      #         echo "Updating deployment for $deployment_name"
-      #         kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
-      #       else
-      #         echo "Skipping deployment for mainnet-$service (no updates)"
-      #       fi
-      #     done
-
-      # - name: Verify rollout for mainnet
-      #   run: |
-      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-      #     for service in "${services[@]}"; do
-      #       service_sha=${{ needs.build.outputs[service] }}
-      #       
-      #       if [[ "$service_sha" != "false" ]]; then
-      #         deployment_name="mainnet-$service"
-      #         echo "Verifying rollout for $deployment_name"
-      #         if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
-      #           echo "Rollout failed for $deployment_name"
-      #           failed_rollouts+=("$deployment_name")
-      #         fi
-      #       fi
-      #     done
