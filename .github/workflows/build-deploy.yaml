@@ -31,7 +31,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -53,7 +53,7 @@ jobs:
         with:
           context: .
           file: apps/${{ matrix.service }}/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ghcr.io/nearblocks/${{ matrix.service }}:latest
@@ -61,13 +61,13 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
 
-      - name: Check for updates
-        id: check_updates
+      - name: Set image digest output
+        id: set_output
         run: |
           if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
-            echo "${{ matrix.service }}=${{ steps.slug.outputs.sha8 }}" >> $GITHUB_OUTPUT
+            echo "${{ matrix.service }}=ghcr.io/nearblocks/${{ matrix.service }}@$(echo ${{ steps.docker_build.outputs.digest }} | awk -F'@' '{print $2}')" >> $GITHUB_OUTPUT
           else
-            echo "${{ matrix.service }} build failed"
+            echo "${{ matrix.service }} build failed" >> $GITHUB_OUTPUT
           fi
 
   deploy:
@@ -100,7 +100,7 @@ jobs:
               if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
                 deployment_name="$net-$service"
                 echo "Updating deployment for $deployment_name in ${namespaces[$net]}"
-                kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:${{ needs.build.outputs[service] }}
+                kubectl set image deployment/$deployment_name $service=${{ needs.build.outputs[service] }}
               else
                 echo "Skipping deployment for $net-$service (no updates)"
               fi
@@ -110,8 +110,7 @@ jobs:
       - name: Verify rollout
         run: |
           declare -A namespaces=(["testnet"]="nearblocks-testnet")
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)   
           for net in mainnet testnet; do
             echo "Verifying rollouts in namespace ${namespaces[$net]}"
             kubectl config set-context --current --namespace=${namespaces[$net]}
@@ -120,7 +119,10 @@ jobs:
               if [[ -n "${{ needs.build.outputs[service] }}" ]]; then
                 deployment_name="$net-$service"
                 echo "Verifying rollout for $deployment_name in ${namespaces[$net]}"
-                kubectl rollout status deployment/$deployment_name --timeout=300s
+                if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+                  echo "Rollout failed for $deployment_name in ${namespaces[$net]}"
+                  failed_rollouts+=("$deployment_name in ${namespaces[$net]}")
+                fi
               fi
             done
           done
