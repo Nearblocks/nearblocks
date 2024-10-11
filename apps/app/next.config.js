@@ -43,13 +43,7 @@ const nextConfig = nextTranslate({
     ];
   },
   generateBuildId: async () => {
-    const { execSync } = require('child_process');
-
-    return execSync(
-      `git ls-remote https://github.com/Nearblocks/nearblocks refs/heads/main | awk '{print $1}'`,
-    )
-      .toString()
-      .trim();
+    return process.env.GITHUB_SHA || 'nearblocks';
   },
 });
 
