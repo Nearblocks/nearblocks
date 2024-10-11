@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
   _req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const apiKey = process.env.API_ACCESS_KEY;
   const network = process.env.NEXT_PUBLIC_NETWORK_ID;
