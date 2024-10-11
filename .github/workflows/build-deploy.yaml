@@ -2,7 +2,7 @@ name: Build and Deploy Docker Images
 
 on:
   push:
-    branches: ['test']
+    branches: ['main']
 
 jobs:
   build:
