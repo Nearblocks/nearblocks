@@ -62,7 +62,7 @@ jobs:
             echo "Switching to namespace $namespace"
             kubectl config use-context github-actions-$namespace
             echo "Updating deployment for app-beta in $namespace"
-            kubectl set image deployment/app-beta app-beta=ghcr.io/nearblocks/app-beta:beta }} -n $namespace
+            kubectl set image deployment/$namespace-app-beta $namespace-app-beta=ghcr.io/nearblocks/app-beta:beta -n $namespace
           done
 
       - name: Verify rollout
@@ -73,5 +73,5 @@ jobs:
             echo "Verifying rollouts in namespace $namespace"
             kubectl config use-context github-actions-$namespace
             echo "Verifying rollout for app-beta in $namespace"
-            kubectl rollout status deployment/app-beta -n $namespace --timeout=300s
+            kubectl rollout status deployment/$namespace-app-beta -n $namespace --timeout=300s
           done
