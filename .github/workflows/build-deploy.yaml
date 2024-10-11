@@ -41,7 +41,6 @@ jobs:
           for service in "${services[@]}"; do
             echo "Building $service..."
             if docker buildx build \
-              --context . \
               --file apps/$service/Dockerfile \
               --platform linux/amd64,linux/arm64 \
               --push \
@@ -49,11 +48,12 @@ jobs:
               --tag ghcr.io/nearblocks/$service:${{ steps.slug.outputs.sha8 }} \
               --cache-from type=registry,ref=ghcr.io/nearblocks/$service:latest \
               --cache-to type=inline \
-              . | grep -q "exporting manifest"; then
+              .; then
               echo "$service was updated"
               updated_services+=("$service")
             else
-              echo "$service was not updated"
+              echo "Error building $service"
+              exit 1
             fi
           done
           echo "updated_services=${updated_services[*]}" >> $GITHUB_OUTPUT
