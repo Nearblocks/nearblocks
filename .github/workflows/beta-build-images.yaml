@@ -57,21 +57,10 @@ jobs:
 
       - name: Update Kubernetes deployments
         run: |
-          namespaces=(nearblocks-testnet)
-          for namespace in "${namespaces[@]}"; do
-            echo "Switching to namespace $namespace"
-            kubectl config use-context github-actions-$namespace
-            echo "Updating deployment for app-beta in $namespace"
-            kubectl set image deployment/$namespace-app-beta $namespace-app-beta=ghcr.io/nearblocks/app-beta:beta -n $namespace
-          done
+          kubectl config use-context github-actions-nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta testnet-app-beta=ghcr.io/nearblocks/app-beta:beta -n testnet
 
       - name: Verify rollout
         run: |
-          namespaces=(nearblocks-testnet)
-          services=(app-beta)
-          for namespace in "${namespaces[@]}"; do
-            echo "Verifying rollouts in namespace $namespace"
-            kubectl config use-context github-actions-$namespace
-            echo "Verifying rollout for app-beta in $namespace"
-            kubectl rollout status deployment/$namespace-app-beta -n $namespace --timeout=300s
-          done
+          kubectl config use-context github-actions-nearblocks-testnet
+          kubectl rollout status deployment/testnet-app-beta -n testnet --timeout=300s
