@@ -40,9 +40,10 @@ jobs:
           push: true
           tags: |
             ghcr.io/nearblocks/app:beta
-            ghcr.io/nearblocks/beta:"$(echo ${GITHUB_SHA} | cut -c1-8)"
+            ghcr.io/nearblocks/beta:${{ github.sha.slice(0,8) }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
+
 
   deploy:
     needs: build
