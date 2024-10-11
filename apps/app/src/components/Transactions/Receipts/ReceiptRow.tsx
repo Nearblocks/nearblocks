@@ -1,5 +1,10 @@
 import Question from '@/components/Icons/Question';
-import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
+import {
+  convertToMetricPrefix,
+  fiatValue,
+  localFormat,
+  yoctoToNear,
+} from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
@@ -10,19 +15,27 @@ import { useEffect, useRef, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import useHash from '@/hooks/useHash';
+import { networkId } from '@/utils/config';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
   loading: boolean;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const ReceiptRow = (props: Props) => {
-  const { receipt, borderFlag, loading } = props;
+  const { receipt, borderFlag, loading, statsData } = props;
   const { t } = useTranslation();
   const [block, setBlock] = useState<{ height: string } | null>(null);
   const { getBlockDetails } = useRpc();
   const [pageHash] = useHash();
+
+  const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   const lastBlockHash = useRef<string | null>(null);
   const rowRef = useRef<HTMLDivElement | null>(null);
@@ -301,6 +314,41 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
+
+        <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip
+              label={'Deposit value attached with the receipt'}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </Tooltip>
+            Value
+          </div>
+          {!receipt || loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4 break-words space-y-4">
+              {receipt && receipt?.actions[0]?.args?.deposit
+                ? yoctoToNear(receipt?.actions[0]?.args?.deposit, true)
+                : receipt?.actions[0]?.args?.deposit ?? '0'}{' '}
+              Ⓝ
+              {currentPrice && networkId === 'mainnet'
+                ? ` ($${fiatValue(
+                    yoctoToNear(receipt?.actions[0]?.args?.deposit ?? 0, false),
+                    currentPrice,
+                  )})`
+                : ''}
+            </div>
+          )}
+        </div>
+
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
@@ -364,7 +412,12 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow receipt={rcpt} borderFlag loading={loading} />
+                <ReceiptRow
+                  receipt={rcpt}
+                  borderFlag
+                  loading={loading}
+                  statsData={statsData}
+                />
               </div>
             </div>
           ))}
