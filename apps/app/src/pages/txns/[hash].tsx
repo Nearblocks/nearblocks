@@ -154,6 +154,7 @@ const Txn = ({
   const { transactionStatus, getBlockDetails } = useRpc();
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const [allRpcProviderError, setAllRpcProviderError] = useState(false);
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -193,7 +194,13 @@ const Txn = ({
 
   useEffect(() => {
     if (rpcError) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        setAllRpcProviderError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [rpcError, switchRpc]);
 
@@ -349,13 +356,12 @@ const Txn = ({
       <div className="relative container mx-auto px-3">
         {/* <RpcMenu /> */}
         <Fragment key="hash">
-          {rpcError && error ? (
+          {rpcError && (error || allRpcProviderError) ? (
             <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage
                   icons={<FileSlash />}
-                  message="Sorry, we are unable to locate this transaction hash. Please try using a
-        different RPC."
+                  message="Sorry, we are unable to locate this transaction hash. Please try again later."
                   mutedText={hash || ''}
                 />
               </div>
@@ -427,6 +433,7 @@ const Txn = ({
                     txn={txn ? txn : rpcData}
                     rpcTxn={rpcTxn}
                     loading={rpcError || !rpcTxn}
+                    statsData={statsData}
                   />
                 </div>
                 <div className={`${tabIndex === 2 ? '' : 'hidden'} `}>
