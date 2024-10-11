@@ -27,26 +27,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up environment
-        run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
-
       - name: Build and push (APP)
+        id: docker_build
         uses: docker/build-push-action@v5
         with:
           context: .
           file: apps/app/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: |
-            ghcr.io/nearblocks/app:beta
-            ghcr.io/nearblocks/app:${{ env.SHORT_SHA }}
+          tags: ghcr.io/nearblocks/app:beta
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
 
+      - name: Extract image digest
+        run: echo "IMAGE_DIGEST=$(docker inspect ghcr.io/nearblocks/app:beta --format='{{index .RepoDigests 0}}' | sed 's/.*@//')" >> $GITHUB_ENV
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,15 +60,12 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
           echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
 
-      - name: Set up environment
-        run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
-
       - name: Update Kubernetes deployments
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app:${{ env.SHORT_SHA }} -n nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app@${{ env.IMAGE_DIGEST }} -n nearblocks-testnet
 
       - name: Verify rollout
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl rollout status deployment/testnet-app-beta -n nearblocks-testnet --timeout=300s
+          kubectl rollout status deployment
