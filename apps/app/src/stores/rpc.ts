@@ -21,23 +21,36 @@ const getClientCookie = (name: string) => {
 
 type RpcState = {
   rpc: string;
+  errorCount: number;
   setRpc: (rpc: string) => void;
   switchRpc: () => void;
+  resetErrorCount: () => void;
 };
 
 export const useRpcStore = create<RpcState>((set, get) => ({
   rpc: getClientCookie('rpcUrl') || RpcProviders?.[0]?.url || '',
+  errorCount: 0,
   setRpc: (rpc: string) => {
     setClientCookie('rpcUrl', rpc);
-    set(() => ({ rpc }));
+    set(() => ({ rpc, errorCount: 0 }));
   },
   switchRpc: () => {
+    const { rpc, errorCount } = get();
+
+    if (errorCount >= RpcProviders?.length) {
+      throw new Error('All RPC providers have resulted in errors.');
+    }
+
     const currentIndex = RpcProviders.findIndex(
-      (provider) => provider.url === get().rpc,
+      (provider) => provider.url === rpc,
     );
-    const nextIndex = (currentIndex + 1) % RpcProviders.length;
+    const nextIndex = (currentIndex + 1) % RpcProviders?.length;
     const nextRpc = RpcProviders[nextIndex].url;
+
     setClientCookie('rpcUrl', nextRpc);
-    set({ rpc: nextRpc });
+    set({ rpc: nextRpc, errorCount: errorCount + 1 });
+  },
+  resetErrorCount: () => {
+    set({ errorCount: 0 });
   },
 }));

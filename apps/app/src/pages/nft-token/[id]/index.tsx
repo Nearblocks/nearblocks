@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { appUrl } from '@/utils/config';
 import { useRouter } from 'next/router';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import Overview from '@/components/Tokens/NFT/Overview';
@@ -181,7 +181,6 @@ const NFToken = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
-  const [tabIndex, setTabIndex] = useState(0);
   const components = useBosComponents();
 
   const token = tokenDetails?.contracts?.[0];
@@ -213,17 +212,7 @@ const NFToken = ({
     : '';
   const thumbnail = `${ogUrl}/thumbnail/nft-token?token=${token?.name}&network=${network}&brand=near`;
 
-  useEffect(() => {
-    if (tab) {
-      const index = tabs.indexOf(tab as string);
-      if (index !== -1) {
-        setTabIndex(index);
-      }
-    }
-  }, [tab]);
-
   const onTab = (index: number) => {
-    setTabIndex(index);
     const { id } = router.query;
     const newQuery = { id, tab: tabs[index] };
     router.push({
@@ -267,28 +256,31 @@ const NFToken = ({
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-4">
           <div className="w-full">
-            <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
+            <Tabs
+              onSelect={(index) => onTab(index)}
+              selectedIndex={tabs?.indexOf(tab)}
+            >
               <TabList className={'flex flex-wrap'}>
                 <Tab
-                  className={getClassName(tabs[0] === tabs[tabIndex])}
+                  className={getClassName(tabs[0] === tabs[tabs?.indexOf(tab)])}
                   selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                 >
                   <h2>Transfers</h2>
                 </Tab>
                 <Tab
-                  className={getClassName(tabs[1] === tabs[tabIndex])}
+                  className={getClassName(tabs[1] === tabs[tabs?.indexOf(tab)])}
                   selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                 >
                   <h2>Holders</h2>
                 </Tab>
                 <Tab
-                  className={getClassName(tabs[2] === tabs[tabIndex])}
+                  className={getClassName(tabs[2] === tabs[tabs?.indexOf(tab)])}
                   selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                 >
                   <h2>Inventory</h2>
                 </Tab>
                 <Tab
-                  className={getClassName(tabs[3] === tabs[tabIndex])}
+                  className={getClassName(tabs[3] === tabs[tabs?.indexOf(tab)])}
                   selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                 >
                   <h2>Comments</h2>
