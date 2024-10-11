@@ -1,0 +1,125 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      updated_services: ${{ steps.check_updates.outputs.updated_services }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get short SHA
+        id: slug
+        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+
+      - name: Build and push images
+        id: build_push
+        run: |
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          updated_services=()
+          for service in "${services[@]}"; do
+            echo "Building $service..."
+            if docker buildx build \
+              --context . \
+              --file apps/$service/Dockerfile \
+              --platform linux/amd64,linux/arm64 \
+              --push \
+              --tag ghcr.io/nearblocks/$service:latest \
+              --tag ghcr.io/nearblocks/$service:${{ steps.slug.outputs.sha8 }} \
+              --cache-from type=registry,ref=ghcr.io/nearblocks/$service:latest \
+              --cache-to type=inline \
+              . | grep -q "exporting manifest"; then
+              echo "$service was updated"
+              updated_services+=("$service")
+            else
+              echo "$service was not updated"
+            fi
+          done
+          echo "updated_services=${updated_services[*]}" >> $GITHUB_OUTPUT
+
+      - name: Check for updates
+        id: check_updates
+        run: |
+          updated_services="${{ steps.build_push.outputs.updated_services }}"
+          if [ -n "$updated_services" ]; then
+            echo "updated_services=$updated_services" >> $GITHUB_OUTPUT
+          else
+            echo "No services were updated"
+          fi
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.outputs.updated_services
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get short SHA
+        id: slug
+        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.31.1'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
+
+      - name: Update Kubernetes deployments
+        run: |
+          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
+          for service in "${updated_services[@]}"; do
+            echo "Updating deployment for $service"
+            kubectl set image deployment/$service $service=ghcr.io/nearblocks/$service:${{ steps.slug.outputs.sha8 }} -n nearblocks
+          done
+
+      - name: Verify rollout
+        run: |
+          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
+          failed_services=()
+          for service in "${updated_services[@]}"; do
+            echo "Verifying rollout for $service"
+            if ! kubectl rollout status deployment/$service -n nearblocks --timeout=300s; then
+              echo "Rollout failed for $service"
+              failed_services+=("$service")
+            fi
+          done
+          if [ ${#failed_services[@]} -ne 0 ]; then
+            echo "The following services failed to rollout: ${failed_services[*]}"
+            exit 1
+          fi
+
+      - name: Rollback failed deployments
+        if: failure()
+        run: |
+          IFS=' ' read -ra updated_services <<< "${{ needs.build.outputs.updated_services }}"
+          for service in "${updated_services[@]}"; do
+            echo "Attempting rollback for $service"
+            kubectl rollout undo deployment/$service -n nearblocks
+          done
