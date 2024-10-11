@@ -27,9 +27,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get short SHA
-        id: slug
-        run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+      - name: Set up environment
+        run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Build and push (APP)
         uses: docker/build-push-action@v5
@@ -40,7 +39,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/nearblocks/app:beta
-            ghcr.io/nearblocks/beta:${{ github.sha.slice(0,8) }}
+            ghcr.io/nearblocks/beta:${{ env.SHORT_SHA }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
 
@@ -65,7 +64,7 @@ jobs:
       - name: Update Kubernetes deployments
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app:$(echo ${GITHUB_SHA} | cut -c1-8) -n nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app:${{ env.SHORT_SHA }} -n nearblocks-testnet
 
       - name: Verify rollout
         run: |
