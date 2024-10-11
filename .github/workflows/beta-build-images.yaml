@@ -58,7 +58,7 @@ jobs:
       - name: Update Kubernetes deployments
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app-beta:beta -n nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app:beta -n nearblocks-testnet
 
       - name: Verify rollout
         run: |
