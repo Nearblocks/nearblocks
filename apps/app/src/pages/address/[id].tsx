@@ -250,7 +250,6 @@ const Address = ({
   tab,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const [tabIndex, setTabIndex] = useState(0);
   const { id } = router.query;
   const { t } = useTranslation();
   const { ftBalanceOf, contractCode, viewAccessKeys, viewAccount } = useRpc();
@@ -355,7 +354,12 @@ const Address = ({
 
   useEffect(() => {
     if (rpcError) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [rpcError, switchRpc]);
 
@@ -445,22 +449,6 @@ const Address = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, id, rpcUrl]);
 
-  useEffect(() => {
-    if (tab) {
-      const index = tabs.indexOf(tab as string);
-      if (index !== -1) {
-        const hasContractTab =
-          contractInfo && contractInfo?.methodNames?.length > 0;
-        let actualTabIndex = index;
-        if (!hasContractTab && index > 5) {
-          actualTabIndex = index - 1;
-        }
-        setTabIndex(actualTabIndex);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
-
   const onTab = (index: number) => {
     const { id } = router.query;
 
@@ -473,8 +461,6 @@ const Address = ({
       actualTabIndex = index;
       actualTabName = tabs[actualTabIndex + 1];
     }
-
-    setTabIndex(actualTabIndex);
 
     router.push({
       pathname: router.pathname,
@@ -624,7 +610,7 @@ const Address = ({
           <div className="w-full ">
             <>
               <div>
-                <Tabs onSelect={onTab} selectedIndex={tabIndex}>
+                <Tabs onSelect={onTab} selectedIndex={tabs?.indexOf(tab)}>
                   <TabList className="flex flex-wrap">
                     {[
                       { key: 0, label: t ? t('address:txns') : 'Transactions' },
@@ -668,7 +654,9 @@ const Address = ({
                     ].map(({ key, label }) => (
                       <Tab
                         key={key}
-                        className={getClassName(tabs[key] === tabs[tabIndex])}
+                        className={getClassName(
+                          tabs[key] === tabs[tabs?.indexOf(tab)],
+                        )}
                         selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                       >
                         <h2>{label}</h2>

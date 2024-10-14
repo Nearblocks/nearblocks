@@ -1,0 +1,188 @@
+name: Build and Deploy Docker Images
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          [
+            api,
+            app,
+            app-lite,
+            backend,
+            indexer-balance,
+            indexer-base,
+            indexer-events,
+            indexer-dex,
+            explorer-selector,
+            aggregates,
+          ]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/nearblocks/${{ matrix.service }}:latest
+            ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
+          cache-to: type=inline
+
+      - name: Set image output
+        id: set_image_output
+        run: |
+          if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
+            echo "${{ matrix.service }}=${{ github.sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "${{ matrix.service }}=false" >> $GITHUB_OUTPUT
+          fi
+
+    outputs:
+      matrix-result: ${{ toJSON(steps.set_image_output.outputs) }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
+
+      - name: Deploy and verify testnet
+        run: |
+          kubectl config set-context --current --namespace=nearblocks-testnet
+
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          failed_deployments=()
+
+          for service in "${services[@]}"; do
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+            
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+              deployment_name="testnet-$service"
+              echo "Updating deployment for $deployment_name"
+              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
+
+              echo "Verifying rollout for $deployment_name"
+              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+                echo "Rollout failed for $deployment_name"
+                failed_deployments+=("$deployment_name")
+              fi
+            else
+              echo "Skipping deployment for testnet-$service (no updates)"
+            fi
+          done
+
+          if [ ${#failed_deployments[@]} -ne 0 ]; then
+            echo "The following deployments failed:"
+            printf '%s\n' "${failed_deployments[@]}"
+            exit 1
+          fi
+
+      - name: Rollback failed testnet deployments
+        if: failure()
+        run: |
+          kubectl config set-context --current --namespace=nearblocks-testnet
+
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
+
+          for service in "${services[@]}"; do
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+            
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+              deployment_name="testnet-$service"
+              echo "Attempting rollback for $deployment_name"
+              kubectl rollout undo deployment/$deployment_name
+            fi
+          done
+
+      # - name: Deploy and verify mainnet
+      #   run: |
+      #     kubectl config set-context --current --namespace=nearblocks
+
+      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+      #     failed_deployments=()
+
+      #     for service in "${services[@]}"; do
+      #       service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+
+      #       if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+      #         deployment_name="mainnet-$service"
+      #         echo "Updating deployment for $deployment_name"
+      #         kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
+
+      #         echo "Verifying rollout for $deployment_name"
+      #         if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+      #           echo "Rollout failed for $deployment_name"
+      #           failed_deployments+=("$deployment_name")
+      #         fi
+      #       else
+      #         echo "Skipping deployment for mainnet-$service (no updates)"
+      #       fi
+      #     done
+
+      #     if [ ${#failed_deployments[@]} -ne 0 ]; then
+      #       echo "The following deployments failed:"
+      #       printf '%s\n' "${failed_deployments[@]}"
+      #       exit 1
+      #     fi
+
+      # - name: Rollback failed mainnet deployments
+      #   if: failure()
+      #   run: |
+      #     kubectl config set-context --current --namespace=nearblocks
+
+      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+
+      #     for service in "${services[@]}"; do
+      #       service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+
+      #       if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+      #         deployment_name="mainnet-$service"
+      #         echo "Attempting rollback for $deployment_name"
+      #         kubectl rollout undo deployment/$deployment_name
+      #       fi
+      #     done
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed. Manual intervention may be required."

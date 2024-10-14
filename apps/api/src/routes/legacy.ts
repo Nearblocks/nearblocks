@@ -16,6 +16,7 @@ const routes = (app: Router) => {
    * @summary Get total near supply
    * @tags Legacy
    * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
+   * @param {string} format.query - json:{"enum": ["coingecko"], "default": null} - If 'coingecko', return { "result": value }
    * @return 200 - success response
    * @security BearerAuth
    */
@@ -26,6 +27,7 @@ const routes = (app: Router) => {
    * @summary Get circulating near supply
    * @tags Legacy
    * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
+   * @param {string} format.query - json:{"enum": ["coingecko"], "default": null} - If 'coingecko', return { "result": value }
    * @return 200 - success response
    * @security BearerAuth
    */

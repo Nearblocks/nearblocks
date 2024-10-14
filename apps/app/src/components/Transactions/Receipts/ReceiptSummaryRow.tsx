@@ -35,16 +35,16 @@ const ReceiptSummaryRow = (props: Props) => {
 
   const getGasAttached = (actions: Action[]): string => {
     const gasAttached = actions
-      .map((action) => action.args)
+      .map((action) => action?.args)
       .filter(
         (args): args is FunctionCallActionView['FunctionCall'] => 'gas' in args,
       );
 
-    if (gasAttached.length === 0) {
+    if (gasAttached?.length === 0) {
       return '0';
     }
 
-    return gasAttached.reduce(
+    return gasAttached?.reduce(
       (acc, args) =>
         Big(acc || '0')
           .plus(args.gas)
@@ -59,8 +59,8 @@ const ReceiptSummaryRow = (props: Props) => {
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
-      status.SuccessValue !== null &&
-      status.SuccessValue !== undefined) ||
+      status?.SuccessValue !== null &&
+      status?.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
   return (
@@ -78,7 +78,7 @@ const ReceiptSummaryRow = (props: Props) => {
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
-                  href={`#execution#${receipt.id}`}
+                  href={`#execution#${receipt?.id}`}
                 >
                   {' '}
                   {receipt.id}
@@ -86,7 +86,7 @@ const ReceiptSummaryRow = (props: Props) => {
               </Tooltip>
             </td>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
-              {formatActionKind(action.action_kind)}
+              {formatActionKind(action?.action_kind)}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               {action.args?.method_name}
@@ -128,13 +128,13 @@ const ReceiptSummaryRow = (props: Props) => {
 
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <span>
-                {action.args?.deposit
-                  ? yoctoToNear(action.args?.deposit, true)
-                  : action.args?.deposit ?? '0'}{' '}
+                {action?.args?.deposit
+                  ? yoctoToNear(action?.args?.deposit, true)
+                  : action?.args?.deposit ?? '0'}{' '}
                 Ⓝ
                 {currentPrice && networkId === 'mainnet'
                   ? ` ($${fiatValue(
-                      yoctoToNear(action.args?.deposit ?? 0, false),
+                      yoctoToNear(action?.args?.deposit ?? 0, false),
                       currentPrice,
                     )})`
                   : ''}

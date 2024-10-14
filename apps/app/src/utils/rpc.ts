@@ -24,10 +24,6 @@ export const RpcProviders =
           url: 'https://near.lava.build',
         },
         {
-          name: 'Lavender.Five',
-          url: 'https://near.lavenderfive.com/',
-        },
-        {
           name: 'dRPC',
           url: 'https://near.drpc.org',
         },

@@ -9,10 +9,15 @@ interface Props {
   txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
   loading: boolean;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const Receipt = (props: Props) => {
-  const { rpcTxn, txn, loading } = props;
+  const { rpcTxn, txn, loading, statsData } = props;
 
   const [receipt, setReceipt] = useState(null);
 
@@ -99,7 +104,7 @@ const Receipt = (props: Props) => {
           </div>
         </div>
       ) : (
-        <ReceiptRow receipt={receipt} loading={loading} />
+        <ReceiptRow receipt={receipt} loading={loading} statsData={statsData} />
       )}
     </div>
   );
