@@ -35,7 +35,7 @@ const FREE_PLAN: Plan = {
   title: 'Free Plan',
 };
 const KITWALLET_PATH = '/v1/kitwallet';
-
+const SEARCH_PATH = '/v1/search';
 const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
 const rateLimiter = catchAsync(
@@ -68,6 +68,7 @@ const rateLimiter = catchAsync(
     let selectedPlan: Plan;
 
     const cachedPlan = await redisClient.get(`user_plan:${id}`);
+
     if (cachedPlan) {
       selectedPlan = JSON.parse(cachedPlan);
     } else {
@@ -116,7 +117,8 @@ const rateLimiter = catchAsync(
       return await useFreePlan(req, res, next, id);
     }
 
-    const rateLimit = rateLimiterUnion(selectedPlan);
+    const baseUrl = req.baseUrl;
+    const rateLimit = rateLimiterUnion(selectedPlan, baseUrl);
 
     const perPage = req?.query?.per_page || 25;
     const consumeCount = Math.ceil(+perPage / 25);
@@ -163,7 +165,7 @@ const useFreePlan = async (
 
   await redisClient.set(`user_plan:${key}`, JSON.stringify(plan), 'EX', 86400);
 
-  const rateLimit = rateLimiterUnion(plan);
+  const rateLimit = rateLimiterUnion(plan, baseUrl);
 
   try {
     await rateLimit.consume(key, consumeCount);
@@ -179,7 +181,7 @@ const useFreePlan = async (
 };
 
 const getPlan = async (baseUrl: string, token: string) => {
-  if (baseUrl === KITWALLET_PATH) {
+  if (baseUrl === KITWALLET_PATH || baseUrl === SEARCH_PATH) {
     return DEFAULT_PLAN;
   }
 
@@ -199,9 +201,11 @@ const getPlan = async (baseUrl: string, token: string) => {
 const getFreePlan = async () => {
   try {
     const cachedFreePlan = await redisClient.get('free_plan');
+
     if (cachedFreePlan) {
       return JSON.parse(cachedFreePlan);
     }
+
     const plans = await userSql<Plan[]>`
       SELECT
         *
@@ -229,7 +233,7 @@ const isValidToken = (apiKey: string): boolean => {
   return /^[A-F0-9]{32}$/i.test(apiKey);
 };
 
-const rateLimiterUnion = (plan: Plan) => {
+const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
   const pointsMinute = plan.limit_per_minute;
   const pointsDay = plan.limit_per_day;
   const pointsMonth = plan.limit_per_month;
@@ -252,6 +256,10 @@ const rateLimiterUnion = (plan: Plan) => {
     points: pointsMonth,
     storeClient: ratelimiterRedisClient,
   });
+
+  if (baseUrl === KITWALLET_PATH || baseUrl === SEARCH_PATH) {
+    return new RateLimiterUnion(minuteRateLimiter, dayRateLimiter);
+  }
 
   return new RateLimiterUnion(
     minuteRateLimiter,
