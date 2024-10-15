@@ -134,53 +134,53 @@ jobs:
             fi
           done
 
-      # - name: Deploy and verify mainnet
-      #   run: |
-      #     kubectl config set-context --current --namespace=nearblocks
+      - name: Deploy and verify mainnet
+        run: |
+          kubectl config set-context --current --namespace=nearblocks
 
-      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
-      #     failed_deployments=()
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          failed_deployments=()
 
-      #     for service in "${services[@]}"; do
-      #       service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+          for service in "${services[@]}"; do
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-      #       if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
-      #         deployment_name="mainnet-$service"
-      #         echo "Updating deployment for $deployment_name"
-      #         kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+              deployment_name="mainnet-$service"
+              echo "Updating deployment for $deployment_name"
+              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
 
-      #         echo "Verifying rollout for $deployment_name"
-      #         if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
-      #           echo "Rollout failed for $deployment_name"
-      #           failed_deployments+=("$deployment_name")
-      #         fi
-      #       else
-      #         echo "Skipping deployment for mainnet-$service (no updates)"
-      #       fi
-      #     done
+              echo "Verifying rollout for $deployment_name"
+              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+                echo "Rollout failed for $deployment_name"
+                failed_deployments+=("$deployment_name")
+              fi
+            else
+              echo "Skipping deployment for mainnet-$service (no updates)"
+            fi
+          done
 
-      #     if [ ${#failed_deployments[@]} -ne 0 ]; then
-      #       echo "The following deployments failed:"
-      #       printf '%s\n' "${failed_deployments[@]}"
-      #       exit 1
-      #     fi
+          if [ ${#failed_deployments[@]} -ne 0 ]; then
+            echo "The following deployments failed:"
+            printf '%s\n' "${failed_deployments[@]}"
+            exit 1
+          fi
 
-      # - name: Rollback failed mainnet deployments
-      #   if: failure()
-      #   run: |
-      #     kubectl config set-context --current --namespace=nearblocks
+      - name: Rollback failed mainnet deployments
+        if: failure()
+        run: |
+          kubectl config set-context --current --namespace=nearblocks
 
-      #     services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
 
-      #     for service in "${services[@]}"; do
-      #       service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+          for service in "${services[@]}"; do
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-      #       if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
-      #         deployment_name="mainnet-$service"
-      #         echo "Attempting rollback for $deployment_name"
-      #         kubectl rollout undo deployment/$deployment_name
-      #       fi
-      #     done
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+              deployment_name="mainnet-$service"
+              echo "Attempting rollback for $deployment_name"
+              kubectl rollout undo deployment/$deployment_name
+            fi
+          done
 
       - name: Notify on failure
         if: failure()
