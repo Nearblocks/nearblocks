@@ -5,6 +5,7 @@ import FaTimesCircle from '../Icons/FaTimesCircle';
 interface Props {
   status: boolean;
   showLabel: boolean;
+  showReceipt?: React.ReactNode;
 }
 
 const getOptions = (status: boolean) => {
