@@ -16,6 +16,7 @@ import {
 } from '#libs/utils';
 import { DexEventIndex } from '#types/enum';
 import {
+  Action,
   DexPairMeta,
   FtOnTransferArgs,
   PoolArgs,
@@ -44,8 +45,7 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
           outcome.receipt.receipt.Action.actions.length
         ) {
           const maker = outcome.receipt.receipt.Action.signerId;
-
-          return outcome.receipt.receipt.Action.actions.flatMap(
+          const actions = outcome.receipt.receipt.Action.actions.flatMap(
             (receiptAction) => {
               if (
                 typeof receiptAction !== 'string' &&
@@ -86,50 +86,49 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
                   outcome.executionOutcome.outcome.logs.length &&
                   SWAP_METHODS.includes(method)
                 ) {
-                  const logs = outcome.executionOutcome.outcome.logs;
-                  const logsFiltered = logs.filter((log) =>
-                    SWAP_PATTERN.test(log),
-                  );
-
-                  return logsFiltered.flatMap((log, index) => {
-                    const match = log.match(SWAP_PATTERN);
-
-                    if (match && BigInt(match[1]) && BigInt(match[3])) {
-                      const pool = getPool(method, args, index);
-
-                      if (!pool) {
-                        logger.warn({
-                          args,
-                          block,
-                          index,
-                          method,
-                          receipt: outcome.executionOutcome.id,
-                        });
-                        throw Error('no pool');
-                      }
-
-                      pairIds.add(pool);
-
-                      return {
-                        amount0: match[1],
-                        amount1: match[3],
-                        maker,
-                        pool: String(pool),
-                        receipt: outcome.executionOutcome.id,
-                        timestamp: message.block.header.timestampNanosec,
-                        token0: match[2],
-                        token1: match[4],
-                      };
-                    }
-
-                    return [];
-                  });
+                  return getActions(method, args);
                 }
               }
 
               return [];
             },
           );
+
+          const logs = outcome.executionOutcome.outcome.logs;
+          const logsFiltered = logs.filter((log) => SWAP_PATTERN.test(log));
+
+          return logsFiltered.flatMap((log, index) => {
+            const match = log.match(SWAP_PATTERN);
+
+            if (match && BigInt(match[1]) && BigInt(match[3])) {
+              const pool = getPool(actions, index);
+
+              if (!pool) {
+                logger.warn({
+                  actions,
+                  block,
+                  index,
+                  receipt: outcome.executionOutcome.id,
+                });
+                throw Error('no pool');
+              }
+
+              pairIds.add(pool);
+
+              return {
+                amount0: match[1],
+                amount1: match[3],
+                maker,
+                pool: String(pool),
+                receipt: outcome.executionOutcome.id,
+                timestamp: message.block.header.timestampNanosec,
+                token0: match[2],
+                token1: match[4],
+              };
+            }
+
+            return [];
+          });
         }
 
         return [];
@@ -226,22 +225,24 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
   }
 };
 
-const getPool = (method: string, args: string, index: number) => {
+const getActions = (method: string, args: string) => {
   if (method === SWAP_METHODS[0]) {
-    const actions = decodeArgs<SwapArgs>(args).actions;
-    const action = actions[index];
-
-    return String(action.pool_id);
+    return decodeArgs<SwapArgs>(args).actions;
   }
 
   if (method === SWAP_METHODS[1]) {
     const decoded = decodeArgs<FtOnTransferArgs>(args);
     const actions = (JSON.parse(decoded.msg.replace(/\\/g, '')) as SwapArgs)
       .actions;
-    const action = actions[index];
 
-    return String(action.pool_id);
+    return actions;
   }
 
-  return undefined;
+  return [];
+};
+
+const getPool = (actions: Action[], index: number) => {
+  const action = actions?.[index];
+
+  return action ? String(action.pool_id) : null;
 };

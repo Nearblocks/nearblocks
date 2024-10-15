@@ -35,7 +35,7 @@ export type PoolArgs = {
   tokens: string[];
 };
 
-type Action = {
+export type Action = {
   pool_id: number | string;
 };
 
