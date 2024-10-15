@@ -16,7 +16,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
     let pretty = '';
     const decoded = Buffer.from(args, 'base64');
     try {
-      const parsed = JSON.parse(decoded.toString());
+      const parsed = JSON.parse(decoded?.toString());
       if (parsed) {
         pretty = JSON.stringify(parsed, null, 2);
       } else {
@@ -30,7 +30,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
   }
 
   const modifiedData =
-    args?.method_name === 'submit' && receiver.includes('aurora')
+    args?.method_name === 'submit' && receiver?.includes('aurora')
       ? { tx_bytes_b64: args.args_base64 || args.args }
       : args.args_base64 || args.args;
 
@@ -47,7 +47,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         {shortenAddress(receiver)}
       </Link>
       {args?.method_name === 'rlp_execute' ||
-      (args?.method_name === 'submit' && receiver.includes('aurora')) ? (
+      (args?.method_name === 'submit' && receiver?.includes('aurora')) ? (
         <RlpTransaction
           pretty={modifiedData}
           method={args?.method_name}
@@ -57,7 +57,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         <textarea
           readOnly
           rows={4}
-          defaultValue={displayArgs(args.args_base64 || args.args)}
+          defaultValue={displayArgs(args?.args_base64 || args?.args)}
           className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
         ></textarea>
       )}

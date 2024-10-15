@@ -80,8 +80,8 @@ const TokenTransactions = ({
   };
 
   const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const name = e?.target?.name;
+    const value = e?.target?.value;
 
     setForm((f) => ({ ...f, [name]: value }));
   };
@@ -513,7 +513,7 @@ const TokenTransactions = ({
                 txns &&
                 !error &&
                 `A total of ${
-                  count ? localFormat && localFormat(count.toString()) : 0
+                  count ? localFormat && localFormat(count?.toString()) : 0
                 }${' '}
                 transactions found`
               }

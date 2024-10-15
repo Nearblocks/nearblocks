@@ -47,7 +47,7 @@ const ContractOverview = (props: Props) => {
   );
   const signedIn = useAuthStore((store) => store.signedIn);
   const logOut = useAuthStore((store) => store.logOut);
-
+  const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
   const [tab, setTab] = useState(0);
 
   const onTabChange = (index: number) => setTab(index);
@@ -68,7 +68,13 @@ const ContractOverview = (props: Props) => {
 
   useEffect(() => {
     if (rpcError) {
-      switchRpc();
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        setAllRpcProviderError(true);
+        console.error('Failed to switch RPC:', error);
+      }
     }
   }, [rpcError, switchRpc]);
 
@@ -239,7 +245,7 @@ const ContractOverview = (props: Props) => {
               .
             </p>
           )}
-          {contractInfo?.methodNames?.length > 0 && (
+          {contractInfo && contractInfo?.methodNames?.length > 0 && (
             <Accordion
               multiple
               collapsible

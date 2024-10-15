@@ -54,8 +54,8 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const name = e?.target?.name;
+    const value = e?.target?.value;
 
     if (name === 'type') {
       if (isAction(value)) {
@@ -221,7 +221,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
             <span
-              className={`truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap border rounded-md ${
+              className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md ${
                 row?.transaction_hash === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
@@ -254,7 +254,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             <form onSubmit={onFilter} className="flex flex-col">
               <input
                 name="type"
-                value={form.action || form.method}
+                value={form?.action || form.method}
                 onChange={onChange}
                 placeholder="Search by method"
                 className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
@@ -342,7 +342,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="from"
-                  value={form.from}
+                  value={form?.from}
                   onChange={onChange}
                   placeholder={
                     t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
@@ -594,7 +594,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                 !error &&
                 `A total of${' '}
                     ${
-                      count ? localFormat && localFormat(count.toString()) : 0
+                      count ? localFormat && localFormat(count?.toString()) : 0
                     }${' '}
                     receipts found`
               }
@@ -602,7 +602,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                 <Filters filters={modifiedFilter} onClear={onAllClear} />
               }
               linkToDowload={
-                Object.keys(txns).length > 0 && (
+                Object?.keys(txns)?.length > 0 && (
                   <>
                     <button className="hover:no-underline">
                       <Link

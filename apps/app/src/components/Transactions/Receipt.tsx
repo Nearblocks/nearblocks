@@ -58,8 +58,9 @@ const Receipt = (props: Props) => {
       });
 
     const collectReceipts = (receiptHash: any) => {
-      const receipt = receiptsByIdMap?.get(receiptHash);
-      const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
+      const receipt = receiptsByIdMap && receiptsByIdMap?.get(receiptHash);
+      const receiptOutcome =
+        receiptOutcomesByIdMap && receiptOutcomesByIdMap?.get(receiptHash);
 
       return {
         ...receipt,

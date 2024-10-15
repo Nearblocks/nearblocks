@@ -4,7 +4,7 @@ import { shortenAddress } from '@/utils/libs';
 import { DepositPropsInfo } from '@/utils/types';
 
 const WithdrawSucceeded = (props: DepositPropsInfo) => {
-  const log = props.event?.[0];
+  const log = props?.event?.[0];
   const FaRight = (props: { className: string }) => {
     return (
       <svg
@@ -28,15 +28,15 @@ const WithdrawSucceeded = (props: DepositPropsInfo) => {
     <div className="action flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 text-xs" />
       <span className="font-bold px-1">Withdraw </span>
-      <TokenInfo contract={log.token_id} amount={log.amount} decimals={18} />
+      <TokenInfo contract={log?.token_id} amount={log?.amount} decimals={18} />
 
       <span className="font-bold text-gray px-1">
         To{' '}
         <Link
-          href={`/address/${log.account_id}`}
+          href={`/address/${log?.account_id}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
         >
-          {shortenAddress(log.account_id)}
+          {shortenAddress(log?.account_id)}
         </Link>
       </span>
       <span className="font-bold text-gray px-1">

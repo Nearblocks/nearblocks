@@ -32,7 +32,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   );
 
   const parseBuildEnvironment = (buildEnvironment: string) => {
-    const [text] = buildEnvironment.split('@');
+    const [text] = buildEnvironment && buildEnvironment?.split('@');
 
     return text;
   };
@@ -56,7 +56,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           />
         )}
         {(verificationData[selectedVerifier]?.status === 'verified' ||
-          verifiers.length === 0) &&
+          verifiers?.length === 0) &&
           contractData?.contractMetadata &&
           !error && (
             <div className="flex flex-wrap">

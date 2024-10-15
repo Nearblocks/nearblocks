@@ -17,31 +17,31 @@ import { mapRpcActionToAction } from '@/utils/near';
 const TransactionActions = (props: TransActionProps) => {
   const { action, receiver } = props;
 
-  switch (action.action_kind) {
+  switch (action?.action_kind) {
     case 'ADD_KEY':
     case 'AddKey':
-      return <AddKey args={action.args} receiver={receiver} />;
+      return <AddKey args={action?.args} receiver={receiver} />;
     case 'CREATE_ACCOUNT':
     case 'CreateAccount':
-      return <CreateAccount args={action.args} receiver={receiver} />;
+      return <CreateAccount args={action?.args} receiver={receiver} />;
     case 'DELETE_ACCOUNT':
     case 'DeleteAccount':
-      return <DeleteAccount args={action.args} receiver={receiver} />;
+      return <DeleteAccount args={action?.args} receiver={receiver} />;
     case 'DELETE_KEY':
     case 'DeleteKey':
-      return <DeleteKey args={action.args} receiver={receiver} />;
+      return <DeleteKey args={action?.args} receiver={receiver} />;
     case 'DEPLOY_CONTRACT':
     case 'DeployContract':
-      return <DeployContract args={action.args} receiver={receiver} />;
+      return <DeployContract args={action?.args} receiver={receiver} />;
     case 'FUNCTION_CALL':
     case 'FunctionCall':
-      return <FunctionCall args={action.args} receiver={receiver} />;
+      return <FunctionCall args={action?.args} receiver={receiver} />;
     case 'STAKE':
     case 'Stake':
-      return <Stake args={action.args} receiver={receiver} />;
+      return <Stake args={action?.args} receiver={receiver} />;
     case 'TRANSFER':
     case 'Transfer':
-      return <Transfer args={action.args} receiver={receiver} />;
+      return <Transfer args={action?.args} receiver={receiver} />;
     case 'Delegate':
     case 'DELEGATE':
       const delegateAction: DelegateActionView | any =
@@ -66,7 +66,7 @@ const TransactionActions = (props: TransActionProps) => {
       );
 
     default:
-      return <div>{action.action_kind}</div>;
+      return <div>{action?.action_kind}</div>;
   }
 };
 

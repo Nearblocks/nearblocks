@@ -29,9 +29,9 @@ const ReceiptRow = (props: Props) => {
 
   useEffect(() => {
     if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
-      lastBlockHash.current = receipt.block_hash;
+      lastBlockHash.current = receipt?.block_hash;
 
-      getBlockDetails(receipt.block_hash)
+      getBlockDetails(receipt?.block_hash)
         .then((resp: any) => {
           setBlock(resp?.header);
         })
@@ -50,7 +50,7 @@ const ReceiptRow = (props: Props) => {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props?.className}`}
       ></div>
     );
   };
@@ -59,7 +59,7 @@ const ReceiptRow = (props: Props) => {
     if (typeof window === 'undefined') return;
 
     const hash = window.location.hash;
-    const parts = hash.split('#');
+    const parts = hash && hash?.split('#');
     const id = parts.length > 2 ? parts[2] : null;
 
     if (id && receipt?.receipt_id === id) {
@@ -161,7 +161,7 @@ const ReceiptRow = (props: Props) => {
           ) : block?.height ? (
             <div className="w-full md:w-3/4 word-break">
               <Link
-                href={`/blocks/${receipt.block_hash}`}
+                href={`/blocks/${receipt?.block_hash}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
               >
                 {localFormat(block?.height)}
@@ -345,7 +345,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt?.outcome?.logs?.length > 0 ? (
+              {receipt && receipt?.outcome?.logs?.length > 0 ? (
                 <textarea
                   readOnly
                   rows={4}
