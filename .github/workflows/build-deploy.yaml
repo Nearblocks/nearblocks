@@ -90,7 +90,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
           failed_deployments=()
 
           for service in "${services[@]}"; do
