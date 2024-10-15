@@ -20,18 +20,13 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { keyword = '', query = '', filter = 'all', ...qs },
+    query: { ...qs },
   }: any = context;
 
   const apiUrl = 'nfts/txns';
   const fetchUrl = qs ? `nfts/txns?${queryString.stringify(qs)}` : `${apiUrl}`;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   try {
     const [dataResult, dataCountResult, syncResult] = await Promise.allSettled([
@@ -46,12 +41,7 @@ export const getServerSideProps: GetServerSideProps<{
       syncResult.status === 'fulfilled' ? syncResult.value : null;
     const error = dataResult.status === 'rejected';
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     return {
       props: {
@@ -61,8 +51,6 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -75,8 +63,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -150,8 +136,6 @@ NftToxenTxns.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

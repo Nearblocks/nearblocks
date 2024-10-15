@@ -19,27 +19,17 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { hash, keyword = '', query = '', filter = 'all' },
+    query: { hash },
   }: any = context;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   try {
     const [blockInfoResult] = await Promise.allSettled([
       fetcher(`blocks/${hash}`),
     ]);
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     const blockInfo =
       blockInfoResult.status === 'fulfilled' ? blockInfoResult.value : null;
@@ -69,8 +59,6 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -83,8 +71,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -101,6 +87,7 @@ const Block = ({
   const blockHash = blockInfo?.blocks[0]?.block_hash;
 
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
+
   return (
     <>
       <Head>
@@ -157,8 +144,6 @@ Block.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

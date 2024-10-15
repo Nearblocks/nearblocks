@@ -24,16 +24,11 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlock: any;
   error: boolean;
   statsDetails: any;
-  searchRedirectDetails: any;
-  searchResultDetails: any;
 }> = async (context) => {
   const {
-    query: { keyword = '', query = '', filter = 'all', ...qs },
+    query: { qs },
     req,
   }: any = context;
-
-  const q = query?.replace(/[\s,]/g, '');
-  const key = keyword?.replace(/[\s,]/g, '');
 
   const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
 
@@ -44,12 +39,7 @@ export const getServerSideProps: GetServerSideProps<{
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const error = dataResult.status === 'rejected';
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     return {
       props: {
@@ -57,8 +47,6 @@ export const getServerSideProps: GetServerSideProps<{
         latestBlock: latestBlocks,
         error,
         statsDetails,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -69,8 +57,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         latestBlock: null,
         statsDetails: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -130,8 +116,6 @@ NodeExplorer.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlock}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

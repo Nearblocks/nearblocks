@@ -12,30 +12,14 @@ const ogUrl = env('NEXT_PUBLIC_OG_URL');
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
-}> = async (context) => {
-  const {
-    query: { keyword = '', query = '', filter = 'all' },
-  }: any = context;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
-
+}> = async () => {
   try {
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     return {
       props: {
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -44,8 +28,6 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -93,8 +75,6 @@ AboutPage.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

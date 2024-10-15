@@ -41,14 +41,11 @@ import dynamic from 'next/dynamic';
 import { getCookieFromRequest } from '@/utils/libs';
 import { RpcProviders } from '@/utils/rpc';
 import { fetchData } from '@/utils/fetchData';
+import Receipts from '@/components/Address/Receipts';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
-  ssr: false,
-});
-
-const Receipts = dynamic(() => import('../../components/Address/Receipts'), {
   ssr: false,
 });
 
@@ -84,18 +81,9 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   tab: string;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: {
-      id = '',
-      tab = 'txns',
-      keyword = '',
-      query = '',
-      filter = 'all',
-      ...qs
-    },
+    query: { id = '', tab = 'txns', ...qs },
     req,
   }: {
     query: {
@@ -110,9 +98,6 @@ export const getServerSideProps: GetServerSideProps<{
 
   const address = id.toLowerCase();
   const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   const commonApiUrls = {
     account: id && `account/${address}?rpc=${rpcUrl}`,
@@ -183,12 +168,7 @@ export const getServerSideProps: GetServerSideProps<{
     fetchCommonData(commonApiUrls.inventory),
   ]);
 
-  const {
-    statsDetails,
-    latestBlocks,
-    searchResultDetails,
-    searchRedirectDetails,
-  } = await fetchData(q, key, filter);
+  const { statsDetails, latestBlocks } = await fetchData();
 
   const getResult = (result: PromiseSettledResult<any>) =>
     result.status === 'fulfilled' ? result.value : null;
@@ -230,8 +210,6 @@ export const getServerSideProps: GetServerSideProps<{
       error: !dataResult, // Set error to true only if dataResult is null
       tab,
       latestBlocks: latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
     },
   };
 };
@@ -531,6 +509,7 @@ const Address = ({
           href={`${appUrl}/address/${accountData?.account_id}`}
         />
       </Head>
+
       <div className="relative container mx-auto px-3">
         <div className="flex items-center justify-between flex-wrap pt-4">
           {!id ? (
@@ -540,7 +519,7 @@ const Address = ({
           ) : (
             <div className="flex md:flex-wrap w-full">
               <div className="flex justify-between md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
-                <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 ">
+                <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2  dark:text-neargray-10">
                   Near Account:&nbsp;
                   {id && (
                     <span className="text-green-500 dark:text-green-250">
@@ -610,7 +589,15 @@ const Address = ({
           <div className="w-full ">
             <>
               <div>
-                <Tabs onSelect={onTab} selectedIndex={tabs?.indexOf(tab)}>
+                <Tabs
+                  onSelect={onTab}
+                  selectedIndex={
+                    tab === 'comments' &&
+                    contractInfo?.methodNames?.length === undefined
+                      ? tabs?.indexOf(tab) - 1
+                      : tabs?.indexOf(tab)
+                  }
+                >
                   <TabList className="flex flex-wrap">
                     {[
                       { key: 0, label: t ? t('address:txns') : 'Transactions' },
@@ -655,7 +642,13 @@ const Address = ({
                       <Tab
                         key={key}
                         className={getClassName(
-                          tabs[key] === tabs[tabs?.indexOf(tab)],
+                          tabs[key] ===
+                            tabs[
+                              tab === 'comments' &&
+                              contractInfo?.methodNames?.length === undefined
+                                ? tabs?.indexOf(tab) - 1
+                                : tabs?.indexOf(tab)
+                            ],
                         )}
                         selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                       >
@@ -725,21 +718,17 @@ const Address = ({
                       </TabPanel>
                     )}
                     <TabPanel>
-                      {tab === 'comments' ? (
-                        <VmComponent
-                          src={components?.commentsFeed}
-                          defaultSkelton={<Comment />}
-                          props={{
-                            network: network,
-                            path: `nearblocks.io/address/${id}`,
-                            limit: 10,
-                            requestSignInWithWallet,
-                          }}
-                          loading={<Comment />}
-                        />
-                      ) : (
-                        <div className="w-full h-[500px]"></div>
-                      )}
+                      <VmComponent
+                        src={components?.commentsFeed}
+                        defaultSkelton={<Comment />}
+                        props={{
+                          network: network,
+                          path: `nearblocks.io/address/${id}`,
+                          limit: 10,
+                          requestSignInWithWallet,
+                        }}
+                        loading={<Comment />}
+                      />
                     </TabPanel>
                   </div>
                 </Tabs>
@@ -761,14 +750,14 @@ const Address = ({
 };
 
 Address.getLayout = (page: ReactElement) => (
-  <Layout
-    statsDetails={page?.props?.statsDetails}
-    latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
-  >
-    {page}
-  </Layout>
+  <>
+    <Layout
+      statsDetails={page?.props?.statsDetails}
+      latestBlocks={page?.props?.latestBlocks}
+    >
+      {page}
+    </Layout>
+  </>
 );
 
 export default Address;

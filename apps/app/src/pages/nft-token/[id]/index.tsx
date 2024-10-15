@@ -35,18 +35,9 @@ export const getServerSideProps: GetServerSideProps<{
   tab: string;
   statsDetails: any;
   latestBlocks: any;
-  searchRedirectDetails: any;
-  searchResultDetails: any;
 }> = async (context) => {
   const {
-    query: {
-      id = '',
-      tab = 'transfers',
-      query = '',
-      filter = 'all',
-      keyword = '',
-      ...qs
-    },
+    query: { id = '', tab = 'transfers', ...qs },
   }: {
     query: {
       id?: string;
@@ -72,9 +63,6 @@ export const getServerSideProps: GetServerSideProps<{
     },
     comments: { api: `` },
   };
-
-  const q = query?.replace(/[\s,]/g, '');
-  const key = keyword?.replace(/[\s,]/g, '');
 
   const commonApiUrls = {
     token: id && `nfts/${id}`,
@@ -125,12 +113,7 @@ export const getServerSideProps: GetServerSideProps<{
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     return {
       props: {
@@ -144,8 +127,6 @@ export const getServerSideProps: GetServerSideProps<{
         tab: tab as string,
         statsDetails: statsDetails,
         latestBlocks: latestBlocks,
-        searchRedirectDetails,
-        searchResultDetails,
       },
     };
   } catch (error) {
@@ -162,8 +143,6 @@ export const getServerSideProps: GetServerSideProps<{
         tab: 'transfers',
         statsDetails: null,
         latestBlocks: null,
-        searchRedirectDetails: null,
-        searchResultDetails: null,
       },
     };
   }
@@ -342,8 +321,6 @@ NFToken.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

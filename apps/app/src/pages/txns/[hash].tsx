@@ -56,15 +56,10 @@ export const getServerSideProps: GetServerSideProps<{
   isContract: any;
   price: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { hash = '', keyword = '', query = '', filter = 'all' },
+    query: { hash = '' },
   }: any = context;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   try {
     const [dataResult] = await Promise.allSettled([fetcher(`txns/${hash}`)]);
@@ -72,21 +67,17 @@ export const getServerSideProps: GetServerSideProps<{
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const error = dataResult.status === 'rejected';
 
-    const txn = data?.txns?.[0];
+    const txn = data && data?.txns?.[0];
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     let price: number | null = null;
     if (txn?.block_timestamp) {
-      const timestamp = new Date(nanoToMilli(txn.block_timestamp));
+      const timestamp = new Date(nanoToMilli(txn?.block_timestamp));
       const currentDate = new Date();
-      const currentDt = currentDate.toISOString().split('T')[0];
-      const blockDt = timestamp.toISOString().split('T')[0];
+      const currentDt =
+        currentDate && currentDate?.toISOString()?.split('T')[0];
+      const blockDt = timestamp && timestamp?.toISOString()?.split('T')[0];
 
       if (currentDt > blockDt) {
         const priceData = await fetcher(`stats/price?date=${blockDt}`);
@@ -101,7 +92,7 @@ export const getServerSideProps: GetServerSideProps<{
       ]);
 
       isContract =
-        contractResult.status === 'fulfilled' ? contractResult.value : null;
+        contractResult?.status === 'fulfilled' ? contractResult?.value : null;
     }
 
     return {
@@ -112,8 +103,6 @@ export const getServerSideProps: GetServerSideProps<{
         isContract,
         price,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -126,8 +115,6 @@ export const getServerSideProps: GetServerSideProps<{
         isContract: false,
         price: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -160,7 +147,7 @@ const Txn = ({
     (store) => store.requestSignInWithWallet,
   );
 
-  const txn = data?.txns?.[0];
+  const txn = data && data?.txns?.[0];
 
   let title = t('txns:txn.metaTitle', { txn: hash });
   title = `${network === 'testnet' ? 'TESTNET' : ''} ${title}`;
@@ -230,7 +217,7 @@ const Txn = ({
         try {
           setRpcError(false);
           const txnExists: any = await transactionStatus(hash, 'bowen');
-          const status = txnExists.status?.Failure ? false : true;
+          const status = txnExists?.status?.Failure ? false : true;
           let block: any = {};
 
           if (txnExists) {
@@ -240,31 +227,31 @@ const Txn = ({
           }
 
           const modifiedTxns = {
-            transaction_hash: txnExists.transaction_outcome.id,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
+            transaction_hash: txnExists?.transaction_outcome?.id,
+            included_in_block_hash: txnExists?.transaction_outcome?.block_hash,
             outcomes: { status: status },
-            block: { block_height: block?.header.height },
-            block_timestamp: block?.header.timestamp_nanosec,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
+            block: { block_height: block?.header?.height },
+            block_timestamp: block?.header?.timestamp_nanosec,
+            receiver_account_id: txnExists?.transaction?.receiver_id,
+            signer_account_id: txnExists?.transaction?.signer_id,
             receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
+              txnExists?.transaction_outcome?.outcome?.gas_burnt?.toString(),
             receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
+              txnExists.transaction_outcome?.outcome?.tokens_burnt,
             actions_agg: {
-              deposit: calculateTotalDeposit(txnExists?.transaction.actions),
-              gas_attached: calculateTotalGas(txnExists?.transaction.actions),
+              deposit: calculateTotalDeposit(txnExists?.transaction?.actions),
+              gas_attached: calculateTotalGas(txnExists?.transaction?.actions),
             },
             outcomes_agg: {
               transaction_fee: txnFee(
                 (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
                   [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
+                txnExists?.transaction_outcome?.outcome?.tokens_burnt ?? '0',
               ),
               gas_used: calculateGasUsed(
                 (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
                   [],
-                txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
+                txnExists?.transaction_outcome?.outcome?.gas_burnt ?? '0',
               ),
             },
           };
@@ -313,7 +300,7 @@ const Txn = ({
       </Head>
       <div className="md:flex items-center justify-between container mx-auto px-3">
         <div className="flex justify-between dark:text-neargray-10 border-b w-full px-2 pt-3 dark:border-black-200">
-          <h1 className="py-2 space-x-2 text-xl leading-8 text-nearblue-600">
+          <h1 className="py-2 space-x-2 text-xl leading-8 text-nearblue-600 dark:text-neargray-10">
             {t ? t('txns:txn.heading') : 'Transaction Details'}
           </h1>
 
@@ -477,8 +464,6 @@ Txn.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsData}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

@@ -22,19 +22,10 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlocks: any;
 }> = async (context) => {
   const {
-    query: { keyword = '', query = '', filter = 'all', ...qs },
-  }: {
-    query: {
-      query?: string;
-      keyword?: string;
-      filter?: string;
-    };
-  } = context;
+    query: { ...qs },
+  }: any = context;
   const apiUrl = 'fts/txns';
   const fetchUrl = `${apiUrl}?${queryString.stringify(qs)}`;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   try {
     const [dataResult, dataCountResult, syncResult] = await Promise.allSettled([
@@ -43,12 +34,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetcher('sync/status'),
     ]);
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -66,8 +52,6 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -81,8 +65,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -155,8 +137,6 @@ ToxenTxns.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

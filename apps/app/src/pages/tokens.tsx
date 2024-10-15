@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlocks: any;
 }> = async (context) => {
   const {
-    query: { keyword = '', query = '', filter = 'all', ...qs },
+    query: { ...qs },
   }: {
     query: {
       query?: string;
@@ -31,9 +31,6 @@ export const getServerSideProps: GetServerSideProps<{
   } = context;
 
   const params = { ...qs, order: qs.order || 'desc' };
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   const fetchUrl = `fts?sort=onchain_market_cap&per_page=50&${QueryString.stringify(
     params,
@@ -46,12 +43,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetcher(countUrl),
     ]);
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -66,8 +58,6 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -80,8 +70,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -154,8 +142,6 @@ TopFTTokens.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

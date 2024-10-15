@@ -139,16 +139,9 @@ const languages = [
 interface Props {
   statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
-  searchResultDetails?: any;
-  searchRedirectDetails?: any;
 }
 
-const Header = ({
-  statsDetails,
-  latestBlocks,
-  searchResultDetails,
-  searchRedirectDetails,
-}: Props) => {
+const Header = ({ statsDetails, latestBlocks }: Props) => {
   /* eslint-disable @next/next/no-img-element */
 
   const router = useRouter();
@@ -301,11 +294,7 @@ const Header = ({
             {showSearch && (
               <div className="relative h-full w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 md:!pt-2 md:!pb-0 order-2 md:!order-1">
                 <div className="h-11">
-                  <Search
-                    result={searchResultDetails}
-                    redirectResult={searchRedirectDetails}
-                    header
-                  />
+                  <Search header />
                 </div>
               </div>
             )}
