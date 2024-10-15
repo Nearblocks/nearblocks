@@ -318,17 +318,9 @@ const inventory = catchAsync(
         ) AS meta ON TRUE
     `;
 
-    const inventory = await redis.cache(
-      `account:${account}:inventory`,
-      async () => {
-        const [fts, nfts] = await Promise.all([ftQuery, nftQuery]);
+    const [fts, nfts] = await Promise.all([ftQuery, nftQuery]);
 
-        return { fts, nfts };
-      },
-      EXPIRY * 1, // 1 mins
-    );
-
-    return res.status(200).json({ inventory });
+    return res.status(200).json({ inventory: { fts, nfts } });
   },
 );
 
