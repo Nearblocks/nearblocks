@@ -44,6 +44,8 @@ const routes = (app: Router) => {
   route.get('/fees', validator(schema.fees), legacy.fees);
 
   route.get('/ping', legacy.ping);
+
+  route.post('/nodes', validator(schema.nodes), legacy.nodes);
 };
 
 export default routes;
