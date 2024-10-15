@@ -18,24 +18,12 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
-    query: { keyword = '', query = '', filter = 'all', ...qs },
-  }: {
-    query: {
-      query?: string;
-      keyword?: string;
-      filter?: string;
-      order?: string;
-    };
-  } = context;
+    query: { ...qs },
+  }: any = context;
 
   const params = { ...qs, order: qs.order || 'desc' };
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   const fetchUrl = `nfts?sort=txns_day&per_page=50&${QueryString.stringify(
     params,
@@ -48,12 +36,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetcher(countUrl),
     ]);
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -68,8 +51,6 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -82,8 +63,6 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -157,8 +136,6 @@ TopNFTTokens.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

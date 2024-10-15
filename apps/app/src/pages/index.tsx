@@ -2,18 +2,21 @@ import Head from 'next/head';
 import Layout from '@/components/Layouts';
 import { appUrl } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Banner from '@/components/Banner';
 import SponserdText from '@/components/SponserdText';
 import LatestBlocks from '@/components/Blocks/Latest';
-import Search from '@/components/common/Search';
+import Search, { redirect, SearchToast } from '@/components/common/Search';
 import fetcher from '@/utils/fetcher';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Overview from '@/components/Transactions/Overview';
 import LatestTransactions from '@/components/Transactions/Latest';
 import { fetchData } from '@/utils/fetchData';
+import { toast } from 'react-toastify';
+import search from '@/utils/search';
+import { useRouter } from 'next/router';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -24,20 +27,8 @@ export const getServerSideProps: GetServerSideProps<{
   blockDetails: any;
   txnsDetails: any;
   latestBlocks: any;
-  searchRedirectDetails: any;
-  searchResultDetails: any;
   error: boolean;
-}> = async (context) => {
-  const {
-    query: { query = '', keyword = '', filter = 'all' },
-  }: {
-    query: { query?: string; keyword?: string; filter?: string };
-    req: any;
-  } = context;
-
-  const q = query?.replace(/[\s,]/g, '');
-  const key = keyword?.replace(/[\s,]/g, '');
-
+}> = async () => {
   try {
     const [chartResult, blockResult, txnsResult] = await Promise.allSettled([
       fetcher(`charts/latest`),
@@ -52,13 +43,7 @@ export const getServerSideProps: GetServerSideProps<{
     const txnsDetails =
       txnsResult.status === 'fulfilled' ? txnsResult.value : null;
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-      error,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks, error } = await fetchData();
 
     return {
       props: {
@@ -67,8 +52,6 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails,
         txnsDetails,
         latestBlocks,
-        searchRedirectDetails,
-        searchResultDetails,
         error,
       },
     };
@@ -81,8 +64,6 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails: null,
         txnsDetails: null,
         latestBlocks: null,
-        searchRedirectDetails: null,
-        searchResultDetails: null,
         error: true,
       },
     };
@@ -94,16 +75,35 @@ const HomePage = ({
   chartDetails,
   blockDetails,
   txnsDetails,
-  searchRedirectDetails,
-  searchResultDetails,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { q } = router.query;
+
   const stats = statsDetails?.stats?.[0];
   const charts = chartDetails;
   const blocks = blockDetails?.blocks || [];
   const txns = txnsDetails?.txns || [];
   const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
+
+  useEffect(() => {
+    const loadResults = async (keyword: string) => {
+      const route = await search(keyword, 'all', true);
+
+      if (route) {
+        return redirect(route);
+      }
+
+      return toast.error(SearchToast);
+    };
+
+    const keyword = typeof q === 'string' ? q.trim() : '';
+
+    if (keyword) {
+      loadResults(keyword);
+    }
+  }, [q]);
 
   return (
     <>
@@ -143,10 +143,7 @@ const HomePage = ({
                   {t('home:heroTitle')}
                 </h1>
                 <div className="h-12" suppressHydrationWarning={true}>
-                  <Search
-                    result={searchResultDetails}
-                    redirectResult={searchRedirectDetails}
-                  />
+                  <Search />
                 </div>
                 <div className="text-white"></div>
                 <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">

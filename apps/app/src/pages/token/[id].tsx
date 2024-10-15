@@ -32,23 +32,12 @@ type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
-    query: {
-      id = '',
-      a = '',
-      tab = 'transfers',
-      keyword = '',
-      query = '',
-      filter = 'all',
-      ...qs
-    },
+    query: { id = '', a = '', tab = 'transfers', ...qs },
   }: {
     query: {
       id?: string;
       a?: string;
       tab?: TabType;
-      query?: string;
-      keyword?: string;
-      filter?: string;
     } & Record<string, any>;
   } = context;
 
@@ -68,9 +57,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
       }
     }
-
-    const key = keyword?.replace(/[\s,]/g, '');
-    const q = query?.replace(/[\s,]/g, '');
 
     const commonApiUrls = {
       stats: 'stats',
@@ -111,12 +97,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       fetchCommonData(commonApiUrls.holdersCount),
     ]);
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     let dataResult = null;
     let dataCountResult = null;
@@ -166,8 +147,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         dataCount: dataCountResult && getResult(dataCountResult),
         error: dataResult && dataResult.status === 'rejected',
         tab,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -408,8 +387,6 @@ TokenDetails.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>

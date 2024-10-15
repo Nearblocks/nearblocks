@@ -75,7 +75,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
         'px-5 py-4 whitespace-nowrap text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>METHOD</span>,
+      header: <span className="pl-2">METHOD</span>,
       key: 'cause',
       cell: (row: TransactionInfo) => (
         <span>
@@ -95,7 +95,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>From</span>,
+      header: <span className="pl-1">From</span>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row.delta_amount) < 0 ? (
@@ -161,9 +161,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
         );
       },
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-3 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
-        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+        'px-3 py-3 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       header: <span></span>,
@@ -182,7 +182,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       tdClassName: 'text-center',
     },
     {
-      header: <span>To</span>,
+      header: <span className="pl-1">To</span>,
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row.delta_amount) < 0 ? (

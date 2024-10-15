@@ -203,7 +203,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
             <span
-              className={`truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap border rounded-md ${
+              className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md ${
                 row?.transaction_hash === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'

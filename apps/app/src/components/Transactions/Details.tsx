@@ -65,33 +65,33 @@ const Details = (props: Props) => {
       let nfts: NftsInfo[] = [];
 
       receipts &&
-        receipts.forEach(
+        receipts?.forEach(
           (receipt) =>
             receipt?.fts?.forEach((ft) => {
-              if (ft.ft_meta && ft.cause === 'TRANSFER') {
-                if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+              if (ft?.ft_meta && ft.cause === 'TRANSFER') {
+                if (ft?.ft_meta && Number(ft?.delta_amount) < 0) fts?.push(ft);
               } else {
-                if (ft.ft_meta) fts.push(ft);
+                if (ft?.ft_meta) fts?.push(ft);
               }
             }),
         );
       receipts &&
-        receipts.forEach(
+        receipts?.forEach(
           (receipt) =>
             receipt?.nfts?.forEach((nft) => {
               if (
-                nft.nft_meta &&
-                nft.nft_token_meta &&
-                nft.cause === 'TRANSFER'
+                nft?.nft_meta &&
+                nft?.nft_token_meta &&
+                nft?.cause === 'TRANSFER'
               ) {
                 if (
-                  nft.nft_meta &&
-                  nft.nft_token_meta &&
-                  Number(nft.delta_amount) < 0
+                  nft?.nft_meta &&
+                  nft?.nft_token_meta &&
+                  Number(nft?.delta_amount) < 0
                 )
-                  nfts.push(nft);
+                  nfts?.push(nft);
               } else {
-                if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+                if (nft?.nft_meta && nft?.nft_token_meta) nfts?.push(nft);
               }
             }),
         );
@@ -103,7 +103,7 @@ const Details = (props: Props) => {
     }
 
     if (txn?.receipts?.length) {
-      return tokensTransfers(txn.receipts);
+      return tokensTransfers(txn?.receipts);
     }
 
     return { fts: [], nfts: [] };
@@ -836,7 +836,10 @@ const Details = (props: Props) => {
                         |
                       </span>{' '}
                       {txn?.receipt_conversion_tokens_burnt
-                        ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)
+                        ? yoctoToNear(
+                            txn?.receipt_conversion_tokens_burnt,
+                            true,
+                          )
                         : txn?.receipt_conversion_tokens_burnt ?? ''}{' '}
                       Ⓝ
                     </div>

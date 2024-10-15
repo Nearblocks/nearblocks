@@ -19,8 +19,6 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
 }> = async (context) => {
   const {
     query: { keyword = '', filter = 'all', query = '', ...qs },
@@ -28,9 +26,6 @@ export const getServerSideProps: GetServerSideProps<{
 
   const apiUrl = 'blocks';
   const fetchUrl = qs ? `blocks?${queryString.stringify(qs)}` : `${apiUrl}`;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
 
   try {
     const [dataResult, dataCountResult] = await Promise.allSettled([
@@ -42,12 +37,7 @@ export const getServerSideProps: GetServerSideProps<{
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
     const error = dataResult.status === 'rejected';
 
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
+    const { statsDetails, latestBlocks } = await fetchData();
 
     return {
       props: {
@@ -57,8 +47,6 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl,
         statsDetails,
         latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
       },
     };
   } catch (error) {
@@ -71,8 +59,6 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl: '',
         statsDetails: null,
         latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
       },
     };
   }
@@ -133,8 +119,6 @@ Blocks.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
   >
     {page}
   </Layout>
