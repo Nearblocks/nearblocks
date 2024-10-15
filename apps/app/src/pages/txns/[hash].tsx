@@ -333,7 +333,7 @@ const Txn = ({
                   <li className="pb-2">
                     <a
                       className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                      href={`https://lite.nearblocks.io/txns/${hash}?network=${networkId}`}
+                      href={`https://validate.nearblocks.io/txns/${hash}?network=${networkId}`}
                       target="_blank"
                     >
                       Validate Transaction
