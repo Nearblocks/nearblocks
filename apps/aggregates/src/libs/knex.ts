@@ -20,7 +20,6 @@ const knex: Knex = createKnex({
     application_name: 'aggregates',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
-    statement_timeout: 60 * 1000, // 60s
   },
   pool: { max: 10, min: 1 },
 });
