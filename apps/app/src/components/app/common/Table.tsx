@@ -18,7 +18,7 @@ interface Props {
   page: number;
   limit: number;
   pageLimit?: number;
-  setPage: (page: number) => void;
+  setPage?: (page: number) => void;
   renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
   expanded?: number[];
   isExpanded?: false;

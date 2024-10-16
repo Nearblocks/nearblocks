@@ -34,7 +34,6 @@ export default async function middleware(request: NextRequest) {
   const [, locale] = request.nextUrl.pathname.split('/');
 
   if (!routes?.includes(locale)) {
-    console.log('if condition');
     return NextResponse.rewrite(new URL('/404', request.url));
   }
 
@@ -48,5 +47,6 @@ export const config = {
     '/((?!api|_next|_vercel|.*\\..*).*)',
     '/(en|kr|id|zh-cn|zh-hk|ua|ru|es|vi|ph|fr|jp|th|it)/:path*',
     '/([\\w-]+)?/address/(.+)',
+    '/([\\w-]+)?/token/(.+)',
   ],
 };
