@@ -474,12 +474,13 @@ const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
                 <div
                   className={`flex flex-wrap text-xs text-left font-bold  tracking-wider  ${
                     Math.abs(
-                      telemetry.lastHeight - latestBlock.blocks[0].block_height,
+                      telemetry?.lastHeight -
+                        latestBlock.blocks[0]?.block_height,
                     ) > 1000
                       ? 'text-red-500 dark:text-red-500'
                       : Math.abs(
-                          telemetry.lastHeight -
-                            latestBlock.blocks[0].block_height,
+                          telemetry?.lastHeight -
+                            latestBlock.blocks[0]?.block_height,
                         ) > 50
                       ? 'text-yellow-500 dark:text-yellow-500'
                       : 'text-black dark:text-white '

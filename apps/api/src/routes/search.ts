@@ -13,9 +13,9 @@ const routes = (app: Router) => {
 
   /**
    * GET /v1/search
-   * @summary Search txn by hash, block by height / hash, account by id, receipt by id
+   * @summary Search txn by hash, block by height / hash, account by id, receipt by id, tokens by hex address
    * @tags Search
-   * @param {string} keyword.query.required - txn hash / block height / account id / receipt id
+   * @param {string} keyword.query.required - txn hash / block height / account id / receipt id / hex address
    * @return 200 - success response
    * @security BearerAuth
    */
@@ -60,6 +60,16 @@ const routes = (app: Router) => {
    * @security BearerAuth
    */
   route.get('/receipts', validator(schema.item), search.receipts);
+
+  /**
+   * GET /v1/search/tokens
+   * @summary Search tokens by hex address
+   * @tags Search
+   * @param {string} keyword.query.required - token hex address
+   * @return 200 - success response
+   * @security BearerAuth
+   */
+  route.get('/tokens', validator(schema.item), search.tokens);
 };
 
 export default routes;
