@@ -3,6 +3,7 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
+import { syncCollidedTxns } from '#services/collidedTxns';
 import { syncGenesis } from '#services/genesis';
 import { syncData } from '#services/stream';
 
@@ -14,6 +15,8 @@ import { syncData } from '#services/stream';
     );
     logger.info('syncing genesis data...');
     await syncGenesis();
+    logger.info('syncing collided txn data...');
+    await syncCollidedTxns();
     logger.info('syncing blockchain data...');
     await syncData();
   } catch (error) {
