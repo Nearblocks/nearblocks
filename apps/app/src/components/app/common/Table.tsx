@@ -172,15 +172,13 @@ const Table = (props: Props) => {
       !props?.Error &&
       props?.data?.length !== 0 &&
       props?.page &&
-      props?.pageLimit &&
-      props?.setPage ? (
+      props?.pageLimit ? (
         <Paginator
           count={props?.count}
           isLoading={props?.countLoading}
           page={props?.page}
           limit={props?.limit}
           pageLimit={props?.pageLimit}
-          setPage={props?.setPage}
         />
       ) : null}
       {props?.cursorPagination && !props?.Error && props?.data?.length !== 0 ? (
