@@ -77,6 +77,33 @@ const receiptQuery = (keyword: string) => {
   `;
 };
 
+const tokenQuery = (keyword: string) => {
+  if (keyword.startsWith('0x')) {
+    const hex = keyword.toLowerCase();
+    return sql`
+      SELECT
+        contract
+      FROM
+        ft_meta
+      WHERE
+        nep518_hex_address = ${hex}
+      LIMIT
+        1
+    `;
+  }
+
+  return sql`
+    SELECT
+      contract
+    FROM
+      ft_meta
+    WHERE
+      contract = ${keyword}
+    LIMIT
+      1
+  `;
+};
+
 const txns = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const keyword = req.validator.data.keyword;
   const txns = await txnQuery(keyword);
@@ -111,18 +138,28 @@ const receipts = catchAsync(
   },
 );
 
+const tokens = catchAsync(
+  async (req: RequestValidator<Item>, res: Response) => {
+    const keyword = req.validator.data.keyword;
+    const tokens = await tokenQuery(keyword);
+
+    return res.status(200).json({ tokens });
+  },
+);
+
 const search = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
-    const [txns, blocks, accounts, receipts] = await Promise.all([
+    const [txns, blocks, accounts, receipts, tokens] = await Promise.all([
       txnQuery(keyword),
       blockQuery(keyword),
       accountQuery(keyword),
       receiptQuery(keyword),
+      tokenQuery(keyword),
     ]);
 
-    return res.status(200).json({ accounts, blocks, receipts, txns });
+    return res.status(200).json({ accounts, blocks, receipts, tokens, txns });
   },
 );
 
-export default { accounts, blocks, receipts, search, txns };
+export default { accounts, blocks, receipts, search, tokens, txns };
