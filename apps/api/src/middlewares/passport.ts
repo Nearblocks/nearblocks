@@ -5,13 +5,19 @@ import {
   VerifyFunction,
 } from 'passport-http-bearer';
 
+import config from '#config';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { redisClient } from '#libs/redis';
 
 const bearerVerify: VerifyFunction = async (token, done) => {
+  if (config.apiAccessKey && token === config.apiAccessKey) {
+    return done(null, false);
+  }
+
   try {
     const cachedUser = await redisClient.get(`api_key:${token}`);
+
     if (cachedUser) {
       return done(null, JSON.parse(cachedUser));
     }
