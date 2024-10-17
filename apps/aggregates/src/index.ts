@@ -2,13 +2,14 @@ import { logger } from 'nb-logger';
 
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
-import { syncFTHolders } from '#services/ft';
-import { syncNFTHolders } from '#services/nft';
-import { syncTPS } from '#services/tps';
+import { syncAccount } from '#services/account/index';
+import { syncFT } from '#services/ft/index';
+import { syncNFT } from '#services/nft/index';
+import { syncTxn } from '#services/txn/index';
 
 (async () => {
   try {
-    await Promise.all([syncFTHolders(), syncNFTHolders(), syncTPS()]);
+    await Promise.all([syncAccount(), syncFT(), syncNFT(), syncTxn()]);
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);
