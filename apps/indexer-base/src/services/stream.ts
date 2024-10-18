@@ -81,7 +81,7 @@ export const onMessage = async (message: types.StreamerMessage) => {
     const start = performance.now();
 
     await prepareCache(message);
-    await storeBlock(knex, message.block);
+    await storeBlock(knex, message);
     await storeChunks(knex, message);
     await storeTransactions(knex, message);
     await storeReceipts(knex, message);
