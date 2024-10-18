@@ -13,6 +13,7 @@ const routes = [
   'hash',
   'tokens',
   'tokentxns',
+  'nft-token',
   'nft-tokens',
   'nft-tokentxns',
   'node-explorer',
@@ -48,5 +49,6 @@ export const config = {
     '/(en|kr|id|zh-cn|zh-hk|ua|ru|es|vi|ph|fr|jp|th|it)/:path*',
     '/([\\w-]+)?/address/(.+)',
     '/([\\w-]+)?/token/(.+)',
+    '/([\\w-]+)?/nft-token/(.+)',
   ],
 };
