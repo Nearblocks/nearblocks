@@ -112,7 +112,7 @@ const tps = async (): Promise<boolean> => {
 
     return false;
   } catch (error) {
-    logger.error(error, 'syncTPS');
+    logger.error(error, 'syncTxnTPS');
     Sentry.captureException(error);
     await sleep(5000);
 

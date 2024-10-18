@@ -8,16 +8,16 @@ import { getLimit } from '#libs/utils';
 
 const TABLE = config.nftHoldersTable;
 
-export const syncNFTHolders = async () => {
+export const syncHolders = async () => {
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const resp = await syncHolders();
+    const resp = await holders();
 
     if (resp) break;
   }
 };
 
-const syncHolders = async (): Promise<boolean> => {
+const holders = async (): Promise<boolean> => {
   try {
     if (!TABLE) {
       logger.warn(`NFT_HOLDERS_TABLE not specified...`);
