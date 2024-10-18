@@ -1,16 +1,11 @@
 import useRpc from '@/hooks/useRpc';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  capitalizeWords,
-  nanoToMilli,
-  yoctoToNear,
-} from '@/utils/libs';
+import { capitalizeWords, nanoToMilli, yoctoToNear } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import TimeStamp from '../common/TimeStamp';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -185,28 +180,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
-            <Tooltip
-              label={
-                !showWhen
-                  ? txn?.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                    : ''
-                  : txn?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
-                  : ''
-              }
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-            >
-              <span>
-                {showWhen
-                  ? txn?.block_timestamp
-                    ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))
-                    : ''
-                  : txn?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
-                  : ''}
-              </span>
-            </Tooltip>
+            <TimeStamp timestamp={txn?.block_timestamp} showAge={showWhen} />
           ) : (
             'Genesis'
           )}
