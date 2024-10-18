@@ -1,7 +1,8 @@
 import { logger } from 'nb-logger';
-import { ExecutionOutcomeStatus, JsonObject } from 'nb-types';
+import { ExecutionOutcomeStatus, JsonObject, Network } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import knex from '#libs/knex';
 
 const key = 'collided-txns';
@@ -282,6 +283,10 @@ const txns = [
 ];
 
 export const syncCollidedTxns = async () => {
+  if (config.network !== Network.MAINNET) {
+    return;
+  }
+
   const settings = await knex('settings').where({ key }).first();
 
   const setting = settings?.value as JsonObject;
