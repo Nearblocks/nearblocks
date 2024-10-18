@@ -103,6 +103,7 @@ export type Block = {
   author_account_id: string;
   block_hash: string;
   block_height: number;
+  block_json: JsonValue;
   block_timestamp: string;
   gas_price: string;
   prev_block_hash: string;
@@ -195,6 +196,7 @@ export type ExecutionOutcome = {
   executor_account_id: string;
   gas_burnt: number;
   index_in_chunk: number;
+  logs: JsonValue;
   receipt_id: string;
   shard_id: number;
   status: ExecutionOutcomeStatus;
