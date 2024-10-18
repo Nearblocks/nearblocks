@@ -1,7 +1,7 @@
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
-import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
+import { ExecutionOutcome } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import { jsonStringify, mapExecutionStatus } from '#libs/utils';
@@ -29,7 +29,6 @@ export const storeChunkExecutionOutcomes = async (
   executionOutcomes: types.ExecutionOutcomeWithReceipt[],
 ) => {
   const outcomes: ExecutionOutcome[] = [];
-  const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
   executionOutcomes.forEach((executionOutcome, indexInChunk) => {
     outcomes.push(
@@ -40,18 +39,6 @@ export const storeChunkExecutionOutcomes = async (
         executionOutcome,
       ),
     );
-
-    const executionOutcomeReceipts =
-      executionOutcome.executionOutcome.outcome.receiptIds.map(
-        (receiptId, receiptIndex) =>
-          getExecutionOutcomeReceiptData(
-            executionOutcome.executionOutcome.id,
-            receiptId,
-            receiptIndex,
-          ),
-      );
-
-    outcomeReceipts.push(...executionOutcomeReceipts);
   });
 
   const promises = [];
@@ -62,22 +49,7 @@ export const storeChunkExecutionOutcomes = async (
         await knex('execution_outcomes')
           .insert(outcomes)
           .onConflict(['receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (outcomeReceipts.length) {
-    promises.push(
-      retry(async () => {
-        await knex('execution_outcome_receipts')
-          .insert(outcomeReceipts)
-          .onConflict([
-            'executed_receipt_id',
-            'index_in_execution_outcome',
-            'produced_receipt_id',
-          ])
-          .ignore();
+          .merge(['logs']);
       }),
     );
   }
@@ -101,14 +73,4 @@ const getExecutionOutcomeData = (
   shard_id: shardId,
   status: mapExecutionStatus(outcome.executionOutcome.outcome.status),
   tokens_burnt: outcome.executionOutcome.outcome.tokensBurnt,
-});
-
-const getExecutionOutcomeReceiptData = (
-  executedReceipt: string,
-  producedReceipt: string,
-  receiptIndex: number,
-): ExecutionOutcomeReceipt => ({
-  executed_receipt_id: executedReceipt,
-  index_in_execution_outcome: receiptIndex,
-  produced_receipt_id: producedReceipt,
 });

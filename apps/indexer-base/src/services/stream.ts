@@ -6,16 +6,11 @@ import { streamBlock } from 'nb-neardata';
 import config from '#config';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
-import { storeAccessKeys } from '#services/accessKey';
-import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
-import { prepareCache } from '#services/cache';
-import { storeChunks } from '#services/chunk';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
-import { storeReceipts } from '#services/receipt';
-import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
+const indexerKey = 'sync_execution_logs_from_genesis';
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
   s3BucketName: config.s3BucketName,
@@ -29,15 +24,16 @@ if (config.s3Endpoint) {
 }
 
 export const syncData = async () => {
-  const block = await knex('blocks').orderBy('block_height', 'desc').first();
+  const settings = await knex('settings').where({ key: indexerKey }).first();
+  const latestBlock = settings?.value?.sync;
 
   if (config.dataSource === DataSource.FAST_NEAR) {
     let startBlockHeight = config.startBlockHeight;
 
-    if (!startBlockHeight && block) {
-      const next = +block.block_height - config.delta / 2;
+    if (!startBlockHeight && latestBlock) {
+      const next = +latestBlock - config.delta / 2;
       startBlockHeight = next;
-      logger.info(`last synced block: ${block.block_height}`);
+      logger.info(`last synced block: ${latestBlock}`);
       logger.info(`syncing from block: ${next}`);
     }
 
@@ -60,10 +56,10 @@ export const syncData = async () => {
       process.exit();
     });
   } else {
-    if (!lakeConfig.startBlockHeight && block) {
-      const next = +block.block_height - config.delta;
+    if (!lakeConfig.startBlockHeight && latestBlock) {
+      const next = +latestBlock - config.delta;
       lakeConfig.startBlockHeight = next;
-      logger.info(`last synced block: ${block.block_height}`);
+      logger.info(`last synced block: ${latestBlock}`);
       logger.info(`syncing from block: ${next}`);
     }
 
@@ -75,26 +71,33 @@ export const syncData = async () => {
 
 export const onMessage = async (message: types.StreamerMessage) => {
   try {
+    if (config.endBlockHeight <= message.block.header.height) {
+      logger.info(`finished syncing blocks: ${message.block.header.height}`);
+      process.exit();
+    }
+
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
 
     const start = performance.now();
 
-    await prepareCache(message);
     await storeBlock(knex, message);
-    await storeChunks(knex, message);
-    await storeTransactions(knex, message);
-    await storeReceipts(knex, message);
-    await Promise.all([
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
-    ]);
+    await storeExecutionOutcomes(knex, message);
 
     logger.info({
       block: message.block.header.height,
       time: `${performance.now() - start} ms`,
     });
+
+    if (message.block.header.height % 100 === 0) {
+      await knex('settings')
+        .insert({
+          key: indexerKey,
+          value: { sync: message.block.header.height },
+        })
+        .onConflict('key')
+        .merge();
+    }
   } catch (error) {
     logger.error(
       `aborting... block ${message.block.header.height} ${message.block.header.hash}`,

@@ -11,6 +11,7 @@ const env = cleanEnv(process.env, {
     choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
     default: DataSource.NEAR_LAKE,
   }),
+  BASE_END_BLOCK: num(),
   BASE_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
@@ -57,6 +58,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 1_000, // start from blocks earlier on sync interuption
+  endBlockHeight: env.BASE_END_BLOCK,
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,
