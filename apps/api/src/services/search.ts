@@ -5,6 +5,8 @@ import sql from '#libs/postgres';
 import { Item } from '#libs/schema/search';
 import { RequestValidator } from '#types/types';
 
+const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
+
 const txnQuery = (keyword: string) => {
   if (keyword.startsWith('0x')) {
     return sql`
@@ -77,6 +79,34 @@ const receiptQuery = (keyword: string) => {
   `;
 };
 
+const tokenQuery = (keyword: string) => {
+  if (isHexAddress(keyword)) {
+    const hex = keyword.toLowerCase();
+
+    return sql`
+      SELECT
+        contract
+      FROM
+        ft_meta
+      WHERE
+        nep518_hex_address = ${hex}
+      LIMIT
+        1
+    `;
+  }
+
+  return sql`
+    SELECT
+      contract
+    FROM
+      ft_meta
+    WHERE
+      contract = ${keyword}
+    LIMIT
+      1
+  `;
+};
+
 const txns = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const keyword = req.validator.data.keyword;
   const txns = await txnQuery(keyword);
@@ -111,18 +141,33 @@ const receipts = catchAsync(
   },
 );
 
+const tokens = catchAsync(
+  async (req: RequestValidator<Item>, res: Response) => {
+    const keyword = req.validator.data.keyword;
+    const tokens = await tokenQuery(keyword);
+
+    return res.status(200).json({ tokens });
+  },
+);
+
 const search = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
-    const [txns, blocks, accounts, receipts] = await Promise.all([
+    const [txns, blocks, accounts, receipts, tokens] = await Promise.all([
       txnQuery(keyword),
       blockQuery(keyword),
       accountQuery(keyword),
       receiptQuery(keyword),
+      tokenQuery(keyword),
     ]);
 
-    return res.status(200).json({ accounts, blocks, receipts, txns });
+    // The chances of a conflict should be infinitesimal. An account (a user's EOA) is derived from the keccak256 of the user's uncompressed Ethereum public key (64 bytes). Even if someone were to intentionally attempt to create such a conflict (considering they can create a named account consisting of 64 arbitrary characters allowed by NEAR for account addresses), they would need to find a private key that produces a public key consisting only of lowercase alphanumeric characters, dots, dashes, or underscores (when decoded as ASCII), which seems to be a practically infeasible task (would require on the order of 2^174 attempts to brute-force, according to my calculations).
+    if (tokens.length > 0 && isHexAddress(keyword)) {
+      accounts.length = 0;
+    }
+
+    return res.status(200).json({ accounts, blocks, receipts, tokens, txns });
   },
 );
 
-export default { accounts, blocks, receipts, search, txns };
+export default { accounts, blocks, receipts, search, tokens, txns };

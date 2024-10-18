@@ -4,7 +4,7 @@ import config from '#config';
 import catchAsync from '#libs/async';
 import db from '#libs/db';
 import sql from '#libs/postgres';
-import { FtTxns, FtTxnsCount, Hex, Holders, Item } from '#libs/schema/fts';
+import { FtTxns, FtTxnsCount, Holders, Item } from '#libs/schema/fts';
 import { getPagination, keyBinder } from '#libs/utils';
 import { RawQueryParams, RequestValidator } from '#types/types';
 
@@ -322,23 +322,7 @@ const holdersCount = catchAsync(
   },
 );
 
-const hex = catchAsync(async (req: RequestValidator<Hex>, res: Response) => {
-  const hex = req.validator.data.hex?.toLowerCase();
-
-  const data = await sql`
-    SELECT
-      contract
-    FROM
-      ft_meta
-    WHERE
-      nep518_hex_address = ${hex}
-  `;
-
-  return res.status(200).json(data);
-});
-
 export default {
-  hex,
   holders,
   holdersCount,
   item,
