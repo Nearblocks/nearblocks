@@ -24,7 +24,7 @@ export default async function Tokens({ searchParams }: any) {
       data={dataResult}
       tokensCount={countResult}
       handleSearch={handleSearch}
-      error={false}
+      error={!dataResult}
     />
   );
 }
