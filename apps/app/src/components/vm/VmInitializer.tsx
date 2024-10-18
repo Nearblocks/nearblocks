@@ -33,10 +33,87 @@ import { sanitizeUrl } from '@braintree/sanitize-url';
 import { useEthersProviderContext } from '@/data/web3';
 import { useAuthStore } from '@/stores/auth';
 import { useVmStore } from '@/stores/vm';
-import { networkId, bosNetworkId } from '@/utils/config';
+import { networkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
+import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
+import { createWeb3Modal } from '@web3modal/wagmi';
+import { reconnect, http, createConfig, type Config } from '@wagmi/core';
+import { walletConnect, injected } from '@wagmi/connectors';
+import { type Chain } from '@wagmi/core/chains';
+import { env } from 'next-runtime-env';
+
+const projectId = env('NEXT_PUBLIC_REOWN_PROJECT_ID') || '';
+
+const nears: Chain = {
+  id: networkId === 'mainnet' ? 397 : 398,
+  name: `NEAR Protocol ${networkId === 'mainnet' ? 'Mainnet' : 'Testnet'}`,
+  nativeCurrency: {
+    decimals: 18,
+    name: 'NEAR',
+    symbol: 'NEAR',
+  },
+  rpcUrls: {
+    default: {
+      http: [
+        `${
+          networkId === 'mainnet'
+            ? ' https://eth-rpc.mainnet.near.org'
+            : 'https://eth-rpc.testnet.near.org'
+        }`,
+      ],
+    },
+    public: {
+      http: [
+        `${
+          networkId === 'mainnet'
+            ? 'https://eth-rpc.mainnet.near.org'
+            : 'https://eth-rpc.testnet.near.org'
+        }`,
+      ],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'NEAR Explorer',
+      url: `${
+        networkId === 'mainnet'
+          ? 'https://nearblocks.io/'
+          : 'https://testnet.nearblocks.io/'
+      }`,
+    },
+  },
+  testnet: networkId !== 'mainnet',
+};
+
+// @ts-ignore
+const wagmiConfig: Config = createConfig({
+  chains: [nears],
+  transports: {
+    [nears.id]: http(),
+  },
+  connectors: [
+    // @ts-ignore
+    walletConnect({
+      projectId,
+      showQrModal: false,
+    }),
+    // @ts-ignore
+    injected({ shimDisconnect: true }),
+  ],
+});
+
+reconnect(wagmiConfig);
+
+// @ts-ignore
+const web3Modal = createWeb3Modal({
+  // @ts-ignore
+  wagmiConfig: wagmiConfig,
+  projectId,
+  enableOnramp: false,
+  allWallets: 'SHOW',
+});
 
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
@@ -45,7 +122,6 @@ export default function VmInitializer() {
   const [walletModal, setWalletModal] = useState<WalletSelectorModal | null>(
     null,
   );
-
   const ethersProviderContext = useEthersProviderContext();
   const { initNear } = useInitNear();
   const near = useNear();
@@ -55,10 +131,11 @@ export default function VmInitializer() {
   const setAuthStore = useAuthStore((state) => state.set);
   const setVmStore = useVmStore((store) => store.set);
   // const { requestAuthentication, saveCurrentUrl } = useSignInRedirect();
+
   useEffect(() => {
     initNear &&
       initNear({
-        networkId: bosNetworkId,
+        networkId: networkId,
         walletConnectCallback: () => {},
         selector: setupWalletSelector({
           network: networkId,
@@ -80,6 +157,13 @@ export default function VmInitializer() {
             setupNearMobileWallet(),
             setupMintbaseWallet(),
             setupBitteWallet(),
+            // @ts-ignore
+            setupEthereumWallets({
+              wagmiConfig,
+              // @ts-ignore
+              web3Modal,
+              alwaysOnboardDuringSignIn: true,
+            }),
           ],
         }),
         customElements: {
