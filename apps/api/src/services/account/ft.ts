@@ -20,6 +20,7 @@ const txns = catchAsync(
   async (req: RequestValidator<FtTxns>, res: Response) => {
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
+    const contract = req.validator.data.contract;
     const event = req.validator.data.event;
     const cursor = req.validator.data.cursor;
     const page = req.validator.data.page;
@@ -89,6 +90,7 @@ const txns = catchAsync(
           WHERE
             affected_account_id = ${account}
             AND ${involved ? sql`involved_account_id = ${involved}` : true}
+            AND ${contract ? sql`contract_account_id = ${contract}` : true}
             AND ${event ? sql`cause = ${event}` : true}
             AND ${cursor
         ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
@@ -187,6 +189,7 @@ const txnsCount = catchAsync(
   async (req: RequestValidator<FtTxnsCount>, res: Response) => {
     const account = req.validator.data.account;
     const involved = req.validator.data.involved;
+    const contract = req.validator.data.contract;
     const event = req.validator.data.event;
     const afterDate = req.validator.data.after_date;
     const beforeDate = req.validator.data.before_date;
@@ -212,6 +215,7 @@ const txnsCount = catchAsync(
       account,
       afterTimestamp,
       beforeTimestamp,
+      contract,
       event,
       involved,
     };
@@ -223,6 +227,7 @@ const txnsCount = catchAsync(
       WHERE
         affected_account_id = :account
         AND ${involved ? `involved_account_id = :involved` : true}
+        AND ${contract ? `contract_account_id = :contract` : true}
         AND ${event ? `cause = :event` : true}
         AND ${afterTimestamp ? `block_timestamp >= :afterTimestamp` : true}
         AND ${beforeTimestamp ? `block_timestamp < :beforeTimestamp` : true}
