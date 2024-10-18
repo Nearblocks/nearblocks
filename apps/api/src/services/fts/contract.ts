@@ -47,7 +47,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 const txns = catchAsync(
   async (req: RequestValidator<FtTxns>, res: Response) => {
     const contract = req.validator.data.contract;
-    const account = req.validator.data.a;
+    const account = req.validator.data.a || req.validator.data.account;
     const event = req.validator.data.event;
     const cursor = req.validator.data.cursor;
     const page = req.validator.data.page;
@@ -177,7 +177,7 @@ const txns = catchAsync(
 const txnsCount = catchAsync(
   async (req: RequestValidator<FtTxnsCount>, res: Response) => {
     const contract = req.validator.data.contract;
-    const account = req.validator.data.a;
+    const account = req.validator.data.a || req.validator.data.account;
     const event = req.validator.data.event;
 
     const useFormat = true;
