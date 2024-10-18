@@ -51,6 +51,8 @@ export const redirect = (route: any) => {
       return Router.push(`/txns/${route?.path}`);
     case 'address':
       return Router.push(`/address/${route?.path}`);
+    case 'token':
+      return Router.push(`/token/${route?.path}`);
     default:
       return toast.error(SearchToast);
   }
@@ -69,7 +71,8 @@ const Search = ({ header = false }) => {
     result?.blocks?.length > 0 ||
     result?.txns?.length > 0 ||
     result?.accounts?.length > 0 ||
-    result?.receipts?.length > 0;
+    result?.receipts?.length > 0 ||
+    result?.tokens?.length > 0;
 
   useEffect(() => {
     if (filter && keyword) {
@@ -131,6 +134,7 @@ const Search = ({ header = false }) => {
           <option value="txns">{t('search.filters.txns')}</option>
           <option value="blocks">{t('search.filters.blocks')}</option>
           <option value="accounts">{t('search.filters.addresses')}</option>
+          <option value="tokens">{t('search.filters.token')}</option>
         </select>
         <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
       </label>
@@ -220,6 +224,25 @@ const Search = ({ header = false }) => {
                     >
                       #{localFormat(block.block_height)} (0x
                       {shortenHex(block.block_hash)})
+                    </ComboboxOption>
+                  ))}
+                </>
+              )}
+              {result?.tokens?.length > 0 && (
+                <>
+                  <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                    {t('search.list.tokens')}
+                  </h3>
+                  {result.tokens.map((token: any) => (
+                    <ComboboxOption
+                      value={token.contract}
+                      className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                      key={token.contract}
+                      onClick={() =>
+                        onSelect({ type: 'token', path: token.contract })
+                      }
+                    >
+                      {shortenAddress(token.contract)}
                     </ComboboxOption>
                   ))}
                 </>

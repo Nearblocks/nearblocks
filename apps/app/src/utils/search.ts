@@ -8,6 +8,8 @@ const getRoute = (filter: string) => {
       return 'blocks';
     case 'accounts':
       return 'accounts';
+    case 'tokens':
+      return 'tokens';
     default:
       return '';
   }
@@ -32,6 +34,7 @@ const search = async (
       txns: [],
       accounts: [],
       receipts: [],
+      tokens: [],
     };
 
     if (resp?.blocks?.length) {
@@ -63,6 +66,13 @@ const search = async (
         return { type: 'address', path: resp.accounts[0].account_id };
       }
       data.accounts = resp.accounts;
+    }
+
+    if (resp?.tokens?.length) {
+      if (returnPath) {
+        return { type: 'token', path: resp.tokens[0].contract };
+      }
+      data.tokens = resp.tokens;
     }
 
     return returnPath ? null : data;

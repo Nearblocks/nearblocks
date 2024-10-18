@@ -44,10 +44,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
   try {
     if (isHexAddress(id)) {
-      const response = await fetcher(`fts/hex/${id}`);
+      const response = await fetcher(`/search/tokens?keyword=${id}`);
 
-      if (response && response[0]?.contract) {
-        const address = response[0].contract;
+      if (response && response?.tokens[0]?.contract) {
+        const address = response.tokens[0].contract;
 
         return {
           redirect: {
