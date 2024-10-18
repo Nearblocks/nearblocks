@@ -79,9 +79,9 @@ const ViewOrChange = (props: Props) => {
       const curFeild = flds.find((fld) => fld.id === id);
 
       if (curFeild) {
-        const name = e.target.name;
-        const value = e.target.value;
-        const rest = flds.filter((fld) => fld.id !== id);
+        const name = e?.target?.name;
+        const value = e?.target?.value;
+        const rest = flds && flds?.filter((fld) => fld?.id !== id);
 
         return sortFields([...rest, { ...curFeild, [name]: value }]);
       }
@@ -90,7 +90,7 @@ const ViewOrChange = (props: Props) => {
     });
 
   const onOptionChange = (key: any) => (e: any) =>
-    setOptions((optns) => ({ ...optns, [key]: e.target.value }));
+    setOptions((optns) => ({ ...optns, [key]: e?.target?.value }));
 
   const onRead = async () => {
     setLoading(true);
@@ -244,47 +244,48 @@ const ViewOrChange = (props: Props) => {
             </Tooltip>
           </button>
         </div>
-        {fields.map((field) => (
-          <div key={field.id} className="flex max-w-xl items-center">
-            <div className="sm:grid grid-cols-9 gap-2">
-              <input
-                name="name"
-                value={field.name}
-                onChange={onChange(field.id)}
-                placeholder="Argument name"
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none"
-              />
-              <select
-                name="type"
-                value={field.type}
-                onChange={onChange(field.id)}
-                className="col-span-2 bg-white block border rounded mb-3 h-9 px-3 w-full outline-none"
-              >
-                <option value="" disabled>
-                  Type
-                </option>
-                {inputTypes.map((type) => (
-                  <option value={type} key={type}>
-                    {capitalize(type)}
+        {fields &&
+          fields.map((field) => (
+            <div key={field.id} className="flex max-w-xl items-center">
+              <div className="sm:grid grid-cols-9 gap-2">
+                <input
+                  name="name"
+                  value={field?.name}
+                  onChange={onChange(field?.id)}
+                  placeholder="Argument name"
+                  className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                />
+                <select
+                  name="type"
+                  value={field?.type}
+                  onChange={onChange(field?.id)}
+                  className="col-span-2 bg-white block border rounded mb-3 h-9 px-3 w-full outline-none"
+                >
+                  <option value="" disabled>
+                    Type
                   </option>
-                ))}
-              </select>
-              <input
-                name="value"
-                value={field.value}
-                onChange={onChange(field.id)}
-                placeholder={field.placeholder || 'Argument value'}
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
-              />
+                  {inputTypes.map((type) => (
+                    <option value={type} key={type}>
+                      {capitalize(type)}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="value"
+                  value={field?.value}
+                  onChange={onChange(field?.id)}
+                  placeholder={field?.placeholder || 'Argument value'}
+                  className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                />
+              </div>
+              <button
+                onClick={onRemove(field?.id)}
+                className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
+              >
+                <CloseCircle className="text-white fill-white w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={onRemove(field.id)}
-              className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
-            >
-              <CloseCircle className="text-white fill-white w-4 h-4" />
-            </button>
-          </div>
-        ))}
+          ))}
         <div className="flex max-w-xl justify-between mb-3 dark:text-neargray-10">
           <div className="flex items-center">
             Options

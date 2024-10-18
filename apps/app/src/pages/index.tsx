@@ -114,7 +114,7 @@ const HomePage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const t = useTranslations();
-  const stats = statsDetails?.stats?.[0];
+  const stats = statsDetails?.stats?.[0] || [];
   const charts = chartDetails;
   const blocks = blockDetails?.blocks || [];
   const txns = txnsDetails?.txns || [];

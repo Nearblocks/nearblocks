@@ -36,33 +36,33 @@ const search = async (
 
     if (resp?.blocks?.length) {
       if (returnPath) {
-        return { type: 'block', path: resp.blocks[0].block_hash };
+        return { type: 'block', path: resp?.blocks[0]?.block_hash };
       }
-      data.blocks = resp.blocks;
+      data.blocks = resp?.blocks;
     }
 
     if (resp?.txns?.length) {
       if (returnPath) {
-        return { type: 'txn', path: resp.txns[0].transaction_hash };
+        return { type: 'txn', path: resp?.txns[0]?.transaction_hash };
       }
-      data.txns = resp.txns;
+      data.txns = resp?.txns;
     }
 
     if (resp?.receipts?.length) {
       if (returnPath) {
         return {
           type: 'txn',
-          path: resp.receipts[0].originated_from_transaction_hash,
+          path: resp?.receipts[0]?.originated_from_transaction_hash,
         };
       }
-      data.receipts = resp.receipts;
+      data.receipts = resp?.receipts;
     }
 
     if (resp?.accounts?.length) {
       if (returnPath) {
-        return { type: 'address', path: resp.accounts[0].account_id };
+        return { type: 'address', path: resp?.accounts[0]?.account_id };
       }
-      data.accounts = resp.accounts;
+      data.accounts = resp?.accounts;
     }
 
     return returnPath ? null : data;

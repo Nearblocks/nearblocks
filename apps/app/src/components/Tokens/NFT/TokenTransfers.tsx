@@ -108,7 +108,7 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
       header: <span>From</span>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.affected_account_id ? (
               <Tooltip
@@ -195,7 +195,7 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
       header: <span>To</span>,
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
@@ -355,7 +355,7 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
               {txns &&
                 !error &&
                 `A total of ${
-                  count ? localFormat && localFormat(count.toString()) : 0
+                  count ? localFormat && localFormat(count?.toString()) : 0
                 }${' '}
                 transactions found`}
             </p>

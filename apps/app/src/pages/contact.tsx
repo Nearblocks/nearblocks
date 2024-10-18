@@ -107,7 +107,7 @@ const Contact = () => {
     });
   };
   const handleChange = (event: any) => {
-    const value = event.target.value;
+    const value = event?.target?.value;
     setSelectedValue(value);
     setIndices([]);
     if (value === '4') {
@@ -414,62 +414,68 @@ const Contact = () => {
                       Introduction
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
-                      {accordionData.Introduction.map((item, index) => (
-                        <Items
-                          index={index}
-                          key={item.title}
-                          title={item.title}
-                          description={item.description}
-                          className={
-                            accordionData.Introduction.length - 1 !== index
-                              ? 'dark:border-black-200 border-b'
-                              : ''
-                          }
-                        />
-                      ))}
+                      {accordionData &&
+                        accordionData?.Introduction?.map((item, index) => (
+                          <Items
+                            index={index}
+                            key={item?.title}
+                            title={item?.title}
+                            description={item?.description}
+                            className={
+                              accordionData?.Introduction?.length - 1 !== index
+                                ? 'dark:border-black-200 border-b'
+                                : ''
+                            }
+                          />
+                        ))}
                     </div>
                     <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Transactions
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
-                      {accordionData.Transactions.map((item, index) => (
-                        <Items
-                          index={index + accordionData.Introduction.length}
-                          key={item.title}
-                          title={item.title}
-                          description={item.description}
-                          className={
-                            accordionData.Transactions.length - 1 !== index
-                              ? 'dark:border-black-200 border-b'
-                              : ''
-                          }
-                        />
-                      ))}
+                      {accordionData &&
+                        accordionData?.Transactions?.map((item, index) => (
+                          <Items
+                            index={index + accordionData?.Introduction?.length}
+                            key={item?.title}
+                            title={item?.title}
+                            description={item?.description}
+                            className={
+                              accordionData?.Transactions?.length - 1 !== index
+                                ? 'dark:border-black-200 border-b'
+                                : ''
+                            }
+                          />
+                        ))}
                     </div>
                     <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Features & Services
                     </div>
                     <div className="border dark:border-black-200 rounded-lg">
-                      {accordionData.featuresAndServices.map((item, index) => (
-                        <Items
-                          index={
-                            index +
-                            accordionData.Introduction.length +
-                            accordionData.Transactions.length +
-                            accordionData.featuresAndServices.length -
-                            1
-                          }
-                          key={item.title}
-                          title={item.title}
-                          description={item.description}
-                          className={
-                            accordionData.featuresAndServices.length - 1 !==
-                            index
-                              ? 'dark:border-black-200 border-b'
-                              : ''
-                          }
-                        />
-                      ))}
+                      {accordionData &&
+                        accordionData?.featuresAndServices?.map(
+                          (item, index) => (
+                            <Items
+                              index={
+                                index +
+                                accordionData?.Introduction?.length +
+                                accordionData?.Transactions?.length +
+                                accordionData?.featuresAndServices?.length -
+                                1
+                              }
+                              key={item?.title}
+                              title={item?.title}
+                              description={item?.description}
+                              className={
+                                accordionData?.featuresAndServices?.length -
+                                  1 !==
+                                index
+                                  ? 'dark:border-black-200 border-b'
+                                  : ''
+                              }
+                            />
+                          ),
+                        )}
                     </div>
                     <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
                       Additional Support

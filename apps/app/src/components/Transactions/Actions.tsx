@@ -12,51 +12,53 @@ import { Action } from 'near-api-js/lib/transaction';
 
 const Actions = (props: ActionPropsInfo) => {
   const showAction = () => {
-    switch (props.action.action_kind) {
+    switch (props?.action?.action_kind) {
       case 'ADD_KEY':
       case 'AddKey':
-        return <AddKey args={props.action.args} receiver={props.action?.to} />;
+        return (
+          <AddKey args={props?.action?.args} receiver={props?.action?.to} />
+        );
       case 'CreateAccount':
-        return <CreateAccount action={props.action} />;
+        return <CreateAccount action={props?.action} />;
       case 'DeleteAccount':
-        return <DeleteAccount action={props.action} />;
+        return <DeleteAccount action={props?.action} />;
       case 'DeployContract':
-        return <DeployContract action={props.action} />;
+        return <DeployContract action={props?.action} />;
       case 'FunctionCall':
-        return <FunctionCall action={props.action} />;
+        return <FunctionCall action={props?.action} />;
       case 'Stake':
-        return <Stake action={props.action} />;
+        return <Stake action={props?.action} />;
       case 'Transfer':
-        return <Transfer action={props.action} />;
+        return <Transfer action={props?.action} />;
       case 'Delegate':
       case 'DELEGATE':
         const delegateAction: DelegateActionView | any =
-          props.action?.args?.delegate_action?.actions &&
-          props.action?.args?.delegate_action?.actions?.map(
+          props?.action?.args?.delegate_action?.actions &&
+          props?.action?.args?.delegate_action?.actions?.map(
             (txn: ActionType | any) => {
               const action = mapRpcActionToAction(txn);
               return {
                 ...action,
-                from: props.action?.from,
-                to: props.action?.to,
+                from: props?.action?.from,
+                to: props?.action?.to,
               };
             },
           );
 
         return (
           delegateAction &&
-          delegateAction.map((subAction: Action | any, i: number) => (
+          delegateAction?.map((subAction: Action | any, i: number) => (
             <div className="flex flex-col" key={i}>
               <Actions
                 key={i}
                 action={subAction}
-                receiver={props.action?.args?.delegate_action?.receiver_id}
+                receiver={props?.action?.args?.delegate_action?.receiver_id}
               />
             </div>
           ))
         );
       default:
-        return <div>{props.action.action_kind}</div>;
+        return <div>{props?.action?.action_kind}</div>;
     }
   };
 
