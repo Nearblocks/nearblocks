@@ -66,6 +66,11 @@ jobs:
             echo "${{ matrix.service }}=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Debug matrix result output
+        run: |
+          echo "Matrix result output:"
+          echo '${{ needs.build.outputs.matrix-result }}'
+          
     outputs:
       matrix-result: ${{ toJSON(steps.set_image_output.outputs) }}
 
@@ -95,7 +100,10 @@ jobs:
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
-            
+
+            echo "Service: $service"
+            echo "Service SHA: $service_sha"
+
             if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
               echo "Updating deployment for $deployment_name"
