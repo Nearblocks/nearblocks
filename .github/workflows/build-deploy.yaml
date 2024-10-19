@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "Matrix result output:"
           echo '${{ needs.build.outputs.matrix-result }}'
-          
+
     outputs:
       matrix-result: ${{ toJSON(steps.set_image_output.outputs) }}
 
