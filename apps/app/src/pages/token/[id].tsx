@@ -22,6 +22,8 @@ import { useBosComponents } from '@/hooks/useBosComponents';
 import Comment from '@/components/skeleton/common/Comment';
 import { useAuthStore } from '@/stores/auth';
 import { fetchData } from '@/utils/fetchData';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import FileSlash from '@/components/Icons/FileSlash';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -257,126 +259,144 @@ const TokenDetails = ({
       </Head>
       <div className="relative container mx-auto px-3">
         <section>
-          <Overview
-            stats={stats}
-            token={token}
-            status={status}
-            transfers={transfers}
-            holders={holders}
-          />
-          <div className="py-6"></div>
-          {a && (
-            <TokenFilter
-              id={id}
-              tokenFilter={a}
-              inventoryData={inventoryData}
-            />
-          )}
-          <div className="block lg:flex lg:space-x-2 mb-4">
-            <div className="w-full">
-              <Tabs
-                onSelect={(index) => onTab(index)}
-                selectedIndex={tabs.indexOf(tab)}
-              >
-                <TabList className={'flex flex-wrap'}>
-                  <Tab
-                    className={getClassName(
-                      tabs[0] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>{t('token:fts.ft.transfers')}</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(
-                      tabs[1] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>{t('token:fts.ft.holders')}</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(
-                      tabs[2] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Info</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(
-                      tabs[3] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>FAQ</h2>
-                  </Tab>
-                  <Tab
-                    className={getClassName(
-                      tabs[4] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Comments</h2>
-                  </Tab>
-                </TabList>
-                <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                  <TabPanel>
-                    <Transfers
-                      txns={txns}
-                      count={transfers}
-                      error={error}
-                      cursor={txnCursor}
-                      tab={tab}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <Holders
-                      token={token}
-                      status={status}
-                      holder={holder}
-                      count={holders}
-                      error={error}
-                      tab={tab}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    <Info token={token} error={error} tab={tab} />
-                  </TabPanel>
-                  <TabPanel>
-                    <FAQ
-                      id={id}
-                      token={token}
-                      account={account}
-                      contract={contract}
-                      transfers={transfers}
-                      holdersData={holder}
-                      holdersCount={holders}
-                      tab={tab}
-                    />
-                  </TabPanel>
-                  <TabPanel>
-                    {tab === 'comments' ? (
-                      <VmComponent
-                        src={components?.commentsFeed}
-                        defaultSkelton={<Comment />}
-                        props={{
-                          network: network,
-                          path: `nearblocks.io/token/${id}`,
-                          limit: 10,
-                          requestSignInWithWallet,
-                        }}
-                        loading={<Comment />}
-                      />
-                    ) : (
-                      <div className="w-full h-[500px]"></div>
-                    )}
-                  </TabPanel>
+          {!token ? (
+            <>
+              <div className="py-8"></div>
+              <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 ">
+                <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
+                  <ErrorMessage
+                    icons={<FileSlash />}
+                    message="Sorry, we are unable to locate this token."
+                    mutedText={id || ''}
+                  />
                 </div>
-              </Tabs>
+              </div>
+              <div className="py-8"></div>
+            </>
+          ) : (
+            <div>
+              <Overview
+                stats={stats}
+                token={token}
+                status={status}
+                transfers={transfers}
+                holders={holders}
+              />
+              <div className="py-6"></div>
+              {a && (
+                <TokenFilter
+                  id={id}
+                  tokenFilter={a}
+                  inventoryData={inventoryData}
+                />
+              )}
+              <div className="block lg:flex lg:space-x-2 mb-4">
+                <div className="w-full">
+                  <Tabs
+                    onSelect={(index) => onTab(index)}
+                    selectedIndex={tabs.indexOf(tab)}
+                  >
+                    <TabList className={'flex flex-wrap'}>
+                      <Tab
+                        className={getClassName(
+                          tabs[0] === tabs[tabs.indexOf(tab)],
+                        )}
+                        selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                      >
+                        <h2>{t('token:fts.ft.transfers')}</h2>
+                      </Tab>
+                      <Tab
+                        className={getClassName(
+                          tabs[1] === tabs[tabs.indexOf(tab)],
+                        )}
+                        selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                      >
+                        <h2>{t('token:fts.ft.holders')}</h2>
+                      </Tab>
+                      <Tab
+                        className={getClassName(
+                          tabs[2] === tabs[tabs.indexOf(tab)],
+                        )}
+                        selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                      >
+                        <h2>Info</h2>
+                      </Tab>
+                      <Tab
+                        className={getClassName(
+                          tabs[3] === tabs[tabs.indexOf(tab)],
+                        )}
+                        selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                      >
+                        <h2>FAQ</h2>
+                      </Tab>
+                      <Tab
+                        className={getClassName(
+                          tabs[4] === tabs[tabs.indexOf(tab)],
+                        )}
+                        selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
+                      >
+                        <h2>Comments</h2>
+                      </Tab>
+                    </TabList>
+                    <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+                      <TabPanel>
+                        <Transfers
+                          txns={txns}
+                          count={transfers}
+                          error={error}
+                          cursor={txnCursor}
+                          tab={tab}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <Holders
+                          token={token}
+                          status={status}
+                          holder={holder}
+                          count={holders}
+                          error={error}
+                          tab={tab}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <Info token={token} error={error} tab={tab} />
+                      </TabPanel>
+                      <TabPanel>
+                        <FAQ
+                          id={id}
+                          token={token}
+                          account={account}
+                          contract={contract}
+                          transfers={transfers}
+                          holdersData={holder}
+                          holdersCount={holders}
+                          tab={tab}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        {tab === 'comments' ? (
+                          <VmComponent
+                            src={components?.commentsFeed}
+                            defaultSkelton={<Comment />}
+                            props={{
+                              network: network,
+                              path: `nearblocks.io/token/${id}`,
+                              limit: 10,
+                              requestSignInWithWallet,
+                            }}
+                            loading={<Comment />}
+                          />
+                        ) : (
+                          <div className="w-full h-[500px]"></div>
+                        )}
+                      </TabPanel>
+                    </div>
+                  </Tabs>
+                </div>
+              </div>
+              <div className="py-8"></div>
             </div>
-          </div>
-          <div className="py-8"></div>
+          )}
         </section>
       </div>
     </>
