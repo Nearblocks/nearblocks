@@ -1683,3 +1683,51 @@ export type ContractData = {
   onChainCodeHash: string;
   contractMetadata: ContractMetadata | null;
 };
+
+export type CampaignData = {
+  data?: {
+    title?: string;
+    url?: string;
+    is_active?: number;
+    mobile_image_url?: string;
+    desktop_image_right_url?: string;
+    start_date?: string;
+    subscription?: {
+      status?: string;
+    };
+    text?: string;
+    site_name?: string;
+    link_name?: string;
+    icon?: string;
+  };
+};
+
+export type CampaignProps = {
+  campaignId?: string | string[];
+  campaignData: CampaignData;
+  mutate: () => void;
+  loading: boolean;
+  campaignMutate: () => void;
+};
+
+export type currentCampaign = {
+  key: string;
+  id: string;
+  title: string;
+  is_active: number;
+  impression_count: number;
+  click_count: number;
+  start_date: string;
+  is_approved?: number;
+  price_monthly: number;
+  price_annually: number;
+  user?: {
+    username: string;
+  };
+  subscription?: {
+    status: string;
+    campaign_plan?: {
+      title: string;
+    };
+  };
+};
