@@ -24,7 +24,7 @@ const Stake = (props: ActionPropsInfo) => {
       <span className="font-bold px-1">
         Stake{' '}
         <span className="font-normal pl-1">
-          {yoctoToNear(props.action.args.stake, true)} Ⓝ
+          {yoctoToNear(props?.action?.args?.stake, true)} Ⓝ
         </span>
       </span>
     </div>

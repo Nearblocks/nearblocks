@@ -152,7 +152,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
           {keyInfo &&
-            Object.keys(keyInfo).length !== 0 &&
+            Object?.keys(keyInfo)?.length !== 0 &&
             keyInfo?.permission?.FunctionCall?.receiver_id}
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 justify-start">
@@ -172,7 +172,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
           {keyInfo &&
-            Object.keys(keyInfo).length !== 0 &&
+            Object?.keys(keyInfo)?.length !== 0 &&
             keyInfo?.permission?.FunctionCall?.allowance &&
             'Ⓝ ' +
               yoctoToNear(

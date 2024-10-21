@@ -65,33 +65,33 @@ const Details = (props: Props) => {
       let nfts: NftsInfo[] = [];
 
       receipts &&
-        receipts.forEach(
+        receipts?.forEach(
           (receipt) =>
             receipt?.fts?.forEach((ft) => {
-              if (ft.ft_meta && ft.cause === 'TRANSFER') {
-                if (ft.ft_meta && Number(ft.delta_amount) < 0) fts.push(ft);
+              if (ft?.ft_meta && ft?.cause === 'TRANSFER') {
+                if (ft?.ft_meta && Number(ft?.delta_amount) < 0) fts?.push(ft);
               } else {
-                if (ft.ft_meta) fts.push(ft);
+                if (ft?.ft_meta) fts?.push(ft);
               }
             }),
         );
       receipts &&
-        receipts.forEach(
+        receipts?.forEach(
           (receipt) =>
             receipt?.nfts?.forEach((nft) => {
               if (
-                nft.nft_meta &&
-                nft.nft_token_meta &&
-                nft.cause === 'TRANSFER'
+                nft?.nft_meta &&
+                nft?.nft_token_meta &&
+                nft?.cause === 'TRANSFER'
               ) {
                 if (
-                  nft.nft_meta &&
-                  nft.nft_token_meta &&
-                  Number(nft.delta_amount) < 0
+                  nft?.nft_meta &&
+                  nft?.nft_token_meta &&
+                  Number(nft?.delta_amount) < 0
                 )
-                  nfts.push(nft);
+                  nfts?.push(nft);
               } else {
-                if (nft.nft_meta && nft.nft_token_meta) nfts.push(nft);
+                if (nft?.nft_meta && nft?.nft_token_meta) nfts?.push(nft);
               }
             }),
         );
@@ -103,7 +103,7 @@ const Details = (props: Props) => {
     }
 
     if (txn?.receipts?.length) {
-      return tokensTransfers(txn.receipts);
+      return tokensTransfers(txn?.receipts);
     }
 
     return { fts: [], nfts: [] };
@@ -112,7 +112,7 @@ const Details = (props: Props) => {
   }, [txn]);
 
   function absoluteValue(number: string) {
-    return new Big(number).abs().toString();
+    return new Big(number)?.abs()?.toString();
   }
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -159,7 +159,7 @@ const Details = (props: Props) => {
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
+        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props?.className} ${props?.wrapperClassName}`}
       ></div>
     );
   };
@@ -397,240 +397,252 @@ const Details = (props: Props) => {
             <div className="relative w-full md:w-3/4">
               <PerfectScrollbar>
                 <div className="max-h-[302px] break-words space-y-3">
-                  {fts?.map((ft: any, i: number) => (
-                    <div
-                      className="flex items-center flex-wrap break-all leading-7"
-                      key={i}
-                    >
-                      <FaRight className="inline-flex text-gray-400 text-xs" />
-                      {ft?.cause === 'MINT' ? (
-                        <>
-                          <div className="font-semibold text-gray px-1">
-                            From{' '}
-                            {ft?.involved_account_id ? (
-                              <Link
-                                href={`/address/${ft?.involved_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                              >
-                                {shortenAddress(ft?.involved_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                          <div className="font-semibold text-gray px-1">
-                            To{' '}
-                            {ft?.affected_account_id ? (
-                              <Link
-                                href={`/address/${ft?.affected_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1"
-                              >
-                                {shortenAddress(ft?.affected_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="font-semibold text-gray px-1">
-                            From{' '}
-                            {ft?.affected_account_id ? (
-                              <Link
-                                href={`/address/${ft?.affected_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                              >
-                                {shortenAddress(ft?.affected_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                          <div className="font-semibold text-gray px-1">
-                            To{' '}
-                            {ft?.involved_account_id ? (
-                              <Link
-                                href={`/address/${ft?.involved_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1"
-                              >
-                                {shortenAddress(ft?.involved_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                        </>
-                      )}
-                      <div className="font-semibold text-gray px-1">
-                        For{' '}
-                        <span className="pl-1 font-normal">
-                          {ft?.delta_amount &&
-                          ft?.ft_meta?.decimals &&
-                          tokenAmount
-                            ? tokenAmount(
-                                absoluteValue(ft?.delta_amount),
-                                ft?.ft_meta?.decimals,
-                                true,
-                              )
-                            : ''}
-                        </span>
-                      </div>
-
-                      <Link
-                        href={`/token/${ft?.ft_meta?.contract}`}
-                        className="text-green dark:text-green-250 flex items-center hover:no-underline"
+                  {fts &&
+                    fts?.map((ft: any, i: number) => (
+                      <div
+                        className="flex items-center flex-wrap break-all leading-7"
+                        key={i}
                       >
-                        <TokenImage
-                          src={ft?.ft_meta?.icon}
-                          alt={ft?.ft_meta?.name}
-                          className="w-4 h-4 mx-1"
-                        />
-                        {shortenToken(ft?.ft_meta?.name ?? '')}
-                        <span>
-                          {`(${shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})`}
-                        </span>
-                      </Link>
-                    </div>
-                  ))}
-                  {nfts?.map((nft: any) => (
-                    <div className="flex" key={nft?.key}>
-                      <div className="flex justify-start items-start">
-                        <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
-                        <div className="flex flex-wrap">
-                          <div>
-                            <div className="sm:flex">
-                              {nft?.cause === 'MINT' ? (
-                                <>
-                                  <div className="font-semibold text-gray px-1">
-                                    From{' '}
-                                    {nft?.involved_account_id ? (
-                                      <Link
-                                        href={`/address/${nft?.involved_account_id}`}
-                                        className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                      >
-                                        {shortenAddress(
-                                          nft?.involved_account_id ?? '',
-                                        )}
-                                      </Link>
-                                    ) : (
-                                      <span className="font-normal pl-1">
-                                        system
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="font-semibold text-gray px-1">
-                                    To{' '}
-                                    {nft?.affected_account_id ? (
-                                      <Link
-                                        href={`/address/${nft?.affected_account_id}`}
-                                        className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                      >
-                                        {shortenAddress(
-                                          nft?.affected_account_id ?? '',
-                                        )}
-                                      </Link>
-                                    ) : (
-                                      <span className="font-normal pl-1">
-                                        system
-                                      </span>
-                                    )}
-                                  </div>
-                                </>
+                        <FaRight className="inline-flex text-gray-400 text-xs" />
+                        {ft?.cause === 'MINT' ? (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                >
+                                  {shortenAddress(
+                                    ft?.involved_account_id ?? '',
+                                  )}
+                                </Link>
                               ) : (
-                                <>
-                                  <div className="font-semibold text-gray px-1">
-                                    From{' '}
-                                    {nft?.affected_account_id ? (
-                                      <Link
-                                        href={`/address/${nft?.affected_account_id}`}
-                                        className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                      >
-                                        {shortenAddress(
-                                          nft?.affected_account_id ?? '',
-                                        )}
-                                      </Link>
-                                    ) : (
-                                      <span className="font-normal pl-1">
-                                        system
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="font-semibold text-gray px-1">
-                                    To{' '}
-                                    {nft?.involved_account_id ? (
-                                      <Link
-                                        href={`/address/${nft?.involved_account_id}`}
-                                        className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                      >
-                                        {shortenAddress(
-                                          nft?.involved_account_id ?? '',
-                                        )}
-                                      </Link>
-                                    ) : (
-                                      <span className="font-normal pl-1">
-                                        system
-                                      </span>
-                                    )}
-                                  </div>
-                                </>
+                                <span className="font-normal pl-1">system</span>
                               )}
                             </div>
-                            <div className="sm:flex mt-1">
-                              <div className="text-gray px-1">
-                                <span className="text-gray-400">For </span>
-                                <span className="pl-1 font-normal">
-                                  NFT Token ID [
-                                  <Link
-                                    href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
-                                    className="text-green hover:no-underline dark:text-green-250"
-                                  >
-                                    {shortenToken(nft?.token_id ?? '')}
-                                  </Link>
-                                  ]
-                                </span>
-                              </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                >
+                                  {shortenAddress(
+                                    ft?.affected_account_id ?? '',
+                                  )}
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-semibold text-gray px-1">
+                              From{' '}
+                              {ft?.affected_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.affected_account_id}`}
+                                  className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                >
+                                  {shortenAddress(
+                                    ft?.affected_account_id ?? '',
+                                  )}
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                            <div className="font-semibold text-gray px-1">
+                              To{' '}
+                              {ft?.involved_account_id ? (
+                                <Link
+                                  href={`/address/${ft?.involved_account_id}`}
+                                  className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                >
+                                  {shortenAddress(
+                                    ft?.involved_account_id ?? '',
+                                  )}
+                                </Link>
+                              ) : (
+                                <span className="font-normal pl-1">system</span>
+                              )}
+                            </div>
+                          </>
+                        )}
+                        <div className="font-semibold text-gray px-1">
+                          For{' '}
+                          <span className="pl-1 font-normal">
+                            {ft?.delta_amount &&
+                            ft?.ft_meta?.decimals &&
+                            tokenAmount
+                              ? tokenAmount(
+                                  absoluteValue(ft?.delta_amount),
+                                  ft?.ft_meta?.decimals,
+                                  true,
+                                )
+                              : ''}
+                          </span>
+                        </div>
 
+                        <Link
+                          href={`/token/${ft?.ft_meta?.contract}`}
+                          className="text-green dark:text-green-250 flex items-center hover:no-underline"
+                        >
+                          <TokenImage
+                            src={ft?.ft_meta?.icon}
+                            alt={ft?.ft_meta?.name}
+                            className="w-4 h-4 mx-1"
+                          />
+                          {shortenToken(ft?.ft_meta?.name ?? '')}
+                          <span>
+                            {`(${shortenTokenSymbol(
+                              ft?.ft_meta?.symbol ?? '',
+                            )})`}
+                          </span>
+                        </Link>
+                      </div>
+                    ))}
+                  {nfts &&
+                    nfts?.map((nft: any) => (
+                      <div className="flex" key={nft?.key}>
+                        <div className="flex justify-start items-start">
+                          <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
+                          <div className="flex flex-wrap">
+                            <div>
+                              <div className="sm:flex">
+                                {nft?.cause === 'MINT' ? (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                        >
+                                          {shortenAddress(
+                                            nft?.involved_account_id ?? '',
+                                          )}
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                        >
+                                          {shortenAddress(
+                                            nft?.affected_account_id ?? '',
+                                          )}
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="font-semibold text-gray px-1">
+                                      From{' '}
+                                      {nft?.affected_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.affected_account_id}`}
+                                          className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                        >
+                                          {shortenAddress(
+                                            nft?.affected_account_id ?? '',
+                                          )}
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="font-semibold text-gray px-1">
+                                      To{' '}
+                                      {nft?.involved_account_id ? (
+                                        <Link
+                                          href={`/address/${nft?.involved_account_id}`}
+                                          className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                        >
+                                          {shortenAddress(
+                                            nft?.involved_account_id ?? '',
+                                          )}
+                                        </Link>
+                                      ) : (
+                                        <span className="font-normal pl-1">
+                                          system
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                              <div className="sm:flex mt-1">
+                                <div className="text-gray px-1">
+                                  <span className="text-gray-400">For </span>
+                                  <span className="pl-1 font-normal">
+                                    NFT Token ID [
+                                    <Link
+                                      href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
+                                      className="text-green hover:no-underline dark:text-green-250"
+                                    >
+                                      {shortenToken(nft?.token_id ?? '')}
+                                    </Link>
+                                    ]
+                                  </span>
+                                </div>
+
+                                <Link
+                                  href={`/nft-token/${nft?.nft_meta?.contract}`}
+                                  className="text-green flex items-center hover:no-underline dark:text-green-250"
+                                >
+                                  <TokenImage
+                                    src={nft?.nft_meta?.icon}
+                                    alt={nft?.nft_meta?.name}
+                                    className="w-4 h-4 mx-1"
+                                  />
+                                  {shortenToken(nft?.nft_meta?.name ?? '')}
+                                  <span>
+                                    &nbsp;
+                                    {`(${shortenTokenSymbol(
+                                      nft?.nft_meta?.symbol ?? '',
+                                    )})`}
+                                  </span>
+                                </Link>
+                              </div>
+                            </div>
+                            <div className="border rounded ml-2 w-11 h-11 p-1">
                               <Link
-                                href={`/nft-token/${nft?.nft_meta?.contract}`}
-                                className="text-green flex items-center hover:no-underline dark:text-green-250"
+                                href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
+                                className="hover:no-underline"
                               >
-                                <TokenImage
-                                  src={nft?.nft_meta?.icon}
-                                  alt={nft?.nft_meta?.name}
-                                  className="w-4 h-4 mx-1"
+                                <NFTImage
+                                  base={nft?.nft_meta?.base_uri}
+                                  media={nft?.nft_token_meta?.media}
+                                  reference={
+                                    nft?.nft_meta?.reference ||
+                                    nft?.nft_token_meta?.reference
+                                  }
+                                  alt={nft?.nft_token_meta?.title}
+                                  className="max-h-full rounded"
                                 />
-                                {shortenToken(nft?.nft_meta?.name ?? '')}
-                                <span>
-                                  &nbsp;
-                                  {`(${shortenTokenSymbol(
-                                    nft?.nft_meta?.symbol ?? '',
-                                  )})`}
-                                </span>
                               </Link>
                             </div>
-                          </div>
-                          <div className="border rounded ml-2 w-11 h-11 p-1">
-                            <Link
-                              href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
-                              className="hover:no-underline"
-                            >
-                              <NFTImage
-                                base={nft.nft_meta.base_uri}
-                                media={nft.nft_token_meta.media}
-                                reference={
-                                  nft.nft_meta.reference ||
-                                  nft.nft_token_meta.reference
-                                }
-                                alt={nft.nft_token_meta.title}
-                                className="max-h-full rounded"
-                              />
-                            </Link>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </PerfectScrollbar>
             </div>
@@ -662,12 +674,12 @@ const Details = (props: Props) => {
               >
                 <span>
                   {txn?.actions_agg?.deposit
-                    ? yoctoToNear(txn.actions_agg?.deposit, true)
+                    ? yoctoToNear(txn?.actions_agg?.deposit, true)
                     : txn?.actions_agg?.deposit ?? ''}{' '}
                   Ⓝ
                   {currentPrice && networkId === 'mainnet'
                     ? ` ($${fiatValue(
-                        yoctoToNear(txn.actions_agg?.deposit ?? 0, false),
+                        yoctoToNear(txn?.actions_agg?.deposit ?? 0, false),
                         currentPrice,
                       )})`
                     : ''}
@@ -700,7 +712,7 @@ const Details = (props: Props) => {
               Ⓝ
               {currentPrice && networkId === 'mainnet'
                 ? ` ($${fiatValue(
-                    yoctoToNear(txn.outcomes_agg?.transaction_fee ?? 0, false),
+                    yoctoToNear(txn?.outcomes_agg?.transaction_fee ?? 0, false),
                     currentPrice,
                   )})`
                 : ''}
@@ -834,7 +846,10 @@ const Details = (props: Props) => {
                         |
                       </span>{' '}
                       {txn?.receipt_conversion_tokens_burnt
-                        ? yoctoToNear(txn.receipt_conversion_tokens_burnt, true)
+                        ? yoctoToNear(
+                            txn?.receipt_conversion_tokens_burnt,
+                            true,
+                          )
                         : txn?.receipt_conversion_tokens_burnt ?? ''}{' '}
                       Ⓝ
                     </div>

@@ -11,13 +11,13 @@ interface Props {
 
 const RlpTransaction = ({ pretty, method, receiver }: Props) => {
   const decoded =
-    method === 'submit' && receiver.includes('aurora')
+    method === 'submit' && receiver?.includes('aurora')
       ? pretty
       : pretty && Buffer.from(pretty, 'base64');
   const parsed =
-    method === 'submit' && receiver.includes('aurora')
+    method === 'submit' && receiver?.includes('aurora')
       ? decoded
-      : decoded && jsonParser(decoded.toString());
+      : decoded && jsonParser(decoded?.toString());
 
   const [format, setFormat] = useState('rlp');
   const [displayedArgs, setDisplayedArgs] = useState(
@@ -33,24 +33,24 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
   }
 
   function decodeTransaction(parsed: any) {
-    if (!parsed || !parsed.tx_bytes_b64 || !isBase64(parsed.tx_bytes_b64)) {
+    if (!parsed || !parsed?.tx_bytes_b64 || !isBase64(parsed?.tx_bytes_b64)) {
       return parsed;
     }
 
-    const input = ethers.utils.base64.decode(parsed.tx_bytes_b64);
-    const data = ethers.utils.parseTransaction(input);
+    const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
+    const data = ethers?.utils?.parseTransaction(input);
     //@ts-ignore
-    data.value = data.value.toString();
+    data.value = data?.value?.toString();
     //@ts-ignore
-    data.gasPrice = data.gasPrice.toString();
+    data.gasPrice = data?.gasPrice?.toString();
     //@ts-ignore
-    data.gasLimit = data.gasLimit.toString();
+    data.gasLimit = data?.gasLimit?.toString();
 
     return { ...parsed, tx_bytes_b64: data };
   }
 
   const handleFormatChange = (event: any) => {
-    const selectedFormat = event.target.value;
+    const selectedFormat = event?.target?.value;
     setFormat(selectedFormat);
     let transformedArgs;
     switch (selectedFormat) {
@@ -84,14 +84,16 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
             </thead>
             <tbody>
               {displayedArgs &&
-                Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
+                Object.entries(jsonParser(displayedArgs)?.tx_bytes_b64)?.map(
                   ([key, value]) => (
                     <tr key={key}>
                       <td className="border px-4 py-2 whitespace-nowrap align-top">
                         {key}
                       </td>
                       <td className="border px-4 py-2">
-                        {key === 'hash' ? (
+                        {key === 'hash' &&
+                        method === 'submit' &&
+                        receiver?.includes('aurora') ? (
                           <a
                             href={`${aurorablocksUrl}/tx/${value}`}
                             target="_blank"
@@ -118,7 +120,7 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
           style={{ height: '150px' }}
         >
           {displayedArgs &&
-            Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
+            Object.entries(jsonParser(displayedArgs)?.tx_bytes_b64)?.map(
               ([key, value]) => (
                 <p key={key} className="mb-2">
                   {key}:{' '}
@@ -146,7 +148,7 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
           rows={4}
           value={
             method === 'submit' && receiver.includes('aurora')
-              ? jsonParser(displayedArgs).tx_bytes_b64
+              ? jsonParser(displayedArgs)?.tx_bytes_b64
               : displayedArgs
           }
           className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"

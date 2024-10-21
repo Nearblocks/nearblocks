@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 const useHash = (): [string | undefined, (newHash: string) => void] => {
   const { push, asPath } = useRouter();
 
-  const hash = useMemo(() => asPath.split('#')[1], [asPath]);
+  const hash = useMemo(() => asPath && asPath?.split('#')[1], [asPath]);
 
   const setHash = useCallback(
     (newHash: string) => {

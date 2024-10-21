@@ -79,8 +79,8 @@ const List = ({ data, tokensCount, error }: Props) => {
   const handleClickOutside = (event: MouseEvent) => {
     if (
       containerRef.current &&
-      event.target &&
-      !containerRef.current.contains(event.target)
+      event?.target &&
+      !containerRef?.current?.contains(event?.target)
     ) {
       setIsOpen(false);
       setSelectedIndex(-1);
@@ -95,9 +95,9 @@ const List = ({ data, tokensCount, error }: Props) => {
   }, []);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    if (!value || value.trim() === '') {
+    const name = e?.target?.name;
+    const value = e?.target?.value;
+    if (!value || value?.trim() === '') {
       setSearchResults([]);
       setValue(undefined);
       return;
@@ -135,7 +135,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         if (value) {
           onFilter();
           setSelectedIndex(-1);
-        } else if (Object.keys(router.query).length > 0) {
+        } else if (Object.keys(router.query)?.length > 0) {
           // @ts-ignore: Unreachable code error
           intlRouter.push(`/tokens`);
         }
@@ -145,7 +145,7 @@ const List = ({ data, tokensCount, error }: Props) => {
       if (e.key === 'ArrowDown') {
         setSelectedIndex((prevIndex) => {
           const nextIndex =
-            prevIndex < searchResults.length - 1 ? prevIndex + 1 : -1;
+            prevIndex < searchResults?.length - 1 ? prevIndex + 1 : -1;
           return nextIndex;
         });
       } else if (e.key === 'ArrowUp') {
@@ -363,7 +363,7 @@ const List = ({ data, tokensCount, error }: Props) => {
           {tokens?.length > 0 &&
             totalCount > 0 &&
             `${t('fts.top.listing', {
-              count: localFormat(totalCount.toString()),
+              count: localFormat(totalCount?.toString()),
             })}`}
         </p>
         <div className="flex w-full h-10 sm:w-80 mr-2" ref={containerRef}>

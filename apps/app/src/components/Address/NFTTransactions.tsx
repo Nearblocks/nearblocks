@@ -55,8 +55,8 @@ const NFTTransactions = ({
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const name = e?.target?.name;
+    const value = e?.target?.value;
 
     setForm((f) => ({ ...f, [name]: value }));
   };
@@ -507,7 +507,7 @@ const NFTTransactions = ({
                 txns &&
                 !error &&
                 `A total of ${
-                  count ? localFormat && localFormat(count.toString()) : 0
+                  count ? localFormat && localFormat(count?.toString()) : 0
                 }${' '}
         transactions found`
               }
@@ -516,7 +516,7 @@ const NFTTransactions = ({
               }
               linkToDowload={
                 txns &&
-                txns.length > 0 && (
+                txns?.length > 0 && (
                   <button className="hover:no-underline ">
                     <Link
                       href={`/nft-token/exportdata?address=${id}`}

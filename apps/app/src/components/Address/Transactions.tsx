@@ -55,8 +55,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
   const toggleShowAge = () => setShowAge((s) => !s);
 
   const onChange = (e: any) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const name = e?.target?.name;
+    const value = e?.target?.value;
 
     if (name === 'type') {
       if (isAction(value)) {
@@ -210,42 +210,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: (
-        <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t ? t('type') : 'METHOD'}{' '}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
-            <form onSubmit={onFilter} className="flex flex-col">
-              <input
-                name="type"
-                value={form.action || form.method}
-                onChange={onChange}
-                placeholder="Search by method"
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-              />
-              <div className="flex">
-                <button
-                  type="submit"
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t ? t('filter.filter') : 'Filter'}
-                </button>
-                <button
-                  name="type"
-                  type="button"
-                  onClick={onClear}
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
-                >
-                  {t ? t('filter.clear') : 'Clear'}
-                </button>
-              </div>
-            </form>
-          </MenuList>
-        </Menu>
-      ),
+      header: <span className="pl-1">{t ? t('type') : 'METHOD'}</span>,
       key: 'actions',
       cell: (row: TransactionInfo) => (
         <span>
@@ -263,6 +228,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       ),
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t ? t('depositValue') : 'DEPOSIT VALUE'}</span>,
@@ -308,7 +275,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="from"
-                  value={form.from}
+                  value={form?.from}
                   onChange={onChange}
                   placeholder={
                     t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
@@ -550,14 +517,14 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                 txns &&
                 !error &&
                 `A total of${' '}
-              ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
+              ${count ? localFormat && localFormat(count?.toString()) : 0}${' '}
               transactions found`
               }
               filters={
                 <Filters filters={modifiedFilter} onClear={onAllClear} />
               }
               linkToDowload={
-                Object.keys(txns).length > 0 && (
+                Object?.keys(txns)?.length > 0 && (
                   <>
                     <button className="hover:no-underline">
                       <Link

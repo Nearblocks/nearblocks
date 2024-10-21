@@ -110,11 +110,11 @@ const Search = ({
   );
 
   const handleChange = (event: any) => {
-    const { value: nextValue } = event.target;
+    const { value: nextValue } = event?.target;
     debouncedSave(nextValue.replace(/[\s,]/g, ''));
   };
 
-  const onFilter = (event: any) => setFilter(event.target.value);
+  const onFilter = (event: any) => setFilter(event?.target?.value);
 
   const onSelect = (item: any) => redirect(item);
 
@@ -179,14 +179,14 @@ const Search = ({
                   </h3>
                   {result.accounts.map((address: any) => (
                     <ComboboxOption
-                      value={address.account_id}
+                      value={address?.account_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
-                      key={address.account_id}
+                      key={address?.account_id}
                       onClick={() =>
-                        onSelect({ type: 'address', path: address.account_id })
+                        onSelect({ type: 'address', path: address?.account_id })
                       }
                     >
-                      {shortenAddress(address.account_id)}
+                      {shortenAddress(address?.account_id)}
                     </ComboboxOption>
                   ))}
                 </>
@@ -196,16 +196,16 @@ const Search = ({
                   <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.txns')}
                   </h3>
-                  {result.txns.map((txn: any) => (
+                  {result?.txns?.map((txn: any) => (
                     <ComboboxOption
-                      value={txn.transaction_hash}
+                      value={txn?.transaction_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={txn.transaction_hash}
+                      key={txn?.transaction_hash}
                       onClick={() =>
-                        onSelect({ type: 'txn', path: txn.transaction_hash })
+                        onSelect({ type: 'txn', path: txn?.transaction_hash })
                       }
                     >
-                      {shortenHex(txn.transaction_hash)}
+                      {shortenHex(txn?.transaction_hash)}
                     </ComboboxOption>
                   ))}
                 </>
@@ -215,19 +215,19 @@ const Search = ({
                   <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     Receipts
                   </h3>
-                  {result.receipts.map((receipt: any) => (
+                  {result?.receipts?.map((receipt: any) => (
                     <ComboboxOption
-                      value={receipt.receipt_id}
+                      value={receipt?.receipt_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={receipt.receipt_id}
+                      key={receipt?.receipt_id}
                       onClick={() =>
                         onSelect({
                           type: 'receipt',
-                          path: receipt.originated_from_transaction_hash,
+                          path: receipt?.originated_from_transaction_hash,
                         })
                       }
                     >
-                      {shortenHex(receipt.receipt_id)}
+                      {shortenHex(receipt?.receipt_id)}
                     </ComboboxOption>
                   ))}
                 </>
@@ -237,17 +237,17 @@ const Search = ({
                   <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.blocks')}
                   </h3>
-                  {result.blocks.map((block: any) => (
+                  {result?.blocks?.map((block: any) => (
                     <ComboboxOption
-                      value={block.block_hash}
+                      value={block?.block_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={block.block_hash}
+                      key={block?.block_hash}
                       onClick={() =>
-                        onSelect({ type: 'block', path: block.block_hash })
+                        onSelect({ type: 'block', path: block?.block_hash })
                       }
                     >
-                      #{localFormat(block.block_height)} (0x
-                      {shortenHex(block.block_hash)})
+                      #{localFormat(block?.block_height)} (0x
+                      {shortenHex(block?.block_hash)})
                     </ComboboxOption>
                   ))}
                 </>

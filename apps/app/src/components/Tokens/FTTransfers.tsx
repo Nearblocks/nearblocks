@@ -59,13 +59,13 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
         console.error('Error loading schema:', error);
       }
     };
-    if (typeof status.height === 'string' && Number(status.height) > 0) {
-      fetchTimeStamp(status.height);
+    if (typeof status?.height === 'string' && Number(status?.height) > 0) {
+      fetchTimeStamp(status?.height);
     } else {
-      console.log('Invalid height:', status.height);
+      console.log('Invalid height:', status?.height);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status.height]);
+  }, [status?.height]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const onHandleMouseOver = (e: any, id: string) => {
@@ -133,7 +133,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
       header: <span>From</span>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.affected_account_id ? (
               <Tooltip
@@ -220,7 +220,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
       header: <span className="px-1">To</span>,
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
@@ -419,11 +419,11 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
   return (
     <>
       <div className="bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl pb-1">
-        {!status.sync && (
+        {!status?.sync && (
           <div className="w-full text-center bg-nearblue dark:bg-black-200 rounded-t-xl px-5 py-4 text-green dark:text-green-250 text-sm">
             Token transfers are out of sync. Last synced block was
             <span className="font-bold mx-0.5">
-              {localFormat && localFormat(status.height)}
+              {localFormat && localFormat(status?.height)}
             </span>
             {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))}).`}
             Token transfers data will be delayed.
@@ -435,7 +435,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
               {tokens &&
                 tokens.length > 0 &&
                 `A total of ${
-                  localFormat && localFormat(count.toString())
+                  localFormat && localFormat(count?.toString())
                 }${' '}
                   transactions found`}
             </p>

@@ -91,11 +91,13 @@ const ExportData = () => {
         <link rel="canonical" href={`${appUrl}/token/exportdata`} />
       </Head>
       <div className="relative">
-        <Export
-          id={address}
-          onHandleDowload={onHandleDowload}
-          exportType={'tokentransactions'}
-        />
+        {address && (
+          <Export
+            id={address}
+            onHandleDowload={onHandleDowload}
+            exportType={'tokentransactions'}
+          />
+        )}
       </div>
     </>
   );

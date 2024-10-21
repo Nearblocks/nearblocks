@@ -17,8 +17,10 @@ const endOfCurrentMonth = new Date(
   Date.UTC(today.getFullYear(), today.getMonth() + 1, 0),
 );
 
-const formattedStart = startOfCurrentMonth.toISOString().split('T')[0];
-const formattedEnd = endOfCurrentMonth.toISOString().split('T')[0];
+const formattedStart =
+  startOfCurrentMonth && startOfCurrentMonth?.toISOString()?.split('T')[0];
+const formattedEnd =
+  endOfCurrentMonth && endOfCurrentMonth?.toISOString()?.split('T')[0];
 
 const initial = {
   start: formattedStart,
@@ -85,7 +87,7 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
   const handleStartDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ): void => {
-    const selectedStartDate = event.target.value;
+    const selectedStartDate = event?.target?.value;
 
     setStartDate(selectedStartDate);
   };
@@ -93,7 +95,7 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
   const handleEndDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ): void => {
-    const selectedEndDate = event.target.value;
+    const selectedEndDate = event?.target?.value;
 
     setEndDate(selectedEndDate);
   };

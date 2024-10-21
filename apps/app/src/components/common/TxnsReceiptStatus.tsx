@@ -29,17 +29,17 @@ const TxnsReceiptStatus = (props: Props) => {
   const { status, showLabel } = props;
 
   const option = getOptions(status);
-  const Icon = option.icon;
+  const Icon = option?.icon;
 
   return (
     <div className="w-full md:w-3/4 break-words flex items-center">
       <span
-        className={`inline-flex items-center text-xs rounded py-1 ${
-          option.bg
-        } ${option.text} ${showLabel ? ' px-2' : ' px-1'}`}
+        className={`inline-flex items-center text-xs rounded py-1 ${option?.bg} ${option?.text} ${
+          showLabel ? ' px-2' : ' px-1'
+        }`}
       >
         <Icon />
-        {showLabel && <span className="ml-2">{option.label}</span>}
+        {showLabel && <span className="ml-2">{option?.label}</span>}
       </span>
     </div>
   );

@@ -20,18 +20,20 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
     setTxTypeActive(expandAll);
   }, [expandAll]);
 
-  const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);
-  const lastFellowOutgoingReceipt = fellowOutgoingReceipts.at(-1);
+  const remainingFellowOutgoingReceipts =
+    fellowOutgoingReceipts && fellowOutgoingReceipts?.slice(0, -1);
+  const lastFellowOutgoingReceipt =
+    fellowOutgoingReceipts && fellowOutgoingReceipts?.at(-1);
   const filterRefundNestedReceipts =
     receipt?.outcome?.nestedReceipts &&
-    receipt?.outcome.nestedReceipts.filter(
+    receipt?.outcome?.nestedReceipts?.filter(
       (nestedReceipt: any) =>
-        'outcome' in nestedReceipt && nestedReceipt.predecessorId !== 'system',
+        'outcome' in nestedReceipt && nestedReceipt?.predecessorId !== 'system',
     );
   const nonRefundNestedReceipts =
-    filterRefundNestedReceipts && filterRefundNestedReceipts.slice(0, -1);
+    filterRefundNestedReceipts && filterRefundNestedReceipts?.slice(0, -1);
   const lastNonRefundNestedReceipt =
-    filterRefundNestedReceipts && filterRefundNestedReceipts.at(-1);
+    filterRefundNestedReceipts && filterRefundNestedReceipts?.at(-1);
 
   return (
     <>

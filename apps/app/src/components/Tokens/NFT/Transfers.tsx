@@ -98,7 +98,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       header: <span>From</span>,
       key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.affected_account_id ? (
               <Tooltip
@@ -169,7 +169,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       header: <span></span>,
       key: '',
       cell: (row: TransactionInfo) => {
-        return row.affected_account_id === row.involved_account_id ? (
+        return row?.affected_account_id === row?.involved_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             SELF
           </span>
@@ -185,7 +185,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
       header: <span>To</span>,
       key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
-        return Number(row.delta_amount) < 0 ? (
+        return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
@@ -344,7 +344,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   {txns &&
                     !error &&
                     `A total of ${
-                      count ? localFormat && localFormat(count.toString()) : 0
+                      count ? localFormat && localFormat(count?.toString()) : 0
                     } transactions found`}
                 </p>
               </div>

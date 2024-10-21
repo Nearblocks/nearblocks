@@ -30,16 +30,16 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
             >
               <div className="flex flex-col">
                 <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
-                  {tokens.length > 0 &&
+                  {tokens?.length > 0 &&
                     `A total of ${
-                      localFormat && localFormat(count.toString())
+                      localFormat && localFormat(count?.toString())
                     }${' '}
               tokens found`}
                 </p>
               </div>
             </div>
           )}
-          {error && tokens.length === 0 && (
+          {error && tokens?.length === 0 && (
             <div className="px-6 py-4 text-gray-400 text-xs">
               <ErrorMessage
                 icons={<FaInbox />}

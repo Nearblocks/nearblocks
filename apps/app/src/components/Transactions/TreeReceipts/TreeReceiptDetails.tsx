@@ -18,8 +18,8 @@ const TreeReceiptDetails = (props: Props) => {
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
-      status.SuccessValue !== null &&
-      status.SuccessValue !== undefined) ||
+      status?.SuccessValue !== null &&
+      status?.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -65,28 +65,28 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="w-full pl-3 py-2 flex items-center">
                       From:{' '}
                       <Tooltip
-                        label={receipt.predecessor_id}
+                        label={receipt?.predecessor_id}
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       >
                         <Link
                           href={`/address/${receipt?.predecessor_id}`}
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
                         >
-                          {receipt.predecessor_id}
+                          {receipt?.predecessor_id}
                         </Link>
                       </Tooltip>
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
                       To:{' '}
                       <Tooltip
-                        label={receipt.receiver_id}
+                        label={receipt?.receiver_id}
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       >
                         <Link
                           href={`/address/${receipt?.receiver_id}`}
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
                         >
-                          {` ${receipt.receiver_id}`}
+                          {` ${receipt?.receiver_id}`}
                         </Link>
                       </Tooltip>
                     </div>

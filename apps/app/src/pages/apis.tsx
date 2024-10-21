@@ -89,7 +89,7 @@ const ApiPlan = () => {
   const [data, setData] = useState();
 
   function get(obj: any, path: any, defaultValue = null) {
-    const keys = Array.isArray(path) ? path : path.split('.');
+    const keys = Array.isArray(path) ? path : path && path?.split('.');
     let value = obj;
     for (let key of keys) {
       if (value && typeof value === 'object' && key in value) {
@@ -291,9 +291,9 @@ const ApiPlan = () => {
             className="flex justify-center sm:px-10 2xl:px-20 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6"
           >
             {plans?.length > 0
-              ? plans.map((item: any, index: any) => (
+              ? plans?.map((item: any, index: any) => (
                   <div
-                    key={item.id}
+                    key={item?.id}
                     className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
                       index === 2 && 'border-2 border-neargreen-200'
                     }`}
@@ -305,27 +305,27 @@ const ApiPlan = () => {
                     )}
                     <div className="border-b border-b-gray-200 py-2">
                       <h3 className="uppercase py-2 text-sm dark:text-neargray-10">
-                        {item.title}
+                        {item?.title}
                       </h3>
                       <h1 className="py-2 text-4xl">
                         {!interval ? (
                           <p className="dark:text-neargray-10">
-                            ${localFormat(String(item.price_monthly / 100))}
+                            ${localFormat(String(item?.price_monthly / 100))}
                             {item?.price_monthly !== 0 &&
-                              item.price_annually !== 0 && (
+                              item?.price_annually !== 0 && (
                                 <span className="text-lg">/mo</span>
                               )}
                           </p>
                         ) : (
                           <p className="dark:text-neargray-10">
                             {item?.price_monthly === 0 &&
-                            item.price_annually === 0 ? (
+                            item?.price_annually === 0 ? (
                               <span>$0</span>
                             ) : (
                               <>
                                 $
                                 {dollarFormat(
-                                  (item.price_annually / 100 / 12).toString(),
+                                  (item?.price_annually / 100 / 12)?.toString(),
                                 )}
                                 <span className="text-lg">/mo</span>
                               </>
@@ -335,7 +335,7 @@ const ApiPlan = () => {
                       </h1>
                       <p className="py-2 text-gray-500 text-xs">
                         {item?.price_monthly === 0 &&
-                        item.price_annually === 0 ? (
+                        item?.price_annually === 0 ? (
                           <span>* Attribution required</span>
                         ) : interval ? (
                           <>
@@ -343,13 +343,13 @@ const ApiPlan = () => {
                               <s>
                                 $
                                 {dollarNonCentFormat(
-                                  String((item.price_monthly / 100) * 12),
+                                  String((item?.price_monthly / 100) * 12),
                                 )}
                               </s>
                             </span>{' '}
                             $
                             {dollarFormat(
-                              (item.price_annually / 100).toString(),
+                              (item?.price_annually / 100)?.toString(),
                             )}
                             /yr
                           </>
@@ -357,7 +357,7 @@ const ApiPlan = () => {
                           <>
                             Or $
                             {dollarFormat(
-                              (item.price_annually / 100 / 12).toString(),
+                              (item?.price_annually / 100 / 12)?.toString(),
                             )}{' '}
                             (15% off) when billed yearly
                           </>
@@ -563,7 +563,7 @@ const ApiPlan = () => {
                 <input
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => setName(e?.target?.value)}
                   className="border px-3 outline-blue w-full rounded-md h-12"
                 />
               </div>
@@ -575,7 +575,7 @@ const ApiPlan = () => {
                 <input
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e?.target?.value)}
                   className="border px-3 w-full outline-blue rounded-md h-12"
                 />
               </div>
@@ -593,7 +593,7 @@ const ApiPlan = () => {
                 rows={5}
                 required
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e?.target?.value)}
               />
             </div>
             <div className="w-full text-center my-2">
