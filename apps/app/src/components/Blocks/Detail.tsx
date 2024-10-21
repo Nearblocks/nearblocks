@@ -3,7 +3,6 @@ import {
   convertToUTC,
   dollarFormat,
   gasFee,
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
@@ -16,6 +15,7 @@ import { BlocksInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import ListCheck from '../Icons/ListCheck';
 import FaCheckCircle from '../Icons/FaCheckCircle';
+import dayjs from '../../utils/dayjs';
 
 interface Props {
   hash: string;
@@ -89,7 +89,7 @@ const Details = (props: Props) => {
                 <li className="pb-2">
                   <a
                     className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                    href={`https://lite.nearblocks.io/blocks/${hash}?network=${networkId}`}
+                    href={`https://nearvalidate.org/blocks/${hash}?network=${networkId}`}
                     target="_blank"
                   >
                     Validate Block
@@ -150,8 +150,8 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.block_timestamp &&
-                  `${getTimeAgoString(
-                    nanoToMilli(block?.block_timestamp),
+                  `${dayjs().to(
+                    dayjs(nanoToMilli(block?.block_timestamp)),
                   )} (${convertToUTC(
                     nanoToMilli(block?.block_timestamp),
                     true,

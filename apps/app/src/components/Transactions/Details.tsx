@@ -13,7 +13,6 @@ import {
   dollarFormat,
   fiatValue,
   gasPercentage,
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
   shortenAddress,
@@ -45,6 +44,7 @@ import EventLogs from './Action';
 import Actions from './Actions';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import { isEmpty } from 'lodash';
+import dayjs from '../../utils/dayjs';
 
 interface Props {
   loading: boolean;
@@ -281,8 +281,8 @@ const Details = (props: Props) => {
             </div>
           ) : txn ? (
             <div className="w-full md:w-3/4 break-words">
-              {`${getTimeAgoString(
-                nanoToMilli(txn?.block_timestamp || '0'),
+              {`${dayjs().to(
+                dayjs(nanoToMilli(txn?.block_timestamp || '0')),
               )} (${convertToUTC(
                 nanoToMilli(txn?.block_timestamp || '0'),
                 true,

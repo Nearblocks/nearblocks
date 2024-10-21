@@ -544,7 +544,7 @@ const Address = ({
                         <li className="pb-2">
                           <a
                             className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                            href={`https://validate.nearblocks.io/address/${id}?network=${networkId}`}
+                            href={`https://nearvalidate.org/address/${id}?network=${networkId}`}
                             target="_blank"
                           >
                             Validate Account

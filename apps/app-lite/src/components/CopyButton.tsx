@@ -18,7 +18,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
 
   const onCopy = () => {
     navigator.clipboard
-      .writeText(`https://lite.nearblocks.io/?rpcUrl=${url}`)
+      .writeText(`https://nearvalidate.org/?rpcUrl=${url}`)
       .then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);

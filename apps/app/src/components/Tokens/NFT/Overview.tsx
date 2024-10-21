@@ -2,13 +2,14 @@ import Links from '@/components/common/Links';
 import WarningIcon from '@/components/Icons/WarningIcon';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useFetch } from '@/hooks/useFetch';
-import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
+import { localFormat, nanoToMilli } from '@/utils/libs';
 import { SpamToken } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import TokenImage from '@/components/common/TokenImage';
+import dayjs from '../../../utils/dayjs';
 
 interface Props {
   token: any;
@@ -146,8 +147,8 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
                                   {localFormat && localFormat(status?.height)}
                                 </span>
                                 {status?.timestamp &&
-                                  `(${getTimeAgoString(
-                                    nanoToMilli(status?.timestamp),
+                                  `(${dayjs().to(
+                                    dayjs(nanoToMilli(status?.timestamp)),
                                   )}).`}
                                 Holders data will be delayed.
                               </>
