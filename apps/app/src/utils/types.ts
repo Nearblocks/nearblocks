@@ -728,6 +728,7 @@ export type Token = {
   decimals: string;
   title: string;
   nft: Token;
+  nep518_hex_address: string;
 };
 
 export type TransActionProps = {
