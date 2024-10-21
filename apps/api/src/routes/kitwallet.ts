@@ -1,9 +1,11 @@
 import { Router } from 'express';
 
+import accountSchema from '#libs/schema/account';
 import schema from '#libs/schema/kitwallet';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import account from '#services/account/txn';
 import kitwallet from '#services/kitwallet';
 
 const route = Router();
@@ -132,6 +134,49 @@ const routes = (app: Router) => {
     '/account/:account/likelyNFTsFromBlock',
     validator(schema.nftsFromBlock),
     kitwallet.nftsFromBlock,
+  );
+
+  /**
+   * GET /v1/kitwallet/account/{account}/receipts
+   * @summary Get account receipts
+   * @tags Kitwallet
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} action.query - action kind
+   * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
+   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
+   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
+   * @return 200 - success response
+   * @security BearerAuth
+   */
+  route.get(
+    '/account/:account/receipts',
+    validator(accountSchema.receipts),
+    account.receipts,
+  );
+
+  /**
+   * GET /v1/kitwallet/account/{account}/receipts/count
+   * @summary Get estimated account receipts count
+   * @tags Account
+   * @param {string} account.path.required - account id
+   * @param {string} from.query - sender account id
+   * @param {string} to.query - receiver account id
+   * @param {string} action.query - action kind
+   * @param {string} method.query - function call method
+   * @param {string} after_date.query - date in YYYY-MM-DD format
+   * @param {string} before_date.query - date in YYYY-MM-DD format
+   * @return 200 - success response
+   * @security BearerAuth
+   */
+  route.get(
+    '/account/:account/receipts/count',
+    validator(accountSchema.receiptsCount),
+    account.receiptsCount,
   );
 };
 
