@@ -77,7 +77,6 @@ const Details = (props: Props) => {
     isContract = false,
     hash,
   } = props;
-  console.log({ DetailsPagePrice: price });
   const { transactionStatus, getBlockDetails } = useRpc();
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);

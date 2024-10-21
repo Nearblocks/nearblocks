@@ -88,7 +88,6 @@ const ListActions = ({ txnsData, txnsCount, error }: ListProps) => {
     };
 
     const newQueryString = QueryString.stringify(queryParams);
-    console.log({ newQueryString });
     router.push(`${pathname}?${newQueryString}`);
     router.refresh();
   };

@@ -67,9 +67,6 @@ const OverviewActions = (props: Props) => {
   const [rpcError, setRpcError] = useState(false);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
-  console.log({ contractData });
-  console.log({ verificationData });
-
   useEffect(() => {
     if (rpcError) {
       switchRpc();

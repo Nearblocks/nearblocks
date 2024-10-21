@@ -17,7 +17,6 @@ export async function generateMetadata({
   const tokenDetails = await getRequest(`fts/${id}`);
 
   const token: Token = tokenDetails?.contracts?.[0];
-  console.log({ token });
 
   const title = `${network === 'testnet' ? 'TESTNET ' : ''}${
     token ? `${token.name} (${token.symbol}) ` : ''
