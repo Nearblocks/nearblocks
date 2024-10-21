@@ -42,6 +42,7 @@ const item = z.object({
 
 const ftTxns = z.object({
   a: z.string().optional(),
+  account: z.string().optional(),
   contract: z.string(),
   cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
@@ -52,6 +53,7 @@ const ftTxns = z.object({
 
 const ftTxnsCount = z.object({
   a: z.string().optional(),
+  account: z.string().optional(),
   contract: z.string(),
   event: z.nativeEnum(EventKind).optional(),
 });
