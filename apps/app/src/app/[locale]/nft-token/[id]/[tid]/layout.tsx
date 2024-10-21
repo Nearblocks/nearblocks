@@ -19,7 +19,6 @@ export async function generateMetadata({
   const tokenDetails = await getRequest(`nfts/${id}`);
 
   const token: Token = tokenDetails?.tokens?.[0];
-  console.log({ token });
 
   const prefix = network === 'testnet' ? 'TESTNET ' : '';
   const suffix = ' | NearBlocks';
