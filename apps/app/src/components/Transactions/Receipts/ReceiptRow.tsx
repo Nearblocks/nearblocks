@@ -96,6 +96,8 @@ const ReceiptRow = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.receipt_id, pageHash]);
 
+  const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
+
   return (
     <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div
@@ -335,13 +337,11 @@ const ReceiptRow = (props: Props) => {
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt && receipt?.actions[0]?.args?.deposit
-                ? yoctoToNear(receipt?.actions[0]?.args?.deposit, true)
-                : receipt?.actions[0]?.args?.deposit ?? '0'}{' '}
+              {receipt && deposit ? yoctoToNear(deposit, true) : deposit ?? '0'}{' '}
               Ⓝ
               {currentPrice && networkId === 'mainnet'
                 ? ` ($${fiatValue(
-                    yoctoToNear(receipt?.actions[0]?.args?.deposit ?? 0, false),
+                    yoctoToNear(deposit ?? 0, false),
                     currentPrice,
                   )})`
                 : ''}

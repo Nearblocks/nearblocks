@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
 }> = async (context) => {
   const {
-    query: { qs },
+    query: { ...qs },
     req,
   }: any = context;
 
