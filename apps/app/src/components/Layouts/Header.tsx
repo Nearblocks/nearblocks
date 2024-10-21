@@ -3,7 +3,7 @@ import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { useAuthStore } from '@/stores/auth';
+/* import { useAuthStore } from '@/stores/auth'; */
 import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
@@ -12,9 +12,11 @@ import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { networkId } from '@/utils/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
-import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
+import useStorage from '@/hooks/useStorage';
+import Cookies from 'js-cookie';
+import dynamic from 'next/dynamic';
 
 const menus = [
   {
@@ -136,6 +138,8 @@ const languages = [
   },
 ];
 
+const UserMenu = dynamic(() => import('./UserMenu'), { ssr: false });
+
 interface Props {
   statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
@@ -146,15 +150,36 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
 
   const router = useRouter();
   const { t } = useTranslation('common');
+  const [role] = useStorage('role');
+  const profile = [
+    {
+      id: 1,
+      title: 'My Profile',
+      link: '/user/overview',
+    },
+    {
+      id: 2,
+      title: 'Settings',
+      link: '/user/settings',
+    },
+    {
+      id: 3,
+      title: 'API Keys',
+      link: role === 'publisher' ? '/publisher/keys' : '/user/keys',
+    },
+  ];
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const requestSignInWithWallet = useAuthStore(
+  /*     const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
   );
   const signedIn = useAuthStore((store) => store.signedIn);
-  const accountId = useAuthStore((store) => store.accountId);
+    const accountId = useAuthStore((store) => store.accountId);
   const logOut = useAuthStore((store) => store.logOut);
-  const user = signedIn;
+  const walletUser = signedIn; */
+  const [token, setToken] = useStorage('token');
+  const [user, setUser] = useStorage('user');
+  const [, setRole] = useStorage('role');
 
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
@@ -174,11 +199,21 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
   }, [block]);
 
   const showSearch = router.pathname !== '/';
-  const userLoading = false;
+  /*   const userLoading = false; */
+
+  /*  const onSignOut = () => {
+    logOut();
+  }; */
 
   const onSignOut = () => {
-    logOut();
+    setToken('');
+    setUser('');
+    setRole('');
+    Cookies.remove('token');
+    /* disconnect(); */
+    router.push('/login');
   };
+
   const nearPrice = stats?.near_price ?? '';
   return (
     <div className="dark:bg-black-600 soft-shadow">
@@ -428,100 +463,12 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                   </>
                 </li>
                 <li>
-                  <>
-                    <Collapse
-                      trigger={({ show, onClick }) => (
-                        <a
-                          className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                          href="#"
-                          onClick={onClick}
-                        >
-                          <div className="w-full">
-                            {user ? (
-                              <div className="flex justify-between">
-                                <div className="flex items-center">
-                                  <span className="truncate max-w-[110px]">
-                                    {accountId}
-                                  </span>
-                                </div>
-                                <ArrowDown
-                                  className={`fill-current transition-transform w-5 h-5 ${
-                                    show && 'transform rotate-180'
-                                  }`}
-                                />
-                              </div>
-                            ) : (
-                              <div onClick={requestSignInWithWallet}>
-                                <div className="w-full flex items-center">
-                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                  Sign In
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </a>
-                      )}
-                    >
-                      {user && (
-                        <ul className="border-l-2 border-green-500 md:hidden ml-2">
-                          <li className="px-4 pb-1">
-                            <button
-                              onClick={onSignOut}
-                              className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
-                            >
-                              Sign Out
-                            </button>
-                          </li>
-                        </ul>
-                      )}
-                    </Collapse>
-
-                    <span className="group hidden md:flex h-full w-full relative">
-                      <a
-                        className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
-                        href="#"
-                      >
-                        {user ? (
-                          <>
-                            <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                            <span className="truncate max-w-[110px]">
-                              {accountId}
-                            </span>
-                            <ArrowDown className="fill-current w-4 h-4 ml-2" />
-                          </>
-                        ) : (
-                          <div onClick={requestSignInWithWallet}>
-                            <div className="flex items-center">
-                              {userLoading ? (
-                                <>
-                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                  <Skeleton className="flex w-14 h-4" />
-                                </>
-                              ) : (
-                                <>
-                                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                  Sign In
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </a>
-
-                      {user && (
-                        <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
-                          <li className="px-8 pb-1">
-                            <button
-                              onClick={onSignOut}
-                              className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
-                            >
-                              Sign Out
-                            </button>
-                          </li>
-                        </ul>
-                      )}
-                    </span>
-                  </>
+                  <UserMenu
+                    user={user}
+                    token={token}
+                    profile={profile}
+                    onSignOut={onSignOut}
+                  />
                 </li>
               </ul>
               <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">

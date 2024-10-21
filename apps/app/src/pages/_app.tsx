@@ -8,6 +8,8 @@ import type { NextPageWithLayout } from '@/utils/types';
 import Script from 'next/script';
 import { env } from 'next-runtime-env';
 import { ThemeProvider } from 'next-themes';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const VmInitializer = dynamic(() => import('../components/vm/VmInitializer'), {
   ssr: false,
@@ -34,6 +36,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       </Script>
       <ThemeProvider attribute="class" enableSystem={false}>
         <VmInitializer />
+        <ToastContainer />
         {getLayout(<Component {...pageProps} />)}
       </ThemeProvider>
     </>

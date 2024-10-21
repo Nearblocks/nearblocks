@@ -53,7 +53,7 @@ export const MenuItem = ({
   return (
     <li className={`relative group ${className}`}>
       <button
-        className="flex items-center hover:text-primary p-2"
+        className="flex items-center hover:text-green-500 p-2"
         onClick={onClick}
       >
         {trigger}
@@ -87,7 +87,7 @@ export const MenuLink = ({ checked, children, href }: MenuLinkProps) => {
   return (
     <li>
       <Link
-        className={`flex items-center hover:text-primary pl-6 pr-6 md:pl-3 md:pr-6 ${
+        className={`flex items-center hover:text-green-500 pl-6 pr-6 md:pl-3 md:pr-6 ${
           checked && 'text-green-500'
         }`}
         href={href}

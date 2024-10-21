@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { env } from 'next-runtime-env';
 
-const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
+const userApiUrl = env('NEXT_PUBLIC_API_URL');
 const SponserdText: React.FC<any> = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
@@ -18,9 +18,7 @@ const SponserdText: React.FC<any> = () => {
   useEffect(() => {
     const fetchHtmlContent = async () => {
       try {
-        const response = await fetch(
-          `${userApiUrl}approved-campaigns/text-ads`,
-        );
+        const response = await fetch(`${userApiUrl}campaigns/text-ads`);
 
         if (response?.ok) {
           const html = await response.text();
