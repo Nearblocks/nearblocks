@@ -11,6 +11,8 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
     expandAll,
     convertionReceipt,
     className,
+    statsData,
+    rpcTxn,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -58,6 +60,8 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
             fellowOutgoingReceipts={remainingFellowOutgoingReceipts}
             convertionReceipt={false}
             className="pb-4 !mt-0 border-l ml-2.5"
+            statsData={statsData}
+            rpcTxn={rpcTxn}
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
@@ -74,7 +78,11 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
         </div>
         {isTxTypeActive ? (
           <div className="border-l border-green-500 dark:border-green-250 ml-2.5">
-            <ReceiptInfo receipt={receipt} />
+            <ReceiptInfo
+              receipt={receipt}
+              statsData={statsData}
+              rpcTxn={rpcTxn}
+            />
           </div>
         ) : null}
         <div className="relative flex flex-row my-2.5">
@@ -94,6 +102,8 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           fellowOutgoingReceipts={nonRefundNestedReceipts}
           className="!pl-0 !border-transparent"
           convertionReceipt={false}
+          statsData={statsData}
+          rpcTxn={rpcTxn}
         />
       ) : null}
     </>

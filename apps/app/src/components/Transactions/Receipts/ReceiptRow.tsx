@@ -5,7 +5,7 @@ import {
   localFormat,
   yoctoToNear,
 } from '@/utils/libs';
-import { ReceiptsPropsInfo } from '@/utils/types';
+import { ReceiptsPropsInfo, RPCTransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
@@ -16,11 +16,13 @@ import useRpc from '@/hooks/useRpc';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import useHash from '@/hooks/useHash';
 import { networkId } from '@/utils/config';
+import Big from 'big.js';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
   loading: boolean;
+  rpcTxn: RPCTransactionInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -29,10 +31,11 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { receipt, borderFlag, loading, statsData } = props;
+  const { receipt, borderFlag, loading, statsData, rpcTxn } = props;
   const { t } = useTranslation();
   const [block, setBlock] = useState<{ height: string } | null>(null);
   const { getBlockDetails } = useRpc();
+  const [receiptKey, setReceiptKey] = useState<any>(null);
   const [pageHash] = useHash();
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -40,11 +43,43 @@ const ReceiptRow = (props: Props) => {
   const lastBlockHash = useRef<string | null>(null);
   const rowRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
-      lastBlockHash.current = receipt.block_hash;
+  const getDeposit = (actions: any[]): string =>
+    (actions || [])
+      .map((action) => (action?.args?.deposit ? action?.args?.deposit : '0'))
+      .reduce(
+        (acc, deposit) =>
+          Big(acc)
+            .plus(deposit || '0')
+            .toString(),
+        '0',
+      );
 
-      getBlockDetails(receipt.block_hash)
+  const getRefund = (receipts: any[]): string =>
+    (receipts || [])
+      .filter(
+        (receipt) =>
+          receipt?.predecessor_id === 'system' && 'outcome' in receipt,
+      )
+      .reduce(
+        (acc, receipt) =>
+          Big(acc || '0')
+            .plus(getDeposit(receipt?.actions) || '0')
+            .toString(),
+        '0',
+      );
+
+  const getPreCharged = (receipt: any): string =>
+    receipt
+      ? Big(receipt?.outcome?.tokens_burnt || '0')
+          .plus(getRefund(receipt?.outcome?.outgoing_receipts || []))
+          .toString()
+      : '0';
+
+  useEffect(() => {
+    if (receipt?.block_hash && receipt?.block_hash !== lastBlockHash?.current) {
+      lastBlockHash.current = receipt?.block_hash;
+
+      getBlockDetails(receipt?.block_hash)
         .then((resp: any) => {
           setBlock(resp?.header);
         })
@@ -70,7 +105,6 @@ const ReceiptRow = (props: Props) => {
 
   const handleScroll = () => {
     if (typeof window === 'undefined') return;
-
     const hash = window.location.hash;
     const parts = hash.split('#');
     const id = parts.length > 2 ? parts[2] : null;
@@ -97,6 +131,18 @@ const ReceiptRow = (props: Props) => {
   }, [receipt?.receipt_id, pageHash]);
 
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
+
+  useEffect(() => {
+    if (rpcTxn && rpcTxn?.receipts?.length > 0) {
+      const receiptToFind: any = rpcTxn?.receipts?.find(
+        (item: any) => item?.receipt_id === receipt?.receipt_id,
+      );
+      if (receiptToFind) {
+        setReceiptKey(receiptToFind);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcTxn]);
 
   return (
     <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
@@ -205,12 +251,31 @@ const ReceiptRow = (props: Props) => {
               </div>
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <Link
-                  href={`/address/${receipt?.predecessor_id}`}
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
-                >
-                  {receipt?.predecessor_id}
-                </Link>
+                <div className="md:flex items-center">
+                  <Link
+                    href={`/address/${receipt?.predecessor_id}`}
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                  >
+                    {receipt?.predecessor_id}
+                  </Link>
+                  {receiptKey &&
+                    receiptKey?.receipt?.Action?.signer_public_key &&
+                    receiptKey?.receipt?.Action?.signer_id && (
+                      <Tooltip
+                        label={'Access key used for this receipt'}
+                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      >
+                        <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 md:mx-2 text-left rounded-md px-2 py-1">
+                          <Link
+                            href={`/address/${receiptKey.receipt.Action.signer_id}?tab=accesskeys`}
+                            className="text-green-500 dark:text-green-250 hover:no-underline"
+                          >
+                            {receiptKey.receipt.Action.signer_public_key}
+                          </Link>
+                        </div>
+                      </Tooltip>
+                    )}
+                </div>
               </div>
             ) : (
               ''
@@ -316,7 +381,6 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
@@ -345,6 +409,44 @@ const ReceiptRow = (props: Props) => {
                     currentPrice,
                   )})`
                 : ''}
+            </div>
+          )}
+        </div>
+        <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip
+              label={'Fees Pre-charged on Receipt & Refund from the receipt'}
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </Tooltip>
+            Pre-charged Fee & Refund
+          </div>
+          {!receipt || loading ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full" />
+            </div>
+          ) : (
+            <div className="w-full items-center text-xs flex md:w-3/4 break-words">
+              <div className="bg-orange-50  dark:bg-black-200 rounded-md px-2 py-1">
+                {`${
+                  receipt && yoctoToNear(getPreCharged(receipt) || '0', true)
+                } Ⓝ`}
+                <span className="text-gray-300 px-1">|</span>{' '}
+                {`${
+                  Array.isArray(receipt?.outcome?.outgoing_receipts) &&
+                  receipt.outcome.outgoing_receipts.length > 0
+                    ? yoctoToNear(
+                        getRefund(receipt.outcome.outgoing_receipts),
+                        true,
+                      )
+                    : '0'
+                } Ⓝ`}
+              </div>
             </div>
           )}
         </div>
@@ -417,6 +519,7 @@ const ReceiptRow = (props: Props) => {
                   borderFlag
                   loading={loading}
                   statsData={statsData}
+                  rpcTxn={rpcTxn}
                 />
               </div>
             </div>

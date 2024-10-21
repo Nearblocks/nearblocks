@@ -1,12 +1,19 @@
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/useRpc';
+import { networkId } from '@/utils/config';
 import { hexy } from '@/utils/hexy';
-import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
+import {
+  convertToMetricPrefix,
+  fiatValue,
+  localFormat,
+  yoctoToNear,
+} from '@/utils/libs';
 import {
   Action,
   FunctionCallActionView,
   ReceiptsPropsInfo,
+  RPCTransactionInfo,
 } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
@@ -17,12 +24,19 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
+  rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
+  const [receiptKey, setReceiptKey] = useState<any>(null);
   const { t } = useTranslation();
   const onTab = (index: number) => {
     setHash(hashes[index]);
@@ -32,6 +46,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   const [loading, setLoading] = useState(false);
   const { getBlockDetails } = useRpc();
+
+  const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   useEffect(() => {
     const index = hashes.indexOf(pageHash as string);
@@ -182,6 +198,20 @@ const ReceiptInfo = ({ receipt }: Props) => {
       status !== null &&
       status !== undefined) ||
     status === 'successReceiptId';
+
+  useEffect(() => {
+    if (rpcTxn && rpcTxn?.receipts?.length > 0) {
+      const receiptToFind: any = rpcTxn?.receipts?.find(
+        (item: any) => item?.receipt_id === receipt?.id,
+      );
+      if (receiptToFind) {
+        setReceiptKey(receiptToFind);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcTxn]);
+
+  const deposit = receipt?.actions[0]?.args?.deposit ?? 0;
 
   return (
     <div className="flex flex-col">
@@ -336,13 +366,33 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     </Tooltip>
                     From
                   </td>
-                  <td className="py-2 pl-4">
-                    <Link
-                      href={`/address/${receipt?.predecessorId}`}
-                      className="text-green-500 dark:text-green-250 hover:no-underline"
-                    >
-                      {receipt?.predecessorId}
-                    </Link>
+                  <td className="pl-4">
+                    <div className="flex items-center justify-center">
+                      <Link
+                        href={`/address/${receipt?.predecessorId}`}
+                        className="text-green-500 dark:text-green-250 hover:no-underline"
+                      >
+                        {receipt?.predecessorId}
+                      </Link>
+                      {!loading &&
+                        receiptKey &&
+                        receiptKey?.receipt?.Action?.signer_public_key &&
+                        receiptKey?.receipt?.Action?.signer_id && (
+                          <Tooltip
+                            label={'Access key used for this receipt'}
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          >
+                            <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 mx-2 rounded-md px-2 py-1 text-left">
+                              <Link
+                                href={`/address/${receiptKey?.receipt?.Action?.signer_id}?tab=accesskeys`}
+                                className="text-green-500 dark:text-green-250 hover:no-underline"
+                              >
+                                {receiptKey?.receipt?.Action?.signer_public_key}
+                              </Link>
+                            </div>
+                          </Tooltip>
+                        )}
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -467,6 +517,31 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         true,
                       )}
                     Ⓝ
+                  </td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip
+                      label={'Deposit value attached with the receipt'}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip>
+                    Value
+                  </td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt && deposit
+                      ? yoctoToNear(deposit, true)
+                      : deposit ?? '0'}{' '}
+                    Ⓝ
+                    {currentPrice && networkId === 'mainnet'
+                      ? ` ($${fiatValue(
+                          yoctoToNear(deposit ?? 0, false),
+                          currentPrice,
+                        )})`
+                      : ''}
                   </td>
                 </tr>
               </tbody>
