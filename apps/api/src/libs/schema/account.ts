@@ -50,6 +50,7 @@ const keysCount = z.object({
 const txns = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_block: z.number().optional(),
   after_date: z
     .string()
     .optional()
@@ -57,6 +58,7 @@ const txns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
+  before_block: z.number().optional(),
   before_date: z
     .string()
     .optional()
@@ -76,6 +78,7 @@ const txns = z.object({
 const txnsCount = z.object({
   account: z.string(),
   action: z.nativeEnum(ActionKind).optional(),
+  after_block: z.number().optional(),
   after_date: z
     .string()
     .optional()
@@ -83,6 +86,7 @@ const txnsCount = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
+  before_block: z.number().optional(),
   before_date: z
     .string()
     .optional()

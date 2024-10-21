@@ -37,6 +37,8 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
   const page = req.validator.data.page;
   const per_page = req.validator.data.per_page;
   const order = req.validator.data.order;
+  const afterBlock = req.validator.data.after_block;
+  const beforeBlock = req.validator.data.before_block;
   const afterDate = req.validator.data.after_date;
   const beforeDate = req.validator.data.before_date;
   let afterTimestamp = null;
@@ -120,6 +122,20 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               a.receipt_id = r.receipt_id
               AND ${action ? sql`a.action_kind = ${action}` : true}
               AND ${method ? sql`a.args ->> 'method_name' = ${method}` : true}
+          )
+        `
+      : true}
+          AND ${afterBlock || beforeBlock
+      ? sql`
+          EXISTS (
+            SELECT
+              1
+            FROM
+              blocks b
+            WHERE
+              b.block_hash = t.included_in_block_hash
+              AND ${afterBlock ? sql`b.block_height > ${afterBlock}` : true}
+              AND ${beforeBlock ? sql`b.block_height < ${beforeBlock}` : true}
           )
         `
       : true}
@@ -260,6 +276,8 @@ const txnsCount = catchAsync(
     const to = req.validator.data.to;
     const action = req.validator.data.action;
     const method = req.validator.data.method;
+    const afterBlock = req.validator.data.after_block;
+    const beforeBlock = req.validator.data.before_block;
     const afterDate = req.validator.data.after_date;
     const beforeDate = req.validator.data.before_date;
     let afterTimestamp: null | string = null;
@@ -287,7 +305,9 @@ const txnsCount = catchAsync(
     const bindings = {
       account,
       action,
+      afterBlock,
       afterDate,
+      beforeBlock,
       beforeDate,
       from,
       method,
@@ -330,6 +350,22 @@ const txnsCount = catchAsync(
                     method ? `a.args ->> '${options.method}' = :method` : true
                   }
               )`
+            : true
+        }
+        AND ${
+          afterBlock || beforeBlock
+            ? `
+                EXISTS (
+                  SELECT
+                    1
+                  FROM
+                    blocks b
+                  WHERE
+                    b.block_hash = t.included_in_block_hash
+                    AND ${afterBlock ? `b.block_height > :afterBlock` : true}
+                    AND ${beforeBlock ? `b.block_height < :beforeBlock` : true}
+                )
+              `
             : true
         }
     `;
