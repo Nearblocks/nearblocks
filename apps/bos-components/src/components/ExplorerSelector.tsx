@@ -253,8 +253,8 @@ export default function (props: Props) {
         : 'https://nearblocks.io',
     nearblocksLite:
       props?.network === 'testnet'
-        ? 'https://validate.nearblocks.io'
-        : 'https://validate.nearblocks.io',
+        ? 'https://nearvalidate.org'
+        : 'https://nearvalidate.org',
     pikespeakai: props?.network === 'testnet' ? null : 'https://pikespeak.ai',
   };
 
@@ -529,9 +529,7 @@ export default function (props: Props) {
                     <ImageTab
                       height="45px"
                       width="auto"
-                      src={
-                        'https://validate.nearblocks.io/images/near-validate.svg'
-                      }
+                      src={'https://nearvalidate.org/images/near-validate.svg'}
                       alt="Nearblocks"
                     ></ImageTab>
                     <ExplorerHead>Near Validate</ExplorerHead>

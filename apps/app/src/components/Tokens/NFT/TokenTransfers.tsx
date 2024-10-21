@@ -1,10 +1,4 @@
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-  truncateString,
-} from '@/utils/libs';
+import { localFormat, truncateString } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -17,6 +11,7 @@ import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import TimeStamp from '@/components/common/TimeStamp';
 
 interface Props {
   data: {
@@ -314,28 +309,7 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
         </span>
       ),
       tdClassName:

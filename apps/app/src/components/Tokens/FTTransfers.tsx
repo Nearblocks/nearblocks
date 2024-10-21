@@ -1,10 +1,5 @@
 import { TransactionInfo } from '@/utils/types';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-} from '@/utils/libs';
+import { localFormat, nanoToMilli } from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
 import { useEffect, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
@@ -19,6 +14,8 @@ import useTranslation from 'next-translate/useTranslation';
 import Table from '@/components/common/Table';
 import TokenImage from '@/components/common/TokenImage';
 import useRpc from '@/hooks/useRpc';
+import TimeStamp from '../common/TimeStamp';
+import dayjs from '../../utils/dayjs';
 
 interface ListProps {
   data: {
@@ -387,28 +384,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
         </span>
       ),
       tdClassName:
@@ -425,7 +401,7 @@ const Transfers = ({ data, totalCount, error, status }: ListProps) => {
             <span className="font-bold mx-0.5">
               {localFormat && localFormat(status.height)}
             </span>
-            {`(${timestamp && getTimeAgoString(nanoToMilli(timestamp))}).`}
+            {`(${timestamp && dayjs().to(dayjs(nanoToMilli(timestamp)))}).`}
             Token transfers data will be delayed.
           </div>
         )}
