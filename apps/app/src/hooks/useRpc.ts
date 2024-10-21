@@ -20,26 +20,44 @@ const useRpc = () => {
     }
   };
 
-  const contractCode = async (address: string) =>
-    provider.query({
-      request_type: 'view_code',
-      finality: 'final',
-      account_id: address,
-    });
+  const contractCode = async (address: string) => {
+    try {
+      const response = await provider.query({
+        request_type: 'view_code',
+        finality: 'final',
+        account_id: address,
+      });
+      return response;
+    } catch (error) {
+      return null;
+    }
+  };
 
-  const viewAccessKeys = async (address: string) =>
-    provider.query({
-      request_type: 'view_access_key_list',
-      finality: 'final',
-      account_id: address,
-    });
+  const viewAccessKeys = async (address: string) => {
+    try {
+      const response = await provider.query({
+        request_type: 'view_access_key_list',
+        finality: 'final',
+        account_id: address,
+      });
+      return response;
+    } catch (error) {
+      return null;
+    }
+  };
 
-  const viewAccount = async (accountId: string) =>
-    provider.query({
-      request_type: 'view_account',
-      finality: 'final',
-      account_id: accountId,
-    });
+  const viewAccount = async (accountId: string) => {
+    try {
+      const response = await provider.query({
+        request_type: 'view_account',
+        finality: 'final',
+        account_id: accountId,
+      });
+      return response;
+    } catch (error) {
+      return null;
+    }
+  };
 
   const ftBalanceOf = async (
     contract: string,
