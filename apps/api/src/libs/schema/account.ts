@@ -231,6 +231,7 @@ const ftTxns = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
+  contract: z.string().optional(),
   cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
@@ -255,6 +256,7 @@ const ftTxnsCount = z.object({
       (val) => val === undefined || dayjs(val, 'YYYY-MM-DD', true).isValid(),
       { message: 'Invalid date' },
     ),
+  contract: z.string().optional(),
   event: z.nativeEnum(EventKind).optional(),
   involved: z.string().optional(),
 });

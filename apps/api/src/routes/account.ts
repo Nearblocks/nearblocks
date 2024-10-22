@@ -246,6 +246,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
+   * @param {string} contract.query - contract account id
    * @param {string} event.query - event kind
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
@@ -264,6 +265,7 @@ const routes = (app: Router) => {
    * @tags Account
    * @param {string} account.path.required - account id
    * @param {string} involved.query - involved account id
+   * @param {string} contract.query - contract account id
    * @param {string} event.query - event kind
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format

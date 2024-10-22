@@ -71,6 +71,7 @@ const routes = (app: Router) => {
    * @summary Get token txns by pagination
    * @tags FTs
    * @param {string} contract.path.required - contract id
+   * @param {string} account.query - affected account id
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
    * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
    * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
@@ -84,6 +85,7 @@ const routes = (app: Router) => {
    * @summary Get estimated token txns count
    * @tags FTs
    * @param {string} contract.path.required - contract id
+   * @param {string} account.query - affected account id
    * @return 200 - success response
    * @security BearerAuth
    */
