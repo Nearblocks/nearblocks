@@ -2,49 +2,8 @@ import Buttons from '@/components/app/Address/Button';
 import Delegators from '@/components/app/NodeExplorer/Delegators';
 import DelegatorSkeleton from '@/components/app/skeleton/node-explorer/Delegator';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import { appUrl } from '@/utils/app/config';
-import { Metadata } from 'next';
+
 import { Suspense } from 'react';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
-
-export async function generateMetadata({
-  params: { id },
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const metaTitle = `${network === 'testnet' ? 'TESTNET ' : ''}${
-    id ? `${id}: ` : ''
-  } delegators | NearBlocks`;
-  const metaDescription = id
-    ? `Node Validator ${id} (${id}) Delegators Listing`
-    : '';
-
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
-    metaTitle,
-  )}`;
-
-  return {
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
-    alternates: {
-      canonical: `${appUrl}/node-explorer/${id}`,
-    },
-  };
-}
 
 export default async function Delegator({
   params: { id },

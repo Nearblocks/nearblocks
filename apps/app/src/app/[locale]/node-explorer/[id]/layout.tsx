@@ -1,19 +1,20 @@
 import { appUrl } from '@/utils/app/config';
 import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
-  params: { locale },
+  params: { id },
 }: {
-  params: { hash: string; locale: string };
+  params: { id: string };
 }): Promise<Metadata> {
-  unstable_setRequestLocale(locale);
-
-  const metaTitle = 'NEAR Validator List | Nearblocks';
-  const metaDescription = '';
+  const metaTitle = `${network === 'testnet' ? 'TESTNET ' : ''}${
+    id ? `${id}: ` : ''
+  } delegators | NearBlocks`;
+  const metaDescription = id
+    ? `Node Validator ${id} (${id}) Delegators Listing`
+    : '';
 
   const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
@@ -35,12 +36,12 @@ export async function generateMetadata({
       ],
     },
     alternates: {
-      canonical: `${appUrl}/node-explorer`,
+      canonical: `${appUrl}/node-explorer/${id}`,
     },
   };
 }
 
-export default async function ExplorerLayout({
+export default async function DelegatorLayout({
   children,
 }: {
   children: React.ReactNode;
