@@ -1,6 +1,6 @@
 import { appUrl } from '@/utils/app/config';
 import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
@@ -11,9 +11,9 @@ export async function generateMetadata({
   params: { hash: string; locale: string };
 }): Promise<Metadata> {
   unstable_setRequestLocale(locale);
-
-  const metaTitle = 'NEAR Validator List | Nearblocks';
-  const metaDescription = '';
+  const t = await getTranslations({ locale });
+  const metaTitle = t('fts.metaTitle');
+  const metaDescription = t('fts.metaDescription');
 
   const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
@@ -35,16 +35,15 @@ export async function generateMetadata({
       ],
     },
     alternates: {
-      canonical: `${appUrl}/node-explorer`,
+      canonical: `${appUrl}/tokentxns`,
     },
   };
 }
 
-export default async function ExplorerLayout({
+export default async function TokentxnsLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: any;
 }) {
   return [children];
 }

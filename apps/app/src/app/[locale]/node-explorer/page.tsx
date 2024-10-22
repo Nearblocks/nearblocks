@@ -1,29 +1,24 @@
 import NodeList from '@/components/app/NodeExplorer/NodeList';
-import { getRequest } from '@/utils/app/api';
-import { RpcProviders } from '@/utils/app/rpc';
-import { cookies } from 'next/headers';
-import QueryString from 'qs';
-
-const getCookieFromRequest = (cookieName: string): string | null => {
-  const cookie = cookies().get(cookieName);
-  return cookie ? cookie.value : null;
-};
+import ExplorerIndex from '@/components/app/skeleton/node-explorer/Index';
+import { Suspense } from 'react';
 
 export default async function NodeExplorer({ searchParams }: any) {
-  const rpcUrl = getCookieFromRequest('rpcUrl') || RpcProviders?.[0]?.url;
-
-  const data = await getRequest(
-    `validators?${QueryString.stringify(searchParams)}&rpc=${rpcUrl}`,
-  );
-  const statsDetails = await getRequest('stats');
-  const latestBlock = await getRequest('blocks/latest?limit=1');
-
   return (
-    <NodeList
-      data={data}
-      totalSupply={statsDetails}
-      latestBlock={latestBlock}
-      error={!data}
-    />
+    <>
+      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+        <div className="container mx-auto px-3">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+            NEAR Protocol Validator Explorer
+          </h1>
+        </div>
+      </div>
+      <div className="container mx-auto px-3 -mt-48">
+        <div className="relative">
+          <Suspense fallback={<ExplorerIndex />}>
+            <NodeList searchParams={searchParams} />
+          </Suspense>
+        </div>
+      </div>
+    </>
   );
 }
