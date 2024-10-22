@@ -5,9 +5,13 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { BlocksInfo } from '@/utils/types';
-import { convertToMetricPrefix, localFormat, nanoToMilli } from '@/utils/libs';
+import {
+  convertToMetricPrefix,
+  getTimeAgoString,
+  localFormat,
+  nanoToMilli,
+} from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
-import dayjs from '../../utils/dayjs';
 
 interface Props {
   blocks: BlocksInfo[];
@@ -102,8 +106,8 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                           suppressHydrationWarning
                         >
                           {block?.block_timestamp
-                            ? dayjs().to(
-                                dayjs(nanoToMilli(block?.block_timestamp)),
+                            ? getTimeAgoString(
+                                nanoToMilli(block?.block_timestamp),
                               )
                             : ''}
                         </div>

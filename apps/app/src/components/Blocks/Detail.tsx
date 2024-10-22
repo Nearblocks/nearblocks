@@ -3,6 +3,7 @@ import {
   convertToUTC,
   dollarFormat,
   gasFee,
+  getTimeAgoString,
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
@@ -15,7 +16,6 @@ import { BlocksInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import ListCheck from '../Icons/ListCheck';
 import FaCheckCircle from '../Icons/FaCheckCircle';
-import dayjs from '../../utils/dayjs';
 
 interface Props {
   hash: string;
@@ -150,8 +150,8 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 {block?.block_timestamp &&
-                  `${dayjs().to(
-                    dayjs(nanoToMilli(block?.block_timestamp)),
+                  `${getTimeAgoString(
+                    nanoToMilli(block?.block_timestamp),
                   )} (${convertToUTC(
                     nanoToMilli(block?.block_timestamp),
                     true,
