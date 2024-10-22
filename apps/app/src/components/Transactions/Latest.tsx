@@ -6,13 +6,13 @@ import useTranslation from 'next-translate/useTranslation';
 import Skeleton from '../skeleton/common/Skeleton';
 import { TransactionInfo } from '@/utils/types';
 import {
+  getTimeAgoString,
   nanoToMilli,
   shortenAddress,
   shortenHex,
   yoctoToNear,
 } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
-import dayjs from '../../utils/dayjs';
 
 interface Props {
   txns: TransactionInfo[];
@@ -105,8 +105,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
                           suppressHydrationWarning
                         >
                           {txn?.block_timestamp
-                            ? dayjs().to(
-                                dayjs(nanoToMilli(txn?.block_timestamp)),
+                            ? getTimeAgoString(
+                                nanoToMilli(txn?.block_timestamp),
                               )
                             : ''}
                         </div>
