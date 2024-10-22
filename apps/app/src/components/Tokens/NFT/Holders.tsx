@@ -3,7 +3,6 @@ import Table from '@/components/common/Table';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import {
-  getTimeAgoString,
   holderPercentage,
   localFormat,
   nanoToMilli,
@@ -13,6 +12,7 @@ import { HoldersPropsInfo, Token } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import dayjs from '../../../utils/dayjs';
 
 interface Props {
   tokens: Token;
@@ -126,8 +126,8 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
                     {status && localFormat && localFormat(status?.height)}
                   </span>
                   {status?.timestamp &&
-                    `(${getTimeAgoString(
-                      nanoToMilli(status.timestamp),
+                    `(${dayjs().to(
+                      dayjs(nanoToMilli(status.timestamp)),
                     )}).`}{' '}
                   Holders data will be delayed.
                 </div>
