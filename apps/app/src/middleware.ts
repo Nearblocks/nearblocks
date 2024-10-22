@@ -50,5 +50,6 @@ export const config = {
     '/([\\w-]+)?/address/(.+)',
     '/([\\w-]+)?/token/(.+)',
     '/([\\w-]+)?/nft-token/(.+)',
+    '/([\\w-]+)?/node-explorer/(.+)',
   ],
 };
