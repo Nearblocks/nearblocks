@@ -29,7 +29,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   const router = useRouter();
   const { t } = useTranslation();
   const [showAge, setShowAge] = useState(true);
-  const errorMessage = t ? t('txns:noTxns') : 'No transactions found!';
+  const errorMessage = 'No transactions found!';
   const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);
 
