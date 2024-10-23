@@ -9,16 +9,27 @@ Prerequisites:
 - Docker
 - Docker Compose
 
-In the root directory, you'll find two essential files: `mainnet.env.example` and `testnet.env.example`. These files define many common environment variables. To configure your environment, simply copy these files:
+In the root directory, you'll find these essential files: `mainnet.aggregates.env.example`, `mainnet.api.env.example`, `mainnet.backend.env.example`, `mainnet.indexer.env.example` for Mainnet, and `testnet.aggregates.env.example`, `testnet.api.env.example`, `testnet.backend.env.example`, `testnet.indexer.env.example` for Testnet. These files define many common environment variables. To configure your environment, simply copy these files:
 
-- Copy `mainnet.env.example` to `mainnet.env` for the Mainnet setup.
-- Copy `testnet.env.example` to `testnet.env` for the Testnet setup.
+- For the Mainnet setup:
+  - Copy `mainnet.aggregates.env.example` to `mainnet.aggregates.env`
+  - Copy `mainnet.api.env.example` to `mainnet.api.env`
+  - Copy `mainnet.backend.env.example` to `mainnet.backend.env`
+  - Copy `mainnet.indexer.env.example` to `mainnet.indexer.env`
+- For the Testnet setup:
+  - Copy `testnet.aggregates.env.example` to `testnet.aggregates.env`
+  - Copy `testnet.api.env.example` to `testnet.api.env`
+  - Copy `testnet.backend.env.example` to `testnet.backend.env`
+  - Copy `testnet.indexer.env.example` to `testnet.indexer.env`
 
 Once your environment is set up, you can launch your application using Docker Compose. Here are the commands for both Mainnet and Testnet:
 
 ```
-docker compose -f docker-compose.mainnet.yml up -d --build # for Mainnet
-docker compose -f docker-compose.testnet.yml up -d --build # for Testnet
+# For Mainnet
+docker compose -f mainnet-aggregates.yml -f mainnet-api.yml -f mainnet-app-lite.yml -f mainnet-app.yml -f mainnet-backend.yml -f mainnet-explorer-selector.yml -f mainnet-indexer.yml up -d --build
+
+# For Testnet
+docker compose -f testnet-aggregates.yml -f testnet-api.yml -f testnet-app-lite.yml -f testnet-app.yml -f testnet-backend.yml -f testnet-explorer-selector.yml -f testnet-indexer.yml up -d --build
 ```
 
 ## Modules
