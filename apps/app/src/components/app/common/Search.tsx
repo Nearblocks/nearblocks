@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
 import { toast } from 'react-toastify';
@@ -15,7 +16,7 @@ import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
 import { usePathname } from 'next/navigation';
 import { networkId } from '@/utils/app/config';
-import { useIntlRouter } from '@/i18n/routing';
+import { routing, useIntlRouter } from '@/i18n/routing';
 
 export const SearchToast = () => {
   if (networkId === 'testnet') {
@@ -51,8 +52,11 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
+  const isLocale = (value: string | null): any => {
+    return routing?.locales?.includes(value as any);
+  };
 
-  const homeSearch = pathname === '/';
+  const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
 
   const redirect = (route: any) => {
     switch (route?.type) {

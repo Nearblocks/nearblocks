@@ -3,50 +3,49 @@ import React from 'react';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import Skeleton from '../skeleton/common/Skeleton';
-import { TransactionInfo } from '@/utils/types';
+import { BlocksInfo } from '@/utils/types';
 import {
+  convertToMetricPrefix,
   getTimeAgoString,
+  localFormat,
   nanoToMilli,
-  shortenAddress,
-  shortenHex,
-  yoctoToNear,
 } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 interface Props {
-  txns: TransactionInfo[];
+  blocks: BlocksInfo[];
   error: boolean;
 }
 
-const LatestTransactions = ({ txns, error }: Props) => {
+const LatestBlocks = ({ blocks, error }: Props) => {
   const t = useTranslations();
 
   return (
     <>
       <div className="relative">
         <PerfectScrollbar>
-          {!txns && error && (
+          {!blocks && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('error') : ' Error!'}
+              {t ? t('error') : 'Error!'}
             </div>
           )}
-          {!error && txns?.length === 0 && (
+          {!error && blocks?.length === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('noTxns') : ' No transactions found!'}
+              {t ? t('noBlocks') : 'No blocks found'}
             </div>
           )}
-          {error && txns?.length === 0 && (
-            <div className="px-3 dark:divide-black-200 divide-y h-80">
+          {error && blocks?.length === 0 && (
+            <div className="px-3 divide-y dark:divide-black-200 h-80">
               {[...Array(5)].map((_, i) => (
                 <div
                   className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
                   key={i}
                 >
-                  <div className="flex items-center ">
-                    <div className="flex-shrink-0 rounded-full h-10 w-10 bg-blue-900/10 dark:text-neargray-10 flex items-center justify-center text-sm">
-                      TX
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 rounded-xl h-10 w-10 bg-blue-900/10 dark:text-white flex items-center justify-center text-sm">
+                      BK
                     </div>
                     <div className="px-2">
                       <div className="text-green-500 dark:text-green-250 text-sm">
@@ -80,69 +79,69 @@ const LatestTransactions = ({ txns, error }: Props) => {
               ))}
             </div>
           )}
-          {txns?.length > 0 && (
+          {blocks?.length > 0 && (
             <div className="px-3 divide-y dark:divide-black-200 h-80">
-              {txns?.map((txn: TransactionInfo) => {
+              {blocks?.map((block: BlocksInfo) => {
                 return (
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
-                    key={txn?.transaction_hash}
+                    key={block?.block_hash}
                   >
                     <div className=" flex items-center">
-                      <div className="flex-shrink-0 rounded-full h-10 w-10 bg-blue-900/10 flex items-center justify-center text-sm dark:text-white">
-                        TX
+                      <div className="flex-shrink-0 rounded-xl h-10 w-10 bg-blue-900/10 dark:text-white  flex items-center justify-center text-sm">
+                        BK
                       </div>
                       <div className="overflow-hidden pl-2">
-                        <div className="text-green-500 dark:text-green-250 text-sm">
+                        <div className="text-green-500 dark:text-green-250 text-sm font-medium ">
                           <Link
-                            href={`/txns/${txn?.transaction_hash}`}
-                            className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                            href={`/blocks/${block?.block_hash}`}
+                            className="text-green-500 dark:text-green-250 hover:no-underline"
                           >
-                            {shortenHex(txn?.transaction_hash ?? '')}
+                            {block?.block_height
+                              ? localFormat(block?.block_height)
+                              : block?.block_height ?? ''}
                           </Link>
                         </div>
                         <div
-                          className="text-gray-400 text-xs truncate"
+                          className="text-nearblue-700 text-xs truncate"
                           suppressHydrationWarning
                         >
-                          {txn?.block_timestamp
+                          {block?.block_timestamp
                             ? getTimeAgoString(
-                                nanoToMilli(txn?.block_timestamp),
+                                nanoToMilli(block?.block_timestamp),
                               )
                             : ''}
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
-                      <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('txnFrom') : 'From'}{' '}
-                        <Link
-                          href={`/address/${txn?.signer_account_id}`}
-                          className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                        >
-                          {shortenAddress(txn?.signer_account_id ?? '')}
-                        </Link>
-                      </div>
-                      <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('txnTo') : 'To'}{' '}
-                        <Link
-                          href={`/address/${txn?.receiver_account_id}`}
-                          className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                        >
-                          {shortenAddress(txn?.receiver_account_id ?? '')}
-                        </Link>
+                    <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1  text-sm whitespace-nowrap dark:text-green-250 truncate">
+                      <span className="dark:text-white">
+                        {t ? t('blockMiner') : 'Author'}&nbsp;
+                      </span>
+                      <Link
+                        href={`/address/${block?.author_account_id}`}
+                        className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                      >
+                        <span>{block?.author_account_id}</span>
+                      </Link>
+                      <div className="text-nearblue-700 text-sm ">
+                        {block?.transactions_agg?.count
+                          ? localFormat(block?.transactions_agg?.count)
+                          : block?.transactions_agg?.count ?? ''}{' '}
+                        txns{' '}
                       </div>
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">
                       <Tooltip
-                        label={'Deposit value'}
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                        label="Gas used"
+                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
                       >
-                        <span className="u-label--badge-in  text-nearblue-700 truncate">
-                          {txn?.actions_agg?.deposit
-                            ? yoctoToNear(txn?.actions_agg?.deposit, true)
-                            : txn?.actions_agg?.deposit ?? ''}{' '}
-                          Ⓝ
+                        <span className="u-label--badge-in text-nearblue-700 truncate">
+                          {block?.chunks_agg?.gas_used
+                            ? convertToMetricPrefix(
+                                block?.chunks_agg?.gas_used,
+                              ) + 'gas'
+                            : block?.chunks_agg?.gas_used ?? '' + 'gas'}
                         </span>
                       </Tooltip>
                     </div>
@@ -153,18 +152,17 @@ const LatestTransactions = ({ txns, error }: Props) => {
           )}
         </PerfectScrollbar>
       </div>
-      {error && txns.length === 0 && (
+      {error && blocks?.length === 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Skeleton className="h-10" />
         </div>
       )}
-      {txns && txns?.length > 0 && (
+      {blocks && blocks?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
-          <Link
-            href="/txns"
-            className="block text-center dark:text-white  border border-green-900/10 font-thin dark:font-normal bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-xs dark:text-sm py-3 rounded w-full focus:outline-none hover:no-underline"
-          >
-            View all transactions
+          <Link href="/blocks">
+            <span className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-thin dark:font-normal dark:hover:text-green-250 text-white dark:text-sm text-xs py-3 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
+              View all blocks
+            </span>
           </Link>
         </div>
       )}
@@ -172,4 +170,4 @@ const LatestTransactions = ({ txns, error }: Props) => {
   );
 };
 
-export default LatestTransactions;
+export default LatestBlocks;

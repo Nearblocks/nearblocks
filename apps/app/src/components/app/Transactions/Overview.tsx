@@ -1,3 +1,4 @@
+'use client';
 import {
   currency,
   dollarFormat,
@@ -194,14 +195,14 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                           ? 'near price_dark.svg'
                           : 'near price.svg'
                       }`}
-                      alt={t ? t('nearPrice') : 'nearPrice'}
+                      alt={t ? t('homePage.nearPrice') : 'nearPrice'}
                       width={24}
                       height={24}
                     />
                   </div>
                   <div className="ml-2">
                     <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
-                      {t ? t('nearPrice') : 'NEAR PRICE'}
+                      {t ? t('homePage.nearPrice') : 'NEAR PRICE'}
                     </p>
                     {error ? (
                       <Skeleton className="my-1 h-4" />
@@ -246,14 +247,14 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                       src={`/images/${
                         theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                       }`}
-                      alt={t ? t('marketCap') : 'marketCap'}
+                      alt={t ? t('homePage.marketCap') : 'marketCap'}
                       width={24}
                       height={24}
                     />
                   </div>
                   <div className="ml-2">
                     <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                      {t ? t('marketCap') : ' MARKET CAP'}
+                      {t('homePage.marketCap')}
                     </p>
                     {error ? (
                       <Skeleton className="my-1 h-4" />
@@ -284,14 +285,14 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                         ? 'transactions_dark.svg'
                         : 'transactions.svg'
                     }`}
-                    alt={t ? t('transactions') : 'transactions'}
+                    alt={t ? t('homePage.transactions') : 'transactions'}
                     width={24}
                     height={24}
                   />
                 </div>
                 <div className="ml-2">
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                    {t ? t('transactions') : 'TRANSACTIONS'}
+                    {t ? t('homePage.transactions') : 'TRANSACTIONS'}
                   </p>
                   {error ? (
                     <Skeleton className="my-1 h-4" />
@@ -322,7 +323,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               <div className="flex flex-col text-right">
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {' '}
-                  {t ? t('gasPrice') : 'GAS PRICE'}
+                  {t ? t('homePage.gasPrice') : 'GAS PRICE'}
                 </p>
                 {error ? (
                   <Skeleton className="my-1 h-4" />
@@ -342,7 +343,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                     src={`/images/${
                       (theme === 'dark' && 'pickaxe_dark.svg') || 'pickaxe.svg'
                     }`}
-                    alt={t ? t('activeValidator') : 'activeValidator'}
+                    alt={t ? t('homePage.activeValidator') : 'activeValidator'}
                     width={24}
                     height={24}
                   />
@@ -351,7 +352,9 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     <Link href="/node-explorer" className="hover:no-underline">
                       {' '}
-                      {t ? t('activeValidator') : 'ACTIVE VALIDATORS'}{' '}
+                      {t
+                        ? t('homePage.activeValidator')
+                        : 'ACTIVE VALIDATORS'}{' '}
                     </Link>
                   </p>
                   {error ? (
@@ -370,7 +373,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               </div>
               <div className="flex flex-col text-right">
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                  {t ? t('avgBlockTime') : 'AVG. BLOCK TIME'}
+                  {t ? t('homePage.avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
                 {error ? (
                   <Skeleton className="my-1 h-4" />
@@ -395,7 +398,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               {chartConfig && (
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm dark:bg-black-600">
                   {t
-                    ? t('transactionHistory', { days: 14 })
+                    ? t('homePage.transactionHistory', { days: 14 })
                     : 'NEAR TRANSACTION HISTORY IN 14 DAYS'}
                 </p>
               )}
