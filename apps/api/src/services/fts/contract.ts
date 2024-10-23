@@ -34,7 +34,8 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       coingecko_id,
       coinmarketcap_id,
       livecoinwatch_id,
-      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap
+      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap,
+      nep518_hex_address
     FROM
       ft_meta
     WHERE

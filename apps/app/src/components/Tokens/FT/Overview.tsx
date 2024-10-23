@@ -10,6 +10,7 @@ import Big from 'big.js';
 import Link from 'next/link';
 import { useFetch } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
+import Image from 'next/image';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import TokenImage from '@/components/common/TokenImage';
 import WarningIcon from '@/components/Icons/WarningIcon';
@@ -17,6 +18,8 @@ import Question from '@/components/Icons/Question';
 import Links from '@/components/common/Links';
 import { useRouter } from 'next/router';
 import dayjs from '../../../utils/dayjs';
+import ListCheck from '@/components/Icons/ListCheck';
+import { toast } from 'react-toastify';
 
 interface Props {
   stats: StatusInfo;
@@ -41,6 +44,7 @@ export default function Overview({
   const router = useRouter();
   const { id } = router.query;
   const [showMarketCap, setShowMarketCap] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -62,15 +66,48 @@ export default function Overview({
 
   const onToggle = () => setShowMarketCap((o) => !o);
 
+  const addToMetaMask = async () => {
+    try {
+      const tokenAddress = token?.nep518_hex_address;
+      const tokenSymbol = token?.symbol;
+      const tokenDecimals = token?.decimals;
+      const tokenImage = token?.icon;
+
+      if (window.ethereum) {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: tokenAddress,
+              symbol: tokenSymbol,
+              decimals: tokenDecimals,
+              image: tokenImage,
+            },
+          },
+        });
+
+        toast.success(`${token.name} has been added to your MetaMask!`);
+      } else {
+        toast.info(
+          'Please install MetaMask or another Ethereum wallet to use this feature.',
+        );
+      }
+    } catch (error) {
+      console.error('Error adding token to MetaMask:', error);
+      toast.error('Error adding token to MetaMask. Try again later');
+    }
+  };
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <>
       <div className="flex items-center justify-between flex-wrap pt-4">
-        {!token ? (
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-7" />
-          </div>
-        ) : (
-          <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 px-2">
+        <div className="flex items-center w-full py-4 px-2">
+          <h1 className="flex items-center break-all text-xl text-gray-700 dark:text-neargray-10 leading-8">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 src={token?.icon}
@@ -78,12 +115,48 @@ export default function Overview({
                 className="w-7 h-7"
               />
             </span>
-            <span className="inline-flex align-middle mx-2">Token:</span>
+            <span className="inline-flex align-middle mx-2">{`Token${
+              token?.name ? ':' : ''
+            }`}</span>
             <span className="inline-flex align-middle font-semibold">
               {token?.name}
             </span>
           </h1>
-        )}
+          <div className="relative md:pt-0 pt-2 text-gray-500 text-xs ml-auto">
+            <span className="group flex w-full relative h-full">
+              <button
+                className="flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1"
+                onClick={toggleDropdown}
+                disabled={!token}
+              >
+                <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
+                  <ListCheck className="h-4 dark:filter dark:invert" />
+                </div>
+              </button>
+              {isOpen && (
+                <ul className="bg-white dark:bg-black-600 soft-shadow min-w-full absolute top-full right-0 rounded-md py-1 z-[99]">
+                  <li className="pb-2" onClick={toggleDropdown}>
+                    <button
+                      id="add-to-metamask-btn"
+                      onClick={addToMetaMask}
+                      className="flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 w-full text-left"
+                    >
+                      <span className="w-4 dark:text-green-250">
+                        <Image
+                          width={10}
+                          height={10}
+                          src={'/images/metamask.svg'}
+                          alt="Metamask"
+                        />
+                      </span>
+                      Add Token to MetaMask (Web3)
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </span>
+          </div>
+        </div>
       </div>
       <div>
         {isTokenSpam((token?.contract || id) as string) && isVisible && (
@@ -125,11 +198,7 @@ export default function Overview({
                     <div className="w-full text-nearblue-700 text-xs uppercase mb-1  text-[80%]">
                       Price
                     </div>
-                    {!token ? (
-                      <div className="w-20">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : token?.price !== null && token?.price !== undefined ? (
+                    {token?.price !== null && token?.price !== undefined ? (
                       <div className="w-full break-words flex flex-wrap text-sm">
                         ${localFormat(token?.price)}
                         {stats?.near_price && (
@@ -181,12 +250,8 @@ export default function Overview({
                         </Tooltip>
                       </span>
                     </div>
-                    {!token ? (
-                      <div className="w-20">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : Number(token?.fully_diluted_market_cap) > 0 ||
-                      Number(token?.market_cap) > 0 ? (
+                    {Number(token?.fully_diluted_market_cap) > 0 ||
+                    Number(token?.market_cap) > 0 ? (
                       <div className="w-full break-words flex flex-wrap text-sm">
                         {Number(token?.fully_diluted_market_cap) > 0 &&
                         Number(token?.market_cap) > 0 ? (
@@ -239,9 +304,7 @@ export default function Overview({
                     Max Total Supply:
                   </div>
                   {!token ? (
-                    <div className="w-32">
-                      <Skeleton className="h-4" />
-                    </div>
+                    'N/A'
                   ) : (
                     <div className="w-full md:w-3/4 break-words">
                       {token?.total_supply
@@ -313,11 +376,7 @@ export default function Overview({
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
                   {!token ? (
-                    <div className="w-full md:w-3/4 break-words">
-                      <div className="w-32">
-                        <Skeleton className="h-4" />
-                      </div>
-                    </div>
+                    <div className="w-full md:w-3/4 break-words">N/A</div>
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
@@ -332,13 +391,7 @@ export default function Overview({
                 <div className="flex flex-wrap items-center justify-between py-4">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Decimals:</div>
                   <div className="w-full md:w-3/4 break-words">
-                    {!token ? (
-                      <div className="w-32">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      token?.decimals
-                    )}
+                    {!token ? 'N/A' : token?.decimals}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between py-4">
@@ -347,9 +400,7 @@ export default function Overview({
                   </div>
                   <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
                     {!token ? (
-                      <div className="w-32">
-                        <Skeleton className="h-4" />
-                      </div>
+                      'N/A'
                     ) : (
                       <a
                         href={`${token?.website}`}
@@ -366,13 +417,7 @@ export default function Overview({
                     Social Profiles:
                   </div>
                   <div className="w-full md:w-3/4 break-words">
-                    {!token ? (
-                      <div className="w-32">
-                        <Skeleton className="h-4" />
-                      </div>
-                    ) : (
-                      <Links meta={token} />
-                    )}
+                    {!token ? 'N/A' : <Links meta={token} />}
                   </div>
                 </div>
               </div>
