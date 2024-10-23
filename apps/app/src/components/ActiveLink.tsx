@@ -8,6 +8,7 @@ interface ActiveLinkProps extends LinkProps {
   activeClassName?: string;
   inActiveClassName?: string;
   href: string | UrlObject;
+  exact?: boolean | null;
 }
 
 const ActiveLink = ({
@@ -15,6 +16,7 @@ const ActiveLink = ({
   activeClassName,
   inActiveClassName,
   href,
+  exact,
   ...props
 }: ActiveLinkProps) => {
   const { asPath } = useRouter();
@@ -23,10 +25,13 @@ const ActiveLink = ({
   const childClassName = child?.props?.className || ' ';
 
   const hrefString = typeof href === 'string' ? href : href.pathname || '';
-
-  const className = (
-    href === '/' ? asPath === href : asPath.startsWith(hrefString)
-  )
+  let isActive = false;
+  if (exact) {
+    isActive = asPath === href;
+  } else {
+    isActive = href === '/' ? asPath === href : asPath.startsWith(hrefString);
+  }
+  const className = isActive
     ? `${childClassName} ${activeClassName}`
     : `${childClassName} ${inActiveClassName}`;
 

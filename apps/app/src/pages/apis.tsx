@@ -10,13 +10,16 @@ import SwitchButton from '@/components/SwitchButton';
 import { dollarFormat, dollarNonCentFormat, localFormat } from '@/utils/libs';
 import { docsUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useTheme } from 'next-themes';
 import { GetServerSideProps } from 'next';
 import { fetchData } from '@/utils/fetchData';
+import useStorage from '@/hooks/useStorage';
+import Cookies from 'js-cookie';
+import { request } from '@/hooks/useAuth';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
 
@@ -55,6 +58,56 @@ const ApiPlan = () => {
   const [subject, _setSubject] = useState('API');
   const [description, setDescription] = useState('');
   const [data, setData] = useState();
+  const [token, _setToken] = useStorage('token');
+
+  Cookies.get('token');
+
+  const resetStripePlan = () => {
+    localStorage.setItem('stripe-plan-id', '');
+    localStorage.setItem('interval', '');
+    localStorage.setItem('subscribe-called', '');
+
+    return;
+  };
+
+  const subscribePlan = async () => {
+    try {
+      const stripePlanId = localStorage.getItem('stripe-plan-id');
+      const interval = localStorage.getItem('interval');
+
+      const res = await request.post(`advertiser/subscribe`, {
+        interval: interval === 'year' ? 'year' : 'month',
+        plan_id: stripePlanId,
+      });
+      localStorage.setItem('subscribe-called', 'true');
+
+      if (res?.data && res?.data['url ']) {
+        await router.push(res?.data['url ']);
+        return;
+      }
+      if (res?.data && res?.data['message'] === 'upgraded') {
+        resetStripePlan();
+        router.push('/user/plan?status=upgraded');
+      }
+      if (res?.data && res?.data['message'] === 'downgraded') {
+        resetStripePlan();
+        router.push('/user/plan?status=downgraded');
+      }
+      resetStripePlan();
+      router.push('/user/plan');
+    } catch (error) {
+      const statusCode = get(error, 'response.status') || null;
+
+      if (statusCode === 422) {
+        resetStripePlan();
+        router.push('/user/plan?status=exists');
+      }
+      if (statusCode === 400) {
+        resetStripePlan();
+        router.push('/user/plan?status=invalid');
+      }
+    }
+  };
 
   function get(obj: any, path: any, defaultValue = null) {
     const keys = Array.isArray(path) ? path : path.split('.');
@@ -130,13 +183,29 @@ const ApiPlan = () => {
 
   const onGetStarted = async (plan: any) => {
     if (plan) {
-      router.push({
-        pathname: `https://dash.nearblocks.io/login`,
-        query: {
-          id: plan?.id,
-          interval: !interval ? 'month' : 'year',
-        },
-      });
+      if (plan?.id) {
+        localStorage.setItem('stripe-plan-id', plan?.id as string);
+        localStorage.setItem(
+          'interval',
+          !interval ? 'month' : ('year' as string),
+        );
+        localStorage.setItem('subscribe-called', '');
+      }
+      if (token) {
+        if (plan?.id) {
+          subscribePlan();
+        } else {
+          router.replace('/user/overview');
+        }
+      } else {
+        router.push({
+          pathname: `/login`,
+          query: {
+            id: plan?.id,
+            interval: !interval ? 'month' : 'year',
+          },
+        });
+      }
     }
   };
 
@@ -159,7 +228,6 @@ const ApiPlan = () => {
         />
       </Head>
       <section>
-        <ToastContainer />
         <div className="container mx-auto px-3 pt-14">
           <div className="my-5 sm:!text-left text-center lg:!px-32 px-5">
             {status === 'cancelled' && (

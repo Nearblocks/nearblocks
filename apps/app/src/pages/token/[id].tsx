@@ -17,18 +17,14 @@ import Holders from '@/components/Tokens/FT/Holders';
 import Info from '@/components/Tokens/FT/Info';
 import FAQ from '@/components/Tokens/FT/FAQ';
 import TokenFilter from '@/components/Tokens/FT/TokenFilter';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import Comment from '@/components/skeleton/common/Comment';
-import { useAuthStore } from '@/stores/auth';
 import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
-const tabs = ['transfers', 'holders', 'info', 'faq', 'comments'];
+const tabs = ['transfers', 'holders', 'info', 'faq'];
 
-type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
+type TabType = 'transfers' | 'holders' | 'info' | 'faq';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
@@ -74,7 +70,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       holders: { api: `fts/${id}/holders` },
       info: { api: `` },
       faq: { api: `` },
-      comments: { api: '' },
     };
 
     const fetchCommonData = async (url: string | undefined) =>
@@ -103,30 +98,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let dataCountResult = null;
     let contractResult = null;
 
-    if (tab !== 'comments') {
-      const queryWithA = a ? { ...qs, a } : qs;
+    const queryWithA = a ? { ...qs, a } : qs;
 
-      // Fetch tab-specific data
-      const tabApi = tabApiUrls[tab as TabType];
-      const fetchUrl = `${tabApi.api}${
+    // Fetch tab-specific data
+    const tabApi = tabApiUrls[tab as TabType];
+    const fetchUrl = `${tabApi.api}${
+      queryWithA ? `?${queryString.stringify(queryWithA)}` : ''
+    }`;
+    const countUrl =
+      tabApi.count &&
+      `${tabApi.count}${
         queryWithA ? `?${queryString.stringify(queryWithA)}` : ''
       }`;
-      const countUrl =
-        tabApi.count &&
-        `${tabApi.count}${
-          queryWithA ? `?${queryString.stringify(queryWithA)}` : ''
-        }`;
 
-      [dataResult, dataCountResult] = await Promise.allSettled([
-        fetchCommonData(fetchUrl),
-        fetchCommonData(countUrl),
-      ]);
+    [dataResult, dataCountResult] = await Promise.allSettled([
+      fetchCommonData(fetchUrl),
+      fetchCommonData(countUrl),
+    ]);
 
-      if (tab === 'faq') {
-        contractResult = await fetchCommonData(
-          `account/${id}/contract/deployments`,
-        );
-      }
+    if (tab === 'faq') {
+      contractResult = await fetchCommonData(
+        `account/${id}/contract/deployments`,
+      );
     }
 
     const getResult = (result: PromiseSettledResult<any>) =>
@@ -189,7 +182,6 @@ const TokenDetails = ({
   const router = useRouter();
   const { id, a }: any = router.query;
   const { t } = useTranslation();
-  const components = useBosComponents();
 
   const token: Token = tokenDetails?.contracts?.[0];
   const transfers = transfersDetails?.txns?.[0]?.count;
@@ -216,10 +208,6 @@ const TokenDetails = ({
     ? `All ${token.name} (${token.symbol}) information in one place : Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : '';
   const thumbnail = `${ogUrl}/thumbnail/token?token=${token?.name}&network=${network}&brand=near`;
-
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
 
   const onTab = (index: number) => {
     const { id } = router.query;
@@ -311,14 +299,6 @@ const TokenDetails = ({
                   >
                     <h2>FAQ</h2>
                   </Tab>
-                  <Tab
-                    className={getClassName(
-                      tabs[4] === tabs[tabs.indexOf(tab)],
-                    )}
-                    selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                  >
-                    <h2>Comments</h2>
-                  </Tab>
                 </TabList>
                 <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                   <TabPanel>
@@ -354,23 +334,6 @@ const TokenDetails = ({
                       holdersCount={holders}
                       tab={tab}
                     />
-                  </TabPanel>
-                  <TabPanel>
-                    {tab === 'comments' ? (
-                      <VmComponent
-                        src={components?.commentsFeed}
-                        defaultSkelton={<Comment />}
-                        props={{
-                          network: network,
-                          path: `nearblocks.io/token/${id}`,
-                          limit: 10,
-                          requestSignInWithWallet,
-                        }}
-                        loading={<Comment />}
-                      />
-                    ) : (
-                      <div className="w-full h-[500px]"></div>
-                    )}
                   </TabPanel>
                 </div>
               </Tabs>

@@ -13,8 +13,6 @@ import {
 } from '@reach/accordion';
 import ArrowDown from '@/components/Icons/ArrowDown';
 import { GetServerSideProps } from 'next';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { fetchData } from '@/utils/fetchData';
@@ -288,7 +286,6 @@ const Contact = () => {
         <meta property="twitter:image" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/contact`} />
       </Head>
-      <ToastContainer />
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
       <div className="container mx-auto px-3 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
         <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">

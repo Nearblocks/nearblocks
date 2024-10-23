@@ -12,7 +12,6 @@ import {
 } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
-import { useAuthStore } from '@/stores/auth';
 import SponserdText from '@/components/SponserdText';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '@/components/Icons/FileSlash';
@@ -22,9 +21,6 @@ import Receipt from '@/components/Transactions/Receipt';
 import Execution from '@/components/Transactions/Execution';
 import Tree from '@/components/Transactions/Tree';
 import ReceiptSummary from '@/components/Transactions/ReceiptSummary';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import Comment from '@/components/skeleton/common/Comment';
 import useRpc from '@/hooks/useRpc';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
@@ -41,13 +37,14 @@ import {
 import { useRpcStore } from '@/stores/rpc';
 import dynamic from 'next/dynamic';
 import { fetchData } from '@/utils/fetchData';
+import { useBosLoaderInitializer } from '@/hooks/useBosLoaderInitializer';
 
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
   ssr: false,
 });
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
-const hashes = [' ', 'execution', 'enhanced', 'tree', 'summary', 'comments'];
+const hashes = [' ', 'execution', 'enhanced', 'tree', 'summary'];
 
 export const getServerSideProps: GetServerSideProps<{
   data: any;
@@ -127,9 +124,9 @@ const Txn = ({
   isContract,
   price,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  useBosLoaderInitializer();
   const router = useRouter();
   const { t } = useTranslation();
-  const components = useBosComponents();
   const { hash } = router.query;
   const [pageHash, setHash] = useHash();
   const [rpcTxn, setRpcTxn] = useState<any>({});
@@ -142,10 +139,6 @@ const Txn = ({
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
   const [allRpcProviderError, setAllRpcProviderError] = useState(false);
-
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
 
   const txn = data && data?.txns?.[0];
 
@@ -394,14 +387,6 @@ const Txn = ({
                   >
                     <h2 className="p-2">Receipt Summary</h2>
                   </button>
-                  <button
-                    onClick={() => onTab(5)}
-                    className={buttonStyles(hashes[5] === hashes[tabIndex])}
-                  >
-                    <h2 className="p-2">
-                      {t ? t('txns:txn.tabs.comments') : 'Comments'}
-                    </h2>
-                  </button>
                 </div>
               </div>
               <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
@@ -435,19 +420,6 @@ const Txn = ({
                     rpcTxn={rpcTxn}
                     loading={rpcError || !rpcTxn}
                     statsData={statsData}
-                  />
-                </div>
-                <div className={`${tabIndex === 5 ? '' : 'hidden'} `}>
-                  <VmComponent
-                    src={components?.commentsFeed}
-                    defaultSkelton={<Comment />}
-                    props={{
-                      network: network,
-                      path: `nearblocks.io/txns/${hash}`,
-                      limit: 10,
-                      requestSignInWithWallet,
-                    }}
-                    loading={<Comment />}
                   />
                 </div>
               </div>

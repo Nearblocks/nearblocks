@@ -1,11 +1,15 @@
-const FaChevronRight = () => {
+interface Props {
+  className?: string;
+}
+
+const FaChevronRight = (props: Props) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="16"
       height="16"
       fill="currentColor"
-      className="bi bi-chevron-right"
+      className={`bi bi-chevron-right ${props.className}`}
       viewBox="0 0 16 16"
     >
       <path
