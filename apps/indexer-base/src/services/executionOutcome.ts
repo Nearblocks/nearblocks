@@ -4,7 +4,7 @@ import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import { mapExecutionStatus } from '#libs/utils';
+import { jsonStringify, mapExecutionStatus } from '#libs/utils';
 
 export const storeExecutionOutcomes = async (
   knex: Knex,
@@ -96,6 +96,7 @@ const getExecutionOutcomeData = (
   executor_account_id: outcome.executionOutcome.outcome.executorId,
   gas_burnt: outcome.executionOutcome.outcome.gasBurnt,
   index_in_chunk: indexInChunk,
+  logs: jsonStringify(outcome.executionOutcome.outcome.logs),
   receipt_id: outcome.executionOutcome.id,
   shard_id: shardId,
   status: mapExecutionStatus(outcome.executionOutcome.outcome.status),
