@@ -34,19 +34,12 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
-  const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
 
   const { contractCode, getContractMetadata, getVerifierData } = useRpc();
 
   useEffect(() => {
     if (rpcError) {
-      try {
-        switchRpc();
-      } catch (error) {
-        setRpcError(true);
-        setAllRpcProviderError(true);
-        console.error('Failed to switch RPC:', error);
-      }
+      switchRpc();
     }
   }, [rpcError, switchRpc]);
 
@@ -107,7 +100,7 @@ const Verifier: React.FC<ContractFormProps> = ({
     contractMetadata?.build_info?.build_environment &&
     contractMetadata?.build_info?.source_code_snapshot &&
     contractMetadata?.standards &&
-    contractMetadata?.standards?.length > 0;
+    contractMetadata.standards.length > 0;
 
   const getSourceCode = () => {
     const snapshot =
