@@ -17,6 +17,7 @@ import { setupNeth } from '@near-wallet-selector/neth';
 import { setupXDEFI } from '@near-wallet-selector/xdefi';
 import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet';
 import { setupMintbaseWallet } from '@near-wallet-selector/mintbase-wallet';
+import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
 import {
   CommitButton,
   EthersProviderContext,
@@ -33,10 +34,51 @@ import { sanitizeUrl } from '@braintree/sanitize-url';
 import { useEthersProviderContext } from '@/data/web3';
 import { useAuthStore } from '@/stores/auth';
 import { useVmStore } from '@/stores/vm';
-import { networkId, bosNetworkId } from '@/utils/config';
+import { networkId, bosNetworkId, EVMWalletChain } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
+import { env } from 'next-runtime-env';
+import { injected, walletConnect } from '@wagmi/connectors';
+import { createConfig, http, reconnect } from '@wagmi/core';
+import { createWeb3Modal } from '@web3modal/wagmi';
+
+const projectId = env('NEXT_PUBLIC_REOWN_PROJECT_ID') || '';
+
+const near = {
+  id: EVMWalletChain.chainId,
+  name: EVMWalletChain.name,
+  nativeCurrency: {
+    decimals: 18,
+    name: 'NEAR',
+    symbol: 'NEAR',
+  },
+  rpcUrls: {
+    default: { http: [EVMWalletChain.rpc] },
+    public: { http: [EVMWalletChain.rpc] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'NEAR Explorer',
+      url: EVMWalletChain.explorer,
+    },
+  },
+  testnet: networkId === 'testnet',
+};
+
+const wagmiConfig = createConfig({
+  chains: [near],
+  transports: { [near.id]: http() },
+  connectors: [
+    walletConnect({ projectId, showQrModal: false }),
+    injected({ shimDisconnect: true }),
+  ],
+});
+
+// Preserve login state on page reload
+reconnect(wagmiConfig);
+
+const web3Modal = createWeb3Modal({ wagmiConfig, projectId });
 
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
@@ -80,6 +122,11 @@ export default function VmInitializer() {
             setupNearMobileWallet(),
             setupMintbaseWallet(),
             setupBitteWallet(),
+            setupEthereumWallets({
+              wagmiConfig: wagmiConfig as any,
+              web3Modal: web3Modal as any,
+              alwaysOnboardDuringSignIn: true,
+            }),
           ],
         }),
         customElements: {
