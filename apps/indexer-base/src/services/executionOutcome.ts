@@ -1,11 +1,3 @@
-import jsSha3 from 'js-sha3';
-import { base_decode } from 'near-api-js/lib/utils/serialize.js';
-const { sha3_256 } = jsSha3;
-
-import elliptic from 'elliptic';
-import { keccak256 } from 'viem';
-const { ec: EC } = elliptic;
-
 import { types } from 'near-lake-framework';
 import { Action, FunctionCallAction } from 'near-lake-framework/dist/types.js';
 
@@ -13,10 +5,12 @@ import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import { getBitcoinAddress } from '#libs/chainAbstraction/bitcoin';
+import { getEthereumAddress } from '#libs/chainAbstraction/ethereum';
+import { addressExists } from '#libs/chainAbstraction/utils';
 import { mapExecutionStatus } from '#libs/utils';
 
-const rootPublicKey =
-  'secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3';
+type DerivedData = { chain: null | string; derivedAddress: null | string };
 
 export const storeExecutionOutcomes = async (
   knex: Knex,
@@ -45,9 +39,9 @@ export const storeChunkExecutionOutcomes = async (
   const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
   // Array to hold derived addresses data for batch insert
-  const derivedAddressesToStore: any = [];
+  const derivedAddresses: any = [];
 
-  executionOutcomes.forEach((executionOutcome, indexInChunk) => {
+  for (const [indexInChunk, executionOutcome] of executionOutcomes.entries()) {
     outcomes.push(
       getExecutionOutcomeData(
         shardId,
@@ -71,8 +65,9 @@ export const storeChunkExecutionOutcomes = async (
 
     // Process logs to derive addresses
     const logs = executionOutcome.executionOutcome.outcome.logs;
+
     if (logs) {
-      logs.forEach(async (log) => {
+      for (const log of logs) {
         const receipt = executionOutcome?.receipt?.receipt;
 
         if (receipt && 'Action' in receipt) {
@@ -84,26 +79,27 @@ export const storeChunkExecutionOutcomes = async (
             log.startsWith('sign:') &&
             functionCallAction?.FunctionCall?.methodName === 'sign'
           ) {
+            console.log('log', log);
+
             const signerId = receipt.Action?.signerId;
             const receiverId = executionOutcome?.receipt?.receiverId;
             const { path } = parseSignLog(log);
-            const derivedAddress = await processSignTransactionLog(
-              signerId,
-              path,
-              receiverId,
-            );
+            const { chain, derivedAddress }: DerivedData =
+              await getDerivedAddress(signerId, path);
+            console.log('receiverId', receiverId);
 
-            // Push the derived address data into the array
-            derivedAddressesToStore.push({
-              account_id: signerId,
-              chain: 'Ethereum', // You can customize this if needed
-              derived_address: derivedAddress,
-            });
+            if (derivedAddress && chain) {
+              derivedAddresses.push({
+                account_id: signerId,
+                chain: chain,
+                derived_address: derivedAddress,
+              });
+            }
           }
         }
-      });
+      }
     }
-  });
+  }
 
   const promises = [];
 
@@ -135,19 +131,25 @@ export const storeChunkExecutionOutcomes = async (
     );
   }
 
-  // Insert derived addresses
-  if (derivedAddressesToStore.length) {
-    promises.push(
-      retry(async () => {
-        await knex('derived_addresses')
-          .insert(derivedAddressesToStore)
-          .onConflict(['derived_address', 'account_id'])
-          .ignore();
-      }),
-    );
-  }
+  try {
+    console.log('derivedAddresses', derivedAddresses);
 
-  await Promise.all(promises);
+    // Insert derived addresses
+    if (derivedAddresses.length) {
+      promises.push(
+        retry(async () => {
+          await knex('derived_addresses')
+            .insert(derivedAddresses)
+            .onConflict(['derived_address', 'account_id'])
+            .ignore();
+        }),
+      );
+    }
+
+    await Promise.all(promises);
+  } catch (err) {
+    console.log('ERRORR...', err);
+  }
 };
 
 const getExecutionOutcomeData = (
@@ -200,79 +202,38 @@ function isFunctionCallAction(action: Action): action is FunctionCallAction {
   return (action as FunctionCallAction).FunctionCall !== undefined;
 }
 
-// Function to decode NEAR public key and return uncompressed hex
-function najPublicKeyStrToUncompressedHexPoint(): string {
-  const res =
-    '04' +
-    Buffer.from(base_decode(rootPublicKey.split(':')[1])).toString('hex');
-  return res;
-}
+async function getDerivedAddress(signerId: string, path: string) {
+  if (
+    path === 'ethereum-1' ||
+    path === "m/44'/60'/0'/0/0" ||
+    path === 'ethereum,1'
+  ) {
+    const chain = 'ethereum';
 
-// Derive the child public key using NEAR signer ID and path
-async function deriveChildPublicKey(
-  parentUncompressedPublicKeyHex: string,
-  signerId: string,
-  path = '',
-): Promise<string> {
-  const ec = new EC('secp256k1');
-  const scalarHex = sha3_256(
-    `near-mpc-recovery v0.1.0 epsilon derivation:${signerId},${path}`,
-  );
+    if (await addressExists(signerId, chain))
+      return { chain: null, derivedAddress: null };
 
-  const x = parentUncompressedPublicKeyHex.substring(2, 66);
-  const y = parentUncompressedPublicKeyHex.substring(66);
-
-  // Create a point object from X and Y coordinates
-  const oldPublicKeyPoint = ec.curve.point(x, y);
-
-  // Multiply the scalar by the generator point G
-  const scalarTimesG = ec.g.mul(scalarHex);
-
-  // Add the result to the old public key point
-  const newPublicKeyPoint = oldPublicKeyPoint.add(scalarTimesG);
-  const newX = newPublicKeyPoint.getX().toString('hex').padStart(64, '0');
-  const newY = newPublicKeyPoint.getY().toString('hex').padStart(64, '0');
-
-  return '04' + newX + newY; // uncompressed public key
-}
-
-// Convert the uncompressed public key to an Ethereum address
-function uncompressedHexPointToEvmAddress(
-  uncompressedHexPoint: string,
-): string {
-  const addressHash = keccak256(`0x${uncompressedHexPoint.slice(2)}`);
-  // Ethereum address is last 20 bytes of hash (40 characters), prefixed with 0x
-  return '0x' + addressHash.substring(addressHash.length - 40);
-}
-
-async function getEthereumAddress(accountId: string): Promise<string> {
-  // Convert the root NEAR public key to uncompressed format
-  const parentPublicKey = najPublicKeyStrToUncompressedHexPoint();
-
-  // Derive the child public key for the given account ID and path (ethereum-1)
-  const derivedPublicKey = await deriveChildPublicKey(
-    parentPublicKey,
-    accountId,
-    'ethereum-1',
-  );
-
-  // Convert the derived public key to an Ethereum address
-  const ethereumAddress = uncompressedHexPointToEvmAddress(derivedPublicKey);
-
-  return ethereumAddress;
-}
-
-async function processSignTransactionLog(
-  signerId: any,
-  path: any,
-  receiverId: any,
-) {
-  // Check if path matches Ethereum derivation (ethereum-1)
-  if (path === 'ethereum-1') {
-    // Convert payload to buffer and derive Ethereum address
-    const ethereumAddress = await getEthereumAddress(signerId);
-    console.log('receiverId', receiverId);
-
+    const ethereumAddress = await getEthereumAddress(signerId, path);
     console.log('Ethereum Address:', ethereumAddress);
-  }
+    const derivedData: DerivedData = {
+      chain: 'ethereum',
+      derivedAddress: ethereumAddress,
+    };
+
+    return derivedData;
+  } else if (path === 'bitcoin-1') {
+    const chain = 'bitcoin';
+
+    if (await addressExists(signerId, chain))
+      return { chain: null, derivedAddress: null };
+
+    const bitcoinAddress: string = await getBitcoinAddress(signerId, path);
+    console.log('Bitcoin Address:', bitcoinAddress);
+    const derivedData: DerivedData = {
+      chain: 'bitcoin',
+      derivedAddress: bitcoinAddress,
+    };
+
+    return derivedData;
+  } else return { chain: null, derivedAddress: null };
 }
