@@ -6,7 +6,6 @@ const routes = [
   '',
   'blocks',
   'address',
-  'testing',
   'token',
   'charts',
   'txns',

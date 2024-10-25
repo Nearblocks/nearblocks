@@ -1,4 +1,3 @@
-import { env } from 'next-runtime-env';
 import { Network, NetworkId } from '../types';
 
 export const networks: Record<NetworkId, Network> = {
@@ -23,9 +22,9 @@ export const apiUrl: string =
     : 'https://api3-testnet.nearblocks.io/v1/';
 
 export const appUrl =
-  env('NEXT_PUBLIC_NETWORK_ID') === 'mainnet'
-    ? env('NEXT_PUBLIC_MAINNET_URL')
-    : env('NEXT_PUBLIC_TESTNET_URL');
+  process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
+    ? process.env.NEXT_PUBLIC_MAINNET_URL
+    : process.env.NEXT_PUBLIC_TESTNET_URL;
 
 export const docsUrl: string =
   networkId === 'mainnet'

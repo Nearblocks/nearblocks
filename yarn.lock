@@ -16914,9 +16914,9 @@ near-social-vm-types@^1.0.0, near-social-vm-types@~1.0.0:
   version "0.1.2"
   resolved "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51"
 
-"nearblocks-trans-next-intl@https://github.com/kevin-devstack/translations.git#025fcdf0824156f73d0178650f8e3b0bfa554d84":
+"nearblocks-trans-next-intl@https://github.com/kevin-devstack/translations.git#fa68dd2eb68417ed0492519968dec6ed53a3b133":
   version "0.1.2"
-  resolved "https://github.com/kevin-devstack/translations.git#025fcdf0824156f73d0178650f8e3b0bfa554d84"
+  resolved "https://github.com/kevin-devstack/translations.git#fa68dd2eb68417ed0492519968dec6ed53a3b133"
 
 nearley@^2.20.1:
   version "2.20.1"
