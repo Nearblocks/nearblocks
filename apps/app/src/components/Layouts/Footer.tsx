@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import useTranslation from 'next-translate/useTranslation';
-import { useTheme } from 'next-themes';
 import Arrow from '../Icons/Arrow';
+import { useThemeStore } from '@/stores/theme';
+
 const Footer = () => {
   const { t } = useTranslation('common');
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const currentDate = new Date();
   return (
     <footer className="footer dark:bg-black-600  ">

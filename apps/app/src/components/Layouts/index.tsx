@@ -6,7 +6,7 @@ import { BlocksInfo, Stats } from '@/utils/types';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NextTopLoader from 'nextjs-toploader';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,7 +23,7 @@ const Layout = ({
 }: LayoutProps) => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   useEffect(() => {
     setIsMounted(true);

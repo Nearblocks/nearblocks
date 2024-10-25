@@ -15,13 +15,13 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import { Tooltip } from '@reach/tooltip';
 import { ValidatorEpochData } from 'nb-types';
-import { useTheme } from 'next-themes';
 import Table from '../common/Table';
 import Big from 'big.js';
 import Image from 'next/image';
+import { useThemeStore } from '@/stores/theme';
 
 const NodeList = ({ data, totalSupply, latestBlock, error }: any) => {
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);

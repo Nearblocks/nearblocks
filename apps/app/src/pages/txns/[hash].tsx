@@ -130,7 +130,7 @@ const Txn = ({
   const router = useRouter();
   const { t } = useTranslation();
   const components = useBosComponents();
-  const { hash } = router.query;
+  const { hash } = router?.query;
   const [pageHash, setHash] = useHash();
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
@@ -163,10 +163,16 @@ const Txn = ({
   const onTab = (index: number) => setHash(hashes[index]);
 
   useEffect(() => {
-    if (txn?.outcomes?.status === null || data === null || error) {
+    const MAX_RETRIES = 5;
+
+    if (
+      (txn?.outcomes?.status === null || data === null || error) &&
+      retryCount.current < MAX_RETRIES
+    ) {
       const delay = Math.min(1000 * 2 ** retryCount.current, 150000);
+
       timeoutRef.current = setTimeout(() => {
-        router.replace(router.asPath);
+        router?.replace(router?.asPath);
         retryCount.current += 1;
       }, delay);
     }
@@ -177,7 +183,7 @@ const Txn = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, router, retryCount, rpcUrl]);
+  }, [txn, router, rpcUrl]);
 
   useEffect(() => {
     if (rpcError) {
@@ -186,7 +192,6 @@ const Txn = ({
       } catch (error) {
         setRpcError(true);
         setAllRpcProviderError(true);
-        console.error('Failed to switch RPC:', error);
       }
     }
   }, [rpcError, switchRpc]);

@@ -4,11 +4,11 @@ import Question from '../Icons/Question';
 import Link from 'next/link';
 import { chartDataInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import { useTheme } from 'next-themes';
 import useTranslation from 'next-translate/useTranslation';
 import { networkId } from '@/utils/config';
 import Image from 'next/image';
 import Skeleton from '../skeleton/common/Skeleton';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   chartTypes: string;
@@ -20,7 +20,7 @@ interface Props {
 }
 const TpsChart = (props: Props) => {
   const { chartTypes, poweredBy, data } = props;
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const { t } = useTranslation();
 
   const [chartTpsData, setChartTpsData] = useState<any>([]);

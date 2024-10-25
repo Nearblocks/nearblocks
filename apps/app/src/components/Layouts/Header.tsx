@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useAuthStore } from '@/stores/auth';
-import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
 import ArrowDown from '../Icons/ArrowDown';
@@ -15,6 +14,7 @@ import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
+import { useThemeStore } from '@/stores/theme';
 
 const menus = [
   {
@@ -147,7 +147,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
   );
@@ -158,6 +158,12 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
 
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
+
+  const toggleTheme = () => {
+    localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle('light');
+  };
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -273,7 +279,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
             <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
               <button
                 className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                onClick={toggleTheme}
               >
                 <Image
                   src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
@@ -633,9 +639,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                       >
                         <div
                           className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer"
-                          onClick={() =>
-                            setTheme(theme === 'light' ? 'dark' : 'light')
-                          }
+                          onClick={toggleTheme}
                         >
                           <Image
                             src={`/images/${

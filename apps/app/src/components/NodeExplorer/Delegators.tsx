@@ -7,7 +7,6 @@ import Link from 'next/link';
 import useRpc from '@/hooks/useRpc';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useTheme } from 'next-themes';
 import { networkId } from '@/utils/config';
 import { debounce } from 'lodash';
 import Skeleton from '../skeleton/common/Skeleton';
@@ -15,6 +14,7 @@ import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import { useRpcStore } from '@/stores/rpc';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   accountId: string;
@@ -31,7 +31,7 @@ const Delegators = ({ accountId }: Props) => {
   } = useRpc();
   const router = useRouter();
   const { page } = router.query;
-  const { theme }: any = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =

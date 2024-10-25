@@ -7,10 +7,10 @@ import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
 import { env } from 'next-runtime-env';
 //import ImageModal from '@/components/ImageModal';
-import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 import { GetServerSideProps } from 'next';
 import { fetchData } from '@/utils/fetchData';
+import { useThemeStore } from '@/stores/theme';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
@@ -43,7 +43,7 @@ const AdvertisePage = () => {
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Advertise&brand=near`;
   // const [isModalOpen, setModalOpen] = useState(false);
   // const [selectedImage, setSelectedImage] = useState('');
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   // const handleOpenModal = (imageSrc: string) => {
   //   setSelectedImage(imageSrc);
   //   setModalOpen(true);

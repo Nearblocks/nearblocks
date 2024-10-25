@@ -11,9 +11,9 @@ import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
 import { Tooltip } from '@reach/tooltip';
 import Image from 'next/image';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   stats: StatusInfo;
@@ -23,7 +23,7 @@ interface Props {
 
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
 
   const charts = chartsDetails?.charts;

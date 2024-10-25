@@ -14,9 +14,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useTheme } from 'next-themes';
 import { GetServerSideProps } from 'next';
 import { fetchData } from '@/utils/fetchData';
+import { useThemeStore } from '@/stores/theme';
 
 const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
 
@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps<{
 const ApiPlan = () => {
   const router = useRouter();
   const { status } = router.query;
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [interval, setInterval] = useState(true);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');

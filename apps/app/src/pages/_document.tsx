@@ -1,8 +1,9 @@
 import { Head, Html, Main, NextScript } from 'next/document';
+import Script from 'next/script';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html className="light" lang="en">
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -31,9 +32,22 @@ export default function Document() {
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script src="/__ENV.js" />
       </Head>
-      <body className="overflow-x-hidden   dark:bg-black-300">
+      <body className="overflow-x-hidden  dark:bg-black-300">
         <Main />
         <NextScript />
+        <Script
+          dangerouslySetInnerHTML={{
+            __html: `(function initTheme() {
+                var theme = localStorage.getItem('theme') || 'light'
+                if (theme === 'dark') {
+                  document.documentElement.classList.remove('light');
+                  document.documentElement.classList.add('dark');
+                }
+              })();`,
+          }}
+          id="theme-script"
+          strategy="beforeInteractive"
+        />
       </body>
     </Html>
   );
