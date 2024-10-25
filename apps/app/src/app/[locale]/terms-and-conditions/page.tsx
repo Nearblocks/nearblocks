@@ -1,91 +1,14 @@
-import Head from 'next/head';
-import { Fragment, ReactElement } from 'react';
-import Layout from '@/components/Layouts';
-import { appUrl } from '@/utils/config';
-import { env } from 'next-runtime-env';
-import { GetServerSideProps } from 'next';
-import { fetchData } from '@/utils/fetchData';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-const ogUrl = env('NEXT_PUBLIC_OG_URL');
-
-export const getServerSideProps: GetServerSideProps<{
-  statsDetails: any;
-  latestBlocks: any;
-  searchResultDetails: any;
-  searchRedirectDetails: any;
-  messages: any;
-}> = async (context: any) => {
-  const {
-    query: { keyword = '', query = '', filter = 'all' },
-  }: any = context;
-
-  const key = keyword?.replace(/[\s,]/g, '');
-  const q = query?.replace(/[\s,]/g, '');
-
-  try {
-    const {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
-    } = await fetchData(q, key, filter);
-
-    const locale = context?.params?.locale;
-    const [commonMessages, homeMessages, txnsMessages] = await Promise.all([
-      import(`nearblocks-trans-next-intl/${locale || 'en'}/common.json`),
-      import(`nearblocks-trans-next-intl/${locale || 'en'}/home.json`),
-      import(`nearblocks-trans-next-intl/${locale || 'en'}/txns.json`),
-    ]);
-
-    const messages = {
-      ...commonMessages.default,
-      ...homeMessages.default,
-      ...txnsMessages.default,
-    };
-
-    return {
-      props: {
-        statsDetails,
-        latestBlocks,
-        searchResultDetails,
-        searchRedirectDetails,
-        messages,
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching charts:', error);
-    return {
-      props: {
-        statsDetails: null,
-        latestBlocks: null,
-        searchResultDetails: null,
-        searchRedirectDetails: null,
-        messages: null,
-      },
-    };
-  }
-};
-
-const TermsAndConditions = () => {
-  const t = useTranslations();
-  const thumbnail = `${ogUrl}/thumbnail/basic?title=${encodeURI(
-    t('terms:heading'),
-  )}&brand=near`;
+export default async function TermsAndConditions({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const t = await getTranslations({ locale });
   return (
-    <Fragment>
-      <Head>
-        <title>{t('Terms of Service | Nearblocks')}</title>
-        <meta name="title" content={t('Terms of Service')} />
-        <meta name="description" content={t('metaDescription')} />
-        <meta property="og:title" content={t('Terms of Service')} />
-        <meta property="og:description" content={t('metaDescription')} />
-        <meta property="twitter:title" content={t('Terms of Service')} />
-        <meta property="twitter:description" content={t('metaDescription')} />
-        <meta property="og:image" content={thumbnail} />
-        <meta property="twitter:image" content={thumbnail} />
-        <link rel="canonical" href={`${appUrl}/terms-and-conditions`} />
-      </Head>
+    <>
+      {' '}
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
       <div className="md:px-14 flex flex-col items-start md:py-16 -mt-80 mx-2">
         <h1 className="mb-2 pt-8 sm:!text-2xl text-center text-xl text-white">
@@ -470,19 +393,6 @@ const TermsAndConditions = () => {
           <p>(d) your violation of any rights of any other person or entity.</p>
         </div>
       </div>
-    </Fragment>
+    </>
   );
-};
-
-TermsAndConditions.getLayout = (page: ReactElement) => (
-  <Layout
-    statsDetails={page?.props?.statsDetails}
-    latestBlocks={page?.props?.latestBlocks}
-    searchResultDetails={page?.props?.searchResultDetails}
-    searchRedirectDetails={page?.props?.searchRedirectDetails}
-  >
-    {page}
-  </Layout>
-);
-
-export default TermsAndConditions;
+}
