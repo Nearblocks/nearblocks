@@ -8,9 +8,12 @@ export const getRequest = async (
   path: string,
   params = {},
   customHeaders: Record<string, string> = {},
+  useBase: boolean = true,
 ) => {
   const queryParams = qs.stringify(params, { encode: true });
-  const url = `${baseURL}${path}${queryParams ? `?${queryParams}` : ''}`;
+  const url = useBase
+    ? `${baseURL}${path}${queryParams ? `?${queryParams}` : ''}`
+    : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${fetchKey}`,
