@@ -21,8 +21,6 @@ const Overview = async ({ id, searchParams }: any) => {
     getRequest(`account/${id}?rpc=${rpcUrl}`),
   ]);
 
-  console.log(account?.account[0]?.account_id);
-
   return (
     <>
       <OverviewActions

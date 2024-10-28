@@ -1,46 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
-import createIntlMiddleware from 'next-intl/middleware';
+import createMiddleware from 'next-intl/middleware';
 
-const routes = [
-  '',
-  'blocks',
-  'address',
-  'token',
-  'charts',
-  'txns',
-  'hash',
-  'tokens',
-  'tokentxns',
-  'nft-token',
-  'nft-tokens',
-  'nft-tokentxns',
-  'node-explorer',
-  'advertise',
-  'about',
-  'contact',
-  'terms-and-conditions',
-  'apis',
-  'exportdata',
-  'verify-contract',
-  ...routing.locales,
-];
-
-const intlMiddleware = createIntlMiddleware(routing, {
-  localeDetection: false,
-});
-
-export default async function middleware(request: NextRequest) {
-  const [, locale] = request.nextUrl.pathname.split('/');
-
-  if (!routes?.includes(locale)) {
-    return NextResponse.rewrite(new URL('/404', request.url));
-  }
-
-  const response = await intlMiddleware(request);
-
-  return response || NextResponse.next();
-}
+export default createMiddleware(routing);
 
 export const config = {
   matcher: [
