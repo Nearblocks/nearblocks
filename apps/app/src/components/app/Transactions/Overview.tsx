@@ -9,12 +9,12 @@ import Skeleton from '../skeleton/common/Skeleton';
 import { gasPrice } from '@/utils/near';
 import { useEffect, useMemo, useState } from 'react';
 import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
-import { networkId } from '@/utils/config';
 import { useTheme } from 'next-themes';
 import { Tooltip } from '@reach/tooltip';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { networkId } from '@/utils/app/config';
 
 interface Props {
   stats: StatusInfo;
@@ -22,13 +22,97 @@ interface Props {
   error: boolean;
 }
 
+const LoadingSkeleton = () => {
+  return (
+    <div className="container mx-auto px-3">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
+        <div
+          className={`grid grid-flow-col grid-cols-1 ${
+            networkId === 'mainnet'
+              ? 'grid-rows-3 lg:grid-cols-3'
+              : 'grid-rows-2 lg:grid-cols-2'
+          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
+        >
+          {networkId === 'mainnet' && (
+            <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
+              <div className="flex flex-row py-4 lg:pb-4 lg:px-0">
+                <div className="items-center flex justify-left mr-3">
+                  <Skeleton className="w-6 h-6 rounded-full" />
+                </div>
+                <div className="ml-2 flex-1">
+                  <Skeleton className="h-3.5 w-24 mb-1.5" />
+                  <Skeleton className="h-5 w-full max-w-[200px]" />
+                </div>
+              </div>
+              <div className="flex flex-row py-4 lg:pt-4 lg:px-0">
+                <div className="items-center flex justify-left mr-3">
+                  <Skeleton className="w-6 h-6 rounded-full" />
+                </div>
+                <div className="ml-2 flex-1">
+                  <Skeleton className="h-3.5 w-24 mb-1.5" />
+                  <Skeleton className="h-5 w-full max-w-[180px]" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
+            <div className="flex flex-row justify-between py-4 lg:pb-4 lg:px-0">
+              <div className="flex flex-row">
+                <div className="items-center flex justify-left mr-3">
+                  <Skeleton className="w-6 h-6 rounded-full" />
+                </div>
+                <div className="ml-2">
+                  <Skeleton className="h-3.5 w-24 mb-1.5" />
+                  <Skeleton className="h-5 w-32" />
+                </div>
+              </div>
+              <div className="flex flex-col text-right">
+                <Skeleton className="h-3.5 w-24 mb-1.5" />
+                <Skeleton className="h-5 w-20" />
+              </div>
+            </div>
+            <div className="flex flex-row justify-between py-4 lg:pt-4 lg:px-0">
+              <div className="flex flex-row">
+                <div className="items-center flex justify-left mr-3">
+                  <Skeleton className="w-6 h-6 rounded-full" />
+                </div>
+                <div className="ml-2">
+                  <Skeleton className="h-3.5 w-32 mb-1.5" />
+                  <Skeleton className="h-5 w-24" />
+                </div>
+              </div>
+              <div className="flex flex-col text-right">
+                <Skeleton className="h-3.5 w-28 mb-1.5" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
+            <div className="flex-1 py-4 lg:px-0">
+              <Skeleton className="h-3.5 w-48 mb-3" />
+              <Skeleton className="h-28 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const t = useTranslations();
-  const { theme } = useTheme();
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
+  const currentTheme = theme === 'system' ? systemTheme : theme;
 
   const charts = chartsDetails?.charts;
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const chartData = useMemo(() => {
     try {
       const series = charts?.map((stat: any) => ({
@@ -56,6 +140,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
   }, [charts]);
 
   useEffect(() => {
+    if (!mounted) return;
+
     function fetchData() {
       const fetchedData = {
         chart: {
@@ -79,7 +165,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           labels: {
             step: 7,
             style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+              color: currentTheme === 'dark' ? '#e0e0e0' : '#333333',
             },
           },
           categories: chartData.categories,
@@ -91,7 +177,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           },
           labels: {
             style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+              color: currentTheme === 'dark' ? '#e0e0e0' : '#333333',
             },
           },
         },
@@ -129,46 +215,51 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
     }
 
     fetchData();
-  }, [chartData, theme]);
+  }, [chartData, currentTheme, mounted]);
 
   const iframeSrc = chartConfig
     ? `
-      <html>
-        <head>
-        <style>
-        body, html{
-          background-color: ${theme === 'dark' ? '#0D0D0D' : '#ffff'};
-        }
-        </style>
-          <script src="https://code.highcharts.com/highcharts.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
-          <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
-          <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-        </head>
-        <body>
-          <div id="chart-container" style="width: 100%; height: 100%;"></div>
-          <script type="text/javascript">
-            const chartConfig = ${JSON.stringify(chartConfig)};
-            chartConfig.tooltip = {
-              formatter: function () {
-                const item= this.point
-                function dollarFormat(value) {
-                  return numeral(value).format('0,0.00');
-                 }
-                 return \`<span style="font-size:10px">\${dayjs(this.point.date).format(
-                   'dddd, MMMM DD, YYYY'
-                 )}</span><br/>Transactions: <strong>\${dollarFormat(
-                 this.point.y
-               )}</strong><br/>Price: $\${dollarFormat(this.point.price)}
-               \`;
-              }
-            };
-            Highcharts.chart('chart-container', chartConfig);
-          </script>
-        </body>
-      </html>
-    `
+    <html>
+      <head>
+      <style>
+      body, html{
+        background-color: ${currentTheme === 'dark' ? '#0D0D0D' : '#ffff'};
+      }
+      </style>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
+        <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+      </head>
+      <body>
+        <div id="chart-container" style="width: 100%; height: 100%;"></div>
+        <script type="text/javascript">
+          const chartConfig = ${JSON.stringify(chartConfig)};
+          chartConfig.tooltip = {
+            formatter: function () {
+              const item= this.point
+              function dollarFormat(value) {
+                return numeral(value).format('0,0.00');
+               }
+               return \`<span style="font-size:10px">\${dayjs(this.point.date).format(
+                 'dddd, MMMM DD, YYYY'
+               )}</span><br/>Transactions: <strong>\${dollarFormat(
+               this.point.y
+             )}</strong><br/>Price: $\${dollarFormat(this.point.price)}
+             \`;
+            }
+          };
+          Highcharts.chart('chart-container', chartConfig);
+        </script>
+      </body>
+    </html>
+  `
     : ``;
+
+  if (!mounted) {
+    return <LoadingSkeleton />;
+  }
+
   const nearPrice = stats?.near_price ?? '';
   const nearBtcPrice = stats?.near_btc_price ?? '';
   const change24 = stats?.change_24 ?? '';
@@ -185,95 +276,91 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
         >
           {networkId === 'mainnet' && (
-            <>
-              <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y  lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-                <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
-                  <div className="items-center flex justify-left mr-3 ">
-                    <Image
-                      src={`/images/${
-                        theme === 'dark'
-                          ? 'near price_dark.svg'
-                          : 'near price.svg'
-                      }`}
-                      alt={t ? t('homePage.nearPrice') : 'nearPrice'}
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                  <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
-                      {t ? t('homePage.nearPrice') : 'NEAR PRICE'}
-                    </p>
-                    {error ? (
-                      <Skeleton className="my-1 h-4" />
-                    ) : (
-                      <Link
-                        href="/charts/near-price"
-                        className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center "
-                      >
-                        {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
-                        <span className="text-nearblue-700">
-                          &nbsp;
-                          {nearBtcPrice
-                            ? '@ ' + localFormat(stats?.near_btc_price) + ' BTC'
-                            : ''}
-                        </span>
-                        {change24 && (
-                          <>
-                            {Number(stats?.change_24) > 0 ? (
-                              <span className="text-neargreen text-sm">
-                                &nbsp;
-                                {stats?.change_24
-                                  ? '(' + dollarFormat(stats?.change_24) + '%)'
-                                  : stats?.change_24 ?? ''}
-                              </span>
-                            ) : (
-                              <span className="text-red-500 text-sm">
-                                &nbsp;
-                                {change24
-                                  ? '(' + dollarFormat(change24) + '%)'
-                                  : ''}
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </Link>
-                    )}
-                  </div>
+            <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y  lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
+              <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
+                <div className="items-center flex justify-left mr-3 ">
+                  <Image
+                    src={`/images/${
+                      theme === 'dark'
+                        ? 'near price_dark.svg'
+                        : 'near price.svg'
+                    }`}
+                    alt={t ? t('homePage.nearPrice') : 'nearPrice'}
+                    width={24}
+                    height={24}
+                  />
                 </div>
-                <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
-                  <div className="items-center flex justify-left mr-3 ">
-                    <Image
-                      src={`/images/${
-                        theme === 'dark' ? 'market_dark.svg' : 'market.svg'
-                      }`}
-                      alt={t ? t('homePage.marketCap') : 'marketCap'}
-                      width={24}
-                      height={24}
-                    />
-                  </div>
-                  <div className="ml-2">
-                    <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                      {t('homePage.marketCap')}
-                    </p>
-                    {error ? (
-                      <Skeleton className="my-1 h-4" />
-                    ) : (
-                      <>
-                        <Link
-                          href="/charts/market-cap"
-                          className="leading-6 text-nearblue-700 hover:no-underline"
-                        >
-                          {stats?.market_cap
-                            ? '$' + dollarFormat(stats?.market_cap ?? 0)
-                            : ''}
-                        </Link>
-                      </>
-                    )}
-                  </div>
+                <div className="ml-2">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
+                    {t ? t('homePage.nearPrice') : 'NEAR PRICE'}
+                  </p>
+                  {error ? (
+                    <Skeleton className="my-1 h-4" />
+                  ) : (
+                    <Link
+                      href="/charts/near-price"
+                      className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center "
+                    >
+                      {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
+                      <span className="text-nearblue-700">
+                        &nbsp;
+                        {nearBtcPrice
+                          ? '@ ' + localFormat(stats?.near_btc_price) + ' BTC'
+                          : ''}
+                      </span>
+                      {change24 && (
+                        <>
+                          {Number(stats?.change_24) > 0 ? (
+                            <span className="text-neargreen text-sm">
+                              &nbsp;
+                              {stats?.change_24
+                                ? '(' + dollarFormat(stats?.change_24) + '%)'
+                                : stats?.change_24 ?? ''}
+                            </span>
+                          ) : (
+                            <span className="text-red-500 text-sm">
+                              &nbsp;
+                              {change24
+                                ? '(' + dollarFormat(change24) + '%)'
+                                : ''}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Link>
+                  )}
                 </div>
               </div>
-            </>
+              <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
+                <div className="items-center flex justify-left mr-3 ">
+                  <Image
+                    src={`/images/${
+                      theme === 'dark' ? 'market_dark.svg' : 'market.svg'
+                    }`}
+                    alt={t ? t('homePage.marketCap') : 'marketCap'}
+                    width={24}
+                    height={24}
+                  />
+                </div>
+                <div className="ml-2">
+                  <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
+                    {t('homePage.marketCap')}
+                  </p>
+                  {error ? (
+                    <Skeleton className="my-1 h-4" />
+                  ) : (
+                    <Link
+                      href="/charts/market-cap"
+                      className="leading-6 text-nearblue-700 hover:no-underline"
+                    >
+                      {stats?.market_cap
+                        ? '$' + dollarFormat(stats?.market_cap ?? 0)
+                        : ''}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
           <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
             <div className="flex flex-row justify-between py-5 lg:pb-5 lg:px-0">

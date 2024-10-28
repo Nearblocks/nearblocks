@@ -16,7 +16,6 @@ export default async function ApisPage({
     'use server';
 
     const contactRes = await postRequest('/api/contact', contactDeatils);
-    console.log({ contactRes });
     return contactRes;
   };
   return (

@@ -1,6 +1,7 @@
 'use client';
 import { Link } from '@/i18n/routing';
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 export const Content = () => {
   return (
@@ -26,8 +27,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

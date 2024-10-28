@@ -1,8 +1,8 @@
 'use client';
-import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import Header from './Header';
 import Footer from './Footer';
-import { usePathname } from 'next/navigation';
+import { ReactNode } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,12 +11,11 @@ interface LayoutProps {
   blocks: any;
   handleFilterAndKeyword: any;
 }
-
-const Layout = ({
+const LayoutActions = ({
   children,
-  notice,
-  stats,
   blocks,
+  stats,
+  notice,
   handleFilterAndKeyword,
 }: LayoutProps) => {
   const pathname = usePathname();
@@ -41,4 +40,4 @@ const Layout = ({
   );
 };
 
-export default Layout;
+export default LayoutActions;
