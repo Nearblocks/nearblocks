@@ -486,7 +486,8 @@ export default function (props: Props) {
                 <H1>NEAR Explorer Selector</H1>
                 {getFirstPathSegment(path) &&
                   hasValidLink &&
-                  !isInvalidReceiptsPath && (
+                  !isInvalidReceiptsPath &&
+                  selectUrlAfterSecondSlash(path) !== '' && (
                     <H6>
                       You are searching for{' '}
                       {selectUrlAfterSecondSlash(path)
@@ -519,7 +520,9 @@ export default function (props: Props) {
                     isLinkActive={
                       !linkNearblocksLite(path) ||
                       isInvalidReceiptsPath ||
-                      config.nearblocksLite === null
+                      config.nearblocksLite === null ||
+                      (getFirstPathSegment(path) &&
+                        selectUrlAfterSecondSlash(path) === '')
                     }
                     onClick={() => {
                       onSelect('nearblockslite');
@@ -548,7 +551,10 @@ export default function (props: Props) {
                         : false
                     }
                     isLinkActive={
-                      !linkNearblocks(path) || isInvalidReceiptsPath
+                      !linkNearblocks(path) ||
+                      isInvalidReceiptsPath ||
+                      (getFirstPathSegment(path) &&
+                        selectUrlAfterSecondSlash(path) === '')
                     }
                     onClick={() => {
                       onSelect('nearblocks');
@@ -583,7 +589,10 @@ export default function (props: Props) {
                         onSelect('pikespeakai');
                       }}
                       isLinkActive={
-                        !linkPikespeakai(path) || config.pikespeakai === null
+                        !linkPikespeakai(path) ||
+                        config.pikespeakai === null ||
+                        (getFirstPathSegment(path) &&
+                          selectUrlAfterSecondSlash(path) === '')
                       }
                       isMobileFirst={false}
                     >
