@@ -1,62 +1,66 @@
+'use client';
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
-import { networkId } from '@/utils/config';
 import { useTranslations } from 'next-intl';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   chartTypes: string;
   className?: string;
 }
-const charts = [
-  {
-    link: '/charts/near-price',
-    text: 'charts.nearPrice.heading',
-    exclude: networkId === 'testnet',
-  },
-  {
-    link: '/charts/market-cap',
-    text: 'marketCapCharts.heading',
-    exclude: networkId === 'testnet',
-  },
-  {
-    link: '/charts/near-supply',
-    text: 'nearSupplyCharts.heading',
-    exclude: false,
-  },
-  {
-    link: '/charts/txns',
-    text: 'txnsCharts.heading',
-    exclude: false,
-  },
-  {
-    link: '/charts/blocks',
-    text: 'blocksCharts.heading',
-    exclude: false,
-  },
-  {
-    link: '/charts/addresses',
-    text: 'addressesCharts.heading',
-    exclude: false,
-  },
-  {
-    link: '/charts/txn-fee',
-    text: 'txnFeeCharts.heading',
-    exclude: networkId === 'testnet',
-  },
-  {
-    link: '/charts/txn-volume',
-    text: 'txnVolumeCharts.heading',
-    exclude: networkId === 'testnet',
-  },
-  {
-    link: '/charts/tps',
-    text: 'Near Transactions per Second Chart',
-    exclude: false,
-  },
-];
+
 const ChartDetails = forwardRef(
   ({ chartTypes, className }: Props, ref: Ref<HTMLDivElement>) => {
     const t = useTranslations();
+    const { networkId } = useConfig();
+
+    const charts = [
+      {
+        link: '/charts/near-price',
+        text: 'charts.nearPrice.heading',
+        exclude: networkId === 'testnet',
+      },
+      {
+        link: '/charts/market-cap',
+        text: 'marketCapCharts.heading',
+        exclude: networkId === 'testnet',
+      },
+      {
+        link: '/charts/near-supply',
+        text: 'nearSupplyCharts.heading',
+        exclude: false,
+      },
+      {
+        link: '/charts/txns',
+        text: 'txnsCharts.heading',
+        exclude: false,
+      },
+      {
+        link: '/charts/blocks',
+        text: 'blocksCharts.heading',
+        exclude: false,
+      },
+      {
+        link: '/charts/addresses',
+        text: 'addressesCharts.heading',
+        exclude: false,
+      },
+      {
+        link: '/charts/txn-fee',
+        text: 'txnFeeCharts.heading',
+        exclude: networkId === 'testnet',
+      },
+      {
+        link: '/charts/txn-volume',
+        text: 'txnVolumeCharts.heading',
+        exclude: networkId === 'testnet',
+      },
+      {
+        link: '/charts/tps',
+        text: 'Near Transactions per Second Chart',
+        exclude: false,
+      },
+    ];
     return (
       <div ref={ref} className={`w-full z-10 ${className}`}>
         {chartTypes && (

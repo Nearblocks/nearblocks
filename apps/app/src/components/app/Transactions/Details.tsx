@@ -52,12 +52,12 @@ import TokenImage, { NFTImage } from '../common/TokenImage';
 import { isEmpty } from 'lodash';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { networkId } from '@/utils/app/config';
 import FaRight from '@/components/Icons/FaRight';
 import useRpc from '@/hooks/useRpc';
 import { useRpcStore } from '@/stores/rpc';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   loading: boolean;
@@ -84,6 +84,7 @@ const Details = (props: Props) => {
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
   const [rpcError, setRpcError] = useState(false);
+  const { networkId } = useConfig();
 
   const txn = txnData ? txnData : rpcData;
 

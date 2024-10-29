@@ -14,7 +14,7 @@ import { Tooltip } from '@reach/tooltip';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { networkId } from '@/utils/app/config';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   stats: StatusInfo;
@@ -22,91 +22,92 @@ interface Props {
   error: boolean;
 }
 
-const LoadingSkeleton = () => {
-  return (
-    <div className="container mx-auto px-3">
-      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
-        <div
-          className={`grid grid-flow-col grid-cols-1 ${
-            networkId === 'mainnet'
-              ? 'grid-rows-3 lg:grid-cols-3'
-              : 'grid-rows-2 lg:grid-cols-2'
-          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
-        >
-          {networkId === 'mainnet' && (
-            <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-              <div className="flex flex-row py-4 lg:pb-4 lg:px-0">
-                <div className="items-center flex justify-left mr-3">
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                </div>
-                <div className="ml-2 flex-1">
-                  <Skeleton className="h-3.5 w-24 mb-1.5" />
-                  <Skeleton className="h-5 w-full max-w-[200px]" />
-                </div>
-              </div>
-              <div className="flex flex-row py-4 lg:pt-4 lg:px-0">
-                <div className="items-center flex justify-left mr-3">
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                </div>
-                <div className="ml-2 flex-1">
-                  <Skeleton className="h-3.5 w-24 mb-1.5" />
-                  <Skeleton className="h-5 w-full max-w-[180px]" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-            <div className="flex flex-row justify-between py-4 lg:pb-4 lg:px-0">
-              <div className="flex flex-row">
-                <div className="items-center flex justify-left mr-3">
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                </div>
-                <div className="ml-2">
-                  <Skeleton className="h-3.5 w-24 mb-1.5" />
-                  <Skeleton className="h-5 w-32" />
-                </div>
-              </div>
-              <div className="flex flex-col text-right">
-                <Skeleton className="h-3.5 w-24 mb-1.5" />
-                <Skeleton className="h-5 w-20" />
-              </div>
-            </div>
-            <div className="flex flex-row justify-between py-4 lg:pt-4 lg:px-0">
-              <div className="flex flex-row">
-                <div className="items-center flex justify-left mr-3">
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                </div>
-                <div className="ml-2">
-                  <Skeleton className="h-3.5 w-32 mb-1.5" />
-                  <Skeleton className="h-5 w-24" />
-                </div>
-              </div>
-              <div className="flex flex-col text-right">
-                <Skeleton className="h-3.5 w-28 mb-1.5" />
-                <Skeleton className="h-5 w-16" />
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
-            <div className="flex-1 py-4 lg:px-0">
-              <Skeleton className="h-3.5 w-48 mb-3" />
-              <Skeleton className="h-28 w-full" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const t = useTranslations();
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
   const currentTheme = theme === 'system' ? systemTheme : theme;
+  const { networkId } = useConfig();
+
+  const LoadingSkeleton = () => {
+    return (
+      <div className="container mx-auto px-3">
+        <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
+          <div
+            className={`grid grid-flow-col grid-cols-1 ${
+              networkId === 'mainnet'
+                ? 'grid-rows-3 lg:grid-cols-3'
+                : 'grid-rows-2 lg:grid-cols-2'
+            } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
+          >
+            {networkId === 'mainnet' && (
+              <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
+                <div className="flex flex-row py-4 lg:pb-4 lg:px-0">
+                  <div className="items-center flex justify-left mr-3">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                  </div>
+                  <div className="ml-2 flex-1">
+                    <Skeleton className="h-3.5 w-24 mb-1.5" />
+                    <Skeleton className="h-5 w-full max-w-[200px]" />
+                  </div>
+                </div>
+                <div className="flex flex-row py-4 lg:pt-4 lg:px-0">
+                  <div className="items-center flex justify-left mr-3">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                  </div>
+                  <div className="ml-2 flex-1">
+                    <Skeleton className="h-3.5 w-24 mb-1.5" />
+                    <Skeleton className="h-5 w-full max-w-[180px]" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
+              <div className="flex flex-row justify-between py-4 lg:pb-4 lg:px-0">
+                <div className="flex flex-row">
+                  <div className="items-center flex justify-left mr-3">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                  </div>
+                  <div className="ml-2">
+                    <Skeleton className="h-3.5 w-24 mb-1.5" />
+                    <Skeleton className="h-5 w-32" />
+                  </div>
+                </div>
+                <div className="flex flex-col text-right">
+                  <Skeleton className="h-3.5 w-24 mb-1.5" />
+                  <Skeleton className="h-5 w-20" />
+                </div>
+              </div>
+              <div className="flex flex-row justify-between py-4 lg:pt-4 lg:px-0">
+                <div className="flex flex-row">
+                  <div className="items-center flex justify-left mr-3">
+                    <Skeleton className="w-6 h-6 rounded-full" />
+                  </div>
+                  <div className="ml-2">
+                    <Skeleton className="h-3.5 w-32 mb-1.5" />
+                    <Skeleton className="h-5 w-24" />
+                  </div>
+                </div>
+                <div className="flex flex-col text-right">
+                  <Skeleton className="h-3.5 w-28 mb-1.5" />
+                  <Skeleton className="h-5 w-16" />
+                </div>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
+              <div className="flex-1 py-4 lg:px-0">
+                <Skeleton className="h-3.5 w-48 mb-3" />
+                <Skeleton className="h-28 w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const charts = chartsDetails?.charts;
 

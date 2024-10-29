@@ -63,7 +63,7 @@
     "nearblocks-trans-next-intl": "https://github.com/kevin-devstack/translations.git#fa68dd2eb68417ed0492519968dec6ed53a3b133",
     "next": "14.2.15",
     "next-intl": "^3.19.4",
-    "next-runtime-env": "1.x",
+    "next-runtime-env": "^3.2.2",
     "next-sitemap": "4.2.3",
     "next-themes": "^0.3.0",
     "next-translate": "2.6.2",
