@@ -1,0 +1,45 @@
+{
+  "name": "indexer-multichain",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "dependencies": {
+    "@sentry/node": "7.74.1",
+    "bs58check": "4.0.0",
+    "elliptic": "6.6.0",
+    "envalid": "8.0.0",
+    "js-sha3": "0.9.3",
+    "near-api-js": "5.0.1",
+    "near-lake-framework": "2.0.0",
+    "viem": "2.21.35"
+  },
+  "devDependencies": {
+    "@types/bs58check": "~2.1.2",
+    "@types/elliptic": "~6.4.18",
+    "@types/node": "22",
+    "eslint-config-custom-node": "*",
+    "nb-json": "*",
+    "nb-knex": "*",
+    "nb-lake": "*",
+    "nb-logger": "*",
+    "nb-neardata": "*",
+    "nb-redis": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "rimraf": "~5.0",
+    "typescript": "~5.2"
+  }
+}
