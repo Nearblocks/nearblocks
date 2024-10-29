@@ -1,10 +1,12 @@
+'use client';
 import React from 'react';
 import Skeleton from '../common/Skeleton';
 import { useTranslations } from 'next-intl';
-import { networkId } from '@/utils/app/config';
+import { useConfig } from '@/hooks/app/useConfig';
 
 export default function BalanceSkeleton() {
   const t = useTranslations();
+  const { networkId } = useConfig();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div className="w-full">

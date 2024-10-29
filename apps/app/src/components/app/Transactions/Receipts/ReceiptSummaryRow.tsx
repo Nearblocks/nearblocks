@@ -1,5 +1,4 @@
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
-import { networkId } from '@/utils/config';
 import { convertToMetricPrefix, fiatValue, yoctoToNear } from '@/utils/libs';
 import {
   Action,
@@ -12,6 +11,7 @@ import { Fragment } from 'react';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import { Tooltip } from '@reach/tooltip';
 import { Link } from '@/i18n/routing';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   txn: TransactionInfo;
@@ -21,6 +21,8 @@ interface Props {
 }
 
 const ReceiptSummaryRow = (props: Props) => {
+  const { networkId } = useConfig();
+
   const { receipt, txn, price } = props;
 
   const currentPrice = price ? price : 0;

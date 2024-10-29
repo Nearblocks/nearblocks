@@ -11,11 +11,11 @@ import Skeleton from '@/components/skeleton/common/Skeleton';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { useTheme } from 'next-themes';
-import { networkId } from '@/utils/app/config';
 import { BlocksInfo, Stats } from '@/utils/types';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Search from '../common/Search';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const menus = [
   {
@@ -163,7 +163,7 @@ const Header = ({
   const user = signedIn;
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
-
+  const { networkId } = useConfig();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const status = useMemo(() => {

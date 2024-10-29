@@ -1,9 +1,6 @@
 const path = require('path');
-const { configureRuntimeEnv } = require('next-runtime-env/build/configure');
 
 const withNextIntl = require('next-intl/plugin')();
-
-configureRuntimeEnv();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withNextIntl({

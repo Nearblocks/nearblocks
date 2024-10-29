@@ -1,11 +1,12 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Skeleton from './skeleton/common/Skeleton';
+import { useEnvContext } from 'next-runtime-env';
 
-const userApiUrl = process.env.NEXT_PUBLIC_USER_API_URL;
 const SponserdText: React.FC<any> = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
+  const { NEXT_PUBLIC_USER_API_URL: userApiUrl } = useEnvContext();
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,6 +38,7 @@ const SponserdText: React.FC<any> = () => {
     };
 
     fetchHtmlContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isMobile) {

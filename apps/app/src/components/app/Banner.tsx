@@ -1,12 +1,15 @@
 'use client';
+import { useEnvContext } from 'next-runtime-env';
 import React, { useEffect, useState } from 'react';
 type BannerProps = {
   type: string;
 };
+
 const Banner: React.FC<BannerProps> = ({ type }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
-  const userApiUrl = process.env.NEXT_PUBLIC_USER_API_URL;
+  const { NEXT_PUBLIC_USER_API_URL: userApiUrl } = useEnvContext();
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);

@@ -15,15 +15,16 @@ import ArrowDown from '../Icons/ArrowDown';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
 import { usePathname } from 'next/navigation';
-import { networkId } from '@/utils/app/config';
 import { routing, useIntlRouter } from '@/i18n/routing';
+import { useConfig } from '@/hooks/app/useConfig';
+import { NetworkId } from '@/utils/types';
 
-export const SearchToast = () => {
+export const SearchToast = ({ networkId }: any) => {
   if (networkId === 'testnet') {
     return (
       <div>
         No results. Try on{' '}
-        <Link href="https://nearblocks.io">
+        <Link legacyBehavior href="https://nearblocks.io">
           <a className="text-green-500">Mainnet</a>
         </Link>
       </div>
@@ -33,7 +34,7 @@ export const SearchToast = () => {
   return (
     <div>
       No results. Try on{' '}
-      <Link href="https://testnet.nearblocks.io">
+      <Link legacyBehavior href="https://testnet.nearblocks.io">
         <a className="text-green-500">Testnet</a>
       </Link>
     </div>
@@ -56,6 +57,8 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
     return routing?.locales?.includes(value as any);
   };
 
+  const { networkId } = useConfig();
+
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
 
   const redirect = (route: any) => {
@@ -69,7 +72,7 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
       case 'address':
         return intlRouter.push(`/address/${route?.path}`);
       default:
-        return toast.error(SearchToast);
+        return toast.error(SearchToast(networkId as NetworkId));
     }
   };
 
@@ -110,7 +113,7 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
     ).value;
     const query = text.replace(/[\s,]/g, '');
 
-    if (!query) return toast.error(SearchToast);
+    if (!query) return toast.error(SearchToast(networkId as NetworkId));
 
     const route = await handleFilterAndKeyword(query, filter, true);
 
@@ -118,7 +121,7 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
       return redirect(route);
     }
 
-    return toast.error(SearchToast);
+    return toast.error(SearchToast(networkId as NetworkId));
   };
 
   return (

@@ -1,7 +1,10 @@
-import { networkId } from '@/utils/app/config';
+'use client';
+import { useConfig } from '@/hooks/app/useConfig';
 import Skeleton from '../common/Skeleton';
 
 export default function HashLoading() {
+  const { networkId } = useConfig();
+
   return (
     <>
       <div className="md:flex items-center justify-between">

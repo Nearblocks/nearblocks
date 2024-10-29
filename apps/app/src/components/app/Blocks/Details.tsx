@@ -4,7 +4,6 @@ import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import { gasPrice } from '@/utils/near';
 import { BlocksInfo } from '@/utils/types';
-import { networkId } from '@/utils/app/config';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -16,6 +15,7 @@ import {
 } from '@/utils/app/libs';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { useConfig } from '@/hooks/app/useConfig';
 interface Props {
   hash?: any;
   data: any;
@@ -27,6 +27,7 @@ export default function Details(props: Props) {
   const t = useTranslations();
   const { hash, data, price } = props;
   const nearPrice = price?.stats[0]?.near_price;
+  const { networkId } = useConfig();
 
   interface Props {
     children?: string;

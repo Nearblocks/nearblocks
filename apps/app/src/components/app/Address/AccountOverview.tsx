@@ -5,9 +5,9 @@ import TokenHoldings from '../common/TokenHoldings';
 import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 import useRpc from '@/hooks/useRpc';
 import Big from 'big.js';
-import { networkId } from '@/utils/app/config';
 import { FtInfo, TokenListInfo } from '@/utils/types';
 import { useTranslations } from 'next-intl';
+import { useConfig } from '@/hooks/app/useConfig';
 
 export default function AccountOverview({
   id,
@@ -21,6 +21,7 @@ export default function AccountOverview({
   const { ftBalanceOf } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
+  const { networkId } = useConfig();
 
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';

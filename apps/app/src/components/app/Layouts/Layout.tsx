@@ -1,3 +1,4 @@
+import 'react-toastify/dist/ReactToastify.css';
 import { ReactNode } from 'react';
 import { getRequest } from '@/utils/app/api';
 import LayoutActions from './LayoutActions';
@@ -6,6 +7,8 @@ import { getMessages } from 'next-intl/server';
 import { ThemeProvider } from 'next-themes';
 import { Manrope } from 'next/font/google';
 import Script from 'next/script';
+import { PublicEnvProvider } from 'next-runtime-env';
+import { ToastContainer } from 'react-toastify';
 
 interface LayoutProps {
   children: ReactNode;
@@ -128,18 +131,20 @@ const Layout = async ({ children }: LayoutProps) => {
             })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
           `}
         </Script>
-
-        <ThemeProvider attribute="class" enableSystem={false}>
-          <NextIntlClientProvider messages={messages}>
-            <LayoutActions
-              stats={stats}
-              blocks={blocks}
-              handleFilterAndKeyword={handleFilterAndKeyword}
-            >
-              {children}
-            </LayoutActions>
-          </NextIntlClientProvider>
-        </ThemeProvider>
+        <PublicEnvProvider>
+          <ThemeProvider attribute="class" enableSystem={false}>
+            <NextIntlClientProvider messages={messages}>
+              <ToastContainer />
+              <LayoutActions
+                stats={stats}
+                blocks={blocks}
+                handleFilterAndKeyword={handleFilterAndKeyword}
+              >
+                {children}
+              </LayoutActions>
+            </NextIntlClientProvider>
+          </ThemeProvider>
+        </PublicEnvProvider>
       </body>
     </html>
   );

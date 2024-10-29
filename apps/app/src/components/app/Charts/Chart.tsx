@@ -6,11 +6,11 @@ import { yoctoToNear } from '@/utils/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import { useTheme } from 'next-themes';
-import { networkId } from '@/utils/config';
 import Skeleton from '../skeleton/common/Skeleton';
 import Image from 'next/legacy/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   chartTypes?: string;
@@ -31,6 +31,7 @@ const Chart = (props: Props) => {
     description: '',
   });
   const [logView, setLogView] = useState(false);
+  const { networkId } = useConfig();
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);
