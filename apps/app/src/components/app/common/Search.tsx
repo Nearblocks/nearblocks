@@ -15,9 +15,11 @@ import ArrowDown from '../Icons/ArrowDown';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
 import { usePathname } from 'next/navigation';
-import { routing, useIntlRouter } from '@/i18n/routing';
+import { routing } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
 import { NetworkId } from '@/utils/types';
+// @ts-ignore
+import { useRouter } from 'nextjs-toploader/app';
 
 export const SearchToast = ({ networkId }: any) => {
   if (networkId === 'testnet') {
@@ -48,7 +50,7 @@ const t = (key: string, p?: any): any => {
 };
 
 const Search = ({ header = false, handleFilterAndKeyword }: any) => {
-  const intlRouter = useIntlRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
@@ -64,13 +66,13 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
   const redirect = (route: any) => {
     switch (route?.type) {
       case 'block':
-        return intlRouter.push(`/blocks/${route?.path}`);
+        return router.push(`/blocks/${route?.path}`);
       case 'txn':
-        return intlRouter.push(`/txns/${route?.path}`);
+        return router.push(`/txns/${route?.path}`);
       case 'receipt':
-        return intlRouter.push(`/txns/${route?.path}`);
+        return router.push(`/txns/${route?.path}`);
       case 'address':
-        return intlRouter.push(`/address/${route?.path}`);
+        return router.push(`/address/${route?.path}`);
       default:
         return toast.error(SearchToast(networkId as NetworkId));
     }
