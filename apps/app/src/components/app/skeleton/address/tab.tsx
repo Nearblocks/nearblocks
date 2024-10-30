@@ -30,7 +30,6 @@ export default function TabSkeletion() {
     );
   return (
     <>
-      <div className="py-6"></div>
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
           <div className="flex flex-wrap ">

@@ -3,8 +3,8 @@ import TransactionActions from './TransactionActions';
 
 const Transactions = async ({ id, searchParams }: any) => {
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/txns`, searchParams),
-    getRequest(`account/${id}/txns/count`, searchParams),
+    getRequest(`account/${id}/txns-only`, searchParams),
+    getRequest(`account/${id}/txns-only/count`, searchParams),
   ]);
 
   return (

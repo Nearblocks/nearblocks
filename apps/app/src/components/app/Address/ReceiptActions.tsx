@@ -185,20 +185,28 @@ const ReceiptActions = ({ id, txns, count, error, cursor }: TxnsProps) => {
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>{t('hash') || 'TXN HASH'}</span>,
+      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
       key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.transaction_hash}
+            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
+            <span
+              className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md ${
+                row?.transaction_hash === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
               <Link
-                href={`/txns/${row.transaction_hash}`}
+                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                onMouseOver={(e) => onHandleMouseOver(e, row?.transaction_hash)}
+                onMouseLeave={handleMouseLeave}
               >
-                {row.transaction_hash}
+                {row?.transaction_hash}
               </Link>
             </span>
           </Tooltip>

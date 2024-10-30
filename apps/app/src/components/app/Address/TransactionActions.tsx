@@ -192,52 +192,17 @@ const TransactionActions = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: (
-        <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t('type') || 'METHOD'}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
-            <form onSubmit={onFilter} className="flex flex-col">
-              <input
-                name="type"
-                value={form.action || form.method}
-                onChange={onChange}
-                placeholder="Search by method"
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-              />
-              <div className="flex">
-                <button
-                  type="submit"
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t('filter.filter') || 'Filter'}
-                </button>
-                <button
-                  name="type"
-                  type="button"
-                  onClick={onClear}
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
-                >
-                  {t('filter.clear') || 'Clear'}
-                </button>
-              </div>
-            </form>
-          </MenuList>
-        </Menu>
-      ),
+      header: <span className="pl-2"> {t('type') || 'METHOD'}</span>,
       key: 'actions',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={txnMethod(row.actions, t)}
+            label={txnMethod(row?.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
-                {txnMethod(row.actions, t)}
+                {txnMethod(row?.actions, t)}
               </span>
             </span>
           </Tooltip>
@@ -245,6 +210,8 @@ const TransactionActions = ({
       ),
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
       header: <span>{t('depositValue') || 'DEPOSIT VALUE'}</span>,
@@ -283,7 +250,7 @@ const TransactionActions = ({
         <>
           <Menu>
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t('from') || 'FROM'}{' '}
+              {t ? t('txns:from') : 'FROM'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -293,7 +260,9 @@ const TransactionActions = ({
                   value={form.from}
                   onChange={onChange}
                   placeholder={
-                    t('filter.placeholder') || 'Search by address e.g. Ⓝ..'
+                    t
+                      ? t('txns:filter.placeholder')
+                      : 'Search by address e.g. Ⓝ..'
                   }
                   className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 />
@@ -303,7 +272,7 @@ const TransactionActions = ({
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                    {t('filter.filter') || 'Filter'}
+                    {t ? t('txns:filter.filter') : 'Filter'}
                   </button>
                   <button
                     name="from"
@@ -311,7 +280,7 @@ const TransactionActions = ({
                     onClick={onClear}
                     className="flex-1 rounded bg-gray-300 text-xs h-7"
                   >
-                    {t('filter.clear') || 'Clear'}
+                    {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
                 </div>
               </form>
@@ -319,29 +288,30 @@ const TransactionActions = ({
           </Menu>
         </>
       ),
-      key: 'predecessor_account_id',
+      key: 'signer_account_id',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.predecessor_account_id}
+            label={row?.signer_account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <span
               className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.predecessor_account_id === address
+                row?.signer_account_id === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
               }`}
             >
               <Link
-                href={`/address/${row.predecessor_account_id}`}
+                href={`/address/${row?.signer_account_id}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.predecessor_account_id)
+                  onHandleMouseOver(e, row?.signer_account_id)
                 }
                 onMouseLeave={handleMouseLeave}
               >
-                {truncateString(row.predecessor_account_id, 15, '...')}
+                {row?.signer_account_id &&
+                  truncateString(row?.signer_account_id, 15, '...')}
               </Link>
             </span>
           </Tooltip>
