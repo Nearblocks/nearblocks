@@ -29,6 +29,8 @@ export interface TTables {
   execution_outcomes: ExecutionOutcome;
   ft_events: FTEvent;
   ft_meta: FTMeta;
+  multichain_accounts: MultichainAccount;
+  multichain_transactions: MultichainTransaction;
   nft_events: NFTEvent;
   nft_meta: NFTMeta;
   nft_token_meta: NFTTokenMeta;
@@ -248,6 +250,28 @@ export type FTMeta = {
   updated_at: null | string;
   volume_24h: null | string;
   website: null | string;
+};
+
+export type MultichainAccount = {
+  account_id: string;
+  block_height: number;
+  block_timestamp: string;
+  chain: string;
+  derived_address: string;
+  path: string;
+  public_key: string;
+};
+
+export type MultichainTransaction = {
+  account_id: string;
+  block_height: number;
+  block_timestamp: string;
+  chain: string;
+  derived_address: string;
+  derived_transaction: null | string;
+  path: string;
+  public_key: string;
+  receipt_id: string;
 };
 
 export type NFTEvent = {
