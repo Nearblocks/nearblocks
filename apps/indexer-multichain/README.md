@@ -22,3 +22,13 @@ MULTICHAIN_START_BLOCK=
 MULTICHAIN_DATA_SOURCE=   # NEAR_LAKE | FAST_NEAR
 SENTRY_DSN=
 ```
+
+### Supported Contracts
+
+- Mainnet: v1.signer
+- Testnet: v1.signer-prod.testnet
+
+### Supported Networks
+
+- Bitcoin
+- Ethereum
