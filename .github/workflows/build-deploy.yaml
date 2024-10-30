@@ -19,6 +19,7 @@ jobs:
             indexer-base,
             indexer-events,
             indexer-dex,
+            indexer-multichain,
             explorer-selector,
             aggregates,
           ]
@@ -146,7 +147,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
           failed_deployments=()
 
           for service in "${services[@]}"; do
@@ -178,7 +179,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
