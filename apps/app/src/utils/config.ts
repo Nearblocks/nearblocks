@@ -59,3 +59,26 @@ export const verifierConfig =
           verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
         },
       ];
+
+export const chainAbstractionExplorerUrl =
+  networkId === 'mainnet'
+    ? {
+        ethereum: {
+          address: (address: string) =>
+            `https://etherscan.io/address/${address}`,
+        },
+        bitcoin: {
+          address: (address: string) =>
+            `https://blockchain.com/explorer/addresses/btc/${address}`,
+        },
+      }
+    : {
+        ethereum: {
+          address: (address: string) =>
+            `https://sepolia.etherscan.io/address/${address}`,
+        },
+        bitcoin: {
+          address: (address: string) =>
+            `https://blockexplorer.one/bitcoin/testnet/address/${address}`,
+        },
+      };

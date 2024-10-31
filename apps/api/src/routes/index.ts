@@ -4,6 +4,7 @@ import account from '#routes/account';
 import analytics from '#routes/analytics';
 import blocks from '#routes/blocks';
 import campaigns from '#routes/campaigns';
+import chainAbstraction from '#routes/chain-abstraction';
 import charts from '#routes/charts';
 import dex from '#routes/dex';
 import exports from '#routes/exports';
@@ -38,6 +39,7 @@ const routes = () => {
   txns(app);
   validators(app);
   campaigns(app);
+  chainAbstraction(app);
 
   return app;
 };
