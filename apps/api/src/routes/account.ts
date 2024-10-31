@@ -139,6 +139,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_block.query - block height
+   * @param {string} before_block.query - block height
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
@@ -159,6 +161,8 @@ const routes = (app: Router) => {
    * @param {string} to.query - receiver account id
    * @param {string} action.query - action kind
    * @param {string} method.query - function call method
+   * @param {string} after_block.query - block height
+   * @param {string} before_block.query - block height
    * @param {string} after_date.query - date in YYYY-MM-DD format
    * @param {string} before_date.query - date in YYYY-MM-DD format
    * @return 200 - success response
