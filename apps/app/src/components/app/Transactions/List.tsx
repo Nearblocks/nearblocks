@@ -8,13 +8,11 @@ const List = async ({ searchParams }: any) => {
   ]);
 
   return (
-    <>
-      <ListActions
-        txnsData={data}
-        txnsCount={count}
-        error={!data || data === null}
-      />
-    </>
+    <ListActions
+      txnsData={data}
+      txnsCount={count}
+      error={!data || data === null}
+    />
   );
 };
 export default List;

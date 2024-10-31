@@ -3,7 +3,6 @@ import { appUrl } from '@/utils/app/config';
 import { Metadata } from 'next';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = `${
@@ -11,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }Verify Contract | Nearblocks`;
   const metaDescription = 'Verify a smart contract on the blockchain.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

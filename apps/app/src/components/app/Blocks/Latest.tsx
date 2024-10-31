@@ -28,12 +28,12 @@ const LatestBlocks = ({ blocks, error }: Props) => {
         <PerfectScrollbar>
           {!blocks && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('error') : 'Error!'}
+              {t ? t('homePage.error') : 'Error!'}
             </div>
           )}
           {!error && blocks?.length === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('noBlocks') : 'No blocks found'}
+              {t ? t('homePage.noBlocks') : 'No blocks found'}
             </div>
           )}
           {error && blocks?.length === 0 && (
@@ -116,7 +116,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1  text-sm whitespace-nowrap dark:text-green-250 truncate">
                       <span className="dark:text-white">
-                        {t ? t('blockMiner') : 'Author'}&nbsp;
+                        {t ? t('homePage.blockMiner') : 'Author'}&nbsp;
                       </span>
                       <Link
                         href={`/address/${block?.author_account_id}`}

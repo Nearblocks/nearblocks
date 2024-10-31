@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale },
@@ -16,7 +15,7 @@ export async function generateMetadata({
   const metaDescription =
     'All Latest Near Protocol transactions confirmed on Near Blockchain. The list consists of transactions from sending Near and the transactions details for each transaction.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

@@ -4,7 +4,6 @@ import { Metadata } from 'next';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { hash, locale },
@@ -21,7 +20,7 @@ export async function generateMetadata({
   const metaTitle = t('block.metaTitle', { block: hash });
   const metaDescription = t('block.metaDescription', { block: hash });
 
-  const ogImageUrl = `${ogUrl}/api/og?blockHash=true&block_height=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?blockHash=true&block_height=${encodeURIComponent(
     blockHeight,
   )}&title=${encodeURIComponent(metaTitle)}`;
 

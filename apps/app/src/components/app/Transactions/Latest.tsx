@@ -29,12 +29,12 @@ const LatestTransactions = ({ txns, error }: Props) => {
         <PerfectScrollbar>
           {!txns && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('error') : ' Error!'}
+              {t ? t('homePage.error') : ' Error!'}
             </div>
           )}
           {!error && txns?.length === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
-              {t ? t('noTxns') : ' No transactions found!'}
+              {t ? t('homePage.noTxns') : ' No transactions found!'}
             </div>
           )}
           {error && txns?.length === 0 && (
@@ -115,7 +115,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
                     </div>
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                       <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('txnFrom') : 'From'}{' '}
+                        {t ? t('homePage.txnFrom') : 'From'}{' '}
                         <Link
                           href={`/address/${txn?.signer_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
@@ -124,7 +124,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
                         </Link>
                       </div>
                       <div className="whitespace-nowrap truncate dark:text-white">
-                        {t ? t('txnTo') : 'To'}{' '}
+                        {t ? t('homePage.txnTo') : 'To'}{' '}
                         <Link
                           href={`/address/${txn?.receiver_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"

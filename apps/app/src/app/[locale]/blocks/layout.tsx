@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale },
@@ -16,7 +15,7 @@ export async function generateMetadata({
   const metaDescription =
     'All Near (Ⓝ Blocks that are included in Near blockchain. The timestamp, author, gas used, gas price and included transactions are shown.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 
@@ -47,5 +46,5 @@ export default async function BlockLayout({
   children: React.ReactNode;
   params: any;
 }) {
-  return <>{children}</>;
+  return [children];
 }

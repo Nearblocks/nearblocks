@@ -10,8 +10,7 @@ export default async function ApisPage({
 }: {
   searchParams: { status: string };
 }) {
-  const plans = await getRequest(`${userApiURL}/plans`, {}, {}, false);
-
+  const plans = await getRequest(`${userApiURL}plans`, {}, {}, false);
   const getContactDetails = async (contactDeatils: any) => {
     'use server';
 

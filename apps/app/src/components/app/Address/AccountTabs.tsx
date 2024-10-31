@@ -62,6 +62,7 @@ export default async function AccountTabs({
                     : `/address/${id}?tab=${name}`
                 }
                 className={getClassName(name === tab)}
+                scroll={false}
               >
                 <h2>
                   {t(`${message}`) || label}
