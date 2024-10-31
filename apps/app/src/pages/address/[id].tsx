@@ -81,6 +81,7 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   tab: string;
   latestBlocks: any;
+  multiChainAccountsData: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...qs },
@@ -106,6 +107,8 @@ export const getServerSideProps: GetServerSideProps<{
     nfts: id && `nfts/${address}`,
     parse: id && `account/${address}/contract/parse?rpc=${rpcUrl}`,
     inventory: id && `account/${address}/inventory`,
+    multiChainAccounts:
+      id && `chain-abstraction/${address}/multi-chain-accounts`,
   };
 
   const urlMapping: Record<TabType, { api: string; count?: string }> = {
@@ -159,6 +162,7 @@ export const getServerSideProps: GetServerSideProps<{
     nftResult,
     parseResult,
     inventoryResult,
+    multiChainAccountsResult,
   ] = await Promise.allSettled([
     fetchCommonData(commonApiUrls.account),
     fetchCommonData(commonApiUrls.deployments),
@@ -166,6 +170,7 @@ export const getServerSideProps: GetServerSideProps<{
     fetchCommonData(commonApiUrls.nfts),
     fetchCommonData(commonApiUrls.parse),
     fetchCommonData(commonApiUrls.inventory),
+    fetchCommonData(commonApiUrls.multiChainAccounts),
   ]);
 
   const { statsDetails, latestBlocks } = await fetchData();
@@ -210,6 +215,7 @@ export const getServerSideProps: GetServerSideProps<{
       error: !dataResult, // Set error to true only if dataResult is null
       tab,
       latestBlocks: latestBlocks,
+      multiChainAccountsData: getResult(multiChainAccountsResult),
     },
   };
 };
@@ -226,6 +232,7 @@ const Address = ({
   dataCount,
   error,
   tab,
+  multiChainAccountsData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
@@ -255,6 +262,7 @@ const Address = ({
   const tokenData = tokenDetails?.contracts?.[0];
   const nftTokenData = nftTokenDetails?.contracts?.[0];
   const inventoryData = inventoryDetails?.inventory;
+  const multiChainAccounts = multiChainAccountsData?.multiChainAccounts;
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -583,6 +591,7 @@ const Address = ({
           ft={ft}
           deploymentData={deploymentData}
           nftTokenData={nftTokenData}
+          multiChainAccounts={multiChainAccounts}
         />
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-10">
