@@ -38,8 +38,8 @@ jobs:
           file: apps/app/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/nearblocks/app:beta
-          cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
+          tags: ghcr.io/nearblocks/beta
+          cache-from: type=registry,ref=ghcr.io/nearblocks/beta
           cache-to: type=inline
 
   deploy:
@@ -63,7 +63,7 @@ jobs:
       - name: Update Kubernetes deployments
         run: |
           kubectl config use-context github-actions-nearblocks-testnet
-          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/app@${{ needs.build.outputs.image_digest }} -n nearblocks-testnet
+          kubectl set image deployment/testnet-app-beta app=ghcr.io/nearblocks/beta@${{ needs.build.outputs.image_digest }} -n nearblocks-testnet
 
       - name: Verify rollout
         run: |
