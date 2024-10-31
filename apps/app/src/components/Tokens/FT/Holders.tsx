@@ -88,9 +88,14 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
       header: 'Percentage',
       key: 'total_supply',
       cell: (row: HoldersPropsInfo) => {
-        const percentage = token?.total_supply
-          ? tokenPercentage(token?.total_supply, row.amount, token?.decimals)
-          : null;
+        const percentage =
+          token?.total_supply != null &&
+          Number(token.total_supply) !== 0 &&
+          row?.amount &&
+          token?.decimals
+            ? tokenPercentage(token.total_supply, row.amount, token.decimals)
+            : null;
+
         return (
           <>
             {percentage === null
