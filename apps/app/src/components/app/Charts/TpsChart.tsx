@@ -4,12 +4,12 @@ import SwitchButton from '../SwitchButton';
 import Question from '../Icons/Question';
 import { chartDataInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import Skeleton from '../skeleton/common/Skeleton';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   chartTypes: string;
@@ -21,7 +21,7 @@ interface Props {
 }
 const TpsChart = (props: Props) => {
   const { chartTypes, poweredBy, data } = props;
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const t = useTranslations();
   const { networkId } = useConfig();
 

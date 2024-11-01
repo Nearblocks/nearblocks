@@ -4,9 +4,9 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
-import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
 import LoadingCircular from '@/components/common/LoadingCircular';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   selectValue?: string;
@@ -16,7 +16,7 @@ interface Props {
 const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 const FormContact = ({ selectValue, getContactDetails }: Props) => {
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const t = useTranslations('contact');
 
   const [loading, setLoading] = useState(false);

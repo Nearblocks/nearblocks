@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
 
 /**
  * @interface Props
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const QrCode = (props: Props) => {
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   const colorDark = theme === 'dark' ? '#ffffff' : '#000000';
   const colorLight = theme === 'dark' ? '#000000' : '#ffffff';

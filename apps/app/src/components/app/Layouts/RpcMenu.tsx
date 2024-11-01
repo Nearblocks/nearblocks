@@ -42,7 +42,7 @@ const RpcMenu = () => {
     <li className="relative group flex h-8 justify-end max-md:mb-2">
       <span className="border rounded-md bg-gray-100 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 hover:text-green-500 dark:hover:text-green-250 ">
         <div className="absolute max-md:hidden left-2.5 top-2 md:flex items-center pointer-events-none">
-          <Rpc className="h-3.5 dark:filter dark:invert" />
+          <Rpc className="h-3.5 dark:text-neargray-10" />
         </div>
         <button
           className={`h-full max-md:!w-24 md:w-28 pl-3 pr-6 md:!px-7 py-1 truncate cursor-pointer focus:outline-none appearance-none`}

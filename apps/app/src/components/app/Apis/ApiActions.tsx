@@ -9,9 +9,9 @@ import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 import Link from 'next/link';
 import { useState } from 'react';
 import Skeleton from '../skeleton/common/Skeleton';
-import { useTheme } from 'next-themes';
 import { toast } from 'react-toastify';
 import LoadingCircular from '@/components/common/LoadingCircular';
+import { useThemeStore } from '@/stores/theme';
 
 const ApiActions = ({
   status,
@@ -22,7 +22,7 @@ const ApiActions = ({
   planDetails: any;
   getContactDetails: any;
 }) => {
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [interval, setInterval] = useState(true);
 
   const [subject, _setSubject] = useState('API');

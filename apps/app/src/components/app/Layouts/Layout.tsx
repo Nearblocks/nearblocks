@@ -4,7 +4,6 @@ import { getRequest } from '@/utils/app/api';
 import LayoutActions from './LayoutActions';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { ThemeProvider } from 'next-themes';
 import { Manrope } from 'next/font/google';
 import Script from 'next/script';
 import { PublicEnvProvider } from 'next-runtime-env';
@@ -85,7 +84,11 @@ const Layout = async ({ children }: LayoutProps) => {
   };
 
   return (
-    <html className={manrope.className} suppressHydrationWarning lang="en">
+    <html
+      className={`${manrope.className} light`}
+      suppressHydrationWarning
+      lang="en"
+    >
       <head>
         <link
           rel="apple-touch-icon"
@@ -116,7 +119,6 @@ const Layout = async ({ children }: LayoutProps) => {
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
-
         <Script id="gtm" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){
@@ -131,19 +133,29 @@ const Layout = async ({ children }: LayoutProps) => {
             })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
           `}
         </Script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function initTheme() {
+                var theme = localStorage.getItem('theme') || 'light'
+                if (theme === 'dark') {
+                  document.documentElement.classList.remove('light');
+                  document.documentElement.classList.add('dark');
+                }
+              })();`,
+          }}
+          id="theme-script"
+        />
         <PublicEnvProvider>
-          <ThemeProvider attribute="class" enableSystem={false}>
-            <NextIntlClientProvider messages={messages}>
-              <ToastContainer />
-              <LayoutActions
-                stats={stats}
-                blocks={blocks}
-                handleFilterAndKeyword={handleFilterAndKeyword}
-              >
-                {children}
-              </LayoutActions>
-            </NextIntlClientProvider>
-          </ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ToastContainer />
+            <LayoutActions
+              stats={stats}
+              blocks={blocks}
+              handleFilterAndKeyword={handleFilterAndKeyword}
+            >
+              {children}
+            </LayoutActions>
+          </NextIntlClientProvider>
         </PublicEnvProvider>
       </body>
     </html>

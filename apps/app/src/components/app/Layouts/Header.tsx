@@ -10,12 +10,12 @@ import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
-import { useTheme } from 'next-themes';
 import { BlocksInfo, Stats } from '@/utils/types';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Search from '../common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useThemeStore } from '@/stores/theme';
 
 const menus = [
   {
@@ -165,7 +165,8 @@ const Header = ({
   const t = useTranslations();
   const { networkId } = useConfig();
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
+
   const status = useMemo(() => {
     if (block?.block_timestamp) {
       const timestamp = nanoToMilli(block?.block_timestamp);
@@ -179,6 +180,12 @@ const Header = ({
     }
     return true;
   }, [block]);
+
+  const toggleTheme = () => {
+    localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle('light');
+  };
 
   const showSearch = pathname !== '/';
   const userLoading = false;
@@ -300,7 +307,7 @@ const Header = ({
             <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
               <button
                 className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                onClick={toggleTheme}
               >
                 <Image
                   src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
@@ -667,9 +674,7 @@ const Header = ({
                       >
                         <div
                           className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer"
-                          onClick={() =>
-                            setTheme(theme === 'light' ? 'dark' : 'light')
-                          }
+                          onClick={toggleTheme}
                         >
                           <Image
                             src={`/images/${
