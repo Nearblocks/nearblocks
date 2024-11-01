@@ -5,7 +5,6 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale },
@@ -18,7 +17,7 @@ export async function generateMetadata({
   const metaDescription =
     'A curated list of all NEP-141 Tokens within the Near Protocol Ecoystem. Discover statistics, holders, transaction volume and more.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

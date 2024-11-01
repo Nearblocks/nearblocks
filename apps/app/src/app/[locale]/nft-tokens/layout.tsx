@@ -5,7 +5,6 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale },
@@ -19,7 +18,7 @@ export async function generateMetadata({
   const metaDescription =
     'The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

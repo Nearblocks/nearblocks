@@ -20,10 +20,8 @@ const CursorPaginator = (props: PaginatorProps) => {
       const params = new URLSearchParams(currentUrl?.search);
       params.set('page', String(Number(page) + 1));
       params.set('cursor', `${cursor}`);
-
       const newUrl = `${pathname}?${params?.toString()}`;
-
-      intlRouter.push(newUrl);
+      intlRouter.push(newUrl, { scroll: false });
     }
   };
 
@@ -33,10 +31,8 @@ const CursorPaginator = (props: PaginatorProps) => {
 
     params.delete('cursor');
     params.delete('page');
-
     const newUrl = `${pathname}?${params.toString()}`;
-
-    intlRouter.replace(newUrl);
+    intlRouter.replace(newUrl, { scroll: false });
   };
 
   return (

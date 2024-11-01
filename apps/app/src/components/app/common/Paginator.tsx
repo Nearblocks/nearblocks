@@ -35,7 +35,7 @@ const Paginator = (props: PaginatorProps) => {
     const newParams = new URLSearchParams(searchParams || '');
     newParams.set('page', String(newPage));
 
-    intlRouter.push(`${pathname}?${newParams.toString()}`);
+    intlRouter.push(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
   const onNext = () => {
@@ -43,19 +43,19 @@ const Paginator = (props: PaginatorProps) => {
     const newPage = currentPage + 1;
     const newParams = new URLSearchParams(searchParams || '');
     newParams.set('page', String(newPage));
-    intlRouter.push(`${pathname}?${newParams.toString()}`);
+    intlRouter.push(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
   const onFirst = () => {
     const newParams = new URLSearchParams(searchParams || '');
     newParams.set('page', '1');
-    intlRouter.push(`${pathname}?${newParams.toString()}`);
+    intlRouter.push(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
 
   const onLast = () => {
     const newParams = new URLSearchParams(searchParams || '');
     newParams.set('page', pages.toString());
-    intlRouter.push(`${pathname}?${newParams.toString()}`);
+    intlRouter.push(`${pathname}?${newParams.toString()}`, { scroll: false });
   };
   return (
     <div className="bg-white dark:bg-black-600 px-2 py-3 flex items-center justify-between border-t dark:border-black-200 md:px-4 rounded-b-xl">

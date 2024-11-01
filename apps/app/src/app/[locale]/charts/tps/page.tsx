@@ -7,7 +7,6 @@ import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale },
@@ -20,7 +19,7 @@ export async function generateMetadata({
   const metaDescription =
     'Near Transactions per Second Chart shows the transactions occuring per second on Near blockchain.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     t('charts.heading'),
   )}`;
 

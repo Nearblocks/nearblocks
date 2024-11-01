@@ -7,7 +7,6 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { id, locale },
@@ -16,7 +15,7 @@ export async function generateMetadata({
 }) {
   unstable_setRequestLocale(locale);
 
-  const thumbnail = `${ogUrl}/api/og?account=true&address=${id}`;
+  const thumbnail = `${appUrl}/api/og?account=true&address=${id}`;
 
   const metaTitle = `Near Account ${id} | NearBlocks`;
   const metaDescription = `Near Account ${id} page allows users to view transactions, balances, token holdings and transfers.`;

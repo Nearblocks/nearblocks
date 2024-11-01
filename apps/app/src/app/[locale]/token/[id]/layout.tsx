@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-const ogUrl = process.env.NEXT_PUBLIC_OG_URL;
 
 export async function generateMetadata({
   params: { locale, id },
@@ -26,7 +25,7 @@ export async function generateMetadata({
     ? `All ${token.name} (${token.symbol}) information in one place: Statistics, price, market-cap, total & circulating supply, number of holders & latest transactions`
     : 'View detailed statistics, market cap, circulating supply, holders, and transaction data for the token on NearBlocks.';
 
-  const ogImageUrl = `${ogUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     title,
   )}`;
   return {
