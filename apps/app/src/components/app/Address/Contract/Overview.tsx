@@ -3,11 +3,16 @@ import OverviewActions from './OverviewActions';
 import { ContractCodeInfo } from '@/utils/types';
 import { cookies } from 'next/headers';
 import { RpcProviders } from '@/utils/app/rpc';
+import dynamic from 'next/dynamic';
 
 const getCookieFromRequest = (cookieName: string): string | null => {
   const cookie = cookies().get(cookieName);
   return cookie ? cookie.value : null;
 };
+
+const VmInitializer = dynamic(() => import('../../vm/VmInitializer'), {
+  ssr: false,
+});
 
 const Overview = async ({ id, searchParams }: any) => {
   const rpcUrl = getCookieFromRequest('rpcUrl') || RpcProviders?.[0]?.url;
@@ -23,6 +28,7 @@ const Overview = async ({ id, searchParams }: any) => {
 
   return (
     <>
+      <VmInitializer />
       <OverviewActions
         id={id}
         schema={parse?.contract?.[0]?.schema}
