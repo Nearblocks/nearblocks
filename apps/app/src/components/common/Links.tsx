@@ -1,6 +1,6 @@
+import { useThemeStore } from '@/stores/theme';
 import { urlHostName } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
-import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 
 const Links = (props: any) => {
@@ -8,7 +8,7 @@ const Links = (props: any) => {
   const twitter = urlHostName && urlHostName(meta?.twitter);
   const facebook = urlHostName && urlHostName(meta?.facebook);
   const telegram = urlHostName && urlHostName(meta?.telegram);
-  const { theme }: any = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   return (
     <div className="flex space-x-4">

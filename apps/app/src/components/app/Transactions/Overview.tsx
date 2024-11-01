@@ -9,12 +9,12 @@ import Skeleton from '../skeleton/common/Skeleton';
 import { gasPrice } from '@/utils/near';
 import { useEffect, useMemo, useState } from 'react';
 import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
-import { useTheme } from 'next-themes';
 import { Tooltip } from '@reach/tooltip';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   stats: StatusInfo;
@@ -24,10 +24,9 @@ interface Props {
 
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const t = useTranslations();
-  const { theme, systemTheme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [mounted, setMounted] = useState(false);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
-  const currentTheme = theme === 'system' ? systemTheme : theme;
   const { networkId } = useConfig();
 
   const LoadingSkeleton = () => {
@@ -166,7 +165,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           labels: {
             step: 7,
             style: {
-              color: currentTheme === 'dark' ? '#e0e0e0' : '#333333',
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
             },
           },
           categories: chartData.categories,
@@ -178,7 +177,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
           },
           labels: {
             style: {
-              color: currentTheme === 'dark' ? '#e0e0e0' : '#333333',
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
             },
           },
         },
@@ -216,7 +215,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
     }
 
     fetchData();
-  }, [chartData, currentTheme, mounted]);
+  }, [chartData, theme, mounted]);
 
   const iframeSrc = chartConfig
     ? `
@@ -224,7 +223,7 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
       <head>
       <style>
       body, html{
-        background-color: ${currentTheme === 'dark' ? '#0D0D0D' : '#ffff'};
+        background-color: ${theme === 'dark' ? '#0D0D0D' : '#ffff'};
       }
       </style>
         <script src="https://code.highcharts.com/highcharts.js"></script>

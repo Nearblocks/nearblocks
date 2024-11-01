@@ -5,12 +5,12 @@ import SwitchButton from '../SwitchButton';
 import { yoctoToNear } from '@/utils/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import { useTheme } from 'next-themes';
 import Skeleton from '../skeleton/common/Skeleton';
 import Image from 'next/legacy/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   chartTypes?: string;
@@ -24,7 +24,7 @@ interface Props {
 const Chart = (props: Props) => {
   const { chartTypes, poweredBy, chartsData } = props;
   const t = useTranslations();
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     title: '',

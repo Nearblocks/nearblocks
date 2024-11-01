@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
@@ -13,6 +12,7 @@ import { VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import { verifierConfig } from '@/utils/app/config';
+import { useThemeStore } from '@/stores/theme';
 
 type VerifiedDataProps = {
   verifierData: VerifierData;
@@ -49,7 +49,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     {},
   );
 
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   useEffect(() => {
     const fetchCode = async () => {

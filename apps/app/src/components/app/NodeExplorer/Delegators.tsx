@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
 import useRpc from '@/hooks/useRpc';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
 import { debounce } from 'lodash';
 import Skeleton from '../skeleton/common/Skeleton';
 import Table from '../common/Table';
@@ -16,6 +15,7 @@ import { useRpcStore } from '@/stores/rpc';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useThemeStore } from '@/stores/theme';
 
 interface Props {
   accountId: string;
@@ -33,7 +33,7 @@ const Delegators = ({ accountId }: Props) => {
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
-  const { theme }: any = useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =

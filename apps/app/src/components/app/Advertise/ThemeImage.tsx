@@ -1,9 +1,9 @@
 'use client';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
 import Image from 'next/legacy/image';
 
 export default function ThemeImage() {
-  const { theme } = useTheme();
+  const theme = useThemeStore((store) => store.theme);
 
   return (
     <Image

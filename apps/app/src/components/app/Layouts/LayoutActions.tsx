@@ -4,7 +4,8 @@ import Header from './Header';
 import Footer from './Footer';
 import { ReactNode } from 'react';
 import NextTopLoader from 'nextjs-toploader';
-import { useTheme } from 'next-themes';
+import { useThemeStore } from '@/stores/theme';
+import { useTheme } from '@/hooks/app/useTheme';
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,7 +23,8 @@ const LayoutActions = ({
   handleFilterAndKeyword,
 }: LayoutProps) => {
   const pathname = usePathname();
-  const theme: any = useTheme();
+  useTheme();
+  const theme = useThemeStore((store) => store.theme);
   const className =
     pathname === '/404'
       ? 'bg-white dark:bg-black-300'
