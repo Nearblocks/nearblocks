@@ -14,6 +14,7 @@ export const useConfig = () => {
     NEXT_PUBLIC_BOS_NETWORK,
     NEXT_PUBLIC_MAINNET_URL,
     NEXT_PUBLIC_TESTNET_URL,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   } = useEnvContext();
 
   const networkId: NetworkId =
@@ -27,6 +28,8 @@ export const useConfig = () => {
   };
 
   const network = networks[networkId];
+
+  const siteKey = NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const apiUrl =
     networkId === 'mainnet'
@@ -78,5 +81,6 @@ export const useConfig = () => {
     docsUrl,
     aurorablocksUrl,
     verifierConfig,
+    siteKey,
   };
 };

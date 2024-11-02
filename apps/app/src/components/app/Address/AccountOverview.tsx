@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
 import TokenHoldings from '../common/TokenHoldings';
 import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
-import useRpc from '@/hooks/useRpc';
 import Big from 'big.js';
 import { FtInfo, TokenListInfo } from '@/utils/types';
 import { useTranslations } from 'next-intl';
 import { useConfig } from '@/hooks/app/useConfig';
+import useRpc from '@/hooks/app/useRpc';
 
 export default function AccountOverview({
   id,

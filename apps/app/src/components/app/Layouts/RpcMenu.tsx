@@ -1,14 +1,33 @@
 'use client';
-import { useRpcStore } from '@/stores/rpc';
 import { useEffect, useRef, useState } from 'react';
 import Rpc from '../Icons/Rpc';
 import ArrowDown from '../Icons/ArrowDown';
 import Check from '../Icons/Check';
-import { RpcProviders } from '@/utils/app/rpc';
+import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRouter } from 'next/navigation';
 
 const RpcMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const { RpcProviders } = useRpcProvider();
+  const initializedRef = useRef(false);
+  const router = useRouter();
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { setRpc, rpc: rpcUrl } = useRpcStoreWithProviders();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -17,6 +36,7 @@ const RpcMenu = () => {
   const handleSelect = (url: string) => {
     setRpc(url);
     setIsOpen(false);
+    router.refresh();
   };
 
   useEffect(() => {
@@ -34,9 +54,6 @@ const RpcMenu = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownRef]);
-
-  const rpcUrl = useRpcStore((state) => state.rpc);
-  const setRpc = useRpcStore((state) => state.setRpc);
 
   return (
     <li className="relative group flex h-8 justify-end max-md:mb-2">

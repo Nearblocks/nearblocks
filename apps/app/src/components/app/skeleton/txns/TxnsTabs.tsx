@@ -32,7 +32,6 @@ function TxnsTabsSkeleton({ tab, hash }: { tab: string; hash: string }) {
   return (
     <>
       <div className="relative container mx-auto px-3">
-        {/* <RpcMenu /> */}
         <>
           <div className="md:flex justify-between">
             <div className="w-fit md:flex md:gap-2">

@@ -16,10 +16,10 @@ import Clock from '@/components/Icons/Clock';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import TokenImage from '@/components/common/TokenImage';
-import useRpc from '@/hooks/useRpc';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import Table from '../common/Table';
+import useRpc from '@/hooks/app/useRpc';
 
 interface ListProps {
   data: {

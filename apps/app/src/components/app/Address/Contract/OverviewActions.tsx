@@ -7,7 +7,7 @@ import {
   VerificationData,
   VerifierStatus,
 } from '@/utils/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Info from './Info';
 import { Tooltip } from '@reach/tooltip';
@@ -16,9 +16,10 @@ import ViewOrChange from './ViewOrChange';
 import { useAuthStore } from '@/stores/auth';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import ContractCode from './ContractCode';
-import useRpc from '@/hooks/useRpc';
-import { useRpcStore } from '@/stores/rpc';
 import { verifierConfig } from '@/utils/app/config';
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {
   id: string;
@@ -65,7 +66,22 @@ const OverviewActions = (props: Props) => {
     Record<string, VerificationData>
   >({});
   const [rpcError, setRpcError] = useState(false);
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const initializedRef = useRef(false);
+
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { switchRpc } = useRpcStoreWithProviders();
 
   useEffect(() => {
     if (rpcError) {

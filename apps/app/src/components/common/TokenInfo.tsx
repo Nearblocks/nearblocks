@@ -6,9 +6,9 @@ import {
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 import { useEffect, useState } from 'react';
-import useRpc from '@/hooks/useRpc';
 import TokenImage from './TokenImage';
 import { Link } from '@/i18n/routing';
+import useRpc from '@/hooks/app/useRpc';
 
 const TokenInfo = (props: TokenInfoProps) => {
   const { contract, amount, decimals } = props;

@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useRef, useState } from 'react';
 import ArrowDown from '../Icons/ArrowDown';
 import { toast } from 'react-toastify';
@@ -7,18 +8,17 @@ import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTranslations } from 'next-intl';
 import LoadingCircular from '@/components/common/LoadingCircular';
 import { useThemeStore } from '@/stores/theme';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   selectValue?: string;
   getContactDetails: any;
 }
 
-const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-
 const FormContact = ({ selectValue, getContactDetails }: Props) => {
   const theme = useThemeStore((store) => store.theme);
   const t = useTranslations('contact');
-
+  const { siteKey } = useConfig();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -2,8 +2,8 @@
 import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
 import { useEffect, useState, useCallback } from 'react';
 import WarningIcon from '../Icons/WarningIcon';
-import useRpc from '@/hooks/useRpc';
 import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
+import useRpc from '@/hooks/app/useRpc';
 
 export default function AccountAlerts({
   id,
