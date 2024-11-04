@@ -42,6 +42,7 @@ import { getCookieFromRequest } from '@/utils/libs';
 import { RpcProviders } from '@/utils/rpc';
 import { fetchData } from '@/utils/fetchData';
 import Receipts from '@/components/Address/Receipts';
+import MultiChainTxns from '@/components/Address/MultiChainTxns';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -55,6 +56,7 @@ const tabs = [
   'tokentxns',
   'nfttokentxns',
   'accesskeys',
+  'multichaintxns',
   'contract',
   'comments',
 ];
@@ -65,6 +67,7 @@ type TabType =
   | 'tokentxns'
   | 'nfttokentxns'
   | 'accesskeys'
+  | 'multichaintxns'
   | 'contract'
   | 'comments';
 
@@ -132,6 +135,10 @@ export const getServerSideProps: GetServerSideProps<{
       api: `account/${address}/keys`,
       count: `account/${address}/keys/count`,
     },
+    multichaintxns: {
+      api: `chain-abstraction/${address}/txns`,
+      count: `chain-abstraction/${address}/txns/count`,
+    },
     contract: { api: '' },
     comments: { api: '' },
   };
@@ -196,6 +203,7 @@ export const getServerSideProps: GetServerSideProps<{
       fetchCommonData(fetchUrl),
       fetchCommonData(countUrl),
     ]);
+
     dataResult = getResult(tabResults[0]);
     dataCountResult = getResult(tabResults[1]);
   }
@@ -443,7 +451,7 @@ const Address = ({
     let actualTabName = tabs[index];
     let actualTabIndex = index;
 
-    if (!hasContractTab && index > 4) {
+    if (!hasContractTab && index > 5) {
       actualTabIndex = index;
       actualTabName = tabs[actualTabIndex + 1];
     }
@@ -623,10 +631,14 @@ const Address = ({
                         key: 4,
                         label: t ? t('address:accessKeys') : 'Access Keys',
                       },
+                      {
+                        key: 5,
+                        label: 'Multichain Transactions',
+                      },
                       ...(contractInfo && contractInfo?.methodNames?.length > 0
                         ? [
                             {
-                              key: 5,
+                              key: 6,
                               label: (
                                 <div className="flex h-full">
                                   <h2>Contract</h2>
@@ -637,13 +649,13 @@ const Address = ({
                               ),
                             },
                             {
-                              key: 6,
+                              key: 7,
                               label: t ? t('address:comments') : 'Comments',
                             },
                           ]
                         : [
                             {
-                              key: 5,
+                              key: 8,
                               label: t ? t('address:comments') : 'Comments',
                             },
                           ]),
@@ -707,6 +719,15 @@ const Address = ({
                         keys={keys}
                         count={keysCount}
                         error={error}
+                        tab={tab}
+                      />
+                    </TabPanel>
+                    <TabPanel>
+                      <MultiChainTxns
+                        txns={txns}
+                        count={count}
+                        error={error}
+                        cursor={txnCursor}
                         tab={tab}
                       />
                     </TabPanel>
