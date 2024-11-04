@@ -19,6 +19,7 @@ import {
   Action,
   DexPairMeta,
   FtOnTransferArgs,
+  HotZapArgs,
   PoolArgs,
   SwapArgs,
 } from '#types/types';
@@ -232,10 +233,13 @@ const getActions = (method: string, args: string) => {
 
   if (method === SWAP_METHODS[1]) {
     const decoded = decodeArgs<FtOnTransferArgs>(args);
-    const actions = (JSON.parse(decoded.msg.replace(/\\/g, '')) as SwapArgs)
-      .actions;
+    const msg = JSON.parse(decoded.msg.replace(/\\/g, ''));
 
-    return actions;
+    if ('hot_zap_actions' in msg) {
+      return (msg as HotZapArgs).hot_zap_actions;
+    }
+
+    return (msg as SwapArgs).actions;
   }
 
   return [];
