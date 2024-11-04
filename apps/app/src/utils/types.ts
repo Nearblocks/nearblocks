@@ -1684,3 +1684,18 @@ export type ContractData = {
   onChainCodeHash: string;
   contractMetadata: ContractMetadata | null;
 };
+
+export type MultiChainTxnInfo = {
+  id: string;
+  receipt_id: string;
+  account_id: string;
+  derived_address: string;
+  public_key: string;
+  chain: string;
+  path: string;
+  derived_transaction: string;
+  block_height: string;
+  block_timestamp: string;
+  transaction_hash: string;
+  status: boolean;
+};

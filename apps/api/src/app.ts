@@ -28,6 +28,7 @@ app.set('query parser', (str: string) =>
       cursor: 'string',
       hash: 'string',
       keyword: 'string',
+      multichain_address: 'string',
     },
   }),
 );

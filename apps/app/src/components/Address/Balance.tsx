@@ -9,8 +9,6 @@ import {
   shortenAddress,
   shortenHex,
 } from '@/utils/libs';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import WarningIcon from '../Icons/WarningIcon';
@@ -25,6 +23,8 @@ import TokenImage from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
 import { Menu, MenuButton, MenuItems, MenuPopover } from '@reach/menu-button';
 import { useRef, useState } from 'react';
+import Bitcoin from '../Icons/Bitcoin';
+import Ethereum from '../Icons/Ethereum';
 
 const Balance = ({
   accountData,
@@ -47,7 +47,6 @@ const Balance = ({
 }: any) => {
   const router = useRouter();
   const { id } = router.query;
-  const { theme } = useTheme();
   const { t } = useTranslation();
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
@@ -413,7 +412,9 @@ const Balance = ({
               ) : true ? (
                 <div className="flex w-full flex-wrap items-center gap-2 md:gap-4">
                   <span className="flex-shrink-0">
-                    {multiChainAccounts?.length ?? 0}{' '}
+                    {multiChainAccounts?.length
+                      ? multiChainAccounts?.length
+                      : 'No'}{' '}
                     {multiChainAccounts?.length === 1 ? 'address' : 'addresses'}{' '}
                     found on:
                   </span>
@@ -458,14 +459,12 @@ const Balance = ({
                                       {address.chain && (
                                         <div className="flex items-center justify-between w-full ">
                                           <div className="flex items-center">
-                                            <Image
-                                              width={10}
-                                              height={10}
-                                              src={`/images/${address.chain.toLowerCase()}${
-                                                theme === 'dark' ? '_dark' : ''
-                                              }.svg`}
-                                              alt=""
-                                            />
+                                            {address.chain === 'BITCOIN' && (
+                                              <Bitcoin className="w-4 h-4 text-orange-400" />
+                                            )}
+                                            {address.chain === 'ETHEREUM' && (
+                                              <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                                            )}
                                             <span className="ml-2">
                                               {address.path
                                                 .toLowerCase()
