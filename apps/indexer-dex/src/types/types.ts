@@ -26,6 +26,10 @@ export type SwapArgs = {
   actions: Action[];
 };
 
+export type HotZapArgs = {
+  hot_zap_actions: Action[];
+};
+
 export type FtOnTransferArgs = {
   msg: string;
   sender_id: string;
