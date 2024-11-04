@@ -1,40 +1,24 @@
 'use client';
-import {
-  calculateGasUsed,
-  calculateTotalDeposit,
-  calculateTotalGas,
-  mapRpcActionToAction,
-  txnFee,
-} from '@/utils/near';
-import {
-  ExecutionOutcomeWithIdView,
-  RPCTransactionInfo,
-  TransactionInfo,
-} from '@/utils/types';
+import { mapRpcActionToAction } from '@/utils/near';
+import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 import FaHourglassStart from '../Icons/FaHourglassStart';
 import Skeleton from '../skeleton/common/Skeleton';
 import TreeReceipt from './TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
-import { useRpcStore } from '@/stores/rpc';
-import useRpc from '@/hooks/useRpc';
+
 import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 
 interface Props {
   txn: TransactionInfo;
   hash: string;
+  rpcTxn: RPCTransactionInfo;
 }
 
 const Tree = (props: Props) => {
-  const { txn: txnData, hash } = props;
-  const rpcUrl: string = useRpcStore((state) => state.rpc);
-  const { transactionStatus, getBlockDetails } = useRpc();
-  const [rpcTxn, setRpcTxn] = useState<any>({});
-  const [rpcData, setRpcData] = useState<any>({});
-
-  const txn = txnData ? txnData : rpcData;
+  const { txn, hash, rpcTxn } = props;
 
   const [receipt, setReceipt] = useState<any>(null);
   const [show, setShow] = useState<any>(null);
@@ -97,78 +81,6 @@ const Tree = (props: Props) => {
 
     return collectReceipts(receiptsOutcome[0]?.id);
   }
-
-  useEffect(() => {
-    const checkTxnExistence = async () => {
-      if (txn === null) {
-        try {
-          const txnExists: any = await transactionStatus(hash, 'bowen');
-          const status = txnExists.status?.Failure ? false : true;
-          let block: any = {};
-
-          if (txnExists) {
-            block = await getBlockDetails(
-              txnExists.transaction_outcome.block_hash,
-            );
-          }
-
-          const modifiedTxns = {
-            transaction_hash: txnExists.transaction_outcome.id,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
-            outcomes: { status: status },
-            block: { block_height: block?.header.height },
-            block_timestamp: block?.header.timestamp_nanosec,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
-            receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
-            receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
-            actions_agg: {
-              deposit: calculateTotalDeposit(txnExists?.transaction.actions),
-              gas_attached: calculateTotalGas(txnExists?.transaction.actions),
-            },
-            outcomes_agg: {
-              transaction_fee: txnFee(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
-              ),
-              gas_used: calculateGasUsed(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
-              ),
-            },
-          };
-          if (txnExists) {
-            setRpcTxn(txnExists);
-            setRpcData(modifiedTxns);
-          }
-        } catch (error) {}
-      }
-    };
-
-    checkTxnExistence();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, hash, rpcUrl]);
-
-  useEffect(() => {
-    const fetchTransactionStatus = async () => {
-      if (!txn) return;
-
-      try {
-        const res = await transactionStatus(
-          txn.transaction_hash,
-          txn.signer_account_id,
-        );
-        setRpcTxn(res);
-      } catch {}
-    };
-
-    fetchTransactionStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, rpcUrl]);
 
   useEffect(() => {
     if (!isEmpty(rpcTxn)) {

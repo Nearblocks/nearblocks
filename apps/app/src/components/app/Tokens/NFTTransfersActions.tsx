@@ -3,7 +3,6 @@ import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
-import useRpc from '@/hooks/useRpc';
 import TxnStatus from '@/components/common/Status';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import TokenImage from '@/components/common/TokenImage';
@@ -14,6 +13,7 @@ import FaInbox from '@/components/Icons/FaInbox';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import Table from '../common/Table';
+import useRpc from '@/hooks/app/useRpc';
 
 interface ListProps {
   data: {

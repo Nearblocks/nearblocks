@@ -4,18 +4,19 @@ import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
 import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
 import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
-import useRpc from '@/hooks/useRpc';
 import Image from 'next/image';
 import { debounce } from 'lodash';
 import Skeleton from '../skeleton/common/Skeleton';
 import Table from '../common/Table';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
-import { useRpcStore } from '@/stores/rpc';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
 import { useThemeStore } from '@/stores/theme';
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {
   accountId: string;
@@ -45,10 +46,23 @@ const Delegators = ({ accountId }: Props) => {
   const [searchResults, setSearchResults] = useState<DelegatorInfo[]>([]);
   const [status, setStatus] = useState<string>();
   const [count, setCount] = useState<number>();
-  const rpcUrl: string = useRpcStore((state) => state.rpc);
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
   const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
+  const initializedRef = useRef(false);
 
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { switchRpc, rpc: rpcUrl } = useRpcStoreWithProviders();
   const start = (pagination.page - 1) * pagination.per_page;
 
   const getStatusColorClass = (status: string) => {

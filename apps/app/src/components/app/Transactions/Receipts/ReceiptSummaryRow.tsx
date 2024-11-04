@@ -18,14 +18,19 @@ interface Props {
   receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
   price: string;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const ReceiptSummaryRow = (props: Props) => {
   const { networkId } = useConfig();
 
-  const { receipt, txn, price } = props;
+  const { receipt, txn, price, statsData } = props;
 
-  const currentPrice = price ? price : 0;
+  const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   function formatActionKind(actionKind: string) {
     return actionKind.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -153,6 +158,7 @@ const ReceiptSummaryRow = (props: Props) => {
                 borderFlag={true}
                 txn={txn}
                 price={price}
+                statsData={statsData}
               />
             </Fragment>
           ))}

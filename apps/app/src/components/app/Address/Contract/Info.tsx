@@ -1,6 +1,6 @@
 'use client';
 import Question from '@/components/Icons/Question';
-import useRpc from '@/hooks/useRpc';
+import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/rpc';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';

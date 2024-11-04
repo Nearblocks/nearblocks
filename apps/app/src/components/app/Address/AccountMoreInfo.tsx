@@ -9,10 +9,10 @@ import {
   yoctoToNear,
 } from '@/utils/app/libs';
 import TokenImage from '../common/TokenImage';
-import useRpc from '@/hooks/useRpc';
 import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import useRpc from '@/hooks/app/useRpc';
 
 export default function AccountMoreInfo({
   id,

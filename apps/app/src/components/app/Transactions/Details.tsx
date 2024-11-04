@@ -23,7 +23,6 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 import {
-  ExecutionOutcomeWithIdView,
   FtsInfo,
   InventoryInfo,
   NftsInfo,
@@ -37,15 +36,7 @@ import ArrowUp from '../Icons/ArrowUp';
 import Question from '../Icons/Question';
 import TxnStatus from '../common/Status';
 import { Tooltip } from '@reach/tooltip';
-import {
-  calculateGasUsed,
-  calculateTotalDeposit,
-  calculateTotalGas,
-  txnActions,
-  txnErrorMessage,
-  txnFee,
-  txnLogs,
-} from '@/utils/near';
+import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
 import EventLogs from './Action';
 import Actions from './Actions';
 import TokenImage, { NFTImage } from '../common/TokenImage';
@@ -53,8 +44,6 @@ import { isEmpty } from 'lodash';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import FaRight from '@/components/Icons/FaRight';
-import useRpc from '@/hooks/useRpc';
-import { useRpcStore } from '@/stores/rpc';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import { useConfig } from '@/hooks/app/useConfig';
@@ -62,31 +51,30 @@ import { useConfig } from '@/hooks/app/useConfig';
 interface Props {
   loading: boolean;
   txn: TransactionInfo;
-  statsData: any;
   isContract: boolean;
   price: string;
   hash: string;
+  rpcTxn: any;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const Details = (props: Props) => {
   const {
     loading,
-    txn: txnData,
+    txn,
     statsData,
     price,
     isContract = false,
     hash,
+    rpcTxn,
   } = props;
-  const { transactionStatus, getBlockDetails } = useRpc();
-  const rpcUrl: string = useRpcStore((state) => state.rpc);
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
   const [more, setMore] = useState(false);
-  const [rpcTxn, setRpcTxn] = useState<any>({});
-  const [rpcData, setRpcData] = useState<any>({});
-  const [rpcError, setRpcError] = useState(false);
-  const { networkId } = useConfig();
 
-  const txn = txnData ? txnData : rpcData;
+  const { networkId } = useConfig();
 
   const t = useTranslations();
   const { fts, nfts } = useMemo(() => {
@@ -146,7 +134,6 @@ const Details = (props: Props) => {
   }
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
-
   const [logs, actions, errorMessage] = useMemo(() => {
     if (!isEmpty(rpcTxn)) {
       return [txnLogs(rpcTxn), txnActions(rpcTxn), txnErrorMessage(rpcTxn)];
@@ -167,95 +154,6 @@ const Details = (props: Props) => {
       }
     }
   }, [logs, actions]);
-
-  useEffect(() => {
-    const fetchTransactionStatus = async () => {
-      if (!txn) return;
-
-      try {
-        setRpcError(false);
-        const res = await transactionStatus(
-          txn.transaction_hash,
-          txn.signer_account_id,
-        );
-        setRpcTxn(res);
-      } catch {
-        setRpcError(true);
-      }
-    };
-
-    fetchTransactionStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, rpcUrl]);
-
-  useEffect(() => {
-    const checkTxnExistence = async () => {
-      if (txn === undefined || txn === null) {
-        try {
-          setRpcError(false);
-          const txnExists: any = await transactionStatus(hash, 'bowen');
-          const status = txnExists.status?.Failure ? false : true;
-          let block: any = {};
-
-          if (txnExists) {
-            block = await getBlockDetails(
-              txnExists.transaction_outcome.block_hash,
-            );
-          }
-
-          const modifiedTxns = {
-            transaction_hash: txnExists.transaction_outcome.id,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
-            outcomes: { status: status },
-            block: { block_height: block?.header.height },
-            block_timestamp: block?.header.timestamp_nanosec,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
-            receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
-            receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
-            actions_agg: {
-              deposit: calculateTotalDeposit(txnExists?.transaction.actions),
-              gas_attached: calculateTotalGas(txnExists?.transaction.actions),
-            },
-            outcomes_agg: {
-              transaction_fee: txnFee(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
-              ),
-              gas_used: calculateGasUsed(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
-              ),
-            },
-          };
-          if (txnExists) {
-            setRpcTxn(txnExists);
-            setRpcData(modifiedTxns);
-          }
-        } catch (error) {
-          setRpcError(true);
-        }
-      }
-    };
-
-    checkTxnExistence();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, hash, rpcUrl]);
-
-  useEffect(() => {
-    if (rpcError) {
-      try {
-        switchRpc();
-      } catch (error) {
-        setRpcError(true);
-        console.error('Failed to switch RPC:', error);
-      }
-    }
-  }, [rpcError, switchRpc]);
 
   const FailedReceipts = ({ data }: any) => {
     const failedReceiptCount = (data?.receipts_outcome || []).filter(

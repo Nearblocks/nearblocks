@@ -1,6 +1,6 @@
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
-import useRpc from '@/hooks/useRpc';
+import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/hexy';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';

@@ -3,12 +3,13 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import LoadingCircular from '@/components/common/LoadingCircular';
 import ArrowDown from '@/components/Icons/ArrowDown';
 import FaInbox from '@/components/Icons/FaInbox';
-import useRpc from '@/hooks/useRpc';
-import { useRpcStore } from '@/stores/rpc';
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
 import { verifierConfig } from '@/utils/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractMetadata } from '@/utils/types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 type ContractFormProps = {
   accountId: string;
@@ -34,8 +35,22 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [onChainCodeHash, setOnChainCodeHash] = useState<string | null>(null);
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const initializedRef = useRef(false);
 
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { switchRpc } = useRpcStoreWithProviders();
   const { contractCode, getContractMetadata, getVerifierData } = useRpc();
 
   useEffect(() => {
