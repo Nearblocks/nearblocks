@@ -1,12 +1,18 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import dayjs from '#libs/dayjs';
 import sql from '#libs/postgres';
 import { Charts, Item, Txns, TxnsCount } from '#libs/schema/dex';
 import { RequestValidator } from '#types/types';
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const pair = req.validator.data.pair;
+  const utc = dayjs.utc();
+  const interval5m = utc.subtract(5, 'minutes').unix();
+  const interval1h = utc.subtract(1, 'hour').unix();
+  const interval6h = utc.subtract(6, 'hours').unix();
+  const interval1d = utc.subtract(1, 'day').unix();
 
   const pairs = await sql`
     SELECT
@@ -61,7 +67,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           dex_events e
         WHERE
           e.pair_id = p.id
-          AND TO_TIMESTAMP(e.timestamp) >= NOW() - INTERVAL '1 day'
+          AND e.timestamp >= ${interval1d}
       ) ea ON TRUE
       LEFT JOIN LATERAL (
         SELECT
@@ -79,7 +85,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           dex_events e
         WHERE
           e.pair_id = p.id
-          AND TO_TIMESTAMP(e.timestamp) >= NOW() - INTERVAL '5 minutes'
+          AND e.timestamp >= ${interval5m}
         GROUP BY
           bucket,
           pair_id
@@ -100,7 +106,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           dex_events e
         WHERE
           e.pair_id = p.id
-          AND TO_TIMESTAMP(e.timestamp) >= NOW() - INTERVAL '1 hour'
+          AND e.timestamp >= ${interval1h}
         GROUP BY
           bucket,
           pair_id
@@ -121,7 +127,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           dex_events e
         WHERE
           e.pair_id = p.id
-          AND TO_TIMESTAMP(e.timestamp) >= NOW() - INTERVAL '6 hours'
+          AND e.timestamp >= ${interval6h}
         GROUP BY
           bucket,
           pair_id
@@ -142,7 +148,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
           dex_events e
         WHERE
           e.pair_id = p.id
-          AND TO_TIMESTAMP(e.timestamp) >= NOW() - INTERVAL '1 day'
+          AND e.timestamp >= ${interval1d}
         GROUP BY
           bucket,
           pair_id
