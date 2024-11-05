@@ -60,7 +60,7 @@ export const circulatingSupply = async (block: Block) => {
         await retry(async () => {
           try {
             const amount = await lockup.locked(
-              config.rpcUrl,
+              config.rpcUrl2,
               account.account_id,
               +block.block_height,
               block.block_timestamp,
