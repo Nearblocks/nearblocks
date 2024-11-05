@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 interface Props {
   stats: StatusInfo;
@@ -24,7 +24,7 @@ interface Props {
 
 const Overview = ({ stats, chartsDetails, error }: Props) => {
   const t = useTranslations();
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const [mounted, setMounted] = useState(false);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
   const { networkId } = useConfig();

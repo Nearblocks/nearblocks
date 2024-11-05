@@ -19,10 +19,10 @@ import Table from '../common/Table';
 import Big from 'big.js';
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);
