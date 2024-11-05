@@ -12,7 +12,7 @@ import { VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
 import { verifierConfig } from '@/utils/app/config';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 type VerifiedDataProps = {
   verifierData: VerifierData;
@@ -49,7 +49,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     {},
   );
 
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
 
   useEffect(() => {
     const fetchCode = async () => {

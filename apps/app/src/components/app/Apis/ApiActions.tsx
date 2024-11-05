@@ -11,7 +11,7 @@ import { useState } from 'react';
 import Skeleton from '../skeleton/common/Skeleton';
 import { toast } from 'react-toastify';
 import LoadingCircular from '@/components/common/LoadingCircular';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 const ApiActions = ({
   status,
@@ -22,7 +22,7 @@ const ApiActions = ({
   planDetails: any;
   getContactDetails: any;
 }) => {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const [interval, setInterval] = useState(true);
 
   const [subject, _setSubject] = useState('API');

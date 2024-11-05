@@ -9,7 +9,7 @@ import Skeleton from '../skeleton/common/Skeleton';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 interface Props {
   chartTypes: string;
@@ -21,7 +21,7 @@ interface Props {
 }
 const TpsChart = (props: Props) => {
   const { chartTypes, poweredBy, data } = props;
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const t = useTranslations();
   const { networkId } = useConfig();
 

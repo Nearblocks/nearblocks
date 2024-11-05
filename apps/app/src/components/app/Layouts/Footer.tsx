@@ -3,10 +3,8 @@ import Image from 'next/legacy/image';
 import Arrow from '../Icons/Arrow';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { useThemeStore } from '@/stores/theme';
 
-const Footer = () => {
-  const theme = useThemeStore((store) => store.theme);
+const Footer = ({ theme }: any) => {
   const currentDate = new Date();
   const t = useTranslations();
 

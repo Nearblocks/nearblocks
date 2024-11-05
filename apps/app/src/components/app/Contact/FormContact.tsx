@@ -7,7 +7,7 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTranslations } from 'next-intl';
 import LoadingCircular from '@/components/common/LoadingCircular';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 const FormContact = ({ selectValue, getContactDetails }: Props) => {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const t = useTranslations('contact');
   const { siteKey } = useConfig();
   const [loading, setLoading] = useState(false);

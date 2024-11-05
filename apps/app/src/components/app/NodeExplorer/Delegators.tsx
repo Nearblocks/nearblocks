@@ -13,10 +13,10 @@ import FaInbox from '../Icons/FaInbox';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
-import { useThemeStore } from '@/stores/theme';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
+import Cookies from 'js-cookie';
 
 interface Props {
   accountId: string;
@@ -34,7 +34,7 @@ const Delegators = ({ accountId }: Props) => {
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =

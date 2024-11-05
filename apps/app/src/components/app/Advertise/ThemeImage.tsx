@@ -1,9 +1,9 @@
 'use client';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 import Image from 'next/legacy/image';
 
 export default function ThemeImage() {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
 
   return (
     <Image

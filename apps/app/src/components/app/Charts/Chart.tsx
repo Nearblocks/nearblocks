@@ -10,7 +10,7 @@ import Image from 'next/legacy/image';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useConfig } from '@/hooks/app/useConfig';
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 interface Props {
   chartTypes?: string;
@@ -24,7 +24,7 @@ interface Props {
 const Chart = (props: Props) => {
   const { chartTypes, poweredBy, chartsData } = props;
   const t = useTranslations();
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     title: '',

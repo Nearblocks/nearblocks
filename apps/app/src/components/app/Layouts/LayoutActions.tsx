@@ -4,8 +4,6 @@ import Header from './Header';
 import Footer from './Footer';
 import { ReactNode } from 'react';
 import NextTopLoader from 'nextjs-toploader';
-import { useThemeStore } from '@/stores/theme';
-import { useTheme } from '@/hooks/app/useTheme';
 
 interface LayoutProps {
   children: ReactNode;
@@ -13,6 +11,7 @@ interface LayoutProps {
   stats: any;
   blocks: any;
   handleFilterAndKeyword: any;
+  theme?: string;
 }
 
 const LayoutActions = ({
@@ -21,10 +20,10 @@ const LayoutActions = ({
   stats,
   notice,
   handleFilterAndKeyword,
+  theme,
 }: LayoutProps) => {
   const pathname = usePathname();
-  useTheme();
-  const theme = useThemeStore((store) => store.theme);
+
   const className =
     pathname === '/404'
       ? 'bg-white dark:bg-black-300'
@@ -32,19 +31,18 @@ const LayoutActions = ({
 
   return (
     <div className={className}>
-      <NextTopLoader
-        color={`${(theme as string) === 'dark' ? '#31766A' : '#0D494A'}`}
-      />
+      <NextTopLoader color={`${(theme as string) ? '#31766A' : '#0D494A'}`} />
       {notice}
       <header>
         <Header
           stats={stats}
           block={blocks}
           handleFilterAndKeyword={handleFilterAndKeyword}
+          theme={theme}
         />
       </header>
       <main>{children}</main>
-      <Footer />
+      <Footer theme={theme} />
     </div>
   );
 };

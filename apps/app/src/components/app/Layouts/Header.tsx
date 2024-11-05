@@ -15,7 +15,7 @@ import { Link, routing, usePathname } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Search from '../common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
-import { useThemeStore } from '@/stores/theme';
+import { setTheme } from '@/utils/app/actions';
 
 const menus = [
   {
@@ -149,10 +149,10 @@ const Header = ({
   stats: statsDetails,
   block: latestBlocks,
   handleFilterAndKeyword,
+  theme,
 }: any) => {
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
-
   const [open, setOpen] = useState<boolean>(false);
   const requestSignInWithWallet = useAuthStore(
     (store) => store.requestSignInWithWallet,
@@ -165,7 +165,6 @@ const Header = ({
   const t = useTranslations();
   const { networkId } = useConfig();
   const pathname = usePathname();
-  const theme = useThemeStore((store) => store.theme);
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -181,12 +180,6 @@ const Header = ({
     return true;
   }, [block]);
 
-  const toggleTheme = () => {
-    localStorage.setItem('theme', theme === 'light' ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark');
-    document.documentElement.classList.toggle('light');
-  };
-
   const showSearch = pathname !== '/';
   const userLoading = false;
 
@@ -199,6 +192,11 @@ const Header = ({
     locale: any;
     children: any;
     className: any;
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
   };
 
   const IntlLink: React.FC<LinkProps> = (props) => {

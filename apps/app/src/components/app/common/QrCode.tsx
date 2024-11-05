@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/stores/theme';
+import Cookies from 'js-cookie';
 
 /**
  * @interface Props
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const QrCode = (props: Props) => {
-  const theme = useThemeStore((store) => store.theme);
+  const theme = Cookies?.get('theme') || 'light';
 
   const colorDark = theme === 'dark' ? '#ffffff' : '#000000';
   const colorLight = theme === 'dark' ? '#000000' : '#ffffff';

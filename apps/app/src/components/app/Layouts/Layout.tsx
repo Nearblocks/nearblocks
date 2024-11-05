@@ -8,6 +8,7 @@ import { Manrope } from 'next/font/google';
 import Script from 'next/script';
 import { PublicEnvProvider } from 'next-runtime-env';
 import { ToastContainer } from 'react-toastify';
+import { cookies } from 'next/headers';
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,7 +24,7 @@ const manrope = Manrope({
 
 const Layout = async ({ children }: LayoutProps) => {
   const messages = await getMessages();
-
+  const theme = cookies().get('theme')?.value || 'light';
   const [stats, blocks] = await Promise.all([
     getRequest(`stats`),
     getRequest(`blocks/latest?limit=1`),
@@ -85,7 +86,7 @@ const Layout = async ({ children }: LayoutProps) => {
 
   return (
     <html
-      className={`${manrope.className} light`}
+      className={`${manrope.className} ${theme}`}
       suppressHydrationWarning
       lang="en"
     >
@@ -110,7 +111,7 @@ const Layout = async ({ children }: LayoutProps) => {
         <link rel="manifest" href="/site.webmanifest" />
         <Script src="/__ENV.js" />
       </head>
-      <body className="overflow-x-hidden dark:bg-black-300">
+      <body className={`overflow-x-hidden dark:bg-black-300`}>
         <noscript>
           <iframe
             src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
@@ -133,18 +134,6 @@ const Layout = async ({ children }: LayoutProps) => {
             })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
           `}
         </Script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function initTheme() {
-                var theme = localStorage.getItem('theme') || 'light'
-                if (theme === 'dark') {
-                  document.documentElement.classList.remove('light');
-                  document.documentElement.classList.add('dark');
-                }
-              })();`,
-          }}
-          id="theme-script"
-        />
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
             <ToastContainer />
@@ -152,6 +141,7 @@ const Layout = async ({ children }: LayoutProps) => {
               stats={stats}
               blocks={blocks}
               handleFilterAndKeyword={handleFilterAndKeyword}
+              theme={theme}
             >
               {children}
             </LayoutActions>
