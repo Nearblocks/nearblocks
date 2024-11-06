@@ -424,7 +424,11 @@ const Txn = ({
                   />
                 </div>
                 <div className={`${tabIndex === 2 ? '' : 'hidden'} `}>
-                  <Execution txn={txn ? txn : rpcData} rpcTxn={rpcTxn} />
+                  <Execution
+                    txn={txn ? txn : rpcData}
+                    rpcTxn={rpcTxn}
+                    statsData={statsData}
+                  />
                 </div>
                 <div className={`${tabIndex === 3 ? '' : 'hidden'} `}>
                   <Tree txn={txn ? txn : rpcData} rpcTxn={rpcTxn} />
