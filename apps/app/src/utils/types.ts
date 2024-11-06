@@ -1500,6 +1500,12 @@ export type TransactionReceiptInfo = {
   expandAll: any;
   convertionReceipt: any;
   className: string;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
+  rpcTxn: RPCTransactionInfo;
 };
 
 export type ReceiptKindInfo = {
