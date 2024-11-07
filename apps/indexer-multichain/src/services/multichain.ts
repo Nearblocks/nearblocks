@@ -16,7 +16,15 @@ import { Sign } from '#types/types';
 type ChainData = {
   address: null | string;
   chain: null | string;
+  parsedPath: null | string;
   publicKey: null | string;
+};
+
+const errorData = {
+  address: null,
+  chain: null,
+  parsedPath: null,
+  publicKey: null,
 };
 
 export const storeMultichainData = async (message: types.StreamerMessage) => {
@@ -98,7 +106,7 @@ export const storeChunkData = async (
       retry(async () => {
         await knex('multichain_accounts')
           .insert(accounts)
-          .onConflict(['account_id', 'derived_address'])
+          .onConflict(['account_id', 'chain', 'path'])
           .ignore();
       }),
     );
@@ -125,9 +133,12 @@ const getDerivedData = async (
   predecessor: string,
   path: string,
 ) => {
-  const { address, chain, publicKey } = await getChainData(predecessor, path);
+  const { address, chain, parsedPath, publicKey } = await getChainData(
+    predecessor,
+    path,
+  );
 
-  if (address && chain && publicKey) {
+  if (address && chain && parsedPath && publicKey) {
     return getTableData(
       receiptId,
       blockHeight,
@@ -136,11 +147,11 @@ const getDerivedData = async (
       address,
       publicKey,
       chain,
-      path,
+      parsedPath,
     );
   }
 
-  logger.warn({ path, predecessor, receiptId });
+  logger.warn({ parsedPath, path, predecessor, receiptId });
 
   return { account: null, transaction: null };
 };
@@ -149,25 +160,25 @@ const getChainData = async (
   predecessor: string,
   path: string,
 ): Promise<ChainData> => {
-  const errorData = { address: null, chain: null, publicKey: null };
+  const parsedPath = path.replace(/\\/g, '');
 
   switch (true) {
-    case path.startsWith('ethereum'):
-    case path.replace(/\\'/g, "'").startsWith("m/44'/60"):
-      return getEvmData(predecessor, path);
-    case path.startsWith('bitcoin'):
-    case path.replace(/\\'/g, "'").startsWith("m/44'/0"):
-      return getBtcData(predecessor, path);
+    case parsedPath.startsWith('ethereum'):
+    case parsedPath.startsWith("m/44'/60'"):
+      return getEvmData(predecessor, parsedPath);
+    case parsedPath.startsWith('bitcoin'):
+    case parsedPath.startsWith("m/44'/0'"):
+      return getBtcData(predecessor, parsedPath);
     default: {
-      if (path.includes('chain')) {
+      if (parsedPath.includes('chain')) {
         try {
-          const chainData = jsonParse(path.replace(/\\/g, ''));
+          const chainData = jsonParse(parsedPath);
 
-          switch (chainData?.chain) {
+          switch (+chainData?.chain) {
             case 60:
-              return getEvmData(predecessor, path);
+              return getEvmData(predecessor, JSON.stringify(chainData));
             case 0:
-              return getBtcData(predecessor, path);
+              return getBtcData(predecessor, JSON.stringify(chainData));
             default:
               return errorData;
           }
@@ -183,29 +194,59 @@ const getChainData = async (
 
 const getEvmData = async (
   predecessor: string,
-  path: string,
+  parsedPath: string,
 ): Promise<ChainData> => {
   try {
-    const derivedData = await ethereum(predecessor, path);
+    const address = await knex('multichain_accounts')
+      .where('account_id', predecessor)
+      .where('chain', Chains.ETHEREUM)
+      .where('path', parsedPath)
+      .first();
 
-    return { chain: Chains.ETHEREUM, ...derivedData };
+    if (address) {
+      return {
+        address: address.derived_address,
+        chain: address.chain,
+        parsedPath,
+        publicKey: address.public_key,
+      };
+    }
+
+    const derivedData = await ethereum(predecessor, parsedPath);
+
+    return { chain: Chains.ETHEREUM, ...derivedData, parsedPath };
   } catch (error) {
     logger.error(error);
-    return { address: null, chain: null, publicKey: null };
+    return errorData;
   }
 };
 
 const getBtcData = async (
   predecessor: string,
-  path: string,
+  parsedPath: string,
 ): Promise<ChainData> => {
   try {
-    const derivedData = await bitcoin(predecessor, path);
+    const address = await knex('multichain_accounts')
+      .where('account_id', predecessor)
+      .where('chain', Chains.BITCOIN)
+      .where('path', parsedPath)
+      .first();
 
-    return { chain: Chains.BITCOIN, ...derivedData };
+    if (address) {
+      return {
+        address: address.derived_address,
+        chain: address.chain,
+        parsedPath,
+        publicKey: address.public_key,
+      };
+    }
+
+    const derivedData = await bitcoin(predecessor, parsedPath);
+
+    return { chain: Chains.BITCOIN, ...derivedData, parsedPath };
   } catch (error) {
     logger.error(error);
-    return { address: null, chain: null, publicKey: null };
+    return errorData;
   }
 };
 

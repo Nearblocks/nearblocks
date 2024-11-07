@@ -2,14 +2,14 @@ import { keccak256 } from 'viem';
 
 import {
   deriveChildPublicKey,
-  najPublicKeyStrToUncompressedHexPoint,
+  signerUncompressedPublicKeyHex,
 } from '#libs/kdf';
 
-const deriveAddress = async (accountId: string, derivation_path: string) => {
+const deriveAddress = async (accountId: string, derivationPath: string) => {
   const publicKey = await deriveChildPublicKey(
-    najPublicKeyStrToUncompressedHexPoint(),
+    signerUncompressedPublicKeyHex,
     accountId,
-    derivation_path,
+    derivationPath,
   );
   const address = uncompressedHexPointToEvmAddress(publicKey);
 
