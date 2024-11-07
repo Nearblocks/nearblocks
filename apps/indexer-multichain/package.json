@@ -16,8 +16,11 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
+    "@cosmjs/crypto": "0.32.4",
+    "@cosmjs/encoding": "0.32.4",
     "@sentry/node": "7.74.1",
-    "bs58check": "4.0.0",
+    "bech32": "2.0.0",
+    "bitcoinjs-lib": "7.0.0-rc.0",
     "elliptic": "6.6.0",
     "envalid": "8.0.0",
     "js-sha3": "0.9.3",

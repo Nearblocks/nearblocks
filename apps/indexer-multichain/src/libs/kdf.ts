@@ -8,6 +8,7 @@ import config from '#config';
 
 const { ec: EC } = elliptic;
 const { sha3_256 } = jsSha3;
+const ec = new EC('secp256k1');
 
 export const signer =
   config.network === Network.MAINNET
@@ -22,11 +23,30 @@ export const signer =
           'secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3',
       };
 
-export const najPublicKeyStrToUncompressedHexPoint = () => {
-  return (
-    '04' +
-    Buffer.from(base_decode(signer.publicKey.split(':')[1])).toString('hex')
+export const signerUncompressedPublicKeyHex =
+  '04' +
+  Buffer.from(base_decode(signer.publicKey.split(':')[1])).toString('hex');
+
+export const generateCompressedPublicKey = async (
+  signerId: string,
+  path: string,
+): Promise<string> => {
+  const derivedPublicKeyHex = await deriveChildPublicKey(
+    signerUncompressedPublicKeyHex,
+    signerId,
+    path,
   );
+
+  const publicKeyBuffer = Buffer.from(derivedPublicKeyHex, 'hex');
+
+  // Compress the public key
+  const compressedPublicKey = ec
+    .keyFromPublic(publicKeyBuffer)
+    .getPublic()
+    .encodeCompressed();
+
+  // Return the compressed public key as a hex string
+  return Buffer.from(compressedPublicKey).toString('hex');
 };
 
 export const deriveChildPublicKey = async (
@@ -34,7 +54,6 @@ export const deriveChildPublicKey = async (
   signerId: string,
   path = '',
 ) => {
-  const ec = new EC('secp256k1');
   const scalarHex = sha3_256(
     `near-mpc-recovery v0.1.0 epsilon derivation:${signerId},${path}`,
   );
