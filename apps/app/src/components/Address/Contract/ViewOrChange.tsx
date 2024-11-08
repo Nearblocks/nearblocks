@@ -63,7 +63,7 @@ const ViewOrChange = (props: Props) => {
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [hideQuery, setHideQuery] = useState(false);
+  const [hideQuery, _setHideQuery] = useState(false);
   const [options, setOptions] = useState({
     attachedDeposit: '0',
     gas: '30000000000000',
@@ -185,7 +185,7 @@ const ViewOrChange = (props: Props) => {
                 : value,
           };
           setFields((flds) => [...flds, field]);
-          setHideQuery(true);
+          //setHideQuery(true);
         }
       }
     } catch (error) {

@@ -15,10 +15,12 @@
     "@aws-sdk/client-ses": "^3.651.1",
     "@braintree/sanitize-url": "7.0.1",
     "@marsidev/react-turnstile": "1.0.2",
+    "@near-js/providers": "^1.0.1",
     "@near-wallet-selector/bitget-wallet": "8.9.13",
     "@near-wallet-selector/bitte-wallet": "8.9.13",
     "@near-wallet-selector/coin98-wallet": "8.9.13",
     "@near-wallet-selector/core": "8.9.13",
+    "@near-wallet-selector/ethereum-wallets": "^8.9.14",
     "@near-wallet-selector/here-wallet": "8.9.13",
     "@near-wallet-selector/ledger": "8.9.13",
     "@near-wallet-selector/math-wallet": "8.9.13",
@@ -48,6 +50,7 @@
     "@web3-onboard/ledger": "2.5.2",
     "@web3-onboard/react": "2.8.13",
     "@web3-onboard/walletconnect": "2.3.9",
+    "@web3modal/wagmi": "^5.1.11",
     "ahooks": "^3.8.0",
     "axios": "^1.7.2",
     "big.js": "6.2.1",
@@ -75,7 +78,13 @@
     "react-tabs": "^6.0.2",
     "react-toastify": "10.0.5",
     "swr": "^2.2.5",
+    "wagmi": "^2.12.27",
     "zustand": "4.3.7"
+  },
+  "overrides": {
+    "@near-wallet-selector/ethereum-wallets": {
+      "near-api-js": "5.0.0"
+    }
   },
   "devDependencies": {
     "@types/big.js": "~6.2.2",
@@ -86,10 +95,12 @@
     "@types/react-dom": "~18.2",
     "@types/react-syntax-highlighter": "^15.5.13",
     "autoprefixer": "~10.4",
+    "encoding": "^0.1.13",
     "eslint-config-custom-nextjs": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "next-translate-plugin": "~2.6",
+    "pino-pretty": "^11.3.0",
     "postcss": "~8.4",
     "tailwindcss": "~3.3",
     "typescript": "~5.2"

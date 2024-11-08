@@ -30,7 +30,8 @@
         "TURNSTILE_SECRET_KEY",
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_RUNTIME",
-        "CI"
+        "CI",
+        "NEXT_PUBLIC_REOWN_PROJECT_ID"
       ]
     },
     "lint": {

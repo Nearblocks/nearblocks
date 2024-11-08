@@ -17,6 +17,7 @@ import { setupNeth } from '@near-wallet-selector/neth';
 import { setupXDEFI } from '@near-wallet-selector/xdefi';
 import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet';
 import { setupMintbaseWallet } from '@near-wallet-selector/mintbase-wallet';
+import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
 import {
   CommitButton,
   EthersProviderContext,
@@ -37,12 +38,13 @@ import { networkId, bosNetworkId } from '@/utils/config';
 import '@near-wallet-selector/modal-ui/styles.css';
 import Link from 'next/link';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
+import { wagmiConfig, web3Modal } from '@/utils/web3modal';
 
 export default function VmInitializer() {
   const [signedIn, setSignedIn] = useState(false);
   const [signedAccountId, setSignedAccountId] = useState(null);
   const [availableStorage, setAvailableStorage] = useState<Big | null>(null);
-  const [walletModal, setWalletModal] = useState<WalletSelectorModal | null>(
+  const [_walletModal, setWalletModal] = useState<WalletSelectorModal | null>(
     null,
   );
 
@@ -80,6 +82,11 @@ export default function VmInitializer() {
             setupNearMobileWallet(),
             setupMintbaseWallet(),
             setupBitteWallet(),
+            setupEthereumWallets({
+              wagmiConfig: wagmiConfig as any,
+              web3Modal: web3Modal as any,
+              alwaysOnboardDuringSignIn: true,
+            }),
           ],
         }),
         customElements: {
@@ -99,10 +106,19 @@ export default function VmInitializer() {
     });
   }, [near]);
 
-  const requestSignInWithWallet = useCallback(() => {
-    walletModal?.show();
-    return false;
-  }, [walletModal]);
+  const requestSignInWithWallet = useCallback(async () => {
+    try {
+      if (!near) {
+        return;
+      }
+
+      const selector = await near.selector;
+      const modal = setupModal(selector, { contractId: '' });
+      modal.show();
+    } catch (error) {
+      console.error('Failed to set up or show the modal:', error);
+    }
+  }, [near]);
 
   const logOut = useCallback(async () => {
     if (!near) {

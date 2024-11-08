@@ -6,7 +6,7 @@ services:
       dockerfile: ./apps/app/Dockerfile
     restart: always
     ports:
-      - '127.0.0.1:3005:3000'
+      - '127.0.0.1:3009:3000'
     environment:
       PORT: 3000
       NEXT_PUBLIC_NETWORK_ID: mainnet
@@ -25,7 +25,8 @@ services:
       NEXT_PUBLIC_USER_DASHBOARD_URL: https://dash.nearblocks.io/
       NEXT_PUBLIC_API_URL: https://api.nearblocks.io/v1/
       API_URL: https://api.nearblocks.io/v1/
-      API_ACCESS_KEY: ${API_ACCESS_KEY}
+      API_ACCESS_KEY: 69447c5cc69447c5cc
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
       NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN}
+      NEXT_PUBLIC_REOWN_PROJECT_ID: 5690251ad29b1ed10f9a41bf343964e1

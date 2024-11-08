@@ -82,3 +82,20 @@ export const chainAbstractionExplorerUrl =
             `https://blockexplorer.one/bitcoin/testnet/address/${address}`,
         },
       };
+
+const evmWalletChains = {
+  mainnet: {
+    chainId: 397,
+    name: 'Near Mainnet',
+    explorer: 'https://nearblocks.io',
+    rpc: 'https://eth-rpc.mainnet.near.org',
+  },
+  testnet: {
+    chainId: 398,
+    name: 'Near Testnet',
+    explorer: 'https://testnet.nearblocks.io',
+    rpc: 'https://eth-rpc.testnet.near.org',
+  },
+};
+
+export const EVMWalletChain = evmWalletChains[networkId];
