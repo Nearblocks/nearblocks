@@ -61,11 +61,9 @@ jobs:
       - name: Set image output
         id: set_image_output
         run: |
-          if [[ "${{ steps.docker_build.outcome }}" == "success" ]]; then
-            echo "${{ matrix.service }}=${{ github.sha }}" >> $GITHUB_OUTPUT
-          else
-            echo "${{ matrix.service }}=false" >> $GITHUB_OUTPUT
-          fi
+          echo "${{ matrix.service }}=${{ github.sha }}" >> services.json
+          jq -n --slurpfile services services.json 'reduce $services[] as $service ({}; . + {($service): "${{ github.sha }}"})' > services.json
+          echo "result=$(cat services.json)" >> $GITHUB_ENV
 
       - name: Debug matrix result output
         run: |
@@ -73,7 +71,7 @@ jobs:
           echo '${{ needs.build.outputs.matrix-result }}'
 
     outputs:
-      matrix-result: ${{ toJSON(steps.set_image_output.outputs) }}
+      matrix-result: ${{ steps.set_image_output.outputs.result }}
 
   deploy:
     needs: build
@@ -96,20 +94,24 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
+          service_list=$(echo '${{ needs.build.outputs.matrix-result }}')
+
           failed_deployments=()
 
-          for service in "${services[@]}"; do
-            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
+          for service in $(echo $service_list | jq -r 'keys[]'); do
+            # Get the SHA for the current service
+            service_sha=$(echo $service_list | jq -r ".\"$service\"")
 
             echo "Service: $service"
             echo "Service SHA: $service_sha"
 
+            # If SHA is valid, update the deployment for that service
             if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
               echo "Updating deployment for $deployment_name"
               kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
 
+              # Verify the rollout status for the deployment
               echo "Verifying rollout for $deployment_name"
               if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
                 echo "Rollout failed for $deployment_name"
@@ -120,6 +122,7 @@ jobs:
             fi
           done
 
+          # If there are failed deployments, print them and exit with an error
           if [ ${#failed_deployments[@]} -ne 0 ]; then
             echo "The following deployments failed:"
             printf '%s\n' "${failed_deployments[@]}"
@@ -131,7 +134,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
+          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-multichain explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
