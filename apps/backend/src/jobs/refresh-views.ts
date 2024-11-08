@@ -23,6 +23,14 @@ import sentry from '#libs/sentry';
     logger.error(error);
     await sleep(1000);
   }
+
+  try {
+    await knex.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY staking_pools');
+  } catch (error) {
+    sentry.captureException(error);
+    logger.error(error);
+    await sleep(1000);
+  }
   logger.info({ action: 'job ended', job: 'refresh-views' });
 
   if (parentPort) {

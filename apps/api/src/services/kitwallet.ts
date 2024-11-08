@@ -168,9 +168,7 @@ const pools = catchAsync(async (_req: Request, res: Response) => {
     SELECT
       account_id
     FROM
-      accounts
-    WHERE
-      account_id LIKE ANY (${POOLS})
+      staking_pools
   `;
 
   return res.status(200).json(pools.map(({ account_id }) => account_id));
