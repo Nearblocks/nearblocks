@@ -69,7 +69,7 @@ const blockData = async (day: Dayjs) => {
   let supply: null | string = null;
 
   if (config.network === Network.MAINNET && lastBlock) {
-    supply = await circulatingSupply(lastBlock);
+    supply = await circulatingSupply(lastBlock, config.rpcUrl);
   }
 
   return {
