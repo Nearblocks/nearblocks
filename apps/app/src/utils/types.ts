@@ -482,6 +482,7 @@ export type RPCTransactionInfo = {
 export type TransactionLog = {
   contract: string;
   logs: string;
+  receiptId: string;
 };
 
 export type ActionType = {
@@ -523,6 +524,7 @@ export type DepositPropsInfo = {
     account_id: string;
     amount: string;
   }[];
+  receiptId: string;
 };
 
 export type ActionPropsInfo = {
@@ -531,6 +533,7 @@ export type ActionPropsInfo = {
     to: string;
     action_kind: string;
     args: ArgsPropsInfo;
+    receiptId: string;
   };
   receiver?: string;
 };

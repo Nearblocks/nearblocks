@@ -136,6 +136,7 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
       const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
         contract: outcome?.outcome?.executor_id || '',
         logs: log,
+        receiptId: outcome.id,
       }));
       txLogs = [...txLogs, ...mappedLogs];
     }
@@ -171,6 +172,7 @@ export function txnActions(txn: RPCTransactionInfo) {
     const receipt = receipts[i];
     const from = receipt?.predecessor_id;
     const to = receipt?.receiver_id;
+    const receiptId = receipt?.receipt_id;
 
     if (from === 'system') continue;
 
@@ -180,7 +182,7 @@ export function txnActions(txn: RPCTransactionInfo) {
       for (let j = 0; j < actions.length; j++) {
         const action = actions[j];
 
-        txActions.push({ from, to, ...action });
+        txActions.push({ from, to, receiptId, ...action });
       }
     } else {
       const actions = receipt?.receipt?.Action?.actions || [];
@@ -188,7 +190,7 @@ export function txnActions(txn: RPCTransactionInfo) {
       for (let j = 0; j < actions.length; j++) {
         const action = mapRpcActionToAction(actions[j]);
 
-        txActions.push({ from, to, ...action });
+        txActions.push({ from, to, receiptId, ...action });
       }
     }
   }

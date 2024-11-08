@@ -3,13 +3,27 @@ import { shortenAddress, shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 const AddKey = (props: TransactionActionInfo) => {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { hash } = router.query;
+
+  const handleClick = () => {
+    router.push(`/txns/${hash}#execution#${props.action?.receiptId}`);
+  };
+
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">
-        <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+        {props?.action?.receiptId && hash ? (
+          <span onClick={handleClick} className="cursor-pointer">
+            <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+          </span>
+        ) : (
+          <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+        )}
         {t ? t('txns:txn.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}
@@ -30,7 +44,13 @@ const AddKey = (props: TransactionActionInfo) => {
   if (props.args.access_key.permission.permission_kind) {
     return (
       <div className="py-1">
-        <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+        {props?.action?.receiptId && hash ? (
+          <span onClick={handleClick} className="cursor-pointer">
+            <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+          </span>
+        ) : (
+          <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+        )}
         {t ? t('txns:txn.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}{' '}
@@ -50,7 +70,13 @@ const AddKey = (props: TransactionActionInfo) => {
 
   return (
     <div className="py-1">
-      <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+      {props?.action?.receiptId && hash ? (
+        <span onClick={handleClick} className="cursor-pointer">
+          <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+        </span>
+      ) : (
+        <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+      )}
       {t ? t('txns:txn.actions.addKey.1') : 'Access key'} (
       <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
       {t ? t('txns:txn.actions.addKey.2') : 'added for'}
