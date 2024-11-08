@@ -7,8 +7,6 @@ import { logger } from 'nb-logger';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
-
 import knex from './knex.js';
 import { nearBalance } from './near.js';
 
@@ -42,7 +40,7 @@ const getLockupAccounts = async () => {
     .select('accounts.account_id');
 };
 
-export const circulatingSupply = async (block: Block) => {
+export const circulatingSupply = async (block: Block, rpcUrl: string) => {
   let lockedAmount = Big(0);
   const foundationAccounts = ['contributors.near', 'lockup.near'];
 
@@ -60,7 +58,7 @@ export const circulatingSupply = async (block: Block) => {
         await retry(async () => {
           try {
             const amount = await lockup.locked(
-              config.rpcUrl2,
+              rpcUrl,
               account.account_id,
               +block.block_height,
               block.block_timestamp,
