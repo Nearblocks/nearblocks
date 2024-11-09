@@ -1,5 +1,4 @@
 name: Build and Deploy Docker Images
-
 on:
   push:
     branches: ['main']
@@ -62,16 +61,12 @@ jobs:
         id: set_image_output
         run: |
           echo "${{ matrix.service }}=${{ github.sha }}" >> services.json
-          jq -n --slurpfile services services.json 'reduce $services[] as $service ({}; . + {($service): "${{ github.sha }}"})' > services.json
-          echo "result=$(cat services.json)" >> $GITHUB_ENV
 
-      - name: Debug matrix result output
-        run: |
-          echo "Matrix result output:"
-          echo '${{ needs.build.outputs.matrix-result }}'
-
-    outputs:
-      matrix-result: ${{ steps.set_image_output.outputs.result }}
+      - name: Save Matrix Result as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: matrix-result
+          path: services.json
 
   deploy:
     needs: build
@@ -79,6 +74,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download Matrix Result Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: matrix-result
+          path: .
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
