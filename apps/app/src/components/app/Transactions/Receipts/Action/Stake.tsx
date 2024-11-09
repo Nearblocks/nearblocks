@@ -1,7 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 import FaCoins from '@/components/Icons/FaCoins';
 import { shortenHex, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import { useTranslations } from 'next-intl';
 
 const Stake = (props: TransactionActionInfo) => {
   const t = useTranslations();

@@ -1,6 +1,7 @@
-import { NFTImageProps } from '@/utils/types';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+
+import { NFTImageProps } from '@/utils/types';
 
 const placeholder = '/images/tokenplaceholder.svg';
 
@@ -34,9 +35,9 @@ const getMediaUrl = async (base: string, media: string, reference: string) => {
 };
 
 export const NFTImage = ({
+  alt,
   base,
   media,
-  alt,
   reference,
   ...rest
 }: NFTImageProps) => {
@@ -62,18 +63,18 @@ export const NFTImage = ({
           <span className="absolute inset-0 animate-pulse bg-gray-300 dark:bg-black-200 rounded" />
         </span>
       )}
-      <TokenImage src={src} alt={alt} {...rest} onLoad={onLoad} />
+      <TokenImage alt={alt} src={src} {...rest} onLoad={onLoad} />
     </span>
   );
 };
 
-const TokenImage = ({ src, alt, ...rest }: any) => {
+const TokenImage = ({ alt, src, ...rest }: any) => {
   const onError = (e: any) => {
     e.target.onError = null;
     e.target.src = placeholder;
   };
   /* eslint-disable @next/next/no-img-element */
-  return <img src={src || placeholder} alt={alt} {...rest} onError={onError} />;
+  return <img alt={alt} src={src || placeholder} {...rest} onError={onError} />;
 };
 
 export default TokenImage;

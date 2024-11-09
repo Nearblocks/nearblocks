@@ -1,10 +1,12 @@
 import { cookies } from 'next/headers';
-import NodeListActions from './NodeListActions';
-import { RpcProviders } from '@/utils/app/rpc';
-import { getRequest } from '@/utils/app/api';
 import QueryString from 'qs';
 
-const getCookieFromRequest = (cookieName: string): string | null => {
+import { getRequest } from '@/utils/app/api';
+import { RpcProviders } from '@/utils/app/rpc';
+
+import NodeListActions from './NodeListActions';
+
+const getCookieFromRequest = (cookieName: string): null | string => {
   const cookie = cookies().get(cookieName);
   return cookie ? cookie.value : null;
 };
@@ -20,9 +22,9 @@ export default async function NodeList({ searchParams }: any) {
   return (
     <NodeListActions
       data={data}
-      totalSupply={statsDetails}
-      latestBlock={latestBlock}
       error={!data}
+      latestBlock={latestBlock}
+      totalSupply={statsDetails}
     />
   );
 }

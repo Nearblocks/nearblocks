@@ -1,5 +1,8 @@
-import TransfersList from '@/components/app/Tokens/NFTTransfers';
+export const runtime = 'edge';
+
 import { getTranslations } from 'next-intl/server';
+
+import TransfersList from '@/components/app/Tokens/NFTTransfers';
 
 export default async function NFTTokentxns({
   params: { locale },

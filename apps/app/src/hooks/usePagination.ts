@@ -1,11 +1,12 @@
-import { stripEmpty } from '@/utils/libs';
 import queryString from 'qs';
-import { useMemo, useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
+import { stripEmpty } from '@/utils/libs';
 
 type Pagination = {
+  [key: string]: any; // Add more properties as needed
   page: number;
   per_page: number;
-  [key: string]: any; // Add more properties as needed
 };
 
 const values: Pagination = { page: 1, per_page: 25 };
@@ -19,7 +20,7 @@ const usePagination = (initial?: Partial<Pagination>) => {
   const pqs = useMemo(() => queryString.stringify(pagination), [pagination]);
 
   const setPagination = useCallback(
-    (key: keyof Pagination | ((s: Pagination) => Pagination), value?: any) => {
+    (key: ((s: Pagination) => Pagination) | keyof Pagination, value?: any) => {
       if (typeof key === 'function') {
         return setState((s) => stripEmpty<Pagination>(key(s)));
       }
@@ -34,7 +35,7 @@ const usePagination = (initial?: Partial<Pagination>) => {
     [initial],
   );
 
-  return { pqs, pagination, setPagination, resetPagination };
+  return { pagination, pqs, resetPagination, setPagination };
 };
 
 export default usePagination;

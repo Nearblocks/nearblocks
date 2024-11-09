@@ -1,13 +1,14 @@
 import classNames from 'classnames';
-import { getRequest } from '@/utils/app/api';
+
 import { Link } from '@/i18n/routing';
+import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
-import NFTTransfers from './NFTTransfers';
-import NFTInventory from './NFTInventory';
 import NFTHolders from './NFTHolders';
+import NFTInventory from './NFTInventory';
+import NFTTransfers from './NFTTransfers';
 
-type TabType = 'transfers' | 'holders' | 'inventory';
+type TabType = 'holders' | 'inventory' | 'transfers';
 
 export default async function NFTTokenTab({
   id,
@@ -22,7 +23,6 @@ export default async function NFTTokenTab({
     TabType,
     { api: string; count?: any; queryModifier?: () => void }
   > = {
-    transfers: { api: `nfts/${id}/txns`, count: `nfts/${id}/txns/count` },
     holders: { api: `nfts/${id}/holders`, count: `nfts/${id}/holders/count` },
     inventory: {
       api: `nfts/${id}/tokens`,
@@ -31,6 +31,7 @@ export default async function NFTTokenTab({
         searchParams.per_page = '24';
       },
     },
+    transfers: { api: `nfts/${id}/txns`, count: `nfts/${id}/txns/count` },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -61,33 +62,33 @@ export default async function NFTTokenTab({
   const inventoryCount = dataCount?.tokens?.[0]?.count;
 
   const tabs = [
-    { name: 'transfers', message: 'fts.ft.transfers', label: 'Transfers' },
-    { name: 'holders', message: 'fts.ft.holders', label: 'Holders' },
-    { name: 'inventory', message: 'fts.ft.info', label: 'Inventory' },
+    { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
+    { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
+    { label: 'Inventory', message: 'fts.ft.info', name: 'inventory' },
   ];
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
   return (
     <div className="block lg:flex lg:space-x-2 mb-10">
       <div className="w-full ">
         <div className="flex flex-wrap ">
-          {tabs?.map(({ name, label }) => {
+          {tabs?.map(({ label, name }) => {
             return (
               <Link
-                key={name}
+                className={getClassName(name === tab)}
                 href={
                   name === 'transfers'
                     ? `/nft-token/${id}`
                     : `/nft-token/${id}?tab=${name}`
                 }
-                className={getClassName(name === tab)}
+                key={name}
               >
                 <h2>{label}</h2>
               </Link>
@@ -97,30 +98,30 @@ export default async function NFTTokenTab({
         <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
           {tab === 'transfers' ? (
             <NFTTransfers
-              txns={txns}
               count={transferCount}
-              error={!txns}
               cursor={txnCursor}
+              error={!txns}
               tab={tab}
+              txns={txns}
             />
           ) : null}
           {tab === 'holders' ? (
             <NFTHolders
-              tokens={token}
-              status={status}
-              holder={holder}
               count={holders}
               error={!txns}
+              holder={holder}
+              status={status}
               tab={tab}
+              tokens={token}
             />
           ) : null}
           {tab === 'inventory' ? (
             <NFTInventory
-              token={token}
-              tokens={tokens}
               count={inventoryCount}
               error={!txns}
               tab={tab}
+              token={token}
+              tokens={tokens}
             />
           ) : null}
         </div>

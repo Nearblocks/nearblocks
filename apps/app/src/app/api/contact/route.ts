@@ -1,6 +1,8 @@
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { NextRequest, NextResponse } from 'next/server';
+export const runtime = 'edge';
+
+import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
+import { NextRequest, NextResponse } from 'next/server';
 
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -13,10 +15,10 @@ const TURNSTILE_VERIFY_URL =
   'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
 interface ContactFormData {
-  name: string;
-  email: string;
-  subject: string;
   description: string;
+  email: string;
+  name: string;
+  subject: string;
   token: string;
 }
 
@@ -24,25 +26,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as ContactFormData;
 
-    const { name, email, subject, description, token } = body;
+    const { description, email, name, subject, token } = body;
 
     if (!name || !email || !subject || !description) {
       return NextResponse.json(
-        { status: 0, err: 'Missing required fields' },
+        { err: 'Missing required fields', status: 0 },
         { status: 400 },
       );
     }
 
     if (!TO_EMAIL || !FROM_EMAIL || !TURNSTILE_SECRET_KEY) {
       return NextResponse.json(
-        { status: 0, err: 'Server configuration error' },
+        { err: 'Server configuration error', status: 0 },
         { status: 500 },
       );
     }
 
     if (!token) {
       return NextResponse.json(
-        { status: 0, err: 'Captcha token is missing' },
+        { err: 'Captcha token is missing', status: 0 },
         { status: 400 },
       );
     }
@@ -52,11 +54,11 @@ export async function POST(request: NextRequest) {
     formData.append('response', token);
 
     const verificationResponse = await fetch(TURNSTILE_VERIFY_URL, {
-      method: 'POST',
       body: formData.toString(),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      method: 'POST',
     });
 
     if (!verificationResponse.ok) {
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
         verificationResponse.status,
       );
       return NextResponse.json(
-        { status: 0, err: 'Captcha verification service unavailable' },
+        { err: 'Captcha verification service unavailable', status: 0 },
         { status: 502 },
       );
     }
@@ -76,20 +78,16 @@ export async function POST(request: NextRequest) {
     if (!data.success) {
       console.log('Captcha verification failed:', data);
       return NextResponse.json(
-        { status: 0, err: 'Captcha verification failed', details: data },
+        { details: data, err: 'Captcha verification failed', status: 0 },
         { status: 400 },
       );
     }
 
     const params = {
-      Source: FROM_EMAIL,
       Destination: {
         ToAddresses: [TO_EMAIL],
       },
       Message: {
-        Subject: {
-          Data: subject,
-        },
         Body: {
           Html: {
             Data: `
@@ -104,7 +102,11 @@ export async function POST(request: NextRequest) {
             Data: `From: ${name} (${email})\nSubject: ${subject}\n\n${description}`,
           },
         },
+        Subject: {
+          Data: subject,
+        },
       },
+      Source: FROM_EMAIL,
     };
 
     const command = new SendEmailCommand(params);
@@ -112,17 +114,17 @@ export async function POST(request: NextRequest) {
     console.log('Email sent successfully:', emailResponse);
 
     return NextResponse.json(
-      { status: 1, message: 'Message sent successfully' },
+      { message: 'Message sent successfully', status: 1 },
       { status: 200 },
     );
   } catch (err) {
     const error = err as Error;
     return NextResponse.json(
       {
-        status: 0,
-        err: 'An unexpected error occurred',
         detail:
           process.env.NODE_ENV === 'development' ? error.message : undefined,
+        err: 'An unexpected error occurred',
+        status: 0,
       },
       { status: 500 },
     );

@@ -1,22 +1,24 @@
 'use client';
-import { useState } from 'react';
-import SortIcon from '../Icons/SortIcon';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import Paginator from '../common/Paginator';
-import { AccountContractInfo } from '@/utils/types';
-import AccessKeyRow from './AccessKeyRow';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
+import { useState } from 'react';
+
+import { AccountContractInfo } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
+import Paginator from '../common/Paginator';
+import FaInbox from '../Icons/FaInbox';
+import SortIcon from '../Icons/SortIcon';
+import AccessKeyRow from './AccessKeyRow';
 
 interface Props {
-  keys: AccountContractInfo[];
   count: number;
   error: boolean;
+  keys: AccountContractInfo[];
   tab?: string;
 }
 
-const AccessKeysActions = ({ keys, count, error }: Props) => {
+const AccessKeysActions = ({ count, error, keys }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -42,57 +44,57 @@ const AccessKeysActions = ({ keys, count, error }: Props) => {
           <thead className="bg-gray-100 dark:bg-black-300">
             <tr>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Txn Hash
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Public key
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Access
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Contract
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Method
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Allowance
               </th>
               <th
-                scope="col"
                 className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                scope="col"
               >
                 Action
               </th>
-              <th scope="col" className="text-left whitespace-nowrap">
+              <th className="text-left whitespace-nowrap" scope="col">
                 <div className="w-full inline-flex px-4 py-4">
                   <button
-                    type="button"
-                    onClick={toggleShowWhen}
                     className="text-left text-xs w-full font-semibold uppercase tracking-wider text-nearblue-600 dark:text-neargray-10 focus:outline-none"
+                    onClick={toggleShowWhen}
+                    type="button"
                   >
                     {showWhen ? 'When' : 'Date Time (UTC)'}
                   </button>
-                  <button type="button" onClick={onOrder} className="px-2">
+                  <button className="px-2" onClick={onOrder} type="button">
                     <div className="text-nearblue-600  dark:text-neargray-10 font-semibold">
                       <SortIcon order={order as string} />
                     </div>
@@ -105,8 +107,8 @@ const AccessKeysActions = ({ keys, count, error }: Props) => {
             {(error && (
               <tr className="h-[57px]">
                 <td
-                  colSpan={100}
                   className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
+                  colSpan={100}
                 >
                   <ErrorMessage
                     icons={<FaInbox />}
@@ -120,8 +122,8 @@ const AccessKeysActions = ({ keys, count, error }: Props) => {
               (keys?.length === 0 && (
                 <tr className="h-[57px]">
                   <td
-                    colSpan={100}
                     className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
+                    colSpan={100}
                   >
                     <ErrorMessage
                       icons={<FaInbox />}
@@ -136,8 +138,8 @@ const AccessKeysActions = ({ keys, count, error }: Props) => {
               keys &&
               keys?.map((key: any) => (
                 <AccessKeyRow
-                  key={key?.account_id + key?.public_key}
                   accessKey={key}
+                  key={key?.account_id + key?.public_key}
                   showWhen={showWhen}
                 />
               ))}

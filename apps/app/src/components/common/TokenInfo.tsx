@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+
+import useRpc from '@/hooks/app/useRpc';
+import { Link } from '@/i18n/routing';
 import {
   localFormat,
   shortenToken,
@@ -5,13 +9,11 @@ import {
   tokenAmount,
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
-import { useEffect, useState } from 'react';
+
 import TokenImage from './TokenImage';
-import { Link } from '@/i18n/routing';
-import useRpc from '@/hooks/app/useRpc';
 
 const TokenInfo = (props: TokenInfoProps) => {
-  const { contract, amount, decimals } = props;
+  const { amount, contract, decimals } = props;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
 
@@ -37,14 +39,14 @@ const TokenInfo = (props: TokenInfoProps) => {
           : amount ?? ''}
       </span>
       <Link
-        href={`/token/${contract}`}
         className="text-green flex items-center hover:no-underline dark:text-green-250"
+        href={`/token/${contract}`}
       >
         <span className="flex items-center">
           <TokenImage
-            src={meta?.icon}
             alt={meta?.name}
             className="w-4 h-4 mx-1"
+            src={meta?.icon}
           />
           {shortenToken(meta?.name)}
           <span>&nbsp;({shortenTokenSymbol(meta?.symbol)})</span>

@@ -1,5 +1,6 @@
-import type { Network, NetworkId } from './types';
 import { env } from 'next-runtime-env';
+
+import type { Network, NetworkId } from './types';
 
 export const networks: Record<NetworkId, Network> = {
   mainnet: {

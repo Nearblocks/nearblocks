@@ -1,10 +1,11 @@
+import { unstable_setRequestLocale } from 'next-intl/server';
+import dynamic from 'next/dynamic';
+
 import Buttons from '@/components/app/Icons/Button';
 import SponserdText from '@/components/app/SponserdText';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import ListCheck from '@/components/Icons/ListCheck';
 import { appUrl, networkId } from '@/utils/app/config';
-import { unstable_setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -21,30 +22,30 @@ export async function generateMetadata({
   const metaDescription = `Near Account ${id} page allows users to view transactions, balances, token holdings and transfers.`;
 
   return {
-    title: `${network === 'testnet' ? 'TESTNET ' : ''}${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [thumbnail],
-    },
-    twitter: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [thumbnail],
-    },
     alternates: {
       canonical: `${appUrl}/address/${id}`,
+    },
+    description: metaDescription,
+    openGraph: {
+      description: metaDescription,
+      images: [thumbnail],
+      title: metaTitle,
+    },
+    title: `${network === 'testnet' ? 'TESTNET ' : ''}${metaTitle}`,
+    twitter: {
+      description: metaDescription,
+      images: [thumbnail],
+      title: metaTitle,
     },
   };
 }
 
 export default function HaseLayout({
-  params: { id },
   children,
+  params: { id },
 }: {
-  params: { id: string };
   children: React.ReactNode;
+  params: { id: string };
 }) {
   const RpcMenu = dynamic(
     () => import('../../../../components/app/Layouts/RpcMenu'),

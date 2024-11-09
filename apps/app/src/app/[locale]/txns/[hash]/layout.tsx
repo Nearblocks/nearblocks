@@ -1,17 +1,18 @@
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { unstable_setRequestLocale } from 'next-intl/server';
+import dynamic from 'next/dynamic';
+
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import SponserdText from '@/components/app/SponserdText';
 import ListCheck from '@/components/Icons/ListCheck';
 import { networkId } from '@/utils/app/config';
-import { getTranslations } from 'next-intl/server';
-import dynamic from 'next/dynamic';
 import { appUrl } from '@/utils/app/config';
-import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata({
-  params: { locale, hash },
+  params: { hash, locale },
 }: {
   params: { hash: string; locale: string };
 }): Promise<Metadata> {
@@ -26,29 +27,29 @@ export async function generateMetadata({
   )}`;
 
   return {
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/txns/${hash}`,
     },
+    description: metaDescription,
+    openGraph: {
+      description: metaDescription,
+      images: [
+        {
+          alt: metaTitle,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: metaTitle,
+    },
+    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
 export default async function TxnsLayout({
-  params: { hash, locale },
   children,
+  params: { hash, locale },
 }: {
   children: React.ReactNode;
   params: any;

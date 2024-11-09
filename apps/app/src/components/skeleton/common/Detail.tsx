@@ -1,18 +1,19 @@
-import React, { Ref, forwardRef } from 'react';
-import Skeleton from './Skeleton';
-import Summary from '../txns/Summary';
+import { useTranslations } from 'next-intl';
+import React, { forwardRef, Ref } from 'react';
+
 import Execution from '../txns/Execution';
+import Summary from '../txns/Summary';
 import Tree from '../txns/Tree';
 import Comment from './Comment';
-import { useTranslations } from 'next-intl';
+import Skeleton from './Skeleton';
 interface Props {
-  network: string;
-  txns?: boolean;
   className?: string;
+  network: string;
   pageTab?: string;
+  txns?: boolean;
 }
 const Detail = forwardRef(
-  ({ network, txns, className, pageTab }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ className, network, pageTab, txns }: Props, ref: Ref<HTMLDivElement>) => {
     const t = useTranslations();
 
     const buttonStyles = (hash: string) =>
@@ -23,7 +24,7 @@ const Detail = forwardRef(
       }`;
 
     return (
-      <div ref={ref} className={`w-full z-10 ${className} pr-2 mr-3.5`}>
+      <div className={`w-full z-10 ${className} pr-2 mr-3.5`} ref={ref}>
         {!txns && (
           <div className="md:flex items-center justify-between">
             <div className="w-80 max-w-xs px-3 py-5">

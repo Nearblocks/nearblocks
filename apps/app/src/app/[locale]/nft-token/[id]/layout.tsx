@@ -1,15 +1,16 @@
+import { Metadata } from 'next';
+import { unstable_setRequestLocale } from 'next-intl/server';
+
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
 import { Token } from '@/utils/types';
-import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata({
-  params: { locale, id },
+  params: { id, locale },
 }: {
-  params: { locale: string; id: string };
+  params: { id: string; locale: string };
 }): Promise<Metadata> {
   unstable_setRequestLocale(locale);
 
@@ -29,23 +30,23 @@ export async function generateMetadata({
     title,
   )}`;
   return {
-    title: title,
-    description: description,
-    openGraph: {
-      title: title,
-      description: description,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: title,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/token/${id}`,
     },
+    description: description,
+    openGraph: {
+      description: description,
+      images: [
+        {
+          alt: title,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: title,
+    },
+    title: title,
   };
 }
 

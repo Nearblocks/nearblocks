@@ -40,10 +40,10 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
 
     return (
       <textarea
+        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+        defaultValue={displayArgs(SuccessValue)}
         readOnly
         rows={4}
-        defaultValue={displayArgs(SuccessValue)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
       ></textarea>
     );
   }
@@ -51,10 +51,10 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
   if (status && 'Failure' in status) {
     return (
       <textarea
+        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+        defaultValue={JSON.stringify(status.Failure, null, 2)}
         readOnly
         rows={4}
-        defaultValue={JSON.stringify(status.Failure, null, 2)}
-        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
       ></textarea>
     );
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SwitchButton = ({ selected, onChange }: any) => {
+const SwitchButton = ({ onChange, selected }: any) => {
   return (
     <div
       className={`${

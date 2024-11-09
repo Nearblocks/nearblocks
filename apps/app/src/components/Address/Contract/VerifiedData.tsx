@@ -1,34 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { Tooltip } from '@reach/tooltip';
+import Clipboard from 'clipboard';
 import { useTheme } from 'next-themes';
+import React, { useEffect, useRef, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import Clipboard from 'clipboard';
-import FaExpand from '@/components/Icons/FaExpand';
-import FaMinimize from '@/components/Icons/FaMinimize';
-import FaCode from '@/components/Icons/FaCode';
-import { Tooltip } from '@reach/tooltip';
-import CopyIcon from '@/components/Icons/CopyIcon';
-import { VerifierData } from '@/utils/types';
+
 import ErrorMessage from '@/components/common/ErrorMessage';
+import CopyIcon from '@/components/Icons/CopyIcon';
+import FaCode from '@/components/Icons/FaCode';
+import FaExpand from '@/components/Icons/FaExpand';
 import FaInbox from '@/components/Icons/FaInbox';
+import FaMinimize from '@/components/Icons/FaMinimize';
 import { verifierConfig } from '@/utils/config';
+import { VerifierData } from '@/utils/types';
 
 type VerifiedDataProps = {
-  verifierData: VerifierData;
-  selectedVerifier: string;
   base64Code: string;
+  selectedVerifier: string;
+  verifierData: VerifierData;
 };
 
 type FileItem = {
-  type?: string;
   name?: string;
+  type?: string;
 };
 
 const VerifiedData: React.FC<VerifiedDataProps> = ({
-  verifierData,
-  selectedVerifier,
   base64Code,
+  selectedVerifier,
+  verifierData,
 }) => {
   const [showFullCode, setShowFullCode] = useState<{ [key: string]: boolean }>(
     {},
@@ -37,11 +38,11 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   const codeContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>(
     {},
   );
-  const [fileData, setFileData] = useState<{ name: string; content: string }[]>(
+  const [fileData, setFileData] = useState<{ content: string; name: string }[]>(
     [],
   );
   const [fileDataLoading, setFileDataLoading] = useState(true);
-  const [fileDataError, setFileDataError] = useState<string | null>(null);
+  const [fileDataError, setFileDataError] = useState<null | string>(null);
   const [copiedTooltips, setCopiedTooltips] = useState<{
     [key: string]: boolean;
   }>({});
@@ -104,11 +105,11 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                 }
 
                 const content = await res.text();
-                return { name: fileName, content };
+                return { content, name: fileName };
               } else throw new Error('File name not found');
             } catch (error) {
               console.error(error);
-              return { name: fileName, content: null };
+              return { content: null, name: fileName };
             }
           });
 
@@ -232,14 +233,14 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     mutedText="Please try again later"
                   />
                 ) : fileData && fileData?.length > 0 ? (
-                  fileData.map(({ name, content }, index) => (
-                    <div key={index} className="pb-4">
+                  fileData.map(({ content, name }, index) => (
+                    <div className="pb-4" key={index}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center">{name}</div>
                         <div className="flex items-center">
                           <Tooltip
-                            label="Copy code to clipboard"
                             className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                            label="Copy code to clipboard"
                           >
                             <span className="relative">
                               {copiedTooltips[name] && (
@@ -248,23 +249,23 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                                 </span>
                               )}
                               <button
+                                className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 mr-2"
                                 ref={(el) => {
                                   copyButtonRefs.current[name] = el;
                                 }}
                                 type="button"
-                                className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 mr-2"
                               >
                                 <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
                               </button>
                             </span>
                           </Tooltip>
                           <Tooltip
-                            label={showFullCode[name] ? 'Minimize' : 'Maximize'}
                             className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                            label={showFullCode[name] ? 'Minimize' : 'Maximize'}
                           >
                             <button
-                              onClick={() => handleToggleCodeView(name)}
                               className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
+                              onClick={() => handleToggleCodeView(name)}
                             >
                               {showFullCode[name] ? (
                                 <FaMinimize className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
@@ -277,29 +278,14 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                       </div>
 
                       <div
+                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0 `}
                         ref={(el) => (codeContainerRefs.current[name] = el)}
                         style={{
                           height: `${codeHeights[name] || 300}px`,
                         }}
-                        className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0 `}
                       >
                         {content ? (
                           <SyntaxHighlighter
-                            language={verifierData?.lang || 'rust'}
-                            style={theme === 'dark' ? oneDark : oneLight}
-                            showLineNumbers={true}
-                            lineNumberStyle={{
-                              backgroundColor: `${
-                                theme === 'dark' ? '#030712' : '#d1d5db'
-                              }`,
-                              padding: '0 10px 0 0',
-                              width: '5em',
-                              minWidth: '5em',
-                              display: 'inline-block',
-                              margin: '0 5px 0 0',
-                            }}
-                            wrapLines={true}
-                            wrapLongLines={true}
                             customStyle={{
                               backgroundColor:
                                 theme === 'dark'
@@ -309,9 +295,24 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                                 theme === 'dark'
                                   ? 'var(--color-black-200)'
                                   : '',
-                              padding: 0,
                               margin: 0,
+                              padding: 0,
                             }}
+                            language={verifierData?.lang || 'rust'}
+                            lineNumberStyle={{
+                              backgroundColor: `${
+                                theme === 'dark' ? '#030712' : '#d1d5db'
+                              }`,
+                              display: 'inline-block',
+                              margin: '0 5px 0 0',
+                              minWidth: '5em',
+                              padding: '0 10px 0 0',
+                              width: '5em',
+                            }}
+                            showLineNumbers={true}
+                            style={theme === 'dark' ? oneDark : oneLight}
+                            wrapLines={true}
+                            wrapLongLines={true}
                           >
                             {content || 'No source code available'}
                           </SyntaxHighlighter>
@@ -327,16 +328,16 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                   ))
                 ) : (
                   <textarea
+                    className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
                     readOnly
                     rows={4}
-                    value={base64Code}
-                    className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
                     style={{
                       height: '300px',
                       overflowX: 'hidden',
                       whiteSpace: 'pre-wrap',
                       wordWrap: 'break-word',
                     }}
+                    value={base64Code}
                   ></textarea>
                 )}
               </>

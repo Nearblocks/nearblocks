@@ -1,5 +1,5 @@
 interface Props {
-  icons: SVGElement | any;
+  icons: any | SVGElement;
   message: string;
   mutedText: string;
 }

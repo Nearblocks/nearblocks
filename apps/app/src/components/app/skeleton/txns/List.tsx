@@ -1,4 +1,5 @@
 import React from 'react';
+
 import TableSkeleton from '../common/table';
 
 function ListSkeletion() {

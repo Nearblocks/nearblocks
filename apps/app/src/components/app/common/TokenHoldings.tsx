@@ -1,23 +1,25 @@
+import { Menu, MenuButton, MenuItems, MenuPopover } from '@reach/menu-button';
+import Big from 'big.js';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
+import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat, truncateString } from '@/utils/libs';
 import { InventoryInfo, TokenListInfo } from '@/utils/types';
-import 'react-perfect-scrollbar/dist/css/styles.css';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import { Menu, MenuItems, MenuButton, MenuPopover } from '@reach/menu-button';
+
 import ArrowDown from '../Icons/ArrowDown';
-import Big from 'big.js';
 import Skeleton from '../skeleton/common/Skeleton';
-import { Link } from '@/i18n/routing';
 
 interface Props {
-  id?: string;
-  loading?: boolean;
-  inventoryLoading?: boolean;
+  appUrl?: string;
   data: InventoryInfo;
   ft: {
     amount: string;
     tokens: TokenListInfo[];
   };
-  appUrl?: string;
+  id?: string;
+  inventoryLoading?: boolean;
+  loading?: boolean;
   spamTokens?: string[];
 }
 
@@ -64,7 +66,7 @@ const TokenHoldings = (props: Props) => {
         </span>
         <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
       </MenuButton>
-      <MenuPopover portal={false} className="relative">
+      <MenuPopover className="relative" portal={false}>
         <MenuItems className="absolute bg-white w-full rounded-b-lg shadow border z-50 pb-2 dark:border-black-200 dark:bg-black">
           <div className="dark:bg-black">
             <PerfectScrollbar>
@@ -79,23 +81,23 @@ const TokenHoldings = (props: Props) => {
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
                       {props.ft?.tokens?.map((token, index) => (
-                        <div key={token?.contract} className="dark:bg-black">
+                        <div className="dark:bg-black" key={token?.contract}>
                           <Link
-                            href={`/token/${token?.contract}?a=${props.id}`}
                             className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline"
+                            href={`/token/${token?.contract}?a=${props.id}`}
                           >
                             <div key={index}>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
                                   <img
+                                    alt={token?.ft_meta?.name}
+                                    className="w-4 h-4"
+                                    height={16}
                                     src={
                                       token?.ft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
                                     }
-                                    alt={token?.ft_meta?.name}
                                     width={16}
-                                    height={16}
-                                    className="w-4 h-4"
                                     /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
@@ -150,23 +152,23 @@ const TokenHoldings = (props: Props) => {
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
                       {nfts.map((nft) => (
-                        <div key={nft?.contract} className="dark:bg-black">
+                        <div className="dark:bg-black" key={nft?.contract}>
                           <Link
-                            href={`/nft-token/${nft?.contract}`}
                             className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline"
+                            href={`/nft-token/${nft?.contract}`}
                           >
                             <div>
                               <div className="flex items-center">
                                 <div className="flex mr-1">
                                   <img
+                                    alt={nft?.nft_meta?.name}
+                                    className="w-4 h-4"
+                                    height={16}
                                     src={
                                       nft?.nft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
                                     }
-                                    alt={nft?.nft_meta?.name}
                                     width={16}
-                                    height={16}
-                                    className="w-4 h-4"
                                     /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>

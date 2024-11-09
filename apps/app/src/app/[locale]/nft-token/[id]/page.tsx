@@ -1,14 +1,17 @@
+export const runtime = 'edge';
+
+import { Suspense } from 'react';
+
 import NFTTokenTabSkeletion from '@/components/app/skeleton/nft/NFTTokenTab';
 import NFTOverview from '@/components/app/Tokens/NFT/NFTOverview';
 import NFTTokenTab from '@/components/app/Tokens/NFT/NFTTokenTab';
-import { Suspense } from 'react';
 
 export default async function TokenIndex({
   params: { id },
   searchParams,
 }: {
   params: { id: string; locale: string };
-  searchParams: { tab: string; cursor?: string; p?: string; order: string };
+  searchParams: { cursor?: string; order: string; p?: string; tab: string };
 }) {
   return (
     <div className="relative container mx-auto px-3">

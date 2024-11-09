@@ -1,6 +1,9 @@
+export const runtime = 'edge';
+
+import { Suspense } from 'react';
+
 import NodeList from '@/components/app/NodeExplorer/NodeList';
 import ExplorerIndex from '@/components/app/skeleton/node-explorer/Index';
-import { Suspense } from 'react';
 
 export default async function NodeExplorer({ searchParams }: any) {
   return (

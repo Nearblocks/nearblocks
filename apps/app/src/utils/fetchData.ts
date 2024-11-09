@@ -37,20 +37,20 @@ export async function fetchData(q?: string, keyword?: string, filter?: string) {
     const error: boolean = statsResult.status === 'rejected';
 
     return {
-      statsDetails,
-      latestBlocks,
-      searchResultDetails,
-      searchRedirectDetails,
       error,
+      latestBlocks,
+      searchRedirectDetails,
+      searchResultDetails,
+      statsDetails,
     };
   } catch (error) {
     console.error('Error fetching blocks:', error);
     return {
-      statsDetails: null,
-      latestBlocks: null,
-      searchResultDetails: null,
-      searchRedirectDetails: null,
       error: true,
+      latestBlocks: null,
+      searchRedirectDetails: null,
+      searchResultDetails: null,
+      statsDetails: null,
     };
   }
 }

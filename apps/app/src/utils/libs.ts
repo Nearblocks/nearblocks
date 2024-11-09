@@ -1,4 +1,5 @@
 import Big from 'big.js';
+
 import { FieldType, GuessableTypeString } from './types';
 
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
@@ -206,12 +207,12 @@ export function getTimeAgoString(timestamp: number) {
   const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
 
   const intervals = {
-    year: seconds / (60 * 60 * 24 * 365),
-    month: seconds / (60 * 60 * 24 * 30),
-    week: seconds / (60 * 60 * 24 * 7),
     day: seconds / (60 * 60 * 24),
     hour: seconds / (60 * 60),
     minute: seconds / 60,
+    month: seconds / (60 * 60 * 24 * 30),
+    week: seconds / (60 * 60 * 24 * 7),
+    year: seconds / (60 * 60 * 24 * 365),
   };
 
   if (intervals.year >= 1) {
@@ -354,7 +355,7 @@ export function weight(number: string) {
 }
 
 export function capitalizeWords(str: string) {
-  const words: string[] | any = str && str.split('_');
+  const words: any | string[] = str && str.split('_');
   const capitalizedWords: string[] =
     words &&
     words.map((word: any) => word.charAt(0).toUpperCase() + word.slice(1));
@@ -456,7 +457,7 @@ const strToType = (str: string, type: GuessableTypeString): unknown => {
       return Number(str);
     case 'boolean':
       return (
-        str.trim()?.length > 0 && !['false', '0'].includes(str.toLowerCase())
+        str.trim()?.length > 0 && !['0', 'false'].includes(str.toLowerCase())
       );
     case 'null':
       return null;
@@ -594,7 +595,7 @@ export function jsonStringify(obj: any, replacer?: any, space?: any) {
 export const getCookieFromRequest = (
   cookieName: string,
   req: any,
-): string | null => {
+): null | string => {
   const cookies = req.headers.cookie || '';
   const cookie = cookies
     .split('; ')
@@ -613,9 +614,9 @@ export const parseGitHubLink = (snapshot: string) => {
 
   const url = snapshot.substring(snapshot.indexOf('http'));
 
-  if (match && commitHash) return { url, text: commitHash };
+  if (match && commitHash) return { text: commitHash, url };
 
-  if (url) return { url, text: snapshot };
+  if (url) return { text: snapshot, url };
 
   return null;
 };
@@ -625,8 +626,8 @@ export const parseLink = (link: string) => {
     const url = new URL(link);
 
     return {
-      url: link,
       text: `${url.hostname}${url.pathname}`,
+      url: link,
     };
   } catch {
     return null;

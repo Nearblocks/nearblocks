@@ -1,33 +1,34 @@
 'use client';
-import { SpamToken, Token } from '@/utils/types';
-import { useState } from 'react';
-import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
-import { useFetch } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
-import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useState } from 'react';
+
+import Links from '@/components/common/Links';
 import TokenImage from '@/components/common/TokenImage';
 import WarningIcon from '@/components/Icons/WarningIcon';
-import Links from '@/components/common/Links';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useFetch } from '@/hooks/useFetch';
 import { Link } from '@/i18n/routing';
+import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
+import { SpamToken, Token } from '@/utils/types';
 
 interface Props {
+  holders: string;
   id: string;
-  token: Token;
   status: {
     height: 0;
     sync: true;
     timestamp: '';
   };
+  token: Token;
   transfers: string;
-  holders: string;
 }
 
 const NFTOverviewActions = ({
-  id,
-  token,
-  status,
-  transfers,
   holders,
+  id,
+  status,
+  token,
+  transfers,
 }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -62,9 +63,9 @@ const NFTOverviewActions = ({
           <h1 className="break-all space-x-2 text-xl text-nearblue-600 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
-                src={token?.icon}
                 alt={token?.name}
                 className="w-7 h-7"
+                src={token?.icon}
               />
             </span>
             <span className="inline-flex align-middle ">Token: </span>
@@ -82,8 +83,8 @@ const NFTOverviewActions = ({
               This token is reported to have been spammed to many users. Please
               exercise caution when interacting with it. Click
               <a
-                href="https://github.com/Nearblocks/spam-token-list"
                 className="underline mx-0.5"
+                href="https://github.com/Nearblocks/spam-token-list"
                 target="_blank"
               >
                 here
@@ -147,6 +148,7 @@ const NFTOverviewActions = ({
                         {holders ? localFormat(holders) : ''}
                         {!status?.sync && status && (
                           <Tooltip
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                             label={
                               <>
                                 Holders count is out of sync. Last synced block
@@ -162,7 +164,6 @@ const NFTOverviewActions = ({
                                 Holders data will be delayed.
                               </>
                             }
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                           >
                             <span>
                               <WarningIcon className="w-4 h-4 fill-current ml-1" />
@@ -191,8 +192,8 @@ const NFTOverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        href={`/address/${token?.contract}`}
                         className="text-green-500 dark:text-green-250 hover:no-underline"
+                        href={`/address/${token?.contract}`}
                       >
                         {token?.contract}
                       </Link>
@@ -208,8 +209,8 @@ const NFTOverviewActions = ({
                       <Skeleton className="h-4 w-32" />
                     ) : (
                       <Link
-                        href={`${token?.website}`}
                         className="hover:no-underline"
+                        href={`${token?.website}`}
                       >
                         {token?.website}
                       </Link>

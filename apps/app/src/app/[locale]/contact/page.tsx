@@ -1,8 +1,11 @@
-import ContactOptions from '@/components/app/Contact/ContactOptions';
-import { appUrl } from '@/utils/app/config';
+export const runtime = 'edge';
+
 import { Metadata } from 'next';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { ToastContainer } from 'react-toastify';
+
+import ContactOptions from '@/components/app/Contact/ContactOptions';
+import { appUrl } from '@/utils/app/config';
 
 export async function generateMetadata({
   params: { locale },
@@ -20,23 +23,23 @@ export async function generateMetadata({
     title,
   )}`;
   return {
-    title: title,
-    description: description,
-    openGraph: {
-      title: title,
-      description: description,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: title,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/about`,
     },
+    description: description,
+    openGraph: {
+      description: description,
+      images: [
+        {
+          alt: title,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: title,
+    },
+    title: title,
   };
 }
 
@@ -65,19 +68,19 @@ export default async function Contact({
               <div className="my-4 flex flex-col gap-4">
                 {[
                   {
+                    description: `We do not process transactions and are therefore unable to expedite, cancel or replace them.`,
                     id: Math.random(),
                     title: 'Pending Transaction',
-                    description: `We do not process transactions and are therefore unable to expedite, cancel or replace them.`,
                   },
                   {
+                    description: `NearBlocks is an independent block explorer unrelated to other service providers (unless stated explicitly otherwise) and is therefore unable to provide a precise response for inquiries that are specific to other service providers.`,
                     id: Math.random(),
                     title: 'Near Protocol Block Explorer',
-                    description: `NearBlocks is an independent block explorer unrelated to other service providers (unless stated explicitly otherwise) and is therefore unable to provide a precise response for inquiries that are specific to other service providers.`,
                   },
                   {
+                    description: `Kindly reach out to your wallet service provider, exchanges or project/contract owner for further support as they are in a better position to assist you on the issues related to and from their platforms.`,
                     id: Math.random(),
                     title: 'Wallet / Exchange / Project related issues ',
-                    description: `Kindly reach out to your wallet service provider, exchanges or project/contract owner for further support as they are in a better position to assist you on the issues related to and from their platforms.`,
                   },
                 ].map((item, index) => (
                   <div key={item.id}>

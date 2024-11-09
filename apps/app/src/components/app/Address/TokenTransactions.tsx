@@ -1,4 +1,5 @@
 import { getRequest } from '@/utils/app/api';
+
 import TokenTxnsActions from './TokenTxnsActions';
 
 const TokenTransactions = async ({ id, searchParams }: any) => {
@@ -9,11 +10,11 @@ const TokenTransactions = async ({ id, searchParams }: any) => {
 
   return (
     <TokenTxnsActions
+      count={count?.txns?.[0]?.count}
+      cursor={data?.cursor}
+      error={!data || data === null}
       id={id}
       txns={data?.txns}
-      count={count?.txns?.[0]?.count}
-      error={!data || data === null}
-      cursor={data?.cursor}
     />
   );
 };

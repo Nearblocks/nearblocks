@@ -1,10 +1,13 @@
 'use client';
+import classNames from 'classnames';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import Details from './Details';
-import Execution from './Execution';
-import Receipt from './Receipt';
-import ReceiptSummary from './ReceiptSummary';
-import Tree from './Tree';
+
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { usePathname } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
+import { useRpcStore } from '@/stores/app/rpc';
 import {
   calculateGasUsed,
   calculateTotalDeposit,
@@ -12,23 +15,22 @@ import {
   txnFee,
 } from '@/utils/near';
 import { ExecutionOutcomeWithIdView } from '@/utils/types';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { useRpcStore } from '@/stores/app/rpc';
-import { useRouter } from 'next/navigation';
-import { usePathname } from '@/i18n/routing';
-import { Link } from '@/i18n/routing';
-import classNames from 'classnames';
+
 import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
-import useRpc from '@/hooks/app/useRpc';
+import Details from './Details';
+import Execution from './Execution';
+import Receipt from './Receipt';
+import ReceiptSummary from './ReceiptSummary';
+import Tree from './Tree';
 
 export type RpcProvider = {
   name: string;
   url: string;
 };
 
-const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
-  const { transactionStatus, getBlockDetails } = useRpc();
+const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
+  const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
@@ -52,7 +54,7 @@ const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
     return useRpcStore((state) => state);
   };
 
-  const { switchRpc, rpc: rpcUrl } = useRpcStoreWithProviders();
+  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
 
   useEffect(() => {
     if (txn === null || !txn) {
@@ -99,33 +101,33 @@ const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
           }
 
           const modifiedTxns = {
-            transaction_hash: txnExists.transaction_outcome.id,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
-            outcomes: { status: status },
-            block: { block_height: block?.header.height },
-            block_timestamp: block?.header.timestamp_nanosec,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
-            receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
-            receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
             actions_agg: {
               deposit: calculateTotalDeposit(txnExists?.transaction.actions),
               gas_attached: calculateTotalGas(txnExists?.transaction.actions),
             },
+            block: { block_height: block?.header.height },
+            block_timestamp: block?.header.timestamp_nanosec,
+            included_in_block_hash: txnExists.transaction_outcome.block_hash,
+            outcomes: { status: status },
             outcomes_agg: {
-              transaction_fee: txnFee(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
-              ),
               gas_used: calculateGasUsed(
                 (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
                   [],
                 txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
               ),
+              transaction_fee: txnFee(
+                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
+                  [],
+                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
+              ),
             },
+            receipt_conversion_gas_burnt:
+              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
+            receipt_conversion_tokens_burnt:
+              txnExists.transaction_outcome.outcome.tokens_burnt,
+            receiver_account_id: txnExists.transaction.receiver_id,
+            signer_account_id: txnExists.transaction.signer_id,
+            transaction_hash: txnExists.transaction_outcome.id,
           };
           if (txnExists) {
             setRpcTxn(txnExists);
@@ -162,24 +164,24 @@ const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
   }, [txn, rpcUrl]);
 
   const tabs = [
-    { name: 'overview', message: 'txn.tabs.overview', label: 'Overview' },
+    { label: 'Overview', message: 'txn.tabs.overview', name: 'overview' },
     {
-      name: 'execution',
-      message: 'txn.tabs.execution',
       label: 'Execution Plan',
+      message: 'txn.tabs.execution',
+      name: 'execution',
     },
-    { name: 'enhanced', message: 'tokenTxns', label: 'Enhanced Plan' },
-    { name: 'tree', message: 'nftTokenTxns', label: 'Tree Plan' },
-    { name: 'summary', message: 'accessKeys', label: 'Reciept Summary' },
+    { label: 'Enhanced Plan', message: 'tokenTxns', name: 'enhanced' },
+    { label: 'Tree Plan', message: 'nftTokenTxns', name: 'tree' },
+    { label: 'Reciept Summary', message: 'accessKeys', name: 'summary' },
   ];
 
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
 
@@ -200,16 +202,16 @@ const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
           <>
             <div className="md:flex justify-between">
               <div className="w-fit md:flex md:gap-2">
-                {tabs?.map(({ name, label }) => {
+                {tabs?.map(({ label, name }) => {
                   return (
                     <Link
-                      key={name}
+                      className={getClassName(name === tab)}
                       href={
                         name === 'overview'
                           ? `/txns/${hash}`
                           : `/txns/${hash}?tab=${name}`
                       }
-                      className={getClassName(name === tab)}
+                      key={name}
                     >
                       <h2>
                         {label}
@@ -228,41 +230,41 @@ const TxnsTabActions = ({ tab, txn, stats, isContract, price, hash }: any) => {
               <>
                 {tab === 'overview' ? (
                   <Details
-                    txn={txn ? txn : rpcData}
+                    hash={hash}
+                    isContract={isContract}
+                    loading={false}
+                    price={price ? String(price) : ''}
                     rpcTxn={rpcTxn}
                     statsData={stats}
-                    loading={false}
-                    isContract={isContract}
-                    price={price ? String(price) : ''}
-                    hash={hash}
+                    txn={txn ? txn : rpcData}
                   />
                 ) : null}
                 {tab === 'execution' ? (
                   <Receipt
-                    txn={txn ? txn : rpcData}
                     hash={hash}
                     rpcTxn={rpcTxn}
                     statsData={stats}
+                    txn={txn ? txn : rpcData}
                   />
                 ) : null}
                 {tab === 'enhanced' ? (
                   <Execution
-                    txn={txn ? txn : rpcData}
                     hash={hash}
                     rpcTxn={rpcTxn}
+                    txn={txn ? txn : rpcData}
                   />
                 ) : null}
                 {tab === 'tree' ? (
-                  <Tree txn={txn ? txn : rpcData} hash={hash} rpcTxn={rpcTxn} />
+                  <Tree hash={hash} rpcTxn={rpcTxn} txn={txn ? txn : rpcData} />
                 ) : null}
                 {tab === 'summary' ? (
                   <ReceiptSummary
-                    txn={txn ? txn : rpcData}
+                    hash={hash}
                     loading={false}
                     price={price ? String(price) : ''}
-                    hash={hash}
                     rpcTxn={rpcTxn}
                     statsData={stats}
+                    txn={txn ? txn : rpcData}
                   />
                 ) : null}
               </>

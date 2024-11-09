@@ -2,8 +2,8 @@ import FaCheckCircle from '../Icons/FaCheckCircle';
 import FaTimesCircle from '../Icons/FaTimesCircle';
 
 interface Props {
-  status: any;
   showLabel?: boolean;
+  status: any;
 }
 
 const getOptions = (status: boolean) => {
@@ -11,22 +11,22 @@ const getOptions = (status: boolean) => {
     case false:
       return {
         bg: 'bg-red-50 dark:bg-black',
-        text: 'text-red-500',
         icon: FaTimesCircle,
         label: 'Fail',
+        text: 'text-red-500',
       };
     default:
       return {
         bg: 'bg-emerald-50 dark:bg-black',
-        text: 'text-emerald-500',
         icon: FaCheckCircle,
         label: 'Success',
+        text: 'text-emerald-500',
       };
   }
 };
 
 const TxnsReceiptStatus = (props: Props) => {
-  const { status, showLabel } = props;
+  const { showLabel, status } = props;
 
   const option = getOptions(status);
   const Icon = option?.icon;

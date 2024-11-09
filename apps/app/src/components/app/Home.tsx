@@ -1,11 +1,13 @@
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+
 import { getRequest } from '@/utils/app/api';
+
+import Banner from './Banner';
+import LatestBlocks from './Blocks/Latest';
 import Search from './common/Search';
 import SponserdText from './SponserdText';
-import Banner from './Banner';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
-import Overview from './Transactions/Overview';
-import LatestBlocks from './Blocks/Latest';
 import LatestTransactions from './Transactions/Latest';
+import Overview from './Transactions/Overview';
 
 export default async function Home({ locale }: { locale: string }) {
   unstable_setRequestLocale(locale);
@@ -33,22 +35,22 @@ export default async function Home({ locale }: { locale: string }) {
     const res = await getRequest(`search${filter}?keyword=${keyword}`);
 
     const data = {
-      blocks: [],
-      txns: [],
       accounts: [],
+      blocks: [],
       receipts: [],
+      txns: [],
     };
 
     if (res?.blocks?.length) {
       if (returnPath) {
-        return { type: 'block', path: res.blocks[0].block_hash };
+        return { path: res.blocks[0].block_hash, type: 'block' };
       }
       data.blocks = res.blocks;
     }
 
     if (res?.txns?.length) {
       if (returnPath) {
-        return { type: 'txn', path: res.txns[0].transaction_hash };
+        return { path: res.txns[0].transaction_hash, type: 'txn' };
       }
       data.txns = res.txns;
     }
@@ -56,8 +58,8 @@ export default async function Home({ locale }: { locale: string }) {
     if (res?.receipts?.length) {
       if (returnPath) {
         return {
-          type: 'txn',
           path: res.receipts[0].originated_from_transaction_hash,
+          type: 'txn',
         };
       }
       data.receipts = res.receipts;
@@ -65,7 +67,7 @@ export default async function Home({ locale }: { locale: string }) {
 
     if (res?.accounts?.length) {
       if (returnPath) {
-        return { type: 'address', path: res.accounts[0].account_id };
+        return { path: res.accounts[0].account_id, type: 'address' };
       }
       data.accounts = res.accounts;
     }
@@ -96,7 +98,7 @@ export default async function Home({ locale }: { locale: string }) {
         </div>
       </div>
       <div className="relative -mt-14 ">
-        <Overview stats={stats} chartsDetails={charts} error={!stats} />
+        <Overview chartsDetails={charts} error={!stats} stats={stats} />
       </div>
       <div className="py-8">
         <div className="lg:!hidden block container mx-auto px-3">
@@ -122,7 +124,7 @@ export default async function Home({ locale }: { locale: string }) {
                   {t('homePage.latestTxns')}
                 </h2>
                 <div className="relative">
-                  <LatestTransactions txns={txns} error={!txns} />
+                  <LatestTransactions error={!txns} txns={txns} />
                 </div>
               </div>
             </div>

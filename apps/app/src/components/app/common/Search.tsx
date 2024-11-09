@@ -1,32 +1,33 @@
 'use client';
-import Link from 'next/link';
-import debounce from 'lodash/debounce';
-import { toast } from 'react-toastify';
-import React, { useEffect, useState, useCallback } from 'react';
 import {
   Combobox,
-  ComboboxList,
   ComboboxInput,
+  ComboboxList,
   ComboboxOption,
   ComboboxPopover,
 } from '@reach/combobox';
-
-import ArrowDown from '../Icons/ArrowDown';
-import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
-import SearchIcon from '../Icons/SearchIcon';
+import debounce from 'lodash/debounce';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { routing } from '@/i18n/routing';
-import { useConfig } from '@/hooks/app/useConfig';
-import { NetworkId } from '@/utils/types';
 // @ts-ignore
 import { useRouter } from 'nextjs-toploader/app';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
+import { useConfig } from '@/hooks/app/useConfig';
+import { routing } from '@/i18n/routing';
+import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
+import { NetworkId } from '@/utils/types';
+
+import ArrowDown from '../Icons/ArrowDown';
+import SearchIcon from '../Icons/SearchIcon';
 
 export const SearchToast = ({ networkId }: any) => {
   if (networkId === 'testnet') {
     return (
       <div>
         No results. Try on{' '}
-        <Link legacyBehavior href="https://nearblocks.io">
+        <Link href="https://nearblocks.io" legacyBehavior>
           <a className="text-green-500">Mainnet</a>
         </Link>
       </div>
@@ -36,7 +37,7 @@ export const SearchToast = ({ networkId }: any) => {
   return (
     <div>
       No results. Try on{' '}
-      <Link legacyBehavior href="https://testnet.nearblocks.io">
+      <Link href="https://testnet.nearblocks.io" legacyBehavior>
         <a className="text-green-500">Testnet</a>
       </Link>
     </div>
@@ -49,13 +50,13 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({ header = false, handleFilterAndKeyword }: any) => {
+const Search = ({ handleFilterAndKeyword, header = false }: any) => {
   const router = useRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
-  const isLocale = (value: string | null): any => {
+  const isLocale = (value: null | string): any => {
     return routing?.locales?.includes(value as any);
   };
 
@@ -138,8 +139,8 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
               ? 'bg-gray-100 dark:bg-black-500 dark:text-neargray-10'
               : 'bg-blue-900/[0.05] dark:bg-black dark:text-neargray-10'
           }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border dark:border-black-200 dark:text-neargray-10`}
-          value={filter}
           onChange={onFilter}
+          value={filter}
         >
           <option value="">{t('search.filters.all') || 'All Filters'}</option>
           <option value="/txns">{t('search.filters.txns') || 'Txns'}</option>
@@ -155,11 +156,11 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
 
       <Combobox className="flex-grow">
         <ComboboxInput
+          className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+          onChange={handleChange}
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }
-          className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
-          onChange={handleChange}
         />
         {showResults && (
           <ComboboxPopover className="z-50 dark:bg-black-600">
@@ -171,12 +172,12 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
                   </h3>
                   {result?.accounts?.map((address: any) => (
                     <ComboboxOption
-                      value={address.account_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
                       key={address.account_id}
                       onClick={() =>
-                        onSelect({ type: 'address', path: address.account_id })
+                        onSelect({ path: address.account_id, type: 'address' })
                       }
+                      value={address.account_id}
                     >
                       {shortenAddress(address.account_id)}
                     </ComboboxOption>
@@ -190,12 +191,12 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
                   </h3>
                   {result.txns.map((txn: any) => (
                     <ComboboxOption
-                      value={txn.transaction_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={txn.transaction_hash}
                       onClick={() =>
-                        onSelect({ type: 'txn', path: txn.transaction_hash })
+                        onSelect({ path: txn.transaction_hash, type: 'txn' })
                       }
+                      value={txn.transaction_hash}
                     >
                       {shortenHex(txn.transaction_hash)}
                     </ComboboxOption>
@@ -209,15 +210,15 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
                   </h3>
                   {result.receipts.map((receipt: any) => (
                     <ComboboxOption
-                      value={receipt.receipt_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={receipt.receipt_id}
                       onClick={() =>
                         onSelect({
-                          type: 'receipt',
                           path: receipt.originated_from_transaction_hash,
+                          type: 'receipt',
                         })
                       }
+                      value={receipt.receipt_id}
                     >
                       {shortenHex(receipt.receipt_id)}
                     </ComboboxOption>
@@ -231,12 +232,12 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
                   </h3>
                   {result.blocks.map((block: any) => (
                     <ComboboxOption
-                      value={block.block_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={block.block_hash}
                       onClick={() =>
-                        onSelect({ type: 'block', path: block.block_hash })
+                        onSelect({ path: block.block_hash, type: 'block' })
                       }
+                      value={block.block_hash}
                     >
                       #{localFormat(block.block_height)} (0x
                       {shortenHex(block.block_hash)})
@@ -249,12 +250,12 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
         )}
       </Combobox>
       <button
-        type="submit"
         className={`${
           homeSearch
             ? 'bg-gray-100 dark:bg-black-500'
             : 'bg-blue-900/[0.05] dark:bg-black-600'
         } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
+        type="submit"
       >
         <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
       </button>

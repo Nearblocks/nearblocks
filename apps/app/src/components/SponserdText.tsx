@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { env } from 'next-runtime-env';
+import React, { useEffect, useState } from 'react';
 
 const userApiUrl = env('NEXT_PUBLIC_USER_API_URL');
 const SponserdText: React.FC<any> = () => {

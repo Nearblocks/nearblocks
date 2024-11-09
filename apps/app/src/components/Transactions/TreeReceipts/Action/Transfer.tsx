@@ -1,12 +1,14 @@
+import { useTranslations } from 'next-intl';
+
 import FaArrowAltCircleRight from '@/components/Icons/FaArrowAltCircleRight';
+import { Link } from '@/i18n/routing';
 import { shortenAddress, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
 import TreeNode from '../TreeNode';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 const Transfer = (props: TransactionActionInfo) => {
-  const { args, receiver, action } = props;
+  const { action, args, receiver } = props;
   const t = useTranslations();
   return (
     <>
@@ -21,8 +23,8 @@ const Transfer = (props: TransactionActionInfo) => {
         </span>{' '}
         {t ? t('txn.actions.transfer.1') : 'to'}
         <Link
-          href={`/address/${receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+          href={`/address/${receiver}`}
         >
           {shortenAddress(receiver)}
         </Link>

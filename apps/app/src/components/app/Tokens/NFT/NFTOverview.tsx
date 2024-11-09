@@ -1,5 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
+
 import NFTOverviewActions from './NFTOverviewActions';
 // import TokenFilter from './TokenFilter';
 
@@ -23,11 +24,11 @@ const NFTOverview = async ({ id }: any) => {
   return (
     <>
       <NFTOverviewActions
-        id={id}
-        token={token}
-        status={status}
-        transfers={transfers}
         holders={holders}
+        id={id}
+        status={status}
+        token={token}
+        transfers={transfers}
       />
       <div className="py-6"></div>
     </>

@@ -1,6 +1,7 @@
-import { stripEmpty } from '@/utils/libs';
 import queryString from 'qs';
-import { useMemo, useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
+import { stripEmpty } from '@/utils/libs';
 
 type Filters = Record<string, any>;
 
@@ -10,7 +11,7 @@ const useFilters = (initial?: Filters) => {
   const qs = useMemo(() => queryString.stringify(filters), [filters]);
 
   const setFilters = useCallback(
-    (key: keyof Filters | ((s: Filters) => Filters), value?: any) => {
+    (key: ((s: Filters) => Filters) | keyof Filters, value?: any) => {
       if (typeof key === 'function') {
         return setState((s) => stripEmpty(key(s)));
       }
@@ -20,7 +21,7 @@ const useFilters = (initial?: Filters) => {
     [],
   );
 
-  return { qs, filters, setFilters };
+  return { filters, qs, setFilters };
 };
 
 export default useFilters;

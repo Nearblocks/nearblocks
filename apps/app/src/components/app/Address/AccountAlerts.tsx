@@ -1,16 +1,18 @@
 'use client';
-import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
-import { useEffect, useState, useCallback } from 'react';
-import WarningIcon from '../Icons/WarningIcon';
-import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
+import { useCallback, useEffect, useState } from 'react';
+
 import useRpc from '@/hooks/app/useRpc';
+import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
+import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
+
+import WarningIcon from '../Icons/WarningIcon';
 
 export default function AccountAlerts({
-  id,
   accountData,
+  id,
 }: {
-  id: string;
   accountData: any;
+  id: string;
 }) {
   const { contractCode, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);

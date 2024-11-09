@@ -1,8 +1,10 @@
+export const runtime = 'edge';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { getRequest, postRequest } from '@/utils/app/api';
 import ApiActions from '@/components/app/Apis/ApiActions';
+import { getRequest, postRequest } from '@/utils/app/api';
 
 const userApiURL = process.env.NEXT_PUBLIC_USER_API_URL;
 export default async function ApisPage({
@@ -21,9 +23,9 @@ export default async function ApisPage({
     <section>
       <ToastContainer />
       <ApiActions
-        status={status}
-        planDetails={plans}
         getContactDetails={getContactDetails}
+        planDetails={plans}
+        status={status}
       />
     </section>
   );

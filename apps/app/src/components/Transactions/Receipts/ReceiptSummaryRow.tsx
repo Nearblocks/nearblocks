@@ -1,4 +1,10 @@
+import { Tooltip } from '@reach/tooltip';
+import Big from 'big.js';
+import { Fragment } from 'react';
+
+import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
+import { Link } from '@/i18n/routing';
 import { networkId } from '@/utils/config';
 import { convertToMetricPrefix, fiatValue, yoctoToNear } from '@/utils/libs';
 import {
@@ -7,25 +13,20 @@ import {
   ReceiptsPropsInfo,
   TransactionInfo,
 } from '@/utils/types';
-import Big from 'big.js';
-import { Fragment } from 'react';
-import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
-import { Tooltip } from '@reach/tooltip';
-import { Link } from '@/i18n/routing';
 
 interface Props {
-  txn: TransactionInfo;
-  receipt: ReceiptsPropsInfo | any;
   borderFlag?: boolean;
+  receipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
     }>;
   };
+  txn: TransactionInfo;
 }
 
 const ReceiptSummaryRow = (props: Props) => {
-  const { receipt, txn, statsData } = props;
+  const { receipt, statsData, txn } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -76,8 +77,8 @@ const ReceiptSummaryRow = (props: Props) => {
             </td>
             <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <Tooltip
-                label={receipt?.id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={receipt?.id}
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
@@ -98,8 +99,8 @@ const ReceiptSummaryRow = (props: Props) => {
               {receipt?.predecessor_id ? (
                 <div className="word-break">
                   <Link
-                    href={`/address/${receipt?.predecessor_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px]"
+                    href={`/address/${receipt?.predecessor_id}`}
                   >
                     {receipt?.predecessor_id}
                   </Link>
@@ -118,8 +119,8 @@ const ReceiptSummaryRow = (props: Props) => {
               {receipt?.receiver_id ? (
                 <div className="word-break">
                   <Link
-                    href={`/address/${receipt?.receiver_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px]"
+                    href={`/address/${receipt?.receiver_id}`}
                   >
                     {receipt?.receiver_id}
                   </Link>
@@ -154,10 +155,10 @@ const ReceiptSummaryRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <Fragment key={rcpt?.receipt_id}>
               <ReceiptSummaryRow
-                receipt={rcpt}
                 borderFlag={true}
-                txn={txn}
+                receipt={rcpt}
                 statsData={statsData}
+                txn={txn}
               />
             </Fragment>
           ))}

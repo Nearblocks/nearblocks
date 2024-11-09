@@ -1,11 +1,13 @@
-import FaKey from '@/components/Icons/FaKey';
-import TreeNode from '../TreeNode';
-import { TransactionActionInfo } from '@/utils/types';
-import { shortenHex } from '@/utils/libs';
 import { useTranslations } from 'next-intl';
 
+import FaKey from '@/components/Icons/FaKey';
+import { shortenHex } from '@/utils/libs';
+import { TransactionActionInfo } from '@/utils/types';
+
+import TreeNode from '../TreeNode';
+
 const DeleteKey = (props: TransactionActionInfo) => {
-  const { args, action } = props;
+  const { action, args } = props;
   const t = useTranslations();
 
   return (

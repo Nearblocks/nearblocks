@@ -1,8 +1,11 @@
+export const runtime = 'edge';
+
+import { Metadata } from 'next';
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+
 import ThemeImage from '@/components/app/Advertise/ThemeImage';
 import { Link } from '@/i18n/routing';
 import { appUrl } from '@/utils/app/config';
-import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
 export async function generateMetadata({
   params: { locale },
@@ -22,23 +25,23 @@ export async function generateMetadata({
   )}`;
 
   return {
-    title: title,
-    description: description,
-    openGraph: {
-      title: title,
-      description: description,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: title,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/advertise`,
     },
+    description: description,
+    openGraph: {
+      description: description,
+      images: [
+        {
+          alt: title,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: title,
+    },
+    title: title,
   };
 }
 
@@ -72,8 +75,8 @@ export default async function Advertise({
             )}
           </h3>
           <Link
-            href="https://dash.nearblocks.io/login"
             className="text-base lg:!text-lg text-white font-normal px-4 py-2 bg-green-500 hover:bg-green-400  border border-green-900/10 rounded mt-6"
+            href="https://dash.nearblocks.io/login"
           >
             {t('Get started now')}
           </Link>
@@ -143,9 +146,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Graphical')}</span>
@@ -154,9 +157,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Eyeball Catching')}</span>
@@ -165,9 +168,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Brand Awareness')}</span>
@@ -178,9 +181,9 @@ export default async function Advertise({
               {
                 // eslint-disable-next-line
                 <img
-                  src="/images/banner-ads-near.svg"
                   alt="NearBlocks"
                   className="w-full"
+                  src="/images/banner-ads-near.svg"
                   width="100%"
                 />
               }
@@ -202,9 +205,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Clear Message')}</span>
@@ -213,9 +216,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Non-Intrusive')}</span>
@@ -224,9 +227,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('High Coverage')}</span>
@@ -237,9 +240,9 @@ export default async function Advertise({
               {
                 // eslint-disable-next-line
                 <img
-                  src="/images/text-ads-near.svg"
                   alt="NearBlocks"
                   className="w-full"
+                  src="/images/text-ads-near.svg"
                   width="100%"
                 />
               }
@@ -260,9 +263,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Clear Message')}</span>
@@ -271,9 +274,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('Non-Intrusive')}</span>
@@ -282,9 +285,9 @@ export default async function Advertise({
                   {
                     // eslint-disable-next-line
                     <img
-                      src="/images/icon-check.svg"
                       alt="NearBlocks"
                       className="lg:!w-5.5 w-4.5"
+                      src="/images/icon-check.svg"
                     />
                   }
                   <span className="ml-2">{t('High Coverage')}</span>
@@ -295,9 +298,9 @@ export default async function Advertise({
               {
                 // eslint-disable-next-line
                 <img
-                  src="/images/search-ads-near.svg"
                   alt="NearBlocks"
                   className="w-full"
+                  src="/images/search-ads-near.svg"
                   width="100%"
                 />
               }

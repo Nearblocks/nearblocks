@@ -1,6 +1,8 @@
 import QueryString from 'qs';
-import NFTTransfersActions from './NFTTransfersActions';
+
 import { getRequest } from '@/utils/app/api';
+
+import NFTTransfersActions from './NFTTransfersActions';
 
 const TransfersList = async ({ searchParams }: any) => {
   const apiUrl = 'nfts/txns';
@@ -22,9 +24,9 @@ const TransfersList = async ({ searchParams }: any) => {
   return (
     <NFTTransfersActions
       data={data}
-      totalCount={dataCount}
       error={!data}
       status={status}
+      totalCount={dataCount}
     />
   );
 };

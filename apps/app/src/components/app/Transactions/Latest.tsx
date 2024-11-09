@@ -1,9 +1,11 @@
 'use client';
+import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
 import React from 'react';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Skeleton from '../skeleton/common/Skeleton';
-import { TransactionInfo } from '@/utils/types';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
+import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
   nanoToMilli,
@@ -11,16 +13,16 @@ import {
   shortenHex,
   yoctoToNear,
 } from '@/utils/libs';
-import { Tooltip } from '@reach/tooltip';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { TransactionInfo } from '@/utils/types';
+
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
-  txns: TransactionInfo[];
   error: boolean;
+  txns: TransactionInfo[];
 }
 
-const LatestTransactions = ({ txns, error }: Props) => {
+const LatestTransactions = ({ error, txns }: Props) => {
   const t = useTranslations();
 
   return (
@@ -95,8 +97,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
                       <div className="overflow-hidden pl-2">
                         <div className="text-green-500 dark:text-green-250 text-sm">
                           <Link
-                            href={`/txns/${txn?.transaction_hash}`}
                             className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                            href={`/txns/${txn?.transaction_hash}`}
                           >
                             {shortenHex(txn?.transaction_hash ?? '')}
                           </Link>
@@ -117,8 +119,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnFrom') : 'From'}{' '}
                         <Link
-                          href={`/address/${txn?.signer_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                          href={`/address/${txn?.signer_account_id}`}
                         >
                           {shortenAddress(txn?.signer_account_id ?? '')}
                         </Link>
@@ -126,8 +128,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnTo') : 'To'}{' '}
                         <Link
-                          href={`/address/${txn?.receiver_account_id}`}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                          href={`/address/${txn?.receiver_account_id}`}
                         >
                           {shortenAddress(txn?.receiver_account_id ?? '')}
                         </Link>
@@ -135,8 +137,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">
                       <Tooltip
-                        label={'Deposit value'}
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                        label={'Deposit value'}
                       >
                         <span className="u-label--badge-in  text-nearblue-700 truncate">
                           {txn?.actions_agg?.deposit
@@ -161,8 +163,8 @@ const LatestTransactions = ({ txns, error }: Props) => {
       {txns && txns?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
           <Link
-            href="/txns"
             className="block text-center dark:text-white  border border-green-900/10 font-thin dark:font-normal bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-xs dark:text-sm py-3 rounded w-full focus:outline-none hover:no-underline"
+            href="/txns"
           >
             View all transactions
           </Link>

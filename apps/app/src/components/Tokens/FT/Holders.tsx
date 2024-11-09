@@ -1,5 +1,11 @@
 import { Tooltip } from '@reach/tooltip';
-import { HoldersPropsInfo, Token } from '../../../utils/types';
+import { useRouter } from 'next/router';
+
+import ErrorMessage from '@/components/common/ErrorMessage';
+import Table from '@/components/common/Table';
+import FaInbox from '@/components/Icons/FaInbox';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
   localFormat,
@@ -8,56 +14,50 @@ import {
   tokenAmount,
 } from '@/utils/libs';
 import { price, tokenPercentage } from '@/utils/near';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useRouter } from 'next/router';
-import Table from '@/components/common/Table';
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
-import { Link } from '@/i18n/routing';
+
+import { HoldersPropsInfo, Token } from '../../../utils/types';
 
 interface Props {
-  token: Token;
+  count: number;
+  error: boolean;
+  holder: HoldersPropsInfo[];
   status: {
     height: string;
     sync: true;
     timestamp: '';
   };
-  holder: HoldersPropsInfo[];
-  count: number;
-  error: boolean;
   tab: string;
+  token: Token;
 }
 
-const Holders = ({ token, status, holder, count, error, tab }: Props) => {
+const Holders = ({ count, error, holder, status, tab, token }: Props) => {
   const errorMessage = 'No token holders found!';
   const router = useRouter();
   const currentPage = Number(router.query.page) || 1;
 
   const columns: any = [
     {
-      header: 'Rank',
-      key: '',
       cell: (_row: HoldersPropsInfo, index: number) => (
         <span>{serialNumber(index, currentPage, 25)}</span>
       ),
+      header: 'Rank',
+      key: '',
       tdClassName:
         'pl-4 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-[50px]',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[50]',
     },
     {
-      header: 'Address',
-      key: 'account',
       cell: (row: HoldersPropsInfo) => (
         <span>
           <Tooltip
-            label={row.account}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+            label={row.account}
           >
             <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
               <Link
-                href={`/address/${row.account}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-undeline"
+                href={`/address/${row.account}`}
               >
                 {row.account}
               </Link>
@@ -65,13 +65,13 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
           </Tooltip>
         </span>
       ),
+      header: 'Address',
+      key: 'account',
       tdClassName: 'px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: 'Quantity',
-      key: '',
       cell: (row: HoldersPropsInfo) => (
         <>
           {row.amount && token?.decimals
@@ -79,14 +79,14 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
             : ''}
         </>
       ),
+      header: 'Quantity',
+      key: '',
       tdClassName:
         'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: 'Percentage',
-      key: 'total_supply',
       cell: (row: HoldersPropsInfo) => {
         const percentage = token?.total_supply
           ? tokenPercentage(token?.total_supply, row.amount, token?.decimals)
@@ -103,22 +103,22 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
               Number(percentage) >= 0 && (
                 <div className="h-0.5 mt-1 w-full bg-gray-100">
                   <div
-                    style={{ width: `${percentage}%` }}
                     className="h-0.5 bg-green-500 dark:bg-green-250"
+                    style={{ width: `${percentage}%` }}
                   />
                 </div>
               )}
           </>
         );
       },
+      header: 'Percentage',
+      key: 'total_supply',
       tdClassName:
         'px-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: 'Value',
-      key: 'tokens',
       cell: (row: HoldersPropsInfo) => {
         return (
           <span>
@@ -128,6 +128,8 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
           </span>
         );
       },
+      header: 'Value',
+      key: 'tokens',
       tdClassName:
         'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -174,12 +176,8 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
           )}
           <Table
             columns={columns}
-            data={holder}
-            isPagination={true}
             count={count}
-            page={currentPage}
-            limit={25}
-            pageLimit={200}
+            data={holder}
             Error={error}
             ErrorText={
               <ErrorMessage
@@ -188,6 +186,10 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
                 mutedText="Please try again later"
               />
             }
+            isPagination={true}
+            limit={25}
+            page={currentPage}
+            pageLimit={200}
           />
         </>
       ) : (

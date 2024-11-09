@@ -1,13 +1,16 @@
+export const runtime = 'edge';
+
 import { ImageResponse } from 'next/og';
 import { format } from 'numerable';
-import { config } from '@/config/brandConfig';
-import { thumbnailBasicSvg } from '@/components/thumbnail/ThumbnailBasic';
+
 import { thumbnailAccountSvg } from '@/components/thumbnail/ThumbnailAccount';
+import { thumbnailBasicSvg } from '@/components/thumbnail/ThumbnailBasic';
+import { thumbnailBlockSvg } from '@/components/thumbnail/ThumbnailBlock';
+import { thumbnailLogoBottom } from '@/components/thumbnail/ThumbnailLogoBottom';
+import { thumbnailLogoTop } from '@/components/thumbnail/ThumbnailLogoTop';
 import { thumbnailTokenSvg } from '@/components/thumbnail/ThumbnailToken';
 import { thumbnailTransactionSvg } from '@/components/thumbnail/ThumbnailTransaction';
-import { thumbnailBlockSvg } from '../../../components/thumbnail/ThumbnailBlock';
-import path from 'path';
-import { readFileSync } from 'fs';
+import { config } from '@/config/brandConfig';
 
 function truncateString(str: string, startChars = 6, endChars = 4) {
   if (str.length <= startChars + endChars) return str;
@@ -18,12 +21,6 @@ function svgToBase64(svgString: string) {
   return `data:image/svg+xml;base64,${Buffer.from(svgString).toString(
     'base64',
   )}`;
-}
-
-function imageToBase64(filePath: string) {
-  return `data:image/svg+xml;base64,${Buffer.from(
-    readFileSync(filePath),
-  ).toString('base64')}`;
 }
 
 export async function GET(request: Request) {
@@ -69,12 +66,9 @@ export async function GET(request: Request) {
 
   const backgroundImage = svgToBase64(svgString);
 
-  const topLogoPath = path.resolve(process.cwd(), brandConfig.topLogo);
-  const bottomLogoPath = path.resolve(process.cwd(), brandConfig.bottomLogo);
-  const topLogo = brandConfig.topLogo ? imageToBase64(topLogoPath) : null;
-  const bottomLogo = brandConfig.bottomLogo
-    ? imageToBase64(bottomLogoPath)
-    : null;
+
+  const topLogo = svgToBase64(thumbnailLogoTop());
+  const bottomLogo = svgToBase64(thumbnailLogoBottom());
 
   let titleText = title;
   if (blockHash) {
@@ -99,16 +93,16 @@ export async function GET(request: Request) {
     (
       <div
         style={{
-          display: 'flex',
-          color: 'white',
+          alignItems: 'center',
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
-          width: '100%',
+          color: 'white',
+          display: 'flex',
           height: '100%',
-          textAlign: 'center',
           justifyContent: 'center',
-          alignItems: 'center',
           position: 'relative',
+          textAlign: 'center',
+          width: '100%',
         }}
       >
         {!home && topLogo && (
@@ -116,11 +110,11 @@ export async function GET(request: Request) {
           <img
             src={topLogo}
             style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
               height: '50px',
               margin: '10px',
+              position: 'absolute',
+              right: 0,
+              top: 0,
             }}
           />
         )}
@@ -129,11 +123,11 @@ export async function GET(request: Request) {
           <img
             src={bottomLogo}
             style={{
-              position: 'absolute',
-              left: '50%',
               bottom: '50%',
-              transform: 'translate(-50%, 50%)',
               height: '110px',
+              left: '50%',
+              position: 'absolute',
+              transform: 'translate(-50%, 50%)',
             }}
           />
         )}
@@ -142,11 +136,11 @@ export async function GET(request: Request) {
           <img
             src={bottomLogo}
             style={{
-              position: 'absolute',
               bottom: 0,
-              left: 0,
               height: '50px',
+              left: 0,
               margin: '10px',
+              position: 'absolute',
             }}
           />
         )}
@@ -154,15 +148,15 @@ export async function GET(request: Request) {
         {!home && (
           <div
             style={{
-              position: 'relative',
-              zIndex: 1,
+              alignItems: basic || home ? 'center' : 'flex-start',
               display: 'flex',
               flexDirection: 'column',
-              alignItems: basic || home ? 'center' : 'flex-start',
-              textAlign: basic || home ? 'center' : 'left',
               fontSize: basic || home ? 40 : 25,
-              top: basic || home ? '' : 50,
+              position: 'relative',
               right: basic || home ? '' : '150px',
+              textAlign: basic || home ? 'center' : 'left',
+              top: basic || home ? '' : 50,
+              zIndex: 1,
             }}
           >
             <div>{titleText}</div>
@@ -170,9 +164,9 @@ export async function GET(request: Request) {
             {blockHash && blockHeight && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 700,
                   fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
                 }}
               >
                 {format(blockHeight, '0,0.#####')}
@@ -182,9 +176,9 @@ export async function GET(request: Request) {
             {transaction && transactionHash && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 700,
                   fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
                 }}
               >
                 {truncateString(transactionHash)}
@@ -194,9 +188,9 @@ export async function GET(request: Request) {
             {transaction && blobHash && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 700,
                   fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
                 }}
               >
                 {truncateString(blobHash)}
@@ -206,9 +200,9 @@ export async function GET(request: Request) {
             {account && addressHash && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 700,
                   fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
                 }}
               >
                 {truncateString(addressHash)}
@@ -218,9 +212,9 @@ export async function GET(request: Request) {
             {token && tokenHash && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 700,
                   fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
                 }}
               >
                 {truncateString(tokenHash)}
@@ -230,9 +224,9 @@ export async function GET(request: Request) {
             {nft && nftHash && (
               <div
                 style={{
-                  marginTop: '10px',
-                  fontWeight: 900,
                   fontSize: 40,
+                  fontWeight: 900,
+                  marginTop: '10px',
                 }}
               >
                 {truncateString(nftHash)}
@@ -243,8 +237,8 @@ export async function GET(request: Request) {
       </div>
     ),
     {
-      width: 720,
       height: 405,
+      width: 720,
     },
   );
 }

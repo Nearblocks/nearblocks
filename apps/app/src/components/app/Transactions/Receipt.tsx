@@ -1,16 +1,16 @@
 'use client';
+import { isEmpty } from 'lodash';
+import { useEffect, useState } from 'react';
+
 import { mapRpcActionToAction } from '@/utils/near';
 import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
-import { useEffect, useState } from 'react';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import ReceiptRow from './Receipts/ReceiptRow';
-import { isEmpty } from 'lodash';
 
 import ErrorMessage from '../common/ErrorMessage';
+import FaHourglassStart from '../Icons/FaHourglassStart';
 import FileSlash from '../Icons/FileSlash';
+import ReceiptRow from './Receipts/ReceiptRow';
 
 interface Props {
-  txn: TransactionInfo;
   hash: string;
   rpcTxn: RPCTransactionInfo;
   statsData: {
@@ -18,10 +18,11 @@ interface Props {
       near_price: string;
     }>;
   };
+  txn: TransactionInfo;
 }
 
 const Receipt = (props: Props) => {
-  const { txn, hash, rpcTxn, statsData } = props;
+  const { hash, rpcTxn, statsData, txn } = props;
 
   const [receipt, setReceipt] = useState(null);
 

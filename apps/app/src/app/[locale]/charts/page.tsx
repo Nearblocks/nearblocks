@@ -1,7 +1,10 @@
-import Chart from '@/components/app/Charts/Chart';
-import ChartSkeletion from '@/components/app/skeleton/charts/Index';
+export const runtime = 'edge';
+
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
+
+import Chart from '@/components/app/Charts/Chart';
+import ChartSkeletion from '@/components/app/skeleton/charts/Index';
 
 export default async function ChartIndex({
   params: { locale },

@@ -1,20 +1,23 @@
-import { formatWithCommas, yoctoToNear } from '@/utils/libs';
-import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
-import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
-import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from '@reach/tooltip';
-import useRpc from '@/hooks/useRpc';
+import { debounce } from 'lodash';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useTheme } from 'next-themes';
-import { networkId } from '@/utils/config';
-import { debounce } from 'lodash';
-import Skeleton from '../skeleton/common/Skeleton';
-import Table from '../common/Table';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import { useRpcStore } from '@/stores/rpc';
+import { useEffect, useRef, useState } from 'react';
+
+import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
+
+import useRpc from '@/hooks/useRpc';
 import { Link } from '@/i18n/routing';
+import { useRpcStore } from '@/stores/rpc';
+import { networkId } from '@/utils/config';
+import { formatWithCommas, yoctoToNear } from '@/utils/libs';
+import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
+import Table from '../common/Table';
+import FaInbox from '../Icons/FaInbox';
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
   accountId: string;
@@ -24,10 +27,10 @@ const Delegators = ({ accountId }: Props) => {
   const {
     getAccount,
     getAccounts,
-    getNumberOfAccounts,
-    getValidators,
-    getRewardFeeFraction,
     getFieldsByPool,
+    getNumberOfAccounts,
+    getRewardFeeFraction,
+    getValidators,
   } = useRpc();
   const router = useRouter();
   const { page } = router.query;
@@ -53,31 +56,31 @@ const Delegators = ({ accountId }: Props) => {
     switch (status) {
       case 'Active':
         return {
-          textColor: 'text-emerald-500',
           bgColor:
             'bg-emerald-50 dark:dark:bg-emerald-500/[0.25] text-emerald-500 ',
+          textColor: 'text-emerald-500',
         };
       case 'Joining':
         return {
-          textColor: 'text-yellow-500',
           bgColor: 'bg-yellow-50 dark:bg-yellow-500/[0.25]  text-yellow-500',
+          textColor: 'text-yellow-500',
         };
       case 'Kickout':
         return {
-          textColor: 'text-red-500',
           bgColor: 'bg-red-50 text-red-500 dark:bg-red-500/[0.25]',
+          textColor: 'text-red-500',
         };
       case 'Proposal':
         return {
-          textColor: 'text-teal-900',
           bgColor:
             'bg-teal-300 dark:bg-teal-500/[0.25] dark:text-teal-500 text-teal-900',
+          textColor: 'text-teal-900',
         };
       case 'idle':
         return {
-          textColor: 'text-gray-600',
           bgColor:
             'bg-gray-300 text-gray-600 dark:bg-gray-500/[0.25] dark:text-gray-400',
+          textColor: 'text-gray-600',
         };
       default:
         return {};
@@ -87,18 +90,18 @@ const Delegators = ({ accountId }: Props) => {
   const getUptimeColorClass = (uptime: number) => {
     if (uptime >= 90) {
       return {
-        textColor: 'text-emerald-500',
         bgColor: 'bg-emerald-50 dark:bg-emerald-500/[0.25] text-emerald-500',
+        textColor: 'text-emerald-500',
       };
     } else if (uptime >= 80) {
       return {
-        textColor: 'text-yellow-500',
         bgColor: 'bg-yellow-50 dark:bg-yellow-500/[0.25] text-yellow-500',
+        textColor: 'text-yellow-500',
       };
     } else {
       return {
-        textColor: 'text-red-500',
         bgColor: 'bg-red-50 text-red-500 dark:bg-red-500/[0.25]',
+        textColor: 'text-red-500',
       };
     }
   };
@@ -182,9 +185,9 @@ const Delegators = ({ accountId }: Props) => {
         (item) => item.account_id === poolId,
       );
       let stat = getStatus({
+        afterNextEpoch,
         currentEpoch,
         nextEpoch,
-        afterNextEpoch,
       });
       setStatus(stat);
       let validator = [...result?.current_validators];
@@ -227,31 +230,29 @@ const Delegators = ({ accountId }: Props) => {
 
   const columns = [
     {
-      header: <span>ACCOUNT</span>,
-      key: 'accountId',
       cell: (row: DelegatorInfo) => (
         <>
           <Tooltip
-            label={row?.account_id}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.account_id}
           >
             <Link
-              href={`/address/${row?.account_id}`}
               className="text-green-500 dark:text-green-250 hover:no-underline"
+              href={`/address/${row?.account_id}`}
             >
               {row?.account_id}
             </Link>
           </Tooltip>
         </>
       ),
+      header: <span>ACCOUNT</span>,
+      key: 'accountId',
       tdClassName:
         'pl-7 py-2 w-[36rem] text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'pl-7 py-2 w-[36rem] text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>STAKED BALANCE</span>,
-      key: 'staked_balance',
       cell: (row: DelegatorInfo) => (
         <span>
           {formatWithCommas(
@@ -259,14 +260,14 @@ const Delegators = ({ accountId }: Props) => {
           ) + '  Ⓝ'}
         </span>
       ),
+      header: <span>STAKED BALANCE</span>,
+      key: 'staked_balance',
       tdClassName:
         'px-3 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-36',
       thClassName:
         'px-3 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap w-36',
     },
     {
-      header: <span>UNSTAKED BALANCE</span>,
-      key: 'unstaked_balance',
       cell: (row: DelegatorInfo) => (
         <span>
           {formatWithCommas(
@@ -274,6 +275,8 @@ const Delegators = ({ accountId }: Props) => {
           ) + '  Ⓝ'}
         </span>
       ),
+      header: <span>UNSTAKED BALANCE</span>,
+      key: 'unstaked_balance',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-40',
       thClassName:
@@ -349,15 +352,15 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Web"
                                       className="w-5 h-5"
+                                      height={16}
                                       src={
                                         theme === 'dark'
                                           ? '/images/web_icon_black.svg'
                                           : '/images/web_icon.svg'
                                       }
-                                      alt="Web"
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -369,15 +372,15 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Email"
                                       className="w-5 h-5"
+                                      height={16}
                                       src={
                                         theme === 'dark'
                                           ? '/images/email_icon_black.svg'
                                           : '/images/email_icon.svg'
                                       }
-                                      alt="Email"
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -394,16 +397,16 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Twitter"
                                       className="w-5 h-5"
+                                      height={16}
+                                      priority
                                       src={
                                         theme === 'dark'
                                           ? '/images/twitter_icon_black.svg'
                                           : '/images/twitter_icon.svg'
                                       }
-                                      alt="Twitter"
-                                      priority
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -420,15 +423,15 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Discord"
                                       className="w-5 h-5"
+                                      height={16}
                                       src={
                                         theme === 'dark'
                                           ? '/images/discord_icon_black.svg'
                                           : '/images/discord_icon.svg'
                                       }
-                                      alt="Discord"
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -445,16 +448,16 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Github"
                                       className="w-5 h-5"
+                                      height={16}
+                                      priority
                                       src={
                                         theme === 'dark'
                                           ? '/images/github_icon_black.svg'
                                           : '/images/github_icon.svg'
                                       }
-                                      alt="Github"
-                                      priority
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -476,15 +479,15 @@ const Delegators = ({ accountId }: Props) => {
                                     target="_blank"
                                   >
                                     <Image
-                                      width={16}
-                                      height={16}
+                                      alt="Telegram"
                                       className="w-5 h-5"
+                                      height={16}
                                       src={
                                         theme === 'dark'
                                           ? '/images/telegram_black.svg'
                                           : '/images/telegram.svg'
                                       }
-                                      alt="Telegram"
+                                      width={16}
                                     />
                                   </a>
                                 )}
@@ -608,11 +611,11 @@ const Delegators = ({ accountId }: Props) => {
                     <div className="flex-grow">
                       <label htmlFor="token-search" id="token-search">
                         <input
-                          name="search"
                           autoComplete="off"
-                          placeholder="Search"
                           className="search ml-2 pl-8 token-search bg-white dark:bg-black-600 dark:border-black-200 w-full h-full text-sm py-2 outline-none border rounded-xl"
+                          name="search"
                           onChange={onChange}
+                          placeholder="Search"
                         />
                       </label>
                     </div>
@@ -624,14 +627,9 @@ const Delegators = ({ accountId }: Props) => {
           <div className="flex flex-col">
             <Table
               columns={columns}
-              data={data}
-              limit={pagination.per_page}
-              isPagination={true}
-              isLoading={loading}
               count={totalCount}
-              pageLimit={9999}
+              data={data}
               Error={error}
-              shallow={true}
               ErrorText={
                 <ErrorMessage
                   icons={<FaInbox />}
@@ -639,6 +637,11 @@ const Delegators = ({ accountId }: Props) => {
                   mutedText="Please try again later"
                 />
               }
+              isLoading={loading}
+              isPagination={true}
+              limit={pagination.per_page}
+              pageLimit={9999}
+              shallow={true}
             />
           </div>
         </div>

@@ -1,5 +1,6 @@
-import { apiUrl } from '@/utils/config';
 import React, { useEffect, useState } from 'react';
+
+import { apiUrl } from '@/utils/config';
 
 const Notice = () => {
   const [status, setStatus] = useState(true);
@@ -7,10 +8,10 @@ const Notice = () => {
     async function fetchToken() {
       try {
         const response = await fetch(`${apiUrl}sync/status`, {
-          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
+          method: 'GET',
         });
         const dataArray = await response.json();
         const data: any = dataArray?.status?.jobs?.daily_stats?.sync;

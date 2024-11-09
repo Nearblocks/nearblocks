@@ -1,22 +1,23 @@
+import { env } from 'next-runtime-env';
+import { useEffect, useRef, useState } from 'react';
+
 import { useBosLoaderStore } from '@/stores/bos-loader';
 import { useVmStore } from '@/stores/vm';
-import { useEffect, useRef, useState } from 'react';
-import { env } from 'next-runtime-env';
 
 type Props = {
-  src: string;
-  props?: Record<string, unknown>;
-  skeleton?: JSX.Element;
-  onChangeHeight?: () => void;
   defaultSkelton?: JSX.Element;
   loading?: JSX.Element;
+  onChangeHeight?: () => void;
+  props?: Record<string, unknown>;
+  skeleton?: JSX.Element;
+  src: string;
 };
 
 export function VmComponent(props: Props) {
-  const { skeleton, onChangeHeight, defaultSkelton } = props;
+  const { defaultSkelton, onChangeHeight, skeleton } = props;
   const onChangeHeightCalled = useRef(false);
 
-  const { EthersProvider, ethersContext, Widget } = useVmStore();
+  const { ethersContext, EthersProvider, Widget } = useVmStore();
   const redirectMapStore = useBosLoaderStore();
   const [showLoader, setShowLoader] = useState(true);
   const [Loader, setLoader] = useState(true);

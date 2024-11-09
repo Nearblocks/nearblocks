@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
+
 import FaUser from '@/components/Icons/FaUser';
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
 import TreeNode from '../TreeNode';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 const DeleteAccount = (props: TransactionActionInfo) => {
   const { action } = props;
@@ -15,8 +17,8 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         <FaUser className="inline-flex text-red-400 mr-1" />
         {t ? t('txn.actions.deleteAccount.0') : 'Delete account'} (
         <Link
-          href={`/address/${props?.receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
+          href={`/address/${props?.receiver}`}
         >
           {shortenAddress(props?.receiver)}
         </Link>
@@ -25,8 +27,8 @@ const DeleteAccount = (props: TransactionActionInfo) => {
           ? t('txn.actions.deleteAccount.1')
           : 'and transfer remaining funds to'}
         <Link
-          href={`/address/${props?.args?.beneficiary_id}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
+          href={`/address/${props?.args?.beneficiary_id}`}
         >
           {shortenAddress(props?.args?.beneficiary_id)}
         </Link>

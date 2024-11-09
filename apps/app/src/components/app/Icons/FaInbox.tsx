@@ -1,11 +1,11 @@
 const FaInbox = () => {
   return (
     <svg
-      stroke="currentColor"
       fill="currentColor"
+      height="24"
+      stroke="currentColor"
       strokeWidth="0"
       viewBox="0 0 576 512"
-      height="24"
       width="24"
       xmlns="http://www.w3.org/2000/svg"
     >

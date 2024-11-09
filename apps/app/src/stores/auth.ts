@@ -22,6 +22,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logOut: async () => undefined,
   refreshAllowance: async () => undefined,
   requestSignInWithWallet: () => undefined,
-  signedIn: false,
   set: (state) => set((previousState) => ({ ...previousState, ...state })),
+  signedIn: false,
 }));

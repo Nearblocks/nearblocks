@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
-import Check from '../Icons/Check';
+
 import { Link } from '@/i18n/routing';
+
+import Check from '../Icons/Check';
 
 type MenuProps = {
   children: ReactNode;

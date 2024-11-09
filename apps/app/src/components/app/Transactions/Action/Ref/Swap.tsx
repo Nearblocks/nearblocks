@@ -6,12 +6,12 @@ const Swap = (props: EventPropsInfo) => {
   const FaRight = (props: { className: string }) => {
     return (
       <svg
-        stroke="currentColor"
+        className={props.className}
         fill="currentColor"
+        height="1em"
+        stroke="currentColor"
         stroke-width="0"
         viewBox="0 0 192 512"
-        className={props.className}
-        height="1em"
         width="1em"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -32,13 +32,13 @@ const Swap = (props: EventPropsInfo) => {
     <div className="action flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 text-xs" />
       <span className="font-bold px-1">Swap </span>
-      <TokenInfo contract={log[2]} amount={log[1]} />
-      <TokenInfo contract={log[4].replace(/,$/, '')} amount={log[3]} />
+      <TokenInfo amount={log[1]} contract={log[2]} />
+      <TokenInfo amount={log[3]} contract={log[4].replace(/,$/, '')} />
       <span className="font-bold text-gray px-1">
         On{' '}
         <Link
-          href="/address/v2.ref-finance.near"
           className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
+          href="/address/v2.ref-finance.near"
         >
           Ref Finance
         </Link>

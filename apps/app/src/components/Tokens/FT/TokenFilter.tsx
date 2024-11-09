@@ -1,19 +1,20 @@
-import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 import Big from 'big.js';
 import { useEffect, useState } from 'react';
-import { dollarFormat, localFormat } from '@/utils/libs';
-import useRpc from '@/hooks/useRpc';
+
 import FaAddressBook from '@/components/Icons/FaAddressBook';
 import Skeleton from '@/components/skeleton/common/Skeleton';
+import useRpc from '@/hooks/useRpc';
 import { Link } from '@/i18n/routing';
+import { dollarFormat, localFormat } from '@/utils/libs';
+import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 
 interface Props {
   id: string;
-  tokenFilter?: string;
   inventoryData: InventoryInfo;
+  tokenFilter?: string;
 }
 
-export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
+export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const { ftBalanceOf } = useRpc();
   const [inventoryLoading, setInventoryLoading] = useState(false);
@@ -111,8 +112,8 @@ export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
                 </div>
                 <h5 className="text-sm my-1 font-bold text-green-500 dark:text-green-250 truncate md:max-w-[200px] lg:max-w-[310px] xl:max-w-full max-w-full inline-block">
                   <Link
-                    href={`/address/${tokenFilter}`}
                     className="hover:no-underline"
+                    href={`/address/${tokenFilter}`}
                   >
                     {tokenFilter}
                   </Link>

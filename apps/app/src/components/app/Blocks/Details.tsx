@@ -1,9 +1,9 @@
 'use client';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FileSlash from '../Icons/FileSlash';
-import { gasPrice } from '@/utils/near';
-import { BlocksInfo } from '@/utils/types';
+import { useTranslations } from 'next-intl';
+
+import { useConfig } from '@/hooks/app/useConfig';
+import { Link } from '@/i18n/routing';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -13,19 +13,21 @@ import {
   localFormat,
   nanoToMilli,
 } from '@/utils/app/libs';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
-import { useConfig } from '@/hooks/app/useConfig';
+import { gasPrice } from '@/utils/near';
+import { BlocksInfo } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
+import FileSlash from '../Icons/FileSlash';
 interface Props {
-  hash?: any;
   data: any;
+  hash?: any;
   loading?: any;
   price: any;
 }
 
 export default function Details(props: Props) {
   const t = useTranslations();
-  const { hash, data, price } = props;
+  const { data, hash, price } = props;
   const nearPrice = price?.stats[0]?.near_price;
   const { networkId } = useConfig();
 
@@ -35,8 +37,8 @@ export default function Details(props: Props) {
   }
   const LinkWrapper = (props: Props) => (
     <Link
-      href={props.href}
       className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 text-green-500 dark:text-green-250 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline"
+      href={props.href}
     >
       {props.children}
     </Link>
@@ -54,7 +56,7 @@ export default function Details(props: Props) {
             t ? (
               <>
                 {t('block.heading.0') || 'Block'}
-                <span key={1} className="font-semibold pl-1">
+                <span className="font-semibold pl-1" key={1}>
                   {t('block.heading.1', {
                     block: block?.block_height
                       ? localFormat(block?.block_height.toString())
@@ -70,7 +72,7 @@ export default function Details(props: Props) {
             ) : (
               <>
                 Block
-                <span key={1} className="font-semibold">
+                <span className="font-semibold" key={1}>
                   #
                   {block?.block_height
                     ? localFormat(block?.block_height.toString())
@@ -172,8 +174,8 @@ export default function Details(props: Props) {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  href={`/address/${block?.author_account_id}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/address/${block?.author_account_id}`}
                 >
                   {block?.author_account_id}
                 </Link>
@@ -226,8 +228,8 @@ export default function Details(props: Props) {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  href={`/blocks/${block?.prev_block_hash}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/blocks/${block?.prev_block_hash}`}
                 >
                   {block?.prev_block_hash}
                 </Link>

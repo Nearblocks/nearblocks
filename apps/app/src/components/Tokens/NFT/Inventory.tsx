@@ -8,14 +8,14 @@ import { localFormat } from '@/utils/libs';
 import { Token } from '@/utils/types';
 
 interface Props {
-  token: Token;
-  tokens: Token[];
   count: number;
   error: boolean;
   tab: string;
+  token: Token;
+  tokens: Token[];
 }
 
-const Inventory = ({ token, tokens, count, error, tab }: Props) => {
+const Inventory = ({ count, error, tab, token, tokens }: Props) => {
   return (
     <>
       {tab === 'inventory' ? (
@@ -56,8 +56,8 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
                   key={i}
                 >
                   <a
-                    href="#"
                     className="flex items-center justify-center m-auto overflow-hidden"
+                    href="#"
                   >
                     <div className="w-40 h-40 ">
                       <Skeleton className="h-40" />
@@ -79,21 +79,21 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
                   key={nft?.contract + nft?.token}
                 >
                   <Link
-                    href={`/nft-token/${nft?.contract}/${nft?.token}`}
                     className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline"
+                    href={`/nft-token/${nft?.contract}/${nft?.token}`}
                   >
                     <NFTImage
                       base={token.base_uri}
+                      className="rounded max-h-full"
                       media={nft.media}
                       reference={nft.reference}
-                      className="rounded max-h-full"
                     />
                   </Link>
                   <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
                     Token ID:{' '}
                     <Link
-                      href={`/nft-token/${nft?.contract}/${nft?.token}`}
                       className="text-green dark:text-green-250 hover:no-underline"
+                      href={`/nft-token/${nft?.contract}/${nft?.token}`}
                     >
                       {nft?.token}
                     </Link>
@@ -102,8 +102,8 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
                     <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
                       Owner:{' '}
                       <Link
-                        href={`/address/${nft?.asset?.owner}`}
                         className="text-green dark:text-green-250 hover:no-underline"
+                        href={`/address/${nft?.asset?.owner}`}
                       >
                         {nft?.asset?.owner}
                       </Link>

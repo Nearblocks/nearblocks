@@ -1,16 +1,17 @@
-import FaTimesCircle from '@/components/Icons/FaTimesCircle';
-import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
 import { Fragment } from 'react';
 
+import FaTimesCircle from '@/components/Icons/FaTimesCircle';
+import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
+
 interface Props {
-  txn: TransactionInfo;
-  receipt: ReceiptsPropsInfo | any;
-  setShow: (id: string) => void | any;
+  receipt: any | ReceiptsPropsInfo;
+  setShow: (id: string) => any | void;
   show: string;
+  txn: TransactionInfo;
 }
 
 const TreeReceipt = (props: Props) => {
-  const { receipt, txn, setShow, show } = props;
+  const { receipt, setShow, show, txn } = props;
 
   function formatActionKind(actionKind: string) {
     return actionKind && actionKind?.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -28,14 +29,14 @@ const TreeReceipt = (props: Props) => {
     <>
       {receipt?.actions && (
         <div
-          onClick={() => {
-            setShow(receipt?.receipt_id);
-          }}
           className={`relative ${
             show === receipt?.receipt_id
               ? '!text-white bg-green-500 dark:bg-green-250'
               : 'text-green-500'
           } !border-2 !border-solid !border-green-600 dark:!border-green-250 dark:text-green-250 !rounded-lg cursor-pointer`}
+          onClick={() => {
+            setShow(receipt?.receipt_id);
+          }}
         >
           {!isSuccess && (
             <p className="absolute text-red-500 bg-red-50 dark:bg-black top-0 right-0 text-xs inline-flex items-center rounded -mt-3 -mr-5  px-2 py-1">
@@ -45,8 +46,8 @@ const TreeReceipt = (props: Props) => {
           {receipt?.actions &&
             receipt?.actions.map((action: any, index: number) => (
               <p
-                key={index}
                 className="flex flex-col dark:divide-black-200 divide-gray-200 divide-y p-0.5"
+                key={index}
               >
                 {formatActionKind(action?.action_kind)}
                 {action?.args?.method_name && (
@@ -62,10 +63,10 @@ const TreeReceipt = (props: Props) => {
             <Fragment key={rpcTxn?.receipt_id}>
               <li>
                 <TreeReceipt
-                  txn={txn}
                   receipt={rpcTxn}
                   setShow={setShow}
                   show={show}
+                  txn={txn}
                 />
               </li>
             </Fragment>

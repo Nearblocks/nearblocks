@@ -1,13 +1,15 @@
+import { useTranslations } from 'next-intl';
+
 import FaCode from '@/components/Icons/FaCode';
+import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/hexy';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
 import TreeNode from '../TreeNode';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 const FunctionCall = (props: TransactionActionInfo) => {
-  const { args, receiver, action } = props;
+  const { action, args, receiver } = props;
   const t = useTranslations();
 
   function displayArgs(args: any) {
@@ -53,8 +55,8 @@ const FunctionCall = (props: TransactionActionInfo) => {
         <span className="font-bold ml-1">{args?.method_name}</span>{' '}
         {t ? t('txn.actions.functionCall.1') : 'in contract'}
         <Link
-          href={`/address/${receiver}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+          href={`/address/${receiver}`}
         >
           {shortenAddress(receiver)}
         </Link>

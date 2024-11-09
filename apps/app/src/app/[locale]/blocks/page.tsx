@@ -1,7 +1,10 @@
+export const runtime = 'edge';
+
+import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
+
 import List from '@/components/app/Blocks/List';
 import ListSkeleton from '@/components/app/skeleton/blocks/list';
-import { Suspense } from 'react';
-import { getTranslations } from 'next-intl/server';
 
 export default async function Blocks({
   params: { locale },

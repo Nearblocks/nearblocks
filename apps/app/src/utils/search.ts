@@ -28,22 +28,22 @@ const search = async (
     const resp = await fetcher(`search/${route}?keyword=${keyword}`);
 
     const data = {
-      blocks: [],
-      txns: [],
       accounts: [],
+      blocks: [],
       receipts: [],
+      txns: [],
     };
 
     if (resp?.blocks?.length) {
       if (returnPath) {
-        return { type: 'block', path: resp?.blocks[0]?.block_hash };
+        return { path: resp?.blocks[0]?.block_hash, type: 'block' };
       }
       data.blocks = resp?.blocks;
     }
 
     if (resp?.txns?.length) {
       if (returnPath) {
-        return { type: 'txn', path: resp?.txns[0]?.transaction_hash };
+        return { path: resp?.txns[0]?.transaction_hash, type: 'txn' };
       }
       data.txns = resp?.txns;
     }
@@ -51,8 +51,8 @@ const search = async (
     if (resp?.receipts?.length) {
       if (returnPath) {
         return {
-          type: 'txn',
           path: resp?.receipts[0]?.originated_from_transaction_hash,
+          type: 'txn',
         };
       }
       data.receipts = resp?.receipts;
@@ -60,7 +60,7 @@ const search = async (
 
     if (resp?.accounts?.length) {
       if (returnPath) {
-        return { type: 'address', path: resp?.accounts[0]?.account_id };
+        return { path: resp?.accounts[0]?.account_id, type: 'address' };
       }
       data.accounts = resp?.accounts;
     }

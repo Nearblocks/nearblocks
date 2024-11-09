@@ -1,35 +1,37 @@
-import { shortenAddress } from '@/utils/libs';
-import { SpamToken, Token, TransactionInfo } from '@/utils/types';
-import { useState } from 'react';
 import {
   Accordion,
   AccordionButton,
   AccordionItem,
   AccordionPanel,
 } from '@reach/accordion';
-import { useFetch } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
+import { useState } from 'react';
+
 import TokenImage, { NFTImage } from '@/components/common/TokenImage';
-import WarningIcon from '@/components/Icons/WarningIcon';
-import ArrowUp from '@/components/Icons/ArrowUp';
 import ArrowDown from '@/components/Icons/ArrowDown';
+import ArrowUp from '@/components/Icons/ArrowUp';
 import Question from '@/components/Icons/Question';
-import TokenTransfers from './TokenTransfers';
+import WarningIcon from '@/components/Icons/WarningIcon';
+import { useFetch } from '@/hooks/useFetch';
 import { Link } from '@/i18n/routing';
+import { shortenAddress } from '@/utils/libs';
+import { SpamToken, Token, TransactionInfo } from '@/utils/types';
+
+import TokenTransfers from './TokenTransfers';
 interface Props {
+  error: boolean;
   id: string;
   tid?: string;
   tokenInfo: { tokens: Token[] };
-  txnsList: {
-    txns: TransactionInfo[];
-    cursor: string;
-  };
   txnsCount: {
     txns: { count: string }[];
   };
-  error: boolean;
+  txnsList: {
+    cursor: string;
+    txns: TransactionInfo[];
+  };
 }
-const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
+const Detail = ({ error, id, tid, tokenInfo, txnsCount, txnsList }: Props) => {
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [isVisible, setIsVisible] = useState(true);
   const token: Token = tokenInfo?.tokens?.[0];
@@ -70,8 +72,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
               This token is reported to have been spammed to many users. Please
               exercise caution when interacting with it. Click
               <a
-                href="https://github.com/Nearblocks/spam-token-list"
                 className="underline mx-0.5"
+                href="https://github.com/Nearblocks/spam-token-list"
                 target="_blank"
               >
                 here
@@ -92,9 +94,9 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
           <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl soft-shadow p-3 aspect-square">
             <NFTImage
               base={token?.nft?.base_uri}
+              className={'rounded max-h-full'}
               media={token?.media}
               reference={token?.reference}
-              className={'rounded max-h-full'}
             />
           </div>
         </div>
@@ -103,28 +105,28 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
             {token?.title || token?.token}
           </h1>
           <Link
-            href={`/nft-token/${id}`}
             className="break-all text-green dark:text-green-250 leading-6 text-sm hover:no-underline"
+            href={`/nft-token/${id}`}
           >
             <span className="inline-flex align-middle h-5 w-5 mr-2.5">
               <TokenImage
-                src={token?.nft?.icon}
                 alt={token?.nft?.name}
                 className="w-5 h-5"
+                src={token?.nft?.icon}
               />
             </span>
             <span>{token?.nft?.name}</span>
           </Link>
           <Accordion
-            multiple
             className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl  soft-shadow mt-4"
-            defaultIndex={indices}
             collapsible
+            defaultIndex={indices}
+            multiple
           >
             <AccordionItem index={1}>
               <AccordionButton
-                onChange={() => toggleItem(1)}
                 className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
+                onChange={() => toggleItem(1)}
               >
                 <h2>Details</h2>
                 {indices?.includes(1) ? (
@@ -139,8 +141,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                     <div className="flex p-4">
                       <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                         <Tooltip
-                          label="Current owner of this NFT"
                           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          label="Current owner of this NFT"
                         >
                           <div>
                             <Question className="w-4 h-4 fill-current mr-1" />
@@ -150,8 +152,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
                         <Link
-                          href={`/address/${token?.asset?.owner}`}
                           className="text-green dark:text-green-250 hover:no-underline"
+                          href={`/address/${token?.asset?.owner}`}
                         >
                           {shortenAddress &&
                             shortenAddress(token?.asset?.owner ?? '')}
@@ -162,8 +164,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        label="Address of this NFT contract"
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        label="Address of this NFT contract"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -173,8 +175,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
                       <Link
-                        href={`/address/${id}`}
                         className="text-green  dark:text-green-250 hover:no-underline"
+                        href={`/address/${id}`}
                       >
                         {shortenAddress && shortenAddress(id ?? '')}
                       </Link>
@@ -183,8 +185,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        label="This NFT's unique token ID"
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        label="This NFT's unique token ID"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -197,8 +199,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        label="The standard followed by this NFT"
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        label="The standard followed by this NFT"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -214,8 +216,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
             {token?.description && (
               <AccordionItem index={2}>
                 <AccordionButton
-                  onClick={() => toggleItem(2)}
                   className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
+                  onClick={() => toggleItem(2)}
                 >
                   <h2>Description</h2>
                   {indices.includes(2) ? (
@@ -238,8 +240,8 @@ const Detail = ({ id, tid, tokenInfo, txnsList, txnsCount, error }: Props) => {
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <TokenTransfers
               data={txnsList}
-              txnsCount={txnsCount}
               error={error}
+              txnsCount={txnsCount}
             />
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useMemo } from 'react';
 
 const useHash = (): [string | undefined, (newHash: string) => void] => {
-  const { push, asPath } = useRouter();
+  const { asPath, push } = useRouter();
 
   const hash = useMemo(() => asPath && asPath?.split('#')[1], [asPath]);
 
@@ -10,8 +10,8 @@ const useHash = (): [string | undefined, (newHash: string) => void] => {
     (newHash: string) => {
       push(
         {
-          pathname: new URL(asPath, 'http://localhost/').pathname,
           hash: newHash,
+          pathname: new URL(asPath, 'http://localhost/').pathname,
         },
         undefined,
         { shallow: true },

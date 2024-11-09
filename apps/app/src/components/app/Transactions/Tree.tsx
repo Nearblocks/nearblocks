@@ -1,24 +1,25 @@
 'use client';
-import { mapRpcActionToAction } from '@/utils/near';
-import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
+
+import { mapRpcActionToAction } from '@/utils/near';
+import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
 import FaHourglassStart from '../Icons/FaHourglassStart';
+import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
 import TreeReceipt from './TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FileSlash from '../Icons/FileSlash';
-
 interface Props {
-  txn: TransactionInfo;
   hash: string;
   rpcTxn: RPCTransactionInfo;
+  txn: TransactionInfo;
 }
 
 const Tree = (props: Props) => {
-  const { txn, hash, rpcTxn } = props;
+  const { hash, rpcTxn, txn } = props;
 
   const [receipt, setReceipt] = useState<any>(null);
   const [show, setShow] = useState<any>(null);
@@ -161,19 +162,19 @@ const Tree = (props: Props) => {
                       <ul className="hierarchy-tree">
                         <li>
                           <TreeReceipt
-                            txn={txn}
                             receipt={receipt}
                             setShow={setShow}
                             show={show}
+                            txn={txn}
                           />
                         </li>
                       </ul>
                     </div>
                     <div className="w-full md:w-5/12 lg:w-1/3 xl:w-1/4">
                       <TreeReceiptDetails
-                        txn={txn}
                         receipt={receipt}
                         show={show}
+                        txn={txn}
                       />
                     </div>
                   </div>

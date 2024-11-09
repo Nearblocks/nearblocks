@@ -1,6 +1,9 @@
+export const runtime = 'edge';
+
+import QueryString from 'qs';
+
 import NFTDetails from '@/components/app/Tokens/NFT/NFTDetails';
 import { getRequest } from '@/utils/app/api';
-import QueryString from 'qs';
 
 export default async function NFTDetailsIndex({
   params: { id, tid },
@@ -22,12 +25,12 @@ export default async function NFTDetailsIndex({
 
   return (
     <NFTDetails
-      tokenInfo={tokenData}
-      txnsList={txnsListResult}
-      txnsCount={txnsCountResult}
       error={!txnsListResult}
       id={id}
       tid={tid}
+      tokenInfo={tokenData}
+      txnsCount={txnsCountResult}
+      txnsList={txnsListResult}
     />
   );
 }

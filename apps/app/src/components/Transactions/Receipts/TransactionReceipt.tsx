@@ -1,16 +1,18 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import ArrowDown from '@/components/Icons/ArrowDown';
 import { TransactionReceiptInfo } from '@/utils/types';
-import { useCallback, useEffect, useState } from 'react';
-import ReceiptKind from './ReceiptKind';
+
 import ReceiptInfo from './ReceiptInfo';
+import ReceiptKind from './ReceiptKind';
 
 const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const {
-    receipt,
-    fellowOutgoingReceipts,
-    expandAll,
-    convertionReceipt,
     className,
+    convertionReceipt,
+    expandAll,
+    fellowOutgoingReceipts,
+    receipt,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -55,22 +57,22 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
 
         {lastFellowOutgoingReceipt ? (
           <TransactionReceipt
-            receipt={lastFellowOutgoingReceipt}
+            className="pb-4 !mt-0 border-l ml-2.5"
+            convertionReceipt={false}
             expandAll={expandAll}
             fellowOutgoingReceipts={remainingFellowOutgoingReceipts}
-            convertionReceipt={false}
-            className="pb-4 !mt-0 border-l ml-2.5"
+            receipt={lastFellowOutgoingReceipt}
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
           {receipt?.actions?.map((action: any, index: number) => (
             <ReceiptKind
-              key={`${action.kind}_${index}`}
               action={action}
-              onClick={switchActiveTxType}
               isTxTypeActive={isTxTypeActive}
-              receiver={receipt.receiverId}
+              key={`${action.kind}_${index}`}
+              onClick={switchActiveTxType}
               receipt={receipt}
+              receiver={receipt.receiverId}
             />
           ))}
         </div>
@@ -91,11 +93,11 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
       </div>
       {lastNonRefundNestedReceipt ? (
         <TransactionReceipt
-          receipt={lastNonRefundNestedReceipt}
-          expandAll={expandAll}
-          fellowOutgoingReceipts={nonRefundNestedReceipts}
           className="!pl-0 !border-transparent"
           convertionReceipt={false}
+          expandAll={expandAll}
+          fellowOutgoingReceipts={nonRefundNestedReceipts}
+          receipt={lastNonRefundNestedReceipt}
         />
       ) : null}
     </>

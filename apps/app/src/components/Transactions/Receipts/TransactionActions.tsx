@@ -1,9 +1,11 @@
+import { mapRpcActionToAction } from '@/utils/near';
 import {
   Action,
   ActionType,
   DelegateActionView,
   TransActionProps,
 } from '@/utils/types';
+
 import AddKey from './Action/AddKey';
 import CreateAccount from './Action/CreateAccount';
 import DeleteAccount from './Action/DeleteAccount';
@@ -12,7 +14,6 @@ import DeployContract from './Action/DeployContract';
 import FunctionCall from './Action/FunctionCall';
 import Stake from './Action/Stake';
 import Transfer from './Action/Transfer';
-import { mapRpcActionToAction } from '@/utils/near';
 
 const TransactionActions = (props: TransActionProps) => {
   const { action, receiver } = props;
@@ -44,7 +45,7 @@ const TransactionActions = (props: TransActionProps) => {
       return <Transfer args={action?.args} receiver={receiver} />;
     case 'Delegate':
     case 'DELEGATE':
-      const delegateAction: DelegateActionView | any =
+      const delegateAction: any | DelegateActionView =
         action?.args?.delegate_action?.actions &&
         action?.args?.delegate_action?.actions?.map((txn: ActionType) =>
           mapRpcActionToAction(txn),
@@ -57,8 +58,8 @@ const TransactionActions = (props: TransActionProps) => {
               Actions delegated for {receiver}
             </p>
             <TransactionActions
-              key={i}
               action={subAction}
+              key={i}
               receiver={action?.args?.delegate_action?.receiver_id}
             />
           </div>

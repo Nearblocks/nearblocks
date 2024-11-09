@@ -1,4 +1,5 @@
 import { getRequest } from '@/utils/app/api';
+
 import AccessKeysActions from './AccessKeysActions';
 
 const AccessKeys = async ({ id, searchParams }: any) => {
@@ -10,9 +11,9 @@ const AccessKeys = async ({ id, searchParams }: any) => {
   return (
     <>
       <AccessKeysActions
-        keys={data?.keys}
         count={count?.keys?.[0]?.count}
         error={!data || data === null}
+        keys={data?.keys}
       />
     </>
   );

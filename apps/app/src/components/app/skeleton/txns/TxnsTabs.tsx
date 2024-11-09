@@ -1,32 +1,34 @@
 'use client';
 import classNames from 'classnames';
+
 import { Link } from '@/i18n/routing';
-import Tree from './Tree';
+
 import Execution from './Execution';
-import Summary from './Summary';
 import OverviewSkeleton from './Overview';
 import ReceiptSkeleton from './Receipt';
+import Summary from './Summary';
+import Tree from './Tree';
 
 const tabs = [
-  { name: 'overview', message: 'txn.tabs.overview', label: 'Overview' },
+  { label: 'Overview', message: 'txn.tabs.overview', name: 'overview' },
   {
-    name: 'execution',
-    message: 'txn.tabs.execution',
     label: 'Execution Plan',
+    message: 'txn.tabs.execution',
+    name: 'execution',
   },
-  { name: 'enhanced', message: 'tokenTxns', label: 'Enhanced Plan' },
-  { name: 'tree', message: 'nftTokenTxns', label: 'Tree Plan' },
-  { name: 'summary', message: 'accessKeys', label: 'Reciept Summary' },
+  { label: 'Enhanced Plan', message: 'tokenTxns', name: 'enhanced' },
+  { label: 'Tree Plan', message: 'nftTokenTxns', name: 'tree' },
+  { label: 'Reciept Summary', message: 'accessKeys', name: 'summary' },
 ];
 
-function TxnsTabsSkeleton({ tab, hash }: { tab: string; hash: string }) {
+function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
   return (
@@ -35,16 +37,16 @@ function TxnsTabsSkeleton({ tab, hash }: { tab: string; hash: string }) {
         <>
           <div className="md:flex justify-between">
             <div className="w-fit md:flex md:gap-2">
-              {tabs?.map(({ name, label }) => {
+              {tabs?.map(({ label, name }) => {
                 return (
                   <Link
-                    key={name}
+                    className={getClassName(name === tab)}
                     href={
                       name === 'overview'
                         ? `/txns/${hash}`
                         : `/txns/${hash}?tab=${name}`
                     }
-                    className={getClassName(name === tab)}
+                    key={name}
                   >
                     <h2>
                       {label}

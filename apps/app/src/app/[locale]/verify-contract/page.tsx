@@ -1,6 +1,9 @@
+export const runtime = 'edge';
+
+import { Metadata } from 'next';
+
 import Verifier from '@/components/app/Address/Contract/Verifier';
 import { appUrl } from '@/utils/app/config';
-import { Metadata } from 'next';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
 
@@ -15,23 +18,23 @@ export async function generateMetadata(): Promise<Metadata> {
   )}`;
 
   return {
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/verify-contract`,
     },
+    description: metaDescription,
+    openGraph: {
+      description: metaDescription,
+      images: [
+        {
+          alt: metaTitle,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: metaTitle,
+    },
+    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
@@ -52,8 +55,8 @@ export default async function VerifyContract({
         <div className="w-full max-w-3xl items-center mt-8 space-y-6">
           <Verifier
             accountId={accountId}
-            selectedVerifier={selectedVerifier}
             network={network}
+            selectedVerifier={selectedVerifier}
           />
         </div>
       </div>

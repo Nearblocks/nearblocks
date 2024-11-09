@@ -1,29 +1,31 @@
-import { ReactNode } from 'react';
-import Header from './Header';
-import Footer from './Footer';
 import { useRouter } from 'next/router';
-import { BlocksInfo, Stats } from '@/utils/types';
-import useLoading from '@/hooks/useLoading';
-import { Spinner } from '../common/Spinner';
+import { ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import useLoading from '@/hooks/useLoading';
+import { BlocksInfo, Stats } from '@/utils/types';
+
+import { Spinner } from '../common/Spinner';
+import Footer from './Footer';
+import Header from './Header';
+
 interface LayoutProps {
   children: ReactNode;
-  notice?: ReactNode;
-  statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
-  searchResultDetails?: any;
+  notice?: ReactNode;
   searchRedirectDetails?: any;
+  searchResultDetails?: any;
+  statsDetails?: { stats: Stats[] };
 }
 
 const Layout = ({
   children,
-  notice,
-  statsDetails,
   latestBlocks,
-  searchResultDetails,
+  notice,
   searchRedirectDetails,
+  searchResultDetails,
+  statsDetails,
 }: LayoutProps) => {
   const router = useRouter();
   const { loading, setLoading } = useLoading();
@@ -37,10 +39,10 @@ const Layout = ({
       {notice}
       <header>
         <Header
-          statsDetails={statsDetails}
           latestBlocks={latestBlocks}
-          searchResultDetails={searchResultDetails}
           searchRedirectDetails={searchRedirectDetails}
+          searchResultDetails={searchResultDetails}
+          statsDetails={statsDetails}
         />
       </header>
       {loading && <Spinner loading={loading} setLoading={setLoading} />}

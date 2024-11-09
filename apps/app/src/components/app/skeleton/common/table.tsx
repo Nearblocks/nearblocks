@@ -8,7 +8,7 @@ export default function TableSkeleton() {
           <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
             <tr>
               {[...Array(8)].map((_, index) => (
-                <th key={index} scope="col" className="px-6 py-3">
+                <th className="px-6 py-3" key={index} scope="col">
                   <Skeleton className="h-4 w-full" />
                 </th>
               ))}
@@ -16,9 +16,9 @@ export default function TableSkeleton() {
           </thead>
           <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
             {[...Array(20)].map((_, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-blue-900/5 h-[57px]">
+              <tr className="hover:bg-blue-900/5 h-[57px]" key={rowIndex}>
                 {[...Array(8)].map((_, colIndex) => (
-                  <td key={colIndex} className="px-6 py-3">
+                  <td className="px-6 py-3" key={colIndex}>
                     <Skeleton className="h-4 w-full" />
                   </td>
                 ))}

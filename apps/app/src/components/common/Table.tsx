@@ -1,33 +1,34 @@
 import { Fragment } from 'react';
-import Paginator from './Paginator';
-import CursorPaginator from './CursorPaginator';
+
 import Skeleton from '../skeleton/common/Skeleton';
+import CursorPaginator from './CursorPaginator';
+import Paginator from './Paginator';
 
 interface column {
-  header: string | JSX.Element;
-  key: string;
   cell?: (row: any, rowIndex?: number) => React.ReactNode;
+  header: JSX.Element | string;
+  key: string;
   tdClassName: string;
   thClassName?: string;
 }
 interface Props {
   columns: column[];
-  data?: any[];
-  isPagination?: boolean;
   count?: number;
-  page?: number;
-  limit: number;
-  pageLimit?: number;
-  setPage?: (page: number) => void;
-  renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
+  cursor?: string;
+  cursorPagination?: boolean;
+  data?: any[];
+  Error?: any | string;
+  ErrorText?: any | string;
   expanded?: number[];
   isExpanded?: false;
-  Error?: string | any;
-  ErrorText?: string | any;
-  cursorPagination?: boolean;
-  cursor?: string;
-  shallow?: boolean;
   isLoading?: boolean;
+  isPagination?: boolean;
+  limit: number;
+  page?: number;
+  pageLimit?: number;
+  renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
+  setPage?: (page: number) => void;
+  shallow?: boolean;
 }
 const Table = (props: Props) => {
   if (props.isLoading) {
@@ -39,7 +40,7 @@ const Table = (props: Props) => {
               <tr>
                 {props.columns &&
                   props.columns.map((column, index) => (
-                    <th key={index} scope="col" className={column.thClassName}>
+                    <th className={column.thClassName} key={index} scope="col">
                       {column.header}
                     </th>
                   ))}
@@ -47,9 +48,9 @@ const Table = (props: Props) => {
             </thead>
             <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
               {[...Array(props.limit)].map((_, index) => (
-                <tr key={index} className=" hover:bg-blue-900/5 h-[57px]">
+                <tr className=" hover:bg-blue-900/5 h-[57px]" key={index}>
                   {props.columns.map((column, colIndex) => (
-                    <td key={colIndex} className={column.tdClassName}>
+                    <td className={column.tdClassName} key={colIndex}>
                       <Skeleton className="h-4" />
                     </td>
                   ))}
@@ -87,7 +88,7 @@ const Table = (props: Props) => {
             <thead>
               <tr>
                 {props?.columns?.map((column: column, index: number) => (
-                  <th key={index} scope="col" className={column?.thClassName}>
+                  <th className={column?.thClassName} key={index} scope="col">
                     {column?.header}
                   </th>
                 ))}
@@ -96,7 +97,7 @@ const Table = (props: Props) => {
             <tbody>
               {(props?.Error || props?.data?.length === 0) && (
                 <tr className="h-[57px]">
-                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
+                  <td className="px-6 py-4 text-gray-400 text-xs" colSpan={100}>
                     {props.ErrorText}
                   </td>
                 </tr>
@@ -104,11 +105,11 @@ const Table = (props: Props) => {
               {props?.data &&
                 props?.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
-                    <tr key={`expandRow-${rowIndex}`} className="h-[57px]">
+                    <tr className="h-[57px]" key={`expandRow-${rowIndex}`}>
                       {props.columns.map((column: column, colIndex: number) => (
                         <td
-                          key={`expandCol-${colIndex}`}
                           className={column.tdClassName}
+                          key={`expandCol-${colIndex}`}
                         >
                           {column.cell
                             ? column.cell(row, rowIndex)
@@ -118,12 +119,12 @@ const Table = (props: Props) => {
                     </tr>
                     {row?.showWarning && (
                       <tr
-                        key={`expandWarning-${rowIndex}`}
                         className="h-[25px] hover:bg-blue-900/5"
+                        key={`expandWarning-${rowIndex}`}
                       >
                         <td
-                          colSpan={props?.columns?.length}
                           className="px-5 py-2 whitespace-nowrap text-center text-sm text-yellow-500 font-medium"
+                          colSpan={props?.columns?.length}
                         >
                           {row?.warning}
                         </td>
@@ -141,7 +142,7 @@ const Table = (props: Props) => {
               <tr>
                 {props?.columns &&
                   props?.columns?.map((column: column, index: number) => (
-                    <th key={index} scope="col" className={column?.thClassName}>
+                    <th className={column?.thClassName} key={index} scope="col">
                       {column?.header}
                     </th>
                   ))}
@@ -150,7 +151,7 @@ const Table = (props: Props) => {
             <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
               {(props?.Error || props?.data?.length === 0) && (
                 <tr className="h-[57px]">
-                  <td colSpan={100} className="px-6 py-4 text-gray-400 text-xs">
+                  <td className="px-6 py-4 text-gray-400 text-xs" colSpan={100}>
                     {props.ErrorText}
                   </td>
                 </tr>
@@ -159,14 +160,14 @@ const Table = (props: Props) => {
                 props?.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
                     <tr
-                      key={`row-${rowIndex}`}
                       className="hover:bg-blue-900/5 h-[57px]"
+                      key={`row-${rowIndex}`}
                     >
                       {props?.columns.map(
                         (column: column, colIndex: number) => (
                           <td
-                            key={`col-${colIndex}`}
                             className={column?.tdClassName}
+                            key={`col-${colIndex}`}
                           >
                             {column.cell
                               ? column.cell(row, rowIndex)
@@ -184,12 +185,12 @@ const Table = (props: Props) => {
                       : null}
                     {row?.showWarning && (
                       <tr
-                        key={`warning-${rowIndex}`}
                         className="h-[25px] hover:bg-blue-900/5"
+                        key={`warning-${rowIndex}`}
                       >
                         <td
-                          colSpan={props?.columns?.length}
                           className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
+                          colSpan={props?.columns?.length}
                         >
                           {row?.warning}
                         </td>
@@ -219,9 +220,9 @@ const Table = (props: Props) => {
       props?.page &&
       props?.setPage ? (
         <CursorPaginator
+          cursor={props?.cursor}
           page={props?.page}
           setPage={props?.setPage}
-          cursor={props?.cursor}
         />
       ) : null}
     </>

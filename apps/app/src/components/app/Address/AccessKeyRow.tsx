@@ -1,17 +1,18 @@
 'use client';
+import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+
 import useRpc from '@/hooks/useRpc';
 import { Link } from '@/i18n/routing';
 import {
+  capitalizeWords,
   formatTimestampToString,
   getTimeAgoString,
-  capitalizeWords,
   nanoToMilli,
   yoctoToNear,
 } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
-import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -110,17 +111,17 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
 
   return (
     <>
-      <tr key={accessKey?.public_key} className="hover:bg-blue-900/5">
+      <tr className="hover:bg-blue-900/5" key={accessKey?.public_key}>
         <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip
-              label={txn?.transaction_hash}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+              label={txn?.transaction_hash}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 font-medium whitespace-nowrap">
                 <Link
-                  href={`/txns/${txn?.transaction_hash}`}
                   className="text-green-500 dark:text-green-250"
+                  href={`/txns/${txn?.transaction_hash}`}
                 >
                   {txn?.transaction_hash && txn?.transaction_hash}
                 </Link>
@@ -132,8 +133,8 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
           <Tooltip
-            label={accessKey?.public_key}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+            label={accessKey?.public_key}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom ">
               {accessKey?.public_key}
@@ -187,6 +188,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
             <Tooltip
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
               label={
                 !showWhen
                   ? txn?.block_timestamp
@@ -196,7 +198,6 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
                   ? formatTimestampToString(nanoToMilli(txn?.block_timestamp))
                   : ''
               }
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
             >
               <span>
                 {showWhen

@@ -1,7 +1,6 @@
 'use client';
+
 import { Link } from '@/i18n/routing';
-import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
 
 export const Content = () => {
   return (
@@ -23,13 +22,12 @@ export const Content = () => {
 export default function GlobalError({
   error,
 }: {
-  error: Error;
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
-  useEffect(() => {
-    Sentry.captureException(error);
-  }, [error]);
 
+  console.log(error)
+  
   return (
     <html>
       <body>

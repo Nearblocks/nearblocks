@@ -1,11 +1,12 @@
-import React, { Ref, forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
+
 import Skeleton from '../common/Skeleton';
 interface Props {
   className?: string;
 }
 const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div ref={ref} className={`w-full z-10 ${props.className}`}>
+    <div className={`w-full z-10 ${props.className}`} ref={ref}>
       <div className="flex flex-col md:flex-row gap-4 ">
         <div className=" w-full md:w-1/2">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
@@ -105,50 +106,50 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
               <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                 <tr>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
@@ -156,7 +157,7 @@ const Index = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
               </thead>
               <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
                 {[...Array(25)].map((_, i) => (
-                  <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
+                  <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                       <Skeleton className="h-4" />
                     </td>

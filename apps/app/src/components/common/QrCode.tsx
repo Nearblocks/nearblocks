@@ -7,10 +7,10 @@ import { useTheme } from 'next-themes';
  * @param {number} [height] - The height of the QR code component.
  */
 interface Props {
-  value: string;
-  width: number;
   height: number;
   theme?: string;
+  value: string;
+  width: number;
 }
 
 const QrCode = (props: Props) => {
@@ -50,12 +50,12 @@ const QrCode = (props: Props) => {
       <iframe
         srcDoc={srcData}
         style={{
-          width: 320,
-          minWidth: 320,
-          height: 220,
-          minHeight: 220,
-          marginTop: 30,
           backgroundColor: 'transparent',
+          height: 220,
+          marginTop: 30,
+          minHeight: 220,
+          minWidth: 320,
+          width: 320,
         }}
       />
     </div>

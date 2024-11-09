@@ -1,27 +1,28 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { capitalize, toSnakeCase, mapFeilds } from '@/utils/libs';
-import { FieldType } from '@/utils/types';
-import uniqueId from 'lodash/uniqueId';
-import { useVmStore } from '@/stores/vm';
 import {
   AccordionButton,
   AccordionItem,
   AccordionPanel,
 } from '@reach/accordion';
-import ArrowRight from '@/components/Icons/ArrowRight';
 import { Tooltip } from '@reach/tooltip';
+import uniqueId from 'lodash/uniqueId';
+import { useEffect, useState } from 'react';
+
+import ArrowRight from '@/components/Icons/ArrowRight';
 import CloseCircle from '@/components/Icons/CloseCircle';
 import Question from '@/components/Icons/Question';
-import { useAuthStore } from '@/stores/auth';
 import { Link } from '@/i18n/routing';
+import { useAuthStore } from '@/stores/auth';
+import { useVmStore } from '@/stores/vm';
+import { capitalize, mapFeilds, toSnakeCase } from '@/utils/libs';
+import { FieldType } from '@/utils/types';
 
 interface Props {
+  connected?: boolean;
   id: string;
   index: number;
   method: any;
   schema: any;
-  connected?: boolean;
 }
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -39,11 +40,11 @@ const sortFields = (fields: FieldType[]) => {
 const ViewOrChangeAbi = (props: Props) => {
   const { near } = useVmStore();
   const account = useAuthStore((store) => store.account);
-  const { index, method, schema, connected } = props;
-  const [txn, setTxn] = useState<string | null>(null);
+  const { connected, index, method, schema } = props;
+  const [txn, setTxn] = useState<null | string>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
-  const [result, setResult] = useState<string | null>('');
+  const [result, setResult] = useState<null | string>('');
   const [loading, setLoading] = useState(false);
   const [hideQuery, setHideQuery] = useState(false);
   const [options, setOptions] = useState({
@@ -79,7 +80,7 @@ const ViewOrChangeAbi = (props: Props) => {
       const args = mapFeilds(fields);
       near
         .viewCall(props?.id, toSnakeCase(method?.name), args)
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
+        .then((resp: { transaction_outcome: { id: string } } | any | null) => {
           setError(null);
           setTxn(resp?.transaction_outcome?.id);
           setResult(JSON.stringify(resp, null, 2));
@@ -114,7 +115,7 @@ const ViewOrChangeAbi = (props: Props) => {
           options?.gas,
           options?.attachedDeposit,
         )
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
+        .then((resp: { transaction_outcome: { id: string } } | any | null) => {
           setError(null);
           setTxn(resp?.transaction_outcome?.id);
           setResult(JSON.stringify(resp, null, 2));
@@ -155,9 +156,9 @@ const ViewOrChangeAbi = (props: Props) => {
           return {
             id: uniqueId(),
             name: argName.name,
+            placeholder: '',
             type: resolveTypeSchema(argName.type_schema),
             value: '',
-            placeholder: '',
           };
         },
       );
@@ -188,8 +189,8 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex items-center dark:text-neargray-10">
             Arguments
             <Tooltip
-              label="Specify an arguments schema."
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
+              label="Specify an arguments schema."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -200,41 +201,41 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
         </div>
         {fields.map((field: FieldType) => (
-          <div key={field.id} className="flex max-w-xl items-center">
+          <div className="flex max-w-xl items-center" key={field.id}>
             <div className="sm:grid grid-cols-9 gap-2">
               <input
+                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="name"
-                value={field.name}
                 onChange={onChange(field.id)}
                 placeholder="Argument name"
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                value={field.name}
               />
               <select
-                name="type"
-                value={field.type}
-                onChange={onChange(field.id)}
                 className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
+                name="type"
+                onChange={onChange(field.id)}
+                value={field.type}
               >
-                <option value="" disabled>
+                <option disabled value="">
                   Type
                 </option>
                 {inputTypes.map((type) => (
-                  <option value={type} key={type}>
+                  <option key={type} value={type}>
                     {capitalize(type)}
                   </option>
                 ))}
               </select>
               <input
+                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
                 name="value"
-                value={field.value}
                 onChange={onChange(field.id)}
                 placeholder={field.placeholder || 'Argument value'}
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                value={field.value}
               />
             </div>
             <button
-              onClick={onRemove(field.id)}
               className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
+              onClick={onRemove(field.id)}
             >
               <CloseCircle className="text-white fill-white w-4 h-4" />
             </button>
@@ -244,8 +245,8 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex items-center dark:text-neargray-10">
             Options
             <Tooltip
-              label="Optional arguments for write operations."
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
+              label="Optional arguments for write operations."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -258,21 +259,21 @@ const ViewOrChangeAbi = (props: Props) => {
             <label>
               <span className="text-gray-400 text-xs ">Attached deposit</span>
               <input
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="attachedDeposit"
-                value={options.attachedDeposit}
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                value={options.attachedDeposit}
               />
             </label>
             <label>
               <span className="text-gray-400 text-xs">Gas</span>
               <input
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="gas"
-                value={options.gas}
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                value={options.gas}
               />
             </label>
           </div>
@@ -280,20 +281,20 @@ const ViewOrChangeAbi = (props: Props) => {
         <div className="flex items-center mt-5">
           {!hideQuery && method?.kind === 'view' && (
             <button
-              type="submit"
-              onClick={onRead}
-              disabled={loading}
               className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading}
+              onClick={onRead}
+              type="submit"
             >
               Query
             </button>
           )}
           {method?.kind === 'call' && (
             <button
-              type="submit"
-              onClick={onWrite}
-              disabled={loading || !connected}
               className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading || !connected}
+              onClick={onWrite}
+              type="submit"
             >
               Write
             </button>
@@ -301,9 +302,9 @@ const ViewOrChangeAbi = (props: Props) => {
         </div>
         {error && (
           <textarea
+            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
             readOnly
             rows={6}
-            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
             value={error}
           />
         )}
@@ -311,8 +312,8 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
             View txn details:{' '}
             <Tooltip
-              label={txn}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+              label={txn}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                 <Link href={`/txns/${txn}`}>{txn}</Link>
@@ -322,9 +323,9 @@ const ViewOrChangeAbi = (props: Props) => {
         )}
         {result && (
           <textarea
+            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
             readOnly
             rows={6}
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
             value={result}
           />
         )}

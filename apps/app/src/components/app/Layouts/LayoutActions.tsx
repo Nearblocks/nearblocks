@@ -1,25 +1,26 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import Header from './Header';
-import Footer from './Footer';
-import { ReactNode } from 'react';
 import NextTopLoader from 'nextjs-toploader';
+import { ReactNode } from 'react';
+
+import Footer from './Footer';
+import Header from './Header';
 
 interface LayoutProps {
+  blocks: any;
   children: ReactNode;
+  handleFilterAndKeyword: any;
   notice?: ReactNode;
   stats: any;
-  blocks: any;
-  handleFilterAndKeyword: any;
   theme?: string;
 }
 
 const LayoutActions = ({
-  children,
   blocks,
-  stats,
-  notice,
+  children,
   handleFilterAndKeyword,
+  notice,
+  stats,
   theme,
 }: LayoutProps) => {
   const pathname = usePathname();
@@ -35,9 +36,9 @@ const LayoutActions = ({
       {notice}
       <header>
         <Header
-          stats={stats}
           block={blocks}
           handleFilterAndKeyword={handleFilterAndKeyword}
+          stats={stats}
           theme={theme}
         />
       </header>

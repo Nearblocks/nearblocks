@@ -1,4 +1,6 @@
 'use client';
+import React, { useEffect, useRef, useState } from 'react';
+
 import ErrorMessage from '@/components/common/ErrorMessage';
 import LoadingCircular from '@/components/common/LoadingCircular';
 import ArrowDown from '@/components/Icons/ArrowDown';
@@ -9,7 +11,6 @@ import { useRpcStore } from '@/stores/app/rpc';
 import { verifierConfig } from '@/utils/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractMetadata } from '@/utils/types';
-import React, { useEffect, useRef, useState } from 'react';
 
 type ContractFormProps = {
   accountId: string;
@@ -23,16 +24,16 @@ type OnChainResponse = {
 
 const Verifier: React.FC<ContractFormProps> = ({
   accountId,
-  selectedVerifier,
   network,
+  selectedVerifier,
 }) => {
   const [loading, setLoading] = useState(false);
   const [apiLoading, setApiLoading] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<null | string>(null);
+  const [error, setError] = useState<null | string>(null);
   const [contractMetadata, setContractMetadata] = useState<ContractMetadata>();
-  const [onChainCodeHash, setOnChainCodeHash] = useState<string | null>(null);
+  const [onChainCodeHash, setOnChainCodeHash] = useState<null | string>(null);
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
   const initializedRef = useRef(false);
@@ -145,7 +146,6 @@ const Verifier: React.FC<ContractFormProps> = ({
       const verifierApiUrl: string = verifier?.verifierApiUrl || '';
 
       const response = await fetch(verifierApiUrl, {
-        method: 'POST',
         body: JSON.stringify({
           accountId: accountId,
           networkId: network,
@@ -153,6 +153,7 @@ const Verifier: React.FC<ContractFormProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
+        method: 'POST',
       });
 
       if (response) {
@@ -205,10 +206,10 @@ const Verifier: React.FC<ContractFormProps> = ({
           you need to make your source code publicly available. For detailed
           instructions, check out the &nbsp;
           <a
-            href="https://github.com/SourceScan/verification-guide"
             className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
-            target="_blank"
+            href="https://github.com/SourceScan/verification-guide"
             rel="noopener noreferrer"
+            target="_blank"
           >
             verification guide
           </a>
@@ -248,6 +249,8 @@ const Verifier: React.FC<ContractFormProps> = ({
                 ) : (
                   <>
                     <input
+                      className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                      disabled
                       id="standard"
                       value={
                         contractMetadata?.standards
@@ -257,8 +260,6 @@ const Verifier: React.FC<ContractFormProps> = ({
                           )
                           .join('&nbsp') || ''
                       }
-                      className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
-                      disabled
                     />
                     {!contractMetadata?.standards && (
                       <p className="text-red-500 text-xs mt-1">
@@ -275,10 +276,10 @@ const Verifier: React.FC<ContractFormProps> = ({
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <input
-                    id="address"
-                    value={accountId}
                     className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                     disabled
+                    id="address"
+                    value={accountId}
                   />
                 )}
               </div>
@@ -290,11 +291,11 @@ const Verifier: React.FC<ContractFormProps> = ({
                 ) : (
                   <div className="relative">
                     <select
-                      id="language"
                       className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-white dark:bg-black-600 dark:text-neargray-10 outline-none cursor-pointer appearance-none"
+                      id="language"
                     >
                       <option value="rust">Rust</option>
-                      <option value="javascript" disabled>
+                      <option disabled value="javascript">
                         JavaScript
                       </option>
                     </select>
@@ -310,12 +311,12 @@ const Verifier: React.FC<ContractFormProps> = ({
                 ) : (
                   <>
                     <input
+                      className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
+                      disabled
                       id="buildEnvironment"
                       value={
                         contractMetadata?.build_info?.build_environment || ''
                       }
-                      className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
-                      disabled
                     />
                     {!contractMetadata?.build_info?.build_environment && (
                       <p className="text-red-500 text-xs mt-1">
@@ -333,10 +334,10 @@ const Verifier: React.FC<ContractFormProps> = ({
                 ) : (
                   <>
                     <input
-                      id="sourceCode"
-                      value={getSourceCode() || ''}
                       className="px-3 py-1.5 text-sm border dark:border-black-200  w-full rounded h-10 bg-gray-100 dark:bg-[#252525] dark:text-neargray-10 outline-none"
                       disabled
+                      id="sourceCode"
+                      value={getSourceCode() || ''}
                     />
                     {!contractMetadata?.build_info?.source_code_snapshot && (
                       <p className="text-red-500 text-xs mt-1">
@@ -352,13 +353,13 @@ const Verifier: React.FC<ContractFormProps> = ({
           {!error && (
             <div className="w-full max-w-3xl flex justify-center items-center text-center mt-4">
               <button
-                type="submit"
                 className={`text-base text-white border border-green-900/10 font-normal px-3 py-1.5 dark:text-neargray-10 rounded w-fit ${
                   allFieldsExist && !verified
                     ? 'hover:bg-green-400 hover:dark:bg-green-200 hover:shadow-md dark:hover:shadow-green-250/50 hover:shadow-green-600/50 bg-green-500 dark:bg-green-250 '
                     : 'disabled:bg-neargray-800 disabled:dark:bg-black-200 disabled:text-nearblue-600 disabled:dark:text-neargray-10 cursor-not-allowed'
                 } `}
                 disabled={loading || apiLoading || !allFieldsExist || verified}
+                type="submit"
               >
                 {apiLoading ? <LoadingCircular /> : 'Verify Contract'}
               </button>

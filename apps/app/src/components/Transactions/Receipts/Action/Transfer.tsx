@@ -1,8 +1,9 @@
+import { useTranslations } from 'next-intl';
+
 import FaArrowAltCircleRight from '@/components/Icons/FaArrowAltCircleRight';
 import { Link } from '@/i18n/routing';
 import { shortenAddress, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import { useTranslations } from 'next-intl';
 
 const Transfer = (props: TransactionActionInfo) => {
   const t = useTranslations();
@@ -19,8 +20,8 @@ const Transfer = (props: TransactionActionInfo) => {
       </span>{' '}
       {t ? t('txn.actions.transfer.1') : 'to'}
       <Link
-        href={`/address/${receiver}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+        href={`/address/${receiver}`}
       >
         {shortenAddress(receiver)}
       </Link>

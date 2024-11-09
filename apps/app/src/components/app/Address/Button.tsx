@@ -1,12 +1,13 @@
 'use client';
+import { DialogContent, DialogOverlay } from '@reach/dialog';
 import { Tooltip } from '@reach/tooltip';
-import { useEffect, useRef, useState } from 'react';
-import CopyIcon from '../Icons/CopyIcon';
 import Clipboard from 'clipboard';
-import QRCodeIcon from '../Icons/QRCodeIcon';
-import { DialogOverlay, DialogContent } from '@reach/dialog';
-import CloseCircle from '../Icons/CloseCircle';
+import { useEffect, useRef, useState } from 'react';
+
 import QrCode from '../common/QrCode';
+import CloseCircle from '../Icons/CloseCircle';
+import CopyIcon from '../Icons/CopyIcon';
+import QRCodeIcon from '../Icons/QRCodeIcon';
 
 interface Props {
   address: string;
@@ -44,8 +45,8 @@ const Buttons = ({ address }: Props) => {
     <>
       <span className="inline-flex space-x-2 h-7">
         <Tooltip
-          label="Copy account ID to clipboard"
           className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+          label="Copy account ID to clipboard"
         >
           <span className="relative">
             {showTooltip && (
@@ -54,31 +55,31 @@ const Buttons = ({ address }: Props) => {
               </span>
             )}
             <button
+              className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
               ref={ref}
               type="button"
-              className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
             >
               <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
             </button>
           </span>
         </Tooltip>
         <Tooltip
-          label="Click to view QR Code"
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+          label="Click to view QR Code"
         >
           <button
-            type="button"
-            onClick={onToggle}
             className="bg-green-500  dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
+            onClick={onToggle}
+            type="button"
           >
             <QRCodeIcon className="fill-current text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
           </button>
         </Tooltip>
       </span>
       <DialogOverlay
+        className="fixed bg-black bg-opacity-10 inset-0 z-30 flex items-center justify-center"
         isOpen={isOpen}
         onDismiss={onToggle}
-        className="fixed bg-black bg-opacity-10 inset-0 z-30 flex items-center justify-center"
       >
         <DialogContent
           aria-label="Qr Code"
@@ -91,7 +92,7 @@ const Buttons = ({ address }: Props) => {
             </button>
           </div>
           <div className="p-4">
-            <QrCode value={address} width={160} height={160} />
+            <QrCode height={160} value={address} width={160} />
           </div>
         </DialogContent>
       </DialogOverlay>

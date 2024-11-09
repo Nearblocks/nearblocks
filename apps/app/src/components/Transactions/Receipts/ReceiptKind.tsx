@@ -1,24 +1,26 @@
+import { useTranslations } from 'next-intl';
+
+import FaTimesCircle from '@/components/Icons/FaTimesCircle';
 import { hexy } from '@/utils/hexy';
 import { yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
+
 import RlpTransaction from './RlpTransaction';
-import FaTimesCircle from '@/components/Icons/FaTimesCircle';
-import { useTranslations } from 'next-intl';
 
 const backgroundColorClasses: Record<string, string> = {
-  transfer: 'bg-green-50 dark:bg-green-200',
-  stake: 'bg-cyan-50 dark:bg-cyan-900',
-  deployContract: 'bg-orange-50 dark:bg-orange-900',
   addKey: 'bg-indigo-50 dark:bg-indigo-900',
-  deleteKey: 'bg-red-50 dark:bg-red-900',
-  functionCall: 'bg-blue-50 dark:bg-black-200',
   createAccount: 'bg-fuchsia-100 dark:bg-fuchsia-900',
-  deleteAccount: 'bg-red-50 dark:bg-red-900',
   delegateAction: 'bg-blue-50 dark:bg-black-200',
+  deleteAccount: 'bg-red-50 dark:bg-red-900',
+  deleteKey: 'bg-red-50 dark:bg-red-900',
+  deployContract: 'bg-orange-50 dark:bg-orange-900',
+  functionCall: 'bg-blue-50 dark:bg-black-200',
+  stake: 'bg-cyan-50 dark:bg-cyan-900',
+  transfer: 'bg-green-50 dark:bg-green-200',
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, onClick, isTxTypeActive, receiver, receipt } = props;
+  const { action, isTxTypeActive, onClick, receipt, receiver } = props;
   const t = useTranslations();
   const args = action?.args?.args;
   const modifiedData =
@@ -99,17 +101,17 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
           (action?.args?.methodName === 'submit' &&
             receiver.includes('aurora')) ? (
             <RlpTransaction
-              pretty={modifiedData}
               method={action?.args?.methodName}
+              pretty={modifiedData}
               receiver={receiver}
             />
           ) : (
             <div className="py-3">
               <textarea
+                className="block appearance-none outline-none w-full border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-3 resize-y"
+                defaultValue={displayArgs(args?.args_base64 || args)}
                 readOnly
                 rows={4}
-                defaultValue={displayArgs(args?.args_base64 || args)}
-                className="block appearance-none outline-none w-full border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-3 resize-y"
               ></textarea>
             </div>
           )
@@ -123,11 +125,11 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
                 )
                 ?.map((subaction) => (
                   <ReceiptKind
-                    key={subaction.delegateIndex}
                     action={subaction}
                     isTxTypeActive={true}
-                    receiver={receiver}
+                    key={subaction.delegateIndex}
                     receipt={receipt}
+                    receiver={receiver}
                   />
                 ))}
           </div>

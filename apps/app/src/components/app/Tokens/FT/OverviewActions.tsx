@@ -1,6 +1,15 @@
 'use client';
-import { SpamToken, StatusInfo, Token } from '@/utils/types';
+import { Tooltip } from '@reach/tooltip';
+import Big from 'big.js';
 import { useState } from 'react';
+
+import Links from '@/components/common/Links';
+import TokenImage from '@/components/common/TokenImage';
+import Question from '@/components/Icons/Question';
+import WarningIcon from '@/components/Icons/WarningIcon';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import { useFetch } from '@/hooks/useFetch';
+import { Link } from '@/i18n/routing';
 import {
   dollarFormat,
   dollarNonCentFormat,
@@ -8,36 +17,28 @@ import {
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
-import Big from 'big.js';
-import { useFetch } from '@/hooks/useFetch';
-import { Tooltip } from '@reach/tooltip';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import TokenImage from '@/components/common/TokenImage';
-import WarningIcon from '@/components/Icons/WarningIcon';
-import Question from '@/components/Icons/Question';
-import Links from '@/components/common/Links';
-import { Link } from '@/i18n/routing';
+import { SpamToken, StatusInfo, Token } from '@/utils/types';
 
 interface Props {
+  holders: string;
   id: string;
   stats: StatusInfo;
-  token: Token;
   status: {
     height: 0;
     sync: true;
     timestamp: '';
   };
+  token: Token;
   transfers: string;
-  holders: string;
 }
 
 const OverviewActions = ({
+  holders,
   id,
   stats,
-  token,
   status,
+  token,
   transfers,
-  holders,
 }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
   const [showMarketCap, setShowMarketCap] = useState(false);
@@ -73,9 +74,9 @@ const OverviewActions = ({
           <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
-                src={token?.icon}
                 alt={token?.name}
                 className="w-7 h-7"
+                src={token?.icon}
               />
             </span>
             <span className="inline-flex align-middle mx-2">Token:</span>
@@ -94,8 +95,8 @@ const OverviewActions = ({
                 This token is reported to have been spammed to many users.
                 Please exercise caution when interacting with it. Click
                 <a
-                  href="https://github.com/Nearblocks/spam-token-list"
                   className="underline mx-0.5"
+                  href="https://github.com/Nearblocks/spam-token-list"
                   target="_blank"
                 >
                   here
@@ -172,8 +173,8 @@ const OverviewActions = ({
                       </span>
                       <span>
                         <Tooltip
-                          label="Calculated by multiplying the tokens Total Supply on Near with the current market price per token."
                           className="absolute h-auto max-w-xs bg-black  bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                          label="Calculated by multiplying the tokens Total Supply on Near with the current market price per token."
                         >
                           <span>
                             <Question className="w-4 h-4 fill-current ml-1" />
@@ -191,12 +192,12 @@ const OverviewActions = ({
                         {Number(token?.fully_diluted_market_cap) > 0 &&
                         Number(token?.market_cap) > 0 ? (
                           <Tooltip
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                             label={
                               showMarketCap
                                 ? 'Click to switch back'
                                 : 'Click to switch'
                             }
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                           >
                             <p
                               className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200"
@@ -321,8 +322,8 @@ const OverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        href={`/address/${token?.contract}`}
                         className="text-green-500 dark:text-green-250"
+                        href={`/address/${token?.contract}`}
                       >
                         {token?.contract}
                       </Link>
@@ -353,8 +354,8 @@ const OverviewActions = ({
                     ) : (
                       <a
                         href={`${token?.website}`}
-                        target="_blank"
                         rel="noopener noreferrer nofollow"
+                        target="_blank"
                       >
                         {token?.website}
                       </a>

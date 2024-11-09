@@ -1,31 +1,32 @@
-import { TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
-import { useState } from 'react';
-import { localFormat } from '@/utils/libs';
 import Big from 'big.js';
-import { tokenAmount } from '@/utils/near';
-import TxnStatus from '@/components/common/Status';
-import { useRouter } from 'next/router';
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
-import Clock from '@/components/Icons/Clock';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import TimeStamp from '@/components/common/TimeStamp';
-import Filters from '@/components/common/Filters';
-import Table from '@/components/common/Table';
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+
+import ErrorMessage from '@/components/common/ErrorMessage';
+import Filters from '@/components/common/Filters';
+import TxnStatus from '@/components/common/Status';
+import Table from '@/components/common/Table';
+import TimeStamp from '@/components/common/TimeStamp';
+import Clock from '@/components/Icons/Clock';
+import FaInbox from '@/components/Icons/FaInbox';
+import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
+import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
+import { localFormat } from '@/utils/libs';
+import { tokenAmount } from '@/utils/near';
+import { TransactionInfo } from '@/utils/types';
 
 interface Props {
-  txns: TransactionInfo[];
   count: number;
   cursor: string;
   error: boolean;
   tab: string;
+  txns: TransactionInfo[];
 }
 
-const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
+const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
   const router = useRouter();
   const intlRouter = useIntlRouter();
   const pathname = usePathname();
@@ -48,7 +49,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
   };
 
   const onAllClear = () => {
-    const { cursor, a, p, locale, ...newQuery } = router.query;
+    const { a, cursor, locale, p, ...newQuery } = router.query;
 
     // @ts-ignore: Unreachable code error
     intlRouter.push({
@@ -59,29 +60,27 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
 
   const columns = [
     {
-      header: '',
-      key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
+          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
         </>
       ),
+      header: '',
+      key: '',
       tdClassName:
         'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t ? t('hash') : 'HASH'}</span>,
-      key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <>
           <Tooltip
-            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+            label={row?.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
-                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
               </Link>
@@ -89,18 +88,18 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           </Tooltip>
         </>
       ),
+      header: <span>{t ? t('hash') : 'HASH'}</span>,
+      key: 'transaction_hash',
       tdClassName: 'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-3 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>BLOCK</span>,
-      key: 'block.block_height',
       cell: (row: TransactionInfo) => (
         <>
           <Link
-            href={`/blocks/${row?.included_in_block_hash}`}
             className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+            href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)
@@ -108,19 +107,19 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           </Link>
         </>
       ),
+      header: <span>BLOCK</span>,
+      key: 'block.block_height',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('type') : 'TYPE'}</span>,
-      key: 'cause',
       cell: (row: TransactionInfo) => (
         <>
           <Tooltip
-            label={row?.cause}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -128,21 +127,21 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           </Tooltip>
         </>
       ),
+      header: <span>{t ? t('type') : 'TYPE'}</span>,
+      key: 'cause',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>From</span>,
-      key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row?.delta_amount) < 0 ? (
           <>
             {row?.affected_account_id ? (
               <Tooltip
-                label={row?.affected_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.affected_account_id}
               >
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
@@ -152,12 +151,12 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.affected_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.affected_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.affected_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {row?.affected_account_id}
                   </Link>
@@ -171,8 +170,8 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           <>
             {row?.involved_account_id ? (
               <Tooltip
-                label={row?.involved_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.involved_account_id}
               >
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
@@ -182,12 +181,12 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.involved_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.involved_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.involved_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {row?.involved_account_id}
                   </Link>
@@ -199,14 +198,14 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           </>
         );
       },
+      header: <span>From</span>,
+      key: 'affected_account_id',
       tdClassName:
         'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: '',
-      key: '',
       cell: (row: TransactionInfo) =>
         row?.involved_account_id === row?.affected_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
@@ -217,18 +216,18 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
             <FaLongArrowAltRight />
           </div>
         ),
+      header: '',
+      key: '',
       tdClassName: 'text-center',
     },
     {
-      header: <span>To</span>,
-      key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                label={row?.involved_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.involved_account_id}
               >
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
@@ -238,12 +237,12 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.involved_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.involved_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.involved_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {row?.involved_account_id}
                   </Link>
@@ -257,8 +256,8 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                label={row?.affected_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.affected_account_id}
               >
                 <span
                   className={`truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
@@ -268,12 +267,12 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.affected_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.affected_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.affected_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {row?.affected_account_id}
                   </Link>
@@ -285,14 +284,14 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           </span>
         );
       },
+      header: <span>To</span>,
+      key: 'involved_account_id',
       tdClassName:
         'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>Quantity</span>,
-      key: 'amount',
       cell: (row: TransactionInfo) => (
         <>
           {row?.delta_amount
@@ -308,26 +307,33 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
             : ''}
         </>
       ),
+      header: <span>Quantity</span>,
+      key: 'amount',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+        </span>
+      ),
       header: (
         <>
           <Tooltip
+            className="absolute h-auto max-w-[10rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
             }
-            className="absolute h-auto max-w-[10rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <button
-              type="button"
-              onClick={toggleShowAge}
               className="text-left text-xs px-5 py-4 w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row whitespace-nowrap"
+              onClick={toggleShowAge}
+              type="button"
             >
               {showAge ? (
                 <>
@@ -342,11 +348,6 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
         </>
       ),
       key: 'block_timestamp',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
-        </span>
-      ),
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
@@ -354,7 +355,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, locale, keyword, query, filter, ...rest } =
+    const { cursor, filter, keyword, locale, order, p, query, tab, ...rest } =
       queryParams;
     return rest;
   }
@@ -391,12 +392,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
           )}
           <Table
             columns={columns}
-            data={txns}
-            limit={25}
-            cursorPagination={true}
-            page={page}
-            setPage={setPage}
             cursor={cursor}
+            cursorPagination={true}
+            data={txns}
             Error={error}
             ErrorText={
               <ErrorMessage
@@ -405,6 +403,9 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
                 mutedText="Please try again later"
               />
             }
+            limit={25}
+            page={page}
+            setPage={setPage}
           />
         </>
       ) : (

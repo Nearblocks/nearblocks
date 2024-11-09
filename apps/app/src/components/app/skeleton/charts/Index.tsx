@@ -1,8 +1,10 @@
 'use client';
-import React, { Ref, forwardRef } from 'react';
-import Skeleton from '../common/Skeleton';
 import { useTranslations } from 'next-intl';
+import React, { forwardRef, Ref } from 'react';
+
 import { useConfig } from '@/hooks/app/useConfig';
+
+import Skeleton from '../common/Skeleton';
 
 interface Props {
   className?: string;
@@ -14,62 +16,62 @@ const ChartSkeletion = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
 
   const charts = [
     {
+      exclude: networkId === 'testnet',
+      image: '/images/charts/near-price.svg',
       link: '/charts/near-price',
       text: 'charts.nearPrice.heading',
-      image: '/images/charts/near-price.svg',
-      exclude: networkId === 'testnet',
     },
     {
+      exclude: networkId === 'testnet',
+      image: '/images/charts/market-cap.svg',
       link: '/charts/market-cap',
       text: 'marketCapCharts.heading',
-      image: '/images/charts/market-cap.svg',
-      exclude: networkId === 'testnet',
     },
     {
+      exclude: false,
+      image: '/images/charts/near-supply.svg',
       link: '/charts/near-supply',
       text: 'nearSupplyCharts.heading',
-      image: '/images/charts/near-supply.svg',
-      exclude: false,
     },
     {
+      exclude: false,
+      image: '/images/charts/txns.svg',
       link: '/charts/txns',
       text: 'txnsCharts.heading',
-      image: '/images/charts/txns.svg',
-      exclude: false,
     },
     {
+      exclude: false,
+      image: '/images/charts/blocks.svg',
       link: '/charts/blocks',
       text: 'blocksCharts.heading',
-      image: '/images/charts/blocks.svg',
-      exclude: false,
     },
     {
+      exclude: false,
+      image: '/images/charts/addresses.svg',
       link: '/charts/addresses',
       text: 'addressesCharts.heading',
-      image: '/images/charts/addresses.svg',
-      exclude: false,
     },
     {
+      exclude: networkId === 'testnet',
+      image: '/images/charts/txn-fee.svg',
       link: '/charts/txn-fee',
       text: 'txnFeeCharts.heading',
-      image: '/images/charts/txn-fee.svg',
-      exclude: networkId === 'testnet',
     },
     {
+      exclude: networkId === 'testnet',
+      image: '/images/charts/txn-volume.svg',
       link: '/charts/txn-volume',
       text: 'txnVolumeCharts.heading',
-      image: '/images/charts/txn-volume.svg',
-      exclude: networkId === 'testnet',
     },
     {
+      exclude: false,
+      image: '/images/charts/tps.svg',
       link: '/charts/tps',
       text: 'Near Transactions per Second Chart',
-      image: '/images/charts/tps.svg',
-      exclude: false,
     },
   ];
   return (
-    <div ref={ref} className={`w-full z-10 ${props.className}`}>
+    <div className={`w-full z-10 ${props.className}`} ref={ref}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {charts.map((chart) => (
           <>

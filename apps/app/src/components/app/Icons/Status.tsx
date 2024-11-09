@@ -3,8 +3,8 @@ import FaHourglassStart from './FaHourglassStart';
 import FaTimesCircle from './FaTimesCircle';
 
 interface Props {
-  status: boolean;
   showLabel: boolean;
+  status: boolean;
 }
 
 const getOptions = (status: boolean) => {
@@ -12,24 +12,24 @@ const getOptions = (status: boolean) => {
     case null:
       return {
         bg: 'bg-yellow-50 dark:bg-black',
-        text: 'text-yellow-500',
         icon: FaHourglassStart,
         label: 'Pending',
+        text: 'text-yellow-500',
       };
     case false:
       return {
         bg: 'bg-red-50 dark:bg-black',
-        text: 'text-red-500',
         icon: FaTimesCircle,
         label: 'Failure',
+        text: 'text-red-500',
       };
 
     default:
       return {
         bg: 'bg-emerald-50 dark:bg-black',
-        text: 'text-emerald-500',
         icon: FaCheckCircle,
         label: 'Success',
+        text: 'text-emerald-500',
       };
   }
 };

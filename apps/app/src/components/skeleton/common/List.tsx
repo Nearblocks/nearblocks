@@ -1,18 +1,19 @@
-import React, { Ref, forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
+
 import Skeleton from './Skeleton';
 interface Props {
-  showRounded?: boolean;
   className?: string;
+  showRounded?: boolean;
 }
 const List = forwardRef(
-  ({ showRounded, className }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ className, showRounded }: Props, ref: Ref<HTMLDivElement>) => {
     return (
       <div className={`w-full z-10 ${className}`}>
         <div
-          ref={ref}
           className={`bg-white  dark:bg-black-600 dark:border-black-200 border soft-shadow ${
             !showRounded ? 'rounded-xl' : ''
           } overflow-hidden`}
+          ref={ref}
         >
           <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 px-3 py-2">
             <div className="max-w-lg pl-3 w-full py-3.5 ">
@@ -24,50 +25,50 @@ const List = forwardRef(
               <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                 <tr>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
                   <th
-                    scope="col"
                     className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                    scope="col"
                   >
                     <Skeleton className="h-4" />
                   </th>
@@ -75,7 +76,7 @@ const List = forwardRef(
               </thead>
               <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
                 {[...Array(25)].map((_, i) => (
-                  <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
+                  <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                       <Skeleton className="h-4" />
                     </td>

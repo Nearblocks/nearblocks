@@ -1,5 +1,6 @@
 'use client';
 import { useConfig } from '@/hooks/app/useConfig';
+
 import Skeleton from '../common/Skeleton';
 
 export default function HashLoading() {

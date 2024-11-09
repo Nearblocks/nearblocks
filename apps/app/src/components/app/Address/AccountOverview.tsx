@@ -1,22 +1,24 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
-import TokenHoldings from '../common/TokenHoldings';
-import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 import Big from 'big.js';
-import { FtInfo, TokenListInfo } from '@/utils/types';
 import { useTranslations } from 'next-intl';
+import React, { useEffect, useState } from 'react';
+
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
+import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
+import { FtInfo, TokenListInfo } from '@/utils/types';
+
+import TokenHoldings from '../common/TokenHoldings';
+import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 
 export default function AccountOverview({
-  id,
   accountData,
+  id,
+  inventoryData,
+  loading = false,
+  spamTokens,
   statsData,
   tokenData,
-  inventoryData,
-  spamTokens,
-  loading = false,
 }: any) {
   const { ftBalanceOf } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
@@ -115,10 +117,10 @@ export default function AccountOverview({
               <div className="truncate max-w-[110px]">{tokenData?.name}</div>
               {tokenData?.website && (
                 <a
-                  href={tokenData?.website}
                   className="ml-1"
-                  target="_blank"
+                  href={tokenData?.website}
                   rel="noopener noreferrer nofollow"
+                  target="_blank"
                 >
                   <FaExternalLinkAlt />
                 </a>
@@ -168,10 +170,10 @@ export default function AccountOverview({
             <div className="w-full md:w-3/4 break-words -my-1 z-10">
               <TokenHoldings
                 data={inventoryData}
-                loading={loading}
-                inventoryLoading={loading}
                 ft={ft}
                 id={id as string}
+                inventoryLoading={loading}
+                loading={loading}
                 spamTokens={spamTokens?.blacklist}
               />
             </div>

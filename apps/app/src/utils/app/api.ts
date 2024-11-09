@@ -1,4 +1,5 @@
 import qs from 'qs';
+
 import { appUrl } from './config';
 
 const fetchKey = process.env.API_ACCESS_KEY;
@@ -42,16 +43,16 @@ export const postRequest = async (
   const url = `${appUrl}${path}`;
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     Authorization: `Bearer ${fetchKey}`,
+    'Content-Type': 'application/json',
     ...customHeaders,
   };
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
-      headers,
       body: JSON.stringify(body),
+      headers,
+      method: 'POST',
     });
 
     if (!response.ok) {

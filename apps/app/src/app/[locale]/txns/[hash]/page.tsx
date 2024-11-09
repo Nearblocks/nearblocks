@@ -1,18 +1,21 @@
+export const runtime = 'edge';
+
+import { Suspense } from 'react';
+
 import TxnsTabsSkeleton from '@/components/app/skeleton/txns/TxnsTabs';
 import TxnsTabs from '@/components/app/Transactions/TxnsTabs';
-import { Suspense } from 'react';
 
 export default async function TxnsHashIndex({
   params: { hash, locale },
   searchParams,
 }: {
   params: { hash: string; locale: string };
-  searchParams: { tab: string; cursor?: string; p?: string; order: string };
+  searchParams: { cursor?: string; order: string; p?: string; tab: string };
 }) {
   return (
     <Suspense
       fallback={
-        <TxnsTabsSkeleton tab={searchParams?.tab || 'overview'} hash={hash} />
+        <TxnsTabsSkeleton hash={hash} tab={searchParams?.tab || 'overview'} />
       }
     >
       <TxnsTabs hash={hash} locale={locale} searchParams={searchParams} />

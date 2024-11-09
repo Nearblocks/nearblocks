@@ -1,5 +1,9 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
+
+import useRpc from '@/hooks/app/useRpc';
+import { Link } from '@/i18n/routing';
 import {
   convertToUTC,
   localFormat,
@@ -8,18 +12,16 @@ import {
   weight,
   yoctoToNear,
 } from '@/utils/app/libs';
-import TokenImage from '../common/TokenImage';
 import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
-import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
-import useRpc from '@/hooks/app/useRpc';
+
+import TokenImage from '../common/TokenImage';
 
 export default function AccountMoreInfo({
-  id,
   accountData,
-  tokenData,
   deploymentData,
+  id,
   nftTokenData,
+  tokenData,
 }: any) {
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
@@ -159,8 +161,8 @@ export default function AccountMoreInfo({
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                 >
                   {shortenAddress(
                     deploymentData.receipt_predecessor_account_id ?? '',
@@ -168,8 +170,8 @@ export default function AccountMoreInfo({
                 </Link>
                 {' at txn  '}
                 <Link
-                  href={`/txns/${deploymentData.transaction_hash}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/txns/${deploymentData.transaction_hash}`}
                 >
                   {shortenAddress(deploymentData.transaction_hash ?? '')}
                 </Link>
@@ -182,13 +184,13 @@ export default function AccountMoreInfo({
               <div className="w-full md:w-3/4 break-words">
                 <div className="flex items-center">
                   <TokenImage
-                    src={tokenData?.icon}
                     alt={tokenData?.name}
                     className="w-4 h-4 mr-2"
+                    src={tokenData?.icon}
                   />
                   <Link
-                    href={`/token/${id}`}
                     className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/token/${id}`}
                   >
                     <span className="inline-block truncate max-w-[110px] mr-1">
                       {tokenData.name}
@@ -216,13 +218,13 @@ export default function AccountMoreInfo({
               <div className="w-full md:w-3/4 break-words">
                 <div className="flex items-center">
                   <TokenImage
-                    src={nftTokenData?.icon}
                     alt={nftTokenData?.name}
                     className="w-4 h-4 mr-2"
+                    src={nftTokenData?.icon}
                   />
                   <Link
-                    href={`/nft-token/${id}`}
                     className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/nft-token/${id}`}
                   >
                     <span className="inline-block truncate max-w-[110px] mr-1">
                       {nftTokenData?.name}

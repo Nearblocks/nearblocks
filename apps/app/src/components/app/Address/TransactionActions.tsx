@@ -1,52 +1,54 @@
 'use client';
-import { Menu, MenuList, MenuButton } from '@reach/menu-button';
-import {
-  localFormat,
-  isAction,
-  yoctoToNear,
-  truncateString,
-} from '@/utils/libs';
-import React, { useState } from 'react';
-import TxnStatus from '../common/Status';
+import { Menu, MenuButton, MenuList } from '@reach/menu-button';
 import { Tooltip } from '@reach/tooltip';
-import Filter from '../Icons/Filter';
-import Filters from '../common/Filters';
-import Download from '../Icons/Download';
-import Clock from '../Icons/Clock';
-import SortIcon from '../Icons/SortIcon';
-import Table from '../common/Table';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import TimeStamp from '../common/TimeStamp';
-import QueryString from 'qs';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { txnMethod } from '@/utils/app/near';
-import { TransactionInfo } from '@/utils/types';
-import TableSummary from '@/components/common/TableSummary';
 import { useTranslations } from 'next-intl';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import QueryString from 'qs';
+import React, { useState } from 'react';
+
+import TableSummary from '@/components/common/TableSummary';
 import { Link } from '@/i18n/routing';
+import { txnMethod } from '@/utils/app/near';
+import {
+  isAction,
+  localFormat,
+  truncateString,
+  yoctoToNear,
+} from '@/utils/libs';
+import { TransactionInfo } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
+import Filters from '../common/Filters';
+import TxnStatus from '../common/Status';
+import Table from '../common/Table';
+import TimeStamp from '../common/TimeStamp';
+import Clock from '../Icons/Clock';
+import Download from '../Icons/Download';
+import FaInbox from '../Icons/FaInbox';
+import Filter from '../Icons/Filter';
+import SortIcon from '../Icons/SortIcon';
 
 const initialForm = {
   action: '',
-  method: '',
   from: '',
+  method: '',
   to: '',
 };
 
 interface TxnsProps {
+  count: string;
+  cursor: string;
+  error: boolean;
   id: string;
   txns: TransactionInfo[];
-  count: string;
-  error: boolean;
-  cursor: string;
 }
 
 const TransactionActions = ({
+  count,
+  cursor, //   tab,
+  error,
   id,
   txns,
-  count,
-  error,
-  cursor, //   tab,
 }: TxnsProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -75,8 +77,8 @@ const TransactionActions = ({
 
       return setForm((state) => ({
         ...state,
-        method: value,
         action: '',
+        method: value,
       }));
     }
 
@@ -88,7 +90,7 @@ const TransactionActions = ({
 
     setPage(1);
 
-    const { action, method, from, to } = form;
+    const { action, from, method, to } = form;
     const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...updatedQuery } = currentParams;
 
@@ -149,7 +151,7 @@ const TransactionActions = ({
     setForm(initialForm);
 
     const currentParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, action, page, method, from, to, block, ...newQuery } =
+    const { action, block, cursor, from, method, page, to, ...newQuery } =
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
@@ -157,29 +159,27 @@ const TransactionActions = ({
 
   const columns: any = [
     {
-      header: <span></span>,
-      key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row.outcomes.status} showLabel={false} />
+          <TxnStatus showLabel={false} status={row.outcomes.status} />
         </>
       ),
+      header: <span></span>,
+      key: '',
       tdClassName:
         'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t('hash') || 'TXN HASH'}</span>,
-      key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+            label={row.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
               <Link
-                href={`/txns/${row.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                href={`/txns/${row.transaction_hash}`}
               >
                 {row.transaction_hash}
               </Link>
@@ -187,18 +187,18 @@ const TransactionActions = ({
           </Tooltip>
         </span>
       ),
+      header: <span>{t('hash') || 'TXN HASH'}</span>,
+      key: 'transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span className="pl-2"> {t('type') || 'METHOD'}</span>,
-      key: 'actions',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={txnMethod(row?.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={txnMethod(row?.actions, t)}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
@@ -208,14 +208,14 @@ const TransactionActions = ({
           </Tooltip>
         </span>
       ),
+      header: <span className="pl-2"> {t('type') || 'METHOD'}</span>,
+      key: 'actions',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t('depositValue') || 'DEPOSIT VALUE'}</span>,
-      key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
           {row.actions_agg?.deposit
@@ -224,14 +224,14 @@ const TransactionActions = ({
           Ⓝ
         </span>
       ),
+      header: <span>{t('depositValue') || 'DEPOSIT VALUE'}</span>,
+      key: 'deposit',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{'TXN FEE'}</span>,
-      key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
           {row.outcomes_agg?.transaction_fee
@@ -240,12 +240,42 @@ const TransactionActions = ({
           Ⓝ
         </span>
       ),
+      header: <span>{'TXN FEE'}</span>,
+      key: 'transaction_fee',
       tdClassName:
         'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.signer_account_id}
+          >
+            <span
+              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+                row?.signer_account_id === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
+              <Link
+                className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/address/${row?.signer_account_id}`}
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={(e) =>
+                  onHandleMouseOver(e, row?.signer_account_id)
+                }
+              >
+                {row?.signer_account_id &&
+                  truncateString(row?.signer_account_id, 15, '...')}
+              </Link>
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <>
           <Menu>
@@ -254,31 +284,31 @@ const TransactionActions = ({
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
-              <form onSubmit={onFilter} className="flex flex-col">
+              <form className="flex flex-col" onSubmit={onFilter}>
                 <input
+                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="from"
-                  value={form.from}
                   onChange={onChange}
                   placeholder={
                     t
                       ? t('txns:filter.placeholder')
                       : 'Search by address e.g. Ⓝ..'
                   }
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  value={form.from}
                 />
                 <div className="flex">
                   <button
-                    type="submit"
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('txns:filter.filter') : 'Filter'}
                   </button>
                   <button
-                    name="from"
-                    type="button"
-                    onClick={onClear}
                     className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    name="from"
+                    onClick={onClear}
+                    type="button"
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
@@ -289,40 +319,10 @@ const TransactionActions = ({
         </>
       ),
       key: 'signer_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip
-            label={row?.signer_account_id}
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.signer_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                href={`/address/${row?.signer_account_id}`}
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.signer_account_id)
-                }
-                onMouseLeave={handleMouseLeave}
-              >
-                {row?.signer_account_id &&
-                  truncateString(row?.signer_account_id, 15, '...')}
-              </Link>
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      header: <span></span>,
-      key: '',
       cell: (row: TransactionInfo) => {
         return row.predecessor_account_id === row.receiver_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
@@ -338,8 +338,37 @@ const TransactionActions = ({
           </span>
         );
       },
+      header: <span></span>,
+      key: '',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row.receiver_account_id}
+          >
+            <span
+              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+                row?.receiver_account_id === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
+              <Link
+                className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/address/${row.receiver_account_id}`}
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={(e) =>
+                  onHandleMouseOver(e, row?.receiver_account_id)
+                }
+              >
+                {truncateString(row.receiver_account_id, 15, '...')}
+              </Link>
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <>
           <Menu>
@@ -347,29 +376,29 @@ const TransactionActions = ({
               {t('to') || 'To'} <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
-              <form onSubmit={onFilter} className="flex flex-col">
+              <form className="flex flex-col" onSubmit={onFilter}>
                 <input
+                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="to"
-                  value={form.to}
                   onChange={onChange}
                   placeholder={
                     t('filter.placeholder') || 'Search by address e.g. Ⓝ..'
                   }
-                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  value={form.to}
                 />
                 <div className="flex">
                   <button
-                    type="submit"
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t('filter.filter') || 'Filter'}
                   </button>
                   <button
-                    name="to"
-                    type="button"
-                    onClick={onClear}
                     className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
+                    name="to"
+                    onClick={onClear}
+                    type="button"
                   >
                     {t('filter.clear') || 'Clear'}
                   </button>
@@ -380,44 +409,15 @@ const TransactionActions = ({
         </>
       ),
       key: 'receiver_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip
-            label={row.receiver_account_id}
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.receiver_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                href={`/address/${row.receiver_account_id}`}
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.receiver_account_id)
-                }
-                onMouseLeave={handleMouseLeave}
-              >
-                {truncateString(row.receiver_account_id, 15, '...')}
-              </Link>
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      header: <span>{t('blockHeight') || ' BLOCK HEIGHT'}</span>,
-      key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            href={`/blocks/${row.included_in_block_hash}`}
             className="text-green-500  dark:text-green-250 hover:no-underline"
+            href={`/blocks/${row.included_in_block_hash}`}
           >
             {row.block?.block_height
               ? localFormat(row.block?.block_height)
@@ -425,26 +425,33 @@ const TransactionActions = ({
           </Link>
         </span>
       ),
+      header: <span>{t('blockHeight') || ' BLOCK HEIGHT'}</span>,
+      key: 'block_height',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+        </span>
+      ),
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
             }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <button
-              type="button"
-              onClick={toggleShowAge}
               className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none whitespace-nowrap"
+              onClick={toggleShowAge}
+              type="button"
             >
               {showAge ? t('age') || 'AGE' : t('ageDT') || 'DATE TIME (UTC)'}
               {showAge && (
@@ -452,7 +459,7 @@ const TransactionActions = ({
               )}
             </button>
           </Tooltip>
-          <button type="button" onClick={onOrder} className="px-2">
+          <button className="px-2" onClick={onOrder} type="button">
             <div className="text-nearblue-600 font-semibold">
               <SortIcon order={order as string} />
             </div>
@@ -460,11 +467,6 @@ const TransactionActions = ({
         </div>
       ),
       key: 'block_timestamp',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
       thClassName: 'whitespace-nowrap',
@@ -481,13 +483,6 @@ const TransactionActions = ({
   return (
     <>
       <TableSummary
-        text={
-          txns &&
-          !error &&
-          `A total of${' '}
-              ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
-              transactions found`
-        }
         filters={<Filters filters={modifiedFilter} onClear={onAllClear} />}
         linkToDowload={
           txns &&
@@ -495,8 +490,8 @@ const TransactionActions = ({
             <>
               <button className="hover:no-underline">
                 <Link
-                  href={`/exportdata?address=${id}&type=transactions`}
                   className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                  href={`/exportdata?address=${id}&type=transactions`}
                 >
                   <p>CSV Export</p>
                   <span className="ml-2">
@@ -507,15 +502,19 @@ const TransactionActions = ({
             </>
           )
         }
+        text={
+          txns &&
+          !error &&
+          `A total of${' '}
+              ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
+              transactions found`
+        }
       />
       <Table
         columns={columns}
-        data={txns}
-        limit={25}
-        cursorPagination={true}
         cursor={cursor}
-        page={page}
-        setPage={setPage}
+        cursorPagination={true}
+        data={txns}
         Error={error}
         ErrorText={
           <ErrorMessage
@@ -524,6 +523,9 @@ const TransactionActions = ({
             mutedText="Please try again later"
           />
         }
+        limit={25}
+        page={page}
+        setPage={setPage}
       />
     </>
   );

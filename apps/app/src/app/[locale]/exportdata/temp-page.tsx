@@ -1,10 +1,12 @@
 'use client';
-import Export from '@/components/app/Export';
 import { useSearchParams } from 'next/navigation';
+
+import Export from '@/components/app/Export';
 
 export default function NftTokenExportData() {
   const searchParams = useSearchParams();
   const address = searchParams?.get('address');
+  const type = searchParams?.get('type');
 
   const onHandleDowload = (blobUrl: string, file: string): void => {
     const a: HTMLAnchorElement = document.createElement('a');
@@ -17,11 +19,11 @@ export default function NftTokenExportData() {
   };
   return (
     <div className="relative">
-      {address && (
+      {address && type && (
         <Export
+          exportType={type}
           id={address}
           onHandleDowload={onHandleDowload}
-          exportType={'nfttokentransactions'}
         />
       )}
     </div>

@@ -1,7 +1,8 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Skeleton from './skeleton/common/Skeleton';
 import { useEnvContext } from 'next-runtime-env';
+import React, { useEffect, useState } from 'react';
+
+import Skeleton from './skeleton/common/Skeleton';
 
 const SponserdText: React.FC<any> = () => {
   const [isMobile, setIsMobile] = useState(false);

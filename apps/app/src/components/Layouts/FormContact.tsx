@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import ArrowDown from '../Icons/ArrowDown';
-import LoadingCircular from '../common/LoadingCircular';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { env } from 'next-runtime-env';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
-import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
+import { env } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import LoadingCircular from '../common/LoadingCircular';
+import ArrowDown from '../Icons/ArrowDown';
 
 interface Props {
   selectValue?: string;
@@ -46,17 +47,17 @@ const FormContact = ({ selectValue }: Props) => {
     try {
       setLoading(true);
       const response = await fetch('/api/contact', {
-        method: 'POST',
+        body: JSON.stringify({
+          description: description,
+          email: email,
+          name: name,
+          subject: subjectText,
+          token: token,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          subject: subjectText,
-          description: description,
-          token: token,
-        }),
+        method: 'POST',
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -82,26 +83,26 @@ const FormContact = ({ selectValue }: Props) => {
         <div>
           <p className="font-semibold text-sm mb-1">{t('form.name.label')}</p>
           <input
-            id="name"
-            placeholder="Enter name..."
             autoComplete="off"
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm  w-full h-10"
+            id="name"
             onChange={(e) => setName(e?.target?.value)}
-            value={name}
+            placeholder="Enter name..."
             required
+            value={name}
           />
         </div>
         <div>
           <p className="font-semibold text-sm mb-1">{t('form.email.label')}</p>
           <input
-            id="email"
-            type="email"
-            placeholder="Enter email..."
             autoComplete="off"
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm w-full h-10"
-            value={email}
+            id="email"
             onChange={(e) => setEmail(e?.target?.value)}
+            placeholder="Enter email..."
             required
+            type="email"
+            value={email}
           />
         </div>
         {!selectValue && (
@@ -111,11 +112,11 @@ const FormContact = ({ selectValue }: Props) => {
             </p>
             <label className="relative md:flex">
               <select
-                onChange={(e) => setSubject(e?.target?.value)}
                 className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} w-full rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm appearance-none h-10"
+                onChange={(e) => setSubject(e?.target?.value)}
                 value={subject}
               >
-                <option selected disabled={true}>
+                <option disabled={true} selected>
                   Select subject
                 </option>
                 <option value="3">Partnership / Press</option>
@@ -129,22 +130,19 @@ const FormContact = ({ selectValue }: Props) => {
             {t('form.message.label')}
           </p>
           <textarea
-            id="message"
-            placeholder="Max characters (300 words)"
             autoComplete="off"
             className="px-3 py-1.5 bg-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm overflow-hidden w-full"
+            id="message"
             maxLength={300}
-            rows={5}
             onChange={(e) => setDescription(e.target.value)}
-            value={description}
+            placeholder="Max characters (300 words)"
             required
+            rows={5}
+            value={description}
           />
         </div>
         <div className="flex">
           <Turnstile
-            ref={turnstileRef}
-            options={{ theme: theme as any }}
-            siteKey={siteKey as string}
             onError={() => setStatus('error')}
             onExpire={() => setStatus('expired')}
             onSuccess={(token) => {
@@ -152,6 +150,9 @@ const FormContact = ({ selectValue }: Props) => {
               setStatus('solved');
             }}
             onWidgetLoad={(widgetId) => console.log('Widget loaded', widgetId)}
+            options={{ theme: theme as any }}
+            ref={turnstileRef}
+            siteKey={siteKey as string}
           />
           {status === 'error' && (
             <span className="text-red-500 text-sm p-6">
@@ -160,9 +161,9 @@ const FormContact = ({ selectValue }: Props) => {
           )}
         </div>
         <button
-          type="submit"
           className="text-base text-white border border-green-900/10 font-normal px-3 py-1.5 bg-green-500 dark:bg-green-250 dark:text-neargray-10  hover:bg-green-400 rounded w-fit"
           disabled={loading}
+          type="submit"
         >
           {loading ? <LoadingCircular /> : t('form.button')}
         </button>

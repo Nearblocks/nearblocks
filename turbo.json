@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["PORT", "NODE_ENV"],
+  "globalEnv": ["PORT", "NODE_ENV", "GITHUB_SHA"],
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
@@ -32,6 +32,36 @@
         "NEXT_RUNTIME",
         "CI",
         "NEXT_PUBLIC_REOWN_PROJECT_ID"
+      ]
+    },
+    "pages:build": {
+      "outputs": [".vercel/output/static/**"],
+      "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_NETWORK_ID",
+        "NEXT_PUBLIC_ACCOUNT_ID",
+        "NEXT_PUBLIC_LOADER_URL",
+        "NEXT_PUBLIC_BOS_NETWORK",
+        "NEXT_PUBLIC_OG_URL",
+        "NEXT_PUBLIC_MAINNET_URL",
+        "NEXT_PUBLIC_TESTNET_URL",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_REGION",
+        "AWS_SES_FROM_EMAIL",
+        "AWS_SES_TO_EMAIL",
+        "NEXT_PUBLIC_GTM_ID",
+        "NODE_ENV",
+        "NEXT_PUBLIC_USER_API_URL",
+        "NEXT_PUBLIC_USER_DASHBOARD_URL",
+        "NEXT_PUBLIC_API_URL",
+        "API_URL",
+        "API_ACCESS_KEY",
+        "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+        "TURNSTILE_SECRET_KEY",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_RUNTIME",
+        "CI"
       ]
     },
     "lint": {

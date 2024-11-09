@@ -1,9 +1,11 @@
+import { useTranslations } from 'next-intl';
+
 import FaKey from '@/components/Icons/FaKey';
+import { Link } from '@/i18n/routing';
 import { shortenAddress, shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
 import TreeNode from '../TreeNode';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 const AddKey = (props: TransactionActionInfo) => {
   const { action } = props;
@@ -20,8 +22,8 @@ const AddKey = (props: TransactionActionInfo) => {
           </span>
           ) {t ? t('txn.actions.addKey.2') : 'added for'}
           <Link
-            href={`/address/${props?.receiver}`}
             className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
+            href={`/address/${props?.receiver}`}
           >
             {shortenAddress(props?.receiver)}
           </Link>
@@ -48,8 +50,8 @@ const AddKey = (props: TransactionActionInfo) => {
           </span>
           ){t ? t('txn.actions.addKey.2') : 'added for'}{' '}
           <Link
-            href={`/address/${props?.receiver}`}
             className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
+            href={`/address/${props?.receiver}`}
           >
             {shortenAddress(props?.receiver)}
           </Link>
@@ -74,8 +76,8 @@ const AddKey = (props: TransactionActionInfo) => {
         ) {t ? t('txn.actions.addKey.2') : 'added for'}
         {t ? t('txn.actions.addKey.3') : 'contract'}
         <Link
-          href={`/address/${props?.args?.access_key?.permission?.FunctionCall?.receiver_id}`}
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
+          href={`/address/${props?.args?.access_key?.permission?.FunctionCall?.receiver_id}`}
         >
           {shortenAddress(
             props?.args?.access_key?.permission?.FunctionCall?.receiver_id,

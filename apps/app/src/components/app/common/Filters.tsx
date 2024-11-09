@@ -1,4 +1,5 @@
 import { capitalize, stripEmpty } from '@/utils/libs';
+
 import CloseCircle from '../Icons/CloseCircle';
 
 interface FiltersProps {

@@ -7,15 +7,15 @@ export default function ThemeImage() {
 
   return (
     <Image
+      alt="NearBlocks"
+      className="w-full"
+      height={600}
       src={
         theme === 'dark'
           ? '/images/world-link-dark.svg'
           : '/images/world-link-light.svg'
       }
-      alt="NearBlocks"
-      className="w-full"
       width={1024}
-      height={600}
     />
   );
 }

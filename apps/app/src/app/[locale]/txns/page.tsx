@@ -1,14 +1,17 @@
-import ListSkeletion from '@/components/app/skeleton/txns/List';
-import List from '@/components/app/Transactions/List';
+export const runtime = 'edge';
+
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
+
+import ListSkeletion from '@/components/app/skeleton/txns/List';
+import List from '@/components/app/Transactions/List';
 
 export default async function TransactionList({
   params: { locale },
   searchParams,
 }: {
   params: { locale: string };
-  searchParams: { cursor?: string; p?: string; order: string };
+  searchParams: { cursor?: string; order: string; p?: string };
 }) {
   const t = await getTranslations({ locale });
 

@@ -1,24 +1,24 @@
 export function hexy(buffer: any | number[], config: any): string {
   const MAX_ADDRESS_LENGTH = 8;
   const defaults: any = {
-    width: 16,
-    numbering: 'hex_bytes',
-    format: 'fours',
-    littleEndian: false,
-    radix: 16,
-    caps: 'lower',
     annotate: 'ascii',
-    prefix: '',
-    indent: 0,
-    html: false,
-    offset: 0,
-    length: -1,
-    extendedChs: false,
+    caps: 'lower',
     display_offset: 0,
+    extendedChs: false,
+    format: 'fours',
+    html: false,
+    indent: 0,
+    length: -1,
+    littleEndian: false,
+    numbering: 'hex_bytes',
+    offset: 0,
+    prefix: '',
+    radix: 16,
+    width: 16,
   };
   const options: any = { ...defaults, ...config };
 
-  let bufferData: any | [];
+  let bufferData: [] | any;
   if (Buffer.isBuffer(buffer)) {
     bufferData = buffer;
   } else if (Array.isArray(buffer)) {
@@ -28,18 +28,18 @@ export function hexy(buffer: any | number[], config: any): string {
   }
 
   const {
-    width,
-    numbering,
-    format,
-    littleEndian,
-    radix,
     annotate,
-    indent,
-    html,
-    offset,
-    length,
-    extendedChs,
     display_offset,
+    extendedChs,
+    format,
+    html,
+    indent,
+    length,
+    littleEndian,
+    numbering,
+    offset,
+    radix,
+    width,
   } = options;
 
   const prefixSpaces = ' '.repeat(indent);

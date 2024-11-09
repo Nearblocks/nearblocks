@@ -10,12 +10,12 @@ interface Props {
 const FaUser = (props: Props) => {
   return (
     <svg
-      stroke="currentColor"
+      className={props.className}
       fill="currentColor"
+      height="1em"
+      stroke="currentColor"
       stroke-width="0"
       viewBox="0 0 448 512"
-      className={props.className}
-      height="1em"
       width="1em"
       xmlns="http://www.w3.org/2000/svg"
     >

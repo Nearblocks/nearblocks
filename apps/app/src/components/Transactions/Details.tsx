@@ -1,12 +1,19 @@
-import { networkId } from '@/utils/config';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 import {
   Accordion,
-  AccordionItem,
   AccordionButton,
+  AccordionItem,
   AccordionPanel,
 } from '@reach/accordion';
+import { Tooltip } from '@reach/tooltip';
+import Big from 'big.js';
+import { isEmpty } from 'lodash';
+import { useTranslations } from 'next-intl';
+import { useEffect, useMemo, useState } from 'react';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
+import { Link } from '@/i18n/routing';
+import { networkId } from '@/utils/config';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -22,6 +29,7 @@ import {
   tokenAmount,
   yoctoToNear,
 } from '@/utils/libs';
+import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
 import {
   FtsInfo,
   InventoryInfo,
@@ -30,33 +38,27 @@ import {
   TransactionInfo,
   TransactionLog,
 } from '@/utils/types';
-import Big from 'big.js';
-import { useEffect, useMemo, useState } from 'react';
+
+import TxnStatus from '../common/Status';
+import TokenImage, { NFTImage } from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
 import ArrowUp from '../Icons/ArrowUp';
-import Question from '../Icons/Question';
-import TxnStatus from '../common/Status';
 import FaRight from '../Icons/FaRight';
-import { Tooltip } from '@reach/tooltip';
-import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
+import Question from '../Icons/Question';
 import EventLogs from './Action';
 import Actions from './Actions';
-import TokenImage, { NFTImage } from '../common/TokenImage';
-import { isEmpty } from 'lodash';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 interface Props {
+  isContract: boolean;
   loading: boolean;
-  txn: TransactionInfo;
+  price: string;
   rpcTxn: RPCTransactionInfo;
   statsData: any;
-  isContract: boolean;
-  price: string;
+  txn: TransactionInfo;
 }
 
 const Details = (props: Props) => {
-  const { loading, txn, rpcTxn, statsData, price, isContract = false } = props;
+  const { isContract = false, loading, price, rpcTxn, statsData, txn } = props;
   const [more, setMore] = useState(false);
   const t = useTranslations();
   const { fts, nfts } = useMemo(() => {
@@ -176,8 +178,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.hash.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.hash.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -198,8 +200,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap items-start p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.status.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.status.tooltip')}
             >
               <div>
                 <div>
@@ -218,8 +220,8 @@ const Details = (props: Props) => {
               {txn?.outcomes?.status !== undefined && (
                 <TxnStatus
                   showLabel
-                  status={txn?.outcomes?.status}
                   showReceipt={<FailedReceipts data={rpcTxn} />}
+                  status={txn?.outcomes?.status}
                 />
               )}
               {errorMessage && (
@@ -233,8 +235,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.block.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.block.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -249,8 +251,8 @@ const Details = (props: Props) => {
           ) : txn ? (
             <div className="w-full md:w-3/4 font-semibold break-words">
               <Link
-                href={`/blocks/${txn?.included_in_block_hash}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/blocks/${txn?.included_in_block_hash}`}
               >
                 {txn?.block?.block_height
                   ? localFormat(txn?.block?.block_height)
@@ -264,8 +266,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.timestamp.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.timestamp.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -293,10 +295,10 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
               label={
                 'The shard number in which the transaction was executed in'
               }
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -320,8 +322,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.from.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.from.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -336,8 +338,8 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-all">
               <Link
-                href={`/address/${txn?.signer_account_id}`}
                 className="text-green-500  dark:text-green-250 hover:no-underline"
+                href={`/address/${txn?.signer_account_id}`}
               >
                 {txn?.signer_account_id}
               </Link>
@@ -347,8 +349,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.to.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.to.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -367,8 +369,8 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-all">
               <Link
-                href={`/address/${txn?.receiver_account_id}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/address/${txn?.receiver_account_id}`}
               >
                 {txn?.receiver_account_id}
               </Link>
@@ -380,8 +382,8 @@ const Details = (props: Props) => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
             <Tooltip
-              label={'List of tokens transferred in the transaction'}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={'List of tokens transferred in the transaction'}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -410,8 +412,8 @@ const Details = (props: Props) => {
                               From{' '}
                               {ft?.involved_account_id ? (
                                 <Link
-                                  href={`/address/${ft?.involved_account_id}`}
                                   className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                  href={`/address/${ft?.involved_account_id}`}
                                 >
                                   {shortenAddress(
                                     ft?.involved_account_id ?? '',
@@ -425,8 +427,8 @@ const Details = (props: Props) => {
                               To{' '}
                               {ft?.affected_account_id ? (
                                 <Link
-                                  href={`/address/${ft?.affected_account_id}`}
                                   className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                  href={`/address/${ft?.affected_account_id}`}
                                 >
                                   {shortenAddress(
                                     ft?.affected_account_id ?? '',
@@ -443,8 +445,8 @@ const Details = (props: Props) => {
                               From{' '}
                               {ft?.affected_account_id ? (
                                 <Link
-                                  href={`/address/${ft?.affected_account_id}`}
                                   className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                  href={`/address/${ft?.affected_account_id}`}
                                 >
                                   {shortenAddress(
                                     ft?.affected_account_id ?? '',
@@ -458,8 +460,8 @@ const Details = (props: Props) => {
                               To{' '}
                               {ft?.involved_account_id ? (
                                 <Link
-                                  href={`/address/${ft?.involved_account_id}`}
                                   className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                  href={`/address/${ft?.involved_account_id}`}
                                 >
                                   {shortenAddress(
                                     ft?.involved_account_id ?? '',
@@ -487,13 +489,13 @@ const Details = (props: Props) => {
                         </div>
 
                         <Link
-                          href={`/token/${ft?.ft_meta?.contract}`}
                           className="text-green dark:text-green-250 flex items-center hover:no-underline"
+                          href={`/token/${ft?.ft_meta?.contract}`}
                         >
                           <TokenImage
-                            src={ft?.ft_meta?.icon}
                             alt={ft?.ft_meta?.name}
                             className="w-4 h-4 mx-1"
+                            src={ft?.ft_meta?.icon}
                           />
                           {shortenToken(ft?.ft_meta?.name ?? '')}
                           <span>
@@ -518,8 +520,8 @@ const Details = (props: Props) => {
                                       From{' '}
                                       {nft?.involved_account_id ? (
                                         <Link
-                                          href={`/address/${nft?.involved_account_id}`}
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                          href={`/address/${nft?.involved_account_id}`}
                                         >
                                           {shortenAddress(
                                             nft?.involved_account_id ?? '',
@@ -535,8 +537,8 @@ const Details = (props: Props) => {
                                       To{' '}
                                       {nft?.affected_account_id ? (
                                         <Link
-                                          href={`/address/${nft?.affected_account_id}`}
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                          href={`/address/${nft?.affected_account_id}`}
                                         >
                                           {shortenAddress(
                                             nft?.affected_account_id ?? '',
@@ -555,8 +557,8 @@ const Details = (props: Props) => {
                                       From{' '}
                                       {nft?.affected_account_id ? (
                                         <Link
-                                          href={`/address/${nft?.affected_account_id}`}
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                          href={`/address/${nft?.affected_account_id}`}
                                         >
                                           {shortenAddress(
                                             nft?.affected_account_id ?? '',
@@ -572,8 +574,8 @@ const Details = (props: Props) => {
                                       To{' '}
                                       {nft?.involved_account_id ? (
                                         <Link
-                                          href={`/address/${nft?.involved_account_id}`}
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                          href={`/address/${nft?.involved_account_id}`}
                                         >
                                           {shortenAddress(
                                             nft?.involved_account_id ?? '',
@@ -594,8 +596,8 @@ const Details = (props: Props) => {
                                   <span className="pl-1 font-normal">
                                     NFT Token ID [
                                     <Link
-                                      href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                       className="text-green hover:no-underline dark:text-green-250"
+                                      href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                     >
                                       {shortenToken(nft?.token_id ?? '')}
                                     </Link>
@@ -604,13 +606,13 @@ const Details = (props: Props) => {
                                 </div>
 
                                 <Link
-                                  href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   className="text-green flex items-center hover:no-underline dark:text-green-250"
+                                  href={`/nft-token/${nft?.nft_meta?.contract}`}
                                 >
                                   <TokenImage
-                                    src={nft?.nft_meta?.icon}
                                     alt={nft?.nft_meta?.name}
                                     className="w-4 h-4 mx-1"
+                                    src={nft?.nft_meta?.icon}
                                   />
                                   {shortenToken(nft?.nft_meta?.name ?? '')}
                                   <span>
@@ -624,18 +626,18 @@ const Details = (props: Props) => {
                             </div>
                             <div className="border rounded ml-2 w-11 h-11 p-1">
                               <Link
-                                href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                                 className="hover:no-underline"
+                                href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
                               >
                                 <NFTImage
+                                  alt={nft?.nft_token_meta?.title}
                                   base={nft?.nft_meta?.base_uri}
+                                  className="max-h-full rounded"
                                   media={nft?.nft_token_meta?.media}
                                   reference={
                                     nft?.nft_meta?.reference ||
                                     nft?.nft_token_meta?.reference
                                   }
-                                  alt={nft?.nft_token_meta?.title}
-                                  className="max-h-full rounded"
                                 />
                               </Link>
                             </div>
@@ -653,8 +655,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.deposit.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.deposit.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -669,8 +671,8 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words">
               <Tooltip
-                label={t('txn.deposit.tooltip')}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                label={t('txn.deposit.tooltip')}
               >
                 <span>
                   {txn?.actions_agg?.deposit
@@ -691,8 +693,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.fee.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.fee.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -724,8 +726,8 @@ const Details = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              label={t('txn.price.tooltip')}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={t('txn.price.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -745,14 +747,14 @@ const Details = (props: Props) => {
         </div>
       )}
       <div
-        id="action-row"
         className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+        id="action-row"
       >
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
             <Tooltip
-              label={'Highlighted events of the transaction'}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={'Highlighted events of the transaction'}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -768,14 +770,14 @@ const Details = (props: Props) => {
             <div className="w-full md:w-3/4">
               <PerfectScrollbar>
                 <div
-                  id="action-column"
                   className="max-h-[194px] break-words space-y-2"
+                  id="action-column"
                 >
                   {logs?.map((event: TransactionLog, i: number) => (
-                    <EventLogs key={i} event={event} />
+                    <EventLogs event={event} key={i} />
                   ))}
                   {actions?.map((action: any, i: number) => (
-                    <Actions key={i} action={action} />
+                    <Actions action={action} key={i} />
                   ))}
                 </div>
               </PerfectScrollbar>
@@ -791,8 +793,8 @@ const Details = (props: Props) => {
               <div className="flex flex-wrap p-4">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                   <Tooltip
-                    label={t('txn.gas.tooltip')}
                     className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    label={t('txn.gas.tooltip')}
                   >
                     <div>
                       <Question className="w-4 h-4 fill-current mr-1" />
@@ -821,8 +823,8 @@ const Details = (props: Props) => {
               <div className="flex flex-wrap p-4">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                   <Tooltip
-                    label={t('txn.burnt.tooltip')}
                     className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    label={t('txn.burnt.tooltip')}
                   >
                     <div>
                       <Question className="w-4 h-4 fill-current mr-1" />

@@ -1,3 +1,9 @@
+import { Tooltip } from '@reach/tooltip';
+import Big from 'big.js';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/useRpc';
@@ -9,14 +15,9 @@ import {
   FunctionCallActionView,
   ReceiptsPropsInfo,
 } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
-import Big from 'big.js';
-import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 interface Props {
-  receipt: ReceiptsPropsInfo | any;
+  receipt: any | ReceiptsPropsInfo;
 }
 
 const ReceiptInfo = ({ receipt }: Props) => {
@@ -90,10 +91,10 @@ const ReceiptInfo = ({ receipt }: Props) => {
       statusInfo =
         prettyArgs && typeof prettyArgs === 'object' ? (
           <textarea
+            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
+            defaultValue={JSON.stringify(prettyArgs)}
             readOnly
             rows={4}
-            defaultValue={JSON.stringify(prettyArgs)}
-            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
@@ -112,10 +113,10 @@ const ReceiptInfo = ({ receipt }: Props) => {
   } else if (receipt?.outcome?.status?.type === 'failure') {
     statusInfo = (
       <textarea
+        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
+        defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
         readOnly
         rows={4}
-        defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
-        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
@@ -188,12 +189,11 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   return (
     <div className="flex flex-col">
-      <Tabs selectedIndex={tabIndex} onSelect={(index) => onTab(index)}>
+      <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
         <TabList>
           {hashes &&
             hashes.map((hash, index) => (
               <Tab
-                key={index}
                 className={`text-nearblue-600 text-xs leading-4 ${
                   hash === 'output' ? 'ml-6' : 'ml-3'
                 } font-medium overflow-hidden inline-block cursor-pointer p-2 focus:outline-none ${
@@ -201,6 +201,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
                 }`}
+                key={index}
                 value={hash}
               >
                 {hash === 'output' ? <h2>Output</h2> : <h2>Inspect</h2>}
@@ -208,15 +209,15 @@ const ReceiptInfo = ({ receipt }: Props) => {
             ))}
         </TabList>
         <TabPanel
-          value={hashes[0]}
           className={'w-full focus:border-none focus:outline-none'}
+          value={hashes[0]}
         >
           <div className="flex flex-col my-4 ml-6">
             <div className="">
               <h2 className="flex items-center text-sm font-medium">
                 <Tooltip
-                  label={'Logs included in the receipt'}
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                  label={'Logs included in the receipt'}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -228,10 +229,10 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 {receipt?.outcome?.logs?.length > 0 ? (
                   <div className="w-full  break-words  space-y-4">
                     <textarea
+                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 resize-y"
+                      defaultValue={receipt?.outcome?.logs.join('\n')}
                       readOnly
                       rows={4}
-                      defaultValue={receipt?.outcome?.logs.join('\n')}
-                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 resize-y"
                     ></textarea>
                   </div>
                 ) : (
@@ -244,8 +245,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
             <div className="mt-4">
               <h2 className="flex items-center text-sm font-medium">
                 <Tooltip
-                  label={'The result of the receipt execution'}
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                  label={'The result of the receipt execution'}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -258,8 +259,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
           </div>
         </TabPanel>
         <TabPanel
-          value={hashes[1]}
           className={'w-fit focus:border-none focus:outline-none'}
+          value={hashes[1]}
         >
           <div className="overflow-x-auto">
             <table className="my-4 mx-6 whitespace-nowrap table-auto">
@@ -267,8 +268,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Unique identifier (hash) of this receipt.'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Unique identifier (hash) of this receipt.'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -281,8 +282,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={t('txn.status.tooltip')}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={t('txn.status.tooltip')}
                     >
                       <div>
                         <div>
@@ -305,8 +306,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     }`}
                   >
                     <Tooltip
-                      label={'Block height'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Block height'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -317,8 +318,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   <td className="py-2 pl-4">
                     {block && (
                       <Link
-                        href={`/blocks/${receipt?.outcome?.blockHash}`}
                         className="text-green-500 dark:text-green-250"
+                        href={`/blocks/${receipt?.outcome?.blockHash}`}
                       >
                         {!loading &&
                           block?.height &&
@@ -330,8 +331,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'The account which issued the receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'The account which issued the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -341,8 +342,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   </td>
                   <td className="py-2 pl-4">
                     <Link
-                      href={`/address/${receipt?.predecessorId}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
+                      href={`/address/${receipt?.predecessorId}`}
                     >
                       {receipt?.predecessorId}
                     </Link>
@@ -351,8 +352,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'The destination account of the receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'The destination account of the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -362,8 +363,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   </td>
                   <td className="py-2 pl-4">
                     <Link
-                      href={`/address/${receipt?.receiverId}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
+                      href={`/address/${receipt?.receiverId}`}
                     >
                       {receipt?.receiverId}
                     </Link>
@@ -372,8 +373,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Maximum amount of gas allocated for the Receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Maximum amount of gas allocated for the Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -390,8 +391,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Fees Pre-charged on Receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Fees Pre-charged on Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -408,8 +409,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Burnt Gas by Receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Burnt Gas by Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -431,8 +432,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Burnt Tokens by Receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Burnt Tokens by Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -453,8 +454,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      label={'Refund from the receipt'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                      label={'Refund from the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />

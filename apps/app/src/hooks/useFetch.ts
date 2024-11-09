@@ -1,17 +1,18 @@
-import useSWR from 'swr';
 import axios, { AxiosRequestConfig } from 'axios';
-import { toast } from 'react-toastify';
-import RateLimitDialog from '@/components/RateLimitDialog';
-import React from 'react';
 import { env } from 'next-runtime-env';
+import React from 'react';
+import { toast } from 'react-toastify';
+import useSWR from 'swr';
+
+import RateLimitDialog from '@/components/RateLimitDialog';
 
 const fetchKey = env('NEXT_PUBLIC_API_FETCH_KEY');
 const baseURL = env('NEXT_PUBLIC_API_URL');
 
 export const defaultOptions = {
   revalidateOnFocus: false,
-  shouldRetryOnError: false,
   revalidateOnReconnect: false,
+  shouldRetryOnError: false,
 };
 
 const request = axios.create({ baseURL });
@@ -19,8 +20,8 @@ const request = axios.create({ baseURL });
 declare module 'axios' {
   export interface AxiosRequestConfig {
     attempt?: number;
-    retries?: number;
     refreshInterval?: number;
+    retries?: number;
     revalidateOnReconnect?: boolean;
   }
 }
@@ -30,8 +31,8 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 request.interceptors.response.use(undefined, async (error) => {
   if (error?.response?.status === 429) {
     toast.warn(React.createElement(RateLimitDialog), {
-      toastId: 'rateLimit',
       autoClose: false,
+      toastId: 'rateLimit',
     });
   }
 
@@ -53,11 +54,11 @@ request.interceptors.response.use(undefined, async (error) => {
 export const fetcher = (url: string, options: AxiosRequestConfig = {}) => {
   return request
     .get(url, {
+      attempt: 1,
       headers: {
         'Secs-Fetch-Key': fetchKey,
         ...(options?.headers || {}),
       },
-      attempt: 1,
       ...options,
     })
     .then((res) => res?.data)

@@ -1,17 +1,18 @@
 import { Tooltip } from '@reach/tooltip';
+
 import Question from '@/components/Icons/Question';
+import { Link } from '@/i18n/routing';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
 import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
-import { Link } from '@/i18n/routing';
 
 interface Props {
   contract: ContractCodeInfo;
-  isLocked: boolean;
   data: { deployments: DeploymentsInfo[] };
+  isLocked: boolean;
 }
 
 const Info = (props: Props) => {
-  const { contract, isLocked, data } = props;
+  const { contract, data, isLocked } = props;
 
   const deployments = data?.deployments;
   const [createAction, updateAction] = deployments || [];
@@ -32,8 +33,8 @@ const Info = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
-                label={'Latest time the contract deployed'}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                label={'Latest time the contract deployed'}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -56,8 +57,8 @@ const Info = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
               <Tooltip
-                label={`The transaction unique identifier (hash) that the contract is latest deployed.`}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                label={`The transaction unique identifier (hash) that the contract is latest deployed.`}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -71,8 +72,8 @@ const Info = (props: Props) => {
               <div className="w-full md:w-3/4 break-words">
                 {action?.transaction_hash && (
                   <Link
-                    href={`/txns/${action.transaction_hash}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/txns/${action.transaction_hash}`}
                   >
                     {action.transaction_hash}
                   </Link>
@@ -84,8 +85,8 @@ const Info = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
               <Tooltip
-                label={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                label={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -105,8 +106,8 @@ const Info = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
               <Tooltip
-                label={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                label={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />

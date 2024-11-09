@@ -1,15 +1,16 @@
-import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
-import Transactions from '@/components/app/Address/Transactions';
+import classNames from 'classnames';
+import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
-import TokenTransactions from '@/components/app/Address/TokenTransactions';
-import NFTTransactions from '@/components/app/Address/NFTTransactions';
+
 import AccessKeys from '@/components/app/Address/AccessKeys';
 import Overview from '@/components/app/Address/Contract/Overview';
+import NFTTransactions from '@/components/app/Address/NFTTransactions';
 import Receipts from '@/components/app/Address/Receipts';
-import classNames from 'classnames';
-import { getRequest } from '@/utils/app/api';
+import TokenTransactions from '@/components/app/Address/TokenTransactions';
+import Transactions from '@/components/app/Address/Transactions';
+import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
-import { getTranslations } from 'next-intl/server';
+import { getRequest } from '@/utils/app/api';
 
 export default async function AccountTabs({
   id,
@@ -25,27 +26,27 @@ export default async function AccountTabs({
   const tab = searchParams?.tab || 'txns';
 
   const tabs = [
-    { name: 'txns', message: 'Transactions', label: 'Transactions' },
-    { name: 'receipts', message: 'Receipts', label: 'Receipts' },
-    { name: 'tokentxns', message: 'tokenTxns', label: 'Token Txns' },
-    { name: 'nfttokentxns', message: 'nftTokenTxns', label: 'NFT Token Txns' },
-    { name: 'accesskeys', message: 'accessKeys', label: 'Access Keys' },
-    { name: 'contract', message: 'contract', label: 'Contract' },
+    { label: 'Transactions', message: 'Transactions', name: 'txns' },
+    { label: 'Receipts', message: 'Receipts', name: 'receipts' },
+    { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
+    { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+    { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
+    { label: 'Contract', message: 'contract', name: 'contract' },
   ];
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
   return (
     <div className="block lg:flex lg:space-x-2 mb-10">
       <div className="w-full ">
         <div className="flex flex-wrap ">
-          {tabs?.map(({ name, label, message }) => {
+          {tabs?.map(({ label, message, name }) => {
             const hasContractTab =
               parse?.contract?.[0]?.contract &&
               Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
@@ -55,13 +56,13 @@ export default async function AccountTabs({
 
             return (
               <Link
-                key={name}
+                className={getClassName(name === tab)}
                 href={
                   name === 'txns'
                     ? `/address/${id}`
                     : `/address/${id}?tab=${name}`
                 }
-                className={getClassName(name === tab)}
+                key={name}
                 scroll={false}
               >
                 <h2>

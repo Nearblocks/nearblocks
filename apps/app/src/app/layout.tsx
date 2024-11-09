@@ -1,7 +1,9 @@
-import '@/styles/globals.css';
-import '../../public/common.css';
-import { unstable_setRequestLocale } from 'next-intl/server';
 import { Viewport } from 'next';
+import { unstable_setRequestLocale } from 'next-intl/server';
+
+import '@/styles/globals.css';
+
+import '../../public/common.css';
 
 interface paramTypes {
   children: React.ReactNode;

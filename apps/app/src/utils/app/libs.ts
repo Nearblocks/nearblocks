@@ -1,5 +1,6 @@
-import { FieldType, GuessableTypeString } from '@/utils/types';
 import Big from 'big.js';
+
+import { FieldType, GuessableTypeString } from '@/utils/types';
 
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
   Object.entries(obj).reduce((a, [k, v]) => {
@@ -215,12 +216,12 @@ export function getTimeAgoString(timestamp: number) {
   const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
 
   const intervals = {
-    year: seconds / (60 * 60 * 24 * 365),
-    month: seconds / (60 * 60 * 24 * 30),
-    week: seconds / (60 * 60 * 24 * 7),
     day: seconds / (60 * 60 * 24),
     hour: seconds / (60 * 60),
     minute: seconds / 60,
+    month: seconds / (60 * 60 * 24 * 30),
+    week: seconds / (60 * 60 * 24 * 7),
+    year: seconds / (60 * 60 * 24 * 365),
   };
 
   if (intervals.year >= 1) {
@@ -461,7 +462,7 @@ const strToType = (str: string, type: GuessableTypeString): unknown => {
       return Number(str);
     case 'boolean':
       return (
-        str.trim().length > 0 && !['false', '0'].includes(str.toLowerCase())
+        str.trim().length > 0 && !['0', 'false'].includes(str.toLowerCase())
       );
     case 'null':
       return null;

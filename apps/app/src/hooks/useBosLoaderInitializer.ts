@@ -15,10 +15,10 @@ export function useBosLoaderInitializer() {
 
       try {
         const res = await fetch(url, {
-          method: 'GET',
           headers: {
             Accept: 'application/json',
           },
+          method: 'GET',
         });
 
         if (!res.ok) {

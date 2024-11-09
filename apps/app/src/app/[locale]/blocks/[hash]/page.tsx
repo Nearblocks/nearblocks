@@ -1,9 +1,12 @@
-import Details from '@/components/app/Blocks/Details';
-import { nanoToMilli } from '@/utils/app/libs';
+export const runtime = 'edge';
+
+import { unstable_setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
+
+import Details from '@/components/app/Blocks/Details';
 import HashLoading from '@/components/app/skeleton/blocks/hash';
 import { getRequest } from '@/utils/app/api';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { nanoToMilli } from '@/utils/app/libs';
 
 export default async function Hash({
   params: { hash, locale },
@@ -19,8 +22,8 @@ export default async function Hash({
       <div className="relative container mx-auto px-3">
         <Suspense fallback={<HashLoading />}>
           <Details
-            hash={hash}
             data={hashData}
+            hash={hash}
             loading={!hashData}
             price={priceData}
           />

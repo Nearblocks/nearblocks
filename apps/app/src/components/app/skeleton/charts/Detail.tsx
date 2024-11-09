@@ -1,8 +1,10 @@
 'use client';
-import React, { Ref, forwardRef } from 'react';
-import Skeleton from '../common/Skeleton';
 import { useTranslations } from 'next-intl';
+import React, { forwardRef, Ref } from 'react';
+
 import { useConfig } from '@/hooks/app/useConfig';
+
+import Skeleton from '../common/Skeleton';
 
 interface Props {
   chartTypes: string;
@@ -16,53 +18,53 @@ const ChartDetails = forwardRef(
 
     const charts = [
       {
+        exclude: networkId === 'testnet',
         link: '/charts/near-price',
         text: 'charts.nearPrice.heading',
-        exclude: networkId === 'testnet',
       },
       {
+        exclude: networkId === 'testnet',
         link: '/charts/market-cap',
         text: 'marketCapCharts.heading',
-        exclude: networkId === 'testnet',
       },
       {
+        exclude: false,
         link: '/charts/near-supply',
         text: 'nearSupplyCharts.heading',
-        exclude: false,
       },
       {
+        exclude: false,
         link: '/charts/txns',
         text: 'txnsCharts.heading',
-        exclude: false,
       },
       {
+        exclude: false,
         link: '/charts/blocks',
         text: 'blocksCharts.heading',
-        exclude: false,
       },
       {
+        exclude: false,
         link: '/charts/addresses',
         text: 'addressesCharts.heading',
-        exclude: false,
       },
       {
+        exclude: networkId === 'testnet',
         link: '/charts/txn-fee',
         text: 'txnFeeCharts.heading',
-        exclude: networkId === 'testnet',
       },
       {
+        exclude: networkId === 'testnet',
         link: '/charts/txn-volume',
         text: 'txnVolumeCharts.heading',
-        exclude: networkId === 'testnet',
       },
       {
+        exclude: false,
         link: '/charts/tps',
         text: 'Near Transactions per Second Chart',
-        exclude: false,
       },
     ];
     return (
-      <div ref={ref} className={`w-full z-10 ${className}`}>
+      <div className={`w-full z-10 ${className}`} ref={ref}>
         {chartTypes && (
           <>
             <div

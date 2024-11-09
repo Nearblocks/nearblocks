@@ -1,7 +1,8 @@
-import { urlHostName } from '@/utils/libs';
 import { Tooltip } from '@reach/tooltip';
 import Cookies from 'js-cookie';
 import Image from 'next/legacy/image';
+
+import { urlHostName } from '@/utils/libs';
 
 const Links = (props: any) => {
   const { meta } = props;
@@ -14,101 +15,101 @@ const Links = (props: any) => {
     <div className="flex space-x-4">
       {meta?.twitter && (
         <Tooltip
-          label={'Twitter'}
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+          label={'Twitter'}
         >
           <a
+            className="flex"
             href={
               !twitter ? `https://twitter.com/${meta?.twitter}` : meta?.twitter
             }
-            target="_blank"
             rel="noopener noreferrer nofollow"
-            className="flex"
+            target="_blank"
           >
             <Image
-              width={16}
+              alt="Twitter"
               height={16}
               src={
                 theme === 'dark'
                   ? '/images/twitter_icon_black.svg'
                   : '/images/twitter_icon.svg'
               }
-              alt="Twitter"
+              width={16}
             />
           </a>
         </Tooltip>
       )}
       {meta?.facebook && (
         <Tooltip
-          label={'Facebook'}
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+          label={'Facebook'}
         >
           <a
+            className="flex"
             href={
               !facebook
                 ? `https://facebook.com/${meta?.facebook}`
                 : meta.facebook
             }
-            target="_blank"
             rel="noopener noreferrer nofollow"
-            className="flex"
+            target="_blank"
           >
             <Image
-              width={16}
-              height={16}
+              alt="Facebook"
               className="w-4 h-4"
+              height={16}
               src={
                 theme === 'dark'
                   ? '/images/facebook_icon_black.svg'
                   : '/images/facebook_icon.svg'
               }
-              alt="Facebook"
+              width={16}
             />
           </a>
         </Tooltip>
       )}
       {meta?.telegram && (
         <Tooltip
-          label={'Telegram'}
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+          label={'Telegram'}
         >
           <a
-            href={!telegram ? `https://t.me/${meta?.telegram}` : meta?.telegram}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
             className="flex"
+            href={!telegram ? `https://t.me/${meta?.telegram}` : meta?.telegram}
+            rel="noopener noreferrer nofollow"
+            target="_blank"
           >
             <Image
-              width={16}
-              height={16}
+              alt="Telegram"
               className="w-4 h-4"
+              height={16}
               src={
                 theme === 'dark'
                   ? '/images/telegram_black.svg'
                   : '/images/telegram.svg'
               }
-              alt="Telegram"
+              width={16}
             />
           </a>
         </Tooltip>
       )}
       {meta?.coingecko_id && (
         <Tooltip
-          label={'CoinGecko'}
           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+          label={'CoinGecko'}
         >
           <a
-            href={`https://www.coingecko.com/en/coins/${meta?.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
             className="flex"
+            href={`https://www.coingecko.com/en/coins/${meta?.coingecko_id}?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral`}
+            rel="noopener noreferrer nofollow"
+            target="_blank"
           >
             <Image
-              width={16}
-              height={16}
-              className="w-4 h-4"
-              src="/images/coingecko_icon.svg"
               alt="coingecko"
+              className="w-4 h-4"
+              height={16}
+              src="/images/coingecko_icon.svg"
+              width={16}
             />
           </a>
         </Tooltip>

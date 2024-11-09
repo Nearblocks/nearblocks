@@ -1,32 +1,34 @@
 'use client';
-import Question from '@/components/Icons/Question';
 import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
-import VerifiedData from './VerifiedData';
-import VerificationStatus from './VerificationStatus';
-import { ContractData, VerificationData, VerifierData } from '@/utils/types';
+
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
-import { parseGitHubLink, parseLink } from '@/utils/libs';
+import Question from '@/components/Icons/Question';
 import { Link } from '@/i18n/routing';
 import { verifierConfig } from '@/utils/app/config';
+import { parseGitHubLink, parseLink } from '@/utils/libs';
+import { ContractData, VerificationData, VerifierData } from '@/utils/types';
+
+import VerificationStatus from './VerificationStatus';
+import VerifiedData from './VerifiedData';
 
 type ContractCodeProps = {
-  error: string | null;
-  verificationData: Record<string, VerificationData>;
-  contractData: ContractData;
-  statusLoading: boolean;
   accountId: string;
+  contractData: ContractData;
+  error: null | string;
+  statusLoading: boolean;
+  verificationData: Record<string, VerificationData>;
 };
 
 const verifiers = verifierConfig.map((config) => config.accountId);
 
 const ContractCode: React.FC<ContractCodeProps> = ({
-  error,
-  verificationData,
-  contractData,
-  statusLoading,
   accountId,
+  contractData,
+  error,
+  statusLoading,
+  verificationData,
 }) => {
   const [selectedVerifier, setSelectedVerifier] = useState<string>(
     verifiers[0],
@@ -65,8 +67,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      label={'Contract version'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                      label={'Contract version'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -88,8 +90,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      label={'Standards used by the contract'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                      label={'Standards used by the contract'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -118,10 +120,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                       label={
                         'Snapshot of the source code used for the contract'
                       }
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -147,10 +149,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
                         return parsedLink ? (
                           <Link
-                            href={parsedLink.url}
                             className="text-green-500 dark:text-green-250 hover:no-underline break-words"
-                            target="_blank"
+                            href={parsedLink.url}
                             rel="noopener noreferrer"
+                            target="_blank"
                           >
                             {parsedLink.text}
                           </Link>
@@ -169,8 +171,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      label={'The environment in which the contract was built'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                      label={'The environment in which the contract was built'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -196,8 +198,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      label={'Build commands used to compile the contract'}
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                      label={'Build commands used to compile the contract'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -210,6 +212,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                       <Loader wrapperClassName="w-full" />
                     ) : (
                       <textarea
+                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y "
                         readOnly
                         rows={3}
                         value={
@@ -222,7 +225,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                               )
                             : 'N/A'
                         }
-                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y "
                       />
                     )}
                   </div>
@@ -234,22 +236,22 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           !(verifiers?.length === 0 && contractData?.contractMetadata) && (
             <div>
               <VerificationStatus
-                statusLoading={statusLoading}
-                setSelectedVerifier={setSelectedVerifier}
-                selectedVerifier={selectedVerifier}
-                verifiers={verifiers}
-                verificationData={verificationData}
-                contractMetadata={contractData?.contractMetadata}
                 accountId={accountId}
+                contractMetadata={contractData?.contractMetadata}
+                selectedVerifier={selectedVerifier}
+                setSelectedVerifier={setSelectedVerifier}
+                statusLoading={statusLoading}
+                verificationData={verificationData}
+                verifiers={verifiers}
               />
 
               {!statusLoading && (
                 <VerifiedData
+                  base64Code={contractData?.base64Code}
+                  selectedVerifier={selectedVerifier}
                   verifierData={
                     verificationData[selectedVerifier]?.data as VerifierData
                   }
-                  selectedVerifier={selectedVerifier}
-                  base64Code={contractData?.base64Code}
                 />
               )}
             </div>

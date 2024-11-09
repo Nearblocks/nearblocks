@@ -1,5 +1,6 @@
-import { appUrl } from '@/utils/app/config';
 import { Metadata } from 'next';
+
+import { appUrl } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = 'Export NFT Token Transactions Data | Nearblocks';
@@ -8,21 +9,21 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
   )}`;
   return {
-    title: title,
-    openGraph: {
-      title: title,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: title,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/nft-token/exportdata`,
     },
+    openGraph: {
+      images: [
+        {
+          alt: title,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: title,
+    },
+    title: title,
   };
 }
 

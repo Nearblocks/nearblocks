@@ -1,7 +1,10 @@
-import Home from '@/components/app/Home';
-import { appUrl } from '@/utils/config';
+export const runtime = 'edge';
+
 import { Metadata } from 'next';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+
+import Home from '@/components/app/Home';
+import { appUrl } from '@/utils/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -20,34 +23,34 @@ export async function generateMetadata({
   )}`;
 
   return {
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
-    twitter: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/`,
+    },
+    description: metaDescription,
+    openGraph: {
+      description: metaDescription,
+      images: [
+        {
+          alt: metaTitle,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: metaTitle,
+    },
+    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    twitter: {
+      description: metaDescription,
+      images: [
+        {
+          alt: metaTitle,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: metaTitle,
     },
   };
 }

@@ -1,9 +1,9 @@
 import React from 'react';
 
 const TableSummary = ({
-  text = <></>,
   filters = <></>,
   linkToDowload = <></>,
+  text = <></>,
 }: any) => {
   return (
     <div

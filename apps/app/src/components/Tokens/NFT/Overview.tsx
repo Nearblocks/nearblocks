@@ -1,23 +1,24 @@
+import { Tooltip } from '@reach/tooltip';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+
 import Links from '@/components/common/Links';
+import TokenImage from '@/components/common/TokenImage';
 import WarningIcon from '@/components/Icons/WarningIcon';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useFetch } from '@/hooks/useFetch';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { SpamToken } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import TokenImage from '@/components/common/TokenImage';
 
 interface Props {
-  token: any;
-  status: any;
-  transfers: any;
   holders: any;
+  status: any;
+  token: any;
+  transfers: any;
 }
 
-const Overview = ({ token, status, transfers, holders }: Props) => {
+const Overview = ({ holders, status, token, transfers }: Props) => {
   const router = useRouter();
   const { id } = router.query;
   const [isVisible, setIsVisible] = useState(true);
@@ -53,9 +54,9 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
           <h1 className="break-all space-x-2 text-xl text-nearblue-600 dark:text-neargray-10 leading-8 py-4 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
-                src={token?.icon}
                 alt={token?.name}
                 className="w-7 h-7"
+                src={token?.icon}
               />
             </span>
             <span className="inline-flex align-middle ">Token: </span>
@@ -73,8 +74,8 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
               This token is reported to have been spammed to many users. Please
               exercise caution when interacting with it. Click
               <a
-                href="https://github.com/Nearblocks/spam-token-list"
                 className="underline mx-0.5"
+                href="https://github.com/Nearblocks/spam-token-list"
                 target="_blank"
               >
                 here
@@ -138,6 +139,7 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
                         {holders ? localFormat(holders) : ''}
                         {!status?.sync && status && (
                           <Tooltip
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                             label={
                               <>
                                 Holders count is out of sync. Last synced block
@@ -152,7 +154,6 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
                                 Holders data will be delayed.
                               </>
                             }
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
                           >
                             <span>
                               <WarningIcon className="w-4 h-4 fill-current ml-1" />
@@ -181,8 +182,8 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        href={`/address/${token?.contract}`}
                         className="text-green-500 dark:text-green-250 hover:no-underline"
+                        href={`/address/${token?.contract}`}
                       >
                         {token?.contract}
                       </Link>
@@ -198,8 +199,8 @@ const Overview = ({ token, status, transfers, holders }: Props) => {
                       <Skeleton className="h-4 w-32" />
                     ) : (
                       <Link
-                        href={`${token?.website}`}
                         className="hover:no-underline"
+                        href={`${token?.website}`}
                       >
                         {token?.website}
                       </Link>

@@ -5,8 +5,8 @@ type VmState = {
   CommitButton: any;
   ethersContext: any;
   EthersProvider: any;
-  Widget: any;
   near: any;
+  Widget: any;
 };
 
 type VmStore = VmState & {
@@ -18,7 +18,7 @@ export const useVmStore = create<VmStore>((set) => ({
   CommitButton: null,
   ethersContext: null,
   EthersProvider: null,
-  Widget: null,
   near: null,
   set: (params) => set(() => ({ ...params })),
+  Widget: null,
 }));

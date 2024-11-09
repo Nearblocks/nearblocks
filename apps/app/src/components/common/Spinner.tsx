@@ -1,5 +1,6 @@
-import { useIntlRouter, usePathname } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
+
+import { useIntlRouter, usePathname } from '@/i18n/routing';
 
 interface SpinnerProps {
   loading: boolean;

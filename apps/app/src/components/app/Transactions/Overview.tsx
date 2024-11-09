@@ -1,28 +1,30 @@
 'use client';
+import { Tooltip } from '@reach/tooltip';
+import Cookies from 'js-cookie';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
+
+import { useConfig } from '@/hooks/app/useConfig';
+import { Link } from '@/i18n/routing';
 import {
   currency,
   dollarFormat,
   formatCustomDate,
   localFormat,
 } from '@/utils/libs';
-import Skeleton from '../skeleton/common/Skeleton';
 import { gasPrice } from '@/utils/near';
-import { useEffect, useMemo, useState } from 'react';
 import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
-import { useConfig } from '@/hooks/app/useConfig';
-import Cookies from 'js-cookie';
+
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
-  stats: StatusInfo;
   chartsDetails: { charts: ChartInfo[] };
   error: boolean;
+  stats: StatusInfo;
 }
 
-const Overview = ({ stats, chartsDetails, error }: Props) => {
+const Overview = ({ chartsDetails, error, stats }: Props) => {
   const t = useTranslations();
   const theme = Cookies?.get('theme') || 'light';
   const [mounted, setMounted] = useState(false);
@@ -116,9 +118,9 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
   const chartData = useMemo(() => {
     try {
       const series = charts?.map((stat: any) => ({
-        y: Number(stat.txns),
         date: stat.date,
         price: stat.near_price,
+        y: Number(stat.txns),
       }));
       series.sort(
         (a: any, b: any) =>
@@ -126,13 +128,13 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
       );
       const categories = series.map((stat: any) => formatCustomDate(stat.date));
       return {
-        series,
         categories,
+        series,
       };
     } catch (error) {
       return {
-        series: [],
         categories: [],
+        series: [],
       };
     }
 
@@ -144,42 +146,22 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
 
     function fetchData() {
       const fetchedData = {
-        chart: {
-          height: 110,
-          spacingTop: 10,
-          spacingBottom: 0,
-          spacingLeft: 0,
-          spacingRight: 10,
-          backgroundColor: 'transparent',
-        },
         accessibility: {
           enabled: false,
         },
-        title: {
-          text: null,
+        chart: {
+          backgroundColor: 'transparent',
+          height: 110,
+          spacingBottom: 0,
+          spacingLeft: 0,
+          spacingRight: 10,
+          spacingTop: 10,
         },
-        xAxis: {
-          type: 'datetime',
-          lineWidth: 0,
-          tickLength: 0,
-          labels: {
-            step: 7,
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          categories: chartData.categories,
+        credits: {
+          enabled: false,
         },
-        yAxis: {
-          gridLineWidth: 0,
-          title: {
-            text: null,
-          },
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
+        exporting: {
+          enabled: false,
         },
         legend: {
           enabled: false,
@@ -187,28 +169,48 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
         plotOptions: {
           spline: {
             lineWidth: 1,
+            marker: {
+              radius: 0,
+            },
             states: {
               hover: {
                 lineWidth: 1,
               },
             },
-            marker: {
-              radius: 0,
-            },
           },
         },
         series: [
           {
-            type: 'spline',
-            data: chartData.series,
             color: '#80D1BF',
+            data: chartData.series,
+            type: 'spline',
           },
         ],
-        exporting: {
-          enabled: false,
+        title: {
+          text: null,
         },
-        credits: {
-          enabled: false,
+        xAxis: {
+          categories: chartData.categories,
+          labels: {
+            step: 7,
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          lineWidth: 0,
+          tickLength: 0,
+          type: 'datetime',
+        },
+        yAxis: {
+          gridLineWidth: 0,
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          title: {
+            text: null,
+          },
         },
       };
       setChartConfig(fetchedData);
@@ -280,14 +282,14 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                 <div className="items-center flex justify-left mr-3 ">
                   <Image
+                    alt={t ? t('homePage.nearPrice') : 'nearPrice'}
+                    height={24}
                     src={`/images/${
                       theme === 'dark'
                         ? 'near price_dark.svg'
                         : 'near price.svg'
                     }`}
-                    alt={t ? t('homePage.nearPrice') : 'nearPrice'}
                     width={24}
-                    height={24}
                   />
                 </div>
                 <div className="ml-2">
@@ -298,8 +300,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                     <Skeleton className="my-1 h-4" />
                   ) : (
                     <Link
-                      href="/charts/near-price"
                       className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center "
+                      href="/charts/near-price"
                     >
                       {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
                       <span className="text-nearblue-700">
@@ -334,12 +336,12 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                 <div className="items-center flex justify-left mr-3 ">
                   <Image
+                    alt={t ? t('homePage.marketCap') : 'marketCap'}
+                    height={24}
                     src={`/images/${
                       theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                     }`}
-                    alt={t ? t('homePage.marketCap') : 'marketCap'}
                     width={24}
-                    height={24}
                   />
                 </div>
                 <div className="ml-2">
@@ -350,8 +352,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                     <Skeleton className="my-1 h-4" />
                   ) : (
                     <Link
-                      href="/charts/market-cap"
                       className="leading-6 text-nearblue-700 hover:no-underline"
+                      href="/charts/market-cap"
                     >
                       {stats?.market_cap
                         ? '$' + dollarFormat(stats?.market_cap ?? 0)
@@ -367,14 +369,14 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <Image
+                    alt={t ? t('homePage.transactions') : 'transactions'}
+                    height={24}
                     src={`/images/${
                       theme === 'dark'
                         ? 'transactions_dark.svg'
                         : 'transactions.svg'
                     }`}
-                    alt={t ? t('homePage.transactions') : 'transactions'}
                     width={24}
-                    height={24}
                   />
                 </div>
                 <div className="ml-2">
@@ -390,13 +392,13 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                       </p>
                       <div className="leading-6 text-nearblue-700">
                         <Tooltip
-                          label={'Transactions per second'}
                           className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                          label={'Transactions per second'}
                         >
                           <div>
                             <Link
-                              href="/charts/tps"
                               className="hover:no-underline"
+                              href="/charts/tps"
                             >
                               {stats?.tps ? `(${stats?.tps} TPS)` : ''}
                             </Link>
@@ -427,17 +429,17 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
               <div className="flex flex-row ">
                 <div className="items-center flex justify-left mr-3 ">
                   <Image
+                    alt={t ? t('homePage.activeValidator') : 'activeValidator'}
+                    height={24}
                     src={`/images/${
                       (theme === 'dark' && 'pickaxe_dark.svg') || 'pickaxe.svg'
                     }`}
-                    alt={t ? t('homePage.activeValidator') : 'activeValidator'}
                     width={24}
-                    height={24}
                   />
                 </div>
                 <div className="ml-2">
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                    <Link href="/node-explorer" className="hover:no-underline">
+                    <Link className="hover:no-underline" href="/node-explorer">
                       {' '}
                       {t
                         ? t('homePage.activeValidator')
@@ -448,8 +450,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                     <Skeleton className="my-1 h-4" />
                   ) : (
                     <Link
-                      href="/node-explorer"
                       className="leading-6 text-nearblue-700 hover:no-underline"
+                      href="/node-explorer"
                     >
                       {stats?.nodes_online
                         ? localFormat(stats?.nodes_online)
@@ -466,8 +468,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                   <Skeleton className="my-1 h-4" />
                 ) : (
                   <Link
-                    href="/charts/blocks"
                     className="leading-6 text-nearblue-700 hover:no-underline"
+                    href="/charts/blocks"
                     suppressHydrationWarning
                   >
                     {stats?.avg_block_time
@@ -497,8 +499,8 @@ const Overview = ({ stats, chartsDetails, error }: Props) => {
                     className="dark:bg-black-600"
                     srcDoc={iframeSrc}
                     style={{
-                      width: '100%',
                       backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
+                      width: '100%',
                     }}
                   />
                 )}

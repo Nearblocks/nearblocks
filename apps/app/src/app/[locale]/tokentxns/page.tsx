@@ -1,14 +1,17 @@
-import TokenTxnsSkeleton from '@/components/app/skeleton/ft/Tokentxns';
-import Transfers from '@/components/app/Tokens/FTTransfers';
+export const runtime = 'edge';
+
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
+import TokenTxnsSkeleton from '@/components/app/skeleton/ft/Tokentxns';
+import Transfers from '@/components/app/Tokens/FTTransfers';
+
 export default async function TokenTxns({
-  searchParams,
   params: { locale },
+  searchParams,
 }: {
-  searchParams: any;
   params: { locale: string };
+  searchParams: any;
 }) {
   const t = await getTranslations({ locale });
 

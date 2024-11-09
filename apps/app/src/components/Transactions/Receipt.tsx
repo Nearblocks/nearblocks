@@ -1,18 +1,20 @@
+import { isEmpty } from 'lodash';
+import { useEffect, useState } from 'react';
+
 import { mapRpcActionToAction } from '@/utils/near';
 import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
-import { useEffect, useState } from 'react';
+
 import FaHourglassStart from '../Icons/FaHourglassStart';
 import ReceiptRow from './Receipts/ReceiptRow';
-import { isEmpty } from 'lodash';
 
 interface Props {
-  txn: TransactionInfo;
-  rpcTxn: RPCTransactionInfo;
   loading: boolean;
+  rpcTxn: RPCTransactionInfo;
+  txn: TransactionInfo;
 }
 
 const Receipt = (props: Props) => {
-  const { rpcTxn, txn, loading } = props;
+  const { loading, rpcTxn, txn } = props;
 
   const [receipt, setReceipt] = useState(null);
 
@@ -100,7 +102,7 @@ const Receipt = (props: Props) => {
           </div>
         </div>
       ) : (
-        <ReceiptRow receipt={receipt} loading={loading} />
+        <ReceiptRow loading={loading} receipt={receipt} />
       )}
     </div>
   );

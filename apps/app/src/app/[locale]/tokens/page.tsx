@@ -1,6 +1,9 @@
+export const runtime = 'edge';
+
+import QueryString from 'qs';
+
 import List from '@/components/app/Tokens/FTList';
 import { getRequest } from '@/utils/app/api';
-import QueryString from 'qs';
 
 export default async function Tokens({ searchParams }: any) {
   const dataResult = await getRequest(
@@ -22,9 +25,9 @@ export default async function Tokens({ searchParams }: any) {
   return (
     <List
       data={dataResult}
-      tokensCount={countResult}
-      handleSearch={handleSearch}
       error={!dataResult}
+      handleSearch={handleSearch}
+      tokensCount={countResult}
     />
   );
 }

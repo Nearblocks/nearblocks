@@ -1,6 +1,8 @@
-import { getRequest } from '@/utils/app/api';
-import FTTransfersActions from './FTTransfersActions';
 import QueryString from 'qs';
+
+import { getRequest } from '@/utils/app/api';
+
+import FTTransfersActions from './FTTransfersActions';
 
 const Transfers = async ({ searchParams }: any) => {
   const apiUrl = 'fts/txns';
@@ -20,9 +22,9 @@ const Transfers = async ({ searchParams }: any) => {
   return (
     <FTTransfersActions
       data={data}
-      totalCount={dataCount}
       error={!data}
       status={status}
+      totalCount={dataCount}
     />
   );
 };

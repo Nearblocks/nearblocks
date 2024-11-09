@@ -1,9 +1,11 @@
+export const runtime = 'edge';
+
+import { Suspense } from 'react';
+
 import Buttons from '@/components/app/Address/Button';
 import Delegators from '@/components/app/NodeExplorer/Delegators';
 import DelegatorSkeleton from '@/components/app/skeleton/node-explorer/Delegator';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-
-import { Suspense } from 'react';
 
 export default async function Delegator({
   params: { id },

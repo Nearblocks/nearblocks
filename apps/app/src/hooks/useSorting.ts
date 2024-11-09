@@ -1,10 +1,11 @@
-import { stripEmpty } from '@/utils/libs';
 import queryString from 'qs';
-import { useMemo, useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
+import { stripEmpty } from '@/utils/libs';
 
 type Sorting = {
-  order: string;
   [key: string]: any;
+  order: string;
 };
 
 const values: Sorting = { order: 'desc' };
@@ -15,7 +16,7 @@ const useSorting = (initial?: Partial<Sorting>) => {
   const sqs = useMemo(() => queryString.stringify(sorting), [sorting]);
 
   const setSorting = useCallback(
-    (key: keyof Sorting | ((s: Sorting) => Sorting), value?: any) => {
+    (key: ((s: Sorting) => Sorting) | keyof Sorting, value?: any) => {
       if (typeof key === 'function') {
         return setState((s) => stripEmpty<Sorting>(key(s)));
       }
@@ -30,7 +31,7 @@ const useSorting = (initial?: Partial<Sorting>) => {
     [initial],
   );
 
-  return { sqs, sorting, setSorting, resetSorting };
+  return { resetSorting, setSorting, sorting, sqs };
 };
 
 export default useSorting;

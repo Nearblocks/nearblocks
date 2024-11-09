@@ -1,7 +1,7 @@
 interface Props {
-  icons: SVGElement | any;
+  icons: any | SVGElement;
   message: string;
-  mutedText: string | any;
+  mutedText: any | string;
 }
 const ErrorMessage = ({ icons, message, mutedText }: Props) => {
   return (

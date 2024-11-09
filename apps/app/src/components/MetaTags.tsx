@@ -1,17 +1,17 @@
 import Head from 'next/head';
 
 type Props = {
-  title: string;
   description: string;
-  image?: string | null;
+  image?: null | string;
+  title: string;
 };
 
 export function MetaTags(props: Props) {
   return (
     <Head>
       <title>{props.title}</title>
-      <meta name="description" content={props.description} />
-      <meta property="og:title" content={props.title} />
+      <meta content={props.description} name="description" />
+      <meta content={props.title} property="og:title" />
     </Head>
   );
 }

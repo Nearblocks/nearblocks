@@ -1,8 +1,10 @@
-import Balance from '@/components/app/Address/Balance';
-import BalanceSkeleton from '@/components/app/skeleton/address/balance';
+export const runtime = 'edge';
+
 import { Suspense } from 'react';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
+import Balance from '@/components/app/Address/Balance';
+import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabSkeletion from '@/components/app/skeleton/address/tab';
 
 export default async function AddressIndex({
@@ -10,7 +12,7 @@ export default async function AddressIndex({
   searchParams,
 }: {
   params: { id: string; locale: string };
-  searchParams: { tab: string; cursor?: string; p?: string; order: string };
+  searchParams: { cursor?: string; order: string; p?: string; tab: string };
 }) {
   return (
     <>

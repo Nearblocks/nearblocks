@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Skeleton from '../common/Skeleton';
 
 export default function TransferSkeleton() {
@@ -14,50 +15,50 @@ export default function TransferSkeleton() {
           <thead className="bg-gray-100 dark:bg-black-200 h-[51px]">
             <tr>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
               <th
-                scope="col"
                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
@@ -65,7 +66,7 @@ export default function TransferSkeleton() {
           </thead>
           <tbody className="bg-white dark:bg-black-600 dark:divide-black-200  divide-y divide-gray-200">
             {[...Array(25)].map((_, i) => (
-              <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
+              <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                   <Skeleton className="h-4" />
                 </td>

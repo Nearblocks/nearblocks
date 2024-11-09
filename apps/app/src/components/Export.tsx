@@ -1,12 +1,13 @@
-import { fetcher } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { fetcher } from '@/hooks/useFetch';
+
 interface Props {
-  id: string | any;
-  onHandleDowload: (blobUrl: string, file: string) => void;
   exportType: string;
+  id: any | string;
+  onHandleDowload: (blobUrl: string, file: string) => void;
 }
 
 const today = new Date();
@@ -23,19 +24,19 @@ const formattedEnd =
   endOfCurrentMonth && endOfCurrentMonth?.toISOString()?.split('T')[0];
 
 const initial = {
-  start: formattedStart,
   end: formattedEnd,
+  start: formattedStart,
 };
 
-const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
+const Export: React.FC<Props> = ({ exportType, id, onHandleDowload }) => {
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);
   const [endDate, setEndDate] = useState(initial.end);
   const [exportInfo, setExportInfo] = useState<{
     apiUrl: string;
-    tittle: string;
     file: string;
-  }>({} as { apiUrl: string; tittle: string; file: string });
+    tittle: string;
+  }>({} as { apiUrl: string; file: string; tittle: string });
 
   useEffect(() => {
     let url = '';
@@ -65,7 +66,7 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
       default:
     }
 
-    setExportInfo({ apiUrl: url, tittle: text, file: file });
+    setExportInfo({ apiUrl: url, file: file, tittle: text });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exportType, id, startDate, endDate]);
@@ -122,33 +123,33 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
 
             <div className="lg:flex justify-between items-center text-center">
               <Tooltip
-                label={'Select Start Date'}
                 className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 absolute"
+                label={'Select Start Date'}
               >
                 <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                   <input
-                    type="date"
-                    name="startdate"
-                    id="startdate"
                     className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
                     defaultValue={initial?.start}
+                    id="startdate"
+                    name="startdate"
                     onChange={handleStartDateChange}
+                    type="date"
                   />
                 </div>
               </Tooltip>
               <p className="text-center">To</p>
               <Tooltip
-                label={'Select End Date'}
                 className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 absolute"
+                label={'Select End Date'}
               >
                 <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                   <input
-                    type="date"
-                    name="enddate"
-                    id="enddate"
                     className="border flex items-center  border-gray-300 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
                     defaultValue={initial?.end}
+                    id="enddate"
+                    name="enddate"
                     onChange={handleEndDateChange}
+                    type="date"
                   />
                 </div>
               </Tooltip>
@@ -156,10 +157,10 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
             <div className="w-full flex justify-center my-4"></div>
             <div className="w-full flex justify-center my-4">
               <div
-                onClick={onDownload}
                 className={`items-center cursor-pointer ${
                   loading && 'animate-pulse cursor-not-allowed'
                 }  text-center bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:shadow-lg  text-white text-xs py-2 rounded w-20 focus:outline-none`}
+                onClick={onDownload}
               >
                 Generate
               </div>

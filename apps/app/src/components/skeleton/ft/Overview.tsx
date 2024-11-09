@@ -1,9 +1,10 @@
-import React, { Ref, forwardRef } from 'react';
-import Skeleton from '../common/Skeleton';
-import Comment from '../common/Comment';
-import Info from './Info';
-import FAQ from './FAQ';
 import { useTranslations } from 'next-intl';
+import React, { forwardRef, Ref } from 'react';
+
+import Comment from '../common/Comment';
+import Skeleton from '../common/Skeleton';
+import FAQ from './FAQ';
+import Info from './Info';
 interface Props {
   className?: string;
   pageTab?: string;
@@ -19,7 +20,7 @@ const Overview = forwardRef(
           : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
       }`;
     return (
-      <div ref={ref} className={`w-full z-50 ${className}`}>
+      <div className={`w-full z-50 ${className}`} ref={ref}>
         <div className="flex items-center justify-between flex-wrap pt-4">
           <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
             <Skeleton className="h-7" />
@@ -49,13 +50,13 @@ const Overview = forwardRef(
                         FULLY DILUTED MARKET CAP
                         <span>
                           <svg
-                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-4 h-4 fill-current ml-1"
+                            height={16}
                             viewBox="0 0 24 24"
                             width={16}
-                            height={16}
-                            className="w-4 h-4 fill-current ml-1"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            <path fill="none" d="M0 0h24v24H0z" />
+                            <path d="M0 0h24v24H0z" fill="none" />
                             <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm-1-5h2v2h-2v-2zm2-1.645V14h-2v-1.5a1 1 0 011-1 1.5 1.5 0 10-1.471-1.794l-1.962-.393A3.501 3.501 0 1113 13.355z" />
                           </svg>
                         </span>
@@ -165,8 +166,8 @@ const Overview = forwardRef(
 
               <div className="relative">
                 <div
-                  ref={ref}
                   className={`bg-white dark:bg-black-600 border dark:border-black-200 soft-shadow rounded-xl overflow-hidden`}
+                  ref={ref}
                 >
                   {pageTab === 'Info' ? (
                     <Info />
@@ -186,50 +187,50 @@ const Overview = forwardRef(
                           <thead className="bg-gray-100 dark:bg-black-200 h-[51px]">
                             <tr>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
                               <th
-                                scope="col"
                                 className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
+                                scope="col"
                               >
                                 <Skeleton className="h-4" />
                               </th>
@@ -238,8 +239,8 @@ const Overview = forwardRef(
                           <tbody className="bg-white dark:bg-black-600  divide-y dark:divide-black-200 divide-gray-200">
                             {[...Array(25)].map((_, i) => (
                               <tr
-                                key={i}
                                 className="hover:bg-blue-900/5 h-[53px]"
+                                key={i}
                               >
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
                                   <Skeleton className="h-4" />

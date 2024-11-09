@@ -1,10 +1,13 @@
+export const runtime = 'edge';
+
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
+
 import Chart from '@/components/app/Charts/Chart';
 import ChartDetails from '@/components/app/skeleton/charts/Detail';
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
-import { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { Suspense } from 'react';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -23,23 +26,23 @@ export async function generateMetadata({
   )}`;
 
   return {
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-    description: metaDescription,
-    openGraph: {
-      title: metaTitle,
-      description: metaDescription,
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 720,
-          height: 405,
-          alt: metaTitle,
-        },
-      ],
-    },
     alternates: {
       canonical: `${appUrl}/charts/txns`,
     },
+    description: metaDescription,
+    openGraph: {
+      description: metaDescription,
+      images: [
+        {
+          alt: metaTitle,
+          height: 405,
+          url: ogImageUrl.toString(),
+          width: 720,
+        },
+      ],
+      title: metaTitle,
+    },
+    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
@@ -63,7 +66,7 @@ export default async function TxnsChart({
         <div className="container mx-auto px-3 -mt-36">
           <div className="relative">
             <Suspense fallback={<ChartDetails chartTypes="txns" />}>
-              <Chart poweredBy={false} chartTypes={'txns'} chartsData={data} />
+              <Chart chartsData={data} chartTypes={'txns'} poweredBy={false} />
             </Suspense>
           </div>
         </div>

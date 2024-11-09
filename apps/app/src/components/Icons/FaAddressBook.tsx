@@ -1,12 +1,12 @@
 const FaAddressBook = () => {
   return (
     <svg
-      stroke="currentColor"
+      color="#db9a04"
       fill="currentColor"
+      height="10"
+      stroke="currentColor"
       strokeWidth="0"
       viewBox="0 0 448 512"
-      color="#db9a04"
-      height="10"
       width="10"
       xmlns="http://www.w3.org/2000/svg"
     >

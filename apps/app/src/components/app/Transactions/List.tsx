@@ -1,4 +1,5 @@
 import { getRequest } from '@/utils/app/api';
+
 import ListActions from './ListActions';
 
 const List = async ({ searchParams }: any) => {
@@ -9,9 +10,9 @@ const List = async ({ searchParams }: any) => {
 
   return (
     <ListActions
-      txnsData={data}
-      txnsCount={count}
       error={!data || data === null}
+      txnsCount={count}
+      txnsData={data}
     />
   );
 };

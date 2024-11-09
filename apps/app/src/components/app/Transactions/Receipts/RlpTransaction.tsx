@@ -1,15 +1,16 @@
-import { aurorablocksUrl } from '@/utils/config';
-import { jsonParser, jsonStringify } from '@/utils/libs';
 import { ethers } from 'ethers';
 import { useState } from 'react';
 
+import { aurorablocksUrl } from '@/utils/config';
+import { jsonParser, jsonStringify } from '@/utils/libs';
+
 interface Props {
-  pretty: any;
   method?: string;
-  receiver?: string | any;
+  pretty: any;
+  receiver?: any | string;
 }
 
-const RlpTransaction = ({ pretty, method, receiver }: Props) => {
+const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   const decoded =
     method === 'submit' && receiver.includes('aurora')
       ? pretty
@@ -93,10 +94,10 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
                       <td className="border px-4 py-2">
                         {key === 'hash' ? (
                           <a
-                            href={`${aurorablocksUrl}/tx/${value}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="text-green-500 dark:text-green-250 hover:no-underline"
+                            href={`${aurorablocksUrl}/tx/${value}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
                           >
                             {String(value)}
                           </a>
@@ -120,16 +121,16 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
           {displayedArgs &&
             Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
               ([key, value]) => (
-                <p key={key} className="mb-2">
+                <p className="mb-2" key={key}>
                   {key}:{' '}
                   {key === 'hash' &&
                   method === 'submit' &&
                   receiver.includes('aurora') ? (
                     <a
-                      href={`${aurorablocksUrl}/tx/${value}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="text-green-500 dark:text-green-250 hover:no-underline"
+                      href={`${aurorablocksUrl}/tx/${value}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
                     >
                       {String(value)}
                     </a>
@@ -142,21 +143,21 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
         </div>
       ) : (
         <textarea
+          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
           readOnly
           rows={4}
+          style={{ height: '150px' }}
           value={
             method === 'submit' && receiver.includes('aurora')
               ? jsonParser(displayedArgs).tx_bytes_b64
               : displayedArgs
           }
-          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
-          style={{ height: '150px' }}
         ></textarea>
       )}
       <select
         className="opacity-2 pr-5 pl-1 mt-2 border rounded-md mb-2 text-sm focus:outline-none"
-        value={format}
         onChange={handleFormatChange}
+        value={format}
       >
         <option value="default">Default View</option>
         <option value="rlp">RLP Decoded</option>

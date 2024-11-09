@@ -1,18 +1,20 @@
-import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
-import { Fragment } from 'react';
-import TreeTxnsActions from './TreeTxnsActions';
-import TreeNode from './TreeNode';
 import { Tooltip } from '@reach/tooltip';
+import { Fragment } from 'react';
+
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import { Link } from '@/i18n/routing';
+import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
+
+import TreeNode from './TreeNode';
+import TreeTxnsActions from './TreeTxnsActions';
 
 interface Props {
+  receipt: any | ReceiptsPropsInfo;
+  show: any | string;
   txn: TransactionInfo;
-  receipt: ReceiptsPropsInfo | any;
-  show: string | any;
 }
 const TreeReceiptDetails = (props: Props) => {
-  const { receipt, txn, show } = props;
+  const { receipt, show, txn } = props;
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -65,12 +67,12 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="w-full pl-3 py-2 flex items-center">
                       From:{' '}
                       <Tooltip
-                        label={receipt?.predecessor_id}
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        label={receipt?.predecessor_id}
                       >
                         <Link
-                          href={`/address/${receipt?.predecessor_id}`}
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
+                          href={`/address/${receipt?.predecessor_id}`}
                         >
                           {receipt?.predecessor_id}
                         </Link>
@@ -79,12 +81,12 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="w-full pl-3 py-2 flex items-center">
                       To:{' '}
                       <Tooltip
-                        label={receipt?.receiver_id}
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        label={receipt?.receiver_id}
                       >
                         <Link
-                          href={`/address/${receipt?.receiver_id}`}
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
+                          href={`/address/${receipt?.receiver_id}`}
                         >
                           {` ${receipt?.receiver_id}`}
                         </Link>
@@ -92,8 +94,8 @@ const TreeReceiptDetails = (props: Props) => {
                     </div>
                     <div className="w-full pl-3 word-break space-y-4">
                       <TreeTxnsActions
-                        key={i}
                         action={action}
+                        key={i}
                         receiver={receipt?.receiver_id}
                       />
                     </div>
@@ -136,7 +138,7 @@ const TreeReceiptDetails = (props: Props) => {
         <>
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <Fragment key={rcpt?.receipt_id}>
-              <TreeReceiptDetails txn={txn} receipt={rcpt} show={show} />
+              <TreeReceiptDetails receipt={rcpt} show={show} txn={txn} />
             </Fragment>
           ))}
         </>

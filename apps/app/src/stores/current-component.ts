@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 type CurrentComponentStore = {
-  src: string | null;
-  setSrc: (src: string | null) => void;
+  setSrc: (src: null | string) => void;
+  src: null | string;
 };
 
 export const useCurrentComponentStore = create<CurrentComponentStore>(
   (set) => ({
-    src: null,
     setSrc: (src) => set(() => ({ src })),
+    src: null,
   }),
 );

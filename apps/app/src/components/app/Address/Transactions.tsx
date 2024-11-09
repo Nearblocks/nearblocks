@@ -1,4 +1,5 @@
 import { getRequest } from '@/utils/app/api';
+
 import TransactionActions from './TransactionActions';
 
 const Transactions = async ({ id, searchParams }: any) => {
@@ -10,11 +11,11 @@ const Transactions = async ({ id, searchParams }: any) => {
   return (
     <>
       <TransactionActions
+        count={count?.txns?.[0]?.count}
+        cursor={data?.cursor}
+        error={!data || data === null}
         id={id}
         txns={data?.txns}
-        count={count?.txns?.[0]?.count}
-        error={!data || data === null}
-        cursor={data?.cursor}
       />
     </>
   );

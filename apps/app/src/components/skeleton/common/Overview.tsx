@@ -1,4 +1,5 @@
-import React, { Ref, forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
+
 import Skeleton from './Skeleton';
 interface Props {
   className?: string;
@@ -6,7 +7,7 @@ interface Props {
 const Overview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
     return (
-      <div ref={ref} className={`w-full z-50 ${className}`}>
+      <div className={`w-full z-50 ${className}`} ref={ref}>
         <div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="w-full">
@@ -107,50 +108,50 @@ const Overview = forwardRef(
                       <thead className="bg-gray-100  dark:bg-black-200 h-[51px]">
                         <tr>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
                           <th
-                            scope="col"
                             className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                            scope="col"
                           >
                             <Skeleton className="h-4" />
                           </th>
@@ -158,7 +159,7 @@ const Overview = forwardRef(
                       </thead>
                       <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
                         {[...Array(25)].map((_, i) => (
-                          <tr key={i} className="hover:bg-blue-900/5 h-[53px]">
+                          <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top">
                               <Skeleton className="h-4" />
                             </td>

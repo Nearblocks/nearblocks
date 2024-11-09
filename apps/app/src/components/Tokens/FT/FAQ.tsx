@@ -19,25 +19,25 @@ import {
 } from '@/utils/types';
 
 interface Props {
-  id: string;
-  token?: Token;
   account: AccountInfo;
   contract: DeploymentsInfo;
-  transfers: number;
-  holdersData: HoldersPropsInfo[];
   holdersCount: number;
+  holdersData: HoldersPropsInfo[];
+  id: string;
   tab: string;
+  token?: Token;
+  transfers: number;
 }
 
 const FAQ = ({
-  id,
-  token,
   account,
   contract,
-  transfers,
-  holdersData,
   holdersCount,
+  holdersData,
+  id,
   tab,
+  token,
+  transfers,
 }: Props) => {
   const name = token?.name;
   const tokenTicker = token?.symbol;
@@ -86,8 +86,8 @@ const FAQ = ({
           ) : token && Object.keys(token).length > 0 ? (
             <div className="px-3 pb-2 text-sm divide-y divide-gray-200 dark:divide-black-200 space-y-2">
               <div
-                itemScope
                 itemProp="mainEntity"
+                itemScope
                 itemType="https://schema.org/Question"
               >
                 <h3
@@ -97,13 +97,13 @@ const FAQ = ({
                   What is {name} price now?
                 </h3>
                 <div
-                  itemScope
                   itemProp="acceptedAnswer"
+                  itemScope
                   itemType="https://schema.org/Answer"
                 >
                   <div
-                    itemProp="text"
                     className="text-sm text-nearblue-600 dark:text-neargray-10 py-2"
+                    itemProp="text"
                   >
                     The live price of {name} is{' '}
                     {token?.price !== null && token?.price !== undefined ? (
@@ -149,8 +149,8 @@ const FAQ = ({
                 </div>
               </div>
               <div
-                itemScope
                 itemProp="mainEntity"
+                itemScope
                 itemType="https://schema.org/Question"
               >
                 <h3
@@ -160,8 +160,8 @@ const FAQ = ({
                   When was {name} created on Near Protocol?
                 </h3>
                 <div
-                  itemScope
                   itemProp="acceptedAnswer"
+                  itemScope
                   itemType="https://schema.org/Answer"
                 >
                   <div
@@ -169,7 +169,7 @@ const FAQ = ({
                     itemProp="text"
                   >
                     The{' '}
-                    <Link href={`/address/${id}`} className="underline">
+                    <Link className="underline" href={`/address/${id}`}>
                       {name}
                     </Link>{' '}
                     contract was created on Near Protocol at{' '}
@@ -184,8 +184,8 @@ const FAQ = ({
                     by{' '}
                     {contract?.receipt_predecessor_account_id && (
                       <Link
-                        href={`/address/${contract.receipt_predecessor_account_id}`}
                         className="underline"
+                        href={`/address/${contract.receipt_predecessor_account_id}`}
                       >
                         {shortenAddress(
                           contract.receipt_predecessor_account_id,
@@ -195,8 +195,8 @@ const FAQ = ({
                     through this{' '}
                     {contract?.transaction_hash && (
                       <Link
-                        href={`/txns/${contract.transaction_hash}`}
                         className="underline"
+                        href={`/txns/${contract.transaction_hash}`}
                       >
                         transaction
                       </Link>
@@ -208,8 +208,8 @@ const FAQ = ({
                 </div>
               </div>
               <div
-                itemScope
                 itemProp="mainEntity"
+                itemScope
                 itemType="https://schema.org/Question"
               >
                 <h3
@@ -219,8 +219,8 @@ const FAQ = ({
                   How many {name} tokens are there?
                 </h3>
                 <div
-                  itemScope
                   itemProp="acceptedAnswer"
+                  itemScope
                   itemType="https://schema.org/Answer"
                 >
                   <div
@@ -249,8 +249,8 @@ const FAQ = ({
                         The largest {tokenTicker} holder is currently{' '}
                         {largestHolder?.account && (
                           <Link
-                            href={`/address/${largestHolder.account}`}
                             className="underline"
+                            href={`/address/${largestHolder.account}`}
                           >
                             {shortenAddress(largestHolder.account)}
                           </Link>

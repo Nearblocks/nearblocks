@@ -1,8 +1,10 @@
 'use client';
-import Image from 'next/legacy/image';
-import Arrow from '../Icons/Arrow';
 import { useTranslations } from 'next-intl';
+import Image from 'next/legacy/image';
+
 import { Link } from '@/i18n/routing';
+
+import Arrow from '../Icons/Arrow';
 
 const Footer = ({ theme }: any) => {
   const currentDate = new Date();
@@ -17,16 +19,16 @@ const Footer = ({ theme }: any) => {
               <div className="w-64">
                 <div className="text-sm text-grey-dark flex flex-col py-3">
                   <Image
+                    alt="NearBlocks"
+                    className="block"
+                    height="40"
+                    layout="fixed"
                     src={
                       theme === 'dark'
                         ? '/images/nearblocksblack_dark.svg'
                         : '/images/nearblocksblack.svg'
                     }
-                    className="block"
                     width="174"
-                    height="40"
-                    alt="NearBlocks"
-                    layout="fixed"
                   />
                 </div>
                 <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
@@ -35,52 +37,52 @@ const Footer = ({ theme }: any) => {
                 <div>
                   <a
                     href="https://twitter.com/nearblocks"
-                    target="_blank"
                     rel="noreferrer nofollow noopener"
+                    target="_blank"
                   >
                     <Image
+                      alt="Twitter"
+                      height={24}
                       src={
                         theme === 'dark'
                           ? '/images/twitter_icon_black.svg'
                           : '/images/twitter_icon.svg'
                       }
                       width={24}
-                      height={24}
-                      alt="Twitter"
                     />
                   </a>
                   <a
-                    href="https://github.com/Nearblocks"
-                    target="_blank"
                     className="ml-2"
+                    href="https://github.com/Nearblocks"
                     rel="noreferrer nofollow noopener"
+                    target="_blank"
                   >
                     <Image
+                      alt="Github"
+                      height={24}
                       src={
                         theme === 'dark'
                           ? '/images/github_icon_black.svg'
                           : '/images/github_icon.svg'
                       }
                       width={24}
-                      height={24}
-                      alt="Github"
                     />
                   </a>
                   <a
-                    href="https://t.me/nearblocks"
-                    target="_blank"
                     className="ml-2"
+                    href="https://t.me/nearblocks"
                     rel="noreferrer nofollow noopener"
+                    target="_blank"
                   >
                     <Image
+                      alt="Telegram"
+                      height={24}
                       src={
                         theme === 'dark'
                           ? '/images/telegram_black.svg'
                           : '/images/nearblocks-telegram.svg'
                       }
                       width={24}
-                      height={24}
-                      alt="Telegram"
                     />
                   </a>
                 </div>
@@ -175,8 +177,8 @@ const Footer = ({ theme }: any) => {
                     <Link href="https://status.nearblocks.io/" legacyBehavior>
                       <a
                         className="flex"
-                        target="_blank"
                         rel="noreferrer nofollow noopener"
+                        target="_blank"
                       >
                         Status
                       </a>
@@ -198,15 +200,15 @@ const Footer = ({ theme }: any) => {
               >
                 <a
                   className="mx-1  flex items-center"
-                  target="_blank"
                   rel="noreferrer nofollow noopener"
+                  target="_blank"
                 >
                   <Image
-                    src="/images/coingecko_logo_black.svg"
                     alt="CoinGecko"
                     className="inline-flex w-5 h-5"
-                    width={20}
                     height={20}
+                    src="/images/coingecko_logo_black.svg"
+                    width={20}
                   />
                 </a>
               </Link>

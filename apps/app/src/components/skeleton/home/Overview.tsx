@@ -1,9 +1,11 @@
-import { networkId } from '@/utils/config';
-import Skeleton from '../common/Skeleton';
-import React, { Ref, forwardRef } from 'react';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import React, { forwardRef, Ref } from 'react';
+
+import { networkId } from '@/utils/config';
+
+import Skeleton from '../common/Skeleton';
 interface Props {
   className?: string;
 }
@@ -12,7 +14,7 @@ const Overview = forwardRef(
     const t = useTranslations('home');
     const { theme } = useTheme();
     return (
-      <div ref={ref} className={`w-full z-10 ${className}`}>
+      <div className={`w-full z-10 ${className}`} ref={ref}>
         <div className="container mx-auto px-3">
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
             <div
@@ -28,14 +30,14 @@ const Overview = forwardRef(
                     <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
                       <div className="items-center flex justify-left mr-3 ">
                         <Image
+                          alt={t('nearPrice')}
+                          height="24"
                           src={`/images/${
                             theme === 'dark'
                               ? 'near price_dark.svg'
                               : 'near price.svg'
                           }`}
-                          alt={t('nearPrice')}
                           width="24"
-                          height="24"
                         />
                       </div>
                       <div className="ml-2">
@@ -50,12 +52,12 @@ const Overview = forwardRef(
                     <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                       <div className="items-center flex justify-left mr-3 ">
                         <Image
+                          alt={t('marketCap')}
+                          height="24"
                           src={`/images/${
                             theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                           }`}
-                          alt={t('marketCap')}
                           width="24"
-                          height="24"
                         />
                       </div>
                       <div className="ml-2">
@@ -75,14 +77,14 @@ const Overview = forwardRef(
                   <div className="flex flex-row ">
                     <div className="items-center flex justify-left mr-3 ">
                       <Image
+                        alt={t('transactions')}
+                        height="24"
                         src={`/images/${
                           theme === 'dark'
                             ? 'transactions_dark.svg'
                             : 'transactions.svg'
                         }`}
-                        alt={t('transactions')}
                         width="24"
-                        height="24"
                       />
                     </div>
                     <div className="ml-2">
@@ -109,12 +111,12 @@ const Overview = forwardRef(
                   <div className="flex flex-row ">
                     <div className="items-center flex justify-left mr-3 ">
                       <Image
+                        alt={t('activeValidator')}
+                        height="24"
                         src={`/images/${
                           theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
                         }`}
-                        alt={t('activeValidator')}
                         width="24"
-                        height="24"
                       />
                     </div>
                     <div className="ml-2">

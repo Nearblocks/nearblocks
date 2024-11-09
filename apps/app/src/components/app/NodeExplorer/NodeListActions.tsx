@@ -1,5 +1,13 @@
 'use client';
+import { Tooltip } from '@reach/tooltip';
+import Big from 'big.js';
+import Cookies from 'js-cookie';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
+
+import { ValidatorEpochData } from 'nb-types';
+
+import { Link } from '@/i18n/routing';
 import {
   convertAmountToReadableString,
   convertTimestampToTime,
@@ -9,19 +17,14 @@ import {
   timeAgo,
   yoctoToNear,
 } from '@/utils/libs';
-import ArrowDown from '../Icons/ArrowDown';
-import Question from '../Icons/Question';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import { Tooltip } from '@reach/tooltip';
-import { ValidatorEpochData } from 'nb-types';
-import Table from '../common/Table';
-import Big from 'big.js';
-import Image from 'next/image';
-import { Link } from '@/i18n/routing';
-import Cookies from 'js-cookie';
 
-const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
+import ErrorMessage from '../common/ErrorMessage';
+import Table from '../common/Table';
+import ArrowDown from '../Icons/ArrowDown';
+import FaInbox from '../Icons/FaInbox';
+import Question from '../Icons/Question';
+
+const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const theme = Cookies?.get('theme') || 'light';
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -100,43 +103,43 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
     switch (status) {
       case 'active':
         return {
-          textColor: 'text-emerald-500',
           bgColor:
             'bg-emerald-50 dark:dark:bg-emerald-500/[0.25] text-emerald-500 ',
+          textColor: 'text-emerald-500',
         };
       case 'joining':
         return {
-          textColor: 'text-yellow-500',
           bgColor: 'bg-yellow-50 dark:bg-yellow-500/[0.25]  text-yellow-500',
+          textColor: 'text-yellow-500',
         };
       case 'leaving':
         return {
-          textColor: 'text-red-500',
           bgColor: 'bg-red-50 text-red-500 dark:bg-red-500/[0.25]',
+          textColor: 'text-red-500',
         };
       case 'proposal':
         return {
-          textColor: 'text-teal-900',
           bgColor:
             'bg-teal-300 dark:bg-teal-500/[0.25] dark:text-teal-500 text-teal-900',
+          textColor: 'text-teal-900',
         };
       case 'idle':
         return {
-          textColor: 'text-gray-600',
           bgColor:
             'bg-gray-300 text-gray-600 dark:bg-gray-500/[0.25] dark:text-gray-400',
+          textColor: 'text-gray-600',
         };
       case 'newcomer':
         return {
-          textColor: 'text-orange-500',
           bgColor:
             'bg-orange-500 text-white dark:bg-orange-500/[0.25] dark:text-orange-300',
+          textColor: 'text-orange-500',
         };
       case 'onHold':
         return {
-          textColor: 'text-blue-500',
           bgColor:
             'bg-blue-500 dark:bg-blue-500/[0.25] dark:text-blue-400 text-white',
+          textColor: 'text-blue-500',
         };
       default:
         return {};
@@ -145,8 +148,6 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
 
   const columns = [
     {
-      header: <span></span>,
-      key: '',
       cell: (row: ValidatorEpochData) => (
         <button onClick={() => handleRowClick(row.index || 0)}>
           <ArrowDown
@@ -156,28 +157,28 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           />
         </button>
       ),
+      header: <span></span>,
+      key: '',
       tdClassName:
         'px-7 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-20',
       thClassName:
         'px-7 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-20',
     },
     {
-      header: <span>Location</span>,
-      key: '',
       cell: (row: ValidatorEpochData) =>
         row?.description?.country_code ? (
           <div className="relative">
             <Tooltip
-              label={row?.description?.country}
               className="absolute top-0 left-0  h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={row?.description?.country}
             >
               <Image
-                src={`https://flagcdn.com/48x36/${row?.description?.country_code?.toLowerCase()}.png`}
                 alt={row?.description?.country as string}
-                width={20}
                 height={20}
                 layout="fixed"
+                src={`https://flagcdn.com/48x36/${row?.description?.country_code?.toLowerCase()}.png`}
                 unoptimized
+                width={20}
               />
             </Tooltip>
           </div>
@@ -186,14 +187,14 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
             ?
           </div>
         ),
+      header: <span>Location</span>,
+      key: '',
       tdClassName:
         'pl-2 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-24',
       thClassName:
         'pl-2 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-24',
     },
     {
-      header: <span>Status</span>,
-      key: 'View',
       cell: (row: ValidatorEpochData) => (
         <div
           className={`inline-block ${
@@ -203,24 +204,24 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           <div>{stakingStatusLabel(row?.stakingStatus ?? '')}</div>
         </div>
       ),
+      header: <span>Status</span>,
+      key: 'View',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 w-20',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-20',
     },
     {
-      header: <span>VALIDATOR</span>,
-      key: 'accountId',
       cell: (row: ValidatorEpochData) => (
         <>
           <button>
             <Tooltip
-              label={row.accountId}
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              label={row.accountId}
             >
               <Link
-                href={`/node-explorer/${row.accountId}`}
                 className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/node-explorer/${row.accountId}`}
               >
                 {shortenAddress(row.accountId)}
               </Link>
@@ -228,21 +229,21 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           </button>
 
           <Tooltip
-            label={row.publicKey}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+            label={row.publicKey}
           >
             <span>{row.publicKey ? shortenAddress(row.publicKey) : ''}</span>
           </Tooltip>
         </>
       ),
+      header: <span>VALIDATOR</span>,
+      key: 'accountId',
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 w-60',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-60',
     },
     {
-      header: <span>FEE</span>,
-      key: 'poolInfo',
       cell: (row: ValidatorEpochData) => (
         <div>
           {row?.poolInfo?.fee !== undefined
@@ -254,14 +255,14 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
             : 'N/A'}
         </div>
       ),
+      header: <span>FEE</span>,
+      key: 'poolInfo',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-24',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-24',
     },
     {
-      header: <span>APY</span>,
-      key: 'APY',
       cell: (row: ValidatorEpochData) => {
         const fee: any = row?.poolInfo?.fee;
         const lastEpochApy: any = data?.lastEpochApy ?? 0;
@@ -277,14 +278,14 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
 
         return <div>{adjustedApy}</div>;
       },
+      header: <span>APY</span>,
+      key: 'APY',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-24',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-24',
     },
     {
-      header: <span>DELEGATORS</span>,
-      key: 'deligators',
       cell: (row: ValidatorEpochData) => {
         return (
           <div>
@@ -295,14 +296,14 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           </div>
         );
       },
+      header: <span>DELEGATORS</span>,
+      key: 'deligators',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-40',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-40',
     },
     {
-      header: <span>TOTAL STAKE</span>,
-      key: 'stake',
       cell: (row: ValidatorEpochData) => (
         <span>
           {(row?.currentEpoch?.stake ??
@@ -323,25 +324,25 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
             ) + '  Ⓝ'}
         </span>
       ),
+      header: <span>TOTAL STAKE</span>,
+      key: 'stake',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>STAKE %</span>,
-      key: 'percentage',
       cell: (row: ValidatorEpochData) => {
         return <div>{row?.percent}%</div>;
       },
+      header: <span>STAKE %</span>,
+      key: 'percentage',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>CUMULATIVE STAKE</span>,
-      key: 'cumulative_stake',
       cell: (row: ValidatorEpochData) => {
         return (
           <div>
@@ -361,14 +362,14 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           </div>
         );
       },
+      header: <span>CUMULATIVE STAKE</span>,
+      key: 'cumulative_stake',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>STAKE CHANGE (24H)</span>,
-      key: '24_change',
       cell: (row: ValidatorEpochData) => {
         if (!row?.stakeChange?.value) {
           const visibleStake =
@@ -397,6 +398,8 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
           </div>
         );
       },
+      header: <span>STAKE CHANGE (24H)</span>,
+      key: '24_change',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -428,16 +431,16 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
         <tr className="border-none bg-gray-50 dark:bg-black-300">
           {telemetry && (
             <>
-              <td colSpan={2} className="pl-8 py-2">
+              <td className="pl-8 py-2" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase">
                     <div>Uptime</div>
                     <div className="relative">
                       <Tooltip
+                        className="absolute top-0 left-0 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                         label={
                           'Uptime is estimated by the ratio of the number of produced blocks to the number of expected blocks. '
                         }
-                        className="absolute top-0 left-0 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       >
                         <button>
                           <Question className="w-4 h-4 fill-current ml-1" />
@@ -456,15 +459,15 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                     : '-'}
                 </div>
               </td>
-              <td colSpan={2} className="px-4 py-2">
+              <td className="px-4 py-2" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase whitespace-nowrap">
                     <div>Latest block</div>
                     <Tooltip
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       label={
                         'The block height the validation node reported in the most recent telemetry heartbeat.'
                       }
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                     >
                       <button>
                         <Question className="w-4 h-4 fill-current ml-1" />
@@ -489,15 +492,15 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                   {telemetry?.lastHeight ? telemetry?.lastHeight : '-'}
                 </div>
               </td>
-              <td colSpan={3} className="px-4 py-2">
+              <td className="px-4 py-2" colSpan={3}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase whitespace-nowrap">
                     <div>Latest Telemetry Update</div>
                     <Tooltip
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       label={
                         'Telemetry is a regular notification coming from the nodes which includes generic information like the latest known block height, and the version of NEAR Protocol agent (nearcore).'
                       }
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                     >
                       <button>
                         <Question className="w-4 h-4 fill-current ml-1" />
@@ -511,27 +514,27 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                   {telemetry?.lastSeen ? timeAgo(telemetry?.lastSeen) : '-'}
                 </div>
               </td>
-              <td colSpan={2} className="px-4 py-2">
+              <td className="px-4 py-2" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase whitespace-nowrap">
                     <div>Node Agent Name</div>
                     <div className="relative">
                       <Tooltip
+                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                         label={
                           <span>
                             NEAR Protocol could have multiple implementations,
                             so agent is the name of that implementation, where
                             &quot;near-rs&quot; is &nbsp;
                             <Link
+                              className="text-green-250 hover:no-underline"
                               href="https://github.com/near/nearcore"
                               target="_blank"
-                              className="text-green-250 hover:no-underline"
                             >
                               the official implementation.
                             </Link>
                           </span>
                         }
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                       >
                         <button>
                           <Question className="w-4 h-4 fill-current ml-1" />
@@ -552,7 +555,7 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                   )}
                 </div>
               </td>
-              <td colSpan={2} className="px-4 py-2">
+              <td className="px-4 py-2" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider uppercase whitespace-nowrap py-2">
                   Node Agent Version / Build
                 </div>
@@ -574,7 +577,7 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
         <tr className="border-none bg-gray-50 dark:bg-black-300">
           {row?.description && (
             <>
-              <td colSpan={2} className="pl-8 pt-2 pb-4 align-top">
+              <td className="pl-8 pt-2 pb-4 align-top" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase">Name</div>
                 </div>
@@ -586,10 +589,10 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           row?.description?.logo?.startsWith('http') && (
                             <span className="mr-1 flex justify-center">
                               <Image
-                                src={row?.description?.logo}
                                 alt={row?.description?.name}
-                                width={20}
                                 height={20}
+                                src={row?.description?.logo}
+                                width={20}
                               />
                             </span>
                           )}
@@ -601,7 +604,7 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                   </div>
                 </div>
               </td>
-              <td colSpan={2} className="px-4 pt-2 pb-4 align-top">
+              <td className="px-4 pt-2 pb-4 align-top" colSpan={2}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase whitespace-nowrap">
                     Social Media
@@ -623,15 +626,15 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Web"
                             className="w-5 h-5"
+                            height={16}
                             src={
                               theme === 'dark'
                                 ? '/images/web_icon_black.svg'
                                 : '/images/web_icon.svg'
                             }
-                            alt="Web"
+                            width={16}
                           />
                         </a>
                       )}
@@ -643,15 +646,15 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Email"
                             className="w-5 h-5"
+                            height={16}
                             src={
                               theme === 'dark'
                                 ? '/images/email_icon_black.svg'
                                 : '/images/email_icon.svg'
                             }
-                            alt="Email"
+                            width={16}
                           />
                         </a>
                       )}
@@ -668,16 +671,16 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Twitter"
                             className="w-5 h-5"
+                            height={16}
+                            priority
                             src={
                               theme === 'dark'
                                 ? '/images/twitter_icon_black.svg'
                                 : '/images/twitter_icon.svg'
                             }
-                            alt="Twitter"
-                            priority
+                            width={16}
                           />
                         </a>
                       )}
@@ -694,16 +697,16 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Discord"
                             className="w-5 h-5"
+                            height={16}
+                            priority
                             src={
                               theme === 'dark'
                                 ? '/images/discord_icon_black.svg'
                                 : '/images/discord_icon.svg'
                             }
-                            alt="Discord"
-                            priority
+                            width={16}
                           />
                         </a>
                       )}
@@ -720,16 +723,16 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Github"
                             className="w-5 h-5"
+                            height={16}
+                            priority
                             src={
                               theme === 'dark'
                                 ? '/images/github_icon_black.svg'
                                 : '/images/github_icon.svg'
                             }
-                            alt="Github"
-                            priority
+                            width={16}
                           />
                         </a>
                       )}
@@ -747,15 +750,15 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                           target="_blank"
                         >
                           <Image
-                            width={16}
-                            height={16}
+                            alt="Telegram"
                             className="w-5 h-5"
+                            height={16}
                             src={
                               theme === 'dark'
                                 ? '/images/telegram_black.svg'
                                 : '/images/telegram.svg'
                             }
-                            alt="Telegram"
+                            width={16}
                           />
                         </a>
                       )}
@@ -765,7 +768,7 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                   )}
                 </div>
               </td>
-              <td colSpan={7} className="px-4 pt-2 pb-4 align-top">
+              <td className="px-4 pt-2 pb-4 align-top" colSpan={7}>
                 <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
                   <div className="flex uppercase">Description</div>
                 </div>
@@ -782,12 +785,12 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
             </>
           )}
           {!row?.description && (
-            <td colSpan={11} className="px-8">
+            <td className="px-8" colSpan={11}>
               <div className="flex justify-center text-sm text-nearblue-600 dark:text-neargray-10 font-medium py-4 ">
                 If you are node owner feel free to fill all&nbsp;
                 <a
-                  href="https://github.com/zavodil/near-pool-details#description"
                   className="text-green-500 dark:text-green-250 underline"
+                  href="https://github.com/zavodil/near-pool-details#description"
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -860,8 +863,8 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                     {
                       <div className="relative">
                         <Tooltip
-                          label={totalSupply?.stats[0].total_supply + ' yoctoⓃ'}
                           className="absolute top-0 left-1/2 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          label={totalSupply?.stats[0].total_supply + ' yoctoⓃ'}
                         >
                           <button>
                             {TotalSupply ? formatNumber(TotalSupply) : ''}
@@ -961,16 +964,9 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
               <div className="flex flex-col">
                 <Table
                   columns={columns}
-                  data={validatorEpochData}
-                  isPagination={true}
                   count={totalCount}
-                  page={page}
-                  limit={25}
-                  pageLimit={999}
-                  renderRowSubComponent={ExpandedRow}
-                  setPage={setPage}
+                  data={validatorEpochData}
                   Error={error}
-                  expanded={expanded}
                   ErrorText={
                     <ErrorMessage
                       icons={<FaInbox />}
@@ -978,6 +974,13 @@ const NodeListActions = ({ data, totalSupply, latestBlock, error }: any) => {
                       mutedText="Please try again later"
                     />
                   }
+                  expanded={expanded}
+                  isPagination={true}
+                  limit={25}
+                  page={page}
+                  pageLimit={999}
+                  renderRowSubComponent={ExpandedRow}
+                  setPage={setPage}
                 />
               </div>
             </div>

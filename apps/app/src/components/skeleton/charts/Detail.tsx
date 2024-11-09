@@ -1,7 +1,9 @@
-import React, { Ref, forwardRef } from 'react';
-import Skeleton from '../common/Skeleton';
-import { networkId } from '@/utils/config';
 import { useTranslations } from 'next-intl';
+import React, { forwardRef, Ref } from 'react';
+
+import { networkId } from '@/utils/config';
+
+import Skeleton from '../common/Skeleton';
 
 interface Props {
   chartTypes: string;
@@ -9,56 +11,56 @@ interface Props {
 }
 const charts = [
   {
+    exclude: networkId === 'testnet',
     link: '/charts/near-price',
     text: 'nearPrice.heading',
-    exclude: networkId === 'testnet',
   },
   {
+    exclude: networkId === 'testnet',
     link: '/charts/market-cap',
     text: 'marketCap.heading',
-    exclude: networkId === 'testnet',
   },
   {
+    exclude: false,
     link: '/charts/near-supply',
     text: 'nearSupply.heading',
-    exclude: false,
   },
   {
+    exclude: false,
     link: '/charts/txns',
     text: 'txns.heading',
-    exclude: false,
   },
   {
+    exclude: false,
     link: '/charts/blocks',
     text: 'blocks.heading',
-    exclude: false,
   },
   {
+    exclude: false,
     link: '/charts/addresses',
     text: 'addresses.heading',
-    exclude: false,
   },
   {
+    exclude: networkId === 'testnet',
     link: '/charts/txn-fee',
     text: 'txnFee.heading',
-    exclude: networkId === 'testnet',
   },
   {
+    exclude: networkId === 'testnet',
     link: '/charts/txn-volume',
     text: 'txnVolume.heading',
-    exclude: networkId === 'testnet',
   },
   {
+    exclude: false,
     link: '/charts/tps',
     text: 'Near Transactions per Second Chart',
-    exclude: false,
   },
 ];
 const Index = forwardRef(
   ({ chartTypes, className }: Props, ref: Ref<HTMLDivElement>) => {
     const t = useTranslations();
     return (
-      <div ref={ref} className={`w-full z-10 ${className}`}>
+      <div className={`w-full z-10 ${className}`} ref={ref}>
         {chartTypes && (
           <>
             <div

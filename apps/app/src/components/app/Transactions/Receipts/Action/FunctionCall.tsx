@@ -1,10 +1,12 @@
+import { useTranslations } from 'next-intl';
+
 import FaCode from '@/components/Icons/FaCode';
+import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/hexy';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
 import RlpTransaction from '../RlpTransaction';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 const FunctionCall = (props: TransactionActionInfo) => {
   const t = useTranslations();
@@ -41,24 +43,24 @@ const FunctionCall = (props: TransactionActionInfo) => {
       <span className="font-bold ml-1">{args?.method_name}</span>{' '}
       {t ? t('txn.actions.functionCall.1') : 'in contract'}
       <Link
-        href={`/address/${receiver}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+        href={`/address/${receiver}`}
       >
         {shortenAddress(receiver)}
       </Link>
       {args?.method_name === 'rlp_execute' ||
       (args?.method_name === 'submit' && receiver.includes('aurora')) ? (
         <RlpTransaction
-          pretty={modifiedData}
           method={args?.method_name}
+          pretty={modifiedData}
           receiver={receiver}
         />
       ) : (
         <textarea
+          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+          defaultValue={displayArgs(args.args_base64 || args.args)}
           readOnly
           rows={4}
-          defaultValue={displayArgs(args.args_base64 || args.args)}
-          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
         ></textarea>
       )}
     </div>

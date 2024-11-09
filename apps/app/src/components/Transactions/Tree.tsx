@@ -1,15 +1,17 @@
-import { mapRpcActionToAction } from '@/utils/near';
-import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
+
+import { mapRpcActionToAction } from '@/utils/near';
+import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+
 import FaHourglassStart from '../Icons/FaHourglassStart';
 import Skeleton from '../skeleton/common/Skeleton';
 import TreeReceipt from './TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
 
 interface Props {
-  txn: TransactionInfo;
   rpcTxn: RPCTransactionInfo;
+  txn: TransactionInfo;
 }
 
 const Tree = (props: Props) => {
@@ -144,16 +146,16 @@ const Tree = (props: Props) => {
                   <ul className="hierarchy-tree">
                     <li>
                       <TreeReceipt
-                        txn={txn}
                         receipt={receipt}
                         setShow={setShow}
                         show={show}
+                        txn={txn}
                       />
                     </li>
                   </ul>
                 </div>
                 <div className="w-full md:w-5/12 lg:w-1/3 xl:w-1/4">
-                  <TreeReceiptDetails txn={txn} receipt={receipt} show={show} />
+                  <TreeReceiptDetails receipt={receipt} show={show} txn={txn} />
                 </div>
               </div>
             )}

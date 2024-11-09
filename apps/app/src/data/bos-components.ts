@@ -1,63 +1,64 @@
-import type { NetworkId } from '@/utils/types';
 import { env } from 'next-runtime-env';
+
+import type { NetworkId } from '@/utils/types';
 type NetworkComponents = {
-  nodeExplorer: string;
-  delegators: string;
-  sponsoredText: string;
   account: string;
-  blocksList: string;
-  blocksLatest: string;
   blocksDetail: string;
-  transactionsList: string;
-  transactionsLatest: string;
-  transactionsOverview: string;
-  transactionsHash: string;
-  search: string;
+  blocksLatest: string;
+  blocksList: string;
+  buttons: string;
+  charts: string;
+  commentsFeed: string;
+  delegators: string;
+  exportData: string;
   ftList: string;
-  ftTransfersList: string;
   ftOverview: string;
+  ftTransfersList: string;
+  nftDetail: string;
   nftList: string;
   nftOverview: string;
   nftTransfersList: string;
-  nftDetail: string;
-  charts: string;
-  exportData: string;
-  buttons: string;
+  nodeExplorer: string;
+  search: string;
+  sponsoredText: string;
   tpsChart: string;
-  commentsFeed: string;
+  transactionsHash: string;
+  transactionsLatest: string;
+  transactionsList: string;
+  transactionsOverview: string;
 };
 const accountId = env('NEXT_PUBLIC_ACCOUNT_ID');
 
 const ComponentUrl = {
-  nodeExplorer: `${accountId}/widget/bos-components.components.NodeExplorer`,
-  delegators: `${accountId}/widget/bos-components.components.Delegators`,
-  sponsoredText: `${accountId}/widget/bos-components.components.Shared.SponsoredText`,
   account: `${accountId}/widget/bos-components.components.Accounts`,
-  blocksList: `${accountId}/widget/bos-components.components.Blocks.List`,
-  blocksLatest: `${accountId}/widget/bos-components.components.Blocks.Latest`,
   blocksDetail: `${accountId}/widget/bos-components.components.Blocks.Detail`,
-  transactionsList: `${accountId}/widget/bos-components.components.Transactions.List`,
-  transactionsLatest: `${accountId}/widget/bos-components.components.Transactions.Latest`,
-  transactionsOverview: `${accountId}/widget/bos-components.components.Transactions.Overview`,
-  transactionsHash: `${accountId}/widget/bos-components.components.Transactions.Hash`,
-  search: `${accountId}/widget/bos-components.components.Shared.Search`,
+  blocksLatest: `${accountId}/widget/bos-components.components.Blocks.Latest`,
+  blocksList: `${accountId}/widget/bos-components.components.Blocks.List`,
+  buttons: `${accountId}/widget/bos-components.components.Shared.Buttons`,
+  charts: `${accountId}/widget/bos-components.components.Charts`,
+  commentsFeed: `${accountId}/widget/bos-components.components.Comments.Feed`,
+  delegators: `${accountId}/widget/bos-components.components.Delegators`,
+  exportData: `${accountId}/widget/bos-components.components.ExportData`,
   ftList: `${accountId}/widget/bos-components.components.FT.List`,
-  ftTransfersList: `${accountId}/widget/bos-components.components.FT.TransfersList`,
   ftOverview: `${accountId}/widget/bos-components.components.FT.Overview`,
+  ftTransfersList: `${accountId}/widget/bos-components.components.FT.TransfersList`,
+  nftDetail: `${accountId}/widget/bos-components.components.NFT.Detail`,
   nftList: `${accountId}/widget/bos-components.components.NFT.List`,
   nftOverview: `${accountId}/widget/bos-components.components.NFT.Overview`,
   nftTransfersList: `${accountId}/widget/bos-components.components.NFT.TransfersList`,
-  nftDetail: `${accountId}/widget/bos-components.components.NFT.Detail`,
-  charts: `${accountId}/widget/bos-components.components.Charts`,
-  exportData: `${accountId}/widget/bos-components.components.ExportData`,
-  buttons: `${accountId}/widget/bos-components.components.Shared.Buttons`,
+  nodeExplorer: `${accountId}/widget/bos-components.components.NodeExplorer`,
+  search: `${accountId}/widget/bos-components.components.Shared.Search`,
+  sponsoredText: `${accountId}/widget/bos-components.components.Shared.SponsoredText`,
   tpsChart: `${accountId}/widget/bos-components.components.Transactions.TpsChart`,
-  commentsFeed: `${accountId}/widget/bos-components.components.Comments.Feed`,
+  transactionsHash: `${accountId}/widget/bos-components.components.Transactions.Hash`,
+  transactionsLatest: `${accountId}/widget/bos-components.components.Transactions.Latest`,
+  transactionsList: `${accountId}/widget/bos-components.components.Transactions.List`,
+  transactionsOverview: `${accountId}/widget/bos-components.components.Transactions.Overview`,
 };
 export const componentsByNetworkId: Record<
   NetworkId,
   NetworkComponents | undefined
 > = {
-  testnet: ComponentUrl,
   mainnet: ComponentUrl,
+  testnet: ComponentUrl,
 };

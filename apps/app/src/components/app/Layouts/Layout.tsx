@@ -1,25 +1,27 @@
-import 'react-toastify/dist/ReactToastify.css';
-import { ReactNode } from 'react';
-import { getRequest } from '@/utils/app/api';
-import LayoutActions from './LayoutActions';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Manrope } from 'next/font/google';
-import Script from 'next/script';
 import { PublicEnvProvider } from 'next-runtime-env';
-import { ToastContainer } from 'react-toastify';
+import { Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
+import Script from 'next/script';
+import { ReactNode } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import { getRequest } from '@/utils/app/api';
+
+import LayoutActions from './LayoutActions';
 
 interface LayoutProps {
   children: ReactNode;
-  notice?: ReactNode;
   locale: string;
+  notice?: ReactNode;
 }
 
 const manrope = Manrope({
-  weight: ['200', '300', '400', '500', '600'],
-  subsets: ['latin'],
   display: 'swap',
+  subsets: ['latin'],
+  weight: ['200', '300', '400', '500', '600'],
 });
 
 const Layout = async ({ children }: LayoutProps) => {
@@ -44,22 +46,22 @@ const Layout = async ({ children }: LayoutProps) => {
     const res = await getRequest(`search${filter}?keyword=${keyword}`);
 
     const data = {
-      blocks: [],
-      txns: [],
       accounts: [],
+      blocks: [],
       receipts: [],
+      txns: [],
     };
 
     if (res?.blocks?.length) {
       if (returnPath) {
-        return { type: 'block', path: res.blocks[0].block_hash };
+        return { path: res.blocks[0].block_hash, type: 'block' };
       }
       data.blocks = res.blocks;
     }
 
     if (res?.txns?.length) {
       if (returnPath) {
-        return { type: 'txn', path: res.txns[0].transaction_hash };
+        return { path: res.txns[0].transaction_hash, type: 'txn' };
       }
       data.txns = res.txns;
     }
@@ -67,8 +69,8 @@ const Layout = async ({ children }: LayoutProps) => {
     if (res?.receipts?.length) {
       if (returnPath) {
         return {
-          type: 'txn',
           path: res.receipts[0].originated_from_transaction_hash,
+          type: 'txn',
         };
       }
       data.receipts = res.receipts;
@@ -76,7 +78,7 @@ const Layout = async ({ children }: LayoutProps) => {
 
     if (res?.accounts?.length) {
       if (returnPath) {
-        return { type: 'address', path: res.accounts[0].account_id };
+        return { path: res.accounts[0].account_id, type: 'address' };
       }
       data.accounts = res.accounts;
     }
@@ -87,37 +89,37 @@ const Layout = async ({ children }: LayoutProps) => {
   return (
     <html
       className={`${manrope.className} ${theme}`}
-      suppressHydrationWarning
       lang="en"
+      suppressHydrationWarning
     >
       <head>
         <link
+          href="/apple_touch_icon.png"
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/apple_touch_icon.png"
         />
         <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
           href="/favicon_32x32.png"
+          rel="icon"
+          sizes="32x32"
+          type="image/png"
         />
         <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
           href="/favicon_16x16.png"
+          rel="icon"
+          sizes="16x16"
+          type="image/png"
         />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link href="/site.webmanifest" rel="manifest" />
         <Script src="/__ENV.js" />
       </head>
       <body className={`overflow-x-hidden dark:bg-black-300`}>
         <noscript>
           <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
             height="0"
-            width="0"
+            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
             style={{ display: 'none', visibility: 'hidden' }}
+            width="0"
           />
         </noscript>
         <Script id="gtm" strategy="afterInteractive">
@@ -138,9 +140,9 @@ const Layout = async ({ children }: LayoutProps) => {
           <NextIntlClientProvider messages={messages}>
             <ToastContainer />
             <LayoutActions
-              stats={stats}
               blocks={blocks}
               handleFilterAndKeyword={handleFilterAndKeyword}
+              stats={stats}
               theme={theme}
             >
               {children}

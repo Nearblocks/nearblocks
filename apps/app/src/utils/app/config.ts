@@ -62,14 +62,14 @@ export const verifierConfig =
 const evmWalletChains = {
   mainnet: {
     chainId: 397,
-    name: 'Near Mainnet',
     explorer: 'https://nearblocks.io',
+    name: 'Near Mainnet',
     rpc: 'https://eth-rpc.mainnet.near.org',
   },
   testnet: {
     chainId: 398,
-    name: 'Near Testnet',
     explorer: 'https://testnet.nearblocks.io',
+    name: 'Near Testnet',
     rpc: 'https://eth-rpc.testnet.near.org',
   },
 };

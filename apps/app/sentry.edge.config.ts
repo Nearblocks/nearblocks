@@ -9,11 +9,11 @@ import { env } from 'next-runtime-env';
 const SENTRY_DSN_URL = env('NEXT_PUBLIC_SENTRY_DSN');
 
 Sentry.init({
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: false,
+
   dsn: SENTRY_DSN_URL,
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
-
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
 });

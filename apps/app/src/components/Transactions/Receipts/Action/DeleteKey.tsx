@@ -1,7 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 import FaKey from '@/components/Icons/FaKey';
 import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
-import { useTranslations } from 'next-intl';
 
 const DeleteKey = (props: TransactionActionInfo) => {
   const t = useTranslations();

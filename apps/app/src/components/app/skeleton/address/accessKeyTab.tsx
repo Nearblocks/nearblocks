@@ -17,9 +17,9 @@ export default function AccessKeyTabSkeleton() {
               'When',
             ].map((header, index) => (
               <th
+                className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
                 key={index}
                 scope="col"
-                className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
               >
                 {header}
               </th>
@@ -28,11 +28,11 @@ export default function AccessKeyTabSkeleton() {
         </thead>
         <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
           {[...Array(25)].map((_, i) => (
-            <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
+            <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
               {[...Array(8)].map((_, j) => (
                 <td
-                  key={j}
                   className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10"
+                  key={j}
                 >
                   <Skeleton className="w-full h-4" />
                 </td>

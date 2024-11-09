@@ -1,8 +1,10 @@
 'use client';
-import React from 'react';
-import Skeleton from '../common/Skeleton';
 import { useTranslations } from 'next-intl';
+import React from 'react';
+
 import { useConfig } from '@/hooks/app/useConfig';
+
+import Skeleton from '../common/Skeleton';
 
 export default function BalanceSkeleton() {
   const t = useTranslations();

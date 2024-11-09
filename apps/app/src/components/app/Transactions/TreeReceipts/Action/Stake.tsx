@@ -1,11 +1,13 @@
-import { TransactionActionInfo } from '@/utils/types';
-import TreeNode from '../TreeNode';
-import FaCoins from '@/components/Icons/FaCoins';
-import { shortenHex, yoctoToNear } from '@/utils/libs';
 import { useTranslations } from 'next-intl';
 
+import FaCoins from '@/components/Icons/FaCoins';
+import { shortenHex, yoctoToNear } from '@/utils/libs';
+import { TransactionActionInfo } from '@/utils/types';
+
+import TreeNode from '../TreeNode';
+
 const Stake = (props: TransactionActionInfo) => {
-  const { args, action } = props;
+  const { action, args } = props;
   const t = useTranslations();
 
   return (

@@ -1,13 +1,15 @@
 import classNames from 'classnames';
-import { getRequest } from '@/utils/app/api';
+
 import { Link } from '@/i18n/routing';
-import Transfers from './Transfers';
+import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
+
+import FAQ from './FAQ';
 import Holders from './Holders';
 import Info from './Info';
-import FAQ from './FAQ';
+import Transfers from './Transfers';
 
-type TabType = 'transfers' | 'holders' | 'info' | 'faq' | 'comments';
+type TabType = 'comments' | 'faq' | 'holders' | 'info' | 'transfers';
 
 export default async function TokenTabs({
   id,
@@ -19,11 +21,11 @@ export default async function TokenTabs({
   const tab = searchParams?.tab || 'transfers';
 
   const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
-    transfers: { api: `fts/${id}/txns`, count: `fts/${id}/txns/count` },
+    comments: { api: '' },
+    faq: { api: `fts/${id}` },
     holders: { api: `fts/${id}/holders`, count: `fts/${id}/holders/count` },
     info: { api: `fts/${id}` },
-    faq: { api: `fts/${id}` },
-    comments: { api: '' },
+    transfers: { api: `fts/${id}/txns`, count: `fts/${id}/txns/count` },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -60,34 +62,34 @@ export default async function TokenTabs({
   const contract = contractResult?.deployments?.[0];
 
   const tabs = [
-    { name: 'transfers', message: 'fts.ft.transfers', label: 'Transfers' },
-    { name: 'holders', message: 'fts.ft.holders', label: 'Holders' },
-    { name: 'info', message: 'fts.ft.info', label: 'Info' },
-    { name: 'faq', message: 'fts.ft.faq', label: 'FAQ' },
+    { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
+    { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
+    { label: 'Info', message: 'fts.ft.info', name: 'info' },
+    { label: 'FAQ', message: 'fts.ft.faq', name: 'faq' },
   ];
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
   return (
     <div className="block lg:flex lg:space-x-2 mb-10">
       <div className="w-full ">
         <div className="flex flex-wrap ">
-          {tabs?.map(({ name, label }) => {
+          {tabs?.map(({ label, name }) => {
             return (
               <Link
-                key={name}
+                className={getClassName(name === tab)}
                 href={
                   name === 'transfers'
                     ? `/token/${id}`
                     : `/token/${id}?tab=${name}`
                 }
-                className={getClassName(name === tab)}
+                key={name}
               >
                 <h2>{label}</h2>
               </Link>
@@ -97,36 +99,36 @@ export default async function TokenTabs({
         <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
           {tab === 'transfers' ? (
             <Transfers
-              txns={txns}
               count={transfers}
-              error={!txns}
               cursor={txnCursor}
+              error={!txns}
               tab={tab}
+              txns={txns}
             />
           ) : null}
           {tab === 'holders' ? (
             <Holders
-              token={token}
-              status={status}
-              holder={holder}
               count={holders}
               error={!txns}
+              holder={holder}
+              status={status}
               tab={tab}
+              token={token}
             />
           ) : null}
           {tab === 'info' ? (
-            <Info token={token} error={!txns} tab={tab} />
+            <Info error={!txns} tab={tab} token={token} />
           ) : null}
           {tab === 'faq' ? (
             <FAQ
-              id={id}
-              token={token}
               account={account}
               contract={contract}
-              transfers={transfers}
-              holdersData={holder}
               holdersCount={holders}
+              holdersData={holder}
+              id={id}
               tab={tab}
+              token={token}
+              transfers={transfers}
             />
           ) : null}
         </div>

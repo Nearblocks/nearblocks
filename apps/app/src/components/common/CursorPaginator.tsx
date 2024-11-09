@@ -1,18 +1,19 @@
-import { useIntlRouter, usePathname } from '@/i18n/routing';
-import { formatWithCommas } from '@/utils/libs';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
+
+import { useIntlRouter, usePathname } from '@/i18n/routing';
+import { formatWithCommas } from '@/utils/libs';
 interface PaginatorProps {
+  cursor: string | undefined;
   page: number;
   setPage: (page: number) => void;
-  cursor: string | undefined;
 }
 
 const CursorPaginator = (props: PaginatorProps) => {
   const router = useRouter();
   const intlRouter = useIntlRouter();
-  const { locale, id, ...rest } = router.query;
-  const { setPage, cursor } = props;
+  const { id, locale, ...rest } = router.query;
+  const { cursor, setPage } = props;
   const [loading, setLoading] = useState(false);
   const actualPath = usePathname();
   const page = rest.p || 1;
@@ -38,7 +39,7 @@ const CursorPaginator = (props: PaginatorProps) => {
     if (initialLoad.current) {
       initialLoad.current = false;
       const {
-        query: { cursor, p, locale, ...updatedQuery },
+        query: { cursor, locale, p, ...updatedQuery },
       } = router;
 
       if (p) {
@@ -79,37 +80,37 @@ const CursorPaginator = (props: PaginatorProps) => {
         <div className="flex-1 flex items-center justify-between">
           <div></div>
           <div
-            className="relative z-0 inline-flex rounded-md"
             aria-label="Pagination"
+            className="relative z-0 inline-flex rounded-md"
           >
             <button
-              type="button"
-              disabled={page === 1 || loading}
-              onClick={onFirst}
               className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
                 page === 1 || loading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
               } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
+              disabled={page === 1 || loading}
+              onClick={onFirst}
+              type="button"
             >
               First
             </button>
             <button
-              type="button"
-              disabled
               className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500  rounded-md  bg-gray-100 dark:bg-black-200 dark:text-neargray-10"
+              disabled
+              type="button"
             >
               {`Page ${formatWithCommas(String(page))}`}
             </button>
             <button
-              type="button"
-              disabled={!cursor || loading}
-              onClick={handleNextPage}
               className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium text-xs ${
                 !props.cursor || loading
                   ? 'text-gray-500 dark:text-neargray-10'
                   : 'text-green-400 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-400 dark:hover:bg-green-250'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
+              disabled={!cursor || loading}
+              onClick={handleNextPage}
+              type="button"
             >
               Next
             </button>

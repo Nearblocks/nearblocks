@@ -1,4 +1,5 @@
-import React, { Ref, forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
+
 import Skeleton from '../common/Skeleton';
 interface Props {
   className?: string;
@@ -7,8 +8,8 @@ const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <>
       <div
-        ref={ref}
         className={`bg-white dark:bg-black-600 rounded-b-xl overflow-hidden w-full z-10 ${className}`}
+        ref={ref}
       >
         <div className="relative">
           <div className="px-3 dark:divide-black-200 divide-y h-80">

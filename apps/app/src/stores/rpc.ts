@@ -1,5 +1,6 @@
-import { RpcProviders } from '@/utils/rpc';
 import { create } from 'zustand';
+
+import { RpcProviders } from '@/utils/rpc';
 
 const setClientCookie = (name: string, value: string, days = 365) => {
   if (typeof document !== 'undefined') {
@@ -20,22 +21,25 @@ const getClientCookie = (name: string) => {
 };
 
 type RpcState = {
-  rpc: string;
   errorCount: number;
+  resetErrorCount: () => void;
+  rpc: string;
   setRpc: (rpc: string) => void;
   switchRpc: () => void;
-  resetErrorCount: () => void;
 };
 
 export const useRpcStore = create<RpcState>((set, get) => ({
-  rpc: getClientCookie('rpcUrl') || RpcProviders?.[0]?.url || '',
   errorCount: 0,
+  resetErrorCount: () => {
+    set({ errorCount: 0 });
+  },
+  rpc: getClientCookie('rpcUrl') || RpcProviders?.[0]?.url || '',
   setRpc: (rpc: string) => {
     setClientCookie('rpcUrl', rpc);
-    set(() => ({ rpc, errorCount: 0 }));
+    set(() => ({ errorCount: 0, rpc }));
   },
   switchRpc: () => {
-    const { rpc, errorCount } = get();
+    const { errorCount, rpc } = get();
 
     if (errorCount >= RpcProviders?.length) {
       throw new Error('All RPC providers have resulted in errors.');
@@ -48,9 +52,6 @@ export const useRpcStore = create<RpcState>((set, get) => ({
     const nextRpc = RpcProviders[nextIndex].url;
 
     setClientCookie('rpcUrl', nextRpc);
-    set({ rpc: nextRpc, errorCount: errorCount + 1 });
-  },
-  resetErrorCount: () => {
-    set({ errorCount: 0 });
+    set({ errorCount: errorCount + 1, rpc: nextRpc });
   },
 }));

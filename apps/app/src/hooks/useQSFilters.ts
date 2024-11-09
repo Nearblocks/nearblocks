@@ -1,6 +1,7 @@
-import queryString from 'qs';
 import { useRouter } from 'next/router';
-import { useRef, useMemo, useCallback } from 'react';
+import queryString from 'qs';
+import { useCallback, useMemo, useRef } from 'react';
+
 import { stripEmpty } from '@/utils/libs';
 
 const isRouteParam = (route: string, param: string): boolean =>
@@ -17,9 +18,9 @@ const filterRouteParams = (
   );
 
 const useQSFilters = (
-  initial?: Record<string, any> | (() => Record<string, any>),
+  initial?: (() => Record<string, any>) | Record<string, any>,
 ) => {
-  const { route, query, replace, asPath } = useRouter();
+  const { asPath, query, replace, route } = useRouter();
 
   const initialRef = useRef<Record<string, any>>(
     typeof initial === 'function' ? initial() : initial || {},
@@ -53,8 +54,8 @@ const useQSFilters = (
   );
 
   type SetFiltersArg =
-    | keyof typeof filters
-    | ((filters: Record<string, any>) => Record<string, any>);
+    | ((filters: Record<string, any>) => Record<string, any>)
+    | keyof typeof filters;
 
   const setFilters = useCallback(
     (key: SetFiltersArg, value?: any) => {
@@ -67,7 +68,7 @@ const useQSFilters = (
     [filters, urlReplace],
   );
 
-  return { qs, filters, setFilters };
+  return { filters, qs, setFilters };
 };
 
 export default useQSFilters;

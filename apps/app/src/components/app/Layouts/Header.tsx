@@ -1,154 +1,155 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import Image from 'next/legacy/image';
 import React, { Suspense, useMemo, useState } from 'react';
-import { useAuthStore } from '@/stores/auth';
 
-import Collapse from '../Collapse';
-import Menu from '../Icons/Menu';
-import ArrowDown from '../Icons/ArrowDown';
-import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import { dollarFormat, nanoToMilli } from '@/utils/libs';
-import User from '../Icons/User';
-import { BlocksInfo, Stats } from '@/utils/types';
-import { Link, routing, usePathname } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
-import Search from '../common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
+import { Link, routing, usePathname } from '@/i18n/routing';
+import { useAuthStore } from '@/stores/auth';
 import { setTheme } from '@/utils/app/actions';
+import { dollarFormat, nanoToMilli } from '@/utils/libs';
+import { BlocksInfo, Stats } from '@/utils/types';
+
+import ActiveLink from '../ActiveLink';
+import Collapse from '../Collapse';
+import Search from '../common/Search';
+import ArrowDown from '../Icons/ArrowDown';
+import Menu from '../Icons/Menu';
+import User from '../Icons/User';
 
 const menus = [
   {
-    id: 1,
-    title: 'header.menu.home',
     fallbackText: 'Home',
+    id: 1,
     link: '/',
     submenu: [],
+    title: 'header.menu.home',
   },
   {
-    id: 2,
-    title: 'header.menu.blockchain',
     fallbackText: 'Blockchain',
+    id: 2,
     submenu: [
       {
-        id: 1,
-        title: 'header.menu.viewBlocks',
         fallbackText: 'View Blocks',
+        id: 1,
         link: '/blocks',
+        title: 'header.menu.viewBlocks',
       },
       {
-        id: 2,
-        title: 'header.menu.viewTxns',
         fallbackText: 'View Transactions',
+        id: 2,
         link: '/txns',
+        title: 'header.menu.viewTxns',
       },
       {
-        id: 4,
-        title: 'header.menu.charts',
         fallbackText: 'Charts',
+        id: 4,
         link: '/charts',
+        title: 'header.menu.charts',
       },
       {
-        id: 5,
-        title: 'header.menu.nodeExplorer',
         fallbackText: 'Node Explorer',
+        id: 5,
         link: '/node-explorer',
+        title: 'header.menu.nodeExplorer',
       },
     ],
+    title: 'header.menu.blockchain',
   },
   {
-    id: 3,
-    title: 'header.menu.tokens',
     fallbackText: 'Tokens',
+    id: 3,
     submenu: [
       {
-        id: 1,
-        title: 'header.menu.toptoken',
         fallbackText: 'Top Tokens',
+        id: 1,
         link: '/tokens',
+        title: 'header.menu.toptoken',
       },
       {
-        id: 2,
-        title: 'header.menu.viewTokenTrasfers',
         fallbackText: 'View Token Transfers',
+        id: 2,
         link: '/tokentxns',
+        title: 'header.menu.viewTokenTrasfers',
       },
       {
-        id: 3,
-        title: 'header.menu.topnft',
         fallbackText: 'Top NFTs',
+        id: 3,
         link: '/nft-tokens',
+        title: 'header.menu.topnft',
       },
       {
-        id: 4,
-        title: 'header.menu.viewNftTrasfers',
         fallbackText: 'View NFT Transfers',
+        id: 4,
         link: '/nft-tokentxns',
+        title: 'header.menu.viewNftTrasfers',
       },
     ],
+    title: 'header.menu.tokens',
   },
 ];
 
 const languages = [
-  { title: 'English', locale: 'en' },
+  { locale: 'en', title: 'English' },
   {
-    title: '한국어',
     locale: 'kr',
+    title: '한국어',
   },
   {
-    title: 'Bahasa',
     locale: 'id',
+    title: 'Bahasa',
   },
   {
-    title: '汉语 (Simplified)',
     locale: 'zh-cn',
+    title: '汉语 (Simplified)',
   },
   {
-    title: '漢語 (Traditional)',
     locale: 'zh-hk',
+    title: '漢語 (Traditional)',
   },
   {
-    title: 'Українська',
     locale: 'ua',
+    title: 'Українська',
   },
   {
-    title: 'Русский',
     locale: 'ru',
+    title: 'Русский',
   },
   {
-    title: 'Tiếng Việt',
     locale: 'vi',
+    title: 'Tiếng Việt',
   },
   {
-    title: 'Español',
     locale: 'es',
+    title: 'Español',
   },
   {
-    title: 'Français',
     locale: 'fr',
+    title: 'Français',
   },
   {
-    title: '日本語',
     locale: 'jp',
+    title: '日本語',
   },
   {
-    title: 'Filipino',
     locale: 'ph',
+    title: 'Filipino',
   },
   {
-    title: 'ภาษาไทย',
     locale: 'th',
+    title: 'ภาษาไทย',
   },
   {
-    title: 'Italiano',
     locale: 'it',
+    title: 'Italiano',
   },
 ];
 
 const Header = ({
-  stats: statsDetails,
   block: latestBlocks,
   handleFilterAndKeyword,
+  stats: statsDetails,
   theme,
 }: any) => {
   const stats: Stats | undefined = statsDetails?.stats?.[0];
@@ -188,10 +189,10 @@ const Header = ({
   };
 
   type LinkProps = Omit<typeof Link, 'locale'> & {
-    href: string;
-    locale: any;
     children: any;
     className: any;
+    href: string;
+    locale: any;
   };
 
   const toggleTheme = () => {
@@ -222,19 +223,19 @@ const Header = ({
         <div className="flex flex-wrap">
           <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
             <div className={showSearch ? 'pt-3' : ''}>
-              <Link href="/" className="" legacyBehavior>
+              <Link className="" href="/" legacyBehavior>
                 <a className="flex justify-start items-center hover:no-underline">
                   <Image
+                    alt="NearBlocks"
+                    className="block"
+                    height="40"
+                    layout="fixed"
                     src={
                       theme === 'dark'
                         ? '/images/nearblocksblack_dark.svg'
                         : '/images/nearblocksblack.svg'
                     }
-                    className="block"
                     width="174"
-                    height="40"
-                    alt="NearBlocks"
-                    layout="fixed"
                   />
                 </a>
               </Link>
@@ -246,7 +247,7 @@ const Header = ({
                     </div>
                   }
                 >
-                  <div style={{ marginTop: '5px' }} className="mb-2">
+                  <div className="mb-2" style={{ marginTop: '5px' }}>
                     {networkId === 'testnet' ? (
                       <p className="text-xs py-1 text-gray-500 leading-6 px-2">
                         Testnet Network
@@ -256,15 +257,15 @@ const Header = ({
                         {nearPrice ? (
                           <div className="ml-12 px-1 py-1 bg-blue-900/[0.05] rounded-lg flex justify-center items-center">
                             <Image
+                              alt="NearBlock"
+                              className="inline-flex w-5 h-5"
+                              height={15}
                               src={
                                 theme === 'dark'
                                   ? '/images/neargrey_dark.svg'
                                   : '/images/neargrey.svg'
                               }
-                              alt="NearBlock"
-                              className="inline-flex w-5 h-5"
                               width={15}
-                              height={15}
                             />
                             <p className="text-sm text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1">
                               $
@@ -308,10 +309,10 @@ const Header = ({
                 onClick={toggleTheme}
               >
                 <Image
+                  alt="NearBlocks"
+                  height="14"
                   src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
                   width="14"
-                  height="14"
-                  alt="NearBlocks"
                 />
               </button>
               <button
@@ -327,8 +328,8 @@ const Header = ({
               <div className="relative h-full w-full md:!w-3/4 lg:!w-3/5 md:!ml-auto px-3 md:!pt-2 md:!pb-0 order-2 md:!order-1">
                 <div className="h-11">
                   <Search
-                    header
                     handleFilterAndKeyword={handleFilterAndKeyword}
+                    header
                   />
                 </div>
               </div>
@@ -344,7 +345,7 @@ const Header = ({
                     {menu.submenu?.length ? (
                       <>
                         <Collapse
-                          trigger={({ show, onClick }) => (
+                          trigger={({ onClick, show }) => (
                             <a
                               className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                               href="#"
@@ -385,8 +386,8 @@ const Header = ({
                             {menu?.submenu?.map((submenu) => (
                               <li key={submenu?.id}>
                                 <ActiveLink
-                                  href={submenu?.link}
                                   activeClassName="text-green-500 dark:text-green-250"
+                                  href={submenu?.link}
                                 >
                                   <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
                                     {t(submenu?.title) || submenu.fallbackText}
@@ -399,8 +400,8 @@ const Header = ({
                       </>
                     ) : (
                       <ActiveLink
-                        href={menu.link || ''}
                         activeClassName="text-green-500 dark:text-green-250"
+                        href={menu.link || ''}
                       >
                         <a className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                           {t(menu.title) || menu.fallbackText}
@@ -412,7 +413,7 @@ const Header = ({
                 <li>
                   <>
                     <Collapse
-                      trigger={({ show, onClick }) => (
+                      trigger={({ onClick, show }) => (
                         <a
                           className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           href="#"
@@ -468,7 +469,7 @@ const Header = ({
                 <li>
                   <>
                     <Collapse
-                      trigger={({ show, onClick }) => (
+                      trigger={({ onClick, show }) => (
                         <a
                           className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           href="#"
@@ -504,8 +505,8 @@ const Header = ({
                         <ul className="border-l-2 border-green-500 md:hidden ml-2">
                           <li className="px-4 pb-1">
                             <button
-                              onClick={onSignOut}
                               className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
+                              onClick={onSignOut}
                             >
                               Sign Out
                             </button>
@@ -550,8 +551,8 @@ const Header = ({
                         <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                           <li className="px-8 pb-1">
                             <button
-                              onClick={onSignOut}
                               className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
+                              onClick={onSignOut}
                             >
                               Sign Out
                             </button>
@@ -566,11 +567,11 @@ const Header = ({
                 <li>
                   <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                     <Image
-                      src="/images/pipe.svg"
-                      width="2"
+                      alt="NearBlocks"
                       height="31"
                       layout="fixed"
-                      alt="NearBlocks"
+                      src="/images/pipe.svg"
+                      width="2"
                     />
                   </span>
                 </li>
@@ -578,18 +579,18 @@ const Header = ({
                 <li>
                   <>
                     <Collapse
-                      trigger={({ show, onClick }) => (
+                      trigger={({ onClick, show }) => (
                         <a
                           className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline"
                           href="#"
                           onClick={onClick}
                         >
                           <Image
-                            src="/images/near.svg"
-                            width="14"
-                            height="14"
                             alt="NearBlocks"
                             className="fixed dark:filter dark:invert"
+                            height="14"
+                            src="/images/near.svg"
+                            width="14"
                           />
                           <ArrowDown
                             className={`fill-current transition-transform w-5 h-5 ${
@@ -625,11 +626,11 @@ const Header = ({
                       >
                         <div className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded">
                           <Image
-                            src="/images/near.svg"
-                            width="14"
-                            height="14"
                             alt="NearBlocks"
                             className="dark:filter dark:invert"
+                            height="14"
+                            src="/images/near.svg"
+                            width="14"
                           />
                         </div>
                       </a>
@@ -675,12 +676,12 @@ const Header = ({
                           onClick={toggleTheme}
                         >
                           <Image
+                            alt="NearBlocks"
+                            height="14"
                             src={`/images/${
                               theme === 'dark' ? 'moon.svg' : 'sun.svg'
                             }`}
                             width="14"
-                            height="14"
-                            alt="NearBlocks"
                           />
                         </div>
                       </span>

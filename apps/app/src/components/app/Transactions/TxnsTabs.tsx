@@ -1,5 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 import { nanoToMilli } from '@/utils/app/libs';
+
 import TxnsTabActions from './TxnsTabActions';
 
 export default async function TxnsTabs({
@@ -13,7 +14,7 @@ export default async function TxnsTabs({
   const data = (await getRequest(`txns/${hash}`)) || {};
   const stats = (await getRequest(`stats`)) || [];
   const txn = data?.txns?.[0];
-  let price: number | null = null;
+  let price: null | number = null;
   if (txn?.block_timestamp) {
     const timestamp = new Date(nanoToMilli(txn.block_timestamp));
     const currentDate = new Date();
@@ -40,12 +41,12 @@ export default async function TxnsTabs({
 
   return (
     <TxnsTabActions
-      tab={tab}
-      txn={txn}
-      stats={stats}
+      hash={hash}
       isContract={isContract}
       price={price}
-      hash={hash}
+      stats={stats}
+      tab={tab}
+      txn={txn}
     />
   );
 }

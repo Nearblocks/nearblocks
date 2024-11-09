@@ -5,12 +5,12 @@ const Withdraw = (props: EventPropsInfo) => {
   const FaRight = (props: { className: string }) => {
     return (
       <svg
-        stroke="currentColor"
+        className={props.className}
         fill="currentColor"
+        height="1em"
+        stroke="currentColor"
         stroke-width="0"
         viewBox="0 0 192 512"
-        className={props.className}
-        height="1em"
         width="1em"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -30,7 +30,7 @@ const Withdraw = (props: EventPropsInfo) => {
       text-xs"
       />
       <span className="font-bold px-1">Burn </span>
-      <TokenInfo contract={props.event.contract} amount={log[1]} />
+      <TokenInfo amount={log[1]} contract={props.event.contract} />
     </div>
   );
 };

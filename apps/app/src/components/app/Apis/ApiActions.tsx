@@ -1,4 +1,10 @@
 'use client';
+import Cookies from 'js-cookie';
+import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+
+import LoadingCircular from '@/components/common/LoadingCircular';
 import Arrow from '@/components/Icons/Arrow';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
@@ -6,21 +12,17 @@ import SwitchButton from '@/components/SwitchButton';
 import { docsUrl } from '@/utils/app/config';
 import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
-import Link from 'next/link';
-import { useState } from 'react';
+
 import Skeleton from '../skeleton/common/Skeleton';
-import { toast } from 'react-toastify';
-import LoadingCircular from '@/components/common/LoadingCircular';
-import Cookies from 'js-cookie';
 
 const ApiActions = ({
-  status,
-  planDetails,
   getContactDetails,
+  planDetails,
+  status,
 }: {
-  status: string;
-  planDetails: any;
   getContactDetails: any;
+  planDetails: any;
+  status: string;
 }) => {
   const theme = Cookies?.get('theme') || 'light';
   const [interval, setInterval] = useState(true);
@@ -38,10 +40,10 @@ const ApiActions = ({
       setLoading(true);
 
       const contactDetails = {
-        name: name,
-        email: email,
-        subject,
         description: description,
+        email: email,
+        name: name,
+        subject,
       };
       const response = await getContactDetails(contactDetails);
       console.log({ response });
@@ -106,15 +108,15 @@ const ApiActions = ({
           </div>
           <div className="flex items-center sm:!justify-start justify-center my-5">
             <button
-              onClick={scrollToPlans}
               className="text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
+              onClick={scrollToPlans}
             >
               API Pricing Plans
             </button>
             <Link
+              className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
               href="https://dash.nearblocks.io/login"
               rel="noreferrer nofollow noopener"
-              className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
               target="_blank"
             >
               User Dashboard
@@ -125,8 +127,8 @@ const ApiActions = ({
             <Link href={docsUrl} legacyBehavior>
               <a
                 className="flex text-sm text-green-400 dark:text-green-250 cursor-pointer mx-4 font-medium"
-                target="_blank"
                 rel="noreferrer nofollow noopener"
+                target="_blank"
               >
                 API Documentation
                 <span>
@@ -154,8 +156,8 @@ const ApiActions = ({
             </p>
             <span className="mx-2">
               <SwitchButton
-                selected={interval}
                 onChange={() => setInterval(!interval)}
+                selected={interval}
               />
             </span>
             <p
@@ -171,16 +173,16 @@ const ApiActions = ({
           </div>
         </div>
         <div
-          id="plans"
           className="flex justify-center sm:px-10 2xl:px-20 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6"
+          id="plans"
         >
           {plans?.length > 0
             ? plans.map((item: any, index: any) => (
                 <div
-                  key={item.id}
                   className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
                     index === 2 && 'border-2 border-neargreen-200'
                   }`}
+                  key={item.id}
                 >
                   {index === 2 && (
                     <div className="bg-neargreen-200 text-white px-2 text-[10px] rounded-bl-md rounded-t-r-md py-1 float-right -mr-4 -mt-4">
@@ -275,10 +277,10 @@ const ApiActions = ({
                         : 'Commercial Use'}
                     </h3>
                     <Link
+                      className="block text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                       href={`https://dash.nearblocks.io/login?id=${
                         item.id
                       }&interval=${!interval ? 'month' : 'year'}`}
-                      className="block text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Get started now
                     </Link>
@@ -287,10 +289,10 @@ const ApiActions = ({
               ))
             : Array.from({ length: 5 }).map((_, index: number) => (
                 <div
-                  key={index}
                   className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
                     index === 2 && 'border-2 border-neargreen-200'
                   }`}
+                  key={index}
                 >
                   <div className="border-b border-b-gray-200 py-2">
                     <h3 className="uppercase py-2 text-sm dark:text-neargray-10 flex justify-center">
@@ -324,8 +326,8 @@ const ApiActions = ({
               ))}
         </div>
         <div
-          key={theme}
           className="flex justify-between sm:px-10 2xl:px-20 sm:mx-20 max-sm:mx-4 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap gap-4 py-6 rounded-md relative"
+          key={theme}
           style={{
             background:
               theme === 'dark'
@@ -348,8 +350,8 @@ const ApiActions = ({
           </div>
           <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
             <Link
-              href="/contact?subject=apis"
               className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10"
+              href="/contact?subject=apis"
               type="button"
             >
               Contact Us <Arrow className="text-black-600" />
@@ -444,10 +446,10 @@ const ApiActions = ({
                 <span className="text-gray-400">(required)</span>
               </p>
               <input
+                className="border px-3 outline-blue w-full rounded-md h-12"
+                onChange={(e) => setName(e.target.value)}
                 required
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border px-3 outline-blue w-full rounded-md h-12"
               />
             </div>
             <div className="w-full sm:mr-2 ">
@@ -456,10 +458,10 @@ const ApiActions = ({
                 <span className="text-gray-400">(required)</span>
               </p>
               <input
+                className="border px-3 w-full outline-blue rounded-md h-12"
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border px-3 w-full outline-blue rounded-md h-12"
               />
             </div>
           </div>
@@ -469,14 +471,14 @@ const ApiActions = ({
               <span className="text-gray-400">(required)</span>
             </p>{' '}
             <textarea
-              id="message"
               autoComplete="off"
               className="px-3 py-1.5 border w-full border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+              id="message"
               maxLength={300}
-              rows={5}
-              required
-              value={description}
               onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={5}
+              value={description}
             />
           </div>
           <div className="w-full text-center my-2">

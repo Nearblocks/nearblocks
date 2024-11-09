@@ -1,6 +1,7 @@
-import { usePathname } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+
+import { usePathname } from '@/i18n/routing';
 
 const useHash = (): [string | undefined, (newHash: string) => void] => {
   const router = useRouter();
@@ -12,8 +13,8 @@ const useHash = (): [string | undefined, (newHash: string) => void] => {
     (newHash: string) => {
       // @ts-ignore: Unreachable code error
       router.push({
-        pathname: new URL(asPath, 'http://localhost/').pathname,
         hash: newHash,
+        pathname: new URL(asPath, 'http://localhost/').pathname,
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

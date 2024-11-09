@@ -1,3 +1,6 @@
+import { Tooltip } from '@reach/tooltip';
+import { useRouter } from 'next/router';
+
 import ErrorMessage from '@/components/common/ErrorMessage';
 import Table from '@/components/common/Table';
 import FaInbox from '@/components/Icons/FaInbox';
@@ -11,52 +14,48 @@ import {
   serialNumber,
 } from '@/utils/libs';
 import { HoldersPropsInfo, Token } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
-import { useRouter } from 'next/router';
 
 interface Props {
-  tokens: Token;
+  count: number;
+  error: boolean;
+  holder: HoldersPropsInfo[];
   status: {
     height: string;
     sync: true;
     timestamp: '';
   };
-  holder: HoldersPropsInfo[];
-  count: number;
-  error: boolean;
   tab: string;
+  tokens: Token;
 }
 
-const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
+const Holders = ({ count, error, holder, status, tab, tokens }: Props) => {
   const errorMessage = 'No token holders found!';
   const router = useRouter();
   const currentPage = Number(router?.query?.page) || 1;
 
   const columns: any = [
     {
-      header: <span>Rank</span>,
-      key: '',
       cell: (_row: HoldersPropsInfo, index: number) => (
         <span>{serialNumber(index, currentPage, 25)}</span>
       ),
+      header: <span>Rank</span>,
+      key: '',
       tdClassName:
         'pl-5 pr-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-[50px]',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[50px]',
     },
     {
-      header: <span> Address</span>,
-      key: 'account',
       cell: (row: HoldersPropsInfo) => (
         <span>
           <Tooltip
-            label={row?.account}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.account}
           >
             <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
-                href={`/address/${row?.account}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-undeline"
+                href={`/address/${row?.account}`}
               >
                 {row?.account}
               </Link>
@@ -64,23 +63,23 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
           </Tooltip>
         </span>
       ),
+      header: <span> Address</span>,
+      key: 'account',
       tdClassName:
         'px-5 py-4 text-sm text-nearblue-600 dark:text-neargray-10 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
+      cell: (row: HoldersPropsInfo) => <span>{row?.quantity}</span>,
       header: <span>Quantity</span>,
       key: 'quantity',
-      cell: (row: HoldersPropsInfo) => <span>{row?.quantity}</span>,
       tdClassName:
         'px-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider w-[200px]',
     },
     {
-      header: <span> Percentage</span>,
-      key: 'tokens',
       cell: (row: HoldersPropsInfo) => {
         const percentage =
           Number(tokens?.tokens) > 0
@@ -94,14 +93,16 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
               Number(percentage) >= 0 && (
                 <div className="h-0.5 mt-1 w-full bg-gray-100">
                   <div
-                    style={{ width: `${percentage}%` }}
                     className="h-0.5 bg-green-500 dark:bg-green-250"
+                    style={{ width: `${percentage}%` }}
                   />
                 </div>
               )}
           </span>
         );
       },
+      header: <span> Percentage</span>,
+      key: 'tokens',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
@@ -150,12 +151,8 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
           )}
           <Table
             columns={columns}
-            data={holder}
-            isPagination={true}
             count={count}
-            page={currentPage}
-            limit={25}
-            pageLimit={200}
+            data={holder}
             Error={error}
             ErrorText={
               <ErrorMessage
@@ -164,6 +161,10 @@ const Holders = ({ tokens, status, holder, count, error, tab }: Props) => {
                 mutedText="Please try again later"
               />
             }
+            isPagination={true}
+            limit={25}
+            page={currentPage}
+            pageLimit={200}
           />
         </>
       ) : (

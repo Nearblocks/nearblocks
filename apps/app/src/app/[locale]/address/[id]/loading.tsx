@@ -1,18 +1,19 @@
 'use client';
 import classNames from 'classnames';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+
 import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
 
 const tabs = [
-  { name: 'txns', message: 'Transactions', label: 'Transactions' },
-  { name: 'receipts', message: 'Receipts', label: 'Receipts' },
-  { name: 'tokentxns', message: 'tokenTxns', label: 'Token Txns' },
-  { name: 'nfttokentxns', message: 'nftTokenTxns', label: 'NFT Token Txns' },
-  { name: 'accesskeys', message: 'accessKeys', label: 'Access Keys' },
-  { name: 'contract', message: 'contract', label: 'Contract' },
+  { label: 'Transactions', message: 'Transactions', name: 'txns' },
+  { label: 'Receipts', message: 'Receipts', name: 'receipts' },
+  { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
+  { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+  { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
+  { label: 'Contract', message: 'contract', name: 'contract' },
 ];
 export default function AddressLoading() {
   const t = useTranslations();
@@ -23,9 +24,9 @@ export default function AddressLoading() {
     classNames(
       'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
-        'bg-green-600 dark:bg-green-250 text-white': selected,
       },
     );
   return (
@@ -35,12 +36,12 @@ export default function AddressLoading() {
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
           <div className="flex flex-wrap ">
-            {tabs?.map(({ name, label, message }: any) => {
+            {tabs?.map(({ label, message, name }: any) => {
               return (
                 <Link
-                  key={name}
-                  href={`#`}
                   className={getClassName(name === tab)}
+                  href={`#`}
+                  key={name}
                 >
                   <h2>{t(`${message}`) || label}</h2>
                 </Link>

@@ -1,8 +1,11 @@
+export const runtime = 'edge';
+
+import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
+
 import Chart from '@/components/app/Charts/Chart';
 import ChartDetails from '@/components/app/skeleton/charts/Detail';
 import { getRequest } from '@/utils/app/api';
-import { getTranslations } from 'next-intl/server';
-import { Suspense } from 'react';
 
 export default async function Tps({
   params: { locale },
@@ -27,9 +30,9 @@ export default async function Tps({
               fallback={<ChartDetails chartTypes="active-account-daily" />}
             >
               <Chart
-                poweredBy={false}
-                chartTypes={'active-account-daily'}
                 chartsData={data}
+                chartTypes={'active-account-daily'}
+                poweredBy={false}
               />
             </Suspense>
           </div>

@@ -3,11 +3,11 @@ import React, { ReactNode, useState } from 'react';
 interface CollapseProps {
   children: ReactNode;
   trigger: ({
-    show,
     onClick,
+    show,
   }: {
-    show: boolean;
     onClick: React.MouseEventHandler<HTMLAnchorElement>;
+    show: boolean;
   }) => React.ReactNode;
 }
 
@@ -20,7 +20,7 @@ const Collapse = ({ children, trigger }: CollapseProps) => {
 
   return (
     <>
-      {trigger({ show, onClick })}
+      {trigger({ onClick, show })}
       <div
         className={`transition-all overflow-hidden ${
           show ? 'block' : 'hidden'

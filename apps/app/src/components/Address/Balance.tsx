@@ -1,41 +1,42 @@
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
+
+import { Link } from '@/i18n/routing';
+import { networkId } from '@/utils/config';
 import {
-  dollarFormat,
-  localFormat,
-  weight,
   convertToUTC,
-  yoctoToNear,
+  dollarFormat,
   fiatValue,
+  localFormat,
   nanoToMilli,
   shortenAddress,
+  weight,
+  yoctoToNear,
 } from '@/utils/libs';
 
-import WarningIcon from '../Icons/WarningIcon';
-import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
 import TokenHoldings from '../common/TokenHoldings';
-import { networkId } from '@/utils/config';
-import Skeleton from '../skeleton/common/Skeleton';
-import { useRouter } from 'next/router';
 import TokenImage from '../common/TokenImage';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
+import WarningIcon from '../Icons/WarningIcon';
+import Skeleton from '../skeleton/common/Skeleton';
 
 const Balance = ({
   accountData,
-  statsData,
   accountView,
-  isAccountLoading,
-  isLocked,
   contract,
-  isContractLoading,
-  tokenData,
-  loading,
-  inventoryData,
-  spamTokens,
-  isloading,
-  inventoryLoading,
-  ft,
   deploymentData,
+  ft,
+  inventoryData,
+  inventoryLoading,
+  isAccountLoading,
+  isContractLoading,
+  isloading,
+  isLocked,
+  loading,
   nftTokenData,
+  spamTokens,
+  statsData,
+  tokenData,
 }: any) => {
   const router = useRouter();
   const { id } = router.query;
@@ -103,10 +104,10 @@ const Balance = ({
                   </div>
                   {tokenData?.website && (
                     <a
-                      href={tokenData?.website}
                       className="ml-1"
-                      target="_blank"
+                      href={tokenData?.website}
                       rel="noopener noreferrer nofollow"
+                      target="_blank"
                     >
                       <FaExternalLinkAlt />
                     </a>
@@ -168,10 +169,10 @@ const Balance = ({
                 <div className="w-full md:w-3/4 break-words -my-1 z-10">
                   <TokenHoldings
                     data={inventoryData}
-                    loading={isloading}
-                    inventoryLoading={inventoryLoading}
                     ft={ft}
                     id={id as string}
+                    inventoryLoading={inventoryLoading}
+                    loading={isloading}
                     spamTokens={spamTokens?.blacklist}
                   />
                 </div>
@@ -278,8 +279,8 @@ const Balance = ({
                   </div>
                   <div className="w-full md:w-3/4 break-words">
                     <Link
-                      href={`/address/${deploymentData?.receipt_predecessor_account_id}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
+                      href={`/address/${deploymentData?.receipt_predecessor_account_id}`}
                     >
                       {shortenAddress(
                         deploymentData?.receipt_predecessor_account_id ?? '',
@@ -287,8 +288,8 @@ const Balance = ({
                     </Link>
                     {' at txn  '}
                     <Link
-                      href={`/txns/${deploymentData?.transaction_hash}`}
                       className="text-green-500 dark:text-green-250 hover:no-underline"
+                      href={`/txns/${deploymentData?.transaction_hash}`}
                     >
                       {shortenAddress(deploymentData?.transaction_hash ?? '')}
                     </Link>
@@ -303,13 +304,13 @@ const Balance = ({
                   <div className="w-full md:w-3/4 break-words">
                     <div className="flex items-center">
                       <TokenImage
-                        src={tokenData?.icon}
                         alt={tokenData?.name}
                         className="w-4 h-4 mr-2"
+                        src={tokenData?.icon}
                       />
                       <Link
-                        href={`/token/${id}`}
                         className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                        href={`/token/${id}`}
                       >
                         <span className="inline-block truncate max-w-[110px] mr-1">
                           {tokenData?.name}
@@ -337,13 +338,13 @@ const Balance = ({
                   <div className="w-full md:w-3/4 break-words">
                     <div className="flex items-center">
                       <TokenImage
-                        src={nftTokenData?.icon}
                         alt={nftTokenData?.name}
                         className="w-4 h-4 mr-2"
+                        src={nftTokenData?.icon}
                       />
                       <Link
-                        href={`/nft-token/${id}`}
                         className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                        href={`/nft-token/${id}`}
                       >
                         <span className="inline-block truncate max-w-[110px] mr-1">
                           {nftTokenData?.name}

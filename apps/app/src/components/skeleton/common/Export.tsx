@@ -1,11 +1,12 @@
-import React, { Ref, forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
+
 import Skeleton from './Skeleton';
 interface Props {
   className?: string;
 }
 const Export = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
   return (
-    <div ref={ref} className={`w-full z-10 ${className}`}>
+    <div className={`w-full z-10 ${className}`} ref={ref}>
       <div className="bg-neargray-25 dark:bg-black-300 py-16 flex flex-col items-center">
         <div className="w-20 py-1">
           <Skeleton className="h-6" />
@@ -22,10 +23,10 @@ const Export = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
             <div className="lg:flex justify-between items-center text-center">
               <div className="flex items-center border-gray-300  dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                 <input
-                  type="date"
-                  name="startdate"
-                  id="startdate"
                   className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
+                  id="startdate"
+                  name="startdate"
+                  type="date"
                 />
               </div>
 
@@ -33,10 +34,10 @@ const Export = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
 
               <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                 <input
-                  type="date"
-                  name="enddate"
-                  id="enddate"
                   className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
+                  id="enddate"
+                  name="enddate"
+                  type="date"
                 />
               </div>
             </div>

@@ -7,12 +7,12 @@ const Repay = (props: DepositPropsInfo) => {
   const FaRight = (props: { className: string }) => {
     return (
       <svg
-        stroke="currentColor"
+        className={props.className}
         fill="currentColor"
+        height="1em"
+        stroke="currentColor"
         stroke-width="0"
         viewBox="0 0 192 512"
-        className={props.className}
-        height="1em"
         width="1em"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -28,13 +28,13 @@ const Repay = (props: DepositPropsInfo) => {
     <div className="action flex flex-wrap items-center break-all leading-7">
       <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       <span className="font-bold px-1">Repay </span>
-      <TokenInfo contract={log.token_id} amount={log.amount} decimals={18} />
+      <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
 
       <span className="font-bold text-gray px-1">
         From{' '}
         <Link
-          href={`/address/${log.account_id}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+          href={`/address/${log.account_id}`}
         >
           {shortenAddress(log.account_id)}
         </Link>
@@ -42,8 +42,8 @@ const Repay = (props: DepositPropsInfo) => {
       <span className="font-bold text-gray px-1">
         On{' '}
         <Link
-          href="/address/contract.main.burrow.near"
           className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
+          href="/address/contract.main.burrow.near"
         >
           Burrow
         </Link>

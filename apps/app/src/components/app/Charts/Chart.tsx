@@ -1,34 +1,36 @@
 'use client';
+import { Tooltip } from '@reach/tooltip';
+import Cookies from 'js-cookie';
+import { useTranslations } from 'next-intl';
+import Image from 'next/legacy/image';
 import { useEffect, useMemo, useState } from 'react';
-import Question from '../Icons/Question';
-import SwitchButton from '../SwitchButton';
+
+import { useConfig } from '@/hooks/app/useConfig';
+import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
 import { ChartConfig, ChartStat, ChartTypeInfo } from '@/utils/types';
-import { Tooltip } from '@reach/tooltip';
+
+import Question from '../Icons/Question';
 import Skeleton from '../skeleton/common/Skeleton';
-import Image from 'next/legacy/image';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
-import { useConfig } from '@/hooks/app/useConfig';
-import Cookies from 'js-cookie';
+import SwitchButton from '../SwitchButton';
 
 interface Props {
-  chartTypes?: string;
-  poweredBy?: boolean;
   chartsData?: {
     charts: ChartStat[];
     status: number;
   };
+  chartTypes?: string;
+  poweredBy?: boolean;
 }
 
 const Chart = (props: Props) => {
-  const { chartTypes, poweredBy, chartsData } = props;
+  const { chartsData, chartTypes, poweredBy } = props;
   const t = useTranslations();
   const theme = Cookies?.get('theme') || 'light';
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
-    title: '',
     description: '',
+    title: '',
   });
   const [logView, setLogView] = useState(false);
   const { networkId } = useConfig();
@@ -41,120 +43,120 @@ const Chart = (props: Props) => {
 
   const charts = [
     {
-      link: '/charts/near-price',
-      text: t ? t('charts.nearPrice.heading') : 'Near Daily Price (USD) Chart',
+      exclude: `${networkId}` === 'testnet',
       image: `/images/charts/near-price.svg`,
       image_dark: `/images/charts/near-price_dark.svg`,
-      exclude: `${networkId}` === 'testnet',
+      link: '/charts/near-price',
+      text: t ? t('charts.nearPrice.heading') : 'Near Daily Price (USD) Chart',
     },
     {
+      exclude: `${networkId}` === 'testnet',
+      image: `/images/charts/market-cap.svg`,
+      image_dark: `/images/charts/market-cap_dark.svg`,
       link: '/charts/market-cap',
       text: t
         ? t('marketCapCharts.heading')
         : 'Near Market Capitalization Chart',
-      image: `/images/charts/market-cap.svg`,
-      image_dark: `/images/charts/market-cap_dark.svg`,
-      exclude: `${networkId}` === 'testnet',
     },
     {
-      link: '/charts/near-supply',
-      text: t ? t('nearSupplyCharts.heading') : 'Near Supply Growth Chart',
+      exclude: false,
       image: `/images/charts/near-supply.svg`,
       image_dark: `/images/charts/near-supply_dark.svg`,
-      exclude: false,
+      link: '/charts/near-supply',
+      text: t ? t('nearSupplyCharts.heading') : 'Near Supply Growth Chart',
     },
     {
-      link: '/charts/txns',
-      text: t ? t('txnsCharts.heading') : 'Near Daily Transactions Chart',
+      exclude: false,
       image: `/images/charts/txns.svg`,
       image_dark: `/images/charts/txns_dark.svg`,
-      exclude: false,
+      link: '/charts/txns',
+      text: t ? t('txnsCharts.heading') : 'Near Daily Transactions Chart',
     },
     {
-      link: '/charts/blocks',
-      text: t ? t('blocksCharts.heading') : 'New Blocks',
+      exclude: false,
       image: `/images/charts/blocks.svg`,
       image_dark: `/images/charts/blocks_dark.svg`,
-      exclude: false,
+      link: '/charts/blocks',
+      text: t ? t('blocksCharts.heading') : 'New Blocks',
     },
     {
-      link: '/charts/addresses',
-      text: t ? t('addressesCharts.heading') : 'Near Unique Accounts Chart',
+      exclude: false,
       image: `/images/charts/addresses.svg`,
       image_dark: `/images/charts/addresses_dark.svg`,
-      exclude: false,
+      link: '/charts/addresses',
+      text: t ? t('addressesCharts.heading') : 'Near Unique Accounts Chart',
     },
     {
-      link: '/charts/txn-fee',
-      text: t ? t('txnFeeCharts.heading') : 'Transaction Fee Chart',
+      exclude: `${networkId}` === 'testnet',
       image: `/images/charts/txn-fee.svg`,
       image_dark: `/images/charts/txn-fee_dark.svg`,
-      exclude: `${networkId}` === 'testnet',
+      link: '/charts/txn-fee',
+      text: t ? t('txnFeeCharts.heading') : 'Transaction Fee Chart',
     },
     {
-      link: '/charts/txn-volume',
-      text: t ? t('txnVolumeCharts.heading') : 'Transaction Volume Chart',
+      exclude: `${networkId}` === 'testnet',
       image: `/images/charts/txn-volume.svg`,
       image_dark: `/images/charts/txn-volume_dark.svg`,
-      exclude: `${networkId}` === 'testnet',
+      link: '/charts/txn-volume',
+      text: t ? t('txnVolumeCharts.heading') : 'Transaction Volume Chart',
     },
     {
-      link: '/charts/tps',
-      text: 'Near Transactions per Second Chart',
+      exclude: false,
       image: `/images/charts/tps.svg`,
       image_dark: `/images/charts/tps_dark.svg`,
-      exclude: false,
+      link: '/charts/tps',
+      text: 'Near Transactions per Second Chart',
     },
   ];
 
   const chartData = useMemo(() => {
     try {
       const chartTypeMappings = {
-        txns: (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txns),
-          date: stat.date,
-          blocks: stat.blocks,
-          addresses: stat.active_accounts,
-        }),
-        'market-cap': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.market_cap),
-          date: stat.date,
-          price: Number(stat.near_price),
-        }),
-        'near-supply': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(yoctoToNear(stat.total_supply, false)),
-          date: stat.date,
-        }),
-        blocks: (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.blocks),
-          date: stat.date,
-        }),
         addresses: (stat: ChartStat) => ({
+          addresses: stat.active_accounts,
+          date: stat.date,
           x: new Date(stat.date).valueOf(),
           y: Number(stat.active_accounts),
-          date: stat.date,
-          addresses: stat.active_accounts,
         }),
-        'txn-fee': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_fee_usd),
+        blocks: (stat: ChartStat) => ({
           date: stat.date,
-          fee: stat.txn_fee,
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.blocks),
         }),
-        'txn-volume': (stat: ChartStat) => ({
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_volume_usd),
+        'market-cap': (stat: ChartStat) => ({
           date: stat.date,
-          volume: stat.txn_volume,
+          price: Number(stat.near_price),
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.market_cap),
         }),
         'near-price': (stat: ChartStat) => ({
+          date: stat.date,
           x: new Date(stat.date).valueOf(),
           y: Number(stat.near_price),
+        }),
+        'near-supply': (stat: ChartStat) => ({
           date: stat.date,
+          x: new Date(stat.date).valueOf(),
+          y: Number(yoctoToNear(stat.total_supply, false)),
+        }),
+        'txn-fee': (stat: ChartStat) => ({
+          date: stat.date,
+          fee: stat.txn_fee,
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.txn_fee_usd),
+        }),
+        'txn-volume': (stat: ChartStat) => ({
+          date: stat.date,
+          volume: stat.txn_volume,
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.txn_volume_usd),
+        }),
+        txns: (stat: ChartStat) => ({
+          addresses: stat.active_accounts,
+          blocks: stat.blocks,
+          date: stat.date,
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.txns),
         }),
       };
 
@@ -234,90 +236,21 @@ const Chart = (props: Props) => {
         default:
       }
       setChartInfo({
-        title: titleText,
         description: description,
+        title: titleText,
       });
 
       const fetchedData = {
-        chart: {
-          height: 430,
-          zoomType: 'x',
-          backgroundColor: 'transparent',
-        },
         accessibility: {
           enabled: false,
         },
-        title: {
-          text: titleText,
-          style: {
-            color: theme === 'dark' ? '#e0e0e0' : '#333333',
-          },
+        chart: {
+          backgroundColor: 'transparent',
+          height: 430,
+          zoomType: 'x',
         },
-        subtitle: {
-          text: 'Source: NearBlocks.io',
-        },
-        xAxis: {
-          type: 'datetime',
-          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-        },
-        yAxis: {
-          title: {
-            text: yLabel,
-          },
-          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
-        },
-        legend: {
-          enabled: false,
-        },
-        series: [
-          {
-            type: 'area',
-            color: 'rgba(3, 63, 64, 1)',
-          },
-        ],
         credits: {
           enabled: false,
-        },
-        plotOptions: {
-          series: {
-            connectNulls: false,
-          },
-          area: {
-            fillColor: {
-              linearGradient: {
-                x1: 0,
-                y1: 0,
-                x2: 0,
-                y2: 1,
-              },
-              stops: [
-                [0, 'rgba(3, 63, 64, 0.8)'],
-                [1, 'rgba(3, 63, 64, 0)'],
-              ],
-            },
-            marker: {
-              enabled: false,
-            },
-            lineWidth: 1,
-            states: {
-              hover: {
-                lineWidth: 1,
-              },
-            },
-            threshold: null,
-            turboThreshold: 3650,
-          },
         },
         exporting: {
           buttons: {
@@ -334,6 +267,75 @@ const Chart = (props: Props) => {
                 'embed',
               ],
             },
+          },
+        },
+        legend: {
+          enabled: false,
+        },
+        plotOptions: {
+          area: {
+            fillColor: {
+              linearGradient: {
+                x1: 0,
+                x2: 0,
+                y1: 0,
+                y2: 1,
+              },
+              stops: [
+                [0, 'rgba(3, 63, 64, 0.8)'],
+                [1, 'rgba(3, 63, 64, 0)'],
+              ],
+            },
+            lineWidth: 1,
+            marker: {
+              enabled: false,
+            },
+            states: {
+              hover: {
+                lineWidth: 1,
+              },
+            },
+            threshold: null,
+            turboThreshold: 3650,
+          },
+          series: {
+            connectNulls: false,
+          },
+        },
+        series: [
+          {
+            color: 'rgba(3, 63, 64, 1)',
+            type: 'area',
+          },
+        ],
+        subtitle: {
+          text: 'Source: NearBlocks.io',
+        },
+        title: {
+          style: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
+          },
+          text: titleText,
+        },
+        xAxis: {
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+          type: 'datetime',
+        },
+        yAxis: {
+          gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+          title: {
+            text: yLabel,
           },
         },
       };
@@ -484,8 +486,8 @@ const Chart = (props: Props) => {
                   </p>
                   <div className="flex items-center text-nearblue-600 dark:text-neargray-10">
                     <Tooltip
-                      label="Toggle between Log View and Normal View. Log View uses logarithmic scale."
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
+                      label="Toggle between Log View and Normal View. Log View uses logarithmic scale."
                     >
                       <span>
                         <Question className="w-4 h-4 fill-current mr-2" />
@@ -493,8 +495,8 @@ const Chart = (props: Props) => {
                     </Tooltip>
                     <div className="w-8 flex">
                       <SwitchButton
-                        selected={logView}
                         onChange={handleToggle}
+                        selected={logView}
                       />
                     </div>
                     <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none pr-[15px] px-2">
@@ -513,10 +515,10 @@ const Chart = (props: Props) => {
                 <iframe
                   srcDoc={iframeSrc}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
                     backgroundColor: theme === 'dark' ? '#0D0D0D' : '#FFFF',
+                    border: 'none',
+                    height: '100%',
+                    width: '100%',
                   }}
                 />
               ) : (
@@ -534,22 +536,22 @@ const Chart = (props: Props) => {
           (chart, index) =>
             chart?.exclude === false && (
               <div
-                key={index}
                 className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden"
+                key={index}
               >
                 <Link
-                  href={chart?.link}
                   className="block leading-7 p-3 text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 truncate"
+                  href={chart?.link}
                 >
                   <h2>{chart?.text}</h2>
                 </Link>
                 <div className="pl-2 pr-4 py-6">
                   <Link href={chart?.link}>
                     <Image
-                      src={theme === 'dark' ? chart?.image_dark : chart?.image}
                       alt={chart?.text}
-                      width={600}
                       height={550}
+                      src={theme === 'dark' ? chart?.image_dark : chart?.image}
+                      width={600}
                     />
                   </Link>
                 </div>

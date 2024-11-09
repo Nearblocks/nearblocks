@@ -1,4 +1,5 @@
 import { getRequest } from '@/utils/app/api';
+
 import ListActions from './ListActions';
 
 const List = async ({ cursor }: { cursor: string }) => {
@@ -6,10 +7,10 @@ const List = async ({ cursor }: { cursor: string }) => {
   const dataCount = await getRequest('blocks/count');
   return (
     <ListActions
-      data={data}
-      totalCount={dataCount}
       apiUrl={'blocks'}
+      data={data}
       error={!data}
+      totalCount={dataCount}
     />
   );
 };

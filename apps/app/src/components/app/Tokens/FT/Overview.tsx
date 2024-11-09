@@ -1,6 +1,7 @@
 import { getRequest } from '@/utils/app/api';
-import OverviewActions from './OverviewActions';
 import { Token } from '@/utils/types';
+
+import OverviewActions from './OverviewActions';
 import TokenFilter from './TokenFilter';
 
 const Overview = async ({ id, searchParams }: any) => {
@@ -34,19 +35,19 @@ const Overview = async ({ id, searchParams }: any) => {
   return (
     <>
       <OverviewActions
+        holders={holders}
         id={id}
         stats={stats}
-        token={token}
         status={status}
+        token={token}
         transfers={transfers}
-        holders={holders}
       />
       <div className="py-6"></div>
       {searchParams?.a && (
         <TokenFilter
           id={id}
-          tokenFilter={searchParams?.a}
           inventoryData={inventoryData}
+          tokenFilter={searchParams?.a}
         />
       )}
     </>

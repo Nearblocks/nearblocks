@@ -9,7 +9,7 @@ type Props = {
 };
 
 export function VmCommitButton(props: Props) {
-  const { near, CommitButton } = useVmStore();
+  const { CommitButton, near } = useVmStore();
 
   if (!near || !CommitButton) {
     return;

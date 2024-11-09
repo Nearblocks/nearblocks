@@ -1,16 +1,16 @@
-import { dollarNonCentFormat, localFormat } from '@/utils/libs';
-import { Token } from '@/utils/types';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import CoinGecko from '@/components/Icons/CoinGecko';
 import CoinMarketcap from '@/components/Icons/CoinMarketcap';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import { dollarNonCentFormat, localFormat } from '@/utils/libs';
+import { Token } from '@/utils/types';
 
 interface Props {
-  token?: Token;
   error: boolean;
   tab: string;
+  token?: Token;
 }
 
-const Info = ({ token, tab }: Props) => {
+const Info = ({ tab, token }: Props) => {
   return (
     <>
       {tab === 'info' ? (
@@ -114,8 +114,8 @@ const Info = ({ token, tab }: Props) => {
                     <a
                       className="text-green-500 dark:text-green-250 mr-4 flex"
                       href="https://www.coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
-                      target="_blank"
                       rel="noreferrer nofollow noopener"
+                      target="_blank"
                     >
                       <CoinGecko className="h-4 w-4 fill-current mr-1" />
                       CoinGecko
@@ -125,8 +125,8 @@ const Info = ({ token, tab }: Props) => {
                     <a
                       className="text-green-500 dark:text-green-250 mr-4 flex"
                       href="https://coinmarketcap.com/"
-                      target="_blank"
                       rel="noreferrer nofollow noopener"
+                      target="_blank"
                     >
                       <CoinMarketcap className="h-4 w-4 fill-current mr-1" />
                       Coinmarketcap

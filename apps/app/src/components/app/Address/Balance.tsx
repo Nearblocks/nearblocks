@@ -1,12 +1,14 @@
+import { cookies } from 'next/headers';
+
 import { getRequest } from '@/utils/app/api';
+import { RpcProviders } from '@/utils/app/rpc';
+import { SpamToken } from '@/utils/types';
+
 import AccountAlerts from './AccountAlerts';
 import AccountMoreInfo from './AccountMoreInfo';
 import AccountOverview from './AccountOverview';
-import { SpamToken } from '@/utils/types';
-import { cookies } from 'next/headers';
-import { RpcProviders } from '@/utils/app/rpc';
 
-const getCookieFromRequest = (cookieName: string): string | null => {
+const getCookieFromRequest = (cookieName: string): null | string => {
   const cookie = cookies().get(cookieName);
   return cookie ? cookie.value : null;
 };
@@ -41,22 +43,22 @@ export default async function Balance({ id }: { id: string }) {
 
   return (
     <>
-      <AccountAlerts id={id} accountData={accountData} />
+      <AccountAlerts accountData={accountData} id={id} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <AccountOverview
-          id={id}
           accountData={accountData?.account?.[0]}
-          statsData={statsData?.stats?.[0]}
-          tokenData={tokenDetails?.contracts?.[0]}
+          id={id}
           inventoryData={inventoryData?.inventory}
           spamTokens={spamList}
+          statsData={statsData?.stats?.[0]}
+          tokenData={tokenDetails?.contracts?.[0]}
         />
         <AccountMoreInfo
-          id={id}
           accountData={accountData?.account?.[0]}
-          tokenData={tokenDetails?.contracts?.[0]}
           deploymentData={deploymentData?.deployments?.[0]}
+          id={id}
           nftTokenData={nftTokenData?.contracts?.[0]}
+          tokenData={tokenDetails?.contracts?.[0]}
         />
       </div>
     </>

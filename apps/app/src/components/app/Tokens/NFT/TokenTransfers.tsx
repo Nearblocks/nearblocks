@@ -1,3 +1,14 @@
+import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+
+import ErrorMessage from '@/components/common/ErrorMessage';
+import TxnStatus from '@/components/common/Status';
+import Clock from '@/components/Icons/Clock';
+import FaInbox from '@/components/Icons/FaInbox';
+import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
+import Skeleton from '@/components/skeleton/common/Skeleton';
+import { Link } from '@/i18n/routing';
 import {
   formatTimestampToString,
   getTimeAgoString,
@@ -6,30 +17,21 @@ import {
   truncateString,
 } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
-import { useState } from 'react';
-import { Tooltip } from '@reach/tooltip';
-import TxnStatus from '@/components/common/Status';
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
-import Clock from '@/components/Icons/Clock';
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+
 import Table from '../../common/Table';
 
 interface Props {
   data: {
-    txns: TransactionInfo[];
     cursor: string;
+    txns: TransactionInfo[];
   };
+  error: boolean;
   txnsCount: {
     txns: { count: string }[];
   };
-  error: boolean;
 }
 
-export default function TokenTransfers({ data, txnsCount, error }: Props) {
+export default function TokenTransfers({ data, error, txnsCount }: Props) {
   const [showAge, setShowAge] = useState(true);
   const errorMessage = ' No token transfers found!';
   const [address, setAddress] = useState('');
@@ -49,19 +51,17 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
   };
   const columns: any = [
     {
-      header: '',
-      key: 'status',
       cell: (row: TransactionInfo) => (
         <span>
-          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
+          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
         </span>
       ),
+      header: '',
+      key: 'status',
       tdClassName:
         'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>Txn Hash</span>,
-      key: 'hash',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
@@ -70,8 +70,8 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250">
               <Link
-                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
               </Link>
@@ -79,14 +79,14 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </Tooltip>
         </span>
       ),
+      header: <span>Txn Hash</span>,
+      key: 'hash',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>{t ? t('method') : 'METHOD'}</span>,
-      key: 'type',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
@@ -99,14 +99,14 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </Tooltip>
         </span>
       ),
+      header: <span>{t ? t('method') : 'METHOD'}</span>,
+      key: 'type',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>From</span>,
-      key: 'affected_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row.delta_amount) < 0 ? (
           <span>
@@ -123,12 +123,12 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.affected_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.affected_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.affected_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {truncateString(row?.affected_account_id, 15, '...')}
                   </Link>
@@ -142,8 +142,8 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                label={row?.involved_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.involved_account_id}
               >
                 <span
                   className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap border rounded-md  ${
@@ -153,12 +153,12 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.involved_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.involved_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.involved_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {truncateString(row?.involved_account_id, 15, '...')}
                   </Link>
@@ -170,14 +170,14 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </span>
         );
       },
+      header: <span>From</span>,
+      key: 'affected_account_id',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span></span>,
-      key: '',
       cell: (row: TransactionInfo) => {
         return row.affected_account_id === row.involved_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
@@ -189,18 +189,18 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </div>
         );
       },
+      header: <span></span>,
+      key: '',
       tdClassName: 'text-center',
     },
     {
-      header: <span>To</span>,
-      key: 'involved_account_id',
       cell: (row: TransactionInfo) => {
         return Number(row.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                label={row?.involved_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.involved_account_id}
               >
                 <span
                   className={`inline-block align-bottom text-green-500 dark:text-green-250 p-0.5 px-1 border rounded-md whitespace-nowrap ${
@@ -211,12 +211,12 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
                 >
                   {' '}
                   <Link
-                    href={`/address/${row?.involved_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.involved_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.involved_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {truncateString(row?.involved_account_id, 15, '...')}
                   </Link>
@@ -230,8 +230,8 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                label={row?.affected_account_id}
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+                label={row?.affected_account_id}
               >
                 <span
                   className={`inline-block align-bottom text-green-500 dark:text-green-250 border rounded-md p-0.5 px-1 whitespace-nowrap ${
@@ -241,12 +241,12 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
                   }`}
                 >
                   <Link
-                    href={`/address/${row?.affected_account_id}`}
                     className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${row?.affected_account_id}`}
+                    onMouseLeave={handleMouseLeave}
                     onMouseOver={(e) =>
                       onHandleMouseOver(e, row?.affected_account_id)
                     }
-                    onMouseLeave={handleMouseLeave}
                   >
                     {truncateString(row?.affected_account_id, 15, '...')}
                   </Link>
@@ -258,19 +258,19 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </span>
         );
       },
+      header: <span>To</span>,
+      key: 'involved_account_id',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span>BLOCK</span>,
-      key: 'block_hash',
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            href={`/blocks/${row?.included_in_block_hash}`}
             className="text-green-500 dark:text-green-250 hover:no-underline"
+            href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)
@@ -278,26 +278,54 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
           </Link>
         </span>
       ),
+      header: <span>BLOCK</span>,
+      key: 'block_hash',
       tdClassName:
         'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider h-[57px]',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
+            label={
+              showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''
+            }
+          >
+            <span>
+              {!showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''}
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <div>
           <Tooltip
+            className="absolute h-auto max-w-[8rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
             }
-            className="absolute h-auto max-w-[8rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <button
-              type="button"
-              onClick={toggleShowAge}
               className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
+              onClick={toggleShowAge}
+              type="button"
             >
               {showAge ? (
                 <>
@@ -312,32 +340,6 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
         </div>
       ),
       key: 'block_timestamp',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
@@ -364,12 +366,9 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
       )}
       <Table
         columns={columns}
-        data={txns}
-        limit={25}
-        cursorPagination={true}
         cursor={cursor}
-        page={page}
-        setPage={setPage}
+        cursorPagination={true}
+        data={txns}
         Error={error}
         ErrorText={
           <ErrorMessage
@@ -378,6 +377,9 @@ export default function TokenTransfers({ data, txnsCount, error }: Props) {
             mutedText="Please try again later"
           />
         }
+        limit={25}
+        page={page}
+        setPage={setPage}
       />
     </>
   );

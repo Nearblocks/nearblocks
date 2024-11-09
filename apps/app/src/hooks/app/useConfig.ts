@@ -1,5 +1,6 @@
-import { Network, NetworkId } from '@/utils/types';
 import { useEnvContext } from 'next-runtime-env';
+
+import { Network, NetworkId } from '@/utils/types';
 
 interface VerifierConfig {
   accountId: string;
@@ -10,9 +11,9 @@ interface VerifierConfig {
 
 export const useConfig = () => {
   const {
-    NEXT_PUBLIC_NETWORK_ID,
     NEXT_PUBLIC_BOS_NETWORK,
     NEXT_PUBLIC_MAINNET_URL,
+    NEXT_PUBLIC_NETWORK_ID,
     NEXT_PUBLIC_TESTNET_URL,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   } = useEnvContext();
@@ -73,14 +74,14 @@ export const useConfig = () => {
         ];
 
   return {
-    networkId,
-    bosNetworkId,
-    network,
     apiUrl,
     appUrl,
-    docsUrl,
     aurorablocksUrl,
-    verifierConfig,
+    bosNetworkId,
+    docsUrl,
+    network,
+    networkId,
     siteKey,
+    verifierConfig,
   };
 };

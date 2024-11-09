@@ -1,46 +1,48 @@
-import { Menu, MenuList, MenuButton } from '@reach/menu-button';
+import { Menu, MenuButton, MenuList } from '@reach/menu-button';
+import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 import {
-  localFormat,
   isAction,
-  yoctoToNear,
+  localFormat,
   truncateString,
+  yoctoToNear,
 } from '@/utils/libs';
 import { txnMethod } from '@/utils/near';
 import { TransactionInfo } from '@/utils/types';
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import TxnStatus from '../common/Status';
-import { Tooltip } from '@reach/tooltip';
-import Filter from '../Icons/Filter';
-import Skeleton from '../skeleton/common/Skeleton';
-import Filters from '../common/Filters';
-import Download from '../Icons/Download';
-import Clock from '../Icons/Clock';
-import SortIcon from '../Icons/SortIcon';
-import Table from '../common/Table';
+
 import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import TimeStamp from '../common/TimeStamp';
+import Filters from '../common/Filters';
+import TxnStatus from '../common/Status';
+import Table from '../common/Table';
 import TableSummary from '../common/TableSummary';
-import { useTranslations } from 'next-intl';
-import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
+import TimeStamp from '../common/TimeStamp';
+import Clock from '../Icons/Clock';
+import Download from '../Icons/Download';
+import FaInbox from '../Icons/FaInbox';
+import Filter from '../Icons/Filter';
+import SortIcon from '../Icons/SortIcon';
+import Skeleton from '../skeleton/common/Skeleton';
 
 const initialForm = {
   action: '',
-  method: '',
   from: '',
+  method: '',
   to: '',
 };
 
 interface TxnsProps {
-  txns: TransactionInfo[];
   count: string;
-  error: boolean;
   cursor: string;
+  error: boolean;
   tab: string;
+  txns: TransactionInfo[];
 }
 
-const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
+const Transactions = ({ count, cursor, error, tab, txns }: TxnsProps) => {
   const t = useTranslations();
   const router = useRouter();
   const intlRouter = useIntlRouter();
@@ -69,8 +71,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
       return setForm((state) => ({
         ...state,
-        method: value,
         action: '',
+        method: value,
       }));
     }
 
@@ -82,9 +84,9 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
     setPage(1);
 
-    const { action, method, from, to } = form;
+    const { action, from, method, to } = form;
     const { query } = router;
-    const { cursor, p, locale, id, ...updatedQuery } = query;
+    const { cursor, id, locale, p, ...updatedQuery } = query;
 
     const queryParams = {
       ...(action && { action }),
@@ -126,7 +128,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     const { name } = e.currentTarget;
 
     setPage(1);
-    const { cursor, p, locale, id, ...restQuery } = router.query;
+    const { cursor, id, locale, p, ...restQuery } = router.query;
 
     if (name === 'type') {
       setForm((prev) => ({ ...prev, action: '', method: '' }));
@@ -154,15 +156,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     setForm(initialForm);
 
     const {
-      cursor,
       action,
-      p,
-      method,
-      from,
-      to,
       block,
-      locale,
+      cursor,
+      from,
       id,
+      locale,
+      method,
+      p,
+      to,
       ...newQuery
     } = router.query;
 
@@ -175,29 +177,27 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
   const columns: any = [
     {
-      header: <span></span>,
-      key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row?.outcomes?.status} showLabel={false} />
+          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
         </>
       ),
+      header: <span></span>,
+      key: '',
       tdClassName:
         'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      header: <span>{t ? t('hash') : 'TXN HASH'}</span>,
-      key: 'transaction_hash',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={row?.transaction_hash}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+            label={row?.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
               <Link
-                href={`/txns/${row?.transaction_hash}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
               </Link>
@@ -205,18 +205,18 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           </Tooltip>
         </span>
       ),
+      header: <span>{t ? t('hash') : 'TXN HASH'}</span>,
+      key: 'transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      header: <span className="pl-1">{t ? t('type') : 'METHOD'}</span>,
-      key: 'actions',
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            label={txnMethod(row?.actions, t)}
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={txnMethod(row?.actions, t)}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
@@ -226,14 +226,14 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           </Tooltip>
         </span>
       ),
+      header: <span className="pl-1">{t ? t('type') : 'METHOD'}</span>,
+      key: 'actions',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('depositValue') : 'DEPOSIT VALUE'}</span>,
-      key: 'deposit',
       cell: (row: TransactionInfo) => (
         <span>
           {row?.actions_agg?.deposit
@@ -242,14 +242,14 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           Ⓝ
         </span>
       ),
+      header: <span>{t ? t('depositValue') : 'DEPOSIT VALUE'}</span>,
+      key: 'deposit',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('txnFee') : 'TXN FEE'}</span>,
-      key: 'transaction_fee',
       cell: (row: TransactionInfo) => (
         <span>
           {row?.outcomes_agg?.transaction_fee
@@ -258,12 +258,42 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           Ⓝ
         </span>
       ),
+      header: <span>{t ? t('txnFee') : 'TXN FEE'}</span>,
+      key: 'transaction_fee',
       tdClassName:
         'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.signer_account_id}
+          >
+            <span
+              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+                row?.signer_account_id === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
+              <Link
+                className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/address/${row?.signer_account_id}`}
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={(e) =>
+                  onHandleMouseOver(e, row?.signer_account_id)
+                }
+              >
+                {row?.signer_account_id &&
+                  truncateString(row?.signer_account_id, 15, '...')}
+              </Link>
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <>
           <Menu>
@@ -272,29 +302,29 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
-              <form onSubmit={onFilter} className="flex flex-col">
+              <form className="flex flex-col" onSubmit={onFilter}>
                 <input
+                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="from"
-                  value={form?.from}
                   onChange={onChange}
                   placeholder={
                     t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  value={form?.from}
                 />
                 <div className="flex">
                   <button
-                    type="submit"
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
-                    name="from"
-                    type="button"
-                    onClick={onClear}
                     className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    name="from"
+                    onClick={onClear}
+                    type="button"
                   >
                     {t ? t('filter.clear') : 'Clear'}
                   </button>
@@ -305,40 +335,10 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         </>
       ),
       key: 'signer_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip
-            label={row?.signer_account_id}
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.signer_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                href={`/address/${row?.signer_account_id}`}
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.signer_account_id)
-                }
-                onMouseLeave={handleMouseLeave}
-              >
-                {row?.signer_account_id &&
-                  truncateString(row?.signer_account_id, 15, '...')}
-              </Link>
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      header: <span></span>,
-      key: '',
       cell: (row: TransactionInfo) => {
         return row?.signer_account_id === row?.receiver_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
@@ -354,8 +354,37 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           </span>
         );
       },
+      header: <span></span>,
+      key: '',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={row?.receiver_account_id}
+          >
+            <span
+              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+                row?.receiver_account_id === address
+                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+                  : 'text-green-500 dark:text-green-250 border-transparent'
+              }`}
+            >
+              <Link
+                className="text-green-500 dark:text-green-250 hover:no-underline"
+                href={`/address/${row?.receiver_account_id}`}
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={(e) =>
+                  onHandleMouseOver(e, row?.receiver_account_id)
+                }
+              >
+                {truncateString(row?.receiver_account_id, 15, '...')}
+              </Link>
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <>
           <Menu>
@@ -364,29 +393,29 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
-              <form onSubmit={onFilter} className="flex flex-col">
+              <form className="flex flex-col" onSubmit={onFilter}>
                 <input
+                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="to"
-                  value={form.to}
                   onChange={onChange}
                   placeholder={
                     t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
-                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  value={form.to}
                 />
                 <div className="flex">
                   <button
-                    type="submit"
                     className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
-                    name="to"
-                    type="button"
-                    onClick={onClear}
                     className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
+                    name="to"
+                    onClick={onClear}
+                    type="button"
                   >
                     {t ? t('filter.clear') : 'Clear'}
                   </button>
@@ -397,44 +426,15 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         </>
       ),
       key: 'receiver_account_id',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <Tooltip
-            label={row?.receiver_account_id}
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.receiver_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                href={`/address/${row?.receiver_account_id}`}
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.receiver_account_id)
-                }
-                onMouseLeave={handleMouseLeave}
-              >
-                {truncateString(row?.receiver_account_id, 15, '...')}
-              </Link>
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      header: <span>{t ? t('blockHeight') : ' BLOCK HEIGHT'}</span>,
-      key: 'block_height',
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            href={`/blocks/${row?.included_in_block_hash}`}
             className="text-green-500  dark:text-green-250 hover:no-underline"
+            href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)
@@ -442,26 +442,33 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
           </Link>
         </span>
       ),
+      header: <span>{t ? t('blockHeight') : ' BLOCK HEIGHT'}</span>,
+      key: 'block_height',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+        </span>
+      ),
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
             }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
           >
             <button
-              type="button"
-              onClick={toggleShowAge}
               className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none whitespace-nowrap"
+              onClick={toggleShowAge}
+              type="button"
             >
               {showAge
                 ? t
@@ -475,7 +482,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               )}
             </button>
           </Tooltip>
-          <button type="button" onClick={onOrder} className="px-2">
+          <button className="px-2" onClick={onOrder} type="button">
             <div className="text-nearblue-600 font-semibold">
               <SortIcon order={router.query.order as string} />
             </div>
@@ -483,11 +490,6 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         </div>
       ),
       key: 'block_timestamp',
-      cell: (row: TransactionInfo) => (
-        <span>
-          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
-        </span>
-      ),
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
       thClassName: 'whitespace-nowrap',
@@ -496,7 +498,7 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
 
   function removeCursor() {
     const queryParams = router.query;
-    const { cursor, order, p, tab, locale, keyword, query, filter, ...rest } =
+    const { cursor, filter, keyword, locale, order, p, query, tab, ...rest } =
       queryParams;
     return rest;
   }
@@ -513,13 +515,6 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             </div>
           ) : (
             <TableSummary
-              text={
-                txns &&
-                !error &&
-                `A total of${' '}
-              ${count ? localFormat && localFormat(count?.toString()) : 0}${' '}
-              transactions found`
-              }
               filters={
                 <Filters filters={modifiedFilter} onClear={onAllClear} />
               }
@@ -528,8 +523,8 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   <>
                     <button className="hover:no-underline">
                       <Link
-                        href={`/exportdata?address=${id}&type=transactions`}
                         className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                        href={`/exportdata?address=${id}&type=transactions`}
                       >
                         <p>CSV Export</p>
                         <span className="ml-2">
@@ -540,16 +535,20 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                   </>
                 )
               }
+              text={
+                txns &&
+                !error &&
+                `A total of${' '}
+              ${count ? localFormat && localFormat(count?.toString()) : 0}${' '}
+              transactions found`
+              }
             />
           )}
           <Table
             columns={columns}
-            data={txns}
-            limit={25}
-            cursorPagination={true}
             cursor={cursor}
-            page={page}
-            setPage={setPage}
+            cursorPagination={true}
+            data={txns}
             Error={error}
             ErrorText={
               <ErrorMessage
@@ -558,6 +557,9 @@ const Transactions = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                 mutedText="Please try again later"
               />
             }
+            limit={25}
+            page={page}
+            setPage={setPage}
           />
         </>
       ) : (

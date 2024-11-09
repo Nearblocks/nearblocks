@@ -1,23 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import Link from 'next/link';
-import debounce from 'lodash/debounce';
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState, useCallback } from 'react';
 import {
   Combobox,
-  ComboboxList,
   ComboboxInput,
+  ComboboxList,
   ComboboxOption,
   ComboboxPopover,
 } from '@reach/combobox';
-
-import { networkId } from '@/utils/config';
-import ArrowDown from '../Icons/ArrowDown';
-import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
-import SearchIcon from '../Icons/SearchIcon';
+import debounce from 'lodash/debounce';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+
 import { useIntlRouter, usePathname } from '@/i18n/routing';
+import { networkId } from '@/utils/config';
+import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
+
+import ArrowDown from '../Icons/ArrowDown';
+import SearchIcon from '../Icons/SearchIcon';
 
 export const SearchToast = () => {
   if (networkId === 'testnet') {
@@ -43,8 +44,8 @@ export const SearchToast = () => {
 
 const Search = ({
   header = false,
-  result = {} as any,
   redirectResult = {} as any,
+  result = {} as any,
 }) => {
   const router = useRouter();
   const intlRouter = useIntlRouter();
@@ -88,11 +89,11 @@ const Search = ({
 
   useEffect(() => {
     if (filter && keyword) {
-      const { query, locale, ...currentQuery } = router.query;
+      const { locale, query, ...currentQuery } = router.query;
       const newQuery = {
         ...currentQuery,
-        keyword: keyword,
         filter: filter,
+        keyword: keyword,
       };
       // @ts-ignore: Unreachable code error
       intlRouter.push({
@@ -126,11 +127,11 @@ const Search = ({
     ).value;
     const qs = text.replace(/[\s,]/g, '');
 
-    const { query, keyword, locale, ...currentQuery } = router.query;
+    const { keyword, locale, query, ...currentQuery } = router.query;
     const newQuery = {
       ...currentQuery,
-      query: qs,
       filter: filter,
+      query: qs,
     };
 
     // @ts-ignore: Unreachable code error
@@ -152,8 +153,8 @@ const Search = ({
               ? 'bg-gray-100 dark:bg-black-500 dark:text-neargray-10'
               : 'bg-blue-900/[0.05] dark:bg-black dark:text-neargray-10'
           }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border dark:border-black-200 dark:text-neargray-10`}
-          value={filter}
           onChange={onFilter}
+          value={filter}
         >
           <option value="all">{t('search.filters.all')}</option>
           <option value="txns">{t('search.filters.txns')}</option>
@@ -165,9 +166,9 @@ const Search = ({
 
       <Combobox className="flex-grow">
         <ComboboxInput
-          placeholder={t('search.placeholder')}
           className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
           onChange={handleChange}
+          placeholder={t('search.placeholder')}
         />
         {showResults && (
           <ComboboxPopover className="z-50 dark:bg-black-600">
@@ -179,12 +180,12 @@ const Search = ({
                   </h3>
                   {result.accounts.map((address: any) => (
                     <ComboboxOption
-                      value={address?.account_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
                       key={address?.account_id}
                       onClick={() =>
-                        onSelect({ type: 'address', path: address?.account_id })
+                        onSelect({ path: address?.account_id, type: 'address' })
                       }
+                      value={address?.account_id}
                     >
                       {shortenAddress(address?.account_id)}
                     </ComboboxOption>
@@ -198,12 +199,12 @@ const Search = ({
                   </h3>
                   {result?.txns?.map((txn: any) => (
                     <ComboboxOption
-                      value={txn?.transaction_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={txn?.transaction_hash}
                       onClick={() =>
-                        onSelect({ type: 'txn', path: txn?.transaction_hash })
+                        onSelect({ path: txn?.transaction_hash, type: 'txn' })
                       }
+                      value={txn?.transaction_hash}
                     >
                       {shortenHex(txn?.transaction_hash)}
                     </ComboboxOption>
@@ -217,15 +218,15 @@ const Search = ({
                   </h3>
                   {result?.receipts?.map((receipt: any) => (
                     <ComboboxOption
-                      value={receipt?.receipt_id}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={receipt?.receipt_id}
                       onClick={() =>
                         onSelect({
-                          type: 'receipt',
                           path: receipt?.originated_from_transaction_hash,
+                          type: 'receipt',
                         })
                       }
+                      value={receipt?.receipt_id}
                     >
                       {shortenHex(receipt?.receipt_id)}
                     </ComboboxOption>
@@ -239,12 +240,12 @@ const Search = ({
                   </h3>
                   {result?.blocks?.map((block: any) => (
                     <ComboboxOption
-                      value={block?.block_hash}
                       className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={block?.block_hash}
                       onClick={() =>
-                        onSelect({ type: 'block', path: block?.block_hash })
+                        onSelect({ path: block?.block_hash, type: 'block' })
                       }
+                      value={block?.block_hash}
                     >
                       #{localFormat(block?.block_height)} (0x
                       {shortenHex(block?.block_hash)})
@@ -257,12 +258,12 @@ const Search = ({
         )}
       </Combobox>
       <button
-        type="submit"
         className={`${
           homeSearch
             ? 'bg-gray-100 dark:bg-black-500'
             : 'bg-blue-900/[0.05] dark:bg-black-600'
         } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
+        type="submit"
       >
         <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
       </button>

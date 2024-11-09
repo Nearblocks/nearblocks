@@ -1,15 +1,15 @@
 import Image from 'next/image';
 import React, { useEffect } from 'react';
 type ImageModalProps = {
+  imageSrc: string;
   isOpen: boolean;
   onClose: () => void;
-  imageSrc: string;
 };
 
 const ImageModal: React.FC<ImageModalProps> = ({
+  imageSrc,
   isOpen,
   onClose,
-  imageSrc,
 }) => {
   useEffect(() => {
     const handleEsc = (event: any) => {
@@ -41,11 +41,11 @@ const ImageModal: React.FC<ImageModalProps> = ({
           &times;
         </button>
         <Image
-          src={imageSrc}
           alt="Modal Content"
-          width={900}
-          height={900}
           className="max-w-full max-h-full"
+          height={900}
+          src={imageSrc}
+          width={900}
         />
       </div>
     </div>

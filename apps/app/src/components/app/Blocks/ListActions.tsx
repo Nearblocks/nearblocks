@@ -1,13 +1,9 @@
 'use client';
-import { Suspense, useState } from 'react';
-import ErrorMessage from '../common/ErrorMessage';
-import { BlocksInfo } from '@/utils/types';
-
 import { Tooltip } from '@reach/tooltip';
-import Clock from '../Icons/Clock';
-import FaInbox from '../Icons/FaInbox';
-import Skeleton from '../skeleton/common/Skeleton';
-import Table from '../common/Table';
+import { useTranslations } from 'next-intl';
+import { Suspense, useState } from 'react';
+
+import { Link } from '@/i18n/routing';
 import {
   convertToMetricPrefix,
   formatTimestampToString,
@@ -17,16 +13,21 @@ import {
   nanoToMilli,
   shortenAddress,
 } from '@/utils/app/libs';
-import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { BlocksInfo } from '@/utils/types';
+
+import ErrorMessage from '../common/ErrorMessage';
+import Table from '../common/Table';
+import Clock from '../Icons/Clock';
+import FaInbox from '../Icons/FaInbox';
+import Skeleton from '../skeleton/common/Skeleton';
 
 const ListActions = ({
-  data,
-  totalCount,
-  countLoading,
   apiUrl,
-  setUrl,
+  countLoading,
+  data,
   error,
+  setUrl,
+  totalCount,
 }: any) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
@@ -49,13 +50,11 @@ const ListActions = ({
   const toggleShowAge = () => setShowAge((s) => !s);
   const columns: any = [
     {
-      header: <span>{t('blocks') || 'BLOCK'}</span>,
-      key: 'block_hash',
       cell: (row: BlocksInfo) => (
         <span>
           <Link
-            href={`/blocks/${row?.block_hash}`}
             className="text-green-500 dark:text-green-250 hover:no-underline"
+            href={`/blocks/${row?.block_hash}`}
           >
             {row?.block_height
               ? localFormat(row?.block_height)
@@ -63,26 +62,54 @@ const ListActions = ({
           </Link>
         </span>
       ),
+      header: <span>{t('blocks') || 'BLOCK'}</span>,
+      key: 'block_hash',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600  dark:text-neargray-10 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
+      cell: (row: BlocksInfo) => (
+        <span>
+          <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            label={
+              showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''
+            }
+          >
+            <span>
+              {!showAge
+                ? row?.block_timestamp
+                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
+                  : ''
+                : row?.block_timestamp
+                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
+                : ''}
+            </span>
+          </Tooltip>
+        </span>
+      ),
       header: (
         <div>
           <Tooltip
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-6 py-2 break-words"
             label={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
             }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-6 py-2 break-words"
           >
             <button
-              type="button"
-              onClick={toggleShowAge}
               className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
+              onClick={toggleShowAge}
+              type="button"
             >
               {showAge ? (
                 <>
@@ -97,43 +124,15 @@ const ListActions = ({
         </div>
       ),
       key: 'block_timestamp',
-      cell: (row: BlocksInfo) => (
-        <span>
-          <Tooltip
-            label={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
-        </span>
-      ),
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
     {
-      header: <span>{t('txn') || 'TXN'}</span>,
-      key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
           <Link
-            href={`/txns?block=${row?.block_hash}`}
             className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
+            href={`/txns?block=${row?.block_hash}`}
           >
             {row?.transactions_agg?.count
               ? localFormat(row?.transactions_agg?.count)
@@ -141,14 +140,14 @@ const ListActions = ({
           </Link>
         </span>
       ),
+      header: <span>{t('txn') || 'TXN'}</span>,
+      key: 'count',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
-      key: 'count',
       cell: (row: BlocksInfo) => (
         <span>
           {row?.receipts_agg?.count
@@ -156,38 +155,38 @@ const ListActions = ({
             : row?.receipts_agg?.count ?? ''}
         </span>
       ),
+      header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
+      key: 'count',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span className="pl-1">{t('miner') || 'AUTHOR'}</span>,
-      key: 'author_account_id',
       cell: (row: BlocksInfo) => (
         <span>
           <Link
-            href={`/address/${row?.author_account_id}`}
             className={`text-green-500 dark:text-green-250 hover:no-underline p-1 border rounded-md ${
               row?.author_account_id === address
                 ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                 : 'text-green-500 dark:text-green-250 border-transparent'
             }`}
-            onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
+            href={`/address/${row?.author_account_id}`}
             onMouseLeave={handleMouseLeave}
+            onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
           >
             {shortenAddress(row?.author_account_id ?? '')}
           </Link>
         </span>
       ),
+      header: <span className="pl-1">{t('miner') || 'AUTHOR'}</span>,
+      key: 'author_account_id',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t('block.gasUsed') || 'GAS USED'}</span>,
-      key: 'gas_used',
       cell: (row: BlocksInfo) => (
         <span>
           {row?.chunks_agg?.gas_used !== null
@@ -195,25 +194,25 @@ const ListActions = ({
             : ''}
         </span>
       ),
+      header: <span>{t('block.gasUsed') || 'GAS USED'}</span>,
+      key: 'gas_used',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t('block.gasLimit') || 'GAS LIMIT'}</span>,
-      key: 'gas_limit',
       cell: (row: BlocksInfo) => (
         <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
       ),
+      header: <span>{t('block.gasLimit') || 'GAS LIMIT'}</span>,
+      key: 'gas_limit',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t('block.gasFee') || 'GAS FEE'}</span>,
-      key: 'gas_price',
       cell: (row: BlocksInfo) => (
         <span>
           {row?.chunks_agg?.gas_used
@@ -222,6 +221,8 @@ const ListActions = ({
           Ⓝ
         </span>
       ),
+      header: <span>{t('block.gasFee') || 'GAS FEE'}</span>,
+      key: 'gas_price',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -243,13 +244,13 @@ const ListActions = ({
               <span>
                 {(t &&
                   t('block.listing', {
+                    count: localFormat(String(count)),
                     from: start?.block_height
                       ? localFormat(String(start?.block_height))
                       : '',
                     to: end?.block_height
                       ? localFormat(String(end?.block_height))
                       : '',
-                    count: localFormat(String(count)),
                   })) ||
                   `Block #${
                     start?.block_height
@@ -266,17 +267,13 @@ const ListActions = ({
         </div>
       </Suspense>
       <Table
-        columns={columns}
-        data={blocks}
-        countLoading={countLoading}
-        count={count}
-        limit={25}
-        cursorPagination={true}
-        cursor={cursor}
         apiUrl={apiUrl}
-        setUrl={setUrl}
-        page={page}
-        setPage={setPage}
+        columns={columns}
+        count={count}
+        countLoading={countLoading}
+        cursor={cursor}
+        cursorPagination={true}
+        data={blocks}
         Error={error}
         ErrorText={
           <ErrorMessage
@@ -285,6 +282,10 @@ const ListActions = ({
             mutedText="Please try again later"
           />
         }
+        limit={25}
+        page={page}
+        setPage={setPage}
+        setUrl={setUrl}
       />
     </div>
   );

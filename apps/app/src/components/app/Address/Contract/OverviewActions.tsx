@@ -1,4 +1,14 @@
 'use client';
+import { Accordion } from '@reach/accordion';
+import { Tooltip } from '@reach/tooltip';
+import { useEffect, useRef, useState } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
+import { useAuthStore } from '@/stores/auth';
+import { verifierConfig } from '@/utils/app/config';
 import {
   ContractCodeInfo,
   ContractData,
@@ -7,42 +17,34 @@ import {
   VerificationData,
   VerifierStatus,
 } from '@/utils/types';
-import { useEffect, useRef, useState } from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import Info from './Info';
-import { Tooltip } from '@reach/tooltip';
-import { Accordion } from '@reach/accordion';
-import ViewOrChange from './ViewOrChange';
-import { useAuthStore } from '@/stores/auth';
-import ViewOrChangeAbi from './ViewOrChangeAbi';
+
 import ContractCode from './ContractCode';
-import { verifierConfig } from '@/utils/app/config';
-import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { useRpcStore } from '@/stores/app/rpc';
+import Info from './Info';
+import ViewOrChange from './ViewOrChange';
+import ViewOrChangeAbi from './ViewOrChangeAbi';
 
 interface Props {
-  id: string;
-  contract: ContractCodeInfo;
-  isLocked?: boolean;
-  schema?: SchemaInfo;
-  contractInfo: ContractParseInfo;
-  requestSignInWithWallet?: () => void;
-  connected?: boolean;
   accountId?: string;
-  logOut?: () => void;
+  connected?: boolean;
+  contract: ContractCodeInfo;
+  contractInfo: ContractParseInfo;
   deployments: any;
+  id: string;
+  isLocked?: boolean;
+  logOut?: () => void;
+  requestSignInWithWallet?: () => void;
+  schema?: SchemaInfo;
 }
 
 type OnChainResponse = {
-  hash?: string;
   code_base64?: string;
+  hash?: string;
 };
 
 const verifiers = verifierConfig.map((config) => config.accountId);
 
 const OverviewActions = (props: Props) => {
-  const { id, isLocked, schema, contractInfo, deployments, accountId } = props;
+  const { accountId, contractInfo, deployments, id, isLocked, schema } = props;
 
   const requestSignInWithWallet = useAuthStore(
     (store) => store?.requestSignInWithWallet,
@@ -54,13 +56,13 @@ const OverviewActions = (props: Props) => {
   const onTabChange = (index: number) => setTab(index);
 
   const [contractData, setContractData] = useState<ContractData>({
-    onChainCodeHash: '',
     base64Code: '',
     contractMetadata: null,
+    onChainCodeHash: '',
   });
 
   const [statusLoading, setStatusLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<null | string>(null);
   const { contractCode, getContractMetadata, getVerifierData } = useRpc();
   const [verificationData, setVerificationData] = useState<
     Record<string, VerificationData>
@@ -108,9 +110,9 @@ const OverviewActions = (props: Props) => {
           (onChainResponse as OnChainResponse)?.code_base64 || '';
 
         setContractData({
-          onChainCodeHash: onChainHash,
           base64Code: base64Code,
           contractMetadata: contractMetadataResponse,
+          onChainCodeHash: onChainHash,
         });
       } catch (error) {
         setRpcError(true);
@@ -155,8 +157,8 @@ const OverviewActions = (props: Props) => {
           }
 
           acc[verifier] = {
-            status,
             data,
+            status,
           };
           return acc;
         }, {});
@@ -176,9 +178,9 @@ const OverviewActions = (props: Props) => {
 
   return (
     <Tabs
-      selectedIndex={tab}
-      onSelect={onTabChange}
       className={'pb-1 px-4 py-3'}
+      onSelect={onTabChange}
+      selectedIndex={tab}
     >
       <TabList className={'flex flex-wrap'}>
         <Tab
@@ -201,15 +203,15 @@ const OverviewActions = (props: Props) => {
         </Tab>
       </TabList>
       <TabPanel>
-        <Info id={id} isLocked={isLocked as boolean} data={deployments} />
+        <Info data={deployments} id={id} isLocked={isLocked as boolean} />
       </TabPanel>
       <TabPanel>
         <ContractCode
-          error={error}
-          verificationData={verificationData}
-          contractData={contractData}
-          statusLoading={statusLoading}
           accountId={accountId as string}
+          contractData={contractData}
+          error={error}
+          statusLoading={statusLoading}
+          verificationData={verificationData}
         />
       </TabPanel>
       {!schema && (
@@ -217,8 +219,8 @@ const OverviewActions = (props: Props) => {
           <div className="border-t p-4 mt-3">
             {signedIn ? (
               <Tooltip
-                label="Disconnect Wallet"
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+                label="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
@@ -243,9 +245,9 @@ const OverviewActions = (props: Props) => {
               {`Near ABI schema not found, We have provide a best effort “auto detect” facility to find successful methods and parameters from past transactions. If you are the contract owner please consider recompiling your contract with Near`}{' '}
               <a
                 className="text-green-500 dark:text-green-250"
-                target="_blank"
                 href="https://github.com/near/abi"
                 rel="noreferrer noopener nofollow"
+                target="_blank"
               >
                 ABI
               </a>
@@ -254,15 +256,15 @@ const OverviewActions = (props: Props) => {
           )}
           {contractInfo?.methodNames?.length > 0 && (
             <Accordion
-              multiple
-              collapsible
               className="contract-accordian text-gray-600 px-4 pt-4 border-t"
+              collapsible
+              multiple
             >
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <ViewOrChange
-                  key={index}
                   id={id}
                   index={index}
+                  key={index}
                   method={method}
                 />
               ))}
@@ -275,8 +277,8 @@ const OverviewActions = (props: Props) => {
           <div className="border-t p-4 mt-3">
             {signedIn ? (
               <Tooltip
-                label="Disconnect Wallet"
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+                label="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
@@ -301,27 +303,27 @@ const OverviewActions = (props: Props) => {
             Near{' '}
             <a
               className="text-green-500 dark:text-green-250"
-              target="_blank"
               href="https://github.com/near/abi"
               rel="noreferrer noopener nofollow"
+              target="_blank"
             >
               ABI
             </a>{' '}
             {`Schema.`}
           </p>
           <Accordion
-            multiple
-            collapsible
             className="contract-accordian text-gray-600 px-4 pt-4 border-t"
+            collapsible
+            multiple
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
               <ViewOrChangeAbi
+                connected={signedIn}
                 id={id}
-                key={index}
                 index={index}
+                key={index}
                 method={func}
                 schema={schema}
-                connected={signedIn}
               />
             ))}
           </Accordion>

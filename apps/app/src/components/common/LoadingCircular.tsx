@@ -6,8 +6,8 @@ export default function LoadingCircular() {
       <svg
         aria-hidden="true"
         className="mr-2 w-5 h-5 text-white animate-spin dark:text-gray-600 fill-blue-500"
-        viewBox="0 0 100 101"
         fill="none"
+        viewBox="0 0 100 101"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path

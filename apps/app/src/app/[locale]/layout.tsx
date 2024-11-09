@@ -1,5 +1,6 @@
-import Layout from '@/components/app/Layouts/Layout';
 import { unstable_setRequestLocale } from 'next-intl/server';
+
+import Layout from '@/components/app/Layouts/Layout';
 
 export default async function ProviderLayout({
   children,

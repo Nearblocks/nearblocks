@@ -1,32 +1,33 @@
 'use client';
+import { isEmpty } from 'lodash';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+
 import { mapRpcActionToAction } from '@/utils/near';
 import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
-import { isEmpty } from 'lodash';
-import { useEffect, useState } from 'react';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import Skeleton from '../skeleton/common/Skeleton';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
-import { useTranslations } from 'next-intl';
 
+import ErrorMessage from '../common/ErrorMessage';
+import FaHourglassStart from '../Icons/FaHourglassStart';
+import FaInbox from '../Icons/FaInbox';
 import FileSlash from '../Icons/FileSlash';
+import Skeleton from '../skeleton/common/Skeleton';
+import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
 
 interface Props {
-  txn: TransactionInfo;
+  hash: string;
   loading: boolean;
   price: string;
-  hash: string;
   rpcTxn: RPCTransactionInfo;
   statsData: {
     stats: Array<{
       near_price: string;
     }>;
   };
+  txn: TransactionInfo;
 }
 
 const ReceiptSummary = (props: Props) => {
-  const { txn, loading, price, hash, rpcTxn, statsData } = props;
+  const { hash, loading, price, rpcTxn, statsData, txn } = props;
 
   const t = useTranslations();
   const [receipt, setReceipt] = useState<any>(null);
@@ -133,52 +134,52 @@ const ReceiptSummary = (props: Props) => {
                   <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                     <tr>
                       <th
-                        scope="col"
                         className="pl-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       ></th>
                       <th
-                        scope="col"
                         className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         Receipt
                       </th>
                       <th
-                        scope="col"
                         className="px-6 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         Action
                       </th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         Method
                       </th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         {t ? t('txn.receipts.from.text.0') : 'From'}
                       </th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       ></th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         {t ? t('txn.receipts.to.text.0') : 'To'}
                       </th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         Value
                       </th>
                       <th
-                        scope="col"
                         className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
+                        scope="col"
                       >
                         Gas Limit
                       </th>
@@ -187,7 +188,7 @@ const ReceiptSummary = (props: Props) => {
                   <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
                     {(!receipt?.id || loading) &&
                       [...Array(10)].map((_, i) => (
-                        <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
+                        <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                             <Skeleton className="w-full h-4" />
                           </td>
@@ -214,8 +215,8 @@ const ReceiptSummary = (props: Props) => {
                     {receipt?.actions?.length === 0 && (
                       <tr className="h-[57px]">
                         <td
-                          colSpan={100}
                           className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
+                          colSpan={100}
                         >
                           <ErrorMessage
                             icons={<FaInbox />}
@@ -227,10 +228,10 @@ const ReceiptSummary = (props: Props) => {
                     )}
                     {receipt?.id && (
                       <ReceiptSummaryRow
-                        txn={txn}
-                        receipt={receipt}
                         price={price}
+                        receipt={receipt}
                         statsData={statsData}
+                        txn={txn}
                       />
                     )}{' '}
                   </tbody>

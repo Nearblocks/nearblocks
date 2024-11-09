@@ -1,20 +1,21 @@
 import { EventPropsInfo } from '@/utils/types';
-import DepositToReserve from './DopositToReserve';
-import Deposit from './Deposit';
-import WithdrawSucceeded from './WithdrawSucceeded';
-import IncreaseCollateral from './IncreaseCollateral';
-import DescreaseCollateral from './DecreaseCollateral';
+
 import Borrow from './Borrow';
+import DescreaseCollateral from './DecreaseCollateral';
+import Deposit from './Deposit';
+import DepositToReserve from './DopositToReserve';
+import IncreaseCollateral from './IncreaseCollateral';
 import Repay from './Repay';
+import WithdrawSucceeded from './WithdrawSucceeded';
 
 interface ParsedEvent {
-  event: string;
   data: any;
+  event: string;
   network: string;
 }
 
 const BurrowContract = (props: EventPropsInfo) => {
-  let parsedEvent: ParsedEvent | {} = {};
+  let parsedEvent: {} | ParsedEvent = {};
 
   try {
     parsedEvent = JSON.parse(props?.event?.logs?.replace('EVENT_JSON:', ''));

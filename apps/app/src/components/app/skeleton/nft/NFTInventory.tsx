@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Skeleton from '../common/Skeleton';
 
 export default function InventorySkeleton() {
@@ -14,8 +15,8 @@ export default function InventorySkeleton() {
             key={i}
           >
             <a
-              href="#"
               className="flex items-center justify-center m-auto overflow-hidden"
+              href="#"
             >
               <div className="w-40 h-40 ">
                 <Skeleton className="h-40" />

@@ -1,3 +1,5 @@
+import Big from 'big.js';
+
 import {
   ActionError,
   ActionType,
@@ -9,20 +11,18 @@ import {
   NonDelegateActionView,
   Obj,
   OutcomeInfo,
-  ParseOutcomeInfo,
   ParsedReceipt,
+  ParseOutcomeInfo,
+  ReceiptsInfo,
+  ReceiptView,
   RPCCompilationError,
   RPCFunctionCallError,
   RPCInvalidAccessKeyError,
   RPCNewReceiptValidationError,
   RPCTransactionInfo,
-  ReceiptView,
-  ReceiptsInfo,
   TransactionLog,
   TxExecutionError,
 } from '@/utils/types';
-
-import Big from 'big.js';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -139,7 +139,7 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
   return txLogs;
 }
 
-export function mapRpcActionToAction(action: string | ActionType) {
+export function mapRpcActionToAction(action: ActionType | string) {
   if (action === 'CreateAccount') {
     return {
       action_kind: 'CreateAccount',
@@ -228,7 +228,7 @@ export function txnErrorMessage(txn: RPCTransactionInfo) {
 export function collectNestedReceiptWithOutcomeOld(
   idOrHash: string,
   parsedMap: Map<string, ParsedReceipt>,
-): NestedReceiptWithOutcome | FailedToFindReceipt {
+): FailedToFindReceipt | NestedReceiptWithOutcome {
   const parsedElement = parsedMap && parsedMap.get(idOrHash);
   if (!parsedElement) {
     return { id: idOrHash };
@@ -238,7 +238,7 @@ export function collectNestedReceiptWithOutcomeOld(
     ...parsedElement,
     outcome: {
       ...restOutcome,
-      nestedReceipts: receiptIds.map((id: ParsedReceipt | any) =>
+      nestedReceipts: receiptIds.map((id: any | ParsedReceipt) =>
         collectNestedReceiptWithOutcomeOld(id, parsedMap),
       ),
     },
@@ -246,28 +246,28 @@ export function collectNestedReceiptWithOutcomeOld(
 }
 
 export function parseReceipt(
-  receipt: ReceiptView | ReceiptsInfo | undefined,
+  receipt: ReceiptsInfo | ReceiptView | undefined,
   outcome: OutcomeInfo,
   transaction: NonDelegateActionView,
 ) {
   if (!receipt) {
     return {
+      actions:
+        transaction.actions && transaction.actions.map(mapRpcActionToAction1),
       id: outcome.id,
       predecessorId: transaction.signer_id,
       receiverId: transaction.receiver_id,
-      actions:
-        transaction.actions && transaction.actions.map(mapRpcActionToAction1),
     };
   }
   return {
-    id: receipt.receipt_id,
-    predecessorId: receipt.predecessor_id,
-    receiverId: receipt.receiver_id,
     actions:
       'Action' in receipt.receipt
         ? receipt.receipt.Action.actions &&
           receipt.receipt.Action.actions.map(mapRpcActionToAction1)
         : [],
+    id: receipt.receipt_id,
+    predecessorId: receipt.predecessor_id,
+    receiverId: receipt.receiver_id,
   };
 }
 
@@ -276,47 +276,45 @@ export function mapNonDelegateRpcActionToAction(
 ): NonDelegateAction {
   if (rpcAction === 'CreateAccount') {
     return {
-      kind: 'createAccount',
       args: {},
+      kind: 'createAccount',
     };
   }
   if ('DeployContract' in rpcAction) {
     return {
-      kind: 'deployContract',
       args: rpcAction.DeployContract,
+      kind: 'deployContract',
     };
   }
   if ('FunctionCall' in rpcAction) {
     return {
-      kind: 'functionCall',
       args: {
-        methodName: rpcAction.FunctionCall.method_name,
         args: rpcAction.FunctionCall.args,
         deposit: rpcAction.FunctionCall.deposit,
         gas: rpcAction.FunctionCall.gas,
+        methodName: rpcAction.FunctionCall.method_name,
       },
+      kind: 'functionCall',
     };
   }
   if ('Transfer' in rpcAction) {
     return {
-      kind: 'transfer',
       args: rpcAction.Transfer,
+      kind: 'transfer',
     };
   }
   if ('Stake' in rpcAction) {
     return {
-      kind: 'stake',
       args: {
         publicKey: rpcAction.Stake.public_key,
         stake: rpcAction.Stake.stake,
       },
+      kind: 'stake',
     };
   }
   if ('AddKey' in rpcAction) {
     return {
-      kind: 'addKey',
       args: {
-        publicKey: rpcAction.AddKey.public_key,
         accessKey: {
           nonce: rpcAction.AddKey.access_key.nonce,
           permission:
@@ -325,31 +323,33 @@ export function mapNonDelegateRpcActionToAction(
                   type: 'fullAccess',
                 }
               : {
-                  type: 'functionCall',
                   contractId:
                     rpcAction.AddKey.access_key.permission.FunctionCall
                       .receiver_id,
                   methodNames:
                     rpcAction.AddKey.access_key.permission.FunctionCall
                       .method_names,
+                  type: 'functionCall',
                 },
         },
+        publicKey: rpcAction.AddKey.public_key,
       },
+      kind: 'addKey',
     };
   }
   if ('DeleteKey' in rpcAction) {
     return {
-      kind: 'deleteKey',
       args: {
         publicKey: rpcAction.DeleteKey.public_key,
       },
+      kind: 'deleteKey',
     };
   }
   return {
-    kind: 'deleteAccount',
     args: {
       beneficiaryId: rpcAction.DeleteAccount.beneficiary_id,
     },
+    kind: 'deleteAccount',
   };
 }
 
@@ -369,35 +369,35 @@ export function mapRpcInvalidAccessKeyError(error: RPCInvalidAccessKeyError) {
   if ('AccessKeyNotFound' in error) {
     const { account_id, public_key } = error.AccessKeyNotFound;
     return {
-      type: 'accessKeyNotFound',
       accountId: account_id,
       publicKey: public_key,
+      type: 'accessKeyNotFound',
     };
   }
   if ('ReceiverMismatch' in error) {
     const { ak_receiver, tx_receiver } = error.ReceiverMismatch;
     return {
-      type: 'receiverMismatch',
       akReceiver: ak_receiver,
       transactionReceiver: tx_receiver,
+      type: 'receiverMismatch',
     };
   }
   if ('MethodNameMismatch' in error) {
     const { method_name } = error.MethodNameMismatch;
     return {
-      type: 'methodNameMismatch',
       methodName: method_name,
+      type: 'methodNameMismatch',
     };
   }
   if ('NotEnoughAllowance' in error) {
     const { account_id, allowance, cost, public_key } =
       error.NotEnoughAllowance;
     return {
-      type: 'notEnoughAllowance',
       accountId: account_id,
       allowance: allowance,
       cost: cost,
       publicKey: public_key,
+      type: 'notEnoughAllowance',
     };
   }
 
@@ -408,8 +408,8 @@ export function mapRpcCompilationError(error: RPCCompilationError) {
   const UNKNOWN_ERROR = { type: 'unknown' };
   if ('CodeDoesNotExist' in error) {
     return {
-      type: 'codeDoesNotExist',
       accountId: error.CodeDoesNotExist.account_id,
+      type: 'codeDoesNotExist',
     };
   }
   if ('PrepareError' in error) {
@@ -419,14 +419,14 @@ export function mapRpcCompilationError(error: RPCCompilationError) {
   }
   if ('WasmerCompileError' in error) {
     return {
-      type: 'wasmerCompileError',
       msg: error.WasmerCompileError.msg,
+      type: 'wasmerCompileError',
     };
   }
   if ('UnsupportedCompiler' in error) {
     return {
-      type: 'unsupportedCompiler',
       msg: error.UnsupportedCompiler.msg,
+      type: 'unsupportedCompiler',
     };
   }
   return UNKNOWN_ERROR;
@@ -436,14 +436,14 @@ export function mapRpcFunctionCallError(error: RPCFunctionCallError) {
   const UNKNOWN_ERROR = { type: 'unknown' };
   if ('CompilationError' in error) {
     return {
-      type: 'compilationError',
       error: mapRpcCompilationError(error.CompilationError),
+      type: 'compilationError',
     };
   }
   if ('LinkError' in error) {
     return {
-      type: 'linkError',
       msg: error.LinkError.msg,
+      type: 'linkError',
     };
   }
   if ('MethodResolveError' in error) {
@@ -473,8 +473,8 @@ export function mapRpcFunctionCallError(error: RPCFunctionCallError) {
   }
   if ('ExecutionError' in error) {
     return {
-      type: 'executionError',
       error: error.ExecutionError,
+      type: 'executionError',
     };
   }
   return UNKNOWN_ERROR;
@@ -486,42 +486,42 @@ export function mapRpcNewReceiptValidationError(
   const UNKNOWN_ERROR = { type: 'unknown' };
   if ('InvalidPredecessorId' in error) {
     return {
-      type: 'invalidPredecessorId',
       accountId: error.InvalidPredecessorId.account_id,
+      type: 'invalidPredecessorId',
     };
   }
   if ('InvalidReceiverId' in error) {
     return {
-      type: 'invalidReceiverId',
       accountId: error.InvalidReceiverId.account_id,
+      type: 'invalidReceiverId',
     };
   }
   if ('InvalidSignerId' in error) {
     return {
-      type: 'invalidSignerId',
       accountId: error.InvalidSignerId.account_id,
+      type: 'invalidSignerId',
     };
   }
   if ('InvalidDataReceiverId' in error) {
     return {
-      type: 'invalidDataReceiverId',
       accountId: error.InvalidDataReceiverId.account_id,
+      type: 'invalidDataReceiverId',
     };
   }
   if ('ReturnedValueLengthExceeded' in error) {
     return {
-      type: 'returnedValueLengthExceeded',
       length: error.ReturnedValueLengthExceeded.length,
       limit: error.ReturnedValueLengthExceeded.limit,
+      type: 'returnedValueLengthExceeded',
     };
   }
   if ('NumberInputDataDependenciesExceeded' in error) {
     return {
-      type: 'numberInputDataDependenciesExceeded',
+      limit: error.NumberInputDataDependenciesExceeded.limit,
       numberOfInputDataDependencies:
         error.NumberInputDataDependenciesExceeded
           .number_of_input_data_dependencies,
-      limit: error.NumberInputDataDependenciesExceeded.limit,
+      type: 'numberInputDataDependenciesExceeded',
     };
   }
   if ('ActionsValidation' in error) {
@@ -547,138 +547,138 @@ export function mapRpcReceiptActionError(error: ActionError) {
   }
   if ('DelegateActionSenderDoesNotMatchTxReceiver' in kind) {
     return {
-      type: 'delegateActionSenderDoesNotMatchTxReceiver',
       receiverId: kind.DelegateActionSenderDoesNotMatchTxReceiver.receiver_id,
       senderId: kind.DelegateActionSenderDoesNotMatchTxReceiver.sender_id,
+      type: 'delegateActionSenderDoesNotMatchTxReceiver',
     };
   }
   if ('DelegateActionAccessKeyError' in kind) {
     return {
-      type: 'delegateActionAccessKeyError',
       error: mapRpcInvalidAccessKeyError(kind.DelegateActionAccessKeyError),
+      type: 'delegateActionAccessKeyError',
     };
   }
   if ('DelegateActionInvalidNonce' in kind) {
     return {
-      type: 'delegateActionInvalidNonce',
       akNonce: kind.DelegateActionInvalidNonce.ak_nonce,
       delegateNonce: kind.DelegateActionInvalidNonce.delegate_nonce,
+      type: 'delegateActionInvalidNonce',
     };
   }
   if ('DelegateActionNonceTooLarge' in kind) {
     return {
-      type: 'delegateActionNonceTooLarge',
       delegateNonce: kind.DelegateActionNonceTooLarge.delegate_nonce,
+      type: 'delegateActionNonceTooLarge',
       upperBound: kind.DelegateActionNonceTooLarge.upper_bound,
     };
   }
   if ('AccountAlreadyExists' in kind) {
     return {
-      type: 'accountAlreadyExists',
       accountId: kind.AccountAlreadyExists.account_id,
+      type: 'accountAlreadyExists',
     };
   }
   if ('AccountDoesNotExist' in kind) {
     return {
-      type: 'accountDoesNotExist',
       accountId: kind.AccountDoesNotExist.account_id,
+      type: 'accountDoesNotExist',
     };
   }
   if ('CreateAccountOnlyByRegistrar' in kind) {
     return {
-      type: 'createAccountOnlyByRegistrar',
       accountId: kind.CreateAccountOnlyByRegistrar.account_id,
+      predecessorId: kind.CreateAccountOnlyByRegistrar.predecessor_id,
       registrarAccountId:
         kind.CreateAccountOnlyByRegistrar.registrar_account_id,
-      predecessorId: kind.CreateAccountOnlyByRegistrar.predecessor_id,
+      type: 'createAccountOnlyByRegistrar',
     };
   }
   if ('CreateAccountNotAllowed' in kind) {
     return {
-      type: 'createAccountNotAllowed',
       accountId: kind.CreateAccountNotAllowed.account_id,
       predecessorId: kind.CreateAccountNotAllowed.predecessor_id,
+      type: 'createAccountNotAllowed',
     };
   }
   if ('ActorNoPermission' in kind) {
     return {
-      type: 'actorNoPermission',
       accountId: kind.ActorNoPermission.account_id,
       actorId: kind.ActorNoPermission.actor_id,
+      type: 'actorNoPermission',
     };
   }
   if ('DeleteKeyDoesNotExist' in kind) {
     return {
-      type: 'deleteKeyDoesNotExist',
       accountId: kind.DeleteKeyDoesNotExist.account_id,
       publicKey: kind.DeleteKeyDoesNotExist.public_key,
+      type: 'deleteKeyDoesNotExist',
     };
   }
   if ('AddKeyAlreadyExists' in kind) {
     return {
-      type: 'addKeyAlreadyExists',
       accountId: kind.AddKeyAlreadyExists.account_id,
       publicKey: kind.AddKeyAlreadyExists.public_key,
+      type: 'addKeyAlreadyExists',
     };
   }
   if ('DeleteAccountStaking' in kind) {
     return {
-      type: 'deleteAccountStaking',
       accountId: kind.DeleteAccountStaking.account_id,
+      type: 'deleteAccountStaking',
     };
   }
   if ('LackBalanceForState' in kind) {
     return {
-      type: 'lackBalanceForState',
       accountId: kind.LackBalanceForState.account_id,
       amount: kind.LackBalanceForState.amount,
+      type: 'lackBalanceForState',
     };
   }
   if ('TriesToUnstake' in kind) {
     return {
-      type: 'triesToUnstake',
       accountId: kind.TriesToUnstake.account_id,
+      type: 'triesToUnstake',
     };
   }
   if ('TriesToStake' in kind) {
     return {
-      type: 'triesToStake',
       accountId: kind.TriesToStake.account_id,
-      stake: kind.TriesToStake.stake,
-      locked: kind.TriesToStake.locked,
       balance: kind.TriesToStake.balance,
+      locked: kind.TriesToStake.locked,
+      stake: kind.TriesToStake.stake,
+      type: 'triesToStake',
     };
   }
   if ('InsufficientStake' in kind) {
     return {
-      type: 'insufficientStake',
       accountId: kind.InsufficientStake.account_id,
-      stake: kind.InsufficientStake.stake,
       minimumStake: kind.InsufficientStake.minimum_stake,
+      stake: kind.InsufficientStake.stake,
+      type: 'insufficientStake',
     };
   }
   if ('FunctionCallError' in kind) {
     return {
-      type: 'functionCallError',
       error: mapRpcFunctionCallError(kind.FunctionCallError),
+      type: 'functionCallError',
     };
   }
   if ('NewReceiptValidationError' in kind) {
     return {
-      type: 'newReceiptValidationError',
       error: mapRpcNewReceiptValidationError(kind.NewReceiptValidationError),
+      type: 'newReceiptValidationError',
     };
   }
   if ('OnlyImplicitAccountCreationAllowed' in kind) {
     return {
-      type: 'onlyImplicitAccountCreationAllowed',
       accountId: kind.OnlyImplicitAccountCreationAllowed.account_id,
+      type: 'onlyImplicitAccountCreationAllowed',
     };
   }
   if ('DeleteAccountWithLargeState' in kind) {
     return {
-      type: 'deleteAccountWithLargeState',
       accountId: kind.DeleteAccountWithLargeState.account_id,
+      type: 'deleteAccountWithLargeState',
     };
   }
   return UNKNOWN_ERROR;
@@ -688,40 +688,40 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   const UNKNOWN_ERROR = { type: 'unknown' };
   if ('InvalidAccessKeyError' in error) {
     return {
-      type: 'invalidAccessKeyError',
       error: mapRpcInvalidAccessKeyError(error.InvalidAccessKeyError),
+      type: 'invalidAccessKeyError',
     };
   }
   if ('InvalidSignerId' in error) {
     return {
-      type: 'invalidSignerId',
       signerId: error.InvalidSignerId.signer_id,
+      type: 'invalidSignerId',
     };
   }
   if ('SignerDoesNotExist' in error) {
     return {
-      type: 'signerDoesNotExist',
       signerId: error.SignerDoesNotExist.signer_id,
+      type: 'signerDoesNotExist',
     };
   }
   if ('InvalidNonce' in error) {
     return {
-      type: 'invalidNonce',
-      transactionNonce: error.InvalidNonce.tx_nonce,
       akNonce: error.InvalidNonce.ak_nonce,
+      transactionNonce: error.InvalidNonce.tx_nonce,
+      type: 'invalidNonce',
     };
   }
   if ('NonceTooLarge' in error) {
     return {
-      type: 'nonceTooLarge',
       transactionNonce: error.NonceTooLarge.tx_nonce,
+      type: 'nonceTooLarge',
       upperBound: error.NonceTooLarge.upper_bound,
     };
   }
   if ('InvalidReceiverId' in error) {
     return {
-      type: 'invalidReceiverId',
       receiverId: error.InvalidReceiverId.receiver_id,
+      type: 'invalidReceiverId',
     };
   }
   if ('InvalidSignature' in error) {
@@ -731,17 +731,17 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   }
   if ('NotEnoughBalance' in error) {
     return {
-      type: 'notEnoughBalance',
-      signerId: error.NotEnoughBalance.signer_id,
       balance: error.NotEnoughBalance.balance,
       cost: error.NotEnoughBalance.cost,
+      signerId: error.NotEnoughBalance.signer_id,
+      type: 'notEnoughBalance',
     };
   }
   if ('LackBalanceForState' in error) {
     return {
-      type: 'lackBalanceForState',
-      signerId: error.LackBalanceForState.signer_id,
       amount: error.LackBalanceForState.amount,
+      signerId: error.LackBalanceForState.signer_id,
+      type: 'lackBalanceForState',
     };
   }
   if ('CostOverflow' in error) {
@@ -766,9 +766,9 @@ export function mapRpcReceiptInvalidTxError(error: InvalidTxError) {
   }
   if ('TransactionSizeExceeded' in error) {
     return {
-      type: 'transactionSizeExceeded',
-      size: error.TransactionSizeExceeded.size,
       limit: error.TransactionSizeExceeded.limit,
+      size: error.TransactionSizeExceeded.size,
+      type: 'transactionSizeExceeded',
     };
   }
   return UNKNOWN_ERROR;
@@ -778,14 +778,14 @@ export function mapRpcReceiptError(error: TxExecutionError) {
   let UNKNOWN_ERROR = { type: 'unknown' };
   if ('ActionError' in error) {
     return {
-      type: 'action',
       error: mapRpcReceiptActionError(error.ActionError),
+      type: 'action',
     };
   }
   if ('InvalidTxError' in error) {
     return {
-      type: 'transaction',
       error: mapRpcReceiptInvalidTxError(error.InvalidTxError),
+      type: 'transaction',
     };
   }
   return UNKNOWN_ERROR;
@@ -796,10 +796,10 @@ export function mapRpcReceiptStatus(status: ExecutionStatusView) {
     return { type: 'successValue', value: status.SuccessValue };
   }
   if ('SuccessReceiptId' in status) {
-    return { type: 'successReceiptId', receiptId: status.SuccessReceiptId };
+    return { receiptId: status.SuccessReceiptId, type: 'successReceiptId' };
   }
   if ('Failure' in status) {
-    return { type: 'failure', error: mapRpcReceiptError(status.Failure) };
+    return { error: mapRpcReceiptError(status.Failure), type: 'failure' };
   }
   return { type: 'unknown' };
 }
@@ -807,7 +807,6 @@ export function mapRpcReceiptStatus(status: ExecutionStatusView) {
 export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
   if (typeof rpcAction === 'object' && 'Delegate' in rpcAction) {
     return {
-      kind: 'delegateAction',
       args: {
         actions: rpcAction.Delegate.delegate_action.actions.map(
           (subaction: NonDelegateActionView, index: number) => ({
@@ -818,6 +817,7 @@ export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
         receiverId: rpcAction.Delegate.delegate_action.receiver_id,
         senderId: rpcAction.Delegate.delegate_action.sender_id,
       },
+      kind: 'delegateAction',
     };
   }
   return mapNonDelegateRpcActionToAction(rpcAction);
@@ -826,10 +826,10 @@ export function mapRpcActionToAction1(rpcAction: NonDelegateActionView) {
 export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
   return {
     blockHash: outcome.block_hash,
-    tokensBurnt: outcome.outcome.tokens_burnt,
     gasBurnt: outcome.outcome.gas_burnt,
-    status: mapRpcReceiptStatus(outcome.outcome.status),
     logs: outcome.outcome.logs,
     receiptIds: outcome.outcome.receipt_ids,
+    status: mapRpcReceiptStatus(outcome.outcome.status),
+    tokensBurnt: outcome.outcome.tokens_burnt,
   };
 }

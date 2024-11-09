@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 const useLoading = () => {
   const [loading, setLoading] = useState(false);

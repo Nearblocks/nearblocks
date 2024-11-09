@@ -1,6 +1,7 @@
 'use client';
-import Export from '@/components/app/Export';
 import { useSearchParams } from 'next/navigation';
+
+import Export from '@/components/app/Export';
 
 export default function NftTokenExportData() {
   const searchParams = useSearchParams();
@@ -19,9 +20,9 @@ export default function NftTokenExportData() {
     <div className="relative">
       {address && (
         <Export
+          exportType={'tokentransactions'}
           id={address}
           onHandleDowload={onHandleDowload}
-          exportType={'tokentransactions'}
         />
       )}
     </div>

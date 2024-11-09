@@ -1,6 +1,7 @@
 import { EventPropsInfo } from '@/utils/types';
-import WrapDeposit from './WrapDeposit';
+
 import Withdraw from './Withdraw';
+import WrapDeposit from './WrapDeposit';
 
 const WrapContract = (props: EventPropsInfo) => {
   switch (true) {

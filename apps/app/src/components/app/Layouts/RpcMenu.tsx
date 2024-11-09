@@ -1,11 +1,13 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import Rpc from '../Icons/Rpc';
+
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
+
 import ArrowDown from '../Icons/ArrowDown';
 import Check from '../Icons/Check';
-import { useRpcStore } from '@/stores/app/rpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { useRouter } from 'next/navigation';
+import Rpc from '../Icons/Rpc';
 
 const RpcMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +29,7 @@ const RpcMenu = () => {
     return useRpcStore((state) => state);
   };
 
-  const { setRpc, rpc: rpcUrl } = useRpcStoreWithProviders();
+  const { rpc: rpcUrl, setRpc } = useRpcStoreWithProviders();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -73,12 +75,12 @@ const RpcMenu = () => {
         <ul className=" hidden group-hover:block  w-36 bg-white dark:bg-black-600 border border-gray-300 dark:border-black-200 rounded-md soft-shadow">
           {RpcProviders.map((provider) => (
             <li
-              key={provider.url}
               className={`flex justify-between items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-black-500 hover:text-green-400 dark:hover:text-green-250 dark:text-neargray-10 ${
                 provider.url === rpcUrl
                   ? 'bg-gray-100 dark:bg-black-500 text-green-500 dark:!text-green-250'
                   : ''
               }`}
+              key={provider.url}
               onClick={() => handleSelect(provider.url)}
             >
               {' '}

@@ -1,7 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 import FaUser from '@/components/Icons/FaUser';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
-import { useTranslations } from 'next-intl';
 
 const CreateAccount = (props: any) => {
   const t = useTranslations();
@@ -10,8 +11,8 @@ const CreateAccount = (props: any) => {
       <FaUser className="inline-flex text-emerald-400 mr-1" />{' '}
       {t ? t('txn.actions.createAccount.0') : 'New account'} (
       <Link
-        href={`/address/${props.receiver}`}
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
+        href={`/address/${props.receiver}`}
       >
         {shortenAddress(props.receiver)}
       </Link>

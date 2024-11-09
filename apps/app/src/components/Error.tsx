@@ -1,5 +1,6 @@
-import { Link } from '@/i18n/routing';
 import Head from 'next/head';
+
+import { Link } from '@/i18n/routing';
 
 export const Content = () => {
   return (

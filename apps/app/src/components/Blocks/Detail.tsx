@@ -1,3 +1,7 @@
+import { useTranslations } from 'next-intl';
+
+import { Link } from '@/i18n/routing';
+import { networkId } from '@/utils/config';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -7,25 +11,23 @@ import {
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
-import ErrorMessage from '../common/ErrorMessage';
-import FileSlash from '../Icons/FileSlash';
 import { gasPrice } from '@/utils/near';
 import { BlocksInfo } from '@/utils/types';
-import { networkId } from '@/utils/config';
-import ListCheck from '../Icons/ListCheck';
+
+import ErrorMessage from '../common/ErrorMessage';
 import FaCheckCircle from '../Icons/FaCheckCircle';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import FileSlash from '../Icons/FileSlash';
+import ListCheck from '../Icons/ListCheck';
 
 interface Props {
-  hash: string;
   blockInfo?: any;
   error: boolean;
+  hash: string;
   price: string;
 }
 
 const Details = (props: Props) => {
-  const { hash, blockInfo, price, error } = props;
+  const { blockInfo, error, hash, price } = props;
   const t = useTranslations();
 
   interface Props {
@@ -35,8 +37,8 @@ const Details = (props: Props) => {
 
   const LinkWrapper = (props: Props) => (
     <Link
-      href={props.href}
       className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 text-green-500 dark:text-green-250 hover:text-white text-xs px-2 py-1 rounded-xl hover:no-underline"
+      href={props.href}
     >
       {props.children}
     </Link>
@@ -56,7 +58,7 @@ const Details = (props: Props) => {
           {t ? (
             <>
               {t('block.heading.0')}
-              <span key={1} className="font-semibold pl-1">
+              <span className="font-semibold pl-1" key={1}>
                 {t('block.heading.1', {
                   block: block?.block_height
                     ? localFormat(block?.block_height?.toString())
@@ -67,7 +69,7 @@ const Details = (props: Props) => {
           ) : (
             <>
               Block
-              <span key={1} className="font-semibold">
+              <span className="font-semibold" key={1}>
                 #
                 {block?.block_height
                   ? localFormat(block?.block_height?.toString())
@@ -209,8 +211,8 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  href={`/address/${block?.author_account_id}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/address/${block?.author_account_id}`}
                 >
                   {block?.author_account_id}
                 </Link>
@@ -263,8 +265,8 @@ const Details = (props: Props) => {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  href={`/blocks/${block?.prev_block_hash}`}
                   className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/blocks/${block?.prev_block_hash}`}
                 >
                   {block?.prev_block_hash}
                 </Link>

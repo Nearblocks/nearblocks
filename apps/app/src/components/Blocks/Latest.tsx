@@ -1,17 +1,19 @@
+import { Tooltip } from '@reach/tooltip';
+import { useTranslations } from 'next-intl';
 import React from 'react';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import Skeleton from '../skeleton/common/Skeleton';
-import { BlocksInfo } from '@/utils/types';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
+import { Link } from '@/i18n/routing';
 import {
   convertToMetricPrefix,
   getTimeAgoString,
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
-import { Tooltip } from '@reach/tooltip';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { BlocksInfo } from '@/utils/types';
+
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
   blocks: BlocksInfo[];
@@ -93,8 +95,8 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                       <div className="overflow-hidden pl-2">
                         <div className="text-green-500 dark:text-green-250 text-sm font-medium ">
                           <Link
-                            href={`/blocks/${block?.block_hash}`}
                             className="text-green-500 dark:text-green-250 hover:no-underline"
+                            href={`/blocks/${block?.block_hash}`}
                           >
                             {block?.block_height
                               ? localFormat(block?.block_height)
@@ -118,8 +120,8 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                         {t ? t('blockMiner') : 'Author'}&nbsp;
                       </span>
                       <Link
-                        href={`/address/${block?.author_account_id}`}
                         className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                        href={`/address/${block?.author_account_id}`}
                       >
                         <span>{block?.author_account_id}</span>
                       </Link>
@@ -132,8 +134,8 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">
                       <Tooltip
-                        label="Gas used"
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
+                        label="Gas used"
                       >
                         <span className="u-label--badge-in text-nearblue-700 truncate">
                           {block?.chunks_agg?.gas_used

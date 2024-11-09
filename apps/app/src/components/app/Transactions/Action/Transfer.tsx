@@ -6,12 +6,12 @@ const Transfer = (props: ActionPropsInfo) => {
   const FaRight = (props: { className: string }) => {
     return (
       <svg
-        stroke="currentColor"
+        className={props.className}
         fill="currentColor"
+        height="1em"
+        stroke="currentColor"
         stroke-width="0"
         viewBox="0 0 192 512"
-        className={props.className}
-        height="1em"
         width="1em"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -31,8 +31,8 @@ const Transfer = (props: ActionPropsInfo) => {
       <span className="font-bold text-gray px-1">
         From{' '}
         <Link
-          href={`/address/${props.action.from}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+          href={`/address/${props.action.from}`}
         >
           {shortenAddress(props.action.from)}
         </Link>
@@ -40,8 +40,8 @@ const Transfer = (props: ActionPropsInfo) => {
       <span className="font-bold text-gray px-1">
         To{' '}
         <Link
-          href={`/address/${props.action.to}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+          href={`/address/${props.action.to}`}
         >
           {shortenAddress(props.action.to)}
         </Link>

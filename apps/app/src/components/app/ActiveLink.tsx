@@ -1,25 +1,27 @@
-import { Link, usePathname } from '@/i18n/routing';
-import React, { Children, ReactElement, ReactNode } from 'react';
 import { UrlObject } from 'url';
 
+import React, { Children, ReactElement, ReactNode } from 'react';
+
+import { Link, usePathname } from '@/i18n/routing';
+
 type LinkProps = Omit<typeof Link, 'locale'> & {
-  locale?: any;
   className?: any;
   legacyBehavior?: boolean;
+  locale?: any;
 };
 
 interface ActiveLinkProps extends LinkProps {
-  children: ReactNode;
   activeClassName?: string;
-  inActiveClassName?: string;
+  children: ReactNode;
   href: string | UrlObject;
+  inActiveClassName?: string;
 }
 
 const ActiveLink = ({
-  children,
   activeClassName,
-  inActiveClassName,
+  children,
   href,
+  inActiveClassName,
   legacyBehavior,
   ...props
 }: ActiveLinkProps) => {

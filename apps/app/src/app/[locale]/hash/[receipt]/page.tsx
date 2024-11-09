@@ -1,5 +1,8 @@
-import { getRequest } from '@/utils/app/api';
+export const runtime = 'edge';
+
 import { notFound, redirect } from 'next/navigation';
+
+import { getRequest } from '@/utils/app/api';
 
 export default async function ReceiptPage({
   params: { receipt },
