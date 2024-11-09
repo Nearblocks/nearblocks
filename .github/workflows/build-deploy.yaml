@@ -94,35 +94,31 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          service_list=$(echo '${{ needs.build.outputs.matrix-result }}')
-
+          # Define the list of services for testnet deployment (without app-lite)
+          services=(api app backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
           failed_deployments=()
 
-          for service in $(echo $service_list | jq -r 'keys[]'); do
-            # Get the SHA for the current service
-            service_sha=$(echo $service_list | jq -r ".\"$service\"")
+          for service in "${services[@]}"; do
+            service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-            echo "Service: $service"
-            echo "Service SHA: $service_sha"
-
-            # If SHA is valid, update the deployment for that service
-            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+            # Ensure service_sha is valid before updating deployment
+            if [[ -n "$service" && -n "$service_sha" && "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
-              echo "Updating deployment for $deployment_name"
-              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
+              image_name="ghcr.io/nearblocks/$service:$service_sha"
+              echo "Updating deployment for $deployment_name with image: $image_name"
 
-              # Verify the rollout status for the deployment
+              kubectl set image deployment/$deployment_name $service=$image_name
+
               echo "Verifying rollout for $deployment_name"
-              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+              if ! kubectl rollout status deployment/$deployment_name --timeout=600s; then
                 echo "Rollout failed for $deployment_name"
                 failed_deployments+=("$deployment_name")
               fi
             else
-              echo "Skipping deployment for testnet-$service (no updates)"
+              echo "Skipping deployment for testnet-$service (no updates or invalid SHA)"
             fi
           done
 
-          # If there are failed deployments, print them and exit with an error
           if [ ${#failed_deployments[@]} -ne 0 ]; then
             echo "The following deployments failed:"
             printf '%s\n' "${failed_deployments[@]}"
@@ -134,11 +130,12 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-multichain explorer-selector aggregates)
+          # Services to rollback for testnet
+          services=(api app backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
-            
+
             if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               deployment_name="testnet-$service"
               echo "Attempting rollback for $deployment_name"
@@ -150,24 +147,35 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
+          # Define the list of services for mainnet deployment (includes app-lite)
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
           failed_deployments=()
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
-              deployment_name="mainnet-$service"
-              echo "Updating deployment for $deployment_name"
-              kubectl set image deployment/$deployment_name $service=ghcr.io/nearblocks/$service:$service_sha
+            # Ensure service_sha is valid before updating deployment
+            if [[ -n "$service" && -n "$service_sha" && "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+
+              # Adjust the deployment name for app-lite specifically
+              if [[ "$service" == "app-lite" ]]; then
+                deployment_name="mainnet-lite-lite"
+              else
+                deployment_name="mainnet-$service"
+              fi
+
+              image_name="ghcr.io/nearblocks/$service:$service_sha"
+              echo "Updating deployment for $deployment_name with image: $image_name"
+
+              kubectl set image deployment/$deployment_name $service=$image_name
 
               echo "Verifying rollout for $deployment_name"
-              if ! kubectl rollout status deployment/$deployment_name --timeout=300s; then
+              if ! kubectl rollout status deployment/$deployment_name --timeout=600s; then
                 echo "Rollout failed for $deployment_name"
                 failed_deployments+=("$deployment_name")
               fi
             else
-              echo "Skipping deployment for mainnet-$service (no updates)"
+              echo "Skipping deployment for mainnet-$service (no updates or invalid SHA)"
             fi
           done
 
@@ -182,13 +190,20 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
+          # Services to rollback for mainnet (includes app-lite with specific name)
           services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
+            # Adjust rollback deployment name for app-lite specifically
+            if [[ "$service" == "app-lite" ]]; then
+              deployment_name="mainnet-lite-lite"
+            else
               deployment_name="mainnet-$service"
+            fi
+
+            if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               echo "Attempting rollback for $deployment_name"
               kubectl rollout undo deployment/$deployment_name
             fi
