@@ -22,12 +22,11 @@ export const Content = () => {
 export default function GlobalError({
   error,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
+  console.log(error);
 
-  console.log(error)
-  
   return (
     <html>
       <body>

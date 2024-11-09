@@ -66,7 +66,6 @@ export async function GET(request: Request) {
 
   const backgroundImage = svgToBase64(svgString);
 
-
   const topLogo = svgToBase64(thumbnailLogoTop());
   const bottomLogo = svgToBase64(thumbnailLogoBottom());
 

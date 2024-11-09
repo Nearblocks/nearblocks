@@ -2,7 +2,7 @@ const conf = {
   default: {
     style: {
       thumbnailBg: '#171717',
-    }
+    },
   },
   near: {
     style: {
