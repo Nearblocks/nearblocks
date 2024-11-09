@@ -24,8 +24,10 @@ const Txn: PageLayout = () => {
   return (
     <>
       <Meta
-        description={`Near Blockchain detailed info for transaction ${hash}.`}
-        title={`Near Transaction ${hash} | NearBlocks Lite`}
+        description={`Near Blockchain detailed info for transaction ${
+          hash ?? ''
+        }.`}
+        title={`Near Transaction ${hash ?? ''} | NearBlocks Lite`}
       />
       <div className="relative">
         <div className="absolute inset-0" ref={loader}>
