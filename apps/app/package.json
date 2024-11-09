@@ -115,5 +115,8 @@
     "tailwindcss": "~3.3",
     "typescript": "~5.2",
     "vercel": "^37.14.0"
+  },
+  "engines": {
+    "node": "^18.18 || >=20"
   }
 }
