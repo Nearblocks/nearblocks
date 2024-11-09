@@ -12,7 +12,6 @@ jobs:
           [
             api,
             app,
-            app-lite,
             backend,
             indexer-balance,
             indexer-base,
@@ -95,7 +94,7 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks-testnet
 
-          # Define the list of services for testnet deployment (without app-lite)
+          # Define the list of services for testnet deployment
           services=(api app backend indexer-balance indexer-base indexer-events explorer-selector aggregates)
           failed_deployments=()
 
@@ -148,8 +147,8 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
-          # Define the list of services for mainnet deployment (includes app-lite)
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
+          # Define the list of services for mainnet deployment
+          services=(api app backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
           failed_deployments=()
 
           for service in "${services[@]}"; do
@@ -158,12 +157,7 @@ jobs:
             # Ensure service_sha is valid before updating deployment
             if [[ -n "$service" && -n "$service_sha" && "$service_sha" != "false" && "$service_sha" != "null" ]]; then
 
-              # Adjust the deployment name for app-lite specifically
-              if [[ "$service" == "app-lite" ]]; then
-                deployment_name="mainnet-lite-lite"
-              else
-                deployment_name="mainnet-$service"
-              fi
+              deployment_name="mainnet-$service"
 
               image_name="ghcr.io/nearblocks/$service:$service_sha"
               echo "Updating deployment for $deployment_name with image: $image_name"
@@ -191,18 +185,13 @@ jobs:
         run: |
           kubectl config set-context --current --namespace=nearblocks
 
-          # Services to rollback for mainnet (includes app-lite with specific name)
-          services=(api app app-lite backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
+          # Services to rollback for mainnet
+          services=(api app backend indexer-balance indexer-base indexer-events indexer-dex indexer-multichain explorer-selector aggregates)
 
           for service in "${services[@]}"; do
             service_sha=$(echo '${{ needs.build.outputs.matrix-result }}' | jq -r ".[\"$service\"]")
 
-            # Adjust rollback deployment name for app-lite specifically
-            if [[ "$service" == "app-lite" ]]; then
-              deployment_name="mainnet-lite-lite"
-            else
-              deployment_name="mainnet-$service"
-            fi
+            deployment_name="mainnet-$service"
 
             if [[ "$service_sha" != "false" && "$service_sha" != "null" ]]; then
               echo "Attempting rollback for $deployment_name"

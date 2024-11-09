@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "lint:check": "tsc --noEmit && eslint ./",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "pages:build && wrangler pages dev",
+    "deploy": "pages:build && wrangler pages deploy"
   },
   "dependencies": {
     "ahooks": "3.7.11",
@@ -17,24 +20,26 @@
     "ieee754": "1.2.1",
     "near-social-vm": "github:NearSocial/VM#2.6.1",
     "next": "13.3.4",
-    "next-runtime-env": "1.7.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "zustand": "4.5.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.5",
     "@types/big.js": "~6.2",
     "@types/node": "~20.8",
     "@types/react": "~18.2",
     "@types/react-dom": "~18.2",
     "autoprefixer": "~10.4",
     "eslint-config-custom-next": "*",
+    "eslint-plugin-next-on-pages": "^1.13.5",
     "nb-near": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "postcss": "~8.4",
     "tailwindcss": "~3.4",
-    "typescript": "~5.2"
+    "typescript": "~5.2",
+    "vercel": "^37.14.0"
   },
   "resolutions": {
     "react-singleton-hook": "4.0.1"
