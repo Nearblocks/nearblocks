@@ -5,6 +5,7 @@
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "dependsOn": ["^build"],
       "env": [
         "NEXT_PUBLIC_NETWORK_ID",
         "NEXT_PUBLIC_ACCOUNT_ID",
@@ -34,6 +35,7 @@
     },
     "pages:build": {
       "outputs": [".vercel/output/static/**"],
+      "dependsOn": ["^build"],
       "env": [
         "NEXT_PUBLIC_NETWORK_ID",
         "NEXT_PUBLIC_ACCOUNT_ID",
