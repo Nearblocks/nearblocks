@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withNextIntl({
+  experimental: {
+    instrumentationHook: true,
+  },
   async redirects() {
     return [
       {
