@@ -3,6 +3,8 @@ compatibility_date = "2024-07-29"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
 
+[env.testnet]
+workers_dev = true
 [env.testnet.vars]
 NEXT_PUBLIC_NETWORK_ID = "testnet"
 NEXT_PUBLIC_BOS_NETWORK = "testnet"
