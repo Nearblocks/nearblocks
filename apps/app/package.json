@@ -49,7 +49,6 @@
     "@reach/dialog": "^0.18.0",
     "@reach/menu-button": "^0.18.0",
     "@reach/tooltip": "^0.18.0",
-    "@sentry/nextjs": "^8",
     "@vercel/og": "^0.6.3",
     "@vercel/otel": "^1.10.0",
     "@web3-onboard/core": "2.21.2",

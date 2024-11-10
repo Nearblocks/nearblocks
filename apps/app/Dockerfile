@@ -29,7 +29,6 @@ COPY --from=installer /app/apps/app/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
 COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/static ./apps/app/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/app/generate-env.js ./apps/app/generate-env.js
 COPY --from=builder --chown=nextjs:nodejs /app/apps/app/entrypoint.sh ./apps/app/entrypoint.sh
 
 RUN chmod +x /app/apps/app/entrypoint.sh
