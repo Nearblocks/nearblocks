@@ -9,7 +9,6 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
-import { circulatingSupply } from '#libs/supply';
 
 type RawResp = {
   rows: CountResp[];
@@ -69,7 +68,11 @@ const blockData = async (day: Dayjs) => {
   let supply: null | string = null;
 
   if (config.network === Network.MAINNET && lastBlock) {
-    supply = await circulatingSupply(lastBlock, config.rpcUrl);
+    const stats = await knex('stats').first();
+
+    if (stats) {
+      supply = stats?.circulating_supply;
+    }
   }
 
   return {
