@@ -275,7 +275,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                       </div>
 
                       <div
-                        ref={(el) => (codeContainerRefs.current[name] = el)}
+                        ref={(el) => {
+                          codeContainerRefs.current[name] = el;
+                        }}
                         style={{
                           height: `${codeHeights[name] || 300}px`,
                         }}
