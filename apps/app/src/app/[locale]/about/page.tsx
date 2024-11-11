@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { getTranslations } from 'next-intl/server';
-
+//
 export default async function About({
   params: { locale },
 }: {
