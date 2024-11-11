@@ -12,6 +12,7 @@ const baseUrl =
 
 const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const { type } = req.query;
+  // prettier-ignore
   const query = userSql<Campaign[]>`
     WITH
       valid_ads AS (
@@ -106,6 +107,7 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
+  // prettier-ignore
   const query = userSql<Campaign[]>`
     WITH
       valid_ads AS (
