@@ -26,12 +26,12 @@ const Tree = (props: Props) => {
 
     if (
       receipts?.length === 0 ||
-      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
+      receipts?.[0]?.receipt_id !== receiptsOutcome?.[0]?.id
     ) {
       receipts?.unshift({
         predecessor_id: txn?.transaction?.signer_id,
         receipt: actions,
-        receipt_id: receiptsOutcome[0]?.id,
+        receipt_id: receiptsOutcome?.[0]?.id,
         receiver_id: txn?.transaction?.receiver_id,
       });
     }
@@ -74,7 +74,7 @@ const Tree = (props: Props) => {
       };
     };
 
-    return collectReceipts(receiptsOutcome[0]?.id);
+    return collectReceipts(receiptsOutcome?.[0]?.id);
   }
 
   useEffect(() => {
