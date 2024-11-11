@@ -47,6 +47,7 @@ import FaRight from '@/components/Icons/FaRight';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import { useConfig } from '@/hooks/app/useConfig';
+import Bolt from '../Icons/Bolt';
 
 interface Props {
   loading: boolean;
@@ -794,7 +795,7 @@ const Details = (props: Props) => {
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                 >
                   <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
+                    <Bolt className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
                 Transaction Actions

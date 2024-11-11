@@ -9,6 +9,7 @@ import Script from 'next/script';
 import { PublicEnvProvider } from 'next-runtime-env';
 import { ToastContainer } from 'react-toastify';
 import { cookies } from 'next/headers';
+import { revalidateTag } from 'next/cache';
 
 interface LayoutProps {
   children: ReactNode;
@@ -26,8 +27,12 @@ const Layout = async ({ children }: LayoutProps) => {
   const messages = await getMessages();
   const theme = cookies().get('theme')?.value || 'light';
   const [stats, blocks] = await Promise.all([
-    getRequest(`stats`),
-    getRequest(`blocks/latest?limit=1`),
+    getRequest(`stats`, {}, { next: { revalidate: 300, tags: ['stats'] } }),
+    getRequest(
+      `blocks/latest`,
+      { limit: 1 },
+      { next: { revalidate: 0, tags: ['latestBlocks'] } },
+    ),
   ]);
 
   const handleFilterAndKeyword = async (
@@ -84,6 +89,11 @@ const Layout = async ({ children }: LayoutProps) => {
     return returnPath ? null : data;
   };
 
+  const handleRevalidate = async () => {
+    'use server';
+    revalidateTag('stats');
+    revalidateTag('latestBlocks');
+  };
   return (
     <html
       className={`${manrope.className} ${theme}`}
@@ -140,6 +150,7 @@ const Layout = async ({ children }: LayoutProps) => {
             <LayoutActions
               stats={stats}
               blocks={blocks}
+              handleRevalidate={handleRevalidate}
               handleFilterAndKeyword={handleFilterAndKeyword}
               theme={theme}
             >

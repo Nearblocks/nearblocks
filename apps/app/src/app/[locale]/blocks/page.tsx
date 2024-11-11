@@ -16,7 +16,7 @@ export default async function Blocks({
     <>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-white text-lg font-medium">
             {t('blockHeading') || 'Latest Near Protocol Blocks'}
           </h1>
         </div>
@@ -34,5 +34,3 @@ export default async function Blocks({
     </>
   );
 }
-
-export const revalidate = 20;

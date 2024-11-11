@@ -1,15 +1,15 @@
 import { getRequest } from '@/utils/app/api';
 import FTTransfersActions from './FTTransfersActions';
-import QueryString from 'qs';
 
 const Transfers = async ({ searchParams }: any) => {
-  const apiUrl = 'fts/txns';
-  const fetchUrl = `${apiUrl}?${QueryString.stringify(searchParams)}`;
+  const options = {
+    cache: 'no-store',
+  };
 
   const [data, dataCount, syncDetails] = await Promise.all([
-    getRequest(fetchUrl),
-    getRequest('fts/txns/count'),
-    getRequest('sync/status'),
+    getRequest('fts/txns', searchParams, options),
+    getRequest('fts/txns/count', searchParams, options),
+    getRequest('sync/status', searchParams, options),
   ]);
 
   const status = syncDetails?.status?.indexers?.events || {

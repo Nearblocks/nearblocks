@@ -3,13 +3,14 @@ import '../../public/common.css';
 import { unstable_setRequestLocale } from 'next-intl/server';
 import { Viewport } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 interface paramTypes {
   children: React.ReactNode;
   params: { locale: string };
 }
 
 export const viewport: Viewport = {
-  initialScale: 0,
   userScalable: false,
   width: 'device-width',
 };
@@ -22,7 +23,3 @@ export default async function RootLayout({
 
   return [children];
 }
-
-export const revalidate = 5;
-
-export const dynamic = 'force-dynamic';

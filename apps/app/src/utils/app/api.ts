@@ -7,7 +7,7 @@ const baseURL = process.env.API_URL;
 export const getRequest = async (
   path: string,
   params = {},
-  customHeaders: Record<string, string> = {},
+  options?: {},
   useBase: boolean = true,
 ) => {
   const queryParams = qs.stringify(params, { encode: true });
@@ -15,13 +15,12 @@ export const getRequest = async (
     ? `${baseURL}${path}${queryParams ? `?${queryParams}` : ''}`
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
-  const headers: Record<string, string> = {
+  const headers = new Headers({
     Authorization: `Bearer ${fetchKey}`,
-    ...customHeaders,
-  };
+  });
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: headers, ...options });
 
     if (!response.ok) {
       return null;
@@ -30,6 +29,7 @@ export const getRequest = async (
     return response.json();
   } catch (error) {
     console.error(`Error fetching ${url}:`, error);
+
     throw error;
   }
 };

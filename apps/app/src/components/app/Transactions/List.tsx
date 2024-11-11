@@ -1,10 +1,17 @@
 import { getRequest } from '@/utils/app/api';
 import ListActions from './ListActions';
 
-const List = async ({ searchParams }: any) => {
+const List = async ({
+  searchParams,
+}: {
+  searchParams: { cursor?: string; p?: string; order: string };
+}) => {
+  const options = {
+    cache: 'no-store',
+  };
   const [data, count] = await Promise.all([
-    getRequest(`txns`, searchParams),
-    getRequest(`txns/count`, searchParams),
+    getRequest(`txns`, searchParams, options),
+    getRequest(`txns/count`, {}, options),
   ]);
 
   return (

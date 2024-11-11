@@ -10,6 +10,7 @@ interface LayoutProps {
   notice?: ReactNode;
   stats: any;
   blocks: any;
+  handleRevalidate: any;
   handleFilterAndKeyword: any;
   theme?: string;
 }
@@ -19,6 +20,7 @@ const LayoutActions = ({
   blocks,
   stats,
   notice,
+  handleRevalidate,
   handleFilterAndKeyword,
   theme,
 }: LayoutProps) => {
@@ -33,14 +35,15 @@ const LayoutActions = ({
     <div className={className}>
       <NextTopLoader color={`${(theme as string) ? '#31766A' : '#0D494A'}`} />
       {notice}
-      <header>
-        <Header
-          stats={stats}
-          block={blocks}
-          handleFilterAndKeyword={handleFilterAndKeyword}
-          theme={theme}
-        />
-      </header>
+
+      <Header
+        stats={stats}
+        block={blocks}
+        handleRevalidate={handleRevalidate}
+        handleFilterAndKeyword={handleFilterAndKeyword}
+        theme={theme}
+      />
+
       <main>{children}</main>
       <Footer theme={theme} />
     </div>

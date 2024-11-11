@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Skeleton from './skeleton/common/Skeleton';
 import { useEnvContext } from 'next-runtime-env';
 
 const SponserdText: React.FC<any> = () => {
@@ -18,7 +17,6 @@ const SponserdText: React.FC<any> = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Use a promise-based approach to fetch HTML content
   useEffect(() => {
     const fetchHtmlContent = async () => {
       try {
@@ -57,7 +55,7 @@ const SponserdText: React.FC<any> = () => {
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
           </div>
         ) : (
-          <Skeleton className="h-6 w-1/2" />
+          <div className="h-6 w-1/2" />
         )}
       </div>
     );

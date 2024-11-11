@@ -1,17 +1,15 @@
-import QueryString from 'qs';
 import NFTTransfersActions from './NFTTransfersActions';
 import { getRequest } from '@/utils/app/api';
 
 const TransfersList = async ({ searchParams }: any) => {
-  const apiUrl = 'nfts/txns';
-  const fetchUrl = searchParams
-    ? `nfts/txns?${QueryString.stringify(searchParams)}`
-    : `${apiUrl}`;
+  const options = {
+    cache: 'no-store',
+  };
 
   const [data, dataCount, syncDetails] = await Promise.all([
-    getRequest(fetchUrl),
-    getRequest('nfts/txns/count'),
-    getRequest('sync/status'),
+    getRequest('nfts/txns', searchParams, options),
+    getRequest('nfts/txns/count', searchParams, options),
+    getRequest('sync/status', searchParams, options),
   ]);
 
   const status = syncDetails?.status?.indexers?.events || {
@@ -29,5 +27,3 @@ const TransfersList = async ({ searchParams }: any) => {
   );
 };
 export default TransfersList;
-
-export const revalidate = 5;

@@ -32,7 +32,8 @@ const CursorPaginator = (props: PaginatorProps) => {
     params.delete('cursor');
     params.delete('page');
     const newUrl = `${pathname}?${params.toString()}`;
-    intlRouter.replace(newUrl, { scroll: false });
+    intlRouter.push(newUrl, { scroll: false });
+    intlRouter.refresh();
   };
 
   return (

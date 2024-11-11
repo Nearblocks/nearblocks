@@ -107,6 +107,20 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
 
   const onSelect = (item: any) => redirect(item);
 
+  useEffect(() => {
+    const handleKeyDown = (event: any) => {
+      if (event.key === '/') {
+        event.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        searchInput?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const onSubmit = async (event: any) => {
     event.preventDefault();
 
@@ -128,7 +142,7 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
 
   return (
     <form
-      className={`flex w-full ${header ? 'h-11' : 'h-12'}`}
+      className={`flex w-full ${header ? 'h-9' : 'h-12'}`}
       onSubmit={onSubmit}
     >
       <label className="relative hidden md:flex">
@@ -150,11 +164,12 @@ const Search = ({ header = false, handleFilterAndKeyword }: any) => {
             {t('search.filters.addresses') || 'Addresses'}
           </option>
         </select>
-        <ArrowDown className="absolute right-3 top-3.5 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
+        <ArrowDown className="absolute right-3 top-3 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
       </label>
 
       <Combobox className="flex-grow">
         <ComboboxInput
+          id="searchInput"
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }

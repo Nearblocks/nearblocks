@@ -17,7 +17,7 @@ export default async function TransactionList({
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
           <h1
-            className="mb-4 pt-8 sm:!text-2xl text-xl text-white"
+            className="mb-4 pt-8 sm:!text-2xl text-xl text-white font-medium"
             suppressHydrationWarning={true}
           >
             {t('txnsHeading') || 'Latest Near Protocol Transactions'}
@@ -37,5 +37,3 @@ export default async function TransactionList({
     </>
   );
 }
-
-export const revalidate = 10;

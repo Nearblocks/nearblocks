@@ -39,7 +39,7 @@ export async function generateMetadata({
   };
 }
 
-export default function HaseLayout({
+export default function AddressLayout({
   params: { id },
   children,
 }: {
@@ -58,7 +58,7 @@ export default function HaseLayout({
         <div className="flex items-center justify-between flex-wrap pt-4">
           <div className="flex md:flex-wrap w-full">
             <div className="flex justify-between md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
-              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2 ">
+              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 dark:text-white leading-8 px-2 font-medium">
                 Near Account:&nbsp;
                 {id && (
                   <span className="text-green-500 dark:text-green-250">
@@ -83,7 +83,7 @@ export default function HaseLayout({
                       <li className="pb-2">
                         <a
                           className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                          href={`https://validate.nearblocks.io/address/${id}?network=${networkId}`}
+                          href={`https://nearvalidate.org/address/${id}?network=${networkId}`}
                           target="_blank"
                         >
                           Validate Account
@@ -97,10 +97,10 @@ export default function HaseLayout({
                 </li>
               </ul>
             </div>
-            <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
-              <div className="min-h-[80px] md:min-h-[25px]">
-                <SponserdText />
-              </div>
+          </div>
+          <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
+            <div className="min-h-[80px] md:min-h-[25px]">
+              <SponserdText />
             </div>
           </div>
         </div>

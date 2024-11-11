@@ -60,5 +60,3 @@ export default async function HomeIndex({
 
   return <Home locale={locale} />;
 }
-
-export const revalidate = 5;
