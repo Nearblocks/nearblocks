@@ -8,14 +8,10 @@ const useHash = (): [string | undefined, (newHash: string) => void] => {
 
   const setHash = useCallback(
     (newHash: string) => {
-      push(
-        {
-          pathname: new URL(asPath, 'http://localhost/').pathname,
-          hash: newHash,
-        },
-        undefined,
-        { shallow: true },
-      );
+      if (asPath) {
+        const pathname = asPath.split('#')[0];
+        push({ pathname, hash: newHash }, undefined, { shallow: true });
+      }
     },
     [asPath, push],
   );

@@ -45,13 +45,13 @@ const Execution = (props: Props) => {
         const receipt = parseReceipt
           ? parseReceipt(
               txn.receipts.find(
-                (rpcReceipt) => rpcReceipt.receipt_id === receiptOutcome.id,
+                (rpcReceipt) => rpcReceipt?.receipt_id === receiptOutcome?.id,
               ),
               receiptOutcome,
               txn.transaction,
             )
           : '';
-        return mapping.set(receiptOutcome.id, {
+        return mapping.set(receiptOutcome?.id, {
           ...receipt,
           outcome: parseOutcomeOld ? parseOutcomeOld(receiptOutcome) : '',
         });
@@ -59,7 +59,7 @@ const Execution = (props: Props) => {
 
     const receipts = collectNestedReceiptWithOutcomeOld
       ? collectNestedReceiptWithOutcomeOld(
-          txn.transaction_outcome.outcome.receipt_ids[0],
+          txn?.transaction_outcome?.outcome?.receipt_ids[0],
           receiptsMap,
         )
       : '';
