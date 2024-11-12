@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KitWallet Discontinuation Notice</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #1e90ff;
+        --support-color: #00ec97;
+        --text-color: #333;
+        --background-color: #f0f0f0;
+        --btn-border-radius: 30px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+        font-family: 'Inter', 'Lato', sans-serif;
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: 75px 75px;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGeSURBVHgB7doxTisxEAbgeY/mvQro6NiSDo6QkpJbcA2OwjWooKQMJ2DpKENJBV7FEYoBeQSIZr9PGk2cItWvsdfZnSBjKHVf6rnUbdD1N8g4K7VX6jhIEaycofaTIEWwcoam0yFYOYe179WiQ7Byhk8+8wnB6munlHNWgmD1tUGyFSYIVl8bJFcOCYLV106s/aBrJ2hNE+qo1GmpRanz2J5aB6X+x/oQv/l+FWz5E/O1iHU4pom0W/u0/uoZahnrgN2VGuv6Jpidl1+o2T5BznkrfKj9MdZT6l9836r+3k2pq1KXMVNz3gpbU7hOmj49AQ7x/lJ0WWsK5xhv2+AYkHQR29vbddDluqFvbNZPQZdg9S07az4gWH3tHZVgJQhW3xjb4XIZyo+Z3nffHN79CZ1gYuXc1b4KEytFsHLGptMhWDlj7Q9BimDlbJ4Ex4AftggHdwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIpXoUVLSWulnzoAAAAASUVORK5CYII=);
+        background-repeat: repeat;
+        background-position: center top;
+        padding: 1px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 675px;
+        background-color: #fff;
+        padding: 24px;
+        margin: 72px auto;
+        border-radius: 8px;
+      }
+
+      h1 {
+        font-size: 48px;
+        line-height: 1.2;
+        margin-bottom: 15px;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 15px 0;
+      }
+
+      a {
+        color: var(--primary-color);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .buttons {
+        margin-top: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .buttons a {
+        display: inline-block;
+        padding: 12px 20px;
+        font-weight: bold;
+        font-size: 14px;
+        color: var(--text-color);
+        border: 1px solid var(--text-color);
+        border-radius: var(--btn-border-radius);
+        text-decoration: none;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      .buttons a:hover {
+        background-color: var(--text-color);
+        color: #fff;
+      }
+
+      .btn-support {
+        background-color: var(--support-color);
+        border-color: var(--support-color);
+      }
+
+      .btn-support:hover {
+        color: var(--text-color);
+      }
+
+      .footer {
+        padding: 20px;
+        text-align: center;
+        background-color: var(--background-color);
+        font-size: 0.9em;
+      }
+
+      .footer p {
+        margin: 0;
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          margin-top: 90px;
+          margin-bottom: 10rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="container">
+        <h1>KitWallet is being discontinued</h1>
+        <p>
+          KitWallet was an undocumented API widely used by wallets to find
+          users' FTs, NFTs, and accounts by public key.
+        </p>
+        <p>
+          While these endpoints will continue to be available, we suggest
+          migrating to alternative solutions such as
+          <a href="https://nearblocks.io/apis">NearBlocks API</a> or
+          <a href="https://github.com/fastnear/fastnear-api-server-rs"
+            >FastNear API</a
+          >.
+        </p>
+        <div class="buttons">
+          <a
+            href="https://api.nearblocks.io/api-docs/#/Kitwallet"
+            class="btn-doc"
+            >Documentation</a
+          >
+          <a
+            href="https://github.com/Nearblocks/nearblocks/issues"
+            class="btn-support"
+            >Get Support</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <p>
+        KitWallet API is maintained by the
+        <a href="https://nearblocks.io">NearBlocks</a> team
+      </p>
+    </div>
+  </body>
+</html>

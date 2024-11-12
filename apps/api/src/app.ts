@@ -15,7 +15,6 @@ import routes from '#routes/index';
 
 const file = fileURLToPath(import.meta.url);
 const dir = path.dirname(file);
-
 const app = express();
 
 app.set('x-powered-by', false);
@@ -44,6 +43,11 @@ app.set('trust proxy', 2);
 app.get('/ip', (req, res) => res.send(req.ip));
 
 app.use('/v1', routes());
+
+app.get('/v1/kitwallet', (_req, res) => {
+  const htmlFilePath = path.join(dir, '..', 'src', 'kitwallet', 'index.html');
+  res.sendFile(htmlFilePath);
+});
 
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ message: 'Not Found' });
