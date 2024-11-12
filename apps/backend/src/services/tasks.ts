@@ -10,9 +10,12 @@ import {
   ValidatorPoolInfo,
   ValidatorTelemetry,
 } from 'nb-types';
+import { msToNsTime } from 'nb-utils';
 
 import config from '#config';
+import dayjs from '#libs/dayjs';
 import db from '#libs/knex';
+import knex from '#libs/knex';
 import RPC from '#libs/near';
 import { validator } from '#libs/utils';
 import {
@@ -539,4 +542,38 @@ export const validatorsTelemetryCheck = async () => {
       JSON.stringify(nodes),
     );
   }
+};
+
+export const historicalMultiChainTxnUpdate = async () => {
+  const start = dayjs.utc('2024-07-25T19:10:09Z'); // Signer contract creation date
+
+  const end = dayjs.utc().startOf('day');
+
+  const diff = end.diff(start, 'day');
+
+  console.log(`Updating data from ${start.format()} to ${end.format()}`);
+
+  const days = Array.from({ length: diff }, (_, index) => index);
+
+  for (const day of days) {
+    const date = start.clone().add(day, 'day');
+    const startTimestamp = msToNsTime(date.startOf('day').valueOf());
+    const endTimestamp = msToNsTime(
+      date.add(1, 'day').startOf('day').valueOf(),
+    );
+
+    const multiChainTxns = await knex('multichain_transactions')
+      .where('block_timestamp', '>=', startTimestamp)
+      .where('block_timestamp', '<', endTimestamp)
+      .count()
+      .first();
+
+    await knex('daily_stats_new')
+      .where('date', date.format('YYYY-MM-DD'))
+      .update({ multichain_txns: multiChainTxns?.count?.toString() });
+
+    console.log(`Updated data for ${date.format('YYYY-MM-DD')}`);
+  }
+
+  console.log('Historical data update complete.');
 };

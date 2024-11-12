@@ -8,6 +8,7 @@ import { logger as log } from 'nb-logger';
 import knex from '#libs/knex';
 import redis from '#libs/redis';
 import sentry from '#libs/sentry';
+import { historicalMultiChainTxnUpdate } from '#services/tasks';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'jobs');
 
@@ -52,6 +53,7 @@ const bree = new Bree({ errorHandler, jobs, logger, root });
   try {
     log.info('jobs started');
     await bree.start();
+    await historicalMultiChainTxnUpdate();
   } catch (error) {
     log.error('aborting...');
     log.error(error);
