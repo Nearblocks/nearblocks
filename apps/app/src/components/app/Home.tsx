@@ -80,7 +80,7 @@ export default async function Home({ locale }: { locale: string }) {
         <div className="container mx-auto px-3 py-14 mb-10">
           <div className="flex flex-col lg:flex-row pb-5 lg:!items-center">
             <div className="relative lg:w-3/5 flex-col">
-              <h1 className="text-white dark:text-neargray-10 text-2xl pb-3 flex flex-col">
+              <h1 className="text-white dark:text-neargray-10 text-2xl font-medium pb-3 flex flex-col">
                 {t('homePage.heroTitle')}
               </h1>
               <div className="h-12" suppressHydrationWarning={true}>

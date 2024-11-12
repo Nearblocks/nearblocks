@@ -45,6 +45,7 @@ import TxnStatus from '../common/Status';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
 import ArrowUp from '../Icons/ArrowUp';
+import Bolt from '../Icons/Bolt';
 import FileSlash from '../Icons/FileSlash';
 import Question from '../Icons/Question';
 import EventLogs from './Action';
@@ -796,7 +797,7 @@ const Details = (props: Props) => {
                   label={'Highlighted events of the transaction'}
                 >
                   <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
+                    <Bolt className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
                 Transaction Actions

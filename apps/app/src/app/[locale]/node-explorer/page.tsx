@@ -10,7 +10,7 @@ export default async function NodeExplorer({ searchParams }: any) {
     <>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white font-medium dark:text-neargray-10">
             NEAR Protocol Validator Explorer
           </h1>
         </div>
