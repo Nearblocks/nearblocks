@@ -25,6 +25,7 @@ import {
 import {
   FtsInfo,
   InventoryInfo,
+  MtEventLogData,
   NftsInfo,
   RPCTransactionInfo,
   TransactionInfo,
@@ -40,11 +41,17 @@ import useTranslation from 'next-translate/useTranslation';
 import TxnStatus from '../common/Status';
 import FaRight from '../Icons/FaRight';
 import { Tooltip } from '@reach/tooltip';
-import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
+import {
+  parseEventLogs,
+  txnActions,
+  txnErrorMessage,
+  txnLogs,
+} from '@/utils/near';
 import EventLogs from './Action';
 import Actions from './Actions';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import { isEmpty } from 'lodash';
+import NEPTokenTransactions from '../common/NEPTokenTransactions';
 
 interface Props {
   loading: boolean;
@@ -125,6 +132,18 @@ const Details = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
+
+  const parsedEvents = useMemo(() => {
+    return (
+      logs?.filter((log: TransactionLog) => {
+        const parsedLog: MtEventLogData = parseEventLogs(log);
+        return parsedLog?.standard === 'nep245';
+      }) ?? []
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logs]);
+
+  const showRow = parsedEvents && parsedEvents.length > 0;
 
   useEffect(() => {
     // Hide txn actions row
@@ -379,7 +398,7 @@ const Details = (props: Props) => {
           )}
         </div>
       </div>
-      {(fts?.length > 0 || nfts?.length > 0) && (
+      {(fts?.length > 0 || nfts?.length > 0 || showRow) && (
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
             <Tooltip
@@ -593,7 +612,6 @@ const Details = (props: Props) => {
                                   ]
                                 </span>
                               </div>
-
                               <Link
                                 href={`/nft-token/${nft?.nft_meta?.contract}`}
                                 className="text-green flex items-center hover:no-underline dark:text-green-250"
@@ -634,6 +652,7 @@ const Details = (props: Props) => {
                       </div>
                     </div>
                   ))}
+                  <NEPTokenTransactions events={parsedEvents} />
                 </div>
               </PerfectScrollbar>
             </div>

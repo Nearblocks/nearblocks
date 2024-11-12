@@ -14,20 +14,35 @@ const TokenInfo = (props: TokenInfoProps) => {
   const { contract, amount, decimals } = props;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    ftMetadata(contract).then(setMeta).catch(console.error);
+    setLoading(true);
+    ftMetadata(contract)
+      .then((data) => {
+        setMeta(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
-      ></div>
-    );
-  };
 
-  return !meta?.name ? (
+  const Loader = ({
+    className = '',
+    wrapperClassName = '',
+  }: {
+    className?: string;
+    wrapperClassName?: string;
+  }) => (
+    <div
+      className={`bg-gray-200 dark:bg-black-200 h-5 w-full max-w-xs rounded shadow-sm animate-pulse ${className} ${wrapperClassName}`}
+    ></div>
+  );
+
+  return loading ? (
     <Loader wrapperClassName="flex w-full max-w-xs" />
   ) : (
     <>
