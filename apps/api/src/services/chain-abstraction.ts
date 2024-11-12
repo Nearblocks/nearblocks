@@ -6,6 +6,8 @@ import dayjs from '#libs/dayjs';
 import db from '#libs/db';
 import sql from '#libs/postgres';
 import {
+  AccountMultiChainTxns,
+  AccountMultiChainTxnsCount,
   MultiChainAccounts,
   MultiChainTxns,
   MultiChainTxnsCount,
@@ -37,7 +39,10 @@ const multiChainAccounts = catchAsync(
 );
 
 const multiChainTxns = catchAsync(
-  async (req: RequestValidator<MultiChainTxns>, res: Response) => {
+  async (
+    req: RequestValidator<AccountMultiChainTxns | MultiChainTxns>,
+    res: Response,
+  ) => {
     const account = req.validator.data.account;
     const afterBlock = req.validator.data.after_block;
     const beforeBlock = req.validator.data.before_block;
@@ -153,7 +158,10 @@ const multiChainTxns = catchAsync(
 );
 
 const multiChainTxnsCount = catchAsync(
-  async (req: RequestValidator<MultiChainTxnsCount>, res: Response) => {
+  async (
+    req: RequestValidator<AccountMultiChainTxnsCount | MultiChainTxnsCount>,
+    res: Response,
+  ) => {
     const account = req.validator.data.account;
     const from = req.validator.data.from;
     const afterDate = req.validator.data.after_date;

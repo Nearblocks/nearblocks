@@ -162,7 +162,7 @@ const routes = (app: Router) => {
   /**
    * GET /v1/kitwallet/account/{account}/receipts/count
    * @summary Get estimated account receipts count
-   * @tags Account
+   * @tags Kitwallet
    * @param {string} account.path.required - account id
    * @param {string} from.query - sender account id
    * @param {string} to.query - receiver account id

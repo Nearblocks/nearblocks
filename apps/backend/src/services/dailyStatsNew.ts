@@ -293,6 +293,18 @@ const addressData = async (start: string, end: string) => {
   };
 };
 
+const multiChainTxnData = async (start: string, end: string) => {
+  const multiChainTxns = await knex('multichain_transactions')
+    .where('block_timestamp', '>=', start)
+    .where('block_timestamp', '<', end)
+    .count()
+    .first();
+
+  return {
+    multichain_txns: multiChainTxns?.count?.toString(),
+  };
+};
+
 const dayStats = async (day: Dayjs) => {
   if (dayjs.utc().isSameOrBefore(day)) return;
 
@@ -300,10 +312,11 @@ const dayStats = async (day: Dayjs) => {
   const end = msToNsTime(day.clone().add(1, 'day').startOf('day').valueOf());
 
   const price = await marketData(day.clone());
-  const [block, txn, address] = await Promise.all([
+  const [block, txn, address, multiChainTxn] = await Promise.all([
     blockData(day.clone()),
     addressData(start, end),
     txnData(start, end, price.near_price),
+    multiChainTxnData(start, end),
   ]);
 
   const data = {
@@ -312,6 +325,7 @@ const dayStats = async (day: Dayjs) => {
     ...block,
     ...txn,
     ...address,
+    ...multiChainTxn,
   };
 
   await knex('daily_stats_new').insert(data);
