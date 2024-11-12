@@ -19,7 +19,7 @@ export default async function TokenTxns({
     <section>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
         <div className="container mx-auto px-3">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10 font-medium">
             {t ? t('fts.heading') : 'Token Transfers'}
           </h1>
         </div>

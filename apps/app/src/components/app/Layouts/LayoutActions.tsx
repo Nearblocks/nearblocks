@@ -34,14 +34,14 @@ const LayoutActions = ({
     <div className={className}>
       <NextTopLoader color={`${(theme as string) ? '#31766A' : '#0D494A'}`} />
       {notice}
-      <header>
-        <Header
-          block={blocks}
-          handleFilterAndKeyword={handleFilterAndKeyword}
-          stats={stats}
-          theme={theme}
-        />
-      </header>
+
+      <Header
+        block={blocks}
+        handleFilterAndKeyword={handleFilterAndKeyword}
+        stats={stats}
+        theme={theme}
+      />
+
       <main>{children}</main>
       <Footer theme={theme} />
     </div>
