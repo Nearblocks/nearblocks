@@ -103,6 +103,15 @@ const Chart = (props: Props) => {
       image_dark: `/images/charts/tps_dark.svg`,
       exclude: false,
     },
+    {
+      link: '/charts/multi-chain-txns',
+      text: t
+        ? t('charts:multichainTxns.heading')
+        : 'Multi Chain Transactions Chart',
+      image: `/images/charts/multi-chain-txns.svg`,
+      image_dark: `/images/charts/multi-chain-txns.svg`,
+      exclude: false,
+    },
   ];
 
   const chartData = useMemo(() => {
@@ -153,6 +162,12 @@ const Chart = (props: Props) => {
           x: new Date(stat.date).valueOf(),
           y: Number(stat.near_price),
           date: stat.date,
+        }),
+        'multi-chain-txns': (stat: ChartStat) => ({
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.multichain_txns),
+          date: stat.date,
+          multiChainTxns: stat.multichain_txns,
         }),
       };
 
@@ -228,6 +243,12 @@ const Chart = (props: Props) => {
           yLabel = 'Near Price (USD)';
           description =
             'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
+          break;
+        case 'multi-chain-txns':
+          titleText = 'Multi Chain Transactions Chart';
+          yLabel = 'Multichain Transactions per Day';
+          description =
+            'The chart highlights the total number of multichain transactions on Near blockchain.';
           break;
         default:
       }
@@ -446,6 +467,12 @@ const Chart = (props: Props) => {
                       tooltipContent = \`
                         \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
                         Near Price: <strong>$\${dollarFormat(item.y)}</strong>
+                        \`;
+                    break;
+                  case "multi-chain-txns":
+                      tooltipContent = \`
+                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
+                        Total Multichain Transactions: <strong>$\{(item.y)}</strong>
                         \`;
                     break;
                 default:

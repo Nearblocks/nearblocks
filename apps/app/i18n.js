@@ -37,6 +37,7 @@ module.exports = {
     'rgx:^/terms-and-conditions': ['terms'],
     'rgx:^/contact': ['contact'],
     'rgx:^/advertise': ['home'],
+    'rgx:^/multi-chain-txns': ['multi-chain-txns'],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`nearblock-translations/${lang}/${ns}.json`).then((m) => m.default),

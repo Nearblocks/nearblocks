@@ -47,6 +47,11 @@ const menus = [
         title: 'header.menu.nodeExplorer',
         link: '/node-explorer',
       },
+      {
+        id: 6,
+        title: 'Multichain Txns',
+        link: '/multi-chain-txns',
+      },
     ],
   },
   {

@@ -82,3 +82,8 @@ export const chainAbstractionExplorerUrl =
             `https://blockexplorer.one/bitcoin/testnet/address/${address}`,
         },
       };
+
+export const chain = {
+  ethereum: 'ETHEREUM',
+  bitcoin: 'BITCOIN',
+};

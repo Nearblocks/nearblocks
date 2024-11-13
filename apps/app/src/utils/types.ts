@@ -326,6 +326,7 @@ export type ChartStat = {
   total_addresses: string;
   addresses: string;
   active_accounts: string;
+  multichain_txns: string;
 };
 
 export type ChartTypeInfo = {

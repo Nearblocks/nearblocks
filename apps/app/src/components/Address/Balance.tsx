@@ -402,7 +402,7 @@ const Balance = ({
         <div className="w-full">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl">
             <h2 className="leading-6 border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
-              Multichain Information
+              {t ? t('address:multichainInfo') : 'Multichain Information'}
             </h2>
             <div className="px-3 py-4 text-sm text-nearblue-600 dark:text-neargray-10 flex flex-wrap items-center">
               {loading ? (
@@ -414,9 +414,17 @@ const Balance = ({
                   <span className="flex-shrink-0">
                     {multiChainAccounts?.length
                       ? multiChainAccounts?.length
+                      : t
+                      ? t('address:noAddresses')
                       : 'No'}{' '}
-                    {multiChainAccounts?.length === 1 ? 'address' : 'addresses'}{' '}
-                    found on:
+                    {multiChainAccounts?.length === 1
+                      ? t
+                        ? t('address:address')
+                        : 'address'
+                      : t
+                      ? t('address:addresses')
+                      : 'addresses'}{' '}
+                    {t ? t('address:foundOn') : 'found on:'}
                   </span>
                   <div className="relative flex-1 group">
                     <Menu>
@@ -430,7 +438,9 @@ const Balance = ({
                         disabled={!multiChainAccounts?.length}
                         onClick={handleMenuOpen}
                       >
-                        <span>{'Foreign Chain'}</span>
+                        <span>
+                          {t ? t('address:foreignChain') : 'Foreign Chain'}
+                        </span>
                         <ArrowDown className="w-4 h-4 ml-2 fill-current text-gray-500 pointer-events-none" />
                       </MenuButton>
                       <MenuPopover portal={false} className="relative ">
@@ -444,7 +454,7 @@ const Balance = ({
                                   (address: any, index: any) => (
                                     <div
                                       key={index}
-                                      className="pb-2 dark:bg-black flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
+                                      className="pb-2 dark:bg-black flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
                                       onClick={() =>
                                         handleChainSelect(
                                           address.chain.toLowerCase(),
@@ -456,15 +466,17 @@ const Balance = ({
                                       }
                                       onMouseLeave={() => setHoveredIndex(null)}
                                     >
-                                      {address.chain && (
+                                      {address?.chain && (
                                         <div className="flex items-center justify-between w-full ">
                                           <div className="flex items-center">
-                                            {address.chain === 'BITCOIN' && (
-                                              <Bitcoin className="w-4 h-4 text-orange-400" />
-                                            )}
-                                            {address.chain === 'ETHEREUM' && (
-                                              <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                                            )}
+                                            <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                                              {address.chain === 'BITCOIN' && (
+                                                <Bitcoin className="w-4 h-4 text-orange-400" />
+                                              )}
+                                              {address.chain === 'ETHEREUM' && (
+                                                <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                                              )}
+                                            </div>
                                             <span className="ml-2">
                                               {address.path
                                                 .toLowerCase()

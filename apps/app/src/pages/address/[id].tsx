@@ -42,7 +42,7 @@ import { getCookieFromRequest } from '@/utils/libs';
 import { RpcProviders } from '@/utils/rpc';
 import { fetchData } from '@/utils/fetchData';
 import Receipts from '@/components/Address/Receipts';
-import MultiChainTxns from '@/components/Address/MultiChainTxns';
+import MultiChainTxns from '@/components/ChainAbstraction/MultiChainTxns';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -633,7 +633,9 @@ const Address = ({
                       },
                       {
                         key: 5,
-                        label: 'Multichain Transactions',
+                        label: t
+                          ? t('address:multichainTxns')
+                          : 'Multichain Transactions',
                       },
                       ...(contractInfo && contractInfo?.methodNames?.length > 0
                         ? [
@@ -729,6 +731,7 @@ const Address = ({
                         error={error}
                         cursor={txnCursor}
                         tab={tab}
+                        isTab={true}
                       />
                     </TabPanel>
                     {contractInfo && contractInfo?.methodNames?.length > 0 && (
