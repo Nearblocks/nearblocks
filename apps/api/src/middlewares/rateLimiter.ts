@@ -234,9 +234,15 @@ const isValidToken = (apiKey: string): boolean => {
 };
 
 const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
-  const pointsMinute = plan.limit_per_minute;
-  const pointsDay = plan.limit_per_day;
-  const pointsMonth = plan.limit_per_month;
+  let pointsMinute = plan.limit_per_minute;
+  let pointsDay = plan.limit_per_day;
+  let pointsMonth = plan.limit_per_month;
+
+  if (baseUrl === KITWALLET_PATH && plan.id === DEFAULT_PLAN.id) {
+    pointsMinute = 150;
+    pointsDay = 10000;
+    pointsMonth = 300000;
+  }
 
   const minuteRateLimiter = new RateLimiterRedis({
     duration: 60, // 1 min
