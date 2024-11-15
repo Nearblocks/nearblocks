@@ -17,7 +17,13 @@ const Actions = (props: ActionPropsInfo) => {
     switch (props.action.action_kind) {
       case 'ADD_KEY':
       case 'AddKey':
-        return <AddKey args={props.action.args} receiver={props.action?.to} />;
+        return (
+          <AddKey
+            action={props.action}
+            args={props.action.args}
+            receiver={props.action?.to}
+          />
+        );
       case 'CreateAccount':
         return <CreateAccount action={props.action} />;
       case 'DeleteAccount':
@@ -40,6 +46,7 @@ const Actions = (props: ActionPropsInfo) => {
               return {
                 ...action,
                 from: props.action?.from,
+                receiptId: props.action?.receiptId,
                 to: props.action?.to,
               };
             },

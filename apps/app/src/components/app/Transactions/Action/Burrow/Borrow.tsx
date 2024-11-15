@@ -1,35 +1,27 @@
+import { useParams } from 'next/navigation';
+
 import TokenInfo from '@/components/common/TokenInfo';
+import FaRight from '@/components/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { DepositPropsInfo } from '@/utils/types';
 
 const Borrow = (props: DepositPropsInfo) => {
-  const FaRight = (props: { className: string }) => {
-    return (
-      <svg
-        className={props.className}
-        fill="currentColor"
-        height="1em"
-        stroke="currentColor"
-        stroke-width="0"
-        viewBox="0 0 192 512"
-        width="1em"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M0 384.662V127.338c0-17.818 21.543-26.741 34.142-14.142l128.662 128.662c7.81 7.81 7.81 20.474 0 28.284L34.142 398.804C21.543 411.404 0 402.48 0 384.662z"></path>
-      </svg>
-    );
-  };
-
+  const params = useParams();
   const log = props.event?.[0];
 
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
     <div className="action flex flex-wrap items-center break-all leading-7">
-      <FaRight className="inline-flex text-gray-400 text-xs" />
+      {props?.receiptId && params?.hash ? (
+        <Link href={`/txns/${params?.hash}?tab=execution#${props?.receiptId}`}>
+          <FaRight className="inline-flex text-gray-400 text-xs" />
+        </Link>
+      ) : (
+        <FaRight className="inline-flex text-gray-400 text-xs" />
+      )}
       <span className="font-bold px-1">Borrow </span>
-
       <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
       <span className="font-bold text-gray px-1">
         To{' '}
