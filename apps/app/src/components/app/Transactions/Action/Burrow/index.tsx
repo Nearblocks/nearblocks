@@ -26,19 +26,51 @@ const BurrowContract = (props: EventPropsInfo) => {
   if ('event' in parsedEvent) {
     switch (parsedEvent.event) {
       case 'deposit_to_reserve':
-        return <DepositToReserve event={parsedEvent.data} />;
+        return (
+          <DepositToReserve
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'deposit':
-        return <Deposit event={parsedEvent.data} />;
+        return (
+          <Deposit
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'withdraw_succeeded':
-        return <WithdrawSucceeded event={parsedEvent.data} />;
+        return (
+          <WithdrawSucceeded
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'increase_collateral':
-        return <IncreaseCollateral event={parsedEvent.data} />;
+        return (
+          <IncreaseCollateral
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'decrease_collateral':
-        return <DescreaseCollateral event={parsedEvent.data} />;
+        return (
+          <DescreaseCollateral
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'borrow':
-        return <Borrow event={parsedEvent.data} />;
+        return (
+          <Borrow
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+          />
+        );
       case 'repay':
-        return <Repay event={parsedEvent.data} />;
+        return (
+          <Repay event={parsedEvent.data} receiptId={props?.event?.receiptId} />
+        );
       default:
         return null;
     }

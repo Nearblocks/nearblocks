@@ -70,8 +70,9 @@ const ReceiptRow = (props: Props) => {
     if (typeof window === 'undefined') return;
 
     const hash = window.location.hash;
+
     const parts = hash.split('#');
-    const id = parts.length > 2 ? parts[2] : null;
+    const id = parts.length > 1 ? parts[1] : null;
 
     if (id && receipt?.receipt_id === id) {
       requestAnimationFrame(() => {
