@@ -63,8 +63,8 @@ export default async function TxnsLayout({
   );
   return (
     <>
-      <div className="md:flex items-center justify-between container mx-auto px-3">
-        <div className="flex justify-between dark:text-neargray-10 border-b w-full px-2 pt-3 dark:border-black-200">
+      <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
+        <div className="flex justify-between dark:text-neargray-10 border-b w-full pr-1 pt-3 dark:border-black-200">
           <h1 className="py-2 space-x-2 text-lg font-medium leading-8 text-black-600 dark:text-neargray-10">
             {t ? t('txn.heading') : 'Transaction Details'}
           </h1>
@@ -100,7 +100,7 @@ export default async function TxnsLayout({
           </ul>
         </div>
       </div>
-      <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
+      <div className="container-xxl mx-auto pt-3 pb-6 px-5 text-nearblue-600">
         <div className="min-h-[44px] md:min-h-[25px]">
           <SponserdText />
         </div>

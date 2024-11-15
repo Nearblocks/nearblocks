@@ -82,7 +82,7 @@ const ApiActions = ({
   return (
     <>
       {' '}
-      <div className="container mx-auto px-3 pt-14">
+      <div className="container-xxl mx-auto px-3 pt-14">
         <div className="my-5 sm:!text-left text-center lg:!px-32 px-5">
           {status === 'cancelled' && (
             <div className="py-4 flex my-14 px-3 items-center text-sm text-orange-900/70 bg-orange-300/30 rounded-md">

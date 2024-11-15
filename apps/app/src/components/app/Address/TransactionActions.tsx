@@ -280,7 +280,7 @@ const TransactionActions = ({
         <>
           <Menu>
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t ? t('txns:from') : 'FROM'}{' '}
+              {t ? t('from') : 'FROM'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -290,9 +290,7 @@ const TransactionActions = ({
                   name="from"
                   onChange={onChange}
                   placeholder={
-                    t
-                      ? t('txns:filter.placeholder')
-                      : 'Search by address e.g. Ⓝ..'
+                    t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
                   value={form.from}
                 />
@@ -302,7 +300,7 @@ const TransactionActions = ({
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                    {t ? t('txns:filter.filter') : 'Filter'}
+                    {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
                     className="flex-1 rounded bg-gray-300 text-xs h-7"
@@ -310,7 +308,7 @@ const TransactionActions = ({
                     onClick={onClear}
                     type="button"
                   >
-                    {t ? t('txns:filter.clear') : 'Clear'}
+                    {t ? t('filter.clear') : 'Clear'}
                   </button>
                 </div>
               </form>

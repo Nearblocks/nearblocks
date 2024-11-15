@@ -11,7 +11,7 @@ export default async function About({
   return (
     <>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72 -mb-48"></div>
-      <div className="py-16 bg-white dark:bg-black-600 soft-shadow sm:container sm:mx-auto rounded-md my-10">
+      <div className="py-16 bg-white dark:bg-black-600 soft-shadow container-xxl sm:mx-auto rounded-md my-10">
         <h1 className="mb-4 pt-8 sm:text-2xl text-center text-2xl text-green-500 dark:text-green-250">
           {t('About Nearblocks')}
         </h1>

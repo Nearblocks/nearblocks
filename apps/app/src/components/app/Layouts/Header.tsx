@@ -218,7 +218,7 @@ const Header = ({
       <div
         className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-neargray-25 p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
       >
-        <div className="container mx-auto flex justify-between">
+        <div className="container-xxl w-full mx-auto flex justify-between">
           <div className="hidden md:!flex md:!w-[35%] h-11">
             <div className="dark:!bg-black-600 h-full  md:!pt-2 w-32 flex items-center">
               <div className="h-11 flex items-center">
@@ -347,7 +347,7 @@ const Header = ({
             </div>
           </div>
         )}
-        <div className="container mx-auto">
+        <div className="container-xxl w-full mx-auto">
           <div className="flex flex-wrap">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
               <div className={showSearch ? 'pt-3' : ''}>
@@ -637,7 +637,7 @@ const Header = ({
                           <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                             <li className="px-8 pb-1">
                               <button
-                                className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap font-medium text-sm text-black-600"
+                                className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-center py-1 px-4 whitespace-nowrap font-medium text-sm"
                                 onClick={onSignOut}
                               >
                                 Sign Out

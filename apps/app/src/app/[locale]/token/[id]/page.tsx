@@ -14,7 +14,7 @@ export default async function TokenIndex({
   searchParams: { cursor?: string; order: string; p?: string; tab: string };
 }) {
   return (
-    <div className="relative container mx-auto px-3">
+    <div className="relative container-xxl mx-auto px-5">
       <section>
         <Suspense fallback={<TokenTabSkeleton />}>
           <Overview id={id} searchParams={searchParams} />

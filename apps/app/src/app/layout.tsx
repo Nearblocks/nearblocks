@@ -11,7 +11,6 @@ interface paramTypes {
 }
 
 export const viewport: Viewport = {
-  initialScale: 0,
   userScalable: false,
   width: 'device-width',
 };

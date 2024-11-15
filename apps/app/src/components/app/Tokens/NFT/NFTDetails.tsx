@@ -70,7 +70,7 @@ const NFTDetails = ({
     setIsVisible(false);
   };
   return (
-    <div className="container mx-auto px-3">
+    <div className="container-xxl mx-auto px-5">
       {isTokenSpam(token?.contract || id) && isVisible && (
         <>
           <div className="py-2"></div>

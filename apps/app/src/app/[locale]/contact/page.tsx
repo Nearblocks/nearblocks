@@ -54,7 +54,7 @@ export default async function Contact({
     <>
       <ToastContainer />
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
-      <div className="container mx-auto px-3 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
+      <div className="container-xxl mx-auto px-5 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
         <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
           {`Contact NearBlocks`}
         </h1>

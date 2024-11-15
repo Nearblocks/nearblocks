@@ -11,6 +11,11 @@ const tabs = [
   { label: 'Receipts', message: 'Receipts', name: 'receipts' },
   { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
   { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+  {
+    label: 'Multichain Transactions',
+    message: 'Multichain Transactions',
+    name: 'multichaintxns',
+  },
   { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
   { label: 'Contract', message: 'contract', name: 'contract' },
 ];
@@ -59,7 +64,9 @@ export default function TabSkeletion() {
             {tab === 'nfttokentxns' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
-
+            {tab === 'multichaintxns' ? (
+              <TabPanelGeneralSkeleton tab={tab} />
+            ) : null}
             {tab === 'accesskeys' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}

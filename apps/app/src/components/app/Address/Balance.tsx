@@ -7,6 +7,7 @@ import { SpamToken } from '@/utils/types';
 import AccountAlerts from './AccountAlerts';
 import AccountMoreInfo from './AccountMoreInfo';
 import AccountOverview from './AccountOverview';
+import MultichainInfo from './MultichainInfo';
 
 const getCookieFromRequest = (cookieName: string): null | string => {
   const cookie = cookies().get(cookieName);
@@ -23,6 +24,7 @@ export default async function Balance({ id }: { id: string }) {
     inventoryData,
     deploymentData,
     nftTokenData,
+    multiChainAccountsData,
   ] = await Promise.all([
     getRequest(`account/${id}?rpc=${rpcUrl}`),
     getRequest('stats'),
@@ -30,6 +32,7 @@ export default async function Balance({ id }: { id: string }) {
     getRequest(`account/${id}/inventory`),
     getRequest(`account/${id}/contract/deployments?rpc=${rpcUrl}`),
     getRequest(`nfts/${id}`),
+    getRequest(`chain-abstraction/${id}/multi-chain-accounts`),
   ]);
 
   const spamList: SpamToken = await fetch(
@@ -44,7 +47,7 @@ export default async function Balance({ id }: { id: string }) {
   return (
     <>
       <AccountAlerts accountData={accountData} id={id} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <AccountOverview
           accountData={accountData?.account?.[0]}
           id={id}
@@ -59,6 +62,9 @@ export default async function Balance({ id }: { id: string }) {
           id={id}
           nftTokenData={nftTokenData?.contracts?.[0]}
           tokenData={tokenDetails?.contracts?.[0]}
+        />
+        <MultichainInfo
+          multiChainAccounts={multiChainAccountsData?.multiChainAccounts}
         />
       </div>
     </>

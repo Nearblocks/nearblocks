@@ -83,22 +83,29 @@ const TokenHoldings = (props: Props) => {
                       {props.ft?.tokens?.map((token, index) => (
                         <div className="dark:bg-black" key={token?.contract}>
                           <Link
-                            className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline"
+                            className="flex justify-between items-center px-3 py-2 truncate hover:no-underline"
                             href={`/token/${token?.contract}?a=${props.id}`}
                           >
-                            <div key={index}>
-                              <div className="flex items-center">
+                            <div
+                              className="hover:bg-gray-100 dark:hover:bg-black-200 w-full h-full rounded-lg"
+                              key={index}
+                            >
+                              <div className="flex items-center p-2">
                                 <div className="flex mr-1">
                                   <img
                                     alt={token?.ft_meta?.name}
                                     className="w-4 h-4"
                                     height={16}
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        '/images/tokenplaceholder.svg';
+                                      /* eslint-disable @next/next/no-img-element */
+                                    }}
                                     src={
                                       token?.ft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
                                     }
                                     width={16}
-                                    /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
                                 <span>
@@ -112,7 +119,7 @@ const TokenHoldings = (props: Props) => {
                                   ({token?.ft_meta?.symbol})
                                 </span>
                               </div>
-                              <div className="text-gray-400 flex items-center mt-1">
+                              <div className="text-gray-400 flex items-center my-0.5 mx-2.5">
                                 {token?.rpcAmount
                                   ? localFormat(token?.rpcAmount)
                                   : token?.rpcAmount ?? ''}
@@ -154,22 +161,26 @@ const TokenHoldings = (props: Props) => {
                       {nfts.map((nft) => (
                         <div className="dark:bg-black" key={nft?.contract}>
                           <Link
-                            className="flex justify-between items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate hover:no-underline"
+                            className="flex justify-between items-center px-3 py-2 truncate hover:no-underline"
                             href={`/nft-token/${nft?.contract}`}
                           >
-                            <div>
-                              <div className="flex items-center">
+                            <div className="hover:bg-gray-100 dark:hover:bg-black-200 w-full h-full rounded-lg">
+                              <div className="flex items-center p-2">
                                 <div className="flex mr-1">
                                   <img
                                     alt={nft?.nft_meta?.name}
                                     className="w-4 h-4"
                                     height={16}
+                                    onError={(e) => {
+                                      e.currentTarget.src =
+                                        '/images/tokenplaceholder.svg';
+                                      /* eslint-disable @next/next/no-img-element */
+                                    }}
                                     src={
                                       nft?.nft_meta?.icon ??
                                       '/images/tokenplaceholder.svg'
                                     }
                                     width={16}
-                                    /* eslint-disable-next-line @next/next/no-img-element */
                                   />
                                 </div>
                                 <span>
@@ -183,7 +194,7 @@ const TokenHoldings = (props: Props) => {
                                   ({nft?.nft_meta?.symbol})
                                 </span>
                               </div>
-                              <div className="text-gray-400 flex items-center mt-1">
+                              <div className="text-gray-400 flex items-center my-0.5 mx-2.5">
                                 {nft?.quantity
                                   ? localFormat(nft?.quantity)
                                   : nft?.quantity ?? ''}

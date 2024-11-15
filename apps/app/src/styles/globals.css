@@ -276,3 +276,9 @@ a {
   transform: rotate(-180deg);
   color: #31766a;
 }
+
+@media (min-width: 1400px) {
+  .container-xxl {
+    max-width: 1400px;
+  }
+}

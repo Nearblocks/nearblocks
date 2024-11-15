@@ -16,14 +16,14 @@ export default async function ChartIndex({
   return (
     <>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
-        <div className="container mx-auto px-3">
+        <div className="container-xxl mx-auto px-5">
           <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white font-medium">
             {t('charts.heading')}
           </h1>
         </div>
       </div>
       <div className="mx-auto px-3 -mt-48">
-        <div className="container mx-auto px-3 -mt-36">
+        <div className="container-xxl mx-auto px-5 -mt-36">
           <div className="relative">
             <Suspense fallback={<ChartSkeletion />}>
               <Chart poweredBy={false} />

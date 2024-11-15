@@ -7,7 +7,7 @@ interface Props {
 const Detail = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <div className={`w-full z-10 ${props.className}`} ref={ref}>
-      <div className="container mx-auto px-3">
+      <div className="container-xxl mx-auto px-5">
         <div className="grid md:grid-cols-12 pt-4 mb-2">
           <div className="md:col-span-5 lg:col-span-4 pt-4">
             <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl soft-shadow p-3 aspect-square"></div>

@@ -33,7 +33,7 @@ function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
     );
   return (
     <>
-      <div className="relative container mx-auto px-3">
+      <div className="relative container-xxl mx-auto px-5">
         <>
           <div className="md:flex justify-between">
             <div className="w-fit md:flex md:gap-2">

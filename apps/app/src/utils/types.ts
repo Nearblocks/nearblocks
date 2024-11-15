@@ -718,6 +718,7 @@ export type Token = {
     twitter: string;
   };
   name: string;
+  nep518_hex_address: string;
   nft: Token;
   onchain_market_cap: string;
   price: string;
@@ -1687,4 +1688,19 @@ export type ContractData = {
   base64Code: string;
   contractMetadata: ContractMetadata | null;
   onChainCodeHash: string;
+};
+
+export type MultiChainTxnInfo = {
+  account_id: string;
+  block_height: string;
+  block_timestamp: string;
+  chain: string;
+  derived_address: string;
+  derived_transaction: string;
+  id: string;
+  path: string;
+  public_key: string;
+  receipt_id: string;
+  status: boolean;
+  transaction_hash: string;
 };

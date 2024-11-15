@@ -32,7 +32,10 @@ const LayoutActions = ({
 
   return (
     <div className={className}>
-      <NextTopLoader color={`${(theme as string) ? '#31766A' : '#0D494A'}`} />
+      <NextTopLoader
+        color={`${(theme as string) ? '#31766A' : '#0D494A'}`}
+        showSpinner={false}
+      />
       {notice}
 
       <Header

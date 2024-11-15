@@ -12,6 +12,8 @@ import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTa
 import { Link } from '@/i18n/routing';
 import { getRequest } from '@/utils/app/api';
 
+import MultiChainTransactions from './ChainTxns';
+
 export default async function AccountTabs({
   id,
   locale,
@@ -30,6 +32,11 @@ export default async function AccountTabs({
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },
     { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
     { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+    {
+      label: 'Multichain Transactions',
+      message: 'Multichain Transactions',
+      name: 'multichaintxns',
+    },
     { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
     { label: 'Contract', message: 'contract', name: 'contract' },
   ];
@@ -93,6 +100,10 @@ export default async function AccountTabs({
 
             {tab === 'nfttokentxns' ? (
               <NFTTransactions id={id} searchParams={searchParams} />
+            ) : null}
+
+            {tab === 'multichaintxns' ? (
+              <MultiChainTransactions id={id} searchParams={searchParams} />
             ) : null}
 
             {tab === 'accesskeys' ? (
