@@ -10,27 +10,31 @@ import {
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 
+import Skeleton from '../app/skeleton/common/Skeleton';
 import TokenImage from './TokenImage';
 
 const TokenInfo = (props: TokenInfoProps) => {
   const { amount, contract, decimals } = props;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
+  const [loading, setLoading] = useState(true);
   const { ftMetadata } = useRpc();
 
   useEffect(() => {
-    ftMetadata(contract).then(setMeta).catch(console.error);
+    setLoading(true);
+    ftMetadata(contract)
+      .then((data) => {
+        setMeta(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props?.className} ${props?.wrapperClassName}`}
-      ></div>
-    );
-  };
 
-  return !meta?.name ? (
-    <Loader wrapperClassName="flex w-full max-w-xs" />
+  return loading ? (
+    <Skeleton className="h-4 w-40" />
   ) : (
     <>
       <span className="font-normal px-1">

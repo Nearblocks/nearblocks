@@ -833,3 +833,15 @@ export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
     tokensBurnt: outcome.outcome.tokens_burnt,
   };
 }
+
+export function parseEventLogs(event: TransactionLog): {} | any {
+  let parsedEvent: {} | any = {};
+
+  try {
+    parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+  } catch (error) {
+    console.error('Failed to parse event logs:', error);
+  }
+
+  return parsedEvent;
+}
