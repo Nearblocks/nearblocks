@@ -13,7 +13,7 @@ export default async function Delegator({
   params: { id: string };
 }) {
   return (
-    <div className="container relative mx-auto p-3">
+    <div className="container-xxl relative mx-auto p-3">
       <div className="md:flex justify-between">
         {!id ? (
           <div className="w-80 max-w-xs px-3 py-5">

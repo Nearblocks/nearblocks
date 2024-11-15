@@ -187,7 +187,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
 
   return (
     <>
-      <div className="relative container mx-auto px-3">
+      <div className="relative container-xxl mx-auto px-5">
         {rpcError && (!txn || allRpcProviderError) ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">

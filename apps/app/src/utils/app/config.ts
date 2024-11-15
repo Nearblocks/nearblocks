@@ -59,6 +59,29 @@ export const verifierConfig =
         },
       ];
 
+export const chainAbstractionExplorerUrl =
+  networkId === 'mainnet'
+    ? {
+        bitcoin: {
+          address: (address: string) =>
+            `https://blockchain.com/explorer/addresses/btc/${address}`,
+        },
+        ethereum: {
+          address: (address: string) =>
+            `https://etherscan.io/address/${address}`,
+        },
+      }
+    : {
+        bitcoin: {
+          address: (address: string) =>
+            `https://blockexplorer.one/bitcoin/testnet/address/${address}`,
+        },
+        ethereum: {
+          address: (address: string) =>
+            `https://sepolia.etherscan.io/address/${address}`,
+        },
+      };
+
 const evmWalletChains = {
   mainnet: {
     chainId: 397,

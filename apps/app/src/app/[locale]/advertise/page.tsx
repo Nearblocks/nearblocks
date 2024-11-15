@@ -52,7 +52,7 @@ export default async function Advertise({
 }) {
   const t = await getTranslations({ locale });
   return (
-    <div className="container mx-auto herobg flex flex-col items-center p-4.5 lg:!py-16 px-6">
+    <div className="container-xxl mx-auto herobg flex flex-col items-center p-4.5 lg:!py-16 px-6">
       <div className="w-full flex ">
         <div className="md:w-3/6 w-full flex flex-col items-start">
           <p className="text-green-500 text-sm lg:!text-base font-semibold lg:!mt-3 mt-5 dark:text-white">

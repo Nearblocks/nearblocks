@@ -33,7 +33,7 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
 
   const LoadingSkeleton = () => {
     return (
-      <div className="container mx-auto px-3">
+      <div className="container-xxl mx-auto px-5">
         <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
           <div
             className={`grid grid-flow-col grid-cols-1 ${
@@ -268,7 +268,7 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
   const totalTxns = stats?.total_txns ?? 0;
 
   return (
-    <div className="container mx-auto px-3">
+    <div className="container-xxl mx-auto px-5">
       <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0  dark:bg-black-600">
         <div
           className={`grid grid-flow-col grid-cols-1 ${

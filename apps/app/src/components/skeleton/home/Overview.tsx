@@ -15,7 +15,7 @@ const Overview = forwardRef(
     const { theme } = useTheme();
     return (
       <div className={`w-full z-10 ${className}`} ref={ref}>
-        <div className="container mx-auto px-3">
+        <div className="container-xxl w-full mx-auto px-3">
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0">
             <div
               className={`grid grid-flow-col grid-cols-1 ${

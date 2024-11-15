@@ -7,16 +7,16 @@ const TableSummary = ({
 }: any) => {
   return (
     <div
-      className={`flex flex-col lg:flex-row sm:items-center sm:justify-center`}
+      className={`md:flex sm:flex-1 flex-1 w-full items-center py-4 justify-center`}
     >
-      <div className="flex flex-col sm:items-center py-4">
-        <p className="leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10">
+      <div className="flex w-full items-center">
+        <p className="flex leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10">
           {text}
         </p>
       </div>
-      <div className="flex flex-col px-4 text-sm text-nearblue-600 dark:text-neargray-10 lg:flex-row lg:ml-auto lg:items-center lg:justify-between">
-        <div className="px-2 sm:mt-4">{filters}</div>
-        <div className="flex items-center space-x-4 md:mb-0 mb-4 ml-2 md:ml-0">
+      <div className="sm:flex px-4 text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-between flex-nowrap">
+        <div className="flex px-2 whitespace-nowrap py-1">{filters}</div>
+        <div className="flex whitespace-nowrap items-center sm:mb-0">
           {linkToDowload}
         </div>
       </div>

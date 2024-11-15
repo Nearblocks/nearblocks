@@ -24,7 +24,6 @@ export default function AccountOverview({
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
   const { networkId } = useConfig();
-
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
 
@@ -129,7 +128,7 @@ export default function AccountOverview({
           )}
         </div>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-          <div className="flex flex-wrap py-4">
+          <div className="flex-1 flex-wrap py-4">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
               {t('balance') || 'Balance'}:
             </div>
@@ -139,13 +138,13 @@ export default function AccountOverview({
             </div>
           </div>
           {networkId === 'mainnet' && (
-            <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+            <div className="flex-1 flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t('value') || 'Value:'}
               </div>
 
               <div className="w-full md:w-3/4 break-words flex items-center">
-                <span className="px-1">
+                <span>
                   {accountData?.amount && statsData?.near_price
                     ? '$' +
                       fiatValue(
@@ -163,8 +162,8 @@ export default function AccountOverview({
               </div>
             </div>
           )}
-          <div className="flex flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+          <div className="flex-1 flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+            <div className="w-full md:w-1/4 mb-2">
               {t('tokens') || 'Tokens:'}
             </div>
             <div className="w-full md:w-3/4 break-words -my-1 z-10">

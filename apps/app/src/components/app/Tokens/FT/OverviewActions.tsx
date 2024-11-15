@@ -1,10 +1,13 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
+import Image from 'next/legacy/image';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Links from '@/components/common/Links';
 import TokenImage from '@/components/common/TokenImage';
+import ListCheck from '@/components/Icons/ListCheck';
 import Question from '@/components/Icons/Question';
 import WarningIcon from '@/components/Icons/WarningIcon';
 import Skeleton from '@/components/skeleton/common/Skeleton';
@@ -42,6 +45,7 @@ const OverviewActions = ({
 }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
   const [showMarketCap, setShowMarketCap] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -61,6 +65,43 @@ const OverviewActions = ({
     setIsVisible(false);
   };
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const addToMetaMask = async () => {
+    try {
+      const tokenAddress = token?.nep518_hex_address;
+      const tokenSymbol = token?.symbol;
+      const tokenDecimals = token?.decimals;
+      const tokenImage = token?.icon;
+
+      if (window.ethereum) {
+        await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            options: {
+              address: tokenAddress,
+              decimals: tokenDecimals,
+              image: tokenImage,
+              symbol: tokenSymbol,
+            },
+            type: 'ERC20',
+          },
+        });
+
+        toast.success(`${token.name} has been added to your MetaMask!`);
+      } else {
+        toast.info(
+          'Please install MetaMask or another Ethereum wallet to use this feature.',
+        );
+      }
+    } catch (error) {
+      console.error('Error adding token to MetaMask:', error);
+      toast.error('Error adding token to MetaMask. Try again later');
+    }
+  };
+
   const onToggle = () => setShowMarketCap((o) => !o);
 
   return (
@@ -71,19 +112,55 @@ const OverviewActions = ({
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 px-2">
-            <span className="inline-flex align-middle h-7 w-7">
-              <TokenImage
-                alt={token?.name}
-                className="w-7 h-7"
-                src={token?.icon}
-              />
-            </span>
-            <span className="inline-flex align-middle mx-2">Token:</span>
-            <span className="inline-flex align-middle font-semibold">
-              {token?.name}
-            </span>
-          </h1>
+          <div className="flex items-center w-full py-4 px-2">
+            <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 pr-2">
+              <span className="inline-flex align-middle h-7 w-7">
+                <TokenImage
+                  alt={token?.name}
+                  className="w-7 h-7"
+                  src={token?.icon}
+                />
+              </span>
+              <span className="inline-flex align-middle mx-2">Token:</span>
+              <span className="inline-flex align-middle font-semibold">
+                {token?.name}
+              </span>
+            </h1>
+            <div className="relative md:pt-0 pt-2 text-gray-500 text-xs ml-auto">
+              <span className="group flex w-full relative h-full">
+                <button
+                  className="flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1"
+                  disabled={!token}
+                  onClick={toggleDropdown}
+                >
+                  <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
+                    <ListCheck className="h-4 dark:filter dark:invert" />
+                  </div>
+                </button>
+                {isOpen && (
+                  <ul className="bg-white dark:bg-black-600 soft-shadow min-w-full absolute top-full right-0 rounded-md py-1 z-[99]">
+                    <li className="pb-2" onClick={toggleDropdown}>
+                      <button
+                        className="flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 w-full text-left"
+                        id="add-to-metamask-btn"
+                        onClick={addToMetaMask}
+                      >
+                        <span className="w-4 dark:text-green-250">
+                          <Image
+                            alt="Metamask"
+                            height={10}
+                            src={'/images/metamask.svg'}
+                            width={10}
+                          />
+                        </span>
+                        Add Token to MetaMask (Web3)
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </span>
+            </div>
+          </div>
         )}
       </div>
       <div>

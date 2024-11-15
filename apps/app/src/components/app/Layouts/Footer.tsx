@@ -14,7 +14,7 @@ const Footer = ({ theme }: any) => {
     <footer className="footer dark:bg-black-600  ">
       <div className="bg-bottom-right">
         <div className="bg-bottom-left">
-          <div className="container mx-auto px-3 pb-32">
+          <div className="container-xxl mx-auto px-5 pb-32">
             <div className="grid grid-cols-1 lg:!grid-cols-6 gap-5 py-5">
               <div className="w-64">
                 <div className="text-sm text-grey-dark flex flex-col py-3">

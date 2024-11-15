@@ -19,7 +19,7 @@ export default async function Hash({
 
   return (
     <>
-      <div className="relative container mx-auto px-3">
+      <div className="relative container-xxl mx-auto px-5">
         <Suspense fallback={<HashLoading />}>
           <Details
             data={hashData}
