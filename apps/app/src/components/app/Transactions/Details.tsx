@@ -17,6 +17,7 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 import FaRight from '@/components/Icons/FaRight';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
+import { parseEventLogs } from '@/utils/app/near';
 import {
   convertToMetricPrefix,
   convertToUTC,
@@ -36,6 +37,7 @@ import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
 import {
   FtsInfo,
   InventoryInfo,
+  MtEventLogData,
   NftsInfo,
   TransactionInfo,
   TransactionLog,
@@ -50,6 +52,7 @@ import FileSlash from '../Icons/FileSlash';
 import Question from '../Icons/Question';
 import EventLogs from './Action';
 import Actions from './Actions';
+import NEPTokenTransactions from './NEPTokenTransactions';
 
 interface Props {
   hash: string;
@@ -183,6 +186,18 @@ const Details = (props: Props) => {
       ></div>
     );
   };
+
+  const parsedEvents = useMemo(() => {
+    return (
+      logs?.filter((log: TransactionLog) => {
+        const parsedLog: MtEventLogData = parseEventLogs(log);
+        return parsedLog?.standard === 'nep245';
+      }) ?? []
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logs]);
+
+  const showRow = parsedEvents && parsedEvents.length > 0;
 
   return (
     <>
@@ -409,7 +424,7 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-          {(fts?.length > 0 || nfts?.length > 0) && (
+          {(fts?.length > 0 || nfts?.length > 0 || showRow) && (
             <div className="flex items-start flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
                 <Tooltip
@@ -682,6 +697,7 @@ const Details = (props: Props) => {
                           </div>
                         </div>
                       ))}
+                      <NEPTokenTransactions events={parsedEvents} />
                     </div>
                   </PerfectScrollbar>
                 </div>
