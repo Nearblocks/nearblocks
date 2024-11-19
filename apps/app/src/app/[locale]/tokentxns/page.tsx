@@ -6,13 +6,15 @@ import { Suspense } from 'react';
 import TokenTxnsSkeleton from '@/components/app/skeleton/ft/Tokentxns';
 import Transfers from '@/components/app/Tokens/FTTransfers';
 
-export default async function TokenTxns({
-  params: { locale },
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams: any;
+export default async function TokenTxns(props: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<any>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   return (

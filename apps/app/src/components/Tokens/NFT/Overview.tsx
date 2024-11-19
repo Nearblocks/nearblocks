@@ -184,6 +184,7 @@ const Overview = ({ holders, status, token, transfers }: Props) => {
                       <Link
                         className="text-green-500 dark:text-green-250 hover:no-underline"
                         href={`/address/${token?.contract}`}
+                        legacyBehavior
                       >
                         {token?.contract}
                       </Link>
@@ -201,6 +202,7 @@ const Overview = ({ holders, status, token, transfers }: Props) => {
                       <Link
                         className="hover:no-underline"
                         href={`${token?.website}`}
+                        legacyBehavior
                       >
                         {token?.website}
                       </Link>

@@ -4,7 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  getLayout?: (page: ReactElement<any>) => ReactNode;
 };
 
 export type NetworkId = ProductionNetwork['networkId'];

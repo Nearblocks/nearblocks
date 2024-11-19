@@ -11,11 +11,13 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { hash: string; locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   const metaTitle = t('charts.nearPrice.metaTitle');
@@ -46,11 +48,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function NearPriceChart({
-  params: { locale },
-}: {
-  params: { locale: string };
+export default async function NearPriceChart(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
   const data = await getRequest('charts');
   return (

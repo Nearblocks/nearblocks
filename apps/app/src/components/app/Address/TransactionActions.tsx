@@ -280,7 +280,7 @@ const TransactionActions = ({
         <>
           <Menu>
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t ? t('from') : 'FROM'}{' '}
+              {t ? t('filter.from') : 'FROM'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">

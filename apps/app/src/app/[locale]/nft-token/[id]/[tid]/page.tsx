@@ -5,13 +5,15 @@ import QueryString from 'qs';
 import NFTDetails from '@/components/app/Tokens/NFT/NFTDetails';
 import { getRequest } from '@/utils/app/api';
 
-export default async function NFTDetailsIndex({
-  params: { id, tid },
-  searchParams,
-}: {
-  params: { id: string; tid: string };
-  searchParams: any;
+export default async function NFTDetailsIndex(props: {
+  params: Promise<{ id: string; tid: string }>;
+  searchParams: Promise<any>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { id, tid } = params;
+
   const apiUrl = `nfts/${id}/tokens/${tid}`;
   const fetchUrl = searchParams
     ? `${apiUrl}/txns?${QueryString.stringify(searchParams)}`

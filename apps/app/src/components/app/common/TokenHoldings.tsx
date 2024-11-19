@@ -28,7 +28,7 @@ const TokenHoldings = (props: Props) => {
 
   const nfts = props?.data?.nfts || [];
 
-  if (!props.ft?.tokens?.length && !nfts?.length) {
+  if (!props?.ft?.tokens?.length && !nfts?.length) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>

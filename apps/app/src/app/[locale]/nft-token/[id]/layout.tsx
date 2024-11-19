@@ -7,11 +7,13 @@ import { Token } from '@/utils/types';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { id, locale },
-}: {
-  params: { id: string; locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { id, locale } = params;
+
   unstable_setRequestLocale(locale);
 
   const tokenDetails = await getRequest(`nfts/${id}`);
@@ -54,7 +56,6 @@ export default async function NFTTokenLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: any;
 }) {
-  return <>{children}</>;
+  return [children];
 }

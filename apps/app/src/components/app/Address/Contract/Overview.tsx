@@ -7,19 +7,9 @@ import { ContractCodeInfo } from '@/utils/types';
 
 import OverviewActions from './OverviewActions';
 
-const getCookieFromRequest = (cookieName: string): null | string => {
-  const cookie = cookies().get(cookieName);
-  return cookie ? cookie.value : null;
-};
-
-/*
-const VmInitializer = dynamic(() => import('../../vm/VmInitializer'), {
-  ssr: false,
-});
-*/
-
 const Overview = async ({ id, searchParams }: any) => {
-  const rpcUrl = getCookieFromRequest('rpcUrl') || RpcProviders?.[0]?.url;
+  const cookieStore = await cookies();
+  const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
 
   const [data, parse, account] = await Promise.all([
     getRequest(
@@ -32,7 +22,6 @@ const Overview = async ({ id, searchParams }: any) => {
 
   return (
     <>
-      {/* <VmInitializer /> */}
       <OverviewActions
         accountId={account?.account[0]?.account_id}
         contract={parse?.contract?.[0]?.contract as ContractCodeInfo}

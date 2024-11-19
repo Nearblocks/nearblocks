@@ -5,7 +5,8 @@ import QueryString from 'qs';
 import List from '@/components/app/Tokens/NFTList';
 import { getRequest } from '@/utils/app/api';
 
-export default async function NFTTokens({ searchParams }: any) {
+export default async function NFTTokens(props: any) {
+  const searchParams = await props.searchParams;
   const dataResult = await getRequest(
     `nfts?sort=txns_day&per_page=50&${QueryString.stringify(searchParams)}`,
   );

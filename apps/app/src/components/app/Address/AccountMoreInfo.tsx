@@ -34,16 +34,15 @@ export default function AccountMoreInfo({
     const loadSchema = async () => {
       try {
         const [code, keys, account]: any = await Promise.all([
-          contractCode(id as string).catch((error: any) => {
-            console.error(`Error fetching contract code for ${id}:`, error);
+          contractCode(id as string).catch(() => {
             return null;
           }),
-          viewAccessKeys(id as string).catch((error: any) => {
-            console.error(`Error fetching access keys for ${id}:`, error);
+
+          viewAccessKeys(id as string).catch(() => {
             return null;
           }),
-          viewAccount(id as string).catch((error: any) => {
-            console.error(`Error fetching account for ${id}:`, error);
+
+          viewAccount(id as string).catch(() => {
             return null;
           }),
         ]);

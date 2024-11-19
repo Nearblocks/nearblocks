@@ -38,11 +38,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function VerifyContract({
-  searchParams: { accountId, selectedVerifier },
-}: {
-  searchParams: { accountId: string; selectedVerifier: string };
+export default async function VerifyContract(props: {
+  searchParams: Promise<{ accountId: string; selectedVerifier: string }>;
 }) {
+  const searchParams = await props.searchParams;
+
+  const { accountId, selectedVerifier } = searchParams;
+
   return (
     <>
       <div className="h-80"></div>

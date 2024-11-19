@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { unstable_setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
 
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
 import ListCheck from '@/components/Icons/ListCheck';
 import { networkId } from '@/utils/app/config';
@@ -11,11 +11,13 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { hash, locale },
-}: {
-  params: { hash: string; locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { hash, locale } = params;
+
   unstable_setRequestLocale(locale);
 
   const metaTitle = 'All Latest Near Protocol Transactions | NearBlocks';
@@ -47,20 +49,18 @@ export async function generateMetadata({
   };
 }
 
-export default async function TxnsLayout({
-  children,
-  params: { hash, locale },
-}: {
+export default async function TxnsLayout(props: {
   children: React.ReactNode;
-  params: any;
+  params: Promise<any>;
 }) {
+  const params = await props.params;
+
+  const { hash, locale } = params;
+
+  const { children } = props;
+
   const t = await getTranslations({ locale });
-  const RpcMenu = dynamic(
-    () => import('../../../../components/app/Layouts/RpcMenu'),
-    {
-      ssr: false,
-    },
-  );
+
   return (
     <>
       <div className="md:flex items-center justify-between container-xxl mx-auto px-5">

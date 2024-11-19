@@ -176,167 +176,6 @@ const ViewOrChangeAbi = (props: Props) => {
   }, [method?.params?.args, schema?.body?.root_schema?.definitions]);
 
   return (
-    <AccordionItem
-      className="flex flex-col text-gray-600 text-sm mb-3"
-      key={index}
-    >
-      <AccordionButton className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10">
-        <span>
-          <span className="text-gray-400 dark:text-neargray-10">
-            {index + 1}.
-          </span>{' '}
-          {toSnakeCase(method.name ?? '')}
-        </span>
-        <ArrowRight className="contract-icon fill-gray-600" />
-      </AccordionButton>
-      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
-        <div className="flex max-w-xl justify-between mb-3">
-          <div className="flex items-center dark:text-neargray-10">
-            Arguments
-            <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Specify an arguments schema."
-            >
-              <span>
-                <Question className="w-4 h-4 fill-current ml-1" />
-              </span>
-            </Tooltip>
-          </div>
-          <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
-          <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
-        </div>
-        {fields.map((field: FieldType) => (
-          <div className="flex max-w-xl items-center" key={field?.id}>
-            <div className="sm:grid grid-cols-9 gap-2">
-              <input
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
-                name="name"
-                onChange={onChange(field?.id)}
-                placeholder="Argument name"
-                value={field?.name}
-              />
-              <select
-                className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
-                name="type"
-                onChange={onChange(field?.id)}
-                value={field?.type}
-              >
-                <option disabled value="">
-                  Type
-                </option>
-                {inputTypes?.map((type) => (
-                  <option key={type} value={type}>
-                    {capitalize(type)}
-                  </option>
-                ))}
-              </select>
-              <input
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
-                name="value"
-                onChange={onChange(field?.id)}
-                placeholder={field?.placeholder || 'Argument value'}
-                value={field?.value}
-              />
-            </div>
-            <button
-              className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
-              onClick={onRemove(field?.id)}
-            >
-              <CloseCircle className="text-white fill-white w-4 h-4" />
-            </button>
-          </div>
-        ))}
-        <div className="flex max-w-xl justify-between mb-3 dark:text-neargray-10">
-          <div className="flex items-center dark:text-neargray-10">
-            Options
-            <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Optional arguments for write operations."
-            >
-              <span>
-                <Question className="w-4 h-4 fill-current ml-1" />
-              </span>
-            </Tooltip>
-          </div>
-        </div>
-        <div className="slide-down disclosure">
-          <div className="max-w-xl sm:grid grid-cols-2 gap-2">
-            <label>
-              <span className="text-gray-400 text-xs ">Attached deposit</span>
-              <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
-                name="attachedDeposit"
-                onChange={onOptionChange('attachedDeposit')}
-                placeholder="Attached Deposit"
-                value={options.attachedDeposit}
-              />
-            </label>
-            <label>
-              <span className="text-gray-400 text-xs">Gas</span>
-              <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
-                name="gas"
-                onChange={onOptionChange('gas')}
-                placeholder="Gas"
-                value={options.gas}
-              />
-            </label>
-          </div>
-        </div>
-        <div className="flex items-center mt-5">
-          {!hideQuery && method?.kind === 'view' && (
-            <button
-              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading}
-              onClick={onRead}
-              type="submit"
-            >
-              Query
-            </button>
-          )}
-          {method?.kind === 'call' && (
-            <button
-              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading || !connected}
-              onClick={onWrite}
-              type="submit"
-            >
-              Write
-            </button>
-          )}
-        </div>
-        {error && (
-          <textarea
-            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
-            readOnly
-            rows={6}
-            value={error}
-          />
-        )}
-        {txn && (
-          <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
-            View txn details:{' '}
-            <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={txn}
-            >
-              <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-                <Link href={`/txns/${txn}`}>{txn}</Link>
-              </span>
-            </Tooltip>
-          </div>
-        )}
-        {result && (
-          <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
-            readOnly
-            rows={6}
-            value={result}
-          />
-        )}
-      </AccordionPanel>
-    </AccordionItem>
-
     // <Accordion.Item
     //   value={index + 1}
     //   className="flex flex-col text-sm mb-3"
@@ -518,6 +357,166 @@ const ViewOrChangeAbi = (props: Props) => {
     //     )}
     //   </Accordion.Content>
     // </Accordion.Item>
+    <AccordionItem
+      className="flex flex-col text-gray-600 text-sm mb-3"
+      key={index}
+    >
+      <AccordionButton className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10">
+        <span>
+          <span className="text-gray-400 dark:text-neargray-10">
+            {index + 1}.
+          </span>{' '}
+          {toSnakeCase(method.name ?? '')}
+        </span>
+        <ArrowRight className="contract-icon fill-gray-600" />
+      </AccordionButton>
+      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
+        <div className="flex max-w-xl justify-between mb-3">
+          <div className="flex items-center dark:text-neargray-10">
+            Arguments
+            <Tooltip
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
+              label="Specify an arguments schema."
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </Tooltip>
+          </div>
+          <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
+          <div className="flex ml-2 mr-1 text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"></div>
+        </div>
+        {fields.map((field: FieldType) => (
+          <div className="flex max-w-xl items-center" key={field?.id}>
+            <div className="sm:grid grid-cols-9 gap-2">
+              <input
+                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                name="name"
+                onChange={onChange(field?.id)}
+                placeholder="Argument name"
+                value={field?.name}
+              />
+              <select
+                className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
+                name="type"
+                onChange={onChange(field?.id)}
+                value={field?.type}
+              >
+                <option disabled value="">
+                  Type
+                </option>
+                {inputTypes?.map((type) => (
+                  <option key={type} value={type}>
+                    {capitalize(type)}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                name="value"
+                onChange={onChange(field?.id)}
+                placeholder={field?.placeholder || 'Argument value'}
+                value={field?.value}
+              />
+            </div>
+            <button
+              className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
+              onClick={onRemove(field?.id)}
+            >
+              <CloseCircle className="text-white fill-white w-4 h-4" />
+            </button>
+          </div>
+        ))}
+        <div className="flex max-w-xl justify-between mb-3 dark:text-neargray-10">
+          <div className="flex items-center dark:text-neargray-10">
+            Options
+            <Tooltip
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
+              label="Optional arguments for write operations."
+            >
+              <span>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </span>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="slide-down disclosure">
+          <div className="max-w-xl sm:grid grid-cols-2 gap-2">
+            <label>
+              <span className="text-gray-400 text-xs ">Attached deposit</span>
+              <input
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                name="attachedDeposit"
+                onChange={onOptionChange('attachedDeposit')}
+                placeholder="Attached Deposit"
+                value={options.attachedDeposit}
+              />
+            </label>
+            <label>
+              <span className="text-gray-400 text-xs">Gas</span>
+              <input
+                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                name="gas"
+                onChange={onOptionChange('gas')}
+                placeholder="Gas"
+                value={options.gas}
+              />
+            </label>
+          </div>
+        </div>
+        <div className="flex items-center mt-5">
+          {!hideQuery && method?.kind === 'view' && (
+            <button
+              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading}
+              onClick={onRead}
+              type="submit"
+            >
+              Query
+            </button>
+          )}
+          {method?.kind === 'call' && (
+            <button
+              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading || !connected}
+              onClick={onWrite}
+              type="submit"
+            >
+              Write
+            </button>
+          )}
+        </div>
+        {error && (
+          <textarea
+            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
+            readOnly
+            rows={6}
+            value={error}
+          />
+        )}
+        {txn && (
+          <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
+            View txn details:{' '}
+            <Tooltip
+              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
+              label={txn}
+            >
+              <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+                <Link href={`/txns/${txn}`}>{txn}</Link>
+              </span>
+            </Tooltip>
+          </div>
+        )}
+        {result && (
+          <textarea
+            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
+            readOnly
+            rows={6}
+            value={result}
+          />
+        )}
+      </AccordionPanel>
+    </AccordionItem>
   );
 };
 

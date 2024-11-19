@@ -7,11 +7,13 @@ import ThemeImage from '@/components/app/Advertise/ThemeImage';
 import { Link } from '@/i18n/routing';
 import { appUrl } from '@/utils/app/config';
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { locale } = params;
+
   unstable_setRequestLocale(locale);
 
   const t = await getTranslations();
@@ -45,11 +47,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Advertise({
-  params: { locale },
-}: {
-  params: { locale: string };
+export default async function Advertise(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
   return (
     <div className="container-xxl mx-auto herobg flex flex-col items-center p-4.5 lg:!py-16 px-6">

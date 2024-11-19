@@ -4,13 +4,15 @@ import { getTranslations } from 'next-intl/server';
 
 import TransfersList from '@/components/app/Tokens/NFTTransfers';
 
-export default async function NFTTokentxns({
-  params: { locale },
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams: any;
+export default async function NFTTokentxns(props: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<any>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   return (

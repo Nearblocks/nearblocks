@@ -4,17 +4,14 @@ import React, { Children, ReactElement, ReactNode } from 'react';
 
 import { Link, usePathname } from '@/i18n/routing';
 
-type LinkProps = Omit<typeof Link, 'locale'> & {
-  className?: any;
-  legacyBehavior?: boolean;
-  locale?: any;
-};
-
-interface ActiveLinkProps extends LinkProps {
+interface ActiveLinkProps {
   activeClassName?: string;
   children: ReactNode;
+  className?: any;
   href: string | UrlObject;
   inActiveClassName?: string;
+  legacyBehavior?: boolean;
+  locale?: any;
 }
 
 const ActiveLink = ({

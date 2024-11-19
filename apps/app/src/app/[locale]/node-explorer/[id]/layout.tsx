@@ -4,11 +4,13 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { id },
-}: {
-  params: { id: string };
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { id } = params;
+
   const metaTitle = `${network === 'testnet' ? 'TESTNET ' : ''}${
     id ? `${id}: ` : ''
   } delegators | NearBlocks`;
@@ -45,7 +47,6 @@ export default async function DelegatorLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: any;
 }) {
   return [children];
 }

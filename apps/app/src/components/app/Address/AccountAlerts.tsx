@@ -25,13 +25,11 @@ export default function AccountAlerts({
     if (!id) return;
 
     try {
-      const [code, keys, account]: any = await Promise.all([
-        contractCode(id).catch((error) => {
-          console.error(`Error fetching contract code for ${id}:`, error);
+      const [code, account]: any = await Promise.all([
+        contractCode(id).catch(() => {
           return null;
         }),
-        viewAccount(id).catch((error) => {
-          console.error(`Error fetching account for ${id}:`, error);
+        viewAccount(id).catch(() => {
           return null;
         }),
       ]);
@@ -54,7 +52,7 @@ export default function AccountAlerts({
         setIsContractLoading(false);
       }
 
-      const locked = (keys?.keys || []).every(
+      const locked = (account?.keys || []).every(
         (key: { access_key: { permission: string } }) =>
           key.access_key.permission !== 'FullAccess',
       );
@@ -112,11 +110,11 @@ export default function AccountAlerts({
   }
 
   if (
-    accountView &&
+    accountView !== null &&
     isLocked &&
     accountData &&
-    !accountData?.deleted?.transaction_hash &&
-    !contract &&
+    accountData?.deleted?.transaction_hash === null &&
+    contract === null &&
     !isContractLoading
   ) {
     return (

@@ -173,7 +173,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
               label={row?.description?.country}
             >
               <Image
-                alt={row?.description?.country as string}
+                alt={(row?.description?.country as string) || 'location'}
                 height={20}
                 layout="fixed"
                 src={`https://flagcdn.com/48x36/${row?.description?.country_code?.toLowerCase()}.png`}

@@ -1,18 +1,18 @@
-import { unstable_setRequestLocale } from 'next-intl/server';
-import dynamic from 'next/dynamic';
-
 import Buttons from '@/components/app/Icons/Button';
+import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import ListCheck from '@/components/Icons/ListCheck';
 import { appUrl, networkId } from '@/utils/app/config';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-export async function generateMetadata({
-  params: { id, locale },
-}: {
-  params: { id: string; locale: string };
+
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  unstable_setRequestLocale(locale);
+  const params = await props.params;
+
+  const { id } = params;
+
   const thumbnail = `${appUrl}/api/og?account=true&address=${id}`;
   const metaTitle = `Near Account ${id} | NearBlocks`;
   const metaDescription = `Near Account ${id} page allows users to view transactions, balances, token holdings and transfers.`;
@@ -35,19 +35,16 @@ export async function generateMetadata({
   };
 }
 
-export default function AddressLayout({
-  children,
-  params: { id },
-}: {
+export default async function AddressLayout(props: {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const RpcMenu = dynamic(
-    () => import('../../../../components/app/Layouts/RpcMenu'),
-    {
-      ssr: false,
-    },
-  );
+  const params = await props.params;
+
+  const { id } = params;
+
+  const { children } = props;
+
   return (
     <>
       <div className="relative container-xxl mx-auto px-5 mb-10">

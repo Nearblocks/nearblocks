@@ -195,8 +195,8 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                       height={24}
                       src={`/images/${
                         theme === 'dark'
-                          ? 'near price_dark.svg'
-                          : 'near price.svg'
+                          ? 'near_price_dark.svg'
+                          : 'near_price.svg'
                       }`}
                       width={24}
                     />

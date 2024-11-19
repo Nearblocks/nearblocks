@@ -1,7 +1,8 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import Image from 'next/legacy/image';
-import React, { Suspense, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
@@ -59,7 +60,6 @@ const menus = [
         fallbackText: 'Multichain Txns',
         id: 6,
         link: '/multi-chain-txns',
-        title: 'Multichain Txns',
       },
     ],
     title: 'header.menu.blockchain',
@@ -174,6 +174,7 @@ const Header = ({
   const { networkId } = useConfig();
   const pathname = usePathname();
   const isMobile = useScreenSize();
+  const router = useRouter();
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -196,19 +197,12 @@ const Header = ({
     logOut();
   };
 
-  type LinkProps = Omit<typeof Link, 'locale'> & {
-    children: any;
-    className: any;
-    href: string;
-    locale: any;
-  };
-
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   };
 
-  const IntlLink: React.FC<LinkProps> = (props) => {
+  const IntlLink = (props: any) => {
     if (!routing?.locales?.includes(props.locale)) {
       console.error(`Invalid locale: ${props.locale}`);
       return null;
@@ -218,6 +212,11 @@ const Header = ({
   };
 
   const dynamicClass = !showSearch && isMobile ? 'hidden' : '';
+
+  useEffect(() => {
+    router.refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -448,7 +447,9 @@ const Header = ({
                                     href={submenu?.link}
                                     onClick={() => setOpen(false)}
                                   >
-                                    {t(submenu?.title) || submenu.fallbackText}
+                                    {submenu?.title
+                                      ? t(submenu?.title)
+                                      : submenu.fallbackText}
                                   </Link>
                                 </li>
                               ))}
@@ -470,8 +471,9 @@ const Header = ({
                                     href={submenu?.link}
                                   >
                                     <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-black-600">
-                                      {t(submenu?.title) ||
-                                        submenu.fallbackText}
+                                      {submenu?.title
+                                        ? t(submenu?.title)
+                                        : submenu.fallbackText}
                                     </a>
                                   </ActiveLink>
                                 </li>

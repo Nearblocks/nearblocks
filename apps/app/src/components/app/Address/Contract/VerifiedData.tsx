@@ -277,7 +277,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
 
                       <div
                         className={`transition-all duration-300 ease-in-out border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 overflow-y-auto p-0 `}
-                        ref={(el) => (codeContainerRefs.current[name] = el)}
+                        ref={(el) => {
+                          codeContainerRefs.current[name] = el;
+                        }}
                         style={{
                           height: `${codeHeights[name] || 300}px`,
                         }}

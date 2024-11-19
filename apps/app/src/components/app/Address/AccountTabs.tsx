@@ -30,15 +30,19 @@ export default async function AccountTabs({
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },
-    { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
-    { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+    { label: 'Token Txns', message: t('tokenTxns'), name: 'tokentxns' },
+    {
+      label: 'NFT Token Txns',
+      message: t('nftTokenTxns'),
+      name: 'nfttokentxns',
+    },
     {
       label: 'Multichain Transactions',
-      message: 'multichainTxns',
+      message: t('multichainTxns'),
       name: 'multichaintxns',
     },
-    { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
-    { label: 'Contract', message: 'contract', name: 'contract' },
+    { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
+    { label: 'Contract', message: t('contract'), name: 'contract' },
   ];
   const getClassName = (selected: boolean) =>
     classNames(
@@ -53,7 +57,7 @@ export default async function AccountTabs({
     <div className="block lg:flex lg:space-x-2 mb-10">
       <div className="w-full ">
         <div className="flex overflow-x-auto min-w-full min-h-fit">
-          {tabs?.map(({ label, message, name }) => {
+          {tabs?.map(({ message, name }) => {
             const hasContractTab =
               parse?.contract?.[0]?.contract &&
               Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
@@ -73,7 +77,7 @@ export default async function AccountTabs({
                 scroll={false}
               >
                 <h2>
-                  {t(`${message}`) || label}
+                  {message}
                   {name === 'contract' && (
                     <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md  -mt-3 px-1">
                       NEW

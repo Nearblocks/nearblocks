@@ -171,6 +171,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
+                legacyBehavior
               >
                 {row?.transaction_hash}
               </Link>
@@ -302,6 +303,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
               <Link
                 className="hover:no-underline"
                 href={`/address/${row?.signer_account_id}`}
+                legacyBehavior
                 onMouseLeave={handleMouseLeave}
                 onMouseOver={(e) =>
                   onHandleMouseOver(e, row?.signer_account_id)
@@ -383,6 +385,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
                     : 'text-green-500 dark:text-green-250 border-transparent'
                 }`}
                 href={`/address/${row?.receiver_account_id}`}
+                legacyBehavior
                 onMouseLeave={handleMouseLeave}
                 onMouseOver={(e) =>
                   onHandleMouseOver(e, row?.receiver_account_id)
@@ -445,6 +448,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
           <Link
             className="text-green-500 dark:text-green-250 hover:no-underline"
             href={`/blocks/${row?.included_in_block_hash}`}
+            legacyBehavior
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)

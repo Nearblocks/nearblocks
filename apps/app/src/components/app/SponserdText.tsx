@@ -2,9 +2,7 @@
 import { useEnvContext } from 'next-runtime-env';
 import React, { useEffect, useState } from 'react';
 
-import Skeleton from './skeleton/common/Skeleton';
-
-const SponserdText: React.FC<any> = () => {
+const SponserdText = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
   const { NEXT_PUBLIC_USER_API_URL: userApiUrl } = useEnvContext();
@@ -58,7 +56,7 @@ const SponserdText: React.FC<any> = () => {
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
           </div>
         ) : (
-          <Skeleton className="h-6 w-1/2" />
+          <div className="h-6 w-1/2" />
         )}
       </div>
     );
