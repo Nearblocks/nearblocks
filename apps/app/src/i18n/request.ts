@@ -5,27 +5,11 @@ import { routing } from './routing';
 
 export default getRequestConfig(async ({ locale }) => {
   if (!routing.locales.includes(locale as any)) notFound();
-
-  const [
-    commonMessages,
-    homeMessages,
-    blockMessages,
-    txnsMessages,
-    addressMessages,
-    chartsMessages,
-    tokenMessages,
-    contactMessages,
-    topAccountsMessages,
-    termsMessages,
-    claimAddressMessages,
-    kbMessages,
-    notFoundMessages,
-  ] = await Promise.all([
+  const imports = [
     import(`nearblocks-trans-next-intl/${locale}/common.json`),
     import(`nearblocks-trans-next-intl/${locale}/home.json`),
     import(`nearblocks-trans-next-intl/${locale}/blocks.json`),
     import(`nearblocks-trans-next-intl/${locale}/txns.json`),
-    import(`nearblocks-trans-next-intl/${locale}/address.json`),
     import(`nearblocks-trans-next-intl/${locale}/charts.json`),
     import(`nearblocks-trans-next-intl/${locale}/token.json`),
     import(`nearblocks-trans-next-intl/${locale}/contact.json`),
@@ -34,24 +18,17 @@ export default getRequestConfig(async ({ locale }) => {
     import(`nearblocks-trans-next-intl/${locale}/claim-address.json`),
     import(`nearblocks-trans-next-intl/${locale}/kb.json`),
     import(`nearblocks-trans-next-intl/${locale}/404.json`),
-  ]);
-
-  const messages = {
-    ...commonMessages.default,
-    ...homeMessages.default,
-    ...blockMessages.default,
-    ...addressMessages.default,
-    ...txnsMessages.default,
-    ...chartsMessages.default,
-    ...tokenMessages.default,
-    ...contactMessages.default,
-    ...topAccountsMessages.default,
-    ...termsMessages.default,
-    ...claimAddressMessages.default,
-    ...kbMessages.default,
-    ...notFoundMessages.default,
-  };
-
+    import(`nearblocks-trans-next-intl/${locale}/address.json`),
+    import(`nearblocks-trans-next-intl/${locale}/multi-chain-txns.json`),
+  ];
+  const results = await Promise.allSettled(imports);
+  const messages = results.reduce((acc, result) => {
+    if (result.status === 'fulfilled') {
+      return { ...acc, ...result.value.default };
+    } else {
+      return acc;
+    }
+  }, {});
   return {
     messages,
   };

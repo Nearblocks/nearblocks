@@ -82,6 +82,11 @@ export const chainAbstractionExplorerUrl =
         },
       };
 
+export const chain = {
+  bitcoin: 'BITCOIN',
+  ethereum: 'ETHEREUM',
+};
+
 const evmWalletChains = {
   mainnet: {
     chainId: 397,
