@@ -319,6 +319,7 @@ export type ChartStat = {
   gas_fee: string;
   gas_used: string;
   market_cap: string;
+  multichain_txns: string;
   near_price: string;
   total_addresses: string;
   total_supply: string;

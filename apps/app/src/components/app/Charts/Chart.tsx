@@ -107,6 +107,15 @@ const Chart = (props: Props) => {
       link: '/charts/tps',
       text: 'Near Transactions per Second Chart',
     },
+    {
+      exclude: false,
+      image: `/images/charts/multi-chain-txns.svg`,
+      image_dark: `/images/charts/multi-chain-txns.svg`,
+      link: '/charts/multi-chain-txns',
+      text: t
+        ? t('charts:multichainTxns.heading')
+        : 'Multi Chain Transactions Chart',
+    },
   ];
 
   const chartData = useMemo(() => {
@@ -128,6 +137,12 @@ const Chart = (props: Props) => {
           price: Number(stat.near_price),
           x: new Date(stat.date).valueOf(),
           y: Number(stat.market_cap),
+        }),
+        'multi-chain-txns': (stat: ChartStat) => ({
+          date: stat.date,
+          multiChainTxns: stat.multichain_txns,
+          x: new Date(stat.date).valueOf(),
+          y: Number(stat.multichain_txns),
         }),
         'near-price': (stat: ChartStat) => ({
           date: stat.date,
@@ -232,6 +247,12 @@ const Chart = (props: Props) => {
           yLabel = 'Near Price (USD)';
           description =
             'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
+          break;
+        case 'multi-chain-txns':
+          titleText = 'Multi Chain Transactions Chart';
+          yLabel = 'Multichain Transactions per Day';
+          description =
+            'The chart highlights the total number of multichain transactions on Near blockchain.';
           break;
         default:
       }
@@ -450,6 +471,12 @@ const Chart = (props: Props) => {
                       tooltipContent = \`
                         \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
                         Near Price: <strong>$\${dollarFormat(item.y)}</strong>
+                        \`;
+                    break;
+                  case "multi-chain-txns":
+                      tooltipContent = \`
+                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
+                        Total Multichain Transactions: <strong>$\{(item.y)}</strong>
                         \`;
                     break;
                 default:

@@ -7,8 +7,8 @@ import QueryString from 'qs';
 import React, { useState } from 'react';
 
 import { Link } from '@/i18n/routing';
-import { chainAbstractionExplorerUrl } from '@/utils/app/config';
-import { localFormat, truncateString } from '@/utils/libs';
+import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
+import { localFormat } from '@/utils/app/libs';
 import { MultiChainTxnInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
@@ -22,6 +22,7 @@ import Clock from '../Icons/Clock';
 import Ethereum from '../Icons/Ethereum';
 import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
+import Near from '../Icons/Near';
 import SortIcon from '../Icons/SortIcon';
 import Skeleton from '../skeleton/common/Skeleton';
 
@@ -31,14 +32,23 @@ const initialForm = {
   multichain_address: '',
 };
 
-interface TxnsProps {
+interface MultiChainTxnsProps {
   count: string;
   cursor: string;
   error: boolean;
+  isTab: boolean;
+  tab: string;
   txns: MultiChainTxnInfo[];
 }
 
-const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
+const MultiChainTxns = ({
+  count,
+  cursor,
+  error,
+  isTab,
+  tab,
+  txns,
+}: MultiChainTxnsProps) => {
   const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
@@ -50,7 +60,6 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
   const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
   const onChange = (e: any) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -152,7 +161,7 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             label={row?.receipt_id}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
+            <span className="truncate max-w-[150px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                 href={`/txns/${row?.transaction_hash}#execution#${row?.receipt_id}`}
@@ -163,7 +172,7 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
           </Tooltip>
         </span>
       ),
-      header: <span>RECEIPT ID</span>,
+      header: <span>{t ? t('receiptId') : 'RECEIPT ID'}</span>,
       key: 'receipt_id',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -177,7 +186,7 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
             label={row?.transaction_hash}
           >
             <span
-              className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md ${
+              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
                 row?.transaction_hash === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
@@ -189,13 +198,22 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
                 onMouseLeave={handleMouseLeave}
                 onMouseOver={(e) => onHandleMouseOver(e, row?.transaction_hash)}
               >
-                {row?.transaction_hash}
+                {row?.transaction_hash && (
+                  <div className="flex items-center w-full">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    </div>
+                    <span className="ml-2 truncate max-w-[150px]">
+                      {row?.transaction_hash}
+                    </span>
+                  </div>
+                )}
               </Link>
             </span>
           </Tooltip>
         </span>
       ),
-      header: <span>{'SOURCE TXN HASH'}</span>,
+      header: <span>{t ? t('sourceTxn') : 'SOURCE TXN HASH'}</span>,
       key: 'source_transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -205,11 +223,11 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
       cell: (row: MultiChainTxnInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
+            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             label={row?.account_id}
           >
             <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
                 row?.account_id === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
@@ -221,7 +239,16 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
                 onMouseLeave={handleMouseLeave}
                 onMouseOver={(e) => onHandleMouseOver(e, row?.account_id)}
               >
-                {row?.account_id && truncateString(row?.account_id, 15, '...')}
+                {row?.account_id && (
+                  <div className="flex items-center w-full">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    </div>
+                    <span className="ml-2 truncate max-w-[150px]">
+                      {row?.account_id}
+                    </span>
+                  </div>
+                )}
               </Link>
             </span>
           </Tooltip>
@@ -230,8 +257,9 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
       header: (
         <>
           <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {'FROM'} <Filter className="h-4 w-4 fill-current ml-2" />
+            <MenuButton className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+              {t ? t('from') : 'FROM'}{' '}
+              <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
               <form className="flex flex-col" onSubmit={onFilter}>
@@ -269,105 +297,34 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
       key: 'from',
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium ',
+      thClassName: 'px-4 py-4',
     },
     {
       cell: (row: MultiChainTxnInfo) => (
-        <span>
-          <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.chain}
-          >
-            <div
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md w-fit ${
-                row?.chain === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={handleChainSelect(
-                  row?.chain.toLowerCase(),
-                  row?.derived_address,
-                )}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) => onHandleMouseOver(e, row?.chain)}
-                target="_blank"
-              >
-                {row?.chain && (
-                  <div className="flex items-center justify-between w-full ">
-                    <div className="flex items-center">
-                      <div className="p-0.5 w-6 h-6 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                        {row?.chain === 'BITCOIN' && (
-                          <Bitcoin className="w-4 h-4 text-orange-400" />
-                        )}
-                        {row?.chain === 'ETHEREUM' && (
-                          <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                        )}
-                      </div>
-                      <span className="ml-2">{row?.chain}</span>
-                    </div>
-                  </div>
-                )}
-              </Link>
-            </div>
-          </Tooltip>
-        </span>
-      ),
-      header: (
-        <>
-          <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none whitespace-nowrap ">
-              {'DESTINATION CHAIN'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
-              <form className="flex flex-col" onSubmit={onFilter}>
-                <input
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-                  name="chain"
-                  onChange={onChange}
-                  placeholder={'Search by chain'}
-                  value={form.chain}
-                />
-                <div className="flex">
-                  <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
-                    type="submit"
-                  >
-                    <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                    {t ? t('filter.filter') : 'Filter'}
-                  </button>
-                  <button
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
-                    name="chain"
-                    onClick={onClear}
-                    type="button"
-                  >
-                    {t ? t('filter.clear') : 'Clear'}
-                  </button>
-                </div>
-              </form>
-            </MenuList>
-          </Menu>
-        </>
-      ),
-      key: 'chain',
-      tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium ',
-    },
-    {
-      cell: () => (
         <span>
           <span
             className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md border-transparent
             `}
           >
-            -
+            {row?.derived_address && row?.chain && (
+              <div className="flex items-center justify-between w-full ">
+                <div className="flex items-center">
+                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                    {row?.chain === chain.bitcoin && (
+                      <Bitcoin className="w-4 h-4 text-orange-400" />
+                    )}
+                    {row?.chain === chain.ethereum && (
+                      <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    )}
+                  </div>
+                  <span className="ml-2">-</span>
+                </div>
+              </div>
+            )}
           </span>
         </span>
       ),
-      header: <span>{'DESTINATION TXN HASH'}</span>,
+      header: <span>{t ? t('destinationTxn') : 'DESTINATION TXN HASH'}</span>,
       key: 'destination_transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -381,7 +338,7 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
             label={row?.derived_address}
           >
             <div
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
+              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
                 row?.derived_address === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
@@ -390,15 +347,28 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 href={handleChainSelect(
-                  row?.chain.toLowerCase(),
+                  row?.chain?.toLowerCase(),
                   row?.derived_address,
                 )}
                 onMouseLeave={handleMouseLeave}
                 onMouseOver={(e) => onHandleMouseOver(e, row?.derived_address)}
                 target="_blank"
               >
-                {row?.derived_address &&
-                  truncateString(row?.derived_address, 15, '...')}
+                {row?.derived_address && row?.chain && (
+                  <div className="flex items-center w-full">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      {row?.chain === 'BITCOIN' && (
+                        <Bitcoin className="w-4 h-4 text-orange-400" />
+                      )}
+                      {row?.chain === 'ETHEREUM' && (
+                        <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                      )}
+                    </div>
+                    <span className="ml-2 truncate max-w-[150px]">
+                      {row?.derived_address}
+                    </span>
+                  </div>
+                )}
               </Link>
             </div>
           </Tooltip>
@@ -407,8 +377,8 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
       header: (
         <>
           <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none whitespace-nowrap ">
-              {'DESTINATION ADDRESS'}{' '}
+            <MenuButton className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none whitespace-nowrap ">
+              {t ? t('destinationAddress') : 'DESTINATION ADDRESS'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
             <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
@@ -417,7 +387,9 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
                   className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="multichain_address"
                   onChange={onChange}
-                  placeholder={'Search by address'}
+                  placeholder={
+                    t ? t('filter.placeholderForeign') : 'Search by address'
+                  }
                   value={form.multichain_address}
                 />
                 <div className="flex">
@@ -445,6 +417,7 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
       key: 'multichain_address',
       tdClassName:
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium ',
+      thClassName: 'px-4 py-4',
     },
     {
       cell: (row: MultiChainTxnInfo) => (
@@ -505,39 +478,50 @@ const MultiChainTxns = ({ count, cursor, error, txns }: TxnsProps) => {
 
   return (
     <>
-      {!count ? (
-        <div className="pl-6 max-w-lg w-full py-5 ">
-          <Skeleton className="h-4" />
-        </div>
+      {!isTab || tab === 'multichaintxns' ? (
+        <>
+          <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
+            {isTab &&
+              (!count ? (
+                <div className="pl-6 max-w-lg w-full py-5 ">
+                  <Skeleton className="h-4" />
+                </div>
+              ) : (
+                <TableSummary
+                  filters={
+                    <Filters filters={modifiedFilter} onClear={onAllClear} />
+                  }
+                  text={
+                    txns &&
+                    !error &&
+                    `${`A total of${' '}
+            ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
+            multichain transactions found`}`
+                  }
+                />
+              ))}
+            <Table
+              columns={columns}
+              cursor={cursor}
+              cursorPagination={true}
+              data={txns}
+              Error={error}
+              ErrorText={
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message={errorMessage || ''}
+                  mutedText="Please try again later"
+                />
+              }
+              limit={25}
+              page={page}
+              setPage={setPage}
+            />
+          </div>
+        </>
       ) : (
-        <TableSummary
-          filters={<Filters filters={modifiedFilter} onClear={onAllClear} />}
-          text={
-            txns &&
-            !error &&
-            `A total of${' '}
-              ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
-              multichain transactions found`
-          }
-        />
+        <div className="w-full h-[500px]"></div>
       )}
-      <Table
-        columns={columns}
-        cursor={cursor}
-        cursorPagination={true}
-        data={txns}
-        Error={error}
-        ErrorText={
-          <ErrorMessage
-            icons={<FaInbox />}
-            message={errorMessage || ''}
-            mutedText="Please try again later"
-          />
-        }
-        limit={25}
-        page={page}
-        setPage={setPage}
-      />
     </>
   );
 };
