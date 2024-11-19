@@ -113,7 +113,7 @@ const Chart = (props: Props) => {
       image_dark: `/images/charts/multi-chain-txns.svg`,
       link: '/charts/multi-chain-txns',
       text: t
-        ? t('charts:multichainTxns.heading')
+        ? t('charts.multichainTxns.heading')
         : 'Multi Chain Transactions Chart',
     },
   ];

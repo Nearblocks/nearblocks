@@ -6,13 +6,18 @@ import { Suspense } from 'react';
 import List from '@/components/app/Blocks/List';
 import ListSkeleton from '@/components/app/skeleton/blocks/list';
 
-export default async function Blocks({
-  params: { locale },
-  searchParams: { cursor },
-}: {
-  params: { locale: string };
-  searchParams: { cursor?: string };
+export default async function Blocks(props: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ cursor?: string }>;
 }) {
+  const searchParams = await props.searchParams;
+
+  const { cursor } = searchParams;
+
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   return (
@@ -37,5 +42,3 @@ export default async function Blocks({
     </>
   );
 }
-
-export const revalidate = 20;

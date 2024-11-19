@@ -9,13 +9,9 @@ import AccountMoreInfo from './AccountMoreInfo';
 import AccountOverview from './AccountOverview';
 import MultichainInfo from './MultichainInfo';
 
-const getCookieFromRequest = (cookieName: string): null | string => {
-  const cookie = cookies().get(cookieName);
-  return cookie ? cookie.value : null;
-};
-
 export default async function Balance({ id }: { id: string }) {
-  const rpcUrl = getCookieFromRequest('rpcUrl') || RpcProviders?.[0]?.url;
+  const cookieStore = await cookies();
+  const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
 
   const [
     accountData,

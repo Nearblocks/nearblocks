@@ -1,4 +1,4 @@
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import { getRequest } from '@/utils/app/api';
 
@@ -10,9 +10,8 @@ import LatestTransactions from './Transactions/Latest';
 import Overview from './Transactions/Overview';
 
 export default async function Home({ locale }: { locale: string }) {
-  unstable_setRequestLocale(locale);
   const t = await getTranslations({ locale });
-  const statsDetails = await getRequest('stats');
+  const statsDetails = await getRequest('stats', {});
   const blockDetails = await getRequest('blocks/latest');
   const txnsDetails = await getRequest('txns/latest');
   const charts = await getRequest('charts/latest');
@@ -134,5 +133,3 @@ export default async function Home({ locale }: { locale: string }) {
     </div>
   );
 }
-
-export const revalidate = 5;

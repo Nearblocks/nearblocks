@@ -31,5 +31,3 @@ const TransfersList = async ({ searchParams }: any) => {
   );
 };
 export default TransfersList;
-
-export const revalidate = 5;

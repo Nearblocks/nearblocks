@@ -46,7 +46,6 @@ const ApiActions = ({
         subject,
       };
       const response = await getContactDetails(contactDetails);
-      console.log({ response });
       if (!response) {
         throw new Error('Network response was not ok');
       }
@@ -106,7 +105,7 @@ const ApiActions = ({
               Build Precise & Reliable Apps with NearBlocks APIs
             </h1>
           </div>
-          <div className="flex items-center sm:!justify-start justify-center my-5">
+          <div className="flex flex-col gap-2 sm:!flex-row items-center sm:!justify-start justify-center my-5">
             <button
               className="text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
               onClick={scrollToPlans}
@@ -114,13 +113,13 @@ const ApiActions = ({
               API Pricing Plans
             </button>
             <Link
-              className="mx-4 flex text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit"
               href="https://dash.nearblocks.io/login"
+              legacyBehavior
               rel="noreferrer nofollow noopener"
               target="_blank"
             >
-              User Dashboard
-              <span>
+              <span className=" flex ml-2 text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit">
+                User Dashboard
                 <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
               </span>
             </Link>
@@ -349,12 +348,10 @@ const ApiActions = ({
             </div>
           </div>
           <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
-            <Link
-              className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10"
-              href="/contact?subject=apis"
-              type="button"
-            >
-              Contact Us <Arrow className="text-black-600" />
+            <Link href="/contact?subject=apis" legacyBehavior type="button">
+              <span className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10">
+                Contact Us <Arrow className="text-black-600" />
+              </span>
             </Link>
           </div>
         </div>

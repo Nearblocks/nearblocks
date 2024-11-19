@@ -31,7 +31,6 @@ export default async function ExportDataLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: any;
 }) {
   return [children];
 }

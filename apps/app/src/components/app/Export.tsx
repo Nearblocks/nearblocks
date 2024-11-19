@@ -1,3 +1,5 @@
+'use client';
+
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -7,7 +9,6 @@ import { fetcher } from '@/hooks/useFetch';
 interface Props {
   exportType: string;
   id: any | string;
-  onHandleDowload: (blobUrl: string, file: string) => void;
 }
 
 const today = new Date();
@@ -28,7 +29,7 @@ const initial = {
   start: formattedStart,
 };
 
-const Export: React.FC<Props> = ({ exportType, id, onHandleDowload }) => {
+const Export: React.FC<Props> = ({ exportType, id }) => {
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);
   const [endDate, setEndDate] = useState(initial.end);
@@ -70,6 +71,16 @@ const Export: React.FC<Props> = ({ exportType, id, onHandleDowload }) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exportType, id, startDate, endDate]);
+
+  const onHandleDowload = (blobUrl: string, file: string): void => {
+    const a: HTMLAnchorElement = document.createElement('a');
+    a.href = blobUrl;
+    a.target = '_blank';
+    a.setAttribute('download', file);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const onDownload = async () => {
     try {

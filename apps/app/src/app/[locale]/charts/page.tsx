@@ -6,11 +6,13 @@ import { Suspense } from 'react';
 import Chart from '@/components/app/Charts/Chart';
 import ChartSkeletion from '@/components/app/skeleton/charts/Index';
 
-export default async function ChartIndex({
-  params: { locale },
-}: {
-  params: { hash: string; locale: string };
+export default async function ChartIndex(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   return (

@@ -1,6 +1,5 @@
 export const runtime = 'edge';
 
-import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
@@ -10,16 +9,16 @@ import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const params = await props.params;
+  const { locale } = params;
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { hash: string; locale: string };
-}): Promise<Metadata> {
   const t = await getTranslations({ locale });
 
-  const metaTitle = t('charts:multichainTxns.metaTitle');
-  const metaDescription = t('charts:multichainTxns.metaDescription');
+  const metaTitle = t('charts.multichainTxns.metaTitle');
+  const metaDescription = t('charts.multichainTxns.metaDescription');
 
   const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
     t('charts:multichainTxns.heading'),

@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation';
 import { useIntlRouter, usePathname } from '@/i18n/routing';
 import { formatWithCommas } from '@/utils/libs';
 interface PaginatorProps {
-  apiUrl?: string;
   cursor: string | undefined;
   isLoading?: boolean;
 }

@@ -8,11 +8,13 @@ import { appUrl } from '@/utils/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { hash: string; locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { locale } = params;
+
   unstable_setRequestLocale(locale);
   const t = await getTranslations({ locale });
   const metaTitle = t('homePage.metaTitle');
@@ -54,14 +56,14 @@ export async function generateMetadata({
     },
   };
 }
-export default async function HomeIndex({
-  params: { locale },
-}: {
-  params: { locale: string };
+export default async function HomeIndex(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   unstable_setRequestLocale(locale);
 
   return <Home locale={locale} />;
 }
-
-export const revalidate = 5;

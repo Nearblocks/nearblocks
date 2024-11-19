@@ -22,7 +22,6 @@ import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
 
 const ListActions = ({
-  apiUrl,
   countLoading,
   data,
   error,
@@ -140,7 +139,7 @@ const ListActions = ({
           </Link>
         </span>
       ),
-      header: <span>{t('txn') || 'TXN'}</span>,
+      header: <span>{'TXN'}</span>,
       key: 'count',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
@@ -267,7 +266,6 @@ const ListActions = ({
         </div>
       </Suspense>
       <Table
-        apiUrl={apiUrl}
         columns={columns}
         count={count}
         countLoading={countLoading}

@@ -5,7 +5,8 @@ import QueryString from 'qs';
 import List from '@/components/app/Tokens/FTList';
 import { getRequest } from '@/utils/app/api';
 
-export default async function Tokens({ searchParams }: any) {
+export default async function Tokens(props: any) {
+  const searchParams = await props.searchParams;
   const dataResult = await getRequest(
     `fts?sort=onchain_market_cap&per_page=50&${QueryString.stringify(
       searchParams,

@@ -4,18 +4,15 @@ import { PublicEnvProvider } from 'next-runtime-env';
 import { Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
-import { ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import { getRequest } from '@/utils/app/api';
 
 import LayoutActions from './LayoutActions';
 
 interface LayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
   locale: string;
-  notice?: ReactNode;
+  notice?: React.ReactNode;
 }
 
 const manrope = Manrope({
@@ -24,72 +21,14 @@ const manrope = Manrope({
   weight: ['200', '300', '400', '500', '600'],
 });
 
-const Layout = async ({ children }: LayoutProps) => {
+const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
-  const theme = cookies().get('theme')?.value || 'light';
-  const [stats, blocks] = await Promise.all([
-    getRequest(`stats`),
-    getRequest(`blocks/latest?limit=1`),
-  ]);
-
-  const handleFilterAndKeyword = async (
-    keyword: string,
-    filter: string,
-    returnPath: any,
-  ) => {
-    'use server';
-
-    if (keyword.includes('.')) {
-      keyword = keyword.toLowerCase();
-    }
-
-    const res = await getRequest(`search${filter}?keyword=${keyword}`);
-
-    const data = {
-      accounts: [],
-      blocks: [],
-      receipts: [],
-      txns: [],
-    };
-
-    if (res?.blocks?.length) {
-      if (returnPath) {
-        return { path: res.blocks[0].block_hash, type: 'block' };
-      }
-      data.blocks = res.blocks;
-    }
-
-    if (res?.txns?.length) {
-      if (returnPath) {
-        return { path: res.txns[0].transaction_hash, type: 'txn' };
-      }
-      data.txns = res.txns;
-    }
-
-    if (res?.receipts?.length) {
-      if (returnPath) {
-        return {
-          path: res.receipts[0].originated_from_transaction_hash,
-          type: 'txn',
-        };
-      }
-      data.receipts = res.receipts;
-    }
-
-    if (res?.accounts?.length) {
-      if (returnPath) {
-        return { path: res.accounts[0].account_id, type: 'address' };
-      }
-      data.accounts = res.accounts;
-    }
-
-    return returnPath ? null : data;
-  };
+  const theme = (await cookies()).get('theme')?.value || 'light';
 
   return (
     <html
       className={`${manrope.className} ${theme}`}
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
     >
       <head>
@@ -139,14 +78,7 @@ const Layout = async ({ children }: LayoutProps) => {
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
             <ToastContainer />
-            <LayoutActions
-              blocks={blocks}
-              handleFilterAndKeyword={handleFilterAndKeyword}
-              stats={stats}
-              theme={theme}
-            >
-              {children}
-            </LayoutActions>
+            <LayoutActions theme={theme}>{children}</LayoutActions>
           </NextIntlClientProvider>
         </PublicEnvProvider>
       </body>

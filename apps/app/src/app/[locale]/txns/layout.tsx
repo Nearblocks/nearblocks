@@ -5,11 +5,13 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { hash: string; locale: string };
+export async function generateMetadata(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
+
+  const { locale } = params;
+
   unstable_setRequestLocale(locale);
 
   const metaTitle = 'All Latest Near Protocol Transactions | NearBlocks';
@@ -45,7 +47,6 @@ export default async function TxnsLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: any;
 }) {
-  return <>{children}</>;
+  return [children];
 }

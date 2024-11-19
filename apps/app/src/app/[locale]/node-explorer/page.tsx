@@ -5,7 +5,8 @@ import { Suspense } from 'react';
 import NodeList from '@/components/app/NodeExplorer/NodeList';
 import ExplorerIndex from '@/components/app/skeleton/node-explorer/Index';
 
-export default async function NodeExplorer({ searchParams }: any) {
+export default async function NodeExplorer(props: any) {
+  const searchParams = await props.searchParams;
   return (
     <>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">

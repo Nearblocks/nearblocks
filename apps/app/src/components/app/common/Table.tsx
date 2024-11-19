@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, type JSX } from 'react';
 
 import Skeleton from '../skeleton/common/Skeleton';
 import CursorPaginator from './CursorPaginator';
@@ -11,7 +11,6 @@ interface column {
   thClassName?: string;
 }
 interface Props {
-  apiUrl?: string;
   columns: column[];
   count?: any;
   countLoading?: boolean;
@@ -41,8 +40,8 @@ const Table = (props: Props) => {
           <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
             <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
               <tr>
-                {props.columns &&
-                  props.columns.map((column, index) => (
+                {props?.columns &&
+                  props?.columns?.map((column, index) => (
                     <th className={column.thClassName} key={index} scope="col">
                       {column.header}
                     </th>
@@ -50,10 +49,10 @@ const Table = (props: Props) => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-              {[...Array(props.limit)].map((_, index) => (
+              {[...Array(props?.limit)]?.map((_, index) => (
                 <tr className=" hover:bg-blue-900/5 h-[57px]" key={index}>
-                  {props.columns.map((column, colIndex) => (
-                    <td className={column.tdClassName} key={colIndex}>
+                  {props?.columns?.map((column, colIndex) => (
+                    <td className={column?.tdClassName} key={colIndex}>
                       <Skeleton className="h-4" />
                     </td>
                   ))}
@@ -199,7 +198,7 @@ const Table = (props: Props) => {
                       >
                         <td
                           className="px-5 py-4  whitespace-nowrap text-sm text-center text-yellow-500 font-medium"
-                          colSpan={props.columns.length}
+                          colSpan={props?.columns?.length}
                         >
                           {row?.warning}
                         </td>
@@ -224,11 +223,7 @@ const Table = (props: Props) => {
         />
       ) : null}
       {props?.cursorPagination && !props?.Error && props?.data?.length !== 0 ? (
-        <CursorPaginator
-          apiUrl={props?.apiUrl}
-          cursor={props?.cursor}
-          isLoading={props?.isLoading}
-        />
+        <CursorPaginator cursor={props?.cursor} isLoading={props?.isLoading} />
       ) : null}
     </>
   );

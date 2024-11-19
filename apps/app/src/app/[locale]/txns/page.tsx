@@ -6,13 +6,15 @@ import { Suspense } from 'react';
 import ListSkeletion from '@/components/app/skeleton/txns/List';
 import List from '@/components/app/Transactions/List';
 
-export default async function TransactionList({
-  params: { locale },
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams: { cursor?: string; order: string; p?: string };
+export default async function TransactionList(props: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ cursor?: string; order: string; p?: string }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   return (
@@ -40,5 +42,3 @@ export default async function TransactionList({
     </>
   );
 }
-
-export const revalidate = 10;

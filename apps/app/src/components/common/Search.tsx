@@ -25,7 +25,7 @@ export const SearchToast = () => {
     return (
       <div>
         No results. Try on{' '}
-        <Link href="https://nearblocks.io">
+        <Link href="https://nearblocks.io" legacyBehavior>
           <span className="text-green-500">Mainnet</span>
         </Link>
       </div>
@@ -35,7 +35,7 @@ export const SearchToast = () => {
   return (
     <div>
       No results. Try on{' '}
-      <Link href="https://testnet.nearblocks.io">
+      <Link href="https://testnet.nearblocks.io" legacyBehavior>
         <span className="text-green-500">Testnet</span>
       </Link>
     </div>

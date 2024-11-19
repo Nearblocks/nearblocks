@@ -7,11 +7,13 @@ import Chart from '@/components/app/Charts/Chart';
 import ChartDetails from '@/components/app/skeleton/charts/Detail';
 import { getRequest } from '@/utils/app/api';
 
-export default async function Tps({
-  params: { locale },
-}: {
-  params: { locale: string };
+export default async function Tps(props: {
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
   const data = await getRequest('charts');
   return (

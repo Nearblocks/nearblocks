@@ -6,12 +6,12 @@ export const Content = () => {
   return (
     <>
       <div className="text-center text-black dark:text-neargray-10 text-2xl pt-10 top-4">
-        {`Sorry! We encountered an unexpected error.`}
+        Sorry! We encountered an unexpected error.
       </div>
       <div className="flex justify-center pt-12 z-10">
         <Link href="/" legacyBehavior>
           <a className="bg-button hover:bg-blue-500 text-white text-xs py-2 rounded focus:outline-none text-center px-3 w-auto">
-            {`Go back home`}
+            Go back home
           </a>
         </Link>
       </div>

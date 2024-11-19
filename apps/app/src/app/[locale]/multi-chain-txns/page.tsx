@@ -1,7 +1,5 @@
 export const runtime = 'edge';
 
-import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 
 import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
@@ -11,12 +9,12 @@ import { appUrl, chain } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
-  unstable_setRequestLocale(locale);
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const params = await props.params;
+  const { locale } = params;
+
   const t = await getTranslations({ locale });
 
   const metaTitle = `${t('metaTitle')} | NearBlocks`;
@@ -48,13 +46,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function TransactionList({
-  params: { locale },
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams: Record<string, boolean | number | string>;
+export default async function TransactionList(props: {
+  params: Promise<{ hash?: string; locale: string }>;
+  searchParams: Promise<{
+    from?: string;
+    multichain_address?: string;
+    order: string;
+  }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const { locale } = params;
   const t = await getTranslations({ locale });
   const apiUrl = `chain-abstraction/txns`;
   const countUrl = `${apiUrl}/count`;

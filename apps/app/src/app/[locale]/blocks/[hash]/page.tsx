@@ -8,11 +8,13 @@ import HashLoading from '@/components/app/skeleton/blocks/hash';
 import { getRequest } from '@/utils/app/api';
 import { nanoToMilli } from '@/utils/app/libs';
 
-export default async function Hash({
-  params: { hash, locale },
-}: {
-  params: { hash: string; locale: string };
+export default async function Hash(props: {
+  params: Promise<{ hash: string; locale: string }>;
 }) {
+  const params = await props.params;
+
+  const { hash, locale } = params;
+
   unstable_setRequestLocale(locale);
 
   const [hashData, priceData] = await fetchHashAndPriceData(hash);

@@ -212,7 +212,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
           </Tooltip>
         </span>
       ),
-      header: <span>{t ? t('txns:hash') : 'TXN HASH'}</span>,
+      header: <span>{t ? t('hash') : 'TXN HASH'}</span>,
       key: 'transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:

@@ -1,10 +1,13 @@
 import { getRequestConfig } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
 import { routing } from './routing';
 
-export default getRequestConfig(async ({ locale }) => {
-  if (!routing.locales.includes(locale as any)) notFound();
+export default getRequestConfig(async ({ requestLocale }) => {
+  let locale = await requestLocale;
+
+  if (!locale || !routing.locales.includes(locale as any)) {
+    locale = routing.defaultLocale;
+  }
   const imports = [
     import(`nearblocks-trans-next-intl/${locale}/common.json`),
     import(`nearblocks-trans-next-intl/${locale}/home.json`),

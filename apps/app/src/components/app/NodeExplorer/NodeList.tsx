@@ -6,13 +6,9 @@ import { RpcProviders } from '@/utils/app/rpc';
 
 import NodeListActions from './NodeListActions';
 
-const getCookieFromRequest = (cookieName: string): null | string => {
-  const cookie = cookies().get(cookieName);
-  return cookie ? cookie.value : null;
-};
-
 export default async function NodeList({ searchParams }: any) {
-  const rpcUrl = getCookieFromRequest('rpcUrl') || RpcProviders?.[0]?.url;
+  const cookieStore = await cookies();
+  const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
 
   const data = await getRequest(
     `validators?${QueryString.stringify(searchParams)}&rpc=${rpcUrl}`,

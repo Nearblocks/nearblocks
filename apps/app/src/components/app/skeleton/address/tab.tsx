@@ -14,15 +14,18 @@ export default function TabSkeletion() {
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },
-    { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
-    { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
+    { label: 'Token Txns', message: t('tokenTxns'), name: 'tokentxns' },
+    {
+      label: 'NFT Token Txns',
+      message: t('nftTokenTxns'),
+      name: 'nfttokentxns',
+    },
     {
       label: 'Multichain Transactions',
-      message: 'multichainTxns',
+      message: 'Multichain Transactions',
       name: 'multichaintxns',
     },
-    { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
-    { label: 'Contract', message: 'contract', name: 'contract' },
+    { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
   ];
 
   const getClassName = (selected: boolean) =>
@@ -40,14 +43,14 @@ export default function TabSkeletion() {
         <div className="w-full ">
           <div className="w-full ">
             <div className="flex overflow-x-auto min-w-full min-h-fit">
-              {tabs?.map(({ label, message, name }: any) => {
+              {tabs?.map(({ message, name }: any) => {
                 return (
                   <Link
                     className={getClassName(name === tab)}
                     href={`#`}
                     key={name}
                   >
-                    <h2>{t(`${message}`) || label}</h2>
+                    <h2> {message}</h2>
                   </Link>
                 );
               })}

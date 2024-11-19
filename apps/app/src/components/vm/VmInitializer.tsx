@@ -61,7 +61,7 @@ export default function VmInitializer() {
       initNear({
         customElements: {
           Link: ({ href, to, ...rest }: any) => (
-            <Link href={sanitizeUrl(href ?? to)} {...rest} />
+            <Link href={sanitizeUrl(href ?? to)} {...rest} legacyBehavior />
           ),
         },
         networkId: bosNetworkId,

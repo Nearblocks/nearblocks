@@ -26,7 +26,6 @@ export default function AccountOverview({
   const { networkId } = useConfig();
   const balance = accountData?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
-
   useEffect(() => {
     const loadBalances = async () => {
       const fts = inventoryData?.fts;

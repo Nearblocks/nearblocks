@@ -7,18 +7,22 @@ import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
 
-const tabs = [
-  { label: 'Transactions', message: 'Transactions', name: 'txns' },
-  { label: 'Receipts', message: 'Receipts', name: 'receipts' },
-  { label: 'Token Txns', message: 'tokenTxns', name: 'tokentxns' },
-  { label: 'NFT Token Txns', message: 'nftTokenTxns', name: 'nfttokentxns' },
-  { label: 'Access Keys', message: 'accessKeys', name: 'accesskeys' },
-  { label: 'Contract', message: 'contract', name: 'contract' },
-];
 export default function AddressLoading() {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const tab = searchParams?.get('tab');
+
+  const tabs = [
+    { label: 'Transactions', message: 'Transactions', name: 'txns' },
+    { label: 'Receipts', message: 'Receipts', name: 'receipts' },
+    { label: 'Token Txns', message: t('tokenTxns'), name: 'tokentxns' },
+    {
+      label: 'NFT Token Txns',
+      message: t('nftTokenTxns'),
+      name: 'nfttokentxns',
+    },
+    { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
+  ];
 
   const getClassName = (selected: boolean) =>
     classNames(
@@ -36,14 +40,14 @@ export default function AddressLoading() {
       <div className="block lg:flex lg:space-x-2 mb-10">
         <div className="w-full ">
           <div className="flex flex-wrap ">
-            {tabs?.map(({ label, message, name }: any) => {
+            {tabs?.map(({ message, name }: any) => {
               return (
                 <Link
                   className={getClassName(name === tab)}
                   href={`#`}
                   key={name}
                 >
-                  <h2>{t(`${message}`) || label}</h2>
+                  <h2>{message}</h2>
                 </Link>
               );
             })}
@@ -64,9 +68,6 @@ export default function AddressLoading() {
 
             {tab === 'accesskeys' ? (
               <TabPanelGeneralSkeleton tab={tab} />
-            ) : null}
-            {tab === 'contract' ? (
-              <TabPanelGeneralSkeleton tab={'contract'} />
             ) : null}
           </div>
         </div>

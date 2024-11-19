@@ -7,11 +7,13 @@ import Delegators from '@/components/app/NodeExplorer/Delegators';
 import DelegatorSkeleton from '@/components/app/skeleton/node-explorer/Delegator';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 
-export default async function Delegator({
-  params: { id },
-}: {
-  params: { id: string };
+export default async function Delegator(props: {
+  params: Promise<{ id: string }>;
 }) {
+  const params = await props.params;
+
+  const { id } = params;
+
   return (
     <div className="container-xxl relative mx-auto p-3">
       <div className="md:flex justify-between">
