@@ -9,13 +9,11 @@ import {
 import debounce from 'lodash/debounce';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-// @ts-ignore
-import { useRouter } from 'nextjs-toploader/app';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import { routing } from '@/i18n/routing';
+import { routing, useIntlRouter } from '@/i18n/routing';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId } from '@/utils/types';
 
@@ -51,7 +49,7 @@ const t = (key: string, p?: any): any => {
 };
 
 const Search = ({ handleFilterAndKeyword, header = false }: any) => {
-  const router = useRouter();
+  const router = useIntlRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});

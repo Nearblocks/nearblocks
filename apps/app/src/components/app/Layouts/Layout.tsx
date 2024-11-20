@@ -50,7 +50,6 @@ const Layout = async ({ children, locale }: LayoutProps) => {
           type="image/png"
         />
         <link href="/site.webmanifest" rel="manifest" />
-        <Script src="/__ENV.js" />
       </head>
       <body className={`overflow-x-hidden dark:bg-black-300`}>
         <noscript>
