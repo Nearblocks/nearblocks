@@ -1,6 +1,5 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import NextTopLoader from 'nextjs-toploader';
 
 import Footer from './Footer';
 
@@ -20,10 +19,6 @@ const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
 
   return (
     <div className={className}>
-      <NextTopLoader
-        color={`${(theme as string) ? '#31766A' : '#0D494A'}`}
-        showSpinner={false}
-      />
       {notice}
       <main>{children}</main>
       <Footer theme={theme} />
