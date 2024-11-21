@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 const SponserdText = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
-  const { NEXT_PUBLIC_USER_API_URL: userApiUrl } = useEnvContext();
+  const { NEXT_PUBLIC_API_URL: apiUrl } = useEnvContext();
 
   useEffect(() => {
     const handleResize = () => {
@@ -21,10 +21,7 @@ const SponserdText = () => {
   useEffect(() => {
     const fetchHtmlContent = async () => {
       try {
-        const response = await fetch(
-          `${userApiUrl}approved-campaigns/text-ads`,
-        );
-
+        const response = await fetch(`${apiUrl}campaigns/text-ads`);
         if (response.ok) {
           const html = await response.text();
           setHtmlContent(html);
@@ -38,7 +35,7 @@ const SponserdText = () => {
 
     fetchHtmlContent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiUrl]);
 
   if (isMobile) {
     return (

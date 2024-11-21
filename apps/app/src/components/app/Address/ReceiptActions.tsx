@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
-import TableSummary from '@/components/common/TableSummary';
 import { Link } from '@/i18n/routing';
 import { txnMethod } from '@/utils/app/near';
 import {
@@ -21,6 +20,7 @@ import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
 import Table from '../common/Table';
+import TableSummary from '../common/TableSummary';
 import TimeStamp from '../common/TimeStamp';
 import Clock from '../Icons/Clock';
 import Download from '../Icons/Download';

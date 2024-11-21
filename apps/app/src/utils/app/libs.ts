@@ -1,4 +1,5 @@
 import Big from 'big.js';
+import get from 'lodash/get';
 
 import { FieldType, GuessableTypeString } from '@/utils/types';
 
@@ -156,11 +157,11 @@ export function formatCustomDate(inputDate: string) {
 }
 
 export function localFormat(number: string) {
-  const bigNumber = Big(number);
-  const formattedNumber = bigNumber
-    .toFixed(5)
-    .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
-  return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
+  const bigNumber = number && new Big(number); // Instantiate Big correctly
+  const formattedNumber =
+    bigNumber && bigNumber.toFixed(5).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+
+  return formattedNumber && formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
 }
 
 export function priceFormat(number: string) {
@@ -494,3 +495,32 @@ export function holderPercentage(supply: string, quantity: string) {
   const percentage = Big(quantity).div(Big(supply)).mul(Big(100));
   return percentage.gt(100) ? '100.00' : percentage.toFixed(2);
 }
+
+export const catchErrors = (error: any) => {
+  try {
+    const errors = get(error, 'response.data.errors') || {};
+    const common = get(error, 'response.data.message') || null;
+    let message;
+
+    if (errors?.message) {
+      message = errors.message;
+    } else {
+      Object.keys(errors).forEach((key) => {
+        message = get(errors, `${key}.message`) || '';
+      });
+    }
+    return message || common || error.message;
+  } catch (e) {
+    return 'Something went wrong, try again later';
+  }
+};
+
+export const removeProtocol = (url?: string) => {
+  // Remove http:// or https:// from the beginning of the URL
+  return url?.replace(/^https?:\/\//, '');
+};
+
+export const centsToDollar = (val: number) => {
+  const value = (val / 100).toFixed(2);
+  return value;
+};

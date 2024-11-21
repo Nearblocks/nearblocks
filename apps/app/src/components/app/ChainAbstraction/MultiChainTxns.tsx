@@ -24,7 +24,6 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import Near from '../Icons/Near';
 import SortIcon from '../Icons/SortIcon';
-import Skeleton from '../skeleton/common/Skeleton';
 
 const initialForm = {
   chain: '',
@@ -481,25 +480,20 @@ const MultiChainTxns = ({
       {!isTab || tab === 'multichaintxns' ? (
         <>
           <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
-            {isTab &&
-              (!count ? (
-                <div className="pl-6 max-w-lg w-full py-5 ">
-                  <Skeleton className="h-4" />
-                </div>
-              ) : (
-                <TableSummary
-                  filters={
-                    <Filters filters={modifiedFilter} onClear={onAllClear} />
-                  }
-                  text={
-                    txns &&
-                    !error &&
-                    `${`A total of${' '}
+            {isTab && (
+              <TableSummary
+                filters={
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                }
+                text={
+                  txns &&
+                  !error &&
+                  `${`A total of${' '}
             ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
             multichain transactions found`}`
-                  }
-                />
-              ))}
+                }
+              />
+            )}
             <Table
               columns={columns}
               cursor={cursor}

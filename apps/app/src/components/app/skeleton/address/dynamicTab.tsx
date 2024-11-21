@@ -1,4 +1,5 @@
 import AccessKeyTabSkeleton from './accessKeyTab';
+import MultichaintxnsSkeleton from './multichainTxnsTab';
 import NftTokenTxnsSkeleton from './nftTokenTxns';
 import OverviewActionsSkeleton from './overview';
 import TokenTxnsSkeleton from './tokenTransaction';
@@ -24,6 +25,8 @@ export default function TabPanelGeneralSkeleton({
       return <AccessKeyTabSkeleton />;
     case 'contract':
       return <OverviewActionsSkeleton />;
+    case 'multichaintxns':
+      return <MultichaintxnsSkeleton />;
     default:
       return <TransactionSkeleton />;
   }

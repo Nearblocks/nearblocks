@@ -7,7 +7,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useState } from 'react';
 
-import TableSummary from '@/components/common/TableSummary';
 import { Link } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
@@ -16,6 +15,7 @@ import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
 import Table from '../common/Table';
+import TableSummary from '../common/TableSummary';
 import TokenImage from '../common/TokenImage';
 import Clock from '../Icons/Clock';
 import Download from '../Icons/Download';

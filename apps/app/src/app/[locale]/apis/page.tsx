@@ -1,8 +1,5 @@
 export const runtime = 'edge';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
 import ApiActions from '@/components/app/Apis/ApiActions';
 import { getRequest, postRequest } from '@/utils/app/api';
 
@@ -23,7 +20,6 @@ export default async function ApisPage(props: {
   };
   return (
     <section>
-      <ToastContainer />
       <ApiActions
         getContactDetails={getContactDetails}
         planDetails={plans}

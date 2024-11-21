@@ -1,6 +1,7 @@
 'use client';
+import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 
@@ -8,7 +9,6 @@ import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
 import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { useAuthStore } from '@/stores/auth';
 import { setTheme } from '@/utils/app/actions';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import { BlocksInfo, Stats } from '@/utils/types';
@@ -18,7 +18,7 @@ import Collapse from '../Collapse';
 import Search from '../common/Search';
 import ArrowDown from '../Icons/ArrowDown';
 import Menu from '../Icons/Menu';
-import User from '../Icons/User';
+import UserMenu from './UserMenu';
 
 const menus = [
   {
@@ -156,19 +156,34 @@ const languages = [
 const Header = ({
   block: latestBlocks,
   handleFilterAndKeyword,
+  role,
   stats: statsDetails,
   theme,
+  token,
+  user,
 }: any) => {
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
   const [open, setOpen] = useState<boolean>(false);
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
-  const signedIn = useAuthStore((store) => store?.signedIn);
-  const accountId = useAuthStore((store) => store?.accountId);
-  const logOut = useAuthStore((store) => store?.logOut);
-  const user = signedIn;
+
+  const profile = [
+    {
+      id: 1,
+      link: '/user/overview',
+      title: 'My Profile',
+    },
+    {
+      id: 2,
+      link: '/user/settings',
+      title: 'Settings',
+    },
+    {
+      id: 3,
+      link: role === 'publisher' ? '/publisher/keys' : '/user/keys',
+      title: 'API Keys',
+    },
+  ];
+
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
   const { networkId } = useConfig();
@@ -191,10 +206,18 @@ const Header = ({
   }, [block]);
 
   const showSearch = pathname !== '/';
-  const userLoading = false;
 
   const onSignOut = () => {
-    logOut();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    localStorage.removeItem('stripe-plan-id');
+    localStorage.removeItem('interval');
+    localStorage.removeItem('subscribe-called');
+    Cookies.remove('token');
+    Cookies.remove('role');
+    Cookies.remove('user');
+    router.push('/login');
   };
 
   const toggleTheme = () => {
@@ -463,7 +486,7 @@ const Header = ({
                               {t(menu?.title) || menu.fallbackText}
                               <ArrowDown className="fill-current w-4 h-4 ml-2" />
                             </a>
-                            <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                            <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-20">
                               {menu?.submenu?.map((submenu) => (
                                 <li key={submenu?.id}>
                                   <ActiveLink
@@ -533,7 +556,7 @@ const Header = ({
                           {t('header.menu.languages') || 'Languages'}
                           <ArrowDown className="fill-current w-4 h-4 ml-2" />
                         </a>
-                        <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                        <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-20">
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
@@ -561,103 +584,15 @@ const Header = ({
                     </span>
                   </li>
                   <li>
-                    <>
-                      <Collapse
-                        trigger={({ onClick, show }) => (
-                          <a
-                            className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                            href="#"
-                            onClick={onClick}
-                          >
-                            <div className="w-full">
-                              {user ? (
-                                <div className="flex justify-between">
-                                  <div className="flex items-center">
-                                    <span className="truncate max-w-[110px]">
-                                      {accountId}
-                                    </span>
-                                  </div>
-                                  <ArrowDown
-                                    className={`fill-current transition-transform w-5 h-5 ${
-                                      show && 'transform rotate-180'
-                                    }`}
-                                  />
-                                </div>
-                              ) : (
-                                <div onClick={requestSignInWithWallet}>
-                                  <div className="w-full flex items-center font-medium text-sm dark:text-neargray-10 text-black-600">
-                                    <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                    Sign In
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </a>
-                        )}
-                      >
-                        {user && (
-                          <ul className="border-l-2 border-green-500 md:hidden ml-2">
-                            <li className="px-4 pb-1">
-                              <button
-                                className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
-                                onClick={onSignOut}
-                              >
-                                Sign Out
-                              </button>
-                            </li>
-                          </ul>
-                        )}
-                      </Collapse>
-
-                      <span className="group hidden md:flex h-full w-full relative">
-                        <a
-                          className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
-                          href="#"
-                        >
-                          {user ? (
-                            <>
-                              <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                              <span className="truncate max-w-[110px]">
-                                {accountId}
-                              </span>
-                              <ArrowDown className="fill-current w-4 h-4 ml-2" />
-                            </>
-                          ) : (
-                            <div onClick={requestSignInWithWallet}>
-                              <div className="flex items-center font-medium text-sm dark:text-white text-black-600">
-                                {userLoading ? (
-                                  <>
-                                    <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                    <Skeleton className="flex w-14 h-4" />
-                                  </>
-                                ) : (
-                                  <>
-                                    <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-                                    Sign In
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </a>
-
-                        {user && (
-                          <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
-                            <li className="px-8 pb-1">
-                              <button
-                                className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-center py-1 px-4 whitespace-nowrap font-medium text-sm"
-                                onClick={onSignOut}
-                              >
-                                Sign Out
-                              </button>
-                            </li>
-                          </ul>
-                        )}
-                      </span>
-                    </>
+                    <UserMenu
+                      onSignOut={onSignOut}
+                      profile={profile}
+                      token={token}
+                      user={user}
+                    />
                   </li>
                 </ul>
-                <ul className="md:flex justify-end text-gray-500 pb-4 md:pb-0">
+                <ul className="md:flex justify-end dark:text-neargray-10 text-black-600 pb-4 md:pb-0">
                   <li>
                     <>
                       <Collapse
@@ -669,7 +604,7 @@ const Header = ({
                           >
                             <Image
                               alt="NearBlocks"
-                              className="fixed dark:filter dark:invert"
+                              className="dark:filter dark:invert"
                               height="14"
                               src="/images/near.svg"
                               width="14"
@@ -693,7 +628,7 @@ const Header = ({
                           </li>
                           <li>
                             <a
-                              className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline"
+                              className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline font-medium text-xs text-black-600"
                               href="https://testnet.nearblocks.io"
                             >
                               Testnet
