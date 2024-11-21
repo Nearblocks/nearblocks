@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import ThemeImage from '@/components/app/Advertise/ThemeImage';
 import { Link } from '@/i18n/routing';
@@ -14,9 +14,7 @@ export async function generateMetadata(props: {
 
   const { locale } = params;
 
-  unstable_setRequestLocale(locale);
-
-  const t = await getTranslations();
+  const t = await getTranslations({ locale });
 
   const title = `Advertise on nearblocks.io | Nearblocks`;
 

@@ -1,6 +1,7 @@
 'use client';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -9,10 +10,13 @@ import Arrow from '@/components/Icons/Arrow';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
 import SwitchButton from '@/components/SwitchButton';
+import useAuth, { request } from '@/hooks/app/useAuth';
+import useStorage from '@/hooks/app/useStorage';
 import { docsUrl } from '@/utils/app/config';
 import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
+import ConfirmPlan from '../Dashboard/ConfirmPlan';
 import Skeleton from '../skeleton/common/Skeleton';
 
 const ApiActions = ({
@@ -33,6 +37,64 @@ const ApiActions = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
+  const [isOpen, setOpen] = useState<any>(false);
+  const [token, _setToken] = useStorage('token');
+  const { data: userData } = useAuth(token ? '/profile' : '');
+  const currentPlan = userData?.currentPlan?.price_monthly ?? 0;
+
+  const router = useRouter();
+
+  const resetStripePlan = () => {
+    localStorage.removeItem('stripe-plan-id');
+    localStorage.removeItem('interval');
+    localStorage.removeItem('subscribe-called');
+    return;
+  };
+
+  const onConfirmOpen = (plan?: any) => {
+    setOpen(plan);
+  };
+  const onConfirmDismiss = () => {
+    setOpen(false);
+  };
+
+  const subscribePlan = async () => {
+    try {
+      const stripePlanId = localStorage.getItem('stripe-plan-id');
+      const interval = localStorage.getItem('interval');
+
+      const res = await request.post(`advertiser/subscribe`, {
+        interval: interval === 'year' ? 'year' : 'month',
+        plan_id: stripePlanId,
+      });
+      localStorage.setItem('subscribe-called', 'true');
+      if (res?.data && res?.data['url ']) {
+        await router.push(res?.data['url ']);
+        return;
+      }
+      if (res?.data && res?.data['message'] === 'upgraded') {
+        resetStripePlan();
+        router.push('/user/plan?status=upgraded');
+      }
+      if (res?.data && res?.data['message'] === 'downgraded') {
+        resetStripePlan();
+        router.push('/user/plan?status=downgraded');
+      }
+      resetStripePlan();
+      router.push('/user/plan');
+    } catch (error) {
+      const statusCode = get(error, 'response.status') || null;
+
+      if (statusCode === 422) {
+        resetStripePlan();
+        router.push('/user/plan?status=exists');
+      }
+      if (statusCode === 400) {
+        resetStripePlan();
+        router.push('/user/plan?status=invalid');
+      }
+    }
+  };
 
   const submitForm = async (event: any) => {
     event.preventDefault();
@@ -51,7 +113,6 @@ const ApiActions = ({
       }
       toast.success('Thank you!');
     } catch (err) {
-      console.log(err);
       toast.error('Something went wrong!');
     } finally {
       setLoading(false);
@@ -78,10 +139,45 @@ const ApiActions = ({
   };
   const plans = get(planDetails, 'data') || null;
 
+  const roleCookie = Cookies.get('role');
+
+  const onGetStarted = async (plan: any) => {
+    if (plan) {
+      if (token) {
+        if (plan?.id) {
+          if (roleCookie === 'publisher') {
+            toast.warning('Unauthorized Access!');
+          } else if (roleCookie === 'advertiser') {
+            localStorage.setItem('stripe-plan-id', plan?.id as string);
+            localStorage.setItem(
+              'interval',
+              !interval ? 'month' : ('year' as string),
+            );
+            localStorage.setItem('subscribe-called', '');
+            subscribePlan();
+          } else {
+            toast.warning('please login to continue...');
+          }
+        } else {
+          router.replace('/user/overview');
+        }
+      } else {
+        localStorage.setItem('stripe-plan-id', plan?.id as string);
+        localStorage.setItem(
+          'interval',
+          !interval ? 'month' : ('year' as string),
+        );
+        localStorage.setItem('subscribe-called', '');
+        router.push(
+          `/login?id=${plan?.id}&interval=${interval ? 'year' : 'month'}`,
+        );
+      }
+    }
+  };
+
   return (
     <>
-      {' '}
-      <div className="container-xxl mx-auto px-3 pt-14">
+      <section className="container-xxl mx-auto px-3 pt-14">
         <div className="my-5 sm:!text-left text-center lg:!px-32 px-5">
           {status === 'cancelled' && (
             <div className="py-4 flex my-14 px-3 items-center text-sm text-orange-900/70 bg-orange-300/30 rounded-md">
@@ -112,12 +208,7 @@ const ApiActions = ({
             >
               API Pricing Plans
             </button>
-            <Link
-              href="https://dash.nearblocks.io/login"
-              legacyBehavior
-              rel="noreferrer nofollow noopener"
-              target="_blank"
-            >
+            <Link href="/login" rel="noreferrer nofollow noopener">
               <span className=" flex ml-2 text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit">
                 User Dashboard
                 <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
@@ -275,14 +366,23 @@ const ApiActions = ({
                         ? 'Personal Use'
                         : 'Commercial Use'}
                     </h3>
-                    <Link
-                      className="block text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      href={`https://dash.nearblocks.io/login?id=${
-                        item.id
-                      }&interval=${!interval ? 'month' : 'year'}`}
+                    <button
+                      className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        if (
+                          item?.price_annually === 0 &&
+                          item?.price_monthly === 0 &&
+                          token &&
+                          currentPlan > 0
+                        ) {
+                          onConfirmOpen(item);
+                        } else {
+                          onGetStarted(item);
+                        }
+                      }}
                     >
                       Get started now
-                    </Link>
+                    </button>
                   </div>
                 </div>
               ))
@@ -424,70 +524,76 @@ const ApiActions = ({
             </button>
           </Link>
         </div>
-      </div>
-      <div className="bg-white flex justify-center my-4 dark:bg-black-200 dark:text-neargray-10">
-        <form className="my-10 md:w-1/2 w-full mx-4" onSubmit={submitForm}>
-          <h2 className="text-2xl text-center py-2">
-            Contact us for any inquiries
-          </h2>
-          <div className="w-full px-20">
-            <p className="sm:text-lg text-xs text-gray-500 text-center pt-2  pb-5">
-              If you have any questions on the NearBlocks APIs, ask them here!
-            </p>
-          </div>
 
-          <div className="flex sm:!flex-row flex-col">
-            <div className="w-full sm:mr-2">
-              <p className="text-sm my-2">
-                Name <span className="text-red-500">*</span>{' '}
-                <span className="text-gray-400">(required)</span>
+        <div className="bg-white flex justify-center my-4 dark:bg-black-200 dark:text-neargray-10">
+          <form className="my-10 md:w-1/2 w-full mx-4" onSubmit={submitForm}>
+            <h2 className="text-2xl text-center py-2">
+              Contact us for any inquiries
+            </h2>
+            <div className="w-full px-20">
+              <p className="sm:text-lg text-xs text-gray-500 text-center pt-2  pb-5">
+                If you have any questions on the NearBlocks APIs, ask them here!
               </p>
-              <input
-                className="border px-3 outline-blue w-full rounded-md h-12"
-                onChange={(e) => setName(e.target.value)}
+            </div>
+
+            <div className="flex sm:!flex-row flex-col">
+              <div className="w-full sm:mr-2">
+                <p className="text-sm my-2">
+                  Name <span className="text-red-500">*</span>{' '}
+                  <span className="text-gray-400">(required)</span>
+                </p>
+                <input
+                  className="border px-3 outline-blue w-full rounded-md h-12"
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  value={name}
+                />
+              </div>
+              <div className="w-full sm:mr-2 ">
+                <p className="text-sm my-2">
+                  Email Address <span className="text-red-500">*</span>
+                  <span className="text-gray-400">(required)</span>
+                </p>
+                <input
+                  className="border px-3 w-full outline-blue rounded-md h-12"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  value={email}
+                />
+              </div>
+            </div>
+            <div className="w-full my-6">
+              <p className="text-sm my-2">
+                Message<span className="text-red-500">*</span>{' '}
+                <span className="text-gray-400">(required)</span>
+              </p>{' '}
+              <textarea
+                autoComplete="off"
+                className="px-3 py-1.5 border w-full border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
+                id="message"
+                maxLength={300}
+                onChange={(e) => setDescription(e.target.value)}
                 required
-                value={name}
+                rows={5}
+                value={description}
               />
             </div>
-            <div className="w-full sm:mr-2 ">
-              <p className="text-sm my-2">
-                Email Address <span className="text-red-500">*</span>
-                <span className="text-gray-400">(required)</span>
-              </p>
-              <input
-                className="border px-3 w-full outline-blue rounded-md h-12"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                value={email}
-              />
+            <div className="w-full text-center my-2">
+              <button
+                className="text-sm text-white my-2 text-center font-thin px-7 py-3 dark:bg-green-250 bg-green-500 rounded"
+                disabled={loading}
+              >
+                {loading ? <LoadingCircular /> : 'Send message'}
+              </button>
             </div>
-          </div>
-          <div className="w-full my-6">
-            <p className="text-sm my-2">
-              Message<span className="text-red-500">*</span>{' '}
-              <span className="text-gray-400">(required)</span>
-            </p>{' '}
-            <textarea
-              autoComplete="off"
-              className="px-3 py-1.5 border w-full border-{#E5E7EB} rounded outline-blue text-base overflow-hidden"
-              id="message"
-              maxLength={300}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              rows={5}
-              value={description}
-            />
-          </div>
-          <div className="w-full text-center my-2">
-            <button
-              className="text-sm text-white my-2 text-center font-thin px-7 py-3 dark:bg-green-250 bg-green-500 rounded"
-              disabled={loading}
-            >
-              {loading ? <LoadingCircular /> : 'Send message'}
-            </button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      </section>
+      <ConfirmPlan
+        onConfirmDismiss={onConfirmDismiss}
+        onContinue={onGetStarted}
+        plan={isOpen}
+      />
     </>
   );
 };

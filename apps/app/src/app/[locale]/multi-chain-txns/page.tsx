@@ -86,14 +86,14 @@ export default async function TransactionList(props: {
 
   return (
     <>
-      <div className=" h-72">
+      <div className="h-24">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 ">
+          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 ">
             {t ? t('heading') : 'Latest Multichain Transactions'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48">
+      <div className="container-xxl mx-auto px-5">
         <div className="relative block lg:flex lg:space-x-2">
           <div className=" w-full">
             <Stats

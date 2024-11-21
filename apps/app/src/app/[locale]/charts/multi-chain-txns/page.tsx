@@ -17,11 +17,11 @@ export async function generateMetadata(props: {
 
   const t = await getTranslations({ locale });
 
-  const metaTitle = t('charts.multichainTxns.metaTitle');
-  const metaDescription = t('charts.multichainTxns.metaDescription');
+  const metaTitle = t('multichainTxns.metaTitle');
+  const metaDescription = t('multichainTxns.metaDescription');
 
   const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
-    t('charts:multichainTxns.heading'),
+    t('multichainTxns.heading'),
   )}`;
 
   return {

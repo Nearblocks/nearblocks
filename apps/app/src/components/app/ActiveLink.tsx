@@ -7,7 +7,7 @@ import { Link, usePathname } from '@/i18n/routing';
 interface ActiveLinkProps {
   activeClassName?: string;
   children: ReactNode;
-  className?: any;
+  exact?: boolean | null;
   href: string | UrlObject;
   inActiveClassName?: string;
   legacyBehavior?: boolean;
@@ -17,6 +17,7 @@ interface ActiveLinkProps {
 const ActiveLink = ({
   activeClassName,
   children,
+  exact,
   href,
   inActiveClassName,
   legacyBehavior,
@@ -29,9 +30,13 @@ const ActiveLink = ({
 
   const hrefString = typeof href === 'string' ? href : href.pathname || '';
 
-  const className = (
-    href === '/' ? asPath === href : asPath.startsWith(hrefString)
-  )
+  let isActive = false;
+  if (exact) {
+    isActive = asPath === href;
+  } else {
+    isActive = href === '/' ? asPath === href : asPath.startsWith(hrefString);
+  }
+  const className = isActive
     ? `${childClassName} ${activeClassName}`
     : `${childClassName} ${inActiveClassName}`;
 

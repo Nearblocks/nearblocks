@@ -38,7 +38,7 @@ export default async function AccountTabs({
     },
     {
       label: 'Multichain Transactions',
-      message: t('multichainTxns'),
+      message: t('multi-chainTxns'),
       name: 'multichaintxns',
     },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },

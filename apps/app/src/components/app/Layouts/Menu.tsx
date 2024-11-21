@@ -55,7 +55,7 @@ export const MenuItem = ({
   return (
     <li className={`relative group ${className}`}>
       <button
-        className="flex items-center hover:text-primary p-2"
+        className="flex items-center hover:text-green-500 dark:hover:text-green-250 p-2"
         onClick={onClick}
       >
         {trigger}

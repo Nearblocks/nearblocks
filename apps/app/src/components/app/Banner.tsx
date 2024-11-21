@@ -8,7 +8,7 @@ type BannerProps = {
 const Banner: React.FC<BannerProps> = ({ type }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
-  const { NEXT_PUBLIC_USER_API_URL: userApiUrl } = useEnvContext();
+  const { NEXT_PUBLIC_API_URL: apiUrl } = useEnvContext();
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,10 +22,7 @@ const Banner: React.FC<BannerProps> = ({ type }) => {
   useEffect(() => {
     const fetchHtmlContent = async () => {
       try {
-        const response = await fetch(
-          `${userApiUrl}approved-campaigns?type=${type}`,
-        );
-
+        const response = await fetch(`${apiUrl}campaigns?type=${type}`);
         if (response?.ok) {
           const html = await response.text();
           setHtmlContent(html);
@@ -35,7 +32,7 @@ const Banner: React.FC<BannerProps> = ({ type }) => {
       }
     };
     fetchHtmlContent();
-  }, [type, userApiUrl]);
+  }, [type, apiUrl]);
 
   if (isMobile) {
     return (

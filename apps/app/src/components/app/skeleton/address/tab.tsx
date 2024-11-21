@@ -22,7 +22,7 @@ export default function TabSkeletion() {
     },
     {
       label: 'Multichain Transactions',
-      message: 'Multichain Transactions',
+      message: t('multi-chainTxns'),
       name: 'multichaintxns',
     },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },

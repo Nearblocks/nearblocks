@@ -1736,3 +1736,51 @@ export type MtEventLogData = {
   standard: string;
   version: string;
 };
+
+export type CampaignData = {
+  data?: {
+    desktop_image_right_url?: string;
+    icon?: string;
+    is_active?: number;
+    link_name?: string;
+    mobile_image_url?: string;
+    site_name?: string;
+    start_date?: string;
+    subscription?: {
+      status?: string;
+    };
+    text?: string;
+    title?: string;
+    url?: string;
+  };
+};
+
+export type CampaignProps = {
+  campaignData: CampaignData;
+  campaignId?: string;
+  campaignMutate: () => void;
+  loading: boolean;
+  mutate: () => void;
+};
+
+export type currentCampaign = {
+  click_count: number;
+  id: string;
+  impression_count: number;
+  is_active: number;
+  is_approved?: number;
+  key: string;
+  price_annually: number;
+  price_monthly: number;
+  start_date: string;
+  subscription?: {
+    campaign_plan?: {
+      title: string;
+    };
+    status: string;
+  };
+  title: string;
+  user?: {
+    username: string;
+  };
+};

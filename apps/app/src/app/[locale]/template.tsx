@@ -9,6 +9,9 @@ export default async function Template({
   children: React.ReactNode;
 }) {
   const theme = (await cookies()).get('theme')?.value || 'light';
+  const role = (await cookies()).get('role')?.value;
+  const user = (await cookies()).get('user')?.value;
+  const token = (await cookies()).get('token')?.value;
   const [stats, blocks] = await Promise.all([
     getRequest(`stats`),
     getRequest(`blocks/latest`, { limit: 1 }),
@@ -71,8 +74,11 @@ export default async function Template({
       <Header
         block={blocks}
         handleFilterAndKeyword={handleFilterAndKeyword}
+        role={role}
         stats={stats}
         theme={theme}
+        token={token}
+        user={user}
       />
       {children}
     </>
