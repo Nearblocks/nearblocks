@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import React from 'react';
 
@@ -11,12 +11,16 @@ import { appUrl } from '@/utils/app/config';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
+
   const metaTitle = 'Campaign Plans | NearBlocks';
 
   const metaDescription = 'Campaign Plans in Nearblocks';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
-    'Campaign Plans | NearBlocks',
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
+    metaTitle,
   )}`;
 
   return {
