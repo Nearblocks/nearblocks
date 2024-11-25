@@ -10,6 +10,7 @@ import { useConfig } from '@/hooks/app/useConfig';
 import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { setTheme } from '@/utils/app/actions';
+import { docsUrl } from '@/utils/app/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import { BlocksInfo, Stats } from '@/utils/types';
 
@@ -45,14 +46,8 @@ const menus = [
         title: 'header.menu.viewTxns',
       },
       {
-        fallbackText: 'Charts',
-        id: 4,
-        link: '/charts',
-        title: 'header.menu.charts',
-      },
-      {
         fallbackText: 'Node Explorer',
-        id: 5,
+        id: 3,
         link: '/node-explorer',
         title: 'header.menu.nodeExplorer',
       },
@@ -94,6 +89,44 @@ const menus = [
       },
     ],
     title: 'header.menu.tokens',
+  },
+  {
+    fallbackText: 'Resources',
+    id: 4,
+    submenu: [
+      {
+        fallbackText: 'Charts',
+        id: 1,
+        link: '/charts',
+        title: 'header.menu.charts',
+      },
+      {
+        fallbackText: 'DEX Tracker',
+        id: 2,
+        link: '/dex',
+        title: 'DEX Tracker',
+      },
+    ],
+    title: 'Resources',
+  },
+  {
+    fallbackText: 'Developers',
+    id: 5,
+    submenu: [
+      {
+        fallbackText: 'API Plans',
+        id: 1,
+        link: '/apis',
+        title: 'API Plans',
+      },
+      {
+        fallbackText: 'API Documentation',
+        id: 2,
+        link: docsUrl,
+        title: 'API Documentation',
+      },
+    ],
+    title: 'Developers',
   },
 ];
 

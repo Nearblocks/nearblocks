@@ -264,6 +264,20 @@ export type ChartInfo = {
   txns: string;
 };
 
+export type DexTransactionInfo = {
+  amount_usd: string;
+  base_amount: string;
+  event_index: string;
+  maker: string;
+  pair_id: string;
+  price_token: string;
+  price_usd: string;
+  quote_amount: string;
+  receipt_id: string;
+  timestamp: number;
+  type: string;
+};
+
 export type TransactionInfo = {
   actions: {
     action: string;
@@ -1783,4 +1797,35 @@ export type currentCampaign = {
   user?: {
     username: string;
   };
+};
+
+export type DexInfo = {
+  base: string;
+  base_meta: {
+    decimals: number;
+    icon: string;
+    name: string;
+    reference: string;
+    symbol: string;
+  };
+  change_1d: string;
+  change_1h: string;
+  change_5m: string;
+  change_6h: string;
+  contract: string;
+  id: number;
+  makers: string;
+  pool: 0;
+  price_token: string;
+  price_usd: string;
+  quote: string;
+  quote_meta: {
+    decimals: number;
+    icon: string;
+    name: string;
+    reference: string;
+    symbol: string;
+  };
+  txns: string;
+  volume: string;
 };
