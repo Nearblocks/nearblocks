@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 import Verifier from '@/components/app/Address/Contract/Verifier';
 import { appUrl } from '@/utils/app/config';
@@ -8,12 +9,15 @@ import { appUrl } from '@/utils/app/config';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
   const metaTitle = `${
     network === 'testnet' ? 'TESTNET ' : ''
   }Verify Contract | Nearblocks`;
   const metaDescription = 'Verify a smart contract on the blockchain.';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

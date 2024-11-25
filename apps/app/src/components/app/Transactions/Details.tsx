@@ -227,13 +227,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.hash.tooltip')}
+                  label={t('txnDetails.hash.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.hash.text.0') : 'Txn Hash'}
+                {t ? t('txnDetails.hash.text.0') : 'Txn Hash'}
               </div>
               {!txn?.transaction_hash ? (
                 <div className="w-full md:w-3/4">
@@ -249,7 +249,7 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.status.tooltip')}
+                  label={t('txnDetails.status.tooltip')}
                 >
                   <div>
                     <div>
@@ -257,7 +257,7 @@ const Details = (props: Props) => {
                     </div>
                   </div>
                 </Tooltip>
-                {t ? t('txn.status.text.0') : 'Status'}
+                {t ? t('txnDetails.status.text.0') : 'Status'}
               </div>
               {loading ? (
                 <div className="w-full md:w-3/4">
@@ -284,13 +284,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.block.tooltip')}
+                  label={t('txnDetails.block.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.block.text.0') : 'Block Height'}
+                {t ? t('txnDetails.block.text.0') : 'Block Height'}
               </div>
               {!txn?.included_in_block_hash ? (
                 <div className="w-full md:w-3/4">
@@ -315,13 +315,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.timestamp.tooltip')}
+                  label={t('txnDetails.timestamp.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.timestamp.text.0') : 'Timestamp'}
+                {t ? t('txnDetails.timestamp.text.0') : 'Timestamp'}
               </div>
               {!txn?.block_timestamp ? (
                 <div className="w-full md:w-3/4">
@@ -373,13 +373,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.from.tooltip')}
+                  label={t('txnDetails.from.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.from.text.0') : 'From'}
+                {t ? t('txnDetails.from.text.0') : 'From'}
               </div>
               {!txn?.signer_account_id ? (
                 <div className="w-full md:w-3/4">
@@ -400,13 +400,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.to.tooltip')}
+                  label={t('txnDetails.to.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {isContract ? 'To' : t ? t('txn.to.text.0') : 'To'}
+                {isContract ? 'To' : t ? t('txnDetails.to.text.0') : 'To'}
               </div>
               {!txn?.receiver_account_id ? (
                 <div className="w-full md:w-3/4">
@@ -709,13 +709,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.deposit.tooltip')}
+                  label={t('txnDetails.deposit.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.deposit.text.0') : 'Deposit Value'}
+                {t ? t('txnDetails.deposit.text.0') : 'Deposit Value'}
               </div>
               {loading ? (
                 <div className="w-full md:w-3/4">
@@ -725,7 +725,7 @@ const Details = (props: Props) => {
                 <div className="w-full md:w-3/4 break-words">
                   <Tooltip
                     className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    label={t('txn.deposit.tooltip')}
+                    label={t('txnDetails.deposit.tooltip')}
                   >
                     <span>
                       {txn?.actions_agg?.deposit
@@ -747,13 +747,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.fee.tooltip')}
+                  label={t('txnDetails.fee.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.fee.text.0') : 'Transaction fee'}
+                {t ? t('txnDetails.fee.text.0') : 'Transaction fee'}
               </div>
               {!txn?.outcomes_agg?.transaction_fee ? (
                 <div className="w-full md:w-3/4">
@@ -783,13 +783,13 @@ const Details = (props: Props) => {
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={t('txn.price.tooltip')}
+                  label={t('txnDetails.price.tooltip')}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
                   </div>
                 </Tooltip>
-                {t ? t('txn.price.text.0') : 'Ⓝ Price'}
+                {t ? t('txnDetails.price.text.0') : 'Ⓝ Price'}
               </div>
               {loading ? (
                 <div className="w-full md:w-3/4">
@@ -850,13 +850,13 @@ const Details = (props: Props) => {
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={t('txn.gas.tooltip')}
+                        label={t('txnDetails.gas.tooltip')}
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
                         </div>
                       </Tooltip>
-                      {t('txn.gas.text.0')}
+                      {t('txnDetails.gas.text.0')}
                     </div>
                     {!txn?.outcomes_agg?.gas_used ? (
                       <div className="w-full md:w-3/4">
@@ -883,13 +883,13 @@ const Details = (props: Props) => {
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={t('txn.burnt.tooltip')}
+                        label={t('txnDetails.burnt.tooltip')}
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
                         </div>
                       </Tooltip>
-                      {t('txn.burnt.text.0')}
+                      {t('txnDetails.burnt.text.0')}
                     </div>
                     {!txn?.receipt_conversion_tokens_burnt ||
                     !txn?.receipt_conversion_gas_burnt ? (

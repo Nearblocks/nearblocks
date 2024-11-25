@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
@@ -15,16 +15,18 @@ export async function generateMetadata(props: {
   params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
+  const { locale } = params;
 
-  const { hash, locale } = params;
+  const { hash } = params;
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
+  const t = await getTranslations({ locale });
 
-  unstable_setRequestLocale(locale);
+  const metaTitle = t('txnDetails.metaTitle', { txn: hash });
+  const metaDescription = t('txnDetails.metaDescription', { txn: hash });
 
-  const metaTitle = 'All Latest Near Protocol Transactions | NearBlocks';
-  const metaDescription =
-    'All Latest Near Protocol transactions confirmed on Near Blockchain. The list consists of transactions from sending Near and the transactions details for each transaction.';
-
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?transaction=true&transaction_hash=${hash}&title=${encodeURIComponent(
     metaTitle,
   )}`;
 
@@ -66,7 +68,7 @@ export default async function TxnsLayout(props: {
       <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
         <div className="flex justify-between dark:text-neargray-10 border-b w-full pr-1 pt-3 dark:border-black-200">
           <h1 className="py-2 space-x-2 text-lg font-medium leading-8 text-black-600 dark:text-neargray-10">
-            {t ? t('txn.heading') : 'Transaction Details'}
+            {t ? t('txnDetails.heading') : 'Transaction Details'}
           </h1>
 
           <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">

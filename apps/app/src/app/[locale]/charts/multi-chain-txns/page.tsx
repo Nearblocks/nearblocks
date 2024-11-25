@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 
 import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
@@ -16,11 +17,14 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle = t('multichainTxns.metaTitle');
   const metaDescription = t('multichainTxns.metaDescription');
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     t('multichainTxns.heading'),
   )}`;
 

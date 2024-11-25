@@ -72,7 +72,7 @@
     "near-api-js": "5.0.0",
     "near-social-vm": "github:NearSocial/VM#2.5.5",
     "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",
-    "nearblocks-trans-next-intl": "https://github.com/kevin-devstack/translations.git#c24bb9e00e81edcceb7d74a442b8d6222c4b42cd",
+    "nearblocks-trans-next-intl": "https://github.com/kevin-devstack/translations.git#4b973166331f9a21dd065ec22d76480b277bd4c9",
     "next": "15.0.3",
     "next-intl": "^3.25.1",
     "next-runtime-env": "^3.2.2",

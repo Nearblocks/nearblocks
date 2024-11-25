@@ -1,7 +1,8 @@
 export const runtime = 'edge';
 
 import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import ContactOptions from '@/components/app/Contact/ContactOptions';
 import { appUrl } from '@/utils/app/config';
@@ -13,14 +14,16 @@ export async function generateMetadata(props: {
 
   const { locale } = params;
 
-  unstable_setRequestLocale(locale);
   const t = await getTranslations({ locale });
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const title = t('contact.metaTitle');
 
   const description = t('contact.metaDescription');
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     title,
   )}`;
   return {

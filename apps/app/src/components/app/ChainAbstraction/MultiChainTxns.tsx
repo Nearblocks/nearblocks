@@ -163,7 +163,7 @@ const MultiChainTxns = ({
             <span className="truncate max-w-[150px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                href={`/txns/${row?.transaction_hash}#execution#${row?.receipt_id}`}
+                href={`/txns/${row?.transaction_hash}?tab=execution#${row?.receipt_id}`}
               >
                 {row?.receipt_id}
               </Link>
