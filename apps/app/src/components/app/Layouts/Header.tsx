@@ -11,6 +11,7 @@ import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { docsUrl } from '@/utils/app/config';
 import { setCurrentTheme } from '@/utils/app/actions';
+import { docsUrl } from '@/utils/app/config';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import { BlocksInfo, Stats } from '@/utils/types';
 
