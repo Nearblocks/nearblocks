@@ -35,11 +35,13 @@ const Detail = forwardRef(
         {txns === true && (
           <div className="mr-3.5">
             <div className={buttonStyles('overview')}>
-              <h2 className="p-2">{t ? t('txn.tabs.overview') : 'Overview'}</h2>
+              <h2 className="p-2">
+                {t ? t('txnDetails.tabs.overview') : 'Overview'}
+              </h2>
             </div>
             <div className={buttonStyles('execution')}>
               <h2 className="p-2">
-                {t ? t('txn.tabs.execution') : 'Execution Plan'}
+                {t ? t('txnDetails.tabs.execution') : 'Execution Plan'}
               </h2>
             </div>
             <div className={buttonStyles('enhanced')}>
@@ -55,7 +57,9 @@ const Detail = forwardRef(
               <h2 className="p-2">Receipt Summary</h2>
             </div>
             <div className={buttonStyles('comments')}>
-              <h2 className="p-2">{t ? t('txn.tabs.comments') : 'Comments'}</h2>
+              <h2 className="p-2">
+                {t ? t('txnDetails.tabs.comments') : 'Comments'}
+              </h2>
             </div>
           </div>
         )}

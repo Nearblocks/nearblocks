@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 
 import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
 import Stats from '@/components/app/ChainAbstraction/Stats';
@@ -16,12 +17,15 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle = `${t('metaTitle')} | NearBlocks`;
 
   const metaDescription = `${t('metaDescription')}`;
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     t('heading'),
   )}`;
 

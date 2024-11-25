@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import TokensSkeleton from '@/components/app/skeleton/ft/Tokens';
@@ -7,21 +7,17 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata(props: {
-  params: Promise<{ hash: string; locale: string }>;
-}): Promise<Metadata> {
-  const params = await props.params;
-
-  const { locale } = params;
-
-  unstable_setRequestLocale(locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle =
     'Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks';
   const metaDescription =
     'The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

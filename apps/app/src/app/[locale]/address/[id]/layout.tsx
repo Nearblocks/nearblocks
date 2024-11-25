@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+
 import Buttons from '@/components/app/Icons/Button';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
@@ -10,10 +12,12 @@ export async function generateMetadata(props: {
   params: Promise<{ id: string; locale: string }>;
 }) {
   const params = await props.params;
-
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
   const { id } = params;
 
-  const thumbnail = `${appUrl}/api/og?account=true&address=${id}`;
+  const thumbnail = `${baseUrl}api/og?account=true&address=${id}`;
   const metaTitle = `Near Account ${id} | NearBlocks`;
   const metaDescription = `Near Account ${id} page allows users to view transactions, balances, token holdings and transfers.`;
   return {

@@ -1,7 +1,8 @@
 export const runtime = 'edge';
 
 import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import Home from '@/components/app/Home';
 import { appUrl } from '@/utils/config';
@@ -14,13 +15,15 @@ export async function generateMetadata(props: {
   const params = await props.params;
 
   const { locale } = params;
-
-  unstable_setRequestLocale(locale);
   const t = await getTranslations({ locale });
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
+
   const metaTitle = t('homePage.metaTitle');
   const metaDescription = t('homePage.metaDescription');
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?home&title=${encodeURIComponent(
     metaTitle,
   )}`;
 
@@ -62,8 +65,6 @@ export default async function HomeIndex(props: {
   const params = await props.params;
 
   const { locale } = params;
-
-  unstable_setRequestLocale(locale);
 
   return <Home locale={locale} />;
 }

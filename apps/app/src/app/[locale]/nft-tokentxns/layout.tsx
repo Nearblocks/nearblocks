@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import { appUrl } from '@/utils/app/config';
 
@@ -11,13 +12,15 @@ export async function generateMetadata(props: {
   const params = await props.params;
 
   const { locale } = params;
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
-  unstable_setRequestLocale(locale);
   const t = await getTranslations({ locale });
   const metaTitle = t('nfts.metaTitle');
   const metaDescription = t('nfts.metaDescription');
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 
