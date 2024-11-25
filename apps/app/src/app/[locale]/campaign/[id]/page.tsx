@@ -1,6 +1,6 @@
 export const runtime = 'edge';
 import { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import CampaignEdit from '@/components/app/Campaign/CampaignEdit';
 import { appUrl } from '@/utils/app/config';
@@ -12,12 +12,15 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
   const metaTitle = 'Campaign Edit | NearBlocks';
 
   const metaDescription = 'Edit Campaign in Nearblocks.';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
-    'Campaign Edit | NearBlocks',
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
+    metaTitle,
   )}`;
 
   const id = (await params).id;
