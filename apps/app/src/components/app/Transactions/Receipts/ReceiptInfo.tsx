@@ -280,7 +280,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
                       className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={t('txn.status.tooltip')}
+                      label={t('txnDetails.status.tooltip')}
                     >
                       <div>
                         <div>
@@ -288,7 +288,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         </div>
                       </div>
                     </Tooltip>
-                    {t ? t('txn.status.text.0') : 'Status'}
+                    {t ? t('txnDetails.status.text.0') : 'Status'}
                   </td>
                   <td className="font-semibold py-2 pl-4">
                     {receipt?.outcome?.status !== undefined && (

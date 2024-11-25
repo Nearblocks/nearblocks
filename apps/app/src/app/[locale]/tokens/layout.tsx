@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import TokensSkeleton from '@/components/app/skeleton/ft/Tokens';
@@ -7,20 +7,16 @@ import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata(props: {
-  params: Promise<{ hash: string; locale: string }>;
-}): Promise<Metadata> {
-  const params = await props.params;
-
-  const { locale } = params;
-
-  unstable_setRequestLocale(locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle = 'Near Protocol Ecosystem Tokens (NEP-141) | NearBlocks';
   const metaDescription =
     'A curated list of all NEP-141 Tokens within the Near Protocol Ecoystem. Discover statistics, holders, transaction volume and more.';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

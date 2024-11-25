@@ -15,7 +15,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
     <>
       <div className="py-1">
         <FaUser className="inline-flex text-red-400 mr-1" />
-        {t ? t('txn.actions.deleteAccount.0') : 'Delete account'} (
+        {t ? t('txnDetails.actions.deleteAccount.0') : 'Delete account'} (
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
           href={`/address/${props.receiver}`}
@@ -24,7 +24,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         </Link>
         ){' '}
         {t
-          ? t('txn.actions.deleteAccount.1')
+          ? t('txnDetails.actions.deleteAccount.1')
           : 'and transfer remaining funds to'}
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"

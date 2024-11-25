@@ -110,13 +110,13 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.receipts.receipt.tooltip')}
+              label={t('txnDetails.receipts.receipt.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.receipts.receipt.text.0') : 'Receipt'}
+            {t ? t('txnDetails.receipts.receipt.text.0') : 'Receipt'}
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
@@ -132,7 +132,7 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.status.tooltip')}
+              label={t('txnDetails.status.tooltip')}
             >
               <div>
                 <div>
@@ -140,7 +140,7 @@ const ReceiptRow = (props: Props) => {
                 </div>
               </div>
             </Tooltip>
-            {t ? t('txn.status.text.0') : 'Status'}
+            {t ? t('txnDetails.status.text.0') : 'Status'}
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
@@ -164,7 +164,7 @@ const ReceiptRow = (props: Props) => {
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.receipts.block.text.0') : 'Block'}
+            {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
           {!block?.height || loading ? (
             <div className="w-full md:w-3/4">
@@ -188,13 +188,13 @@ const ReceiptRow = (props: Props) => {
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                label={t('txn.receipts.from.tooltip')}
+                label={t('txnDetails.receipts.from.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
                 </div>
               </Tooltip>
-              {t ? t('txn.receipts.from.text.0') : 'From'}
+              {t ? t('txnDetails.receipts.from.text.0') : 'From'}
             </div>
             {!receipt || loading ? (
               <div className="w-full md:w-3/4">
@@ -217,13 +217,13 @@ const ReceiptRow = (props: Props) => {
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                label={t('txn.receipts.to.tooltip')}
+                label={t('txnDetails.receipts.to.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
                 </div>
               </Tooltip>
-              {t ? t('txn.receipts.to.text.0') : 'To'}
+              {t ? t('txnDetails.receipts.to.text.0') : 'To'}
             </div>
             {!receipt || loading ? (
               <div className="w-full md:w-3/4">
@@ -247,14 +247,14 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.receipts.burnt.tooltip')}
+              label={t('txnDetails.receipts.burnt.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
             {t
-              ? t('txn.receipts.burnt.text.0')
+              ? t('txnDetails.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
           {!receipt || loading ? (
@@ -283,13 +283,13 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.receipts.actions.tooltip')}
+              label={t('txnDetails.receipts.actions.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.receipts.actions.text.0') : 'Actions'}
+            {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
@@ -348,13 +348,13 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.receipts.result.tooltip')}
+              label={t('txnDetails.receipts.result.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.receipts.result.text.0') : 'Result'}
+            {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
@@ -372,13 +372,13 @@ const ReceiptRow = (props: Props) => {
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txn.receipts.logs.tooltip')}
+              label={t('txnDetails.receipts.logs.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.receipts.logs.text.0') : 'Logs'}
+            {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">

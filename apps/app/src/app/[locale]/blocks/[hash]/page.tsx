@@ -1,6 +1,5 @@
 export const runtime = 'edge';
 
-import { unstable_setRequestLocale } from 'next-intl/server';
 import { Suspense } from 'react';
 
 import Details from '@/components/app/Blocks/Details';
@@ -13,9 +12,7 @@ export default async function Hash(props: {
 }) {
   const params = await props.params;
 
-  const { hash, locale } = params;
-
-  unstable_setRequestLocale(locale);
+  const { hash } = params;
 
   const [hashData, priceData] = await fetchHashAndPriceData(hash);
 

@@ -60,7 +60,7 @@ const OverviewSkeleton = () => {
                 <Question className="w-4 h-6 fill-current mr-1" />
               </div>
             </Tooltip>
-            {t ? t('txn.block.text.0') : 'Block Height'}
+            {t ? t('txnDetails.block.text.0') : 'Block Height'}
           </div>
           <div className="w-full md:w-3/4">
             <Loader wrapperClassName="flex w-14" />

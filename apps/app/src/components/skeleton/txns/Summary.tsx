@@ -26,7 +26,7 @@ const Summary = () => {
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
               scope="col"
             >
-              {t ? t('txn.receipts.from.text.0') : 'From'}
+              {t ? t('txnDetails.receipts.from.text.0') : 'From'}
             </th>
             <th
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
@@ -36,7 +36,7 @@ const Summary = () => {
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"
               scope="col"
             >
-              {t ? t('txn.receipts.to.text.0') : 'To'}
+              {t ? t('txnDetails.receipts.to.text.0') : 'To'}
             </th>
             <th
               className="px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider"

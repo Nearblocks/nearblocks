@@ -8,30 +8,59 @@ const baseURL = process.env.API_URL;
 export const getRequest = async (
   path: string,
   params = {},
-  options?: {},
+  options: RequestInit = {},
   useBase: boolean = true,
 ) => {
+  if (!fetchKey) {
+    throw new Error('Fetch key is not provided');
+  }
+
   const queryParams = qs.stringify(params, { encode: true });
   const url = useBase
     ? `${baseURL}${path}${queryParams ? `?${queryParams}` : ''}`
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
-  const headers = new Headers({
-    Authorization: `Bearer ${fetchKey}`,
-  });
+  const MAX_RETRIES = 3;
 
-  try {
-    const response = await fetch(url, { headers: headers, ...options });
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const headers = new Headers({
+        Authorization: `Bearer ${fetchKey}`,
+      });
 
-    if (!response.ok) {
-      return null;
+      const mergedOptions = { headers, ...options };
+      const response = await fetch(url, mergedOptions);
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+        const isJson = contentType?.includes('json');
+        return isJson ? response.json() : response.text();
+      }
+
+      if (response.status >= 500) {
+        console.error(
+          `Server error on attempt ${attempt + 1}: ${response.statusText}`,
+        );
+        if (attempt + 1 === MAX_RETRIES) return null;
+      } else {
+        throw new Error(
+          `Request failed with status ${response.status}: ${response.statusText}`,
+        );
+      }
+    } catch (error: any) {
+      const isNetworkError =
+        error instanceof TypeError || (error as Error).name === 'NetworkError';
+      console.error(
+        `Error on attempt ${attempt + 1}: ${(error as Error).message}`,
+      );
+
+      if (!isNetworkError || attempt + 1 === MAX_RETRIES) {
+        throw error;
+      }
+
+      const delay = Math.pow(2, attempt) * 1000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
-
-    return response.json();
-  } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-
-    throw error;
   }
 };
 

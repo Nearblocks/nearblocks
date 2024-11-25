@@ -15,14 +15,14 @@ const DeployContract = (props: TransactionActionInfo) => {
     <>
       <div className="py-1">
         <FaCode className="inline-flex text-emerald-400 mr-1" />{' '}
-        {t ? t('txn.actions.deployContract.0') : 'Contract'} (
+        {t ? t('txnDetails.actions.deployContract.0') : 'Contract'} (
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
           href={`/address/${receiver}`}
         >
           {shortenAddress(receiver)}
         </Link>
-        ) {t ? t('txn.actions.deployContract.1') : 'deployed'}
+        ) {t ? t('txnDetails.actions.deployContract.1') : 'deployed'}
       </div>
       <div className="mt-3 bg-gray-100 dark:bg-black-200 overflow-auto py-3 rounded-lg">
         <TreeNode node={action} path="root" />

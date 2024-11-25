@@ -2,6 +2,7 @@ export const runtime = 'edge';
 
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import TpsChart from '@/components/app/Charts/TpsChart';
@@ -19,12 +20,15 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle = 'Near Transactions per Second Chart';
   const metaDescription =
     'Near Transactions per Second Chart shows the transactions occuring per second on Near blockchain.';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     t('charts.heading'),
   )}`;
 

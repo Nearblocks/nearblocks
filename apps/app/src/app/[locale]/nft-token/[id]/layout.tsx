@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
@@ -12,10 +12,10 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const params = await props.params;
 
-  const { id, locale } = params;
-
-  unstable_setRequestLocale(locale);
-
+  const { id } = params;
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
   const tokenDetails = await getRequest(`nfts/${id}`);
 
   const token: Token = tokenDetails?.contracts?.[0];
@@ -28,7 +28,7 @@ export async function generateMetadata(props: {
     ? `All you need to know about the ${token.name} NFT Collection : Statistics, total supply, number of holders, latest transactions & meta-data.`
     : '';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?nft&nftHash=${id}&title=${encodeURIComponent(
     title,
   )}`;
   return {

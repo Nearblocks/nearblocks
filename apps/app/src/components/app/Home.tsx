@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { getRequest } from '@/utils/app/api';
 
 import Banner from './Banner';
+// import Banner from './Banner';
 import LatestBlocks from './Blocks/Latest';
 import Search from './common/Search';
 import SponserdText from './SponserdText';

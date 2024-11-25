@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 import { appUrl } from '@/utils/app/config';
 
@@ -10,6 +11,9 @@ export async function generateMetadata(props: {
   const params = await props.params;
 
   const { id } = params;
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const baseUrl = `https://${host}/`;
 
   const metaTitle = `${network === 'testnet' ? 'TESTNET ' : ''}${
     id ? `${id}: ` : ''
@@ -18,7 +22,7 @@ export async function generateMetadata(props: {
     ? `Node Validator ${id} (${id}) Delegators Listing`
     : '';
 
-  const ogImageUrl = `${appUrl}/api/og?basic=true&title=${encodeURIComponent(
+  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
   )}`;
 

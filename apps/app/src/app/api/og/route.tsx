@@ -39,8 +39,8 @@ export async function GET(request: Request) {
   const transactionHash = url.searchParams.get('transaction_hash');
   const blobHash = url.searchParams.get('blob_hash');
   const addressHash = url.searchParams.get('address');
-  const tokenHash = url.searchParams.get('token');
-  const nftHash = url.searchParams.get('nft');
+  const tokenHash = url.searchParams.get('tokenHash');
+  const nftHash = url.searchParams.get('nftHash');
 
   const brand = 'near';
   const brandConfig = config(brand);
