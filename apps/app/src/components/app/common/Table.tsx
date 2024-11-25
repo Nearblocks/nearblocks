@@ -1,5 +1,7 @@
 import { Fragment, type JSX } from 'react';
 
+import { useIntlRouter } from '@/i18n/routing';
+
 import Skeleton from '../skeleton/common/Skeleton';
 import CursorPaginator from './CursorPaginator';
 import Paginator from './Paginator';
@@ -28,11 +30,14 @@ interface Props {
   page?: number;
   pageLimit?: number;
   renderRowSubComponent?: (row: any, rowIndex?: number) => React.ReactNode;
+  rowLink?: string;
   setPage?: (page: number) => void;
   setUrl?: (url: string) => void;
   url?: string;
 }
+
 const Table = (props: Props) => {
+  const router = useIntlRouter();
   if (props.isLoading) {
     return (
       <>
@@ -168,8 +173,15 @@ const Table = (props: Props) => {
                 props?.data.map((row, rowIndex: number) => (
                   <Fragment key={rowIndex}>
                     <tr
-                      className="hover:bg-blue-900/5 h-[57px]"
+                      className={`hover:bg-blue-900/5 h-[57px] ${
+                        props?.rowLink ? 'cursor-pointer' : ''
+                      }`}
                       key={`row-${rowIndex}`}
+                      onClick={() => {
+                        if (props?.rowLink) {
+                          router.push(`${props?.rowLink + row?.id}`);
+                        }
+                      }}
                     >
                       {props?.columns?.map(
                         (column: column, colIndex: number) => (
