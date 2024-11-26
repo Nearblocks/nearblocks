@@ -1,13 +1,12 @@
 'use client';
 import { Accordion } from '@reach/accordion';
 import { Tooltip } from '@reach/tooltip';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
-import { useAuthStore } from '@/stores/auth';
 import { verifierConfig } from '@/utils/app/config';
 import {
   ContractCodeInfo,
@@ -17,6 +16,7 @@ import {
   VerificationData,
   VerifierStatus,
 } from '@/utils/types';
+import { NearContext } from '@/wallets/near';
 
 import ContractCode from './ContractCode';
 import Info from './Info';
@@ -25,7 +25,6 @@ import ViewOrChangeAbi from './ViewOrChangeAbi';
 
 interface Props {
   accountId?: string;
-  connected?: boolean;
   contract: ContractCodeInfo;
   contractInfo: ContractParseInfo;
   deployments: any;
@@ -44,13 +43,28 @@ type OnChainResponse = {
 const verifiers = verifierConfig.map((config) => config.accountId);
 
 const OverviewActions = (props: Props) => {
+  const { signedAccountId, wallet } = useContext(NearContext);
   const { accountId, contractInfo, deployments, id, isLocked, schema } = props;
 
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store?.requestSignInWithWallet,
-  );
-  const signedIn = useAuthStore((store) => store.signedIn);
-  const logOut = useAuthStore((store) => store.logOut);
+  const handleSignIn = () => {
+    try {
+      if (!wallet) return;
+      const account = wallet.signIn();
+      console.log('Signed in successfully:', account);
+    } catch (error) {
+      console.error('Error during sign-in:', error);
+    }
+  };
+
+  const handleSignOut = () => {
+    try {
+      if (!wallet) return;
+      wallet.signOut();
+    } catch (error) {
+      console.error('Error during sign-out:', error);
+    }
+  };
+
   const [tab, setTab] = useState(0);
 
   const onTabChange = (index: number) => setTab(index);
@@ -217,14 +231,14 @@ const OverviewActions = (props: Props) => {
       {!schema && (
         <TabPanel>
           <div className="border-t p-4 mt-3">
-            {signedIn ? (
+            {signedAccountId ? (
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
                 label="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                  onClick={logOut}
+                  onClick={handleSignOut}
                 >
                   <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white" />
                   Connected
@@ -233,7 +247,7 @@ const OverviewActions = (props: Props) => {
             ) : (
               <button
                 className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                onClick={requestSignInWithWallet}
+                onClick={handleSignIn}
               >
                 <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white animate-pulse" />
                 Connect to Contract
@@ -275,14 +289,14 @@ const OverviewActions = (props: Props) => {
       {schema && schema?.body?.functions.length > 0 && (
         <TabPanel>
           <div className="border-t p-4 mt-3">
-            {signedIn ? (
+            {signedAccountId ? (
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
                 label="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                  onClick={logOut}
+                  onClick={handleSignOut}
                 >
                   <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white" />
                   Connected
@@ -291,7 +305,7 @@ const OverviewActions = (props: Props) => {
             ) : (
               <button
                 className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                onClick={requestSignInWithWallet}
+                onClick={handleSignIn}
               >
                 <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white animate-pulse" />
                 Connect to Contract
@@ -318,7 +332,6 @@ const OverviewActions = (props: Props) => {
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
               <ViewOrChangeAbi
-                connected={signedIn}
                 id={id}
                 index={index}
                 key={index}

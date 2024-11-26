@@ -6,21 +6,18 @@ import {
 } from '@reach/accordion';
 import { Tooltip } from '@reach/tooltip';
 import uniqueId from 'lodash/uniqueId';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import ArrowRight from '@/components/Icons/ArrowRight';
 import CloseCircle from '@/components/Icons/CloseCircle';
 import Question from '@/components/Icons/Question';
 import { fetcher } from '@/hooks/useFetch';
 import { Link } from '@/i18n/routing';
-import { useAuthStore } from '@/stores/auth';
-import { useVmStore } from '@/stores/vm';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
+import { NearContext } from '@/wallets/near';
 
 interface Props {
-  accountId?: string;
-  connected?: boolean;
   id: string;
   index: number;
   method: string;
@@ -55,9 +52,8 @@ const getDataType = (data: string) => {
 };
 
 const ViewOrChange = (props: Props) => {
-  const { near } = useVmStore();
-  const account = useAuthStore((store) => store.account);
-  const { connected, index, method } = props;
+  const { signedAccountId, wallet } = useContext(NearContext);
+  const { index, method } = props;
   const [txn, setTxn] = useState<null | string>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -97,61 +93,55 @@ const ViewOrChange = (props: Props) => {
 
     try {
       const args = mapFeilds(fields);
-      near
-        .viewCall(props?.id, toSnakeCase(method), args)
-        .then((resp: { transaction_outcome: { id: string } } | any | null) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
+      if (!wallet) return;
 
-    setLoading(false);
+      const response = await wallet.viewMethod({
+        args,
+        contractId: props?.id,
+        method: toSnakeCase(method),
+      });
+
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling view method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onWrite = async () => {
     setLoading(true);
 
     try {
-      if (!account) throw new Error('Error in wallet connection');
+      if (!wallet) return;
+      if (!signedAccountId) throw new Error('Error in wallet connection');
 
       const args = mapFeilds(fields);
-      near
-        .functionCall(
-          props?.id,
-          toSnakeCase(method),
-          args,
-          options?.gas,
-          options?.attachedDeposit,
-        )
-        .then((resp: { transaction_outcome: { id: string } } | any | null) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
 
-    setLoading(false);
+      const response = await wallet.callMethod({
+        args,
+        contractId: props?.id,
+        deposit: options?.attachedDeposit,
+        gas: options?.gas,
+        method: toSnakeCase(method),
+      });
+
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onDetect = async () => {
@@ -347,7 +337,7 @@ const ViewOrChange = (props: Props) => {
           )}
           <button
             className="bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-            disabled={loading || !connected}
+            disabled={loading || !signedAccountId}
             onClick={onWrite}
           >
             Write

@@ -1,7 +1,13 @@
 'use client';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { networkId } from '@/utils/app/config';
+import { NearContext, Wallet } from '@/wallets/near';
 
 import Footer from './Footer';
+
+const wallet = new Wallet({ networkId: networkId });
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,6 +17,11 @@ interface LayoutProps {
 
 const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
   const pathname = usePathname();
+  const [signedAccountId, setSignedAccountId] = useState('');
+
+  useEffect(() => {
+    wallet.startUp(setSignedAccountId);
+  }, []);
 
   const className =
     pathname === '/404'
@@ -19,9 +30,16 @@ const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
 
   return (
     <div className={className}>
-      {notice}
-      <main>{children}</main>
-      <Footer theme={theme} />
+      <NearContext.Provider
+        value={{
+          signedAccountId: signedAccountId || '',
+          wallet: wallet ?? undefined,
+        }}
+      >
+        {notice}
+        <main>{children}</main>
+        <Footer theme={theme} />
+      </NearContext.Provider>
     </div>
   );
 };
