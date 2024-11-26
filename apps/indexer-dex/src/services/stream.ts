@@ -56,8 +56,10 @@ export const syncData = async () => {
 
   if (config.dataSource === DataSource.FAST_NEAR) {
     const stream = streamBlock({
+      limit: config.preloadSize,
       network: config.network,
       start: startBlockHeight,
+      url: config.fastnearEndpoint,
     });
 
     for await (const message of stream) {

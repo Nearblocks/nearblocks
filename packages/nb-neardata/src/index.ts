@@ -18,21 +18,26 @@ interface BlockReadable extends Readable {
 
 export type BlockStreamConfig = {
   limit?: number;
-  network: Network;
+  network: string;
   start: number;
+  url?: string;
 };
 
 interface CamelCaseObject {
   [key: string]: unknown;
 }
 
-const delay = 700;
-const retries = 20;
+const retries = 10;
+
+const retryLogger = (attempt: number, error: unknown) => {
+  logger.error(error);
+  logger.error({ attempt });
+};
 
 const endpoint = (network: string) => {
   return network === Network.MAINNET
-    ? 'https://mainnet.neardata.xyz/v0'
-    : 'https://testnet.neardata.xyz/v0';
+    ? 'https://mainnet.neardata.xyz'
+    : 'https://testnet.neardata.xyz';
 };
 
 const camelCase = (str: string): string => {
@@ -57,37 +62,34 @@ export const camelCaseKeys = <T>(obj: T): T => {
   return newObj as T;
 };
 
-const fetch = async (network: string, block: number): Promise<Message> => {
+const fetch = async (url: string, block: number): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await axios.get(`${endpoint(network)}/block/${block}`, {
+      const response = await axios.get(`${url}/v0/block/${block}`, {
         timeout: 5000,
       });
 
       return response.data;
     },
-    { delay, retries },
+    { exponential: true, logger: retryLogger, retries },
   );
 };
 
-const fetchFinal = async (network: string): Promise<Message> => {
+const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await axios.get(
-        `${endpoint(network)}/last_block/final`,
-        {
-          timeout: 5000,
-        },
-      );
+      const response = await axios.get(`${url}/v0/last_block/final`, {
+        timeout: 5000,
+      });
 
       return response.data;
     },
-    { delay, retries },
+    { exponential: true, logger: retryLogger, retries },
   );
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const network = config.network;
+  const url = config.url ?? endpoint(config.network);
   const start = config.start;
   const limit = config.limit ?? 10;
 
@@ -104,14 +106,14 @@ export const streamBlock = (config: BlockStreamConfig) => {
           const hasFinal = !this.final || this.final - block > limit + 1;
 
           if (hasLast && hasFinal) {
-            this.final = (await fetchFinal(network)).block.header.height;
+            this.final = (await fetchFinal(url)).block.header.height;
             this.last = block;
           }
 
           const concurrency = hasFinal ? limit : 1;
 
           for (let i = 0; i < concurrency; i++) {
-            promises.push(fetch(network, block + i));
+            promises.push(fetch(url, block + i));
           }
 
           const results = await Promise.all(promises);

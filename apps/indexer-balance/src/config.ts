@@ -16,6 +16,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -48,6 +49,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 1_000, // start from blocks earlier on sync interuption
+  fastnearEndpoint: env.FASTNEAR_ENDPOINT,
   genesisHeight,
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,

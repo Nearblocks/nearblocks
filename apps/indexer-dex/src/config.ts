@@ -15,6 +15,7 @@ const env = cleanEnv(process.env, {
     choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
     default: DataSource.NEAR_LAKE,
   }),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -46,6 +47,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 500,
+  fastnearEndpoint: env.FASTNEAR_ENDPOINT,
   genesisHeight,
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
