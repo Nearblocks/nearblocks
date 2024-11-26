@@ -27,7 +27,7 @@ interface CamelCaseObject {
 }
 
 const delay = 700;
-const retries = 20;
+const retries = 500;
 
 const endpoint = (network: string) => {
   return network === Network.MAINNET
