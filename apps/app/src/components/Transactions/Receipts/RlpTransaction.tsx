@@ -33,20 +33,20 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
   }
 
   function decodeTransaction(parsed: any) {
-    if (!parsed || !parsed.tx_bytes_b64 || !isBase64(parsed.tx_bytes_b64)) {
+    if (!parsed || !parsed?.tx_bytes_b64 || !isBase64(parsed?.tx_bytes_b64)) {
       return parsed;
     }
 
-    const input = ethers.utils.base64.decode(parsed.tx_bytes_b64);
-    const data = ethers.utils.parseTransaction(input);
-    //@ts-ignore
-    data.value = data.value.toString();
-    //@ts-ignore
-    data.gasPrice = data.gasPrice.toString();
-    //@ts-ignore
-    data.gasLimit = data.gasLimit.toString();
+    const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
+    const data = ethers?.utils?.parseTransaction(input);
+    const parsedData = {
+      ...data,
+      value: data?.value?.toString(),
+      gasPrice: data?.gasPrice?.toString(),
+      gasLimit: data?.gasLimit?.toString(),
+    };
 
-    return { ...parsed, tx_bytes_b64: data };
+    return { ...parsed, tx_bytes_b64: parsedData };
   }
 
   const handleFormatChange = (event: any) => {
@@ -91,7 +91,7 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
                         {key}
                       </td>
                       <td className="border px-4 py-2">
-                        {key === 'hash' ? (
+                        {key === 'hash' && receiver.includes('aurora') ? (
                           <a
                             href={`${aurorablocksUrl}/tx/${value}`}
                             target="_blank"
@@ -100,6 +100,10 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
                           >
                             {String(value)}
                           </a>
+                        ) : typeof value === 'object' ? (
+                          <pre className="whitespace-pre-wrap text-sm">
+                            {JSON.stringify(value, null, 2)}
+                          </pre>
                         ) : (
                           <>{String(value)}</>
                         )}
