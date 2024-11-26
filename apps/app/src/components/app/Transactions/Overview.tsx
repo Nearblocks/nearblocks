@@ -31,90 +31,12 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
   const { networkId } = useConfig();
 
-  const LoadingSkeleton = () => {
-    return (
-      <div className="container-xxl mx-auto px-5">
-        <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
-          <div
-            className={`grid grid-flow-col grid-cols-1 ${
-              networkId === 'mainnet'
-                ? 'grid-rows-3 lg:grid-cols-3'
-                : 'grid-rows-2 lg:grid-cols-2'
-            } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
-          >
-            {networkId === 'mainnet' && (
-              <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-                <div className="flex flex-row py-4 lg:pb-4 lg:px-0">
-                  <div className="items-center flex justify-left mr-3">
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                  </div>
-                  <div className="ml-2 flex-1">
-                    <Skeleton className="h-3.5 w-24 mb-1.5" />
-                    <Skeleton className="h-5 w-full max-w-[200px]" />
-                  </div>
-                </div>
-                <div className="flex flex-row py-4 lg:pt-4 lg:px-0">
-                  <div className="items-center flex justify-left mr-3">
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                  </div>
-                  <div className="ml-2 flex-1">
-                    <Skeleton className="h-3.5 w-24 mb-1.5" />
-                    <Skeleton className="h-5 w-full max-w-[180px]" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-              <div className="flex flex-row justify-between py-4 lg:pb-4 lg:px-0">
-                <div className="flex flex-row">
-                  <div className="items-center flex justify-left mr-3">
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                  </div>
-                  <div className="ml-2">
-                    <Skeleton className="h-3.5 w-24 mb-1.5" />
-                    <Skeleton className="h-5 w-32" />
-                  </div>
-                </div>
-                <div className="flex flex-col text-right">
-                  <Skeleton className="h-3.5 w-24 mb-1.5" />
-                  <Skeleton className="h-5 w-20" />
-                </div>
-              </div>
-              <div className="flex flex-row justify-between py-4 lg:pt-4 lg:px-0">
-                <div className="flex flex-row">
-                  <div className="items-center flex justify-left mr-3">
-                    <Skeleton className="w-6 h-6 rounded-full" />
-                  </div>
-                  <div className="ml-2">
-                    <Skeleton className="h-3.5 w-32 mb-1.5" />
-                    <Skeleton className="h-5 w-24" />
-                  </div>
-                </div>
-                <div className="flex flex-col text-right">
-                  <Skeleton className="h-3.5 w-28 mb-1.5" />
-                  <Skeleton className="h-5 w-16" />
-                </div>
-              </div>
-            </div>
-
-            <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5">
-              <div className="flex-1 py-4 lg:px-0">
-                <Skeleton className="h-3.5 w-48 mb-3" />
-                <Skeleton className="h-28 w-full" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const charts = chartsDetails?.charts;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
   const chartData = useMemo(() => {
     try {
       const series = charts?.map((stat: any) => ({
@@ -257,10 +179,6 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
     </html>
   `
     : ``;
-
-  if (!mounted) {
-    return <LoadingSkeleton />;
-  }
 
   const nearPrice = stats?.near_price ?? '';
   const nearBtcPrice = stats?.near_btc_price ?? '';
@@ -411,7 +329,6 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
               </div>
               <div className="flex flex-col text-right">
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
-                  {' '}
                   {t ? t('homePage.gasPrice') : 'GAS PRICE'}
                 </p>
                 {error ? (
@@ -440,10 +357,7 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                 <div className="ml-2">
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     <Link className="hover:no-underline" href="/node-explorer">
-                      {' '}
-                      {t
-                        ? t('homePage.activeValidator')
-                        : 'ACTIVE VALIDATORS'}{' '}
+                      {t ? t('homePage.activeValidator') : 'ACTIVE VALIDATORS'}{' '}
                     </Link>
                   </p>
                   {error ? (
