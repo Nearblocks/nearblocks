@@ -9,7 +9,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   delta: number;
-  fastnearEndpoint: string;
+  fastnearEndpoint?: string;
   genesisHeight: number;
   insertLimit: number;
   network: Network;

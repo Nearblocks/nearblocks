@@ -54,6 +54,7 @@ export const syncData = async () => {
 
     const stream = streamBlock({
       limit: config.preloadSize / 2,
+      network: config.network,
       start: startBlockHeight || config.genesisHeight,
       url: config.fastnearEndpoint,
     });

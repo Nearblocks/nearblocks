@@ -10,7 +10,7 @@ export interface Config {
   dbKey: string;
   dbUrl: string;
   delta: number;
-  fastnearEndpoint: string;
+  fastnearEndpoint?: string;
   genesisFile: string;
   genesisHeight: number;
   genesisTimestamp: string;

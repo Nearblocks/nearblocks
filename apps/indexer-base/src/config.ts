@@ -16,7 +16,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  FASTNEAR_ENDPOINT: str(),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),

@@ -15,7 +15,7 @@ const env = cleanEnv(process.env, {
     choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
     default: DataSource.NEAR_LAKE,
   }),
-  FASTNEAR_ENDPOINT: str(),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),

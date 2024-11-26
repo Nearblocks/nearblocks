@@ -11,7 +11,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  FASTNEAR_ENDPOINT: str(),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   MULTICHAIN_DATA_SOURCE: str({
     choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
     default: DataSource.NEAR_LAKE,

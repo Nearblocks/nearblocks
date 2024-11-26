@@ -16,7 +16,7 @@ const env = cleanEnv(process.env, {
     default: DataSource.NEAR_LAKE,
   }),
   EVENTS_START_BLOCK: num({ default: 0 }),
-  FASTNEAR_ENDPOINT: str(),
+  FASTNEAR_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
