@@ -1,6 +1,7 @@
 export type Options = {
   delay?: number;
   exponential?: boolean;
+  logger?: (attempt: number, error: unknown) => void;
   retries?: number;
 };
 
@@ -10,6 +11,8 @@ export type Context = {
 
 const NS_IN_A_MS = 10n ** 6n;
 const YOCTO_IN_A_NEAR = 10n ** 24n;
+
+const emptyLogger = () => {};
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,6 +24,7 @@ export const retry = async <A>(
 ): Promise<A> => {
   const delay = options?.delay || 50;
   const exponential = options?.exponential || false;
+  const logger = options.logger ?? emptyLogger;
   let retries = options?.retries || 5;
   retries = retries < 1 ? 5 : retries;
 
@@ -30,8 +34,10 @@ export const retry = async <A>(
     try {
       return await func({ attempt });
     } catch (error) {
+      logger(attempt, error);
+
       if (exponential) {
-        Math.pow(2, attempt) * 100 + Math.random() * 100;
+        await sleep(Math.pow(2, attempt) * 100 + Math.random() * 100);
       } else {
         await sleep(delay);
       }
