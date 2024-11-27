@@ -1,57 +1,10 @@
 export const runtime = 'edge';
-
-import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
-
 import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
 import Stats from '@/components/app/ChainAbstraction/Stats';
 import { getRequest } from '@/utils/app/api';
-import { appUrl, chain } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
-export async function generateMetadata(props: {
-  params: Promise<{ id: string; locale: string }>;
-}) {
-  const params = await props.params;
-  const { locale } = params;
-
-  const t = await getTranslations({ locale });
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-  const baseUrl = `https://${host}/`;
-
-  const metaTitle = `${t('metaTitle')} | NearBlocks`;
-
-  const metaDescription = `${t('metaDescription')}`;
-
-  const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
-    t('heading'),
-  )}`;
-
-  return {
-    alternates: {
-      canonical: `${appUrl}/multi-chain-txns`,
-    },
-    description: metaDescription,
-    openGraph: {
-      description: metaDescription,
-      images: [
-        {
-          alt: metaTitle,
-          height: 405,
-          url: ogImageUrl.toString(),
-          width: 720,
-        },
-      ],
-      title: metaTitle,
-    },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
-  };
-}
+import { chain } from '@/utils/app/config';
 
 export default async function TransactionList(props: {
-  params: Promise<{ hash?: string; locale: string }>;
   searchParams: Promise<{
     from?: string;
     multichain_address?: string;
@@ -59,9 +12,6 @@ export default async function TransactionList(props: {
   }>;
 }) {
   const searchParams = await props.searchParams;
-  const params = await props.params;
-  const { locale } = params;
-  const t = await getTranslations({ locale });
   const apiUrl = `chain-abstraction/txns`;
   const countUrl = `${apiUrl}/count`;
   const chartUrl = `charts`;
@@ -90,35 +40,22 @@ export default async function TransactionList(props: {
 
   return (
     <>
-      <div className="h-24">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 ">
-            {t ? t('heading') : 'Latest Multichain Transactions'}
-          </h1>
-        </div>
-      </div>
-      <div className="container-xxl mx-auto px-5">
-        <div className="relative block lg:flex lg:space-x-2">
-          <div className=" w-full">
-            <Stats
-              dataChart={dataChart}
-              error={!data}
-              networksCount={networksCount}
-              txns24HrCount={txns24HrCount}
-              txnsTotalCount={txnsTotalCount}
-            />
-            <div className="py-6"></div>
-            <MultiChainTxns
-              count={count}
-              cursor={cursor}
-              error={!data}
-              isTab={false}
-              tab={''}
-              txns={txns}
-            />
-          </div>
-        </div>
-      </div>
+      <Stats
+        dataChart={dataChart}
+        error={!data}
+        networksCount={networksCount}
+        txns24HrCount={txns24HrCount}
+        txnsTotalCount={txnsTotalCount}
+      />
+      <div className="py-6"></div>
+      <MultiChainTxns
+        count={count}
+        cursor={cursor}
+        error={!data}
+        isTab={false}
+        tab={''}
+        txns={txns}
+      />
       <div className="py-8"></div>
     </>
   );
