@@ -65,7 +65,7 @@ const Summary = () => {
         <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
           {[...Array(10)].map((_, i) => (
             <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+              <td className="px-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                 <Skeleton className="w-full h-4" />
               </td>
               <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
@@ -84,6 +84,12 @@ const Summary = () => {
                 <Skeleton className="w-full h-4" />
               </td>
               <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                <Skeleton className="w-full h-4" />
+              </td>
+              <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+                <Skeleton className="w-full h-4" />
+              </td>
+              <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                 <Skeleton className="w-full h-4" />
               </td>
             </tr>

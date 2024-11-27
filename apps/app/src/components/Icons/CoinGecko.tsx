@@ -22,7 +22,7 @@ const CoinGecko = (props: Props) => (
         fill="none"
         id="Path_34"
         stroke="#77838f"
-        stroke-width="19"
+        strokeWidth="19"
         transform="translate(-34 -46.61)"
       />
       <path

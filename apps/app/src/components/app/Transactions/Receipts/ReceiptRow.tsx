@@ -12,6 +12,7 @@ import { fiatValue } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
+import { Loader } from '../../skeleton/common/Skeleton';
 import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';
 
@@ -57,14 +58,6 @@ const ReceiptRow = (props: Props) => {
       status.SuccessValue !== null &&
       status.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
-
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className}`}
-      ></div>
-    );
-  };
 
   const handleScroll = () => {
     if (typeof window === 'undefined') return;
@@ -120,7 +113,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xs" />
+              <Loader wrapperClassName="flex w-80 max-w-xs" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
@@ -128,7 +121,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-start p-4 py-6">
+        <div className="flex flex-wrap items-start p-4 py-6 md:h-16">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
@@ -144,7 +137,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xl" />
+              <Loader wrapperClassName="flex w-16 max-w-xl" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words">
@@ -168,7 +161,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!block?.height || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full max-w-xs" />
+              <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
           ) : block?.height ? (
             <div className="w-full md:w-3/4 word-break">
@@ -198,7 +191,7 @@ const ReceiptRow = (props: Props) => {
             </div>
             {!receipt || loading ? (
               <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full max-w-sm" />
+                <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
@@ -227,7 +220,7 @@ const ReceiptRow = (props: Props) => {
             </div>
             {!receipt || loading ? (
               <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full max-w-xs" />
+                <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
             ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
@@ -243,7 +236,7 @@ const ReceiptRow = (props: Props) => {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap p-4 md:h-16">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"

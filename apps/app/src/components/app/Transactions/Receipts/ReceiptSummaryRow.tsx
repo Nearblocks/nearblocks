@@ -71,7 +71,7 @@ const ReceiptSummaryRow = (props: Props) => {
     <>
       {receipt &&
         receipt?.actions?.map((action: any, i: number) => (
-          <tr key={action.args?.method_name + i}>
+          <tr key={i}>
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
             </td>

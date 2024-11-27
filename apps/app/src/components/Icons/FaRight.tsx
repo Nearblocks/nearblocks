@@ -13,7 +13,7 @@ const FaRight = (props: Props) => {
       fill="currentColor"
       height="1em"
       stroke="currentColor"
-      stroke-width="0"
+      strokeWidth="0"
       viewBox="0 0 192 512"
       width="1em"
       xmlns="http://www.w3.org/2000/svg"

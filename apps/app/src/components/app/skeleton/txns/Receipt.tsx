@@ -30,10 +30,10 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.receipts.receipt.text.0') : 'Receipt'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-80" />
             </div>
           </div>
-          <div className="flex flex-wrap items-start p-4">
+          <div className="flex flex-wrap items-start pt-6 pb-7 px-4 md:h-16">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
@@ -46,7 +46,7 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.status.text.0') : 'Status'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full " />
+              <Loader wrapperClassName="flex w-16 " />
             </div>
           </div>
           <div className="flex flex-wrap p-4">
@@ -62,7 +62,7 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-28" />
             </div>
           </div>
           <div>
@@ -79,7 +79,7 @@ const ReceiptSkeleton = () => {
                 {t ? t('txnDetails.receipts.from.text.0') : 'From'}
               </div>
               <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full " />
+                <Loader wrapperClassName="flex w-72 " />
               </div>
             </div>
             <div className="flex flex-wrap p-4">
@@ -95,11 +95,11 @@ const ReceiptSkeleton = () => {
                 {t ? t('txnDetails.receipts.to.text.0') : 'To'}
               </div>
               <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full " />
+                <Loader wrapperClassName="flex w-72 " />
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap p-4">
+          <div className="flex flex-wrap pt-4 pb-4 px-4 my-0.5 md:h-16">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
@@ -114,10 +114,10 @@ const ReceiptSkeleton = () => {
                 : 'Burnt Gas & Tokens by Receipt'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-36" />
             </div>
           </div>
-          <div className="flex items-start flex-wrap p-4">
+          <div className="flex items-start flex-wrap px-4 py-3">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
@@ -130,10 +130,26 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
             </div>
             <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full my-2 max-w-xs" />
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+            </div>
+          </div>
+          <div className="flex items-start flex-wrap p-4">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+              <Tooltip
+                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                label={'Deposit value attached with the receipt'}
+              >
+                <div>
+                  <Question className="w-4 h-4 fill-current mr-1" />
+                </div>
+              </Tooltip>
+              {'value'}
+            </div>
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-72" />
             </div>
           </div>
           <div className="flex items-start flex-wrap p-4">
@@ -149,9 +165,7 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-72" />
             </div>
           </div>
           <div className="flex items-start flex-wrap p-4">

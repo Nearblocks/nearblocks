@@ -189,13 +189,19 @@ const ReceiptSummary = (props: Props) => {
                     {(!receipt?.id || loading) &&
                       [...Array(10)].map((_, i) => (
                         <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <td className="px-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                             <Skeleton className="w-full h-4" />
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                             <Skeleton className="w-full h-4" />
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-tiny ">
+                            <Skeleton className="w-full h-4" />
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                            <Skeleton className="w-full h-4" />
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
                             <Skeleton className="w-full h-4" />
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
