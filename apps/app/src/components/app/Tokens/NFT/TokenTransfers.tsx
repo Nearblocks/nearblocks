@@ -18,6 +18,7 @@ import {
 } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
+import AddressLink from '../../common/AddressLink';
 import Table from '../../common/Table';
 
 interface Props {
@@ -93,13 +94,13 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={row?.cause}
           >
-            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl max-w-[120px] inline-flex truncate">
+            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl max-w-[120px] px-2 py-1 inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
             </span>
           </Tooltip>
         </span>
       ),
-      header: <span>{t ? t('method') : 'METHOD'}</span>,
+      header: <span>{t('type') || 'METHOD'}</span>,
       key: 'type',
       tdClassName:
         'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
@@ -115,23 +116,15 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                 label={row?.affected_account_id}
               >
-                <span
-                  className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap border rounded-md ${
-                    row?.affected_account_id === address
-                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 border-transparent'
-                  }`}
-                >
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${row?.affected_account_id}`}
+                <span>
+                  <AddressLink
+                    address={address}
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.affected_account_id}
+                    name={truncateString(row?.affected_account_id, 15, '...')}
                     onMouseLeave={handleMouseLeave}
-                    onMouseOver={(e) =>
-                      onHandleMouseOver(e, row?.affected_account_id)
-                    }
-                  >
-                    {truncateString(row?.affected_account_id, 15, '...')}
-                  </Link>
+                    onMouseOver={onHandleMouseOver}
+                  />
                 </span>
               </Tooltip>
             ) : (
@@ -145,23 +138,15 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                 label={row?.involved_account_id}
               >
-                <span
-                  className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap border rounded-md  ${
-                    row?.involved_account_id === address
-                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 border-transparent'
-                  }`}
-                >
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${row?.involved_account_id}`}
+                <span>
+                  <AddressLink
+                    address={address}
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.involved_account_id}
+                    name={truncateString(row?.involved_account_id, 15, '...')}
                     onMouseLeave={handleMouseLeave}
-                    onMouseOver={(e) =>
-                      onHandleMouseOver(e, row?.involved_account_id)
-                    }
-                  >
-                    {truncateString(row?.involved_account_id, 15, '...')}
-                  </Link>
+                    onMouseOver={onHandleMouseOver}
+                  />
                 </span>
               </Tooltip>
             ) : (
@@ -202,24 +187,15 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                 label={row?.involved_account_id}
               >
-                <span
-                  className={`inline-block align-bottom text-green-500 dark:text-green-250 p-0.5 px-1 border rounded-md whitespace-nowrap ${
-                    row?.involved_account_id === address
-                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 border-transparent'
-                  }`}
-                >
-                  {' '}
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${row?.involved_account_id}`}
+                <span>
+                  <AddressLink
+                    address={address}
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.involved_account_id}
+                    name={truncateString(row?.involved_account_id, 15, '...')}
                     onMouseLeave={handleMouseLeave}
-                    onMouseOver={(e) =>
-                      onHandleMouseOver(e, row?.involved_account_id)
-                    }
-                  >
-                    {truncateString(row?.involved_account_id, 15, '...')}
-                  </Link>
+                    onMouseOver={onHandleMouseOver}
+                  />
                 </span>
               </Tooltip>
             ) : (
@@ -233,23 +209,15 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
                 label={row?.affected_account_id}
               >
-                <span
-                  className={`inline-block align-bottom text-green-500 dark:text-green-250 border rounded-md p-0.5 px-1 whitespace-nowrap ${
-                    row?.affected_account_id === address
-                      ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                      : 'text-green-500 dark:text-green-250 border-transparent'
-                  }`}
-                >
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${row?.affected_account_id}`}
+                <span>
+                  <AddressLink
+                    address={address}
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.affected_account_id}
+                    name={truncateString(row?.affected_account_id, 15, '...')}
                     onMouseLeave={handleMouseLeave}
-                    onMouseOver={(e) =>
-                      onHandleMouseOver(e, row?.affected_account_id)
-                    }
-                  >
-                    {truncateString(row?.affected_account_id, 15, '...')}
-                  </Link>
+                    onMouseOver={onHandleMouseOver}
+                  />
                 </span>
               </Tooltip>
             ) : (
