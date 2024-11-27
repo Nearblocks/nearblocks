@@ -12,6 +12,7 @@ import MultichainInfo from './MultichainInfo';
 export default async function Balance({ id }: { id: string }) {
   const cookieStore = await cookies();
   const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
+  const options: RequestInit = { next: { revalidate: 10 } };
 
   const [
     accountData,
@@ -22,13 +23,13 @@ export default async function Balance({ id }: { id: string }) {
     nftTokenData,
     multiChainAccountsData,
   ] = await Promise.all([
-    getRequest(`account/${id}?rpc=${rpcUrl}`),
-    getRequest('stats'),
-    getRequest(`fts/${id}`),
-    getRequest(`account/${id}/inventory`),
-    getRequest(`account/${id}/contract/deployments?rpc=${rpcUrl}`),
-    getRequest(`nfts/${id}`),
-    getRequest(`chain-abstraction/${id}/multi-chain-accounts`),
+    getRequest(`account/${id}?rpc=${rpcUrl}`, {}, options),
+    getRequest('stats', {}, options),
+    getRequest(`fts/${id}`, {}, options),
+    getRequest(`account/${id}/inventory`, {}, options),
+    getRequest(`account/${id}/contract/deployments?rpc=${rpcUrl}`, {}, options),
+    getRequest(`nfts/${id}`, {}, options),
+    getRequest(`chain-abstraction/${id}/multi-chain-accounts`, {}, options),
   ]);
 
   const spamList: SpamToken = await fetch(

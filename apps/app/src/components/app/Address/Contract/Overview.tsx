@@ -8,6 +8,9 @@ import { ContractCodeInfo } from '@/utils/types';
 import OverviewActions from './OverviewActions';
 
 const Overview = async ({ id, searchParams }: any) => {
+  const options: RequestInit = {
+    next: { revalidate: 10 },
+  };
   const cookieStore = await cookies();
   const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
 
@@ -15,9 +18,10 @@ const Overview = async ({ id, searchParams }: any) => {
     getRequest(
       `account/${id}/contract/deployments?rpc=${rpcUrl}`,
       searchParams,
+      options,
     ),
-    getRequest(`account/${id}/contract/parse?rpc=${rpcUrl}`),
-    getRequest(`account/${id}?rpc=${rpcUrl}`),
+    getRequest(`account/${id}/contract/parse?rpc=${rpcUrl}`, {}, options),
+    getRequest(`account/${id}?rpc=${rpcUrl}`, {}, options),
   ]);
 
   return (

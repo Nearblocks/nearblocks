@@ -5,6 +5,9 @@ import OverviewActions from './OverviewActions';
 import TokenFilter from './TokenFilter';
 
 const Overview = async ({ id, searchParams }: any) => {
+  const options: RequestInit = {
+    next: { revalidate: 10 },
+  };
   const [
     statsResult,
     tokenResult,
@@ -13,12 +16,12 @@ const Overview = async ({ id, searchParams }: any) => {
     holderResult,
     filterResult,
   ] = await Promise.all([
-    getRequest(`stats`),
-    getRequest(`fts/${id}`),
-    getRequest(`sync/status`),
-    getRequest(`fts/${id}/txns/count`),
-    getRequest(`fts/${id}/holders/count`),
-    getRequest(`account/${searchParams?.a}/inventory`),
+    getRequest(`stats`, {}, options),
+    getRequest(`fts/${id}`, {}, options),
+    getRequest(`sync/status`, {}, options),
+    getRequest(`fts/${id}/txns/count`, {}, options),
+    getRequest(`fts/${id}/holders/count`, {}, options),
+    getRequest(`account/${searchParams?.a}/inventory`, {}, options),
   ]);
 
   const token: Token = tokenResult?.contracts?.[0];
