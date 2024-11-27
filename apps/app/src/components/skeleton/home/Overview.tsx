@@ -1,3 +1,4 @@
+'use client';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
@@ -9,9 +10,9 @@ import Skeleton from '../common/Skeleton';
 interface Props {
   className?: string;
 }
-const Overview = forwardRef(
+const HomeOverview = forwardRef(
   ({ className }: Props, ref: Ref<HTMLDivElement>) => {
-    const t = useTranslations('home');
+    const t = useTranslations('homePage');
     const { theme } = useTheme();
     return (
       <div className={`w-full z-10 ${className}`} ref={ref}>
@@ -156,5 +157,5 @@ const Overview = forwardRef(
     );
   },
 );
-Overview.displayName = 'Overview';
-export default Overview;
+HomeOverview.displayName = 'Overview';
+export default HomeOverview;

@@ -54,9 +54,9 @@ export default async function AccountTabs({
       },
     );
   return (
-    <div className="block lg:flex lg:space-x-2 mb-10">
-      <div className="w-full ">
-        <div className="flex overflow-x-auto min-w-full min-h-fit">
+    <div className="block lg:flex lg:space-x-2 mb-10 mt-5">
+      <div className=" w-full">
+        <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
           {tabs?.map(({ message, name }) => {
             const hasContractTab =
               parse?.contract?.[0]?.contract &&
@@ -76,7 +76,7 @@ export default async function AccountTabs({
                 key={name}
                 scroll={false}
               >
-                <h2>
+                <h2 className="relative">
                   {message}
                   {name === 'contract' && (
                     <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md  -mt-3 px-1">

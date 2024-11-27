@@ -1,5 +1,7 @@
 export const runtime = 'edge';
 
+export const revalidate = 60;
+
 import { Suspense } from 'react';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
@@ -27,7 +29,7 @@ export default async function AddressIndex(props: {
         <Balance id={id} />
       </Suspense>
 
-      <div className="py-6"></div>
+      <div className="py-3"></div>
 
       <Suspense fallback={<TabSkeletion />}>
         <AccountTabs id={id} locale={locale} searchParams={searchParams} />
