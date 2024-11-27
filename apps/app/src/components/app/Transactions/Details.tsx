@@ -50,6 +50,7 @@ import ArrowUp from '../Icons/ArrowUp';
 import Bolt from '../Icons/Bolt';
 import FileSlash from '../Icons/FileSlash';
 import Question from '../Icons/Question';
+import { Loader } from '../skeleton/common/Skeleton';
 import EventLogs from './Action';
 import Actions from './Actions';
 import NEPTokenTransactions from './NEPTokenTransactions';
@@ -179,14 +180,6 @@ const Details = (props: Props) => {
     );
   };
 
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props.wrapperClassName}`}
-      ></div>
-    );
-  };
-
   const parsedEvents = useMemo(() => {
     return (
       logs?.filter((log: TransactionLog) => {
@@ -261,7 +254,7 @@ const Details = (props: Props) => {
               </div>
               {loading ? (
                 <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                  <Loader wrapperClassName="flex w-24 max-w-xl" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">

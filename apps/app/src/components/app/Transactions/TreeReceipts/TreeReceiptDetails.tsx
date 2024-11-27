@@ -46,7 +46,7 @@ const TreeReceiptDetails = (props: Props) => {
             <>
               {receipt &&
                 receipt?.actions?.map((action: any, i: number) => (
-                  <Fragment key={1}>
+                  <Fragment key={i}>
                     <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                       Receipt
                     </div>

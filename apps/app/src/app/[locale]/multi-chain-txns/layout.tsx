@@ -1,29 +1,34 @@
-import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
-import NFTTokensSkeleton from '@/components/app/skeleton/nft/NFTTokensSkeleton';
+import MultiChainSkeleton from '@/components/app/skeleton/Multichain/multiChainSkeleton';
 import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const params = await props.params;
+  const { locale } = params;
+
+  const t = await getTranslations({ locale });
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
 
-  const metaTitle =
-    'Non-Fungible (NEP-171) Tokens (NFT) Token Tracker | NearBlocks';
-  const metaDescription =
-    'The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the Near Protocol on NearBlocks';
+  const metaTitle = `${t('metaTitle')} | NearBlocks`;
+
+  const metaDescription = `${t('metaDescription')}`;
 
   const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
-    metaTitle,
+    t('heading'),
   )}`;
 
   return {
     alternates: {
-      canonical: `${appUrl}/nft-tokens`,
+      canonical: `${appUrl}/multi-chain-txns`,
     },
     description: metaDescription,
     openGraph: {
@@ -42,25 +47,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function TokensLayout({
-  children,
-}: {
+export default async function TokensLayout(props: {
   children: React.ReactNode;
-  params: any;
+  params: Promise<{ locale: string }>;
 }) {
+  const params = await props.params;
+  const { locale } = params;
+  const t = await getTranslations({ locale });
+  const { children } = props;
+
   return (
     <section>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className="h-24">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10 font-medium">
-            Non-Fungible Token Tracker (NEP-171)
+          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 ">
+            {t ? t('heading') : 'Latest Multichain Transactions'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48 ">
+      <div className="container-xxl mx-auto px-5">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
-            <Suspense fallback={<NFTTokensSkeleton />}>{children}</Suspense>
+            <Suspense fallback={<MultiChainSkeleton />}>{children}</Suspense>
           </div>
         </div>
       </div>
