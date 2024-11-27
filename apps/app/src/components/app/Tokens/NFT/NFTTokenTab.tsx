@@ -18,6 +18,7 @@ export default async function NFTTokenTab({
   searchParams: any;
 }) {
   const tab = searchParams?.tab || 'transfers';
+  const options: RequestInit = { next: { revalidate: 10 } };
 
   const tabApiUrls: Record<
     TabType,
@@ -41,11 +42,11 @@ export default async function NFTTokenTab({
   const countUrl = tabApi?.count ? `${tabApi?.count}` : '';
   const [dataResult, dataCount, tokenDetails, syncDetails, holdersDetails] =
     await Promise.all([
-      getRequest(fetchUrl, searchParams),
-      getRequest(countUrl),
-      getRequest(`nfts/${id}`),
-      getRequest(`sync/status`),
-      getRequest(`nfts/${id}/holders/count`),
+      getRequest(fetchUrl, searchParams, options),
+      getRequest(countUrl, {}, options),
+      getRequest(`nfts/${id}`, {}, options),
+      getRequest(`sync/status`, {}, options),
+      getRequest(`nfts/${id}/holders/count`, {}, options),
     ]);
   const holder = dataResult?.holders || [];
   const holders = holdersDetails?.holders?.[0]?.count;
@@ -89,6 +90,7 @@ export default async function NFTTokenTab({
                     : `/nft-token/${id}?tab=${name}`
                 }
                 key={name}
+                prefetch={true}
               >
                 <h2>{label}</h2>
               </Link>
