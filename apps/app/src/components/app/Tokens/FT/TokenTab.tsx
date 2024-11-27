@@ -30,6 +30,9 @@ export default async function TokenTabs({
 
   const tabApi = tabApiUrls[tab as TabType];
   const fetchUrl = `${tabApi.api}`;
+  const options: RequestInit = {
+    next: { revalidate: 10 },
+  };
   const [
     dataResult,
     transferResult,
@@ -39,13 +42,13 @@ export default async function TokenTabs({
     accountDetails,
     contractResult,
   ] = await Promise.all([
-    getRequest(fetchUrl, searchParams),
-    getRequest(`fts/${id}/txns/count`),
-    getRequest(`fts/${id}`),
-    getRequest(`sync/status`),
-    getRequest(`fts/${id}/holders/count`),
-    getRequest(`account/${id}`),
-    getRequest(`account/${id}/contract/deployments`),
+    getRequest(fetchUrl, searchParams, options),
+    getRequest(`fts/${id}/txns/count`, {}, options),
+    getRequest(`fts/${id}`, {}, options),
+    getRequest(`sync/status`, {}, options),
+    getRequest(`fts/${id}/holders/count`, {}, options),
+    getRequest(`account/${id}`, {}, options),
+    getRequest(`account/${id}/contract/deployments`, {}, options),
   ]);
   const holder = dataResult?.holders || [];
   const holders = holdersDetails?.holders?.[0]?.count;

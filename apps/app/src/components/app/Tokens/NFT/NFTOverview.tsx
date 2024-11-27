@@ -5,12 +5,13 @@ import NFTOverviewActions from './NFTOverviewActions';
 // import TokenFilter from './TokenFilter';
 
 const NFTOverview = async ({ id }: any) => {
+  const options: RequestInit = { next: { revalidate: 10 } };
   const [tokenResult, syncResult, transferResult, holderResult] =
     await Promise.all([
-      getRequest(`nfts/${id}`),
-      getRequest(`sync/status`),
-      getRequest(`nfts/${id}/txns/count`),
-      getRequest(`nfts/${id}/holders/count`),
+      getRequest(`nfts/${id}`, {}, options),
+      getRequest(`sync/status`, {}, options),
+      getRequest(`nfts/${id}/txns/count`, {}, options),
+      getRequest(`nfts/${id}/holders/count`, {}, options),
     ]);
 
   const token: Token = tokenResult?.contracts?.[0];

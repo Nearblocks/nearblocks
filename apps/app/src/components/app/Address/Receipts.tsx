@@ -3,9 +3,12 @@ import { getRequest } from '@/utils/app/api';
 import ReceiptActions from './ReceiptActions';
 
 const Receipts = async ({ id, searchParams }: any) => {
+  const options: RequestInit = {
+    next: { revalidate: 10 },
+  };
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/receipts`, searchParams),
-    getRequest(`account/${id}/receipts/count`, searchParams),
+    getRequest(`account/${id}/receipts`, searchParams, options),
+    getRequest(`account/${id}/receipts/count`, searchParams, options),
   ]);
 
   return (

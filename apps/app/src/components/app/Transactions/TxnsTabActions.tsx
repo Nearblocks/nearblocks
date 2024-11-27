@@ -87,7 +87,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
 
   useEffect(() => {
     const checkTxnExistence = async () => {
-      if (txn === undefined || txn === null) {
+      if (txn === undefined || txn === null || !txn) {
         try {
           setRpcError(false);
           const txnExists: any = await transactionStatus(hash, 'bowen');
@@ -212,6 +212,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                           : `/txns/${hash}?tab=${name}`
                       }
                       key={name}
+                      prefetch={true}
                     >
                       <h2>
                         {label}

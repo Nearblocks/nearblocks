@@ -1,7 +1,5 @@
 export const runtime = 'edge';
 
-export const revalidate = 60;
-
 import { Suspense } from 'react';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
@@ -21,7 +19,7 @@ export default async function AddressIndex(props: {
   const searchParams = await props.searchParams;
   const params = await props.params;
 
-  const { id, locale } = params;
+  const { id } = params;
 
   return (
     <>
@@ -32,7 +30,7 @@ export default async function AddressIndex(props: {
       <div className="py-3"></div>
 
       <Suspense fallback={<TabSkeletion />}>
-        <AccountTabs id={id} locale={locale} searchParams={searchParams} />
+        <AccountTabs id={id} searchParams={searchParams} />
       </Suspense>
     </>
   );
