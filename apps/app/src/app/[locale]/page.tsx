@@ -3,8 +3,10 @@ export const runtime = 'edge';
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
+import { Suspense } from 'react';
 
 import Home from '@/components/app/Home';
+import HomePageSkeleton from '@/components/app/skeleton/home/Home';
 import { appUrl } from '@/utils/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
@@ -66,5 +68,9 @@ export default async function HomeIndex(props: {
 
   const { locale } = params;
 
-  return <Home locale={locale} />;
+  return (
+    <Suspense fallback={<HomePageSkeleton />}>
+      <Home locale={locale} />
+    </Suspense>
+  );
 }

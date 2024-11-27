@@ -3,9 +3,8 @@ import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
 import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
@@ -244,18 +243,18 @@ const Header = ({
   return (
     <>
       <div
-        className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-neargray-25 p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
+        className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
       >
         <div className="container-xxl w-full mx-auto flex justify-between">
-          <div className="hidden md:!flex md:!w-[35%] h-11">
-            <div className="dark:!bg-black-600 h-full  md:!pt-2 w-32 flex items-center">
+          <div className="hidden md:!flex md:!w-[35%] h-10">
+            <div className="dark:!bg-black-600 h-full md:!pt-2 w-32 flex items-center">
               <div className="h-11 flex items-center">
-                {nearPrice ? (
+                {networkId === 'mainnet' && nearPrice ? (
                   <div className="h-10 py-1 rounded-lg flex justify-center items-center w-52">
-                    <p className="text-sm text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1 whitespace-nowrap">
+                    <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1 whitespace-nowrap">
                       NEAR Price:
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1">
+                    <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1">
                       $
                       {stats?.near_price
                         ? dollarFormat(stats?.near_price)
@@ -285,10 +284,18 @@ const Header = ({
                 ) : (
                   ''
                 )}
+
+                {networkId === 'testnet' && (
+                  <div className="h-10 py-1 rounded-lg flex justify-start pl-5 items-center w-52">
+                    <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1 whitespace-nowrap">
+                      Testnet Network
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          <div className="w-full lg:!w-2/4 flex justify-end items-center gap-3 h-11">
+          <div className="w-full lg:!w-2/4 flex justify-end items-center gap-3 h-10">
             {showSearch && (
               <div className="w-full md:w-[70%] flex items-center">
                 <Search
@@ -366,7 +373,7 @@ const Header = ({
         </div>
       </div>
 
-      <header className="dark:bg-black-600 shadow-sm">
+      <header className="dark:bg-black-600 bg-white shadow-sm">
         {!status && (
           <div className="flex flex-wrap">
             <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
@@ -378,13 +385,13 @@ const Header = ({
         <div className="container-xxl w-full mx-auto">
           <div className="flex flex-wrap">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
-              <div className={showSearch ? 'pt-3' : ''}>
+              <div>
                 <Link className="" href="/" legacyBehavior>
                   <a className="flex justify-start items-center hover:no-underline">
                     <Image
                       alt="NearBlocks"
                       className="block"
-                      height="40"
+                      height="41"
                       layout="fixed"
                       src={
                         theme === 'dark'
@@ -395,25 +402,6 @@ const Header = ({
                     />
                   </a>
                 </Link>
-                {showSearch && (
-                  <Suspense
-                    fallback={
-                      <div className="py-3">
-                        <Skeleton className="h-4 mt-[5px]" />
-                      </div>
-                    }
-                  >
-                    <div className="mb-2" style={{ marginTop: '5px' }}>
-                      {networkId === 'testnet' ? (
-                        <p className="text-xs py-1 text-gray-500 leading-6 px-2">
-                          Testnet Network
-                        </p>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  </Suspense>
-                )}
               </div>
               <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
                 <button
@@ -576,7 +564,7 @@ const Header = ({
                     <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
                       <Image
                         alt="NearBlocks"
-                        height="31"
+                        height="41"
                         layout="fixed"
                         src="/images/pipe.svg"
                         width="2"
