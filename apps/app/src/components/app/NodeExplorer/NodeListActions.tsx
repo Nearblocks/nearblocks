@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -25,7 +25,7 @@ import FaInbox from '../Icons/FaInbox';
 import Question from '../Icons/Question';
 
 const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);

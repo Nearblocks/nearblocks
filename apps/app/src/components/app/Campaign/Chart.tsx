@@ -1,7 +1,7 @@
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts/highstock';
 import HighchartsExporting from 'highcharts/modules/exporting';
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
 
 import useAuth from '@/hooks/app/useAuth';
@@ -11,7 +11,7 @@ import CircularLoader from '../skeleton/common/CircularLoader';
 
 const Chart = ({ campaignId }: { campaignId?: string }) => {
   const [options, setOptions] = useState<any | null>(null);
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const { data: chartData, loading: loadingChart } = useAuth(
     campaignId ? `campaign/${campaignId}/chart` : '',
   );

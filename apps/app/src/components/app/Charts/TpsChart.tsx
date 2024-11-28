@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
-import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -23,7 +23,7 @@ interface Props {
 }
 const TpsChart = (props: Props) => {
   const { chartTypes, data, poweredBy } = props;
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const t = useTranslations();
   const { networkId } = useConfig();
 

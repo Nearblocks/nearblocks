@@ -1,8 +1,8 @@
 'use client';
 import { Turnstile } from '@marsidev/react-turnstile';
 import type { TurnstileInstance } from '@marsidev/react-turnstile';
-import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const FormContact = ({ getContactDetails, selectValue }: Props) => {
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const t = useTranslations('contact');
   const { siteKey } = useConfig();
   const [loading, setLoading] = useState(false);

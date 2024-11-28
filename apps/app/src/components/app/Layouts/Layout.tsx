@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { PublicEnvProvider } from 'next-runtime-env';
+import { ThemeProvider } from 'next-themes';
 import { Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
@@ -76,8 +77,10 @@ const Layout = async ({ children, locale }: LayoutProps) => {
         </Script>
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
-            <ToastContainer />
-            <LayoutActions theme={theme}>{children}</LayoutActions>
+            <ThemeProvider attribute="class" defaultTheme={theme}>
+              <ToastContainer />
+              <LayoutActions>{children}</LayoutActions>
+            </ThemeProvider>
           </NextIntlClientProvider>
         </PublicEnvProvider>
       </body>

@@ -1,7 +1,7 @@
 'use client';
 
-import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import React, { forwardRef } from 'react';
 
@@ -13,7 +13,7 @@ import Skeleton from '../common/Skeleton';
 const HomeOverview = forwardRef(() => {
   const { networkId } = useConfig();
   const t = useTranslations();
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
 
   return (
     <div className="container-xxl mx-auto px-5">
