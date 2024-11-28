@@ -1,7 +1,7 @@
 'use client';
 import classNames from 'classnames';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
@@ -9,7 +9,9 @@ import { Link } from '@/i18n/routing';
 export default function TabSkeletion() {
   const t = useTranslations();
   const searchParams = useSearchParams();
-  const tab = searchParams?.get('tab');
+  const params = useParams<{ id: string }>();
+
+  const tab = searchParams?.get('tab') || 'txns';
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
@@ -47,7 +49,11 @@ export default function TabSkeletion() {
                 return (
                   <Link
                     className={getClassName(name === tab)}
-                    href={`#`}
+                    href={
+                      name === 'txns'
+                        ? `/address/${params.id}`
+                        : `/address/${params.id}?tab=${name}`
+                    }
                     key={name}
                   >
                     <h2> {message}</h2>

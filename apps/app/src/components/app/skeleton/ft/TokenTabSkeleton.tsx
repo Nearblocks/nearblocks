@@ -1,5 +1,9 @@
-import { useTranslations } from 'next-intl';
+'use client';
+import classNames from 'classnames';
+import { useParams, useSearchParams } from 'next/navigation';
 import React, { forwardRef, Ref } from 'react';
+
+import { Link } from '@/i18n/routing';
 
 import Skeleton from '../common/Skeleton';
 import FAQ from './FAQ';
@@ -10,23 +14,35 @@ interface Props {
 }
 const TokenTabSkeleton = forwardRef(
   ({ pageTab }: Props, ref: Ref<HTMLDivElement>) => {
-    const t = useTranslations();
+    const params = useParams<{ id: string }>();
+    const searchParams = useSearchParams();
+    const tab = searchParams?.get('tab') || 'transfers';
 
-    const buttonStyles = (hash: string) =>
-      `relative text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-1.5 mr-[0.30rem] focus:outline-none ${
-        pageTab === hash
-          ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
-          : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
-      }`;
+    const getClassName = (selected: boolean) =>
+      classNames(
+        'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
+        {
+          'bg-green-600 dark:bg-green-250 text-white': selected,
+          'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
+            !selected,
+        },
+      );
+
+    const tabs = [
+      { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
+      { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
+      { label: 'Info', message: 'fts.ft.info', name: 'info' },
+      { label: 'FAQ', message: 'fts.ft.faq', name: 'faq' },
+    ];
     return (
       <>
-        <div className="flex items-center justify-between flex-wrap pt-4">
+        <div className="flex items-center justify-between flex-wrap pt-8">
           <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
             <Skeleton className="h-7" />
-          </div>{' '}
+          </div>
         </div>
         <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
+          <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
             <div className="w-full">
               <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
                 <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
@@ -44,7 +60,7 @@ const TokenTabSkeleton = forwardRef(
                         <Skeleton className="h-4" />
                       </div>
                     </div>
-                    <div className="flex-col flex-1 flex-wrap py-1 px-3">
+                    <div className="flex-col flex-1 flex-wrap py-2 px-3">
                       <div className="w-full text-gray-400 text-xs uppercase mb-1 flex  text-[80%]">
                         FULLY DILUTED MARKET CAP
                         <span>
@@ -150,16 +166,22 @@ const TokenTabSkeleton = forwardRef(
           <div className="py-6"></div>
           <div className="block lg:flex lg:space-x-2 mb-4">
             <div className="w-full">
-              <div>
-                <div className={buttonStyles('Transfers')}>
-                  {t ? t('fts.ft.transfers') : 'Transfers'}
-                </div>{' '}
-                <div className={buttonStyles('Holders')}>
-                  {' '}
-                  {t ? t('fts.ft.holders') : 'Holders'}
-                </div>{' '}
-                <div className={buttonStyles('Info')}>Info</div>{' '}
-                <div className={buttonStyles('FAQ')}>FAQ</div>{' '}
+              <div className="flex flex-wrap ">
+                {tabs?.map(({ label, name }) => {
+                  return (
+                    <Link
+                      className={getClassName(name === tab)}
+                      href={
+                        name === 'transfers'
+                          ? `/token/${params?.id}`
+                          : `/token/${params?.id}?tab=${name}`
+                      }
+                      key={name}
+                    >
+                      <h2>{label}</h2>
+                    </Link>
+                  );
+                })}
               </div>
 
               <div className="relative">

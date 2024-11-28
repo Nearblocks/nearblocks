@@ -58,5 +58,9 @@ export default async function TokenLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return [children];
+  return (
+    <div className="relative container-xxl mx-auto px-5">
+      <section>{children}</section>
+    </div>
+  );
 }

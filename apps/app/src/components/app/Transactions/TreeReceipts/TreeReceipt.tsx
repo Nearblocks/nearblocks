@@ -45,11 +45,12 @@ const TreeReceipt = (props: Props) => {
           )}
           {receipt?.actions.map((action: any, index: number) => (
             <p
-              className="flex flex-col dark:divide-black-200 divide-gray-200 divide-y p-0.5"
+              className="flex flex-col dark:divide-black-200 divide-gray-200 divide-y p-0.5 inline-flex-container"
               key={index}
             >
               {formatActionKind(action.action_kind)}
-              {action.args?.method_name && <p>({action.args?.method_name})</p>}
+              <br />
+              {action.args?.method_name && ` (${action.args?.method_name})`}
             </p>
           ))}
         </div>

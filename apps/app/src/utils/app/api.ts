@@ -37,7 +37,7 @@ export const getRequest = async (
         return isJson ? response.json() : response.text();
       }
 
-      if (response.status >= 500) {
+      if (response.status !== 200) {
         console.error(
           `Server error on attempt ${attempt + 1}: ${response.statusText}`,
         );
