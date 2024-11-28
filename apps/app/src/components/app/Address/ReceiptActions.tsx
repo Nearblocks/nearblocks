@@ -16,6 +16,7 @@ import {
 } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
+import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -193,21 +194,18 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             label={row?.transaction_hash}
           >
-            <span
-              className={`truncate max-w-[120px] inline-block align-bottom text-green-500 p-0.5 px-1 dark:text-green-250 whitespace-nowrap border rounded-md ${
-                row?.transaction_hash === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+            <span>
+              <AddressLink
+                address={address}
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap font-medium'
+                }
+                currentAddress={row?.transaction_hash}
                 href={`/txns/${row?.transaction_hash}`}
+                name={row?.transaction_hash}
                 onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) => onHandleMouseOver(e, row?.transaction_hash)}
-              >
-                {row?.transaction_hash}
-              </Link>
+                onMouseOver={onHandleMouseOver}
+              />
             </span>
           </Tooltip>
         </span>
@@ -312,23 +310,15 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={row.predecessor_account_id}
           >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.predecessor_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={`/address/${row.predecessor_account_id}`}
+            <span>
+              <AddressLink
+                address={address}
+                className={'align-bottom whitespace-nowrap'}
+                currentAddress={row?.predecessor_account_id}
+                name={truncateString(row.predecessor_account_id, 15, '...')}
                 onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.predecessor_account_id)
-                }
-              >
-                {truncateString(row.predecessor_account_id, 15, '...')}
-              </Link>
+                onMouseOver={onHandleMouseOver}
+              />
             </span>
           </Tooltip>
         </span>
@@ -403,23 +393,15 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={row.receiver_account_id}
           >
-            <span
-              className={`align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.5 px-1 border rounded-md ${
-                row?.receiver_account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={`/address/${row.receiver_account_id}`}
+            <span>
+              <AddressLink
+                address={address}
+                className={'align-bottom whitespace-nowrap'}
+                currentAddress={row.receiver_account_id}
+                name={truncateString(row.receiver_account_id, 15, '...')}
                 onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) =>
-                  onHandleMouseOver(e, row?.receiver_account_id)
-                }
-              >
-                {truncateString(row.receiver_account_id, 15, '...')}
-              </Link>
+                onMouseOver={onHandleMouseOver}
+              />
             </span>
           </Tooltip>
         </span>

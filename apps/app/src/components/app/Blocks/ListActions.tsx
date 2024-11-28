@@ -11,10 +11,10 @@ import {
   getTimeAgoString,
   localFormat,
   nanoToMilli,
-  shortenAddress,
 } from '@/utils/app/libs';
 import { BlocksInfo } from '@/utils/types';
 
+import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
 import Clock from '../Icons/Clock';
@@ -164,18 +164,12 @@ const ListActions = ({
     {
       cell: (row: BlocksInfo) => (
         <span>
-          <Link
-            className={`text-green-500 dark:text-green-250 hover:no-underline p-1 border rounded-md ${
-              row?.author_account_id === address
-                ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                : 'text-green-500 dark:text-green-250 border-transparent'
-            }`}
-            href={`/address/${row?.author_account_id}`}
+          <AddressLink
+            address={address}
+            currentAddress={row?.author_account_id}
             onMouseLeave={handleMouseLeave}
-            onMouseOver={(e) => onHandleMouseOver(e, row?.author_account_id)}
-          >
-            {shortenAddress(row?.author_account_id ?? '')}
-          </Link>
+            onMouseOver={onHandleMouseOver}
+          />
         </span>
       ),
       header: <span className="pl-1">{t('miner') || 'AUTHOR'}</span>,
