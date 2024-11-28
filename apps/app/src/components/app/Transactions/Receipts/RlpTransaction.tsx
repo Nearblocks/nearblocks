@@ -12,13 +12,13 @@ interface Props {
 
 const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   const decoded =
-    method === 'submit' && receiver.includes('aurora')
+    method === 'submit' && receiver?.includes('aurora')
       ? pretty
       : pretty && Buffer.from(pretty, 'base64');
   const parsed =
-    method === 'submit' && receiver.includes('aurora')
+    method === 'submit' && receiver?.includes('aurora')
       ? decoded
-      : decoded && jsonParser(decoded.toString());
+      : decoded && jsonParser(decoded?.toString());
 
   const [format, setFormat] = useState('rlp');
   const [displayedArgs, setDisplayedArgs] = useState(
@@ -34,20 +34,20 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   }
 
   function decodeTransaction(parsed: any) {
-    if (!parsed || !parsed.tx_bytes_b64 || !isBase64(parsed.tx_bytes_b64)) {
+    if (!parsed || !parsed?.tx_bytes_b64 || !isBase64(parsed?.tx_bytes_b64)) {
       return parsed;
     }
 
-    const input = ethers.utils.base64.decode(parsed.tx_bytes_b64);
-    const data = ethers.utils.parseTransaction(input);
-    //@ts-ignore
-    data.value = data.value.toString();
-    //@ts-ignore
-    data.gasPrice = data.gasPrice.toString();
-    //@ts-ignore
-    data.gasLimit = data.gasLimit.toString();
+    const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
+    const data = ethers?.utils?.parseTransaction(input);
+    const parsedData = {
+      ...data,
+      gasLimit: data?.gasLimit?.toString(),
+      gasPrice: data?.gasPrice?.toString(),
+      value: data?.value?.toString(),
+    };
 
-    return { ...parsed, tx_bytes_b64: data };
+    return { ...parsed, tx_bytes_b64: parsedData };
   }
 
   const handleFormatChange = (event: any) => {
@@ -92,7 +92,9 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
                         {key}
                       </td>
                       <td className="border px-4 py-2">
-                        {key === 'hash' ? (
+                        {key === 'hash' &&
+                        method === 'submit' &&
+                        receiver.includes('aurora') ? (
                           <a
                             className="text-green-500 dark:text-green-250 hover:no-underline"
                             href={`${aurorablocksUrl}/tx/${value}`}
@@ -101,6 +103,10 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
                           >
                             {String(value)}
                           </a>
+                        ) : typeof value === 'object' ? (
+                          <pre className="whitespace-pre-wrap text-sm">
+                            {JSON.stringify(value, null, 2)}
+                          </pre>
                         ) : (
                           <>{String(value)}</>
                         )}
@@ -134,6 +140,10 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
                     >
                       {String(value)}
                     </a>
+                  ) : typeof value === 'object' ? (
+                    <pre className="whitespace-pre-wrap text-sm">
+                      {JSON.stringify(value, null, 2)}
+                    </pre>
                   ) : (
                     <>{String(value)}</>
                   )}
