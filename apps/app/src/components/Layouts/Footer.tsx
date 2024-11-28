@@ -166,9 +166,15 @@ const Footer = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/terms-and-conditions" legacyBehavior>
-                      <a>{t('footer.links.terms')}</a>
-                    </Link>
+                    <div className="flex">
+                      <Link href="/terms-and-conditions" legacyBehavior>
+                        <a>{t('footer.links.terms')}</a>
+                      </Link>
+                      &nbsp;&&nbsp;
+                      <Link href="/privacyPolicy" legacyBehavior>
+                        <a>Policy</a>
+                      </Link>
+                    </div>
                   </li>
                   <li>
                     <Link href="https://status.nearblocks.io/" legacyBehavior>
