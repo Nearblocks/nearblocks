@@ -2,13 +2,17 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
 import FaRight from '@/components/Icons/FaRight';
+import { useActionContext } from '@/components/Transactions/Action/ActionContext';
 import { Link } from '@/i18n/routing';
-import { shortenAddress, shortenHex } from '@/utils/libs';
+import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+
+import AddressLink from '../../common/AddressLink';
 
 const AddKey = (props: TransactionActionInfo) => {
   const params = useParams();
   const t = useTranslations();
+  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">
@@ -24,12 +28,12 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
         {t ? t('txnDetails.actions.addKey.2') : 'added for'}
-        <Link
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
-          href={`/address/${props.receiver}`}
-        >
-          {shortenAddress(props.receiver)}
-        </Link>
+        <AddressLink
+          address={address}
+          currentAddress={props.receiver}
+          onMouseLeave={handleMouseLeave}
+          onMouseOver={onHandleMouseOver}
+        />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
         <span className="font-bold ml-1">
           {props.args.access_key?.permission}
@@ -53,12 +57,12 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
         {t ? t('txnDetails.actions.addKey.2') : 'added for'}{' '}
-        <Link
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
-          href={`/address/${props.receiver}`}
-        >
-          {shortenAddress(props.receiver)}
-        </Link>
+        <AddressLink
+          address={address}
+          currentAddress={props.receiver}
+          onMouseLeave={handleMouseLeave}
+          onMouseOver={onHandleMouseOver}
+        />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}{' '}
         <span className="font-bold ml-1">
           {props.args.access_key.permission.permission_kind}
@@ -84,14 +88,14 @@ const AddKey = (props: TransactionActionInfo) => {
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.3') : 'contract'}
       </span>
-      <Link
-        className="text-green-500 dark:text-green-250 font-bold hover:no-underline mr-1"
-        href={`/address/${props.args.access_key.permission.FunctionCall.receiver_id}`}
-      >
-        {shortenAddress(
-          props.args.access_key.permission.FunctionCall.receiver_id,
-        )}
-      </Link>
+      <AddressLink
+        address={address}
+        currentAddress={
+          props.args.access_key.permission.FunctionCall.receiver_id
+        }
+        onMouseLeave={handleMouseLeave}
+        onMouseOver={onHandleMouseOver}
+      />
       {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.5') : 'to call'}

@@ -1,12 +1,14 @@
 import { useParams } from 'next/navigation';
 
+import AddressLink from '@/components/app/common/AddressLink';
 import TokenInfo from '@/components/common/TokenInfo';
 import FaRight from '@/components/Icons/FaRight';
+import { useActionContext } from '@/components/Transactions/Action/ActionContext';
 import { Link } from '@/i18n/routing';
-import { shortenAddress } from '@/utils/libs';
 import { DepositPropsInfo } from '@/utils/types';
 
 const IncreaseCollateral = (props: DepositPropsInfo) => {
+  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
   const params = useParams();
   const log = props.event?.[0];
 
@@ -25,21 +27,22 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
       <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
       <span className="font-bold text-gray px-1">
         From{' '}
-        <Link
-          className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-          href={`/address/${log.account_id}`}
-        >
-          {shortenAddress(log.account_id)}
-        </Link>
+        <AddressLink
+          address={address}
+          currentAddress={log.account_id}
+          onMouseLeave={handleMouseLeave}
+          onMouseOver={onHandleMouseOver}
+        />
       </span>
       <span className="font-bold text-gray px-1">
         On{' '}
-        <Link
-          className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
-          href="/address/contract.main.burrow.near"
-        >
-          Burrow
-        </Link>
+        <AddressLink
+          address={address}
+          currentAddress={'contract.main.burrow.near'}
+          name="Burrow"
+          onMouseLeave={handleMouseLeave}
+          onMouseOver={onHandleMouseOver}
+        />
       </span>
     </div>
   );

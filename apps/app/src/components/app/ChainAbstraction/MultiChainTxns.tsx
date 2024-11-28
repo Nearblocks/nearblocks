@@ -11,6 +11,7 @@ import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { localFormat } from '@/utils/app/libs';
 import { MultiChainTxnInfo } from '@/utils/types';
 
+import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -184,30 +185,28 @@ const MultiChainTxns = ({
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             label={row?.transaction_hash}
           >
-            <span
-              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
-                row?.transaction_hash === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                href={`/txns/${row?.transaction_hash}`}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) => onHandleMouseOver(e, row?.transaction_hash)}
-              >
-                {row?.transaction_hash && (
-                  <div className="flex items-center w-full">
-                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                      <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+            <span>
+              <AddressLink
+                address={address}
+                className={
+                  'inline-block align-bottom whitespace-nowrap font-medium'
+                }
+                currentAddress={row?.transaction_hash}
+                name={
+                  row?.transaction_hash && (
+                    <div className="flex items-center w-full">
+                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                        <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                      </div>
+                      <span className="ml-2 truncate max-w-[150px]">
+                        {row?.transaction_hash}
+                      </span>
                     </div>
-                    <span className="ml-2 truncate max-w-[150px]">
-                      {row?.transaction_hash}
-                    </span>
-                  </div>
-                )}
-              </Link>
+                  )
+                }
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={onHandleMouseOver}
+              />
             </span>
           </Tooltip>
         </span>
@@ -225,30 +224,26 @@ const MultiChainTxns = ({
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
             label={row?.account_id}
           >
-            <span
-              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
-                row?.account_id === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={`/address/${row?.account_id}`}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) => onHandleMouseOver(e, row?.account_id)}
-              >
-                {row?.account_id && (
-                  <div className="flex items-center w-full">
-                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                      <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+            <span>
+              <AddressLink
+                address={address}
+                className={'inline-block align-bottom whitespace-nowrap'}
+                currentAddress={row?.account_id}
+                name={
+                  row?.account_id && (
+                    <div className="flex items-center w-full">
+                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                        <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                      </div>
+                      <span className="ml-2 truncate max-w-[150px]">
+                        {row?.account_id}
+                      </span>
                     </div>
-                    <span className="ml-2 truncate max-w-[150px]">
-                      {row?.account_id}
-                    </span>
-                  </div>
-                )}
-              </Link>
+                  )
+                }
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={onHandleMouseOver}
+              />
             </span>
           </Tooltip>
         </span>
@@ -336,40 +331,38 @@ const MultiChainTxns = ({
             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
             label={row?.derived_address}
           >
-            <div
-              className={`inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap p-0.2 px-1 border rounded-md ${
-                row?.derived_address === address
-                  ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
-                  : 'text-green-500 dark:text-green-250 border-transparent'
-              }`}
-            >
-              <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
+            <span>
+              <AddressLink
+                address={address}
+                className={'inline-block align-bottom whitespace-nowrap'}
+                currentAddress={row?.derived_address}
                 href={handleChainSelect(
                   row?.chain?.toLowerCase(),
                   row?.derived_address,
                 )}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={(e) => onHandleMouseOver(e, row?.derived_address)}
-                target="_blank"
-              >
-                {row?.derived_address && row?.chain && (
-                  <div className="flex items-center w-full">
-                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                      {row?.chain === 'BITCOIN' && (
-                        <Bitcoin className="w-4 h-4 text-orange-400" />
-                      )}
-                      {row?.chain === 'ETHEREUM' && (
-                        <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                      )}
+                name={
+                  row?.derived_address &&
+                  row?.chain && (
+                    <div className="flex items-center w-full">
+                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                        {row?.chain === 'BITCOIN' && (
+                          <Bitcoin className="w-4 h-4 text-orange-400" />
+                        )}
+                        {row?.chain === 'ETHEREUM' && (
+                          <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                        )}
+                      </div>
+                      <span className="ml-2 truncate max-w-[150px]">
+                        {row?.derived_address}
+                      </span>
                     </div>
-                    <span className="ml-2 truncate max-w-[150px]">
-                      {row?.derived_address}
-                    </span>
-                  </div>
-                )}
-              </Link>
-            </div>
+                  )
+                }
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={onHandleMouseOver}
+                target="_blank"
+              />
+            </span>
           </Tooltip>
         </span>
       ),

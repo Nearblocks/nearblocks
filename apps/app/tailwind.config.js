@@ -17,6 +17,7 @@ module.exports = {
         '4xl': '30px',
       },
       colors: {
+        amber: '#FFC10740',
         black: {
           200: '#1F2228',
           300: '#121212',

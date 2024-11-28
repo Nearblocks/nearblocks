@@ -15,6 +15,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaRight from '@/components/Icons/FaRight';
+import { ActionProvider } from '@/components/Transactions/Action/ActionContext';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { parseEventLogs } from '@/utils/app/near';
@@ -799,8 +800,8 @@ const Details = (props: Props) => {
             className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
             id="action-row"
           >
-            <div className="flex items-start flex-wrap p-4">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+            <div className="flex items-start flex-wrap px-4 py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7 py-2">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                   label={'Highlighted events of the transaction'}
@@ -819,15 +820,17 @@ const Details = (props: Props) => {
                 <div className="w-full md:w-3/4">
                   <PerfectScrollbar>
                     <div
-                      className="max-h-[194px] break-words space-y-2"
+                      className="max-h-[194px] break-words space-y-2 py-2"
                       id="action-column"
                     >
-                      {logs?.map((event: TransactionLog, i: number) => (
-                        <EventLogs event={event} key={i} />
-                      ))}
-                      {actions?.map((action: any, i: number) => (
-                        <Actions action={action} key={i} />
-                      ))}
+                      <ActionProvider>
+                        {logs?.map((event: TransactionLog, i: number) => (
+                          <EventLogs event={event} key={i} />
+                        ))}
+                        {actions?.map((action: any, i: number) => (
+                          <Actions action={action} key={i} />
+                        ))}
+                      </ActionProvider>
                     </div>
                   </PerfectScrollbar>
                 </div>
