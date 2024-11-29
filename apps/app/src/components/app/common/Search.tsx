@@ -48,7 +48,11 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({ handleFilterAndKeyword, header = false }: any) => {
+const Search = ({
+  disabled = false,
+  handleFilterAndKeyword,
+  header = false,
+}: any) => {
   const router = useIntlRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
@@ -144,7 +148,7 @@ const Search = ({ handleFilterAndKeyword, header = false }: any) => {
       className={`flex w-full ${header ? 'h-9' : 'h-12'}`}
       onSubmit={onSubmit}
     >
-      <label className="relative hidden md:flex">
+      <label className="relative hidden md:flex justify-center">
         <select
           className={`h-full block text-sm text-nearblue-600 dark:bg-black dark:text-neargray-10 ${
             homeSearch
@@ -163,12 +167,17 @@ const Search = ({ handleFilterAndKeyword, header = false }: any) => {
             {t('search.filters.addresses') || 'Addresses'}
           </option>
         </select>
-        <ArrowDown className="absolute right-3 top-3 w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none" />
+        <ArrowDown
+          className={`absolute right-3 ${
+            header ? 'top-3' : 'top-4'
+          } w-4 h-4 fill-current text-nearblue-600 dark:text-neargray-10 pointer-events-none`}
+        />
       </label>
 
       <Combobox className="flex-grow">
         <ComboboxInput
           className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+          disabled={disabled}
           id="searchInput"
           onChange={handleChange}
           placeholder={
@@ -268,6 +277,7 @@ const Search = ({ handleFilterAndKeyword, header = false }: any) => {
             ? 'bg-gray-100 dark:bg-black-500'
             : 'bg-blue-900/[0.05] dark:bg-black-600'
         } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
+        disabled={disabled}
         type="submit"
       >
         <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
