@@ -2,7 +2,7 @@
 import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
