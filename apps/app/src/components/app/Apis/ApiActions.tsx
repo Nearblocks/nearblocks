@@ -1,5 +1,6 @@
 'use client';
 import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -28,7 +29,7 @@ const ApiActions = ({
   planDetails: any;
   status: string;
 }) => {
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const [interval, setInterval] = useState(true);
 
   const [subject, _setSubject] = useState('API');

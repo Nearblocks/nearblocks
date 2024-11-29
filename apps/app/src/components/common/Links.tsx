@@ -1,5 +1,5 @@
 import { Tooltip } from '@reach/tooltip';
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 
 import { urlHostName } from '@/utils/libs';
@@ -9,7 +9,7 @@ const Links = (props: any) => {
   const twitter = urlHostName && urlHostName(meta?.twitter);
   const facebook = urlHostName && urlHostName(meta?.facebook);
   const telegram = urlHostName && urlHostName(meta?.telegram);
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
 
   return (
     <div className="flex space-x-4">

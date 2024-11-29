@@ -3,7 +3,7 @@ import { TooltipFormatterContextObject } from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts/highstock';
 import HighchartsExporting from 'highcharts/modules/exporting';
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
 
 import UserLayout from '@/components/app/Layouts/UserLayout';
@@ -16,7 +16,7 @@ import withAuth from '../stores/withAuth';
 
 const ApiUsageChart = ({ keyId, role }: { keyId?: string; role?: string }) => {
   const [options, setOptions] = useState(null);
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const { data: chartData, loading: loadingChart } = useAuth(
     keyId ? `/key-usage/${keyId}` : '',
   );

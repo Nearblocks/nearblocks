@@ -6,10 +6,9 @@ import Footer from './Footer';
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
-  theme?: string;
 }
 
-const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
+const LayoutActions = ({ children, notice }: LayoutProps) => {
   const pathname = usePathname();
 
   const className =
@@ -21,7 +20,7 @@ const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
     <div className={className}>
       {notice}
       <main>{children}</main>
-      <Footer theme={theme} />
+      <Footer />
     </div>
   );
 };

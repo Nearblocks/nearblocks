@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
-import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -26,7 +26,7 @@ interface Props {
 const Chart = (props: Props) => {
   const { chartsData, chartTypes, poweredBy } = props;
   const t = useTranslations();
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     description: '',

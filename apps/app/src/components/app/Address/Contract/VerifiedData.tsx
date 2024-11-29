@@ -1,6 +1,6 @@
 import { Tooltip } from '@reach/tooltip';
 import Clipboard from 'clipboard';
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 import React, { useEffect, useRef, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
@@ -50,7 +50,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     {},
   );
 
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchCode = async () => {

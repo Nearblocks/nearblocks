@@ -1,15 +1,16 @@
 'use client';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import Image from 'next/legacy/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { setTheme } from '@/utils/app/actions';
 import { docsUrl } from '@/utils/app/config';
+import { setCurrentTheme } from '@/utils/app/actions';
 import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import { BlocksInfo, Stats } from '@/utils/types';
 
@@ -190,7 +191,6 @@ const Header = ({
   handleFilterAndKeyword,
   role,
   stats: statsDetails,
-  theme,
   token,
   user,
 }: any) => {
@@ -222,6 +222,7 @@ const Header = ({
   const pathname = usePathname();
   const isMobile = useScreenSize();
   const router = useRouter();
+  const { setTheme, theme } = useTheme();
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -254,6 +255,7 @@ const Header = ({
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
+    setCurrentTheme(newTheme);
     setTheme(newTheme);
   };
 
@@ -392,6 +394,7 @@ const Header = ({
                 <div
                   className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer flex items-center"
                   onClick={toggleTheme}
+                  suppressHydrationWarning
                 >
                   <Image
                     alt="NearBlocks"
@@ -419,21 +422,22 @@ const Header = ({
           <div className="flex flex-wrap">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
               <div>
-                <Link className="" href="/" legacyBehavior>
-                  <a className="flex justify-start items-center hover:no-underline">
-                    <Image
-                      alt="NearBlocks"
-                      className="block"
-                      height="41"
-                      layout="fixed"
-                      src={
-                        theme === 'dark'
-                          ? '/images/nearblocksblack_dark.svg'
-                          : '/images/nearblocksblack.svg'
-                      }
-                      width="174"
-                    />
-                  </a>
+                <Link
+                  className="flex justify-start items-center hover:no-underline"
+                  href="/"
+                >
+                  <Image
+                    alt="NearBlocks"
+                    className="block"
+                    height="41"
+                    layout="fixed"
+                    src={
+                      theme === 'dark'
+                        ? '/images/nearblocksblack_dark.svg'
+                        : '/images/nearblocksblack.svg'
+                    }
+                    width="174"
+                  />
                 </Link>
               </div>
               <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
