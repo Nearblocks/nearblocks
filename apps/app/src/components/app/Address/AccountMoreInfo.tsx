@@ -5,16 +5,15 @@ import React, { useEffect, useState } from 'react';
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import {
-  convertToUTC,
+  getTimeAgoString,
   localFormat,
   nanoToMilli,
-  shortenAddress,
+  truncateString,
   weight,
   yoctoToNear,
 } from '@/utils/app/libs';
 import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
 
-import dayjs from '../../../utils/dayjs';
 import TokenImage from '../common/TokenImage';
 
 export default function AccountMoreInfo({
@@ -137,23 +136,19 @@ export default function AccountMoreInfo({
                     <div className="flex lg:w-80 w-full pr-3 lg:whitespace-nowrap flex-wrap">
                       <span className="flex mr-1">
                         <Link
-                          className="text-green-500 truncate 2xl:max-w-none lg:max-w-[80px] max-w-[4rem] dark:text-green-250 hover:no-underline"
+                          className="text-green-500 truncate max-w-[120px] dark:text-green-250 hover:no-underline"
                           href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                         >
-                          {shortenAddress(
-                            deploymentData.receipt_predecessor_account_id ?? '',
-                          )}
+                          {deploymentData.receipt_predecessor_account_id ?? ''}
                         </Link>
                       </span>
                       <span className="flex">
                         <span className="mr-1 whitespace-nowrap">at txn</span>
                         <Link
-                          className="text-green-500 dark:text-green-250 hover:no-underline"
+                          className="truncate max-w-[120px] text-green-500 dark:text-green-250 hover:no-underline"
                           href={`/txns/${deploymentData.transaction_hash}`}
                         >
-                          {shortenAddress(
-                            deploymentData.transaction_hash ?? '',
-                          )}
+                          {deploymentData.transaction_hash ?? ''}
                         </Link>
                       </span>
                     </div>
@@ -268,27 +263,9 @@ export default function AccountMoreInfo({
                 accountData?.deleted?.transaction_hash ? (
                   <div className="flex whitespace-nowrap">
                     <span className="mr-1">
-                      {dayjs().diff(
-                        dayjs(
-                          convertToUTC(
-                            nanoToMilli(accountData.deleted.block_timestamp),
-                            false,
-                          ),
-                        ),
-                        'days',
-                      ) === 0
-                        ? 'Today'
-                        : `${dayjs().diff(
-                            dayjs(
-                              convertToUTC(
-                                nanoToMilli(
-                                  accountData.deleted.block_timestamp,
-                                ),
-                                false,
-                              ),
-                            ),
-                            'days',
-                          )} days ago`}
+                      {getTimeAgoString(
+                        nanoToMilli(accountData.deleted.block_timestamp),
+                      )}
                     </span>
                     {!deploymentData?.receipt_predecessor_account_id && (
                       <span>
@@ -297,8 +274,10 @@ export default function AccountMoreInfo({
                           className="text-green-500 dark:text-green-250 hover:no-underline px-1"
                           href={`/txns/${accountData?.deleted?.transaction_hash}`}
                         >
-                          {shortenAddress(
+                          {truncateString(
                             accountData?.deleted?.transaction_hash,
+                            15,
+                            '...',
                           )}
                         </Link>
                       </span>
@@ -307,27 +286,9 @@ export default function AccountMoreInfo({
                 ) : accountData?.created?.transaction_hash ? (
                   <div className="flex whitespace-nowrap">
                     <span className="mr-1">
-                      {dayjs().diff(
-                        dayjs(
-                          convertToUTC(
-                            nanoToMilli(accountData.created.block_timestamp),
-                            false,
-                          ),
-                        ),
-                        'days',
-                      ) === 0
-                        ? 'Today'
-                        : `${dayjs().diff(
-                            dayjs(
-                              convertToUTC(
-                                nanoToMilli(
-                                  accountData.created.block_timestamp,
-                                ),
-                                false,
-                              ),
-                            ),
-                            'days',
-                          )} days ago`}
+                      {getTimeAgoString(
+                        nanoToMilli(accountData.created.block_timestamp),
+                      )}
                     </span>
                     {!deploymentData?.receipt_predecessor_account_id && (
                       <span>
@@ -336,8 +297,10 @@ export default function AccountMoreInfo({
                           className="text-green-500 dark:text-green-250 hover:no-underline px-1"
                           href={`/txns/${accountData?.created?.transaction_hash}`}
                         >
-                          {shortenAddress(
+                          {truncateString(
                             accountData?.created?.transaction_hash,
+                            15,
+                            '...',
                           )}
                         </Link>
                       </span>

@@ -1,7 +1,9 @@
 export const runtime = 'edge';
 
 import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 
+import NFTTxnsSkeleton from '@/components/app/skeleton/nft/NFTTxnsSkeleton';
 import TransfersList from '@/components/app/Tokens/NFTTransfers';
 
 export default async function NFTTokentxns(props: {
@@ -27,7 +29,9 @@ export default async function NFTTokentxns(props: {
       <div className="container-xxl mx-auto px-5 -mt-48 ">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
-            <TransfersList searchParams={searchParams} />
+            <Suspense fallback={<NFTTxnsSkeleton />}>
+              <TransfersList searchParams={searchParams} />
+            </Suspense>
           </div>
         </div>
       </div>
