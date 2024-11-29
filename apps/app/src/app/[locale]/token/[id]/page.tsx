@@ -21,13 +21,9 @@ export default async function TokenIndex(props: {
   const { id } = params;
 
   return (
-    <div className="relative container-xxl mx-auto px-5">
-      <section>
-        <Suspense fallback={<TokenTabSkeleton />}>
-          <Overview id={id} searchParams={searchParams} />
-          <TokenTabs id={id} searchParams={searchParams} />
-        </Suspense>
-      </section>
-    </div>
+    <Suspense fallback={<TokenTabSkeleton />}>
+      <Overview id={id} searchParams={searchParams} />
+      <TokenTabs id={id} searchParams={searchParams} />
+    </Suspense>
   );
 }

@@ -56,14 +56,14 @@ const Info = (props: Props) => {
           setContract(null);
         }
 
-        const locked = (keys.keys || []).every(
+        const locked = (keys?.keys || []).every(
           (key: {
             access_key: {
               nonce: string;
               permission: string;
             };
             public_key: string;
-          }) => key.access_key.permission !== 'FullAccess',
+          }) => key?.access_key.permission !== 'FullAccess',
         );
 
         setIsLocked(locked);

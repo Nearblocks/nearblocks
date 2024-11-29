@@ -19,7 +19,7 @@ const HomePageSkeleton = () => {
                 {t('homePage.heroTitle')}
               </h1>
               <div className="h-12" suppressHydrationWarning={true}>
-                <Search />
+                <Search disabled />
               </div>
               <div className="text-white"></div>
               <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]"></div>
