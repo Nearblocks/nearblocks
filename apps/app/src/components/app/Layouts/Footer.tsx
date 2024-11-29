@@ -1,13 +1,15 @@
 'use client';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 
 import { Link } from '@/i18n/routing';
 
 import Arrow from '../Icons/Arrow';
 
-const Footer = ({ theme }: any) => {
+const Footer = () => {
   const currentDate = new Date();
+  const { theme } = useTheme();
   const t = useTranslations();
 
   return (

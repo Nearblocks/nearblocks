@@ -1,9 +1,10 @@
 'use client';
-import Cookies from 'js-cookie';
+
+import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 
 export default function ThemeImage() {
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
 
   return (
     <Image

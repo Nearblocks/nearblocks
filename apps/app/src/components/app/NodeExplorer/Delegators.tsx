@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
-import Cookies from 'js-cookie';
 import { debounce } from 'lodash';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -37,7 +37,7 @@ const Delegators = ({ accountId }: Props) => {
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =

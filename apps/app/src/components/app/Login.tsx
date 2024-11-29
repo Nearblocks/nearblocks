@@ -4,6 +4,7 @@ import { FormikValues, useFormik } from 'formik';
 import Cookies from 'js-cookie';
 import get from 'lodash/get';
 import { useEnvContext } from 'next-runtime-env';
+import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -32,7 +33,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   const [tokens, setTokens] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
   const [updatePassMsg, setUpdatePassMsg] = useState('');
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const { NEXT_PUBLIC_TURNSTILE_SITE_KEY: siteKey } = useEnvContext();
 
   const turnstileRef = useRef<TurnstileInstance>(null);

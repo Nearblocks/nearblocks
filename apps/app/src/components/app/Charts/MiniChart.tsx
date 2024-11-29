@@ -1,5 +1,6 @@
 'use client';
-import Cookies from 'js-cookie';
+
+import { useTheme } from 'next-themes';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ChartConfig, ChartStat } from '@/utils/types';
@@ -16,7 +17,7 @@ interface Props {
 
 const MiniChart = (props: Props) => {
   const { chartsData, chartTypes } = props;
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
 
   const data = chartsData?.charts as ChartStat[];

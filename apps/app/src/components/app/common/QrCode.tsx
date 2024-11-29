@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie';
+import { useTheme } from 'next-themes';
 
 /**
  * @interface Props
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const QrCode = (props: Props) => {
-  const theme = Cookies?.get('theme') || 'light';
+  const { theme } = useTheme();
 
   const colorDark = theme === 'dark' ? '#ffffff' : '#000000';
   const colorLight = theme === 'dark' ? '#000000' : '#ffffff';
