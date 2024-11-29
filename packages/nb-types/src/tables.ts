@@ -336,6 +336,7 @@ export type Receipt = {
   index_in_chunk: number;
   originated_from_transaction_hash: string;
   predecessor_account_id: string;
+  public_key: null | string;
   receipt_id: string;
   receipt_kind: ReceiptKind;
   receiver_account_id: string;

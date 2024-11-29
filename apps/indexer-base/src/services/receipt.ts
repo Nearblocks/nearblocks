@@ -64,7 +64,11 @@ const storeChunkReceipts = async (
       throw new Error(`no parent transaction for receipt: ${receiptOrDataId}`);
     }
 
+    let publicKey = null;
+
     if ('Action' in receipt.receipt) {
+      publicKey = receipt.receipt.Action.signerPublicKey;
+
       receipt.receipt.Action.inputDataIds.forEach((dataId) => {
         receiptInputData.push(
           getActionReceiptInputData(receiptOrDataId, dataId),
@@ -130,6 +134,7 @@ const storeChunkReceipts = async (
         blockTimestamp,
         txnHash,
         receiptIndex,
+        publicKey,
       ),
     );
   });
@@ -311,6 +316,7 @@ const getReceiptData = (
   blockTimestamp: string,
   transactionHash: string,
   indexInChunk: number,
+  publicKey: null | string,
 ): Receipt => ({
   included_in_block_hash: blockHash,
   included_in_block_timestamp: blockTimestamp,
@@ -318,6 +324,7 @@ const getReceiptData = (
   index_in_chunk: indexInChunk,
   originated_from_transaction_hash: transactionHash,
   predecessor_account_id: receipt.predecessorId,
+  public_key: publicKey,
   receipt_id: receipt.receiptId,
   receipt_kind: mapReceiptKind(receipt.receipt),
   receiver_account_id: receipt.receiverId,
