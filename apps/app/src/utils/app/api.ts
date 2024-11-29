@@ -1,9 +1,8 @@
 import qs from 'qs';
 
-import { appUrl } from './config';
+import { apiUrl, appUrl } from './config';
 
 const fetchKey = process.env.API_ACCESS_KEY;
-const baseURL = process.env.API_URL;
 
 export const getRequest = async (
   path: string,
@@ -17,7 +16,7 @@ export const getRequest = async (
 
   const queryParams = qs.stringify(params, { encode: true });
   const url = useBase
-    ? `${baseURL}${path}${queryParams ? `?${queryParams}` : ''}`
+    ? `${apiUrl}${path}${queryParams ? `?${queryParams}` : ''}`
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
   const MAX_RETRIES = 3;
@@ -39,13 +38,9 @@ export const getRequest = async (
 
       if (response.status !== 200) {
         console.error(
-          `Server error on attempt ${attempt + 1}: ${response.statusText}`,
+          `Server error on ${url} attempt ${attempt}: ${response.statusText}`,
         );
-        if (attempt + 1 === MAX_RETRIES) return null;
-      } else {
-        throw new Error(
-          `Request failed with status ${response.status}: ${response.statusText}`,
-        );
+        if (attempt === MAX_RETRIES) return null;
       }
     } catch (error: any) {
       const isNetworkError =

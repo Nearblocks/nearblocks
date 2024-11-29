@@ -13,7 +13,7 @@ export default async function TxnsTabs({
 }) {
   const options: RequestInit = { next: { revalidate: 10 } };
   const data = (await getRequest(`txns/${hash}`, {}, options)) || {};
-  const stats = (await getRequest(`stats`, { options })) || [];
+  const stats = (await getRequest(`stats`, {}, options)) || [];
   const txn = data?.txns?.[0];
   let price: null | number = null;
   if (txn?.block_timestamp) {
@@ -24,7 +24,7 @@ export default async function TxnsTabs({
 
     if (currentDt > blockDt) {
       const priceData =
-        (await getRequest(`stats/price?date=${blockDt}`, { options })) || {};
+        (await getRequest(`stats/price?date=${blockDt}`, {}, options)) || {};
       price = priceData?.stats?.[0]?.near_price || null;
     }
   }

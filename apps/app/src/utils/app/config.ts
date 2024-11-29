@@ -18,8 +18,8 @@ export const network = networks[networkId];
 
 export const apiUrl: string =
   networkId === 'mainnet'
-    ? 'https://api3.nearblocks.io/v1/'
-    : 'https://api3-testnet.nearblocks.io/v1/';
+    ? 'https://api.nearblocks.io/v1/'
+    : 'https://api-testnet.nearblocks.io/v1/';
 
 export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
@@ -103,3 +103,8 @@ const evmWalletChains = {
 };
 
 export const EVMWalletChain = evmWalletChains[networkId];
+
+export const userApiURL =
+  process.env.NEXT_PUBLIC_USER_API_URL || 'https://api.exploreblocks.io/api/';
+
+export const GTMID = process.env.NEXT_PUBLIC_GTM_ID || 'G-XKTTC0Q819';

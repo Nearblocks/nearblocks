@@ -41,10 +41,10 @@ export default function TabSkeletion() {
     );
   return (
     <>
-      <div className="block lg:flex lg:space-x-2 mb-10">
-        <div className="w-full ">
+      <div className="block lg:flex lg:space-x-2 mb-10 mt-5">
+        <div className="w-full">
           <div className="w-full ">
-            <div className="flex overflow-x-auto min-w-full min-h-fit">
+            <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
               {tabs?.map(({ message, name }: any) => {
                 return (
                   <Link
