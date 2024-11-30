@@ -2,8 +2,8 @@ export const runtime = 'edge';
 
 import ApiActions from '@/components/app/Apis/ApiActions';
 import { getRequest, postRequest } from '@/utils/app/api';
+import { userApiURL } from '@/utils/app/config';
 
-const userApiURL = process.env.NEXT_PUBLIC_USER_API_URL;
 export default async function ApisPage(props: {
   searchParams: Promise<{ status: string }>;
 }) {

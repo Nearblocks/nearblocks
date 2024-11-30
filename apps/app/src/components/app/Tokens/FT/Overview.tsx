@@ -5,24 +5,14 @@ import OverviewActions from './OverviewActions';
 import TokenFilter from './TokenFilter';
 
 const Overview = async ({ id, searchParams }: any) => {
-  const options: RequestInit = {
-    next: { revalidate: 10 },
-  };
-  const [
-    statsResult,
-    tokenResult,
-    syncResult,
-    transferResult,
-    holderResult,
-    filterResult,
-  ] = await Promise.all([
-    getRequest(`stats`, {}, options),
-    getRequest(`fts/${id}`, {}, options),
-    getRequest(`sync/status`, {}, options),
-    getRequest(`fts/${id}/txns/count`, {}, options),
-    getRequest(`fts/${id}/holders/count`, {}, options),
-    getRequest(`account/${searchParams?.a}/inventory`, {}, options),
-  ]);
+  const [statsResult, tokenResult, syncResult, transferResult, holderResult] =
+    await Promise.all([
+      getRequest(`stats`),
+      getRequest(`fts/${id}`),
+      getRequest(`sync/status`),
+      getRequest(`fts/${id}/txns/count`),
+      getRequest(`fts/${id}/holders/count`),
+    ]);
 
   const token: Token = tokenResult?.contracts?.[0];
   const transfers = transferResult?.txns?.[0]?.count;
@@ -33,7 +23,11 @@ const Overview = async ({ id, searchParams }: any) => {
     sync: true,
     timestamp: '',
   };
-  const inventoryData = filterResult?.inventory;
+
+  const inventoryDataPromise = searchParams?.a
+    ? await getRequest(`account/${searchParams?.a}/inventory`)
+    : Promise.resolve(null);
+  const inventoryData = inventoryDataPromise?.inventory;
 
   return (
     <>

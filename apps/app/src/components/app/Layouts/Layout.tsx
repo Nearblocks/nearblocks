@@ -8,6 +8,8 @@ import Script from 'next/script';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { GTMID } from '@/utils/app/config';
+
 import LayoutActions from './LayoutActions';
 
 interface LayoutProps {
@@ -56,7 +58,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
         <noscript>
           <iframe
             height="0"
-            src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+            src={`https://www.googletagmanager.com/ns.html?id=${GTMID}`}
             style={{ display: 'none', visibility: 'hidden' }}
             width="0"
           />
@@ -72,7 +74,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
               j.async=true;
               j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
               f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
+            })(window,document,'script','dataLayer','${GTMID}');
           `}
         </Script>
         <PublicEnvProvider>
