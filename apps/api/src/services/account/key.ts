@@ -15,9 +15,9 @@ const keys = catchAsync(async (req: RequestValidator<Keys>, res: Response) => {
   const { limit, offset } = getPagination(page, per_page);
   const keys = await sql`
     SELECT
-      public_key,
-      account_id,
-      permission_kind,
+      a.public_key,
+      a.account_id,
+      a.permission_kind,
       JSON_BUILD_OBJECT(
         'transaction_hash',
         cbrt.transaction_hash,
