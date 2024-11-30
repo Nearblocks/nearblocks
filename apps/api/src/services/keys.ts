@@ -10,9 +10,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 
   const keys = await sql`
     SELECT
-      public_key,
-      account_id,
-      permission_kind,
+      a.public_key,
+      a.account_id,
+      a.permission_kind,
       JSON_BUILD_OBJECT(
         'transaction_hash',
         cbrt.transaction_hash,
