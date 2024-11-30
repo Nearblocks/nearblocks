@@ -81,16 +81,16 @@ const TokenHoldings = (props: Props) => {
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
                       {props.ft?.tokens?.map((token, index) => (
-                        <div className="dark:bg-black" key={token?.contract}>
+                        <div
+                          className="dark:bg-black p-2"
+                          key={token?.contract}
+                        >
                           <Link
-                            className="flex justify-between items-center px-3 py-2 truncate hover:no-underline"
+                            className="flex justify-between items-center px-2 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
                             href={`/token/${token?.contract}?a=${props.id}`}
                           >
-                            <div
-                              className="hover:bg-gray-100 dark:hover:bg-black-200 w-full h-full rounded-lg"
-                              key={index}
-                            >
-                              <div className="flex items-center p-2">
+                            <div key={index}>
+                              <div className="flex items-center p-1">
                                 <div className="flex mr-1">
                                   <img
                                     alt={token?.ft_meta?.name}
@@ -116,7 +116,13 @@ const TokenHoldings = (props: Props) => {
                                         '...',
                                       )
                                     : ''}
-                                  ({token?.ft_meta?.symbol})
+                                  (
+                                  {truncateString(
+                                    token?.ft_meta?.symbol,
+                                    15,
+                                    '...',
+                                  )}
+                                  )
                                 </span>
                               </div>
                               <div className="text-gray-400 flex items-center my-0.5 mx-2.5">
@@ -159,13 +165,13 @@ const TokenHoldings = (props: Props) => {
                     </div>
                     <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
                       {nfts.map((nft) => (
-                        <div className="dark:bg-black" key={nft?.contract}>
+                        <div className="dark:bg-black p-2" key={nft?.contract}>
                           <Link
-                            className="flex justify-between items-center px-3 py-2 truncate hover:no-underline"
+                            className="flex justify-between items-center px-2 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
                             href={`/nft-token/${nft?.contract}`}
                           >
-                            <div className="hover:bg-gray-100 dark:hover:bg-black-200 w-full h-full rounded-lg">
-                              <div className="flex items-center p-2">
+                            <div>
+                              <div className="flex items-center p-1">
                                 <div className="flex mr-1">
                                   <img
                                     alt={nft?.nft_meta?.name}
