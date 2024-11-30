@@ -4,8 +4,8 @@ import { EventKind } from '#types/enums';
 
 const list = z.object({
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(100).optional().default(1),
-  per_page: z.number().positive().max(50).optional().default(50),
+  page: z.number().int().positive().max(100).optional().default(1),
+  per_page: z.number().int().positive().max(50).optional().default(50),
   search: z.string().optional(),
   sort: z
     .enum([
@@ -26,8 +26,8 @@ const count = z.object({
 
 const txns = z.object({
   cursor: z.string().length(35).optional(),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const txnsCount = z.object({
@@ -47,8 +47,8 @@ const ftTxns = z.object({
   cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const ftTxnsCount = z.object({
@@ -61,8 +61,8 @@ const ftTxnsCount = z.object({
 const holders = z.object({
   contract: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const holdersCount = z.object({

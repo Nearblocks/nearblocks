@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 const list = z.object({
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(100).optional().default(1),
-  per_page: z.number().positive().max(50).optional().default(50),
+  page: z.number().int().positive().max(100).optional().default(1),
+  per_page: z.number().int().positive().max(50).optional().default(50),
   search: z.string().optional(),
   sort: z.enum(['volume', 'txns', 'makers']).optional().default('volume'),
 });
@@ -20,7 +20,7 @@ const txns = z.object({
   a: z.string().optional(),
   cursor: z.string().length(35).optional(),
   pair: z.string(),
-  per_page: z.number().positive().max(250).optional().default(25),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const txnsCount = z.object({
@@ -30,9 +30,9 @@ const txnsCount = z.object({
 
 const charts = z.object({
   interval: z.enum(['1m', '1h', '1d']).optional().default('1m'),
-  limit: z.number().positive().optional().default(25),
+  limit: z.number().int().positive().optional().default(25),
   pair: z.string(),
-  to: z.number().positive(),
+  to: z.number().int().positive(),
 });
 
 export type List = z.infer<typeof list>;

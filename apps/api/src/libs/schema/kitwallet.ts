@@ -10,8 +10,8 @@ const deposits = z.object({
 
 const activities = z.object({
   account: z.string(),
-  limit: z.number().min(0).max(100).optional().default(10),
-  offset: z.number().max(5000).optional(),
+  limit: z.number().int().min(0).max(100).optional().default(10),
+  offset: z.number().int().max(5000).optional(),
 });
 
 const receivers = z.object({
@@ -24,7 +24,7 @@ const tokens = z.object({
 
 const tokensFromBlock = z.object({
   account: z.string(),
-  fromBlockTimestamp: z.number().optional().default(0),
+  fromBlockTimestamp: z.number().int().optional().default(0),
 });
 
 const nfts = z.object({
@@ -33,7 +33,7 @@ const nfts = z.object({
 
 const nftsFromBlock = z.object({
   account: z.string(),
-  fromBlockTimestamp: z.number().optional().default(0),
+  fromBlockTimestamp: z.number().int().optional().default(0),
 });
 
 export type Accounts = z.infer<typeof accounts>;
