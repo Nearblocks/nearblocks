@@ -1,15 +1,16 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
-import { useEnvContext } from 'next-runtime-env';
 import React from 'react';
 import { toast } from 'react-toastify';
 
 import RateLimitDialog from '@/components/RateLimitDialog';
+import { userApiURL } from '@/utils/app/config';
 
 import { useSWR } from '../../utils/app/swrExport';
+import { useConfig } from './useConfig';
 import useStorage from './useStorage';
 
-const baseURL = process.env.NEXT_PUBLIC_USER_API_URL;
+const baseURL = userApiURL;
 
 export const defaultOptions = {
   revalidateOnFocus: false,
@@ -84,7 +85,7 @@ request.interceptors.response.use(undefined, async (error) => {
 const useAuth = (url: string, options = {}) => {
   const [token] = useStorage('token');
   const config = { ...defaultOptions, ...options };
-  const { NEXT_PUBLIC_USER_API_URL: baseURL } = useEnvContext();
+  const { userApiURL: baseURL } = useConfig();
 
   const fetcher = async (
     [url, token]: [string, null | string],

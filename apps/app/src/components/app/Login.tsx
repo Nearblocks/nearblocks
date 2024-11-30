@@ -3,7 +3,6 @@ import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile';
 import { FormikValues, useFormik } from 'formik';
 import Cookies from 'js-cookie';
 import get from 'lodash/get';
-import { useEnvContext } from 'next-runtime-env';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -13,6 +12,7 @@ import * as Yup from 'yup';
 import Visibility from '@/components/app/Icons/Visibility';
 import VisibilityOff from '@/components/app/Icons/VisibilityOff';
 import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 import useStorage from '@/hooks/app/useStorage';
 import { Link } from '@/i18n/routing';
 import { catchErrors } from '@/utils/app/libs';
@@ -34,7 +34,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [updatePassMsg, setUpdatePassMsg] = useState('');
   const { theme } = useTheme();
-  const { NEXT_PUBLIC_TURNSTILE_SITE_KEY: siteKey } = useEnvContext();
+  const { siteKey } = useConfig();
 
   const turnstileRef = useRef<TurnstileInstance>(null);
   const validationSchema = Yup.object().shape({

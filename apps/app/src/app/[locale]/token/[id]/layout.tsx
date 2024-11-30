@@ -8,7 +8,7 @@ import { Token } from '@/utils/types';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
-  params: Promise<{ id: string; locale: string }>;
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
 
