@@ -24,8 +24,8 @@ const list = z.object({
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
   to: z.string().optional(),
 });
 
@@ -52,7 +52,7 @@ const count = z.object({
 });
 
 const latest = z.object({
-  limit: z.number().positive().max(10).optional().default(10),
+  limit: z.number().int().positive().max(10).optional().default(10),
 });
 
 const item = z.object({

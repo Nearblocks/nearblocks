@@ -39,8 +39,8 @@ const tokens = z.object({
 const keys = z.object({
   account: z.string(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const keysCount = z.object({
@@ -70,8 +70,8 @@ const txns = z.object({
   from: z.string().optional(),
   method: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
   to: z.string().optional(),
 });
 

@@ -29,8 +29,8 @@ const accountMultiChainTxns = z.object({
   from: z.string().optional(),
   multichain_address: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const accountMultiChainTxnsCount = z.object({
@@ -80,8 +80,8 @@ const multiChainTxns = z.object({
   from: z.string().optional(),
   multichain_address: z.string().optional(),
   order: z.enum(['desc', 'asc']).optional().default('desc'),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const multiChainTxnsCount = z.object({

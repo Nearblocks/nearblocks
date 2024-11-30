@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 const list = z.object({
   cursor: z.string().optional(),
-  page: z.number().positive().max(200).optional().default(1),
-  per_page: z.number().positive().max(250).optional().default(25),
+  page: z.number().int().positive().max(200).optional().default(1),
+  per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
 const latest = z.object({
-  limit: z.number().positive().max(10).optional().default(10),
+  limit: z.number().int().positive().max(10).optional().default(10),
 });
 
 const item = z.object({
