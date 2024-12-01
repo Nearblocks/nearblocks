@@ -1,5 +1,4 @@
 export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { BaselimeSDK, BetterHttpInstrumentation, VercelPlugin } =
       await import('@baselime/node-opentelemetry');
 
@@ -16,5 +15,4 @@ export async function register() {
     });
 
     sdk.start();
-  }
 }
