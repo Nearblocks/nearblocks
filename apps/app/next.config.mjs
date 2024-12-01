@@ -5,9 +5,6 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    webpackMemoryOptimizations: true,
-  },
   async redirects() {
     return [
       {
