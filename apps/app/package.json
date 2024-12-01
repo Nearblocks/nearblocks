@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.651.1",
+    "@baselime/node-opentelemetry": "^0.5.8",
+    "@baselime/react-rum": "^0.3.1",
     "@braintree/sanitize-url": "7.0.1",
     "@marsidev/react-turnstile": "1.0.2",
     "@near-js/providers": "^1.0.1",
