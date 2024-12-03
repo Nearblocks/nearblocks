@@ -41,10 +41,11 @@ export const verifierConfig =
     ? [
         {
           accountId: 'v2-verifier.sourcescan.near',
-          fileStructureApiUrl: (cid: string) =>
-            `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
-          sourceCodeApiUrl: (cid: string, fileName: string) =>
-            `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+          fileStructureApiUrl: (cid: string, path: string = '') =>
+            `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=${path}`,
+          sourceCodeApiUrl: (cid: string, filePath: string) =>
+            `https://api.sourcescan.dev/ipfs/${cid}/${filePath}`,
+
           verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
         },
       ]
