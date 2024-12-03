@@ -28,6 +28,13 @@
     "prettier-plugin-sql": "0.18.0",
     "turbo": "^1.13.3"
   },
+  "resolutions": {
+    "near-api-js": "5.0.1",
+    "@near-js/providers": "1.0.1",
+    "@near-js/accounts": "1.3.1",
+    "@near-js/wallet-account": "1.3.1",
+    "near-api-js/@near-js/providers": "1.0.1"
+  },
   "packageManager": "yarn@1.22.19",
   "engines": {
     "node": "^18.18 || >=20"

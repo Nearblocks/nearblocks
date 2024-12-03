@@ -22,7 +22,7 @@
     "big.js": "6.2.1",
     "cors": "2.8.5",
     "csv-stringify": "6.5.1",
-    "dayjs": "1.11.12",
+    "dayjs": "1.11.13",
     "envalid": "8.0.0",
     "express": "4.19.2",
     "express-jsdoc-swagger": "1.8.0",
