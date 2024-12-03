@@ -248,6 +248,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               {!statusLoading && (
                 <VerifiedData
                   base64Code={contractData?.base64Code}
+                  contractMetadata={contractData?.contractMetadata}
                   selectedVerifier={selectedVerifier}
                   verifierData={
                     verificationData[selectedVerifier]?.data as VerifierData
