@@ -8,6 +8,7 @@ const defaultConfig: knexPkg.Knex.Config = {
 };
 
 export type Knex = knexPkg.Knex;
+export type KnexConfig = knexPkg.Knex.Config;
 
 export const createKnex = (
   config: knexPkg.Knex.Config | string,
