@@ -1,22 +1,13 @@
-import { types } from 'nb-lake';
 import { Network, StateChangeCauseView, StateChangeValueView } from 'nb-types';
 
 export type Config = {
-  cacheExpiry: number;
-  dataSource: string;
   dbCa: string;
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  delta: number;
-  fastnearEndpoint?: string;
+  dbUrlRead: string;
   genesisHeight: number;
-  insertLimit: number;
   network: Network;
-  preloadSize: number;
-  s3BucketName: string;
-  s3Endpoint: null | types.EndpointConfig;
-  s3RegionName: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };

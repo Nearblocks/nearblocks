@@ -1,5 +1,12 @@
+import {
+  BlockHeader,
+  StateChange as BlockStateChange,
+  ExecutionOutcomeWithReceipt,
+  IndexerTransactionWithOutcome,
+  Message,
+  Shard,
+} from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import {
   BalanceEvent,
   EventStatus,
@@ -26,10 +33,7 @@ type BalanceChanges = {
   validators: AccountBalance[];
 };
 
-export const storeBalance = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeBalance = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkBalance(knex, shard, message.block.header);
@@ -39,8 +43,8 @@ export const storeBalance = async (
 
 export const storeChunkBalance = async (
   knex: Knex,
-  shard: types.Shard,
-  block: types.BlockHeader,
+  shard: Shard,
+  block: BlockHeader,
 ) => {
   const stateChanges = getStateChanges(
     shard.stateChanges as StateChange<unknown>[],
@@ -84,7 +88,7 @@ export const storeChunkBalance = async (
     await knex('balance_events')
       .insert(changes)
       .onConflict(['event_index'])
-      .ignore();
+      .merge();
   });
 };
 
@@ -104,7 +108,7 @@ const getStateChanges = (
 
     if (!account) continue;
 
-    switch ((stateChange as types.StateChange).cause.type) {
+    switch ((stateChange as BlockStateChange).cause.type) {
       case StateChangeCauseView.ValidatorAccountsUpdate: {
         result.validators.push(account);
         break;
@@ -159,7 +163,7 @@ const getStateChanges = (
       case StateChangeCauseView.Resharding: {
         throw new Error(
           `Unexpected state change cause met: ${
-            (stateChange as types.StateChange).cause.type
+            (stateChange as BlockStateChange).cause.type
           }`,
         );
       }
@@ -199,7 +203,7 @@ const getAccount = (
 
 const getValidatorChanges = async (
   balanceChanges: AccountBalance[],
-  block: types.BlockHeader,
+  block: BlockHeader,
 ) => {
   const result: BalanceEvent[] = [];
 
@@ -226,9 +230,9 @@ const getValidatorChanges = async (
 };
 
 const getTxnChanges = async (
-  txns: types.IndexerTransactionWithOutcome[],
+  txns: IndexerTransactionWithOutcome[],
   balanceChanges: Map<string, AccountBalance>,
-  block: types.BlockHeader,
+  block: BlockHeader,
 ) => {
   const result: BalanceEvent[] = [];
 
@@ -288,10 +292,10 @@ const getTxnChanges = async (
 };
 
 const getReceiptRewardChanges = async (
-  outcomes: types.ExecutionOutcomeWithReceipt[],
+  outcomes: ExecutionOutcomeWithReceipt[],
   receipts: Map<string, AccountBalance>,
   rewards: Map<string, AccountBalance>,
-  block: types.BlockHeader,
+  block: BlockHeader,
 ) => {
   const result: BalanceEvent[] = [];
 

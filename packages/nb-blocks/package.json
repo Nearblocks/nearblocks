@@ -1,22 +1,22 @@
 {
-  "name": "nb-knex",
-  "version": "0.1.1",
+  "name": "nb-blocks",
+  "version": "0.1.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
-  "dependencies": {
-    "knex": "3.0.1",
-    "pg": "8.11.3"
-  },
   "devDependencies": {
     "eslint-config-custom-node": "*",
+    "nb-knex": "*",
+    "nb-logger": "*",
     "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
     "typescript": "~5.2"
   }
 }

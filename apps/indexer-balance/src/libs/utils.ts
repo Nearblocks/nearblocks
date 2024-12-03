@@ -1,11 +1,9 @@
 import { snakeCase, toUpper } from 'lodash-es';
 
-import { types } from 'nb-lake';
+import { ExecutionStatus } from 'nb-blocks';
 import { EventStatus, ExecutionOutcomeStatus } from 'nb-types';
 
-export const mapStateChangeStatus = (
-  status: types.ExecutionStatus,
-): EventStatus => {
+export const mapStateChangeStatus = (status: ExecutionStatus): EventStatus => {
   const key = toUpper(
     snakeCase(Object.keys(status)[0]),
   ) as keyof typeof ExecutionOutcomeStatus;
