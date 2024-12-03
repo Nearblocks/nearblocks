@@ -76,8 +76,10 @@ const OverviewActions = ({
       const tokenDecimals = token?.decimals;
       const tokenImage = token?.icon;
 
-      if (window.ethereum) {
-        await window.ethereum.request({
+      // @ts-ignore
+      if (window?.ethereum) {
+        // @ts-ignore
+        await window?.ethereum.request({
           method: 'wallet_watchAsset',
           params: {
             options: {

@@ -1,5 +1,6 @@
 import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
 import createNextIntlPlugin from 'next-intl/plugin';
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -35,4 +36,6 @@ if (process.env.NODE_ENV === 'development') {
   await setupDevPlatform();
 }
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer({
+  enabled: 'true'
+})(withNextIntl(nextConfig));

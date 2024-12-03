@@ -10,8 +10,8 @@
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./",
     "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "yarn pages:build && wrangler pages dev",
-    "deploy": "yarn pages:build && wrangler pages deploy"
+    "preview": "pnpm pages:build && wrangler pages dev",
+    "deploy": "pnpm pages:build && wrangler pages deploy"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.651.1",
@@ -38,9 +38,6 @@
     "@near-wallet-selector/sender": "8.9.14",
     "@near-wallet-selector/welldone-wallet": "8.9.14",
     "@near-wallet-selector/xdefi": "8.9.14",
-    "@opentelemetry/api-logs": "^0.54.2",
-    "@opentelemetry/instrumentation": "^0.54.2",
-    "@opentelemetry/sdk-logs": "^0.54.2",
     "@reach/accordion": "^0.18.0",
     "@reach/combobox": "^0.18.0",
     "@reach/dialog": "^0.18.0",
@@ -61,7 +58,7 @@
     "highcharts-react-official": "^3.2.1",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
-    "near-api-js": "5.0.1",
+    "near-api-js": "4.0.3",
     "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",
     "nearblocks-trans-next-intl": "https://github.com/kevin-devstack/translations.git#4b973166331f9a21dd065ec22d76480b277bd4c9",
     "next": "15.0.3",
@@ -83,15 +80,9 @@
     "yup": "^1.4.0",
     "zustand": "4.3.7"
   },
-  "resolutions": {
-    "near-api-js": "5.0.1",
-    "@near-js/providers": "1.0.1",
-    "@near-js/accounts": "1.3.1",
-    "@near-js/wallet-account": "1.3.1",
-    "near-api-js/@near-js/providers": "1.0.1"
-  },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.6",
+    "@next/bundle-analyzer": "^15.0.3",
     "@types/big.js": "~6.2.2",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "~4.17.7",

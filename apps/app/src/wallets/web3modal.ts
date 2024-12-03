@@ -1,3 +1,4 @@
+/*
 import { injected, walletConnect } from '@wagmi/connectors';
 import { createConfig, http, reconnect } from '@wagmi/core';
 import { createWeb3Modal } from '@web3modal/wagmi';
@@ -43,3 +44,4 @@ reconnect(wagmiConfig, { connectors: [injected({ shimDisconnect: true })] });
 
 // Modal for login
 export const web3Modal = createWeb3Modal({ projectId, wagmiConfig });
+*/
