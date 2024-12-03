@@ -33,7 +33,6 @@
     "@near-wallet-selector/near-mobile-wallet": "8.9.14",
     "@near-wallet-selector/near-snap": "8.9.14",
     "@near-wallet-selector/nearfi": "8.9.14",
-    "@near-wallet-selector/neth": "8.9.14",
     "@near-wallet-selector/nightly": "8.9.14",
     "@near-wallet-selector/ramper-wallet": "8.9.14",
     "@near-wallet-selector/sender": "8.9.14",
