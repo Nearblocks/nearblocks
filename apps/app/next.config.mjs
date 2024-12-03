@@ -6,7 +6,6 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  compress: true,
   experimental: {
     webpackMemoryOptimizations: true,
   },
