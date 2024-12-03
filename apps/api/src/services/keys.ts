@@ -32,7 +32,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       LEFT JOIN receipts dbr ON dbr.receipt_id = a.deleted_by_receipt_id
       LEFT JOIN transactions dbrt ON dbrt.transaction_hash = dbr.originated_from_transaction_hash
     WHERE
-      public_key = ${key}
+      a.public_key = ${key}
   `;
 
   return res.status(200).json({ keys });
