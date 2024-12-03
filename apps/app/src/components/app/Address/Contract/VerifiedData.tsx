@@ -1,10 +1,10 @@
 import { Tooltip } from '@reach/tooltip';
 import Clipboard from 'clipboard';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import React, { useEffect, useRef, useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+// import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+// import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 import ErrorMessage from '@/components/common/ErrorMessage';
 import CopyIcon from '@/components/Icons/CopyIcon';
@@ -50,7 +50,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     {},
   );
 
-  const theme = Cookies?.get('theme') || 'light';
+  // const theme = Cookies?.get('theme') || 'light';
 
   useEffect(() => {
     const fetchCode = async () => {
@@ -231,7 +231,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     mutedText="Please try again later"
                   />
                 ) : fileData && fileData.length > 0 ? (
-                  fileData.map(({ content, name }, index) => (
+                  fileData.map(({ name }, index) => (
                     <div className="pb-4" key={index}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center">{name}</div>
@@ -284,7 +284,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                           height: `${codeHeights[name] || 300}px`,
                         }}
                       >
-                        {content ? (
+                        {/*content ? (
                           <SyntaxHighlighter
                             customStyle={{
                               backgroundColor:
@@ -322,7 +322,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                             message={'Failed to fetch the file content'}
                             mutedText="Please try again later"
                           />
-                        )}
+                        )*/}
                       </div>
                     </div>
                   ))
