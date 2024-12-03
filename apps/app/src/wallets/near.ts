@@ -3,7 +3,7 @@ import { setupBitgetWallet } from '@near-wallet-selector/bitget-wallet';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
 import { setupCoin98Wallet } from '@near-wallet-selector/coin98-wallet';
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core';
-import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
+// import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
 // import { setupHereWallet } from '@near-wallet-selector/here-wallet';
 import { setupLedger } from '@near-wallet-selector/ledger';
 import { setupMathWallet } from '@near-wallet-selector/math-wallet';
@@ -24,7 +24,7 @@ import { providers, utils } from 'near-api-js';
 import { createContext } from 'react';
 
 // ethereum wallets
-import { wagmiConfig, web3Modal } from './web3modal';
+// import { wagmiConfig, web3Modal } from './web3modal';
 
 const THIRTY_TGAS = '30000000000000';
 const NO_DEPOSIT = '0';
@@ -189,11 +189,11 @@ export class Wallet {
         setupNearMobileWallet(),
         setupMintbaseWallet(),
         setupBitteWallet(),
-        setupEthereumWallets({
-          alwaysOnboardDuringSignIn: true,
-          wagmiConfig: wagmiConfig as any,
-          web3Modal: web3Modal as any,
-        }),
+//        setupEthereumWallets({
+//          alwaysOnboardDuringSignIn: true,
+//          wagmiConfig: wagmiConfig as any,
+//          web3Modal: web3Modal as any,
+//        }),
       ],
       network: this.networkId as NetworkId,
     });
