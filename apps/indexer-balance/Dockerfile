@@ -1,5 +1,5 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:22-slim AS base
+FROM node:22-alpine AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
