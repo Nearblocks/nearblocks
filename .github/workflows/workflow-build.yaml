@@ -47,7 +47,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/nearblocks/${{ matrix.service }}
-          tags: sha
+          tags: |
+            type=sha
+            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -57,9 +59,7 @@ jobs:
           file: apps/${{ matrix.service }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: |
-            ghcr.io/nearblocks/${{ matrix.service }}:latest
-            ghcr.io/nearblocks/${{ matrix.service }}:${{ steps.meta.outputs.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
 
