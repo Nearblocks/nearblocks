@@ -4,11 +4,15 @@ FROM node:22-alpine as base
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
 
+# Set up pnpm and install turbo
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install turbo --global
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PNPM_HOME}:$PATH"
+RUN pnpm setup && \
+    pnpm install turbo --global
 
 COPY . .
-RUN pnpm turbo prune app --docker
+RUN turbo prune app --docker
 
 # Installer stage
 FROM --platform=$BUILDPLATFORM base AS installer
@@ -16,9 +20,11 @@ RUN apk add --no-cache git
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Install pnpm
+# Set up pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install turbo --global
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PNPM_HOME}:$PATH"
+RUN pnpm setup
 
 # Copy package.json and pnpm-lock.yaml
 COPY --from=builder /app/out/json/ .
