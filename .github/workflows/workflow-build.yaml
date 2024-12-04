@@ -1,7 +1,7 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['testgh']
+    branches: ['main']
 
 jobs:
   build:
