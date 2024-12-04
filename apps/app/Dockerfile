@@ -5,6 +5,7 @@ FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
 
 # Set up pnpm and install turbo
+ENV SHELL=/bin/sh
 RUN corepack enable && corepack prepare pnpm@latest --activate
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:$PATH"
@@ -21,6 +22,7 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Set up pnpm
+ENV SHELL=/bin/sh
 RUN corepack enable && corepack prepare pnpm@latest --activate
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:$PATH"
