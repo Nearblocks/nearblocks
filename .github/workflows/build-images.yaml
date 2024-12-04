@@ -2,7 +2,7 @@ name: Build Docker Images
 
 on:
   push:
-    branches: ['main']
+    branches: ['feat/ft-wallet-connect-2']
 
 jobs:
   build:
@@ -27,17 +27,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push (API)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/api/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/api:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/api:latest
-          cache-to: type=inline
-
       - name: Build and push (APP)
         uses: docker/build-push-action@v5
         with:
@@ -45,105 +34,6 @@ jobs:
           file: apps/app/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/nearblocks/app:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/app:latest
-          cache-to: type=inline
-
-      - name: Build and push (APP LITE)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/app-lite/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/app-lite:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/app-lite:latest
-          cache-to: type=inline
-
-      - name: Build and push (BACKEND)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/backend/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/backend:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/backend:latest
-          cache-to: type=inline
-
-      - name: Build and push (INDEXER BALANCE)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/indexer-balance/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/indexer-balance:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-balance:latest
-          cache-to: type=inline
-
-      - name: Build and push (INDEXER BASE)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/indexer-base/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/indexer-base:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-base:latest
-          cache-to: type=inline
-
-      - name: Build and push (INDEXER EVENTS)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/indexer-events/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/indexer-events:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-events:latest
-          cache-to: type=inline
-
-      - name: Build and push (INDEXER DEX)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/indexer-dex/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/indexer-dex:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/indexer-dex:latest
-          cache-to: type=inline
-
-      - name: Build and push (EXPLORER SELECTOR)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/explorer-selector/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/explorer-selector:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/explorer-selector:latest
-          cache-to: type=inline
-
-      - name: Build and push (AGGREGATES)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/aggregates/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/aggregates:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/aggregates:latest
-          cache-to: type=inline
-
-      - name: Build and push (EXPLORER SELECTOR)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/explorer-selector/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/nearblocks/explorer-selector:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/explorer-selector:latest
+          tags: ghcr.io/nearblocks/app:beta
+          cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline

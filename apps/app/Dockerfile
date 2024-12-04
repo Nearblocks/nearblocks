@@ -1,35 +1,56 @@
 FROM node:22-alpine as base
 
+# Builder stage
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
-RUN yarn global add turbo
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY . .
-RUN turbo prune app --docker
+RUN pnpm turbo prune app --docker
 
+# Installer stage
 FROM --platform=$BUILDPLATFORM base AS installer
-RUN apk add git
+RUN apk add --no-cache git
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED 1
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy package.json and pnpm-lock.yaml
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/yarn.lock ./yarn.lock
-RUN yarn --immutable
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code and build
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN yarn turbo run build --filter=app...
+RUN pnpm turbo run build --filter=app...
 
+# Runner stage
 FROM base AS runner
 WORKDIR /app
+
+# Set production environment
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-USER nextjs
-COPY --from=installer /app/apps/app/next.config.js .
-COPY --from=installer /app/apps/app/package.json .
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/static ./apps/app/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/app/entrypoint.sh ./apps/app/entrypoint.sh
 
-RUN chmod +x /app/apps/app/entrypoint.sh
-CMD ["apps/app/entrypoint.sh"]
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy the built application
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/package.json ./package.json
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next ./.next
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./public
+COPY --from=installer --chown=nextjs:nodejs /app/apps/app/node_modules ./node_modules
+
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Start the application using Next.js start command
+CMD ["pnpm", "start"]
