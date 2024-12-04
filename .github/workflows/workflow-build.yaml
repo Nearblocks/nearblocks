@@ -8,7 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [api, app, backend, indexer-balance, indexer-base, indexer-events, indexer-dex, indexer-multichain, explorer-selector, aggregates]
+        service:
+          [
+            api,
+            app,
+            backend,
+            indexer-balance,
+            indexer-base,
+            indexer-events,
+            indexer-dex,
+            indexer-multichain,
+            explorer-selector,
+            aggregates,
+          ]
       fail-fast: false
 
     steps:
