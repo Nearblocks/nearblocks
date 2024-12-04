@@ -50,7 +50,9 @@ jobs:
           tags: sha
 
       - name: Debug Metadata Output
-        run: echo "Extracted Tags: ${{ steps.meta.outputs.tags }}"
+        run: echo "Extracted Tags: $TAGS"
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
