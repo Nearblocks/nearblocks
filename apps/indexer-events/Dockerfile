@@ -25,11 +25,11 @@ WORKDIR /app
 COPY --from=builder /app/out/full/packages/nb-json .
 RUN yarn --immutable && yarn build-release
 
-FROM node:22-alpine
+FROM base AS runner
 ENV NODE_ENV production
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 COPY --from=neon-builder /app/index.node ./node_modules/nb-json/index.node
 
-CMD ["node", "--max-old-space-size=8192", "apps/indexer-events/dist/index.js"]
+CMD ["node", "--max-old-space-size=4096", "apps/indexer-events/dist/index.js"]
