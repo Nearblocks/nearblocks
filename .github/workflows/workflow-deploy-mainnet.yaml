@@ -1,0 +1,46 @@
+name: Deploy testnet
+on:
+  workflow_run:
+    workflows: ['Build Docker Images']
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download digests
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          run_id: ${{ github.event.workflow_run.id }}
+          name: digests
+          path: .
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$(pwd)/kubeconfig" >> $GITHUB_ENV
+
+      - name: Deploy services
+        run: |
+          failed_deployments=()
+          while IFS= read -r line; do
+            service=$(echo "$line" | cut -d@ -f1)
+            image_name="ghcr.io/nearblocks/$service:${{ github.event.workflow_run.head_sha }}"
+            
+            echo "Updating $service to $image_name"
+            kubectl set image deployment/testnet-$service $service=$image_name
+
+            if ! kubectl rollout status deployment/testnet-$service --timeout=600s; then
+              failed_deployments+=("$service")
+            fi
+          done < digests.txt
+
+          if [ ${#failed_deployments[@]} -ne 0 ]; then
+            echo "Failed deployments: ${failed_deployments[*]}"
+            exit 1
+          fi
