@@ -2,7 +2,7 @@ name: Build Docker Images
 
 on:
   push:
-    branches: ['main']
+    branches: ['beta-cf']
 
 jobs:
   build:
@@ -45,8 +45,8 @@ jobs:
           file: apps/app/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/nearblocks/app:latest
-          cache-from: type=registry,ref=ghcr.io/nearblocks/app:latest
+          tags: ghcr.io/nearblocks/app:beta
+          cache-from: type=registry,ref=ghcr.io/nearblocks/app:beta
           cache-to: type=inline
 
       - name: Build and push (APP LITE)
