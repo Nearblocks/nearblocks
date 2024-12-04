@@ -1,5 +1,5 @@
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import { EventStandard, EventType, FTEvent, NFTEvent } from 'nb-types';
 
 import { isNep141, isNep171 } from '#libs/guards';
@@ -19,20 +19,14 @@ export const EVENT_PATTERN = {
   WRAP_NEAR_DEPOSIT: /^Deposit (\d+) NEAR to ([\S]+)/,
 };
 
-export const storeEvents = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeEvents = async (knex: Knex, message: Message) => {
   await Promise.all([
     storeNEPEvents(knex, message),
     matchLegacyFTEvents(knex, message),
   ]);
 };
 
-export const storeNEPEvents = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeNEPEvents = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       const ftEvents: EventDataEvent[] = [];
@@ -73,7 +67,7 @@ export const storeNEPEvents = async (
   );
 };
 
-export const extractEvents = (outcome: types.ExecutionOutcomeWithReceipt) => {
+export const extractEvents = (outcome: ExecutionOutcomeWithReceipt) => {
   const prefix = 'EVENT_JSON:';
   const events: FTEventLogs[] | NFTEventLogs[] = [];
 

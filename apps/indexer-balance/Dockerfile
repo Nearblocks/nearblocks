@@ -1,5 +1,5 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:20-alpine as base
+FROM node:22-slim AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 RUN yarn turbo run build --filter=indexer-balance...
 
-FROM base AS runner
+FROM node:22-alpine
 ENV NODE_ENV production
 USER node
 WORKDIR /app

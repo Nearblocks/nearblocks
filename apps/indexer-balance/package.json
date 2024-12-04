@@ -16,21 +16,21 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
-    "@sentry/node": "7.74.1",
+    "@sentry/node": "7.120.0",
     "envalid": "8.0.0",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "~4.17",
-    "@types/node": "~20.8",
+    "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
-    "rimraf": "~5.0",
     "nb-blocks": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
+    "rimraf": "~6.0",
     "typescript": "~5.2"
   }
 }

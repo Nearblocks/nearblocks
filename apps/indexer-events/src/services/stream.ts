@@ -1,109 +1,59 @@
-import { stream, types } from 'nb-lake';
+import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
-import { streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeEvents } from '#services/events';
-import { DataSource } from '#types/enum';
 
-const fetchBlocks = async (block: number, limit: number) => {
-  try {
-    const blocks = await knex('blocks')
-      .select('block_height')
-      .where('block_height', '>=', block)
-      .orderBy('block_height', 'asc')
-      .limit(limit);
-
-    return blocks.map((block) => block.block_height);
-  } catch (error) {
-    logger.error(error);
-    sentry.captureException(error);
-    return [];
-  }
-};
-
-const eventsKey = 'events';
-const lakeConfig: types.LakeConfig = {
-  blocksPreloadPoolSize: config.preloadSize,
-  fetchBlocks,
-  s3BucketName: config.s3BucketName,
-  s3RegionName: config.s3RegionName,
-  startBlockHeight: config.startBlockHeight,
-};
-
-if (config.s3Endpoint) {
-  lakeConfig.s3ForcePathStyle = true;
-  lakeConfig.s3Endpoint = config.s3Endpoint;
-}
+const indexerKey = 'events';
 
 export const syncData = async () => {
-  const settings = await knex('settings').where({ key: eventsKey }).first();
+  const settings = await dbRead('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
 
-  if (config.dataSource === DataSource.FAST_NEAR) {
-    let startBlockHeight = config.startBlockHeight;
+  let startBlockHeight = config.startBlockHeight;
 
-    if (!startBlockHeight && latestBlock) {
-      const next = +latestBlock - config.delta / 2;
-      startBlockHeight = next;
-      logger.info(`last synced block: ${latestBlock}`);
-      logger.info(`syncing from block: ${next}`);
-    }
-
-    const stream = streamBlock({
-      limit: config.preloadSize / 2,
-      network: config.network,
-      start: startBlockHeight || config.genesisHeight,
-      url: config.fastnearEndpoint,
-    });
-
-    for await (const message of stream) {
-      await onMessage(message);
-    }
-
-    stream.on('end', () => {
-      logger.error('stream ended');
-      process.exit();
-    });
-    stream.on('error', (error: Error) => {
-      logger.error(error);
-      process.exit();
-    });
-  } else {
-    if (!lakeConfig.startBlockHeight && latestBlock) {
-      const next = +latestBlock - config.delta;
-      lakeConfig.startBlockHeight = next;
-      logger.info(`last synced block: ${latestBlock}`);
-      logger.info(`syncing from block: ${next}`);
-    }
-
-    for await (const message of stream(lakeConfig)) {
-      await onMessage(message);
-    }
+  if (!startBlockHeight && latestBlock) {
+    startBlockHeight = +latestBlock + 1;
   }
+
+  const startBlock = startBlockHeight || config.genesisHeight;
+
+  logger.info(`syncing from block: ${startBlock}`);
+
+  const stream = streamBlock({
+    dbConfig: streamConfig,
+    start: startBlock,
+  });
+
+  for await (const message of stream) {
+    await onMessage(message);
+  }
+
+  stream.on('end', () => {
+    logger.error('stream ended');
+    process.exit();
+  });
+
+  stream.on('error', (error: Error) => {
+    logger.error(error);
+    process.exit();
+  });
 };
 
-export const onMessage = async (message: types.StreamerMessage) => {
+export const onMessage = async (message: Message) => {
   try {
-    if (message.block.header.height % 1000 === 0) {
+    if (message.block.header.height % 100 === 0) {
       logger.info(`syncing block: ${message.block.header.height}`);
     }
 
-    const start = performance.now();
+    await storeEvents(dbWrite, message);
 
-    await storeEvents(knex, message);
-
-    logger.info({
-      block: message.block.header.height,
-      time: `${performance.now() - start} ms`,
-    });
-
-    if (message.block.header.height % 100 === 0) {
-      await knex('settings')
+    if (message.block.header.height % 10 === 0) {
+      await dbWrite('settings')
         .insert({
-          key: eventsKey,
+          key: indexerKey,
           value: { sync: message.block.header.height },
         })
         .onConflict('key')

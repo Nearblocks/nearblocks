@@ -1,4 +1,4 @@
-import { types } from 'nb-lake';
+import { Action, FunctionCallAction } from 'nb-blocks';
 import { FTLogKind, NEP, NFTLogKind } from 'nb-types';
 
 import {
@@ -12,50 +12,10 @@ import {
   NFTTransferEventLog,
 } from '#types/types';
 
-export const isCreateAccountAction = (
-  action: types.Action,
-): action is 'CreateAccount' => typeof action === 'string';
-
 export const isFunctionCallAction = (
-  action: types.Action,
-): action is types.FunctionCallAction =>
-  (action as types.FunctionCallAction).FunctionCall !== undefined;
-
-export const isDeployContractAction = (
-  action: types.Action,
-): action is types.DeployContractAction =>
-  (action as types.DeployContractAction).DeployContract !== undefined;
-
-export const isTransferAction = (
-  action: types.Action,
-): action is types.TransferAction =>
-  (action as types.TransferAction).Transfer !== undefined;
-
-export const isStakeAction = (
-  action: types.Action,
-): action is types.StakeAction =>
-  (action as types.StakeAction).Stake !== undefined;
-
-export const isAddKeyAction = (
-  action: types.Action,
-): action is types.AddKeyAction =>
-  (action as types.AddKeyAction).AddKey !== undefined;
-
-export const isAccessKeyFunctionCallPermission = (
-  accessKeyPermission: string | types.AccessKeyFunctionCallPermission,
-): accessKeyPermission is types.AccessKeyFunctionCallPermission =>
-  (accessKeyPermission as types.AccessKeyFunctionCallPermission)
-    .FunctionCall !== undefined;
-
-export const isDeleteKeyAction = (
-  action: types.Action,
-): action is types.DeleteKeyAction =>
-  (action as types.DeleteKeyAction).DeleteKey !== undefined;
-
-export const isDeleteAccountAction = (
-  action: types.Action,
-): action is types.DeleteAccountAction =>
-  (action as types.DeleteAccountAction).DeleteAccount !== undefined;
+  action: Action,
+): action is FunctionCallAction =>
+  (action as FunctionCallAction).FunctionCall !== undefined;
 
 export const isNep141 = (log: FTEventLogs | NFTEventLogs): log is FTEventLogs =>
   log.standard === NEP.Nep141;

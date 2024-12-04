@@ -42,7 +42,7 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    if (message.block.header.height % 1000 === 0) {
+    if (message.block.header.height % 100 === 0) {
       logger.info(`syncing block: ${message.block.header.height}`);
     }
 

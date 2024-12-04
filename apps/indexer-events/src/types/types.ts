@@ -1,23 +1,20 @@
+import {
+  BlockHeader,
+  ExecutionOutcomeWithReceipt,
+  ExecutionStatus,
+  FunctionCallAction,
+} from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import { EventCause, Network } from 'nb-types';
 
 export type Config = {
-  cacheExpiry: number;
-  dataSource: string;
   dbCa: string;
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  delta: number;
-  fastnearEndpoint?: string;
+  dbUrlRead: string;
   genesisHeight: number;
-  insertLimit: number;
   network: Network;
-  preloadSize: number;
-  s3BucketName: string;
-  s3Endpoint: null | types.EndpointConfig;
-  s3RegionName: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };
@@ -124,17 +121,17 @@ export interface NFTTransferLog {
 export type EventContract = (param: EventContractParam) => Promise<void>;
 
 export type EventContractParam = {
-  blockHeader: types.BlockHeader;
+  blockHeader: BlockHeader;
   knex: Knex;
-  outcomes: types.ExecutionOutcomeWithReceipt[];
+  outcomes: ExecutionOutcomeWithReceipt[];
   shardId: number;
 };
 
 export type FTContractMatchAction = (
-  action: types.FunctionCallAction,
+  action: FunctionCallAction,
   predecessor: string,
   logs: string[],
-  status?: types.ExecutionStatus,
+  status?: ExecutionStatus,
 ) => FTEventEntry[];
 
 export type FTEventEntry = {
@@ -183,10 +180,4 @@ export type FTMeta = {
   reference_hash: string | undefined;
   spec: string;
   symbol: string;
-};
-
-export type AccountTokenBalance = {
-  accountId: string;
-  balance: string;
-  contractId: string;
 };

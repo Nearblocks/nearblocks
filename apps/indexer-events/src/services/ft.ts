@@ -1,5 +1,5 @@
+import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import {
   EventCause,
   EventStandard,
@@ -27,7 +27,7 @@ import {
 export const storeFTEvents = async (
   knex: Knex,
   shardId: number,
-  blockHeader: types.BlockHeader,
+  blockHeader: BlockHeader,
   events: EventDataEvent[],
 ) => {
   let eventData: FTEvent[] = [];
@@ -140,8 +140,8 @@ export const storeFTEvents = async (
 };
 
 export const getLegacyEvents = (
-  blockHeader: types.BlockHeader,
-  outcome: types.ExecutionOutcomeWithReceipt,
+  blockHeader: BlockHeader,
+  outcome: ExecutionOutcomeWithReceipt,
   matchActions: FTContractMatchAction,
 ) => {
   const eventData: FTEvent[] = [];
