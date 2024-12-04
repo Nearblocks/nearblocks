@@ -47,8 +47,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/nearblocks/${{ matrix.service }}
-          tags: |
-            sha
+          tags: sha
+
+      - name: Debug Metadata Output
+        run: echo "Extracted Tags: ${{ steps.meta.outputs.tags }}"
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -60,7 +62,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/nearblocks/${{ matrix.service }}:latest
-            ghcr.io/nearblocks/${{ matrix.service }}:${{ steps.meta.outputs.tags }}
+            ghcr.io/nearblocks/${{ matrix.service }}:${{ steps.meta.outputs.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
 
