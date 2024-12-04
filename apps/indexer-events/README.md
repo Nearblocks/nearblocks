@@ -9,15 +9,12 @@ You can find the code for legacy token implementations in the `src/services/cont
 ```
 DATABASE_URL=
 NETWORK=mainnet
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
 
 # Optional
+DATABASE_URL_READ=
 DATABASE_CA=
 DATABASE_CERT=
 DATABASE_KEY=
 EVENTS_START_BLOCK=
-EVENTS_DATA_SOURCE=   # NEAR_LAKE | FAST_NEAR
-FASTNEAR_ENDPOINT=
 SENTRY_DSN=
 ```

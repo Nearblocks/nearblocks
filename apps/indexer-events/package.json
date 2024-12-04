@@ -16,27 +16,22 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
-    "@sentry/node": "7.74.1",
-    "axios": "1.6.2",
-    "borsh": "1.0.0",
-    "envalid": "8.0.0",
-    "globby": "13.2.2",
-    "lodash-es": "4.17.21"
+    "@sentry/node": "7.120.0",
+    "axios": "1.7.8",
+    "borsh": "2.0.0",
+    "envalid": "8.0.0"
   },
   "devDependencies": {
-    "@types/lodash-es": "~4.17",
-    "@types/node": "~20.8",
+    "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
+    "nb-blocks": "*",
     "nb-json": "*",
     "nb-knex": "*",
-    "nb-lake": "*",
     "nb-logger": "*",
-    "nb-near": "*",
-    "nb-neardata": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "rimraf": "~5.0",
+    "rimraf": "~6.0",
     "typescript": "~5.2"
   }
 }

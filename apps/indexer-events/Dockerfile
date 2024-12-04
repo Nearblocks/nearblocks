@@ -1,5 +1,5 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:20-bookworm-slim as base
+FROM node:22-slim AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
@@ -25,7 +25,7 @@ WORKDIR /app
 COPY --from=builder /app/out/full/packages/nb-json .
 RUN yarn --immutable && yarn build-release
 
-FROM base AS runner
+FROM node:22-alpine
 ENV NODE_ENV production
 USER node
 WORKDIR /app

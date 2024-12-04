@@ -1,5 +1,5 @@
+import { Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
 import config from '#config';
@@ -19,10 +19,7 @@ import tokenSkyward from './token.skyward.near.js';
 import tokenV2RefFinance from './token.v2.ref-finance.near.js';
 import wrap from './wrap.near.js';
 
-export const matchLegacyFTEvents = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const matchLegacyFTEvents = async (knex: Knex, message: Message) => {
   if (config.network === Network.TESTNET) return;
 
   await Promise.all(

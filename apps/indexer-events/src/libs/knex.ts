@@ -14,15 +14,34 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const knex: Knex = createKnex({
+const writeConfig = {
   client: 'pg',
   connection: {
     application_name: 'indexer-events',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
-    statement_timeout: 60 * 1000, // 60s
+    statement_timeout: 60 * 1000,
   },
   pool: { max: 10, min: 1 },
-});
+};
 
-export default knex;
+const readConfig = {
+  ...writeConfig,
+  connection: {
+    ...writeConfig.connection,
+    application_name: 'indexer-events-read',
+    connectionString: config.dbUrlRead || config.dbUrl,
+  },
+};
+
+export const streamConfig = {
+  ...readConfig,
+  connection: {
+    ...readConfig.connection,
+    application_name: 'indexer-events-stream',
+  },
+};
+
+export const dbWrite: Knex = createKnex(writeConfig);
+
+export const dbRead: Knex = createKnex(readConfig);

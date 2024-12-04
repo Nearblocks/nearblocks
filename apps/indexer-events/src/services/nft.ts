@@ -1,5 +1,5 @@
+import { BlockHeader } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { types } from 'nb-lake';
 import {
   EventCause,
   EventStandard,
@@ -20,7 +20,7 @@ import { EventDataEvent } from '#types/types';
 export const storeNFTEvents = async (
   knex: Knex,
   shardId: number,
-  blockHeader: types.BlockHeader,
+  blockHeader: BlockHeader,
   events: EventDataEvent[],
 ) => {
   const eventData: NFTEvent[] = [];
