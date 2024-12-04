@@ -1,5 +1,8 @@
 FROM node:20-alpine as base
 
+# Add required libraries
+RUN apk add --no-cache libc++ curl
+
 # Builder stage
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
