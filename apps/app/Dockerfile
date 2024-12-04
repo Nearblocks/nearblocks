@@ -24,12 +24,6 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
-COPY --from=installer /app/apps/app/next.config.js .
-COPY --from=installer /app/apps/app/package.json .
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/static ./apps/app/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/app/entrypoint.sh ./apps/app/entrypoint.sh
+COPY --from=installer /app/apps/app .
 
-RUN chmod +x /app/apps/app/entrypoint.sh
-CMD ["apps/app/entrypoint.sh"]
+CMD ["yarn", "start"]
