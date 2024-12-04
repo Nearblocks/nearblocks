@@ -8,11 +8,10 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Download digests
-        uses: dawidd6/action-download-artifact@v3
+      - name: Download service info
+        uses: actions/download-artifact@v4
         with:
-          run_id: ${{ github.event.workflow_run.id }}
-          name: digests
+          name: services-info
           path: .
 
       - name: Set up kubectl
@@ -28,17 +27,16 @@ jobs:
       - name: Deploy services
         run: |
           failed_deployments=()
-          while IFS= read -r line; do
-            service=$(echo "$line" | cut -d@ -f1)
+          while IFS= read -r service; do
             image_name="ghcr.io/nearblocks/$service:${{ github.event.workflow_run.head_sha }}"
-            
             echo "Updating $service to $image_name"
+            
             kubectl set image deployment/testnet-$service $service=$image_name
 
             if ! kubectl rollout status deployment/testnet-$service --timeout=600s; then
               failed_deployments+=("$service")
             fi
-          done < digests.txt
+          done < services.txt
 
           if [ ${#failed_deployments[@]} -ne 0 ]; then
             echo "Failed deployments: ${failed_deployments[*]}"

@@ -52,3 +52,14 @@ jobs:
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
+
+      - name: Save service info
+        run: |
+          mkdir -p ./artifacts
+          echo "${{ matrix.service }}" >> ./artifacts/services.txt
+
+      - name: Upload service info
+        uses: actions/upload-artifact@v4
+        with:
+          name: services-info
+          path: artifacts/services.txt
