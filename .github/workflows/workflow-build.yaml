@@ -34,21 +34,9 @@ jobs:
           file: apps/${{ matrix.service }}/Dockerfile
           platforms: linux/amd64
           push: true
+          provenance: false
           tags: |
             ghcr.io/nearblocks/${{ matrix.service }}:latest
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
-          outputs: type=image,name=ghcr.io/nearblocks/${{ matrix.service }},push-by-digest=true
-
-      - name: Record digest
-        if: success()
-        run: |
-          echo "${{ matrix.service }}@${{ steps.docker_build.outputs.digest }}" >> digests.txt
-
-      - name: Upload digests
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: digests
-          path: digests.txt
