@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/amd64
@@ -27,6 +27,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
+        id: docker_build
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -38,3 +39,16 @@ jobs:
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
+          outputs: type=image,name=ghcr.io/nearblocks/${{ matrix.service }},push-by-digest=true
+
+      - name: Record digest
+        if: success()
+        run: |
+          echo "${{ matrix.service }}@${{ steps.docker_build.outputs.digest }}" >> digests.txt
+
+      - name: Upload digests
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests
+          path: digests.txt
