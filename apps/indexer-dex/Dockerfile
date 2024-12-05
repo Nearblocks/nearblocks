@@ -1,5 +1,5 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:20-bookworm-slim as base
+FROM node:22-slim AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
@@ -32,4 +32,4 @@ WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 COPY --from=neon-builder /app/index.node ./node_modules/nb-json/index.node
 
-CMD ["node", "--max-old-space-size=8192", "apps/indexer-dex/dist/index.js"]
+CMD ["node", "--max-old-space-size=4096", "apps/indexer-dex/dist/index.js"]

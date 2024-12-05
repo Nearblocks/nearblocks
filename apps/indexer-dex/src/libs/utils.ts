@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { ExecutionStatus } from 'nb-neardata';
+import { ExecutionStatus } from 'nb-blocks';
 import { DexEventType, DexPairs } from 'nb-types';
 
 import config from '#config';
@@ -8,7 +8,7 @@ import { DexEventIndex } from '#types/enum';
 import { DexPairMeta, SwapPair } from '#types/types';
 
 import Big from './big.js';
-import knex from './knex.js';
+import { dbRead } from './knex.js';
 
 const require = createRequire(import.meta.url);
 const json = require('nb-json');
@@ -106,7 +106,7 @@ export const getPrice = async (
     };
   }
 
-  const middlePair = await knex('dex_pairs')
+  const middlePair = await dbRead('dex_pairs')
     .where('contract', dexPair.contract)
     .where('base', swapPair.quoteToken)
     .where('quote', config.NEAR_TOKEN)

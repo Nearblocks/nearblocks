@@ -1,9 +1,9 @@
-import { types } from 'nb-lake';
+import { Message } from 'nb-blocks';
 import { logger } from 'nb-logger';
 import { DexEvents, DexPairs } from 'nb-types';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import {
   decodeArgs,
   decodeSuccessValue,
@@ -30,7 +30,7 @@ const POOL_METHOD = 'add_simple_pool';
 const SWAP_METHODS = ['swap', 'ft_on_transfer'];
 const SWAP_PATTERN = /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/;
 
-export const syncRefFinance = async (message: types.StreamerMessage) => {
+export const syncRefFinance = async (message: Message) => {
   const pairIds = new Set<string>();
   const block = message.block.header.height;
   const poolMap: Map<string, DexPairs> = new Map();
@@ -138,7 +138,7 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
   );
 
   const [pairs, nearPair] = await Promise.all([
-    knex('dex_pairs as d')
+    dbRead('dex_pairs as d')
       .select<DexPairMeta[]>([
         'd.*',
         'b.decimals as baseDecimal',
@@ -148,7 +148,7 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
       .join('ft_meta as q', 'd.quote', '=', 'q.contract')
       .where('d.contract', CONTRACT)
       .whereIn('d.pool', [...pairIds]),
-    knex('dex_pairs')
+    dbRead('dex_pairs')
       .where('contract', CONTRACT)
       .where('base', config.NEAR_TOKEN)
       .whereIn('quote', config.STABLE_TOKENS)
@@ -189,7 +189,7 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
         price_token: price.priceToken,
         price_usd: price.priceUsd,
         quote: pair.quote,
-        updated_at: knex.raw('now()'),
+        updated_at: dbWrite.raw('now()'),
       });
 
       return {
@@ -212,17 +212,17 @@ export const syncRefFinance = async (message: types.StreamerMessage) => {
   const pairsSorted = [...poolMap.values()].sort((a, b) => +a.pool - +b.pool);
 
   if (pairsSorted.length) {
-    await knex('dex_pairs')
+    await dbWrite('dex_pairs')
       .insert(pairsSorted)
       .onConflict(['contract', 'pool'])
       .merge(['price_token', 'price_usd', 'updated_at']);
   }
 
   if (eventsFiltered.length) {
-    await knex('dex_events')
+    await dbWrite('dex_events')
       .insert(eventsFiltered)
       .onConflict(['event_index', 'timestamp'])
-      .ignore();
+      .merge();
   }
 };
 

@@ -14,7 +14,7 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const knex: Knex = createKnex({
+const writeConfig = {
   client: 'pg',
   connection: {
     application_name: 'indexer-dex',
@@ -22,6 +22,25 @@ const knex: Knex = createKnex({
     ssl: ssl?.ca ? ssl : false,
   },
   pool: { max: 10, min: 1 },
-});
+};
 
-export default knex;
+const readConfig = {
+  ...writeConfig,
+  connection: {
+    ...writeConfig.connection,
+    application_name: 'indexer-dex-read',
+    connectionString: config.dbUrlRead || config.dbUrl,
+  },
+};
+
+export const streamConfig = {
+  ...readConfig,
+  connection: {
+    ...readConfig.connection,
+    application_name: 'indexer-dex-stream',
+  },
+};
+
+export const dbWrite: Knex = createKnex(writeConfig);
+
+export const dbRead: Knex = createKnex(readConfig);

@@ -2,18 +2,15 @@ import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     if (config.network === Network.MAINNET) {
-      logger.info(
-        { data_source: config.dataSource, network: config.network },
-        'initializing dex indexer...',
-      );
-      logger.info('syncing dex data...');
+      logger.info({ network: config.network }, 'initializing indexer...');
+      logger.info('syncing data...');
       await syncData();
     }
   } catch (error) {
@@ -26,7 +23,11 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([knex.destroy(), sentry.close(1_000)]);
+    await Promise.all([
+      dbRead.destroy(),
+      dbWrite.destroy(),
+      sentry.close(1_000),
+    ]);
   } catch (error) {
     logger.error(error);
   }
