@@ -1,18 +1,15 @@
-import React, { forwardRef, Ref } from 'react';
-
 import Skeleton from '../common/Skeleton';
 interface Props {
   className?: string;
 }
-const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
+const Latest = ({ className }: Props) => {
   return (
     <>
       <div
         className={`bg-white dark:bg-black-600 rounded-b-xl overflow-hidden w-full z-10 ${className}`}
-        ref={ref}
       >
         <div className="relative">
-          <div className="px-3 dark:divide-black-200 divide-y h-80">
+          <div className="px-3 dark:divide-black-200 divide-y h-80 overflow-x-auto overflow-hidden">
             {[...Array(5)].map((_, i) => (
               <div
                 className="grid grid-cols-2 md:grid-cols-3 gap-3 py-3"
@@ -60,6 +57,6 @@ const Latest = forwardRef(({ className }: Props, ref: Ref<HTMLDivElement>) => {
       </div>
     </>
   );
-});
+};
 Latest.displayName = 'Latest';
 export default Latest;

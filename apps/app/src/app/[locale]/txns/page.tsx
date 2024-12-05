@@ -8,12 +8,20 @@ import List from '@/components/app/Transactions/List';
 
 export default async function TransactionList(props: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ cursor?: string; order: string; p?: string }>;
+  searchParams: Promise<{
+    cursor?: string;
+    from?: string;
+    method?: string;
+    order: string;
+    page?: string;
+    to?: string;
+  }>;
 }) {
   const searchParams = await props.searchParams;
   const params = await props.params;
 
   const { locale } = params;
+  const { cursor, page, ...rest } = searchParams;
 
   const t = await getTranslations({ locale });
 
@@ -32,7 +40,7 @@ export default async function TransactionList(props: {
       <div className="container-xxl mx-auto px-5 -mt-48">
         <div className="relative block lg:flex lg:space-x-2">
           <div className=" w-full">
-            <Suspense fallback={<ListSkeletion />}>
+            <Suspense fallback={<ListSkeletion />} key={JSON.stringify(rest)}>
               <List searchParams={searchParams} />
             </Suspense>
           </div>

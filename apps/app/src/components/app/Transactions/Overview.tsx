@@ -16,15 +16,13 @@ import {
 import { gasPrice } from '@/utils/near';
 import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
 
-import Skeleton from '../skeleton/common/Skeleton';
-
 interface Props {
   chartsDetails: { charts: ChartInfo[] };
   error: boolean;
   stats: StatusInfo;
 }
 
-const Overview = ({ chartsDetails, error, stats }: Props) => {
+const Overview = ({ chartsDetails, stats }: Props) => {
   const t = useTranslations();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -187,7 +185,7 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
 
   return (
     <div className="container-xxl mx-auto px-5">
-      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0  dark:bg-black-600">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-2 sm:px-5 md:py lg:px-0  dark:bg-black-600">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             networkId === 'mainnet'
@@ -197,7 +195,7 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
         >
           {networkId === 'mainnet' && (
             <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y  lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
-              <div className="flex flex-row py-5 lg:pb-5 lg:px-0">
+              <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
                 <div className="items-center flex justify-left mr-3 ">
                   <Image
                     alt={t ? t('homePage.nearPrice') : 'nearPrice'}
@@ -210,45 +208,41 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                     width={24}
                   />
                 </div>
-                <div className="ml-2">
+                <div className="ml-2 flex flex-col justify-between">
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm ">
                     {t ? t('homePage.nearPrice') : 'NEAR PRICE'}
                   </p>
-                  {error ? (
-                    <Skeleton className="my-1 h-4" />
-                  ) : (
-                    <Link
-                      className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center "
-                      href="/charts/near-price"
-                    >
-                      {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
-                      <span className="text-nearblue-700">
-                        &nbsp;
-                        {nearBtcPrice
-                          ? '@ ' + localFormat(stats?.near_btc_price) + ' BTC'
-                          : ''}
-                      </span>
-                      {change24 && (
-                        <>
-                          {Number(stats?.change_24) > 0 ? (
-                            <span className="text-neargreen text-sm">
-                              &nbsp;
-                              {stats?.change_24
-                                ? '(' + dollarFormat(stats?.change_24) + '%)'
-                                : stats?.change_24 ?? ''}
-                            </span>
-                          ) : (
-                            <span className="text-red-500 text-sm">
-                              &nbsp;
-                              {change24
-                                ? '(' + dollarFormat(change24) + '%)'
-                                : ''}
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </Link>
-                  )}
+                  <Link
+                    className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center"
+                    href="/charts/near-price"
+                  >
+                    {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
+                    <span className="text-nearblue-700">
+                      &nbsp;
+                      {nearBtcPrice
+                        ? '@ ' + localFormat(stats?.near_btc_price) + ' BTC'
+                        : ''}
+                    </span>
+                    {change24 && (
+                      <>
+                        {Number(stats?.change_24) > 0 ? (
+                          <span className="text-neargreen text-sm">
+                            &nbsp;
+                            {stats?.change_24
+                              ? '(' + dollarFormat(stats?.change_24) + '%)'
+                              : stats?.change_24 ?? ''}
+                          </span>
+                        ) : (
+                          <span className="text-red-500 text-sm">
+                            &nbsp;
+                            {change24
+                              ? '(' + dollarFormat(change24) + '%)'
+                              : ''}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Link>
                 </div>
               </div>
               <div className="flex flex-row py-5 lg:pt-5 lg:px-0">
@@ -266,18 +260,14 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t('homePage.marketCap')}
                   </p>
-                  {error ? (
-                    <Skeleton className="my-1 h-4" />
-                  ) : (
-                    <Link
-                      className="leading-6 text-nearblue-700 hover:no-underline"
-                      href="/charts/market-cap"
-                    >
-                      {stats?.market_cap
-                        ? '$' + dollarFormat(stats?.market_cap ?? 0)
-                        : ''}
-                    </Link>
-                  )}
+                  <Link
+                    className="leading-6 text-nearblue-700 hover:no-underline"
+                    href="/charts/market-cap"
+                  >
+                    {stats?.market_cap
+                      ? '$' + dollarFormat(stats?.market_cap ?? 0)
+                      : ''}
+                  </Link>
                 </div>
               </div>
             </div>
@@ -301,45 +291,37 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t ? t('homePage.transactions') : 'TRANSACTIONS'}
                   </p>
-                  {error ? (
-                    <Skeleton className="my-1 h-4" />
-                  ) : (
-                    <div className="flex flex-row">
-                      <p className="leading-6 text-nearblue-600 dark:text-neargray-10 mr-0.5">
-                        {totalTxns ? currency(stats?.total_txns) : ''}
-                      </p>
-                      <div className="leading-6 text-nearblue-700">
-                        <Tooltip
-                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                          label={'Transactions per second'}
-                        >
-                          <div>
-                            <Link
-                              className="hover:no-underline"
-                              href="/charts/tps"
-                            >
-                              {stats?.tps ? `(${stats?.tps} TPS)` : ''}
-                            </Link>
-                          </div>
-                        </Tooltip>
-                      </div>
+                  <div className="flex flex-row">
+                    <p className="leading-6 text-nearblue-600 dark:text-neargray-10 mr-0.5">
+                      {totalTxns ? currency(stats?.total_txns) : ''}
+                    </p>
+                    <div className="leading-6 text-nearblue-700">
+                      <Tooltip
+                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                        label={'Transactions per second'}
+                      >
+                        <div>
+                          <Link
+                            className="hover:no-underline"
+                            href="/charts/tps"
+                          >
+                            {stats?.tps ? `(${stats?.tps} TPS)` : ''}
+                          </Link>
+                        </div>
+                      </Tooltip>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
               <div className="flex flex-col text-right">
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {t ? t('homePage.gasPrice') : 'GAS PRICE'}
                 </p>
-                {error ? (
-                  <Skeleton className="my-1 h-4" />
-                ) : (
-                  <p className="leading-6 text-nearblue-700">
-                    {stats?.gas_price
-                      ? gasPrice(stats?.gas_price)
-                      : stats?.gas_price ?? ''}
-                  </p>
-                )}
+                <p className="leading-6 text-nearblue-700">
+                  {stats?.gas_price
+                    ? gasPrice(stats?.gas_price)
+                    : stats?.gas_price ?? ''}
+                </p>
               </div>
             </div>
             <div className="flex flex-row justify-between align-center py-5 lg:pt-5 lg:px-0">
@@ -360,39 +342,29 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                       {t ? t('homePage.activeValidator') : 'ACTIVE VALIDATORS'}{' '}
                     </Link>
                   </p>
-                  {error ? (
-                    <Skeleton className="my-1 h-4" />
-                  ) : (
-                    <Link
-                      className="leading-6 text-nearblue-700 hover:no-underline"
-                      href="/node-explorer"
-                    >
-                      {stats?.nodes_online
-                        ? localFormat(stats?.nodes_online)
-                        : stats?.nodes_online ?? ''}
-                    </Link>
-                  )}
+                  <Link
+                    className="leading-6 text-nearblue-700 hover:no-underline"
+                    href="/node-explorer"
+                  >
+                    {stats?.nodes_online
+                      ? localFormat(stats?.nodes_online)
+                      : stats?.nodes_online ?? ''}
+                  </Link>
                 </div>
               </div>
               <div className="flex flex-col text-right">
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {t ? t('homePage.avgBlockTime') : 'AVG. BLOCK TIME'}
                 </p>
-                {error ? (
-                  <Skeleton className="my-1 h-4" />
-                ) : (
-                  <Link
-                    className="leading-6 text-nearblue-700 hover:no-underline"
-                    href="/charts/blocks"
-                    suppressHydrationWarning
-                  >
-                    {stats?.avg_block_time
-                      ? `${
-                          (stats?.avg_block_time).replace(/\.?0+$/, '') + ' s'
-                        }`
-                      : ''}
-                  </Link>
-                )}
+                <Link
+                  className="leading-6 text-nearblue-700 hover:no-underline"
+                  href="/charts/blocks"
+                  suppressHydrationWarning
+                >
+                  {stats?.avg_block_time
+                    ? `${(stats?.avg_block_time).replace(/\.?0+$/, '') + ' s'}`
+                    : ''}
+                </Link>
               </div>
             </div>
           </div>
@@ -406,18 +378,14 @@ const Overview = ({ chartsDetails, error, stats }: Props) => {
                 </p>
               )}
               <div className="mt-1 h-28 dark:bg-black-600">
-                {!chartConfig ? (
-                  <Skeleton className="h-28" />
-                ) : (
-                  <iframe
-                    className="dark:bg-black-600"
-                    srcDoc={iframeSrc}
-                    style={{
-                      backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
-                      width: '100%',
-                    }}
-                  />
-                )}
+                <iframe
+                  className="dark:bg-black-600"
+                  srcDoc={iframeSrc}
+                  style={{
+                    backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
+                    width: '100%',
+                  }}
+                />
               </div>
             </div>
           </div>

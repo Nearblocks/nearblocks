@@ -1,3 +1,4 @@
+'use client';
 import classNames from 'classnames';
 import { useTranslations } from 'next-intl';
 
