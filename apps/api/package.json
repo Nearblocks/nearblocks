@@ -39,7 +39,7 @@
     "passport-anonymous": "1.0.1",
     "passport-http-bearer": "1.0.1",
     "pg": "8.12.0",
-    "postgres": "https://github.com/Nearblocks/postgres",
+    "postgres": "3.4.5",
     "query-string": "9.1.0",
     "rate-limiter-flexible": "3.0.6",
     "zod": "3.23.8"

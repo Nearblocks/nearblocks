@@ -15,24 +15,30 @@ if (config.dbCa) {
 }
 
 const sql = postgres(config.dbUrl, {
+  connect_timeout: 10,
   connection: {
     application_name: 'api',
   },
+  idle_timeout: 30,
   max: 60,
   ssl: ssl?.ca ? ssl : false,
 });
 
 export const writeSql = postgres(config.dbWriteUrl, {
+  connect_timeout: 10,
   connection: {
     application_name: 'api-write',
   },
+  idle_timeout: 30,
   ssl: ssl?.ca ? ssl : false,
 });
 
 export const userSql = postgres(config.userDbUrl, {
+  connect_timeout: 10,
   connection: {
     application_name: 'user-api',
   },
+  idle_timeout: 30,
   max: 60,
   ssl: ssl?.ca ? ssl : false,
 });
