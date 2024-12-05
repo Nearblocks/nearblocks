@@ -93,17 +93,25 @@ const TokenHoldings = (props: Props) => {
                               <div className="flex items-center p-1">
                                 <div className="flex mr-1">
                                   <img
-                                    alt={token?.ft_meta?.name}
+                                    alt={token?.ft_meta?.name ?? 'Token Icon'}
                                     className="w-4 h-4"
                                     height={16}
                                     onError={(e) => {
+                                      e.currentTarget.onerror = null;
                                       e.currentTarget.src =
                                         '/images/tokenplaceholder.svg';
-                                      /* eslint-disable @next/next/no-img-element */
                                     }}
                                     src={
-                                      token?.ft_meta?.icon ??
-                                      '/images/tokenplaceholder.svg'
+                                      token?.ft_meta?.icon
+                                        ? token.ft_meta.icon.startsWith(
+                                            'http',
+                                          ) ||
+                                          token.ft_meta.icon.startsWith(
+                                            'data:image/',
+                                          )
+                                          ? token.ft_meta.icon
+                                          : '/images/tokenplaceholder.svg'
+                                        : '/images/tokenplaceholder.svg'
                                     }
                                     width={16}
                                   />

@@ -17,9 +17,10 @@ export const bosNetworkId: NetworkId =
 export const network = networks[networkId];
 
 export const apiUrl: string =
-  networkId === 'mainnet'
+  process.env.API_URL ||
+  (networkId === 'mainnet'
     ? 'https://api.nearblocks.io/v1/'
-    : 'https://api-testnet.nearblocks.io/v1/';
+    : 'https://api-testnet.nearblocks.io/v1/');
 
 export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'

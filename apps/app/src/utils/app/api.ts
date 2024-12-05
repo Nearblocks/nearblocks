@@ -40,7 +40,7 @@ export const getRequest = async (
         console.error(
           `Server error on ${url} attempt ${attempt}: ${response.statusText}`,
         );
-        if (attempt === MAX_RETRIES) return null;
+        if (attempt === MAX_RETRIES - 1) return null;
       }
     } catch (error: any) {
       const isNetworkError =

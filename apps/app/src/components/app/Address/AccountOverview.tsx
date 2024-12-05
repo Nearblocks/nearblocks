@@ -57,37 +57,39 @@ export default function AccountOverview({
 
             return pricedTokens.push({
               ...ft,
-              amountUsd: sum.toString(),
-              rpcAmount: rpcAmount.toString(),
+              amountUsd: sum?.toString(),
+              rpcAmount: rpcAmount?.toString(),
             });
           }
 
           return tokens.push({
             ...ft,
-            amountUsd: sum.toString(),
-            rpcAmount: rpcAmount.toString(),
+            amountUsd: sum?.toString(),
+            rpcAmount: rpcAmount?.toString(),
           });
         }),
       );
 
-      tokens.sort((a, b) => {
-        const first = Big(a.rpcAmount);
+      if (tokens) {
+        tokens?.sort((a, b) => {
+          const first = Big(a?.rpcAmount);
 
-        const second = Big(b.rpcAmount);
+          const second = Big(b?.rpcAmount);
 
-        if (first.lt(second)) return 1;
-        if (first.gt(second)) return -1;
+          if (first?.lt(second)) return 1;
+          if (first?.gt(second)) return -1;
 
-        return 0;
-      });
+          return 0;
+        });
+      }
 
-      pricedTokens.sort((a, b) => {
-        const first = Big(a.amountUsd);
+      pricedTokens?.sort((a, b) => {
+        const first = Big(a?.amountUsd);
 
-        const second = Big(b.amountUsd);
+        const second = Big(b?.amountUsd);
 
-        if (first.lt(second)) return 1;
-        if (first.gt(second)) return -1;
+        if (first?.lt(second)) return 1;
+        if (first?.gt(second)) return -1;
 
         return 0;
       });

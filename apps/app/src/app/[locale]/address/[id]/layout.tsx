@@ -9,7 +9,7 @@ import { appUrl, networkId } from '@/utils/app/config';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
-  params: Promise<{ id: string; locale: string }>;
+  params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
   const headersList = await headers();
