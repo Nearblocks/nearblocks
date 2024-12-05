@@ -48,11 +48,7 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({
-  disabled = false,
-  handleFilterAndKeyword,
-  header = false,
-}: any) => {
+const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
   const router = useIntlRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
@@ -148,13 +144,16 @@ const Search = ({
       className={`flex w-full ${header ? 'h-9' : 'h-12'}`}
       onSubmit={onSubmit}
     >
-      <label className="relative hidden md:flex justify-center">
+      <label className=" relative hidden md:flex justify-center">
         <select
-          className={`h-full block text-sm text-nearblue-600 dark:bg-black dark:text-neargray-10 ${
+          className={`${
+            disabled ? '!opacity-100' : ''
+          } h-full block text-sm text-nearblue-600 dark:bg-black dark:text-neargray-10 ${
             homeSearch
               ? 'bg-gray-100 dark:bg-black-500 dark:text-neargray-10'
               : 'bg-blue-900/[0.05] dark:bg-black dark:text-neargray-10'
           }  pl-4 pr-9  cursor-pointer focus:outline-none appearance-none rounded-none rounded-l-lg border dark:border-black-200 dark:text-neargray-10`}
+          disabled={disabled}
           onChange={onFilter}
           value={filter}
         >
@@ -176,7 +175,9 @@ const Search = ({
 
       <Combobox className="flex-grow">
         <ComboboxInput
-          className="search bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none"
+          className={`search ${
+            disabled ? 'opacity-100' : ''
+          } !bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
           disabled={disabled}
           id="searchInput"
           onChange={handleChange}

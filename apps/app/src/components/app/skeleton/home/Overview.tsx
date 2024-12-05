@@ -71,7 +71,7 @@ const HomeOverview = forwardRef(() => {
           <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">
             <div className="flex flex-row justify-between py-5 lg:pb-4 lg:px-0">
               <div className="flex flex-row">
-                <div className="items-center flex justify-left mr-">
+                <div className="items-center flex justify-left mr-3">
                   <Image
                     alt={t ? t('homePage.transactions') : 'transactions'}
                     height={24}
@@ -87,7 +87,7 @@ const HomeOverview = forwardRef(() => {
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t ? t('homePage.transactions') : 'TRANSACTIONS'}
                   </p>
-                  <Skeleton className="h-4 my-1 w-32" />
+                  <Skeleton className="h-4 my-1 sm:w-32" />
                 </div>
               </div>
               <div className="flex flex-col text-right">
