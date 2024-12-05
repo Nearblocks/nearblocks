@@ -20,6 +20,10 @@ if (config.dbCa) {
 const db = new Pool({
   application_name: 'api',
   connectionString: config.dbUrl,
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
   ssl: ssl?.ca ? ssl : false,
 });
 
