@@ -10,10 +10,12 @@ export interface Config {
   dbKey: string;
   dbUrl: string;
   delta: number;
+  endBlockHeight: number;
   fastnearEndpoint?: string;
   genesisFile: string;
   genesisHeight: number;
   genesisTimestamp: string;
+  indexerKey: string;
   insertLimit: number;
   network: Network;
   preloadSize: number;

@@ -3,17 +3,11 @@ import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
-import {
-  ActionReceiptAction,
-  ActionReceiptInputData,
-  ActionReceiptOutputData,
-  Receipt,
-} from 'nb-types';
+import { Receipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
-import { mapActionKind, mapReceiptKind } from '#libs/utils';
+import { mapReceiptKind } from '#libs/utils';
 
 export const storeReceipts = async (
   knex: Knex,
@@ -49,9 +43,6 @@ const storeChunkReceipts = async (
   const txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
 
   const receiptData: Receipt[] = [];
-  const receiptActionsData: ActionReceiptAction[] = [];
-  const receiptInputData: ActionReceiptInputData[] = [];
-  const receiptOutputData: ActionReceiptOutputData[] = [];
 
   receipts.forEach((receipt, receiptIndex) => {
     const receiptOrDataId: string =
@@ -68,62 +59,6 @@ const storeChunkReceipts = async (
 
     if ('Action' in receipt.receipt) {
       publicKey = receipt.receipt.Action.signerPublicKey;
-
-      receipt.receipt.Action.inputDataIds.forEach((dataId) => {
-        receiptInputData.push(
-          getActionReceiptInputData(receiptOrDataId, dataId),
-        );
-      });
-      receipt.receipt.Action.outputDataReceivers.forEach((receiver) => {
-        receiptOutputData.push(
-          getActionReceiptOutputData(receiptOrDataId, receiver),
-        );
-      });
-
-      let actionIndex = 0;
-      receipt.receipt.Action.actions.forEach((action) => {
-        if (isDelegateAction(action)) {
-          receiptActionsData.push(
-            getActionReceiptActionData(
-              blockTimestamp,
-              receiptOrDataId,
-              actionIndex,
-              action,
-              receipt.predecessorId,
-              receipt.receiverId,
-            ),
-          );
-          actionIndex += 1;
-
-          action.Delegate.delegateAction.actions.forEach((action) => {
-            receiptActionsData.push(
-              getActionReceiptActionData(
-                blockTimestamp,
-                receiptOrDataId,
-                actionIndex,
-                action,
-                receipt.predecessorId,
-                receipt.receiverId,
-              ),
-            );
-            actionIndex += 1;
-          });
-
-          return;
-        }
-
-        receiptActionsData.push(
-          getActionReceiptActionData(
-            blockTimestamp,
-            receiptOrDataId,
-            actionIndex,
-            action,
-            receipt.predecessorId,
-            receipt.receiverId,
-          ),
-        );
-        actionIndex += 1;
-      });
     }
 
     receiptData.push(
@@ -147,40 +82,7 @@ const storeChunkReceipts = async (
         await knex('receipts')
           .insert(receiptData)
           .onConflict(['receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptActionsData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_actions')
-          .insert(receiptActionsData)
-          .onConflict(['receipt_id', 'index_in_action_receipt'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptInputData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_input_data')
-          .insert(receiptInputData)
-          .onConflict(['input_data_id', 'input_to_receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptOutputData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_output_data')
-          .insert(receiptOutputData)
-          .onConflict(['output_data_id', 'output_from_receipt_id'])
-          .ignore();
+          .merge(['public_key']);
       }),
     );
   }
@@ -328,43 +230,4 @@ const getReceiptData = (
   receipt_id: receipt.receiptId,
   receipt_kind: mapReceiptKind(receipt.receipt),
   receiver_account_id: receipt.receiverId,
-});
-
-const getActionReceiptActionData = (
-  blockTimestamp: string,
-  receiptId: string,
-  actionIndex: number,
-  action: types.Action,
-  predecessorId: string,
-  receiverId: string,
-): ActionReceiptAction => {
-  const { args, kind, rlpHash } = mapActionKind(action);
-
-  return {
-    action_kind: kind,
-    args,
-    index_in_action_receipt: actionIndex,
-    nep518_rlp_hash: rlpHash,
-    receipt_id: receiptId,
-    receipt_included_in_block_timestamp: blockTimestamp,
-    receipt_predecessor_account_id: predecessorId,
-    receipt_receiver_account_id: receiverId,
-  };
-};
-
-const getActionReceiptInputData = (
-  receiptId: string,
-  dataId: string,
-): ActionReceiptInputData => ({
-  input_data_id: dataId,
-  input_to_receipt_id: receiptId,
-});
-
-const getActionReceiptOutputData = (
-  receiptId: string,
-  dataReceiver: types.DataReceiver,
-): ActionReceiptOutputData => ({
-  output_data_id: dataReceiver.dataId,
-  output_from_receipt_id: receiptId,
-  receiver_account_id: dataReceiver.receiverId,
 });
