@@ -1,98 +1,62 @@
-import { stream, types } from 'nb-lake';
+import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
-import { streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncRefFinance } from '#services/contracts/v2.ref-finance.near';
-import { DataSource } from '#types/enum';
 
-const fetchBlocks = async (block: number, limit: number) => {
-  try {
-    const blocks = await knex('blocks')
-      .select('block_height')
-      .where('block_height', '>=', block)
-      .orderBy('block_height', 'asc')
-      .limit(limit);
-
-    return blocks.map((block) => block.block_height);
-  } catch (error) {
-    logger.error(error);
-    sentry.captureException(error);
-    return [];
-  }
-};
-
-const dexKey = 'dex';
-const lakeConfig: types.LakeConfig = {
-  blocksPreloadPoolSize: config.preloadSize,
-  fetchBlocks,
-  s3BucketName: config.s3BucketName,
-  s3RegionName: config.s3RegionName,
-  startBlockHeight: config.startBlockHeight,
-};
-
-if (config.s3Endpoint) {
-  lakeConfig.s3ForcePathStyle = true;
-  lakeConfig.s3Endpoint = config.s3Endpoint;
-}
+const indexerKey = 'dex';
 
 export const syncData = async () => {
-  const settings = await knex('settings').where({ key: dexKey }).first();
+  const settings = await dbRead('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
   let startBlockHeight = config.startBlockHeight;
 
-  if (latestBlock) {
-    const next = +latestBlock - config.delta;
-
-    if (next > startBlockHeight) {
-      logger.info(`last synced block: ${latestBlock}`);
-      logger.info(`syncing from block: ${next}`);
-      startBlockHeight = next;
-      lakeConfig.startBlockHeight = next;
-    }
+  if (!startBlockHeight && latestBlock) {
+    startBlockHeight = +latestBlock + 1;
   }
 
-  if (config.dataSource === DataSource.FAST_NEAR) {
-    const stream = streamBlock({
-      limit: config.preloadSize,
-      network: config.network,
-      start: startBlockHeight,
-      url: config.fastnearEndpoint,
-    });
+  logger.info(`syncing from block: ${startBlockHeight}`);
 
-    for await (const message of stream) {
-      await onMessage(message);
-    }
+  const stream = streamBlock({
+    dbConfig: streamConfig,
+    start: startBlockHeight,
+  });
 
-    stream.on('end', () => {
-      logger.error('stream ended');
-      process.exit();
-    });
-    stream.on('error', (error: Error) => {
-      logger.error(error);
-      process.exit();
-    });
-  } else {
-    for await (const message of stream(lakeConfig)) {
-      await onMessage(message);
-    }
+  for await (const message of stream) {
+    await onMessage(message);
   }
+
+  stream.on('end', () => {
+    logger.error('stream ended');
+    process.exit();
+  });
+  stream.on('error', (error: Error) => {
+    logger.error(error);
+    process.exit();
+  });
 };
 
-export const onMessage = async (message: types.StreamerMessage) => {
+export const onMessage = async (message: Message) => {
   try {
-    if (message.block.header.height % 1000 === 0) {
+    if (message.block.header.height % 100 === 0) {
       logger.info(`syncing block: ${message.block.header.height}`);
     }
 
+    const start = performance.now();
+
     await syncRefFinance(message);
 
-    if (message.block.header.height % 100 === 0) {
-      await knex('settings')
+    logger.info({
+      block: message.block.header.height,
+      time: `${performance.now() - start} ms`,
+    });
+
+    if (message.block.header.height % 10 === 0) {
+      await dbWrite('settings')
         .insert({
-          key: dexKey,
+          key: indexerKey,
           value: { sync: message.block.header.height },
         })
         .onConflict('key')

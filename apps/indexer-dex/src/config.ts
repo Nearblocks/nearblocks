@@ -1,9 +1,7 @@
-import { cleanEnv, str, url } from 'envalid';
+import { cleanEnv, num, str } from 'envalid';
 
-import { types } from 'nb-lake';
 import { Network } from 'nb-types';
 
-import { DataSource } from '#types/enum';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
@@ -11,50 +9,22 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  DEX_DATA_SOURCE: str({
-    choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
-    default: DataSource.NEAR_LAKE,
-  }),
-  FASTNEAR_ENDPOINT: str({ default: undefined }),
+  DATABASE_URL_READ: str({ default: '' }),
+  DEX_START_BLOCK: num({ default: 45_753_330 }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  S3_ENDPOINT: url({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 
-const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
-let s3Endpoint: null | types.EndpointConfig = null;
-const s3BucketName =
-  env.NETWORK === Network.MAINNET
-    ? 'near-lake-data-mainnet'
-    : 'near-lake-data-testnet';
-
-if (env.S3_ENDPOINT) {
-  const endpoint = new URL(env.S3_ENDPOINT);
-  s3Endpoint = {
-    hostname: endpoint.hostname,
-    path: endpoint.pathname,
-    port: +endpoint.port || 80,
-    protocol: endpoint.protocol,
-  };
-}
-
 const config: Config = {
-  dataSource: env.DEX_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  delta: 500,
-  fastnearEndpoint: env.FASTNEAR_ENDPOINT,
-  genesisHeight,
+  dbUrlRead: env.DATABASE_URL_READ,
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
-  preloadSize: 50,
-  s3BucketName,
-  s3Endpoint,
-  s3RegionName: 'eu-central-1',
   sentryDsn: env.SENTRY_DSN,
   STABLE_TOKENS: [
     'usdt.tether-token.near', // USDt
@@ -64,7 +34,7 @@ const config: Config = {
     '6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near', // DAI
     // '853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near', // FRAX
   ],
-  startBlockHeight: 45_753_330,
+  startBlockHeight: env.DEX_START_BLOCK,
 };
 
 export default config;
