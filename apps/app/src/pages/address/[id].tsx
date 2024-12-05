@@ -6,7 +6,7 @@ import Head from 'next/head';
 import { ReactElement, useEffect, useState } from 'react';
 import { env } from 'next-runtime-env';
 import Skeleton from '@/components/skeleton/common/Skeleton';
-import SponserdText from '@/components/SponserdText';
+// import SponserdText from '@/components/SponserdText';
 import Balance from '@/components/Address/Balance';
 import Buttons from '@/components/Address/Buttons';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
@@ -577,9 +577,9 @@ const Address = ({
             </div>
           )}
           <div className="container mx-auto pl-2 pb-6 text-nearblue-600">
-            <div className="min-h-[80px] md:min-h-[25px]">
+            {/* <div className="min-h-[80px] md:min-h-[25px]">
               <SponserdText />
-            </div>
+            </div> */}
           </div>
         </div>
         <Balance
