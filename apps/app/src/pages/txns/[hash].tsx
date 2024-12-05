@@ -13,7 +13,7 @@ import {
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { useAuthStore } from '@/stores/auth';
-import SponserdText from '@/components/SponserdText';
+// import SponserdText from '@/components/SponserdText';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FileSlash from '@/components/Icons/FileSlash';
 import Details from '@/components/Transactions/Details';
@@ -336,9 +336,9 @@ const Txn = ({
         </div>
       </div>
       <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
-        <div className="min-h-[44px] md:min-h-[25px]">
+        {/* <div className="min-h-[44px] md:min-h-[25px]">
           <SponserdText />
-        </div>
+        </div> */}
       </div>
       <div className="relative container mx-auto px-3">
         {/* <RpcMenu /> */}

@@ -5,8 +5,8 @@ import useTranslation from 'next-translate/useTranslation';
 import React, { ReactElement, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { env } from 'next-runtime-env';
-import Banner from '@/components/Banner';
-import SponserdText from '@/components/SponserdText';
+// import Banner from '@/components/Banner';
+// import SponserdText from '@/components/SponserdText';
 import LatestBlocks from '@/components/Blocks/Latest';
 import Search, { redirect, SearchToast } from '@/components/common/Search';
 import fetcher from '@/utils/fetcher';
@@ -146,12 +146,12 @@ const HomePage = ({
                   <Search />
                 </div>
                 <div className="text-white"></div>
-                <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
+                {/* <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
                   <SponserdText />
-                </div>
+                </div> */}
               </div>
               <div className="lg:!flex hidden w-2/5 justify-center">
-                <Banner type="right" />
+                {/* <Banner type="right" /> */}
               </div>
             </div>
           </div>
@@ -160,9 +160,9 @@ const HomePage = ({
           <Overview stats={stats} chartsDetails={charts} error={error} />
         </div>
         <div className="py-8">
-          <div className="lg:!hidden block container mx-auto px-3">
+          {/* <div className="lg:!hidden block container mx-auto px-3">
             <Banner type="center" />
-          </div>
+          </div> */}
         </div>
         <section>
           <div className="container mx-auto px-3  z-10">
