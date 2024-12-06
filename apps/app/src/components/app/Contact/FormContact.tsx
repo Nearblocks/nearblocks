@@ -7,9 +7,9 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import LoadingCircular from '@/components/common/LoadingCircular';
 import { useConfig } from '@/hooks/app/useConfig';
 
+import LoadingCircular from '../common/LoadingCircular';
 import ArrowDown from '../Icons/ArrowDown';
 
 interface Props {

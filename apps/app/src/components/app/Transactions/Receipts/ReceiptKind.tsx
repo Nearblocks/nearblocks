@@ -1,10 +1,10 @@
 import { useTranslations } from 'next-intl';
 
-import FaTimesCircle from '@/components/Icons/FaTimesCircle';
-import { hexy } from '@/utils/hexy';
+import { hexy } from '@/utils/app/hexy';
 import { yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
 
+import FaTimesCircle from '../../Icons/FaTimesCircle';
 import RlpTransaction from './RlpTransaction';
 
 const backgroundColorClasses: Record<string, string> = {

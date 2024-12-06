@@ -2,14 +2,14 @@
 import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
-import Question from '@/components/Icons/Question';
 import { Link } from '@/i18n/routing';
 import { verifierConfig } from '@/utils/app/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 
+import ErrorMessage from '../../common/ErrorMessage';
+import FaInbox from '../../Icons/FaInbox';
+import Question from '../../Icons/Question';
 import VerificationStatus from './VerificationStatus';
 import VerifiedData from './VerifiedData';
 

@@ -1,13 +1,13 @@
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
-import FaRight from '@/components/Icons/FaRight';
-import { useActionContext } from '@/components/Transactions/Action/ActionContext';
 import { Link } from '@/i18n/routing';
 import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 
 import AddressLink from '../../common/AddressLink';
+import FaRight from '../../Icons/FaRight';
+import { useActionContext } from './ActionContext';
 
 const AddKey = (props: TransactionActionInfo) => {
   const params = useParams();

@@ -1,7 +1,7 @@
 import { useParams } from 'next/navigation';
 
-import TokenInfo from '@/components/common/TokenInfo';
-import FaRight from '@/components/Icons/FaRight';
+import TokenInfo from '@/components/app/common/TokenInfo';
+import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { EventPropsInfo } from '@/utils/types';
 

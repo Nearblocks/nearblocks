@@ -21,7 +21,7 @@ const getOptions = (status: boolean) => {
       return {
         bg: 'bg-red-50 dark:bg-black',
         icon: FaTimesCircle,
-        label: 'Failure',
+        label: 'Fail',
         text: 'text-red-500',
       };
 
@@ -36,19 +36,20 @@ const getOptions = (status: boolean) => {
 };
 
 const TxnStatus = (props: Props) => {
-  const option = getOptions(props.status);
-  const Icon = option.icon;
+  const option = getOptions(props?.status);
+  const Icon = option?.icon;
 
   return (
-    <div className="w-full md:w-3/4 break-words">
+    <div className="w-full md:w-3/4 break-words inline-flex items-center">
       <span
-        className={`inline-flex items-center text-xs rounded py-1 ${
-          option.bg
-        } ${option.text} ${props.showLabel ? ' px-2' : ' px-1'}`}
+        className={`inline-flex items-center text-xs rounded py-1 ${option?.bg} ${option?.text} ${
+          props?.showLabel ? ' px-2' : ' px-1'
+        }`}
       >
         <Icon />
-        {props.showLabel && <span className="ml-2">{option.label}</span>}
+        {props?.showLabel && <span className="ml-2">{option?.label}</span>}
       </span>
+      {props?.showReceipt ? props?.showReceipt : null}
     </div>
   );
 };

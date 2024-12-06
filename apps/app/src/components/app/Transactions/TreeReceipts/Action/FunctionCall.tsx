@@ -1,8 +1,8 @@
 import { useTranslations } from 'next-intl';
 
-import FaCode from '@/components/Icons/FaCode';
+import FaCode from '@/components/app/Icons/FaCode';
 import { Link } from '@/i18n/routing';
-import { hexy } from '@/utils/hexy';
+import { hexy } from '@/utils/app/hexy';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 

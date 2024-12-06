@@ -2,12 +2,13 @@
 import Big from 'big.js';
 import { useEffect, useState } from 'react';
 
-import FaAddressBook from '@/components/Icons/FaAddressBook';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat } from '@/utils/libs';
 import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
+
+import FaAddressBook from '../../Icons/FaAddressBook';
+import Skeleton from '../../skeleton/common/Skeleton';
 
 interface Props {
   id: string;

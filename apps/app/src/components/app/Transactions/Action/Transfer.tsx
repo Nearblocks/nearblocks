@@ -1,11 +1,12 @@
 import { useParams } from 'next/navigation';
 
 import AddressLink from '@/components/app/common/AddressLink';
-import FaRight from '@/components/Icons/FaRight';
-import { useActionContext } from '@/components/Transactions/Action/ActionContext';
 import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
+
+import FaRight from '../../Icons/FaRight';
+import { useActionContext } from './ActionContext';
 
 const Transfer = (props: ActionPropsInfo) => {
   const params = useParams();

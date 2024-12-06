@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import FaArrowAltCircleRight from '@/components/Icons/FaArrowAltCircleRight';
+import FaArrowAltCircleRight from '@/components/app/Icons/FaArrowAltCircleRight';
 import { Link } from '@/i18n/routing';
 import { shortenAddress, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';

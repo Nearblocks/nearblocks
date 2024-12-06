@@ -2,14 +2,15 @@
 import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
-import Links from '@/components/common/Links';
-import TokenImage from '@/components/common/TokenImage';
-import WarningIcon from '@/components/Icons/WarningIcon';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useFetch } from '@/hooks/useFetch';
+import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { SpamToken, Token } from '@/utils/types';
+
+import Links from '../../common/Links';
+import TokenImage from '../../common/TokenImage';
+import WarningIcon from '../../Icons/WarningIcon';
+import Skeleton from '../../skeleton/common/Skeleton';
 
 interface Props {
   holders: string;

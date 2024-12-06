@@ -2,9 +2,6 @@
 import { Tooltip } from '@reach/tooltip';
 import { useSearchParams } from 'next/navigation';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
@@ -15,7 +12,10 @@ import {
 } from '@/utils/libs';
 import { HoldersPropsInfo, Token } from '@/utils/types';
 
+import ErrorMessage from '../../common/ErrorMessage';
 import Table from '../../common/Table';
+import FaInbox from '../../Icons/FaInbox';
+import Skeleton from '../../skeleton/common/Skeleton';
 
 interface Props {
   count: number;

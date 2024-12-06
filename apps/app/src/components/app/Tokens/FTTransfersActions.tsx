@@ -4,12 +4,6 @@ import Big from 'big.js';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TxnStatus from '@/components/common/Status';
-import TokenImage from '@/components/common/TokenImage';
-import Clock from '@/components/Icons/Clock';
-import FaInbox from '@/components/Icons/FaInbox';
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import {
@@ -22,7 +16,13 @@ import { tokenAmount } from '@/utils/near';
 import { TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
+import ErrorMessage from '../common/ErrorMessage';
+import TxnStatus from '../common/Status';
 import Table from '../common/Table';
+import TokenImage from '../common/TokenImage';
+import Clock from '../Icons/Clock';
+import FaInbox from '../Icons/FaInbox';
+import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 
 interface ListProps {
   data: {

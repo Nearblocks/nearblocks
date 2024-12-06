@@ -2,8 +2,6 @@ import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import { Fragment } from 'react';
 
-import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { convertToMetricPrefix, fiatValue, yoctoToNear } from '@/utils/libs';
@@ -13,6 +11,9 @@ import {
   ReceiptsPropsInfo,
   TransactionInfo,
 } from '@/utils/types';
+
+import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
+import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 
 interface Props {
   borderFlag?: boolean;

@@ -12,9 +12,10 @@ import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import withAuth from '@/components/app/stores/withAuth';
-import CopyIcon from '@/components/Icons/CopyIcon';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
+
+import CopyIcon from '../Icons/CopyIcon';
 
 interface ApiKey {
   created_at: string;

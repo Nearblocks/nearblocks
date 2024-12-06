@@ -1,10 +1,10 @@
 import { Tooltip } from '@reach/tooltip';
 import { Fragment } from 'react';
 
-import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import { Link } from '@/i18n/routing';
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
 
+import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
 import TreeNode from './TreeNode';
 import TreeTxnsActions from './TreeTxnsActions';
 

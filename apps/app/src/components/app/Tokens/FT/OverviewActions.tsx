@@ -5,13 +5,7 @@ import Image from 'next/legacy/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import Links from '@/components/common/Links';
-import TokenImage from '@/components/common/TokenImage';
-import ListCheck from '@/components/Icons/ListCheck';
-import Question from '@/components/Icons/Question';
-import WarningIcon from '@/components/Icons/WarningIcon';
-import Skeleton from '@/components/skeleton/common/Skeleton';
-import { useFetch } from '@/hooks/useFetch';
+import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import {
   dollarFormat,
@@ -21,6 +15,13 @@ import {
   nanoToMilli,
 } from '@/utils/libs';
 import { SpamToken, StatusInfo, Token } from '@/utils/types';
+
+import Links from '../../common/Links';
+import TokenImage from '../../common/TokenImage';
+import ListCheck from '../../Icons/ListCheck';
+import Question from '../../Icons/Question';
+import WarningIcon from '../../Icons/WarningIcon';
+import Skeleton from '../../skeleton/common/Skeleton';
 
 interface Props {
   holders: string;

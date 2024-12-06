@@ -6,19 +6,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import LoadingCircular from '@/components/common/LoadingCircular';
-import Arrow from '@/components/Icons/Arrow';
-import FaCheckCircle from '@/components/Icons/FaCheckCircle';
-import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
-import SwitchButton from '@/components/SwitchButton';
 import useAuth, { request } from '@/hooks/app/useAuth';
 import useStorage from '@/hooks/app/useStorage';
 import { docsUrl } from '@/utils/app/config';
 import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
+import LoadingCircular from '../common/LoadingCircular';
 import ConfirmPlan from '../Dashboard/ConfirmPlan';
+import Arrow from '../Icons/Arrow';
+import FaCheckCircle from '../Icons/FaCheckCircle';
+import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import Skeleton from '../skeleton/common/Skeleton';
+import SwitchButton from '../SwitchButton';
 
 const ApiActions = ({
   getContactDetails,
