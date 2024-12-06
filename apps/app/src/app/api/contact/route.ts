@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
 import { NextRequest, NextResponse } from 'next/server';

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { Suspense } from 'react';
 
 import Details from '@/components/app/Blocks/Details';

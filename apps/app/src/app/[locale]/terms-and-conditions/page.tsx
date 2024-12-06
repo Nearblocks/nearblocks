@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 export default async function TermsAndConditions() {
   return (
     <div className="text-base text-neargray-600 dark:text-neargray-10 pt-12 pb-16 px-6 w-full bg-white dark:bg-black-600 lg:mt-8 flex flex-col gap-6 rounded-md">

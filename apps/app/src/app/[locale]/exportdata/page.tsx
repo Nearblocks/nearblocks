@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import Export from '@/components/app/Export';
 
 export default async function NftTokenExportData(props: {
