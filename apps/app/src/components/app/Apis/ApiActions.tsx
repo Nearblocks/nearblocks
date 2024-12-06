@@ -215,17 +215,16 @@ const ApiActions = ({
                 <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
               </span>
             </Link>
-            <Link href={docsUrl} legacyBehavior>
-              <a
-                className="flex text-sm text-green-400 dark:text-green-250 cursor-pointer mx-4 font-medium"
-                rel="noreferrer nofollow noopener"
-                target="_blank"
-              >
-                API Documentation
-                <span>
-                  <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
-                </span>
-              </a>
+            <Link
+              className="flex text-sm text-green-400 dark:text-green-250 cursor-pointer mx-4 font-medium"
+              href={docsUrl}
+              rel="noreferrer nofollow noopener"
+              target="_blank"
+            >
+              API Documentation
+              <span>
+                <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
+              </span>
             </Link>
           </div>
         </div>
@@ -449,7 +448,7 @@ const ApiActions = ({
             </div>
           </div>
           <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
-            <Link href="/contact?subject=apis" legacyBehavior type="button">
+            <Link href="/contact?subject=apis" type="button">
               <span className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10">
                 Contact Us <Arrow className="text-black-600" />
               </span>
@@ -519,7 +518,7 @@ const ApiActions = ({
           <p className="text-xl text-black dark:text-neargray-10 text-center mx-4 my-6">
             Detailed documentation to get started.{' '}
           </p>
-          <Link href={docsUrl} legacyBehavior>
+          <Link href={docsUrl}>
             <button className="text-sm text-white font-thin px-8 mx-2 py-3 dark:bg-green-250 bg-green-500 rounded w-fit">
               View API Documentation
             </button>

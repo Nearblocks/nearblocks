@@ -1,9 +1,9 @@
-import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
+import Tooltip from '@/components/common/Tooltip';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/app/useRpc';
@@ -213,8 +213,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
             <div className="">
               <h2 className="flex items-center text-sm font-medium">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={'Logs included in the receipt'}
+                  className={'w-36 left-20 max-w-[200px]'}
+                  tooltip={'Logs included in the receipt'}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -242,8 +242,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
             <div className="mt-4">
               <h2 className="flex items-center text-sm font-medium">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  label={'The result of the receipt execution'}
+                  className={'w-40 left-[5.5rem] max-w-[200px]'}
+                  tooltip={'The result of the receipt execution'}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -260,13 +260,13 @@ const ReceiptInfo = ({ receipt }: Props) => {
           value={hashes[1]}
         >
           <div className="overflow-x-auto">
-            <table className="my-4 mx-6 whitespace-nowrap table-auto">
+            <table className="my-4 mx-6 table-auto">
               <tbody>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Unique identifier (hash) of this receipt.'}
+                      className={'w-96 left-25 max-w-[200px]'}
+                      tooltip={'Unique identifier (hash) of this receipt.'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -279,8 +279,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={t('txnDetails.status.tooltip')}
+                      className={'w-96 left-25 max-w-[200px]'}
+                      tooltip={t('txnDetails.status.tooltip')}
                     >
                       <div>
                         <div>
@@ -303,8 +303,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     }`}
                   >
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Block height'}
+                      className={'w-24 left-14 max-w-[200px]'}
+                      tooltip={'Block height'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -328,8 +328,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'The account which issued the receipt'}
+                      className={'w-96 left-25 max-w-[200px]'}
+                      tooltip={'The account which issued the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -349,8 +349,8 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'The destination account of the receipt'}
+                      className={'w-96 left-25 max-w-[200px]'}
+                      tooltip={'The destination account of the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -370,14 +370,16 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Maximum amount of gas allocated for the Receipt'}
+                      className={'w-40 left-[5.5rem] max-w-[200px]'}
+                      tooltip={
+                        'Maximum amount of gas allocated for the Receipt'
+                      }
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    Gas Limit
+                    <span className="whitespace-nowrap">Gas Limit</span>
                   </td>
                   <td className="py-2 pl-4">{`${
                     !loading &&
@@ -388,14 +390,14 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Fees Pre-charged on Receipt'}
+                      className={'w-44 left-24 max-w-[200px]'}
+                      tooltip={'Fees Pre-charged on Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    Pre-charged Fee
+                    <span className="whitespace-nowrap">Pre-charged Fee</span>
                   </td>
                   <td className="py-2 pl-4">{`${
                     !loading &&
@@ -406,14 +408,14 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Burnt Gas by Receipt'}
+                      className={'w-36 left-20 max-w-[200px]'}
+                      tooltip={'Burnt Gas by Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    Burnt Gas
+                    <span className="whitespace-nowrap">Burnt Gas</span>
                   </td>
                   <td className="text-xs py-2 pl-4">
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
@@ -429,14 +431,14 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Burnt Tokens by Receipt'}
+                      className={'w-40 left-[5.5rem] max-w-[200px]'}
+                      tooltip={'Burnt Tokens by Receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    Burnt Tokens
+                    <span className="whitespace-nowrap">Burnt Tokens</span>
                   </td>
                   <td className="text-xs py-2 pl-4">
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
@@ -451,8 +453,9 @@ const ReceiptInfo = ({ receipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={'Refund from the receipt'}
+                      className={'w-40 left-[5.5rem] max-w-[200px]'}
+                      position="top"
+                      tooltip={'Refund from the receipt'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />

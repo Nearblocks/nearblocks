@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 import React, { useEffect, useState } from 'react';
@@ -12,6 +11,7 @@ import UserLayout from '@/components/app/Layouts/UserLayout';
 import SubscriptionStats from '@/components/app/Publisher/SubscriptionStats';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import withAuth from '@/components/app/stores/withAuth';
+import Tooltip from '@/components/common/Tooltip';
 import useAuth from '@/hooks/app/useAuth';
 import { dollarFormat } from '@/utils/app/libs';
 
@@ -152,8 +152,9 @@ const AdSubscription = ({ role }: { role?: string }) => {
                       <tr className="hover:bg-blue-900/5" key={key.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 overflow-hidden text-ellipsis">
                           <Tooltip
-                            className="absolute h-auto max-w-xs bg-black dark:bg-black-200 dark:text-neargray-10 bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                            label={key?.user_email}
+                            className={'left-1/2 max-w-[200px]'}
+                            position="top"
+                            tooltip={key?.user_email}
                           >
                             <span>{key?.user_email}</span>
                           </Tooltip>

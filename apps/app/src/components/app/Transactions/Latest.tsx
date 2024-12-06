@@ -1,10 +1,10 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
+import Tooltip from '@/components/common/Tooltip';
 import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
@@ -137,8 +137,9 @@ const LatestTransactions = ({ error, txns }: Props) => {
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                        label={'Deposit value'}
+                        className={'top-4 sm:whitespace-nowrap max-w-[200px]'}
+                        position="left"
+                        tooltip={'Deposit value'}
                       >
                         <span className="u-label--badge-in  text-nearblue-700 truncate">
                           {txn?.actions_agg?.deposit

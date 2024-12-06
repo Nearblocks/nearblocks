@@ -1,8 +1,8 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useSearchParams } from 'next/navigation';
 
 import ErrorMessage from '@/components/common/ErrorMessage';
+import Tooltip from '@/components/common/Tooltip';
 import FaInbox from '@/components/Icons/FaInbox';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link } from '@/i18n/routing';
@@ -53,8 +53,9 @@ const Holders = ({ count, error, holder, status, tab, token }: Props) => {
       cell: (row: HoldersPropsInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row.account}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row.account}
           >
             <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
               <Link

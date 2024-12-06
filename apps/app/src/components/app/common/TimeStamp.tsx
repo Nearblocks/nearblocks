@@ -1,5 +1,4 @@
-import { Tooltip } from '@reach/tooltip';
-
+import Tooltip from '@/components/common/Tooltip';
 import { nanoToMilli } from '@/utils/app/libs';
 
 import dayjs from '../../../utils/dayjs';
@@ -7,8 +6,9 @@ import dayjs from '../../../utils/dayjs';
 const TimeStamp = ({ showAge = true, timestamp }: any) => {
   return (
     <Tooltip
-      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-      label={
+      className="left-1/2 whitespace-nowrap max-w-[200px]"
+      position="top"
+      tooltip={
         !showAge
           ? dayjs().to(dayjs(nanoToMilli(timestamp || 0)))
           : dayjs.utc(nanoToMilli(timestamp || 0)).format('YYYY-MM-DD HH:mm:ss')

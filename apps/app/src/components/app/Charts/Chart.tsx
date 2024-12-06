@@ -1,10 +1,10 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 import { useEffect, useMemo, useState } from 'react';
 
+import Tooltip from '@/components/common/Tooltip';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
@@ -503,7 +503,7 @@ const Chart = (props: Props) => {
             className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden mb-10"
             style={{ height: 580 }}
           >
-            <div className="border-b dark:border-black-200 flex justify-between items-center text-center">
+            <div className="border-b dark:border-black-200 flex justify-between items-center">
               {chartData?.length > 0 ? (
                 <>
                   <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
@@ -511,8 +511,9 @@ const Chart = (props: Props) => {
                   </p>
                   <div className="flex items-center text-nearblue-600 dark:text-neargray-10">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                      label="Toggle between Log View and Normal View. Log View uses logarithmic scale."
+                      className={'left-1/2 max-w-[200px] w-40'}
+                      position="bottom"
+                      tooltip="Toggle between Log View and Normal View. Log View uses logarithmic scale."
                     >
                       <span>
                         <Question className="w-4 h-4 fill-current mr-2" />

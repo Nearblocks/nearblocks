@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 import React, { useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ import FaDownload from '@/components/app/Icons/FaDownload';
 import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import Tooltip from '@/components/common/Tooltip';
 import useAuth from '@/hooks/app/useAuth';
 import { centsToDollar } from '@/utils/app/libs';
 
@@ -189,8 +189,9 @@ const Invoice = ({ role }: { role?: string }) => {
                         {invoice.number}
                         {role === 'publisher' && (
                           <Tooltip
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                            label={invoice?.customer_email}
+                            className={'left-1/2 max-w-[200px]'}
+                            position="top"
+                            tooltip={invoice?.customer_email}
                           >
                             <div className="w-20">
                               <p className="truncate text-ellipsis overflow-hidden">
