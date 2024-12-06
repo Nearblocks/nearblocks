@@ -197,7 +197,7 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_tracking_datas (
+      campaign_ad_metrics (
         INTERVAL,
         campaign_ad_id,
         impressions,
@@ -215,7 +215,7 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
     ON CONFLICT (campaign_ad_id, INTERVAL) DO
     UPDATE
     SET
-      impressions = campaign_ad_tracking_datas.impressions + 1
+      impressions = campaign_ad_metrics.impressions + 1
   `;
 
   const transparentPixel = Buffer.from(
@@ -235,7 +235,7 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_tracking_datas (
+      campaign_ad_metrics (
         INTERVAL,
         campaign_ad_id,
         clicks,
@@ -253,7 +253,7 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
     ON CONFLICT (campaign_ad_id, INTERVAL) DO
     UPDATE
     SET
-      clicks = campaign_ad_tracking_datas.clicks + 1
+      clicks = campaign_ad_metrics.clicks + 1
   `;
 
   const adResult = await userSql`
