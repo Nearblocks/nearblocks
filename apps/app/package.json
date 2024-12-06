@@ -8,15 +8,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "yarn pages:build && wrangler pages dev",
-    "deploy": "yarn pages:build && wrangler pages deploy"
+    "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.651.1",
     "@braintree/sanitize-url": "7.0.1",
-    "@marsidev/react-turnstile": "1.0.2",
+    "@marsidev/react-turnstile": "v1.1.0",
     "@near-js/providers": "^1.0.1",
     "@near-wallet-selector/bitget-wallet": "8.9.13",
     "@near-wallet-selector/bitte-wallet": "8.9.13",
@@ -42,8 +39,13 @@
     "@near-wallet-selector/welldone-wallet": "8.9.13",
     "@near-wallet-selector/xdefi": "8.9.13",
     "@opentelemetry/api-logs": "^0.54.2",
+    "@opentelemetry/auto-instrumentations-node": "^0.54.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.56.0",
     "@opentelemetry/instrumentation": "^0.54.2",
+    "@opentelemetry/resources": "^1.29.0",
     "@opentelemetry/sdk-logs": "^0.54.2",
+    "@opentelemetry/sdk-node": "^0.56.0",
+    "@opentelemetry/semantic-conventions": "^1.28.0",
     "@reach/accordion": "^0.18.0",
     "@reach/combobox": "^0.18.0",
     "@reach/dialog": "^0.18.0",
@@ -98,7 +100,6 @@
     }
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.5",
     "@types/big.js": "~6.2.2",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "~4.17.7",
@@ -110,14 +111,12 @@
     "autoprefixer": "~10.4",
     "encoding": "^0.1.13",
     "eslint-config-custom-nextjs": "*",
-    "eslint-plugin-next-on-pages": "^1.13.5",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "pino-pretty": "^11.3.0",
     "postcss": "~8.4",
     "tailwindcss": "~3.3",
-    "typescript": "~5.2",
-    "vercel": "^37.14.0"
+    "typescript": "~5.2"
   },
   "engines": {
     "node": "^18.18 || >=20"

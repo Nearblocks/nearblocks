@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import QueryString from 'qs';
 
 import List from '@/components/app/Tokens/FTList';

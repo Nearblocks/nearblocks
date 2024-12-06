@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';

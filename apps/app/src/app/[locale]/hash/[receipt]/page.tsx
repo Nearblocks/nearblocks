@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { notFound, redirect } from 'next/navigation';
 
 import { getRequest } from '@/utils/app/api';

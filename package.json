@@ -16,9 +16,6 @@
     "format:check": "prettier --config .prettierrc --check --ignore-unknown './**/*'",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "wrangler": "^3.86.0"
-  },
   "devDependencies": {
     "eslint-config-custom-nextjs": "*",
     "eslint-config-custom-node": "*",

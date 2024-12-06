@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import ApiActions from '@/components/app/Apis/ApiActions';
 import { getRequest, postRequest } from '@/utils/app/api';
 import { userApiURL } from '@/utils/app/config';
