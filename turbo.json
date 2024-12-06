@@ -32,7 +32,8 @@
         "NEXT_RUNTIME",
         "CI",
         "NEXT_PUBLIC_REOWN_PROJECT_ID",
-        "BASELIME_API_KEY"
+        "OTEL_EXPORTER_OTLP_ENDPOINT",
+        "OTEL_EXPORTER_OTLP_HEADERS"
       ]
     },
     "pages:build": {
