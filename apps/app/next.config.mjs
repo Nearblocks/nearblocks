@@ -1,12 +1,20 @@
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpackMemoryOptimizations: true,
+  reactStrictMode: true,
+  poweredByHeader: false,
+  optimizeFonts: false,
+  output: 'standalone',
   experimental: {
-    webpackMemoryOptimizations: true,
+    outputFileTracingRoot: path.join(__dirname, '../../'),
+  },
+  webpack: (config, options) => {
+    config.experiments.asyncWebAssembly = true;
+    return config;
   },
   async redirects() {
     return [
@@ -33,9 +41,5 @@ const nextConfig = {
     ];
   },
 };
-
-if (process.env.NODE_ENV === 'development') {
-  await setupDevPlatform();
-}
 
 export default withNextIntl(nextConfig);

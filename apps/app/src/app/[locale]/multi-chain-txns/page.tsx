@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
 import Stats from '@/components/app/ChainAbstraction/Stats';
 import { getRequest } from '@/utils/app/api';

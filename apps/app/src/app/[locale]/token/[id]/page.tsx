@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { Suspense } from 'react';
 
 import TokenTabSkeleton from '@/components/app/skeleton/ft/TokenTabSkeleton';

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { Metadata } from 'next';
 
 import EmailUpdate from '@/components/app/EmailUpdate';

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
 import { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import { Suspense } from 'react';
 
 import NFTTokenTabSkeletion from '@/components/app/skeleton/nft/NFTTokenTab';

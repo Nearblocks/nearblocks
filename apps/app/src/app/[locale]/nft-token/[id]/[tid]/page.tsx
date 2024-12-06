@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import QueryString from 'qs';
 
 import NFTDetails from '@/components/app/Tokens/NFT/NFTDetails';
