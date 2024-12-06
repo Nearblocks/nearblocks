@@ -41,6 +41,7 @@
     "@opentelemetry/api-logs": "^0.54.2",
     "@opentelemetry/instrumentation": "^0.54.2",
     "@opentelemetry/sdk-logs": "^0.54.2",
+    "@radix-ui/react-popover": "^1.1.2",
     "@reach/accordion": "^0.18.0",
     "@reach/combobox": "^0.18.0",
     "@reach/dialog": "^0.18.0",

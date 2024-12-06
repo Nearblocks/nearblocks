@@ -1,10 +1,10 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 import { useEffect, useMemo, useState } from 'react';
 
+import Tooltip from '@/components/common/Tooltip';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import {
@@ -297,8 +297,9 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                     </p>
                     <div className="leading-6 text-nearblue-700">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                        label={'Transactions per second'}
+                        className={'left-1/2 whitespace-nowrap max-w-[200px]'}
+                        position="top"
+                        tooltip={'Transactions per second'}
                       >
                         <div>
                           <Link

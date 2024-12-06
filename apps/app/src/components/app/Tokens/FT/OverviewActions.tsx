@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import Image from 'next/legacy/image';
 import { useState } from 'react';
@@ -7,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import Links from '@/components/common/Links';
 import TokenImage from '@/components/common/TokenImage';
+import Tooltip from '@/components/common/Tooltip';
 import ListCheck from '@/components/Icons/ListCheck';
 import Question from '@/components/Icons/Question';
 import WarningIcon from '@/components/Icons/WarningIcon';
@@ -250,8 +250,9 @@ const OverviewActions = ({
                       </span>
                       <span>
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black  bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                          label="Calculated by multiplying the tokens Total Supply on Near with the current market price per token."
+                          className={'max-w-[200px] -left-14 w-44'}
+                          position="bottom"
+                          tooltip="Calculated by multiplying the tokens Total Supply on Near with the current market price per token."
                         >
                           <span>
                             <Question className="w-4 h-4 fill-current ml-1" />
@@ -269,8 +270,11 @@ const OverviewActions = ({
                         {Number(token?.fully_diluted_market_cap) > 0 &&
                         Number(token?.market_cap) > 0 ? (
                           <Tooltip
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                            label={
+                            className={
+                              'left-1/2 max-w-[200px] whitespace-nowrap'
+                            }
+                            position="bottom"
+                            tooltip={
                               showMarketCap
                                 ? 'Click to switch back'
                                 : 'Click to switch'
@@ -354,8 +358,9 @@ const OverviewActions = ({
                         {holders ? localFormat(holders) : holders ?? ''}
                         {!status?.sync && (
                           <Tooltip
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                            label={
+                            className={'left-28 max-w-[200px] w-40'}
+                            position="top"
+                            tooltip={
                               <span>
                                 Holders count is out of sync. Last synced block
                                 is

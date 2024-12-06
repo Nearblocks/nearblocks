@@ -25,8 +25,8 @@ export const SearchToast = ({ networkId }: any) => {
     return (
       <div>
         No results. Try on{' '}
-        <Link href="https://nearblocks.io" legacyBehavior>
-          <a className="text-green-500">Mainnet</a>
+        <Link className="text-green-500" href="https://nearblocks.io">
+          Mainnet
         </Link>
       </div>
     );
@@ -35,8 +35,8 @@ export const SearchToast = ({ networkId }: any) => {
   return (
     <div>
       No results. Try on{' '}
-      <Link href="https://testnet.nearblocks.io" legacyBehavior>
-        <a className="text-green-500">Testnet</a>
+      <Link className="text-green-500" href="https://testnet.nearblocks.io">
+        Testnet
       </Link>
     </div>
   );

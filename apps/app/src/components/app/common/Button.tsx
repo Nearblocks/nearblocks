@@ -1,13 +1,14 @@
 'use client';
 import { DialogContent, DialogOverlay } from '@reach/dialog';
-import { Tooltip } from '@reach/tooltip';
 import Clipboard from 'clipboard';
 import { useEffect, useRef, useState } from 'react';
 
-import QrCode from '../common/QrCode';
+import Tooltip from '@/components/common/Tooltip';
+
 import CloseCircle from '../Icons/CloseCircle';
 import CopyIcon from '../Icons/CopyIcon';
 import QRCodeIcon from '../Icons/QRCodeIcon';
+import QrCode from './QrCode';
 
 interface Props {
   address: string;
@@ -45,8 +46,9 @@ const Buttons = ({ address }: Props) => {
     <>
       <span className="inline-flex space-x-2 h-7">
         <Tooltip
-          className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          label="Copy account ID to clipboard"
+          className="whitespace-nowrap ml-20 max-w-[200px]"
+          position={'bottom'}
+          tooltip="Copy account ID to clipboard"
         >
           <span className="relative">
             {showTooltip && (
@@ -64,8 +66,9 @@ const Buttons = ({ address }: Props) => {
           </span>
         </Tooltip>
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-          label="Click to view QR Code"
+          className="whitespace-nowrap ml-16 max-w-[200px]"
+          position={'bottom'}
+          tooltip="Click to view QR Code"
         >
           <button
             className="bg-green-500  dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"

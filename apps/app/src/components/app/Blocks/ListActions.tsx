@@ -1,8 +1,9 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
+
 import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 
+import Tooltip from '@/components/common/Tooltip';
 import { Link } from '@/i18n/routing';
 import {
   convertToMetricPrefix,
@@ -72,8 +73,9 @@ const ListActions = ({
       cell: (row: BlocksInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={
               showAge
                 ? row?.block_timestamp
                   ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
@@ -98,8 +100,8 @@ const ListActions = ({
       header: (
         <div>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-6 py-2 break-words"
-            label={
+            className={'whitespace-nowrap max-w-[200px]'}
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

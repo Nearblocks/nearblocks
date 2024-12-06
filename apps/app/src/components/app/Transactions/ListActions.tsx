@@ -1,12 +1,12 @@
 'use client';
-import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { Tooltip } from '@reach/tooltip';
+import * as Popover from '@radix-ui/react-popover';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
+import Tooltip from '@/components/common/Tooltip';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import { isAction, localFormat } from '@/utils/app/libs';
 import { txnMethod } from '@/utils/app/near';
@@ -165,8 +165,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500 dark:text-green-250">
               <Link
@@ -193,9 +194,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={txnMethod(row?.actions, t)}
-            suppressHydrationWarning={true}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={txnMethod(row?.actions, t)}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate" suppressHydrationWarning={true}>
@@ -206,18 +207,27 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton
-            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+        <Popover.Root>
+          <Popover.Trigger
+            asChild
+            className="relative flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
             suppressHydrationWarning={true}
           >
-            {t('type') || 'METHOD'}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
+            <button>
+              {t('type') || 'METHOD'}
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </Popover.Trigger>
+          <Popover.Content
+            align="start"
+            alignOffset={14}
+            avoidCollisions={false}
+            className="bg-white absolute dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-20"
+            sideOffset={3}
+          >
             <form className="flex flex-col" onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200  rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 name="type"
                 onChange={onChange}
                 placeholder="Search by method"
@@ -241,8 +251,8 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </Popover.Content>
+        </Popover.Root>
       ),
       key: 'actions',
       tdClassName:
@@ -291,8 +301,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black  bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.signer_account_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.signer_account_id}
           >
             <span>
               <AddressLink
@@ -310,18 +321,27 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton
+        <Popover.Root>
+          <Popover.Trigger
+            asChild
             className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
             suppressHydrationWarning={true}
           >
-            {t('from') || 'FROM'}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
+            <button>
+              {t('from') || 'FROM'}
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </Popover.Trigger>
+          <Popover.Content
+            align="start"
+            alignOffset={14}
+            avoidCollisions={false}
+            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-20"
+            sideOffset={3}
+          >
             <form onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600  dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600  dark:text-neargray-10 text-xs"
                 name="from"
                 onChange={onChange}
                 placeholder={
@@ -347,8 +367,8 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </Popover.Content>
+        </Popover.Root>
       ),
       key: 'signer_account_id',
       tdClassName:
@@ -368,8 +388,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.receiver_account_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.receiver_account_id}
           >
             <span>
               <AddressLink
@@ -385,18 +406,27 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton
+        <Popover.Root>
+          <Popover.Trigger
+            asChild
             className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
             suppressHydrationWarning={true}
           >
-            {t('to') || 'To'}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-50">
+            <button>
+              {t('to') || 'To'}
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </Popover.Trigger>
+          <Popover.Content
+            align="start"
+            alignOffset={14}
+            avoidCollisions={false}
+            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border rounded-b-lg p-2 z-20"
+            sideOffset={3}
+          >
             <form onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200  rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 name="to"
                 onChange={onChange}
                 placeholder={
@@ -422,8 +452,8 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </Popover.Content>
+        </Popover.Root>
       ),
       key: 'receiver_account_id',
       tdClassName:
@@ -464,8 +494,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'whitespace-nowrap max-w-[200px]'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

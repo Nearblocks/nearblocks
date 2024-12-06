@@ -1,7 +1,7 @@
-import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import { Fragment } from 'react';
 
+import Tooltip from '@/components/common/Tooltip';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import { useConfig } from '@/hooks/app/useConfig';
@@ -75,16 +75,16 @@ const ReceiptSummaryRow = (props: Props) => {
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
             </td>
-            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
+            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={receipt.id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={receipt.id}
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
                   href={`#execution#${receipt.id}`}
                 >
-                  {' '}
                   {receipt.id}
                 </Link>
               </Tooltip>
