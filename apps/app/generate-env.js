@@ -12,7 +12,7 @@ const envVariables = Object.keys(process.env)
 const content = `window.__ENV = ${JSON.stringify(envVariables)};`;
 
 // Write the __ENV.js file inside public folder
-fs.writeFile('apps/app-lite/public/__ENV.js', content, (err) => {
+fs.writeFile('apps/app/public/__ENV.js', content, (err) => {
   if (err) throw err;
   console.log('__ENV.js has been saved with the latest environment variables.');
 });

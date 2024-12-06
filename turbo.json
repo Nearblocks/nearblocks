@@ -31,7 +31,8 @@
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_RUNTIME",
         "CI",
-        "NEXT_PUBLIC_REOWN_PROJECT_ID"
+        "NEXT_PUBLIC_REOWN_PROJECT_ID",
+        "BASELIME_API_KEY"
       ]
     },
     "pages:build": {
