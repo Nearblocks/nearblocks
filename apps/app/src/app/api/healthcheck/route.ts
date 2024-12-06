@@ -1,12 +1,11 @@
-// pages/api/healthcheck.js
+import { NextResponse } from 'next/server';
 
-export default function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  
-  return res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString()
-  });
+export async function GET() {
+  return NextResponse.json(
+    {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+    },
+    { status: 200 },
+  );
 }
