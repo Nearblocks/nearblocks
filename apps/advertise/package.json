@@ -1,0 +1,37 @@
+{
+  "name": "advertise",
+  "version": "1.0.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "nb-tsconfig": "*",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "csv-stringify": "^6.5.2",
+    "dayjs": "^1.11.13",
+    "envalid": "^8.0.0",
+    "express": "^4.21.1",
+    "pg": "^8.13.1",
+    "pino": "^9.5.0",
+    "postgres": "3.4.5",
+    "zod": "^3.23.8"
+  }
+}
