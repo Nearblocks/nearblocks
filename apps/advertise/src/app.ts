@@ -5,7 +5,7 @@ import routes from '#routes/index';
 
 const app = express();
 
-app.use('/v1', routes());
+app.use(routes());
 
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ message: 'Not Found' });

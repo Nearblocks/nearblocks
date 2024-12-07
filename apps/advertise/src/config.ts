@@ -3,7 +3,7 @@ import { cleanEnv, str } from 'envalid';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
-  API_URL: str({ default: 'https://api.exploreblocks.io' }),
+  API_URL: str({ default: 'https://api.exploreblocks.io/api' }),
   AWS_PUBLIC_URL: str(),
   DATABASE_URL: str(),
 });

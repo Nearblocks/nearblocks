@@ -82,8 +82,8 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const desktopUrl = config.awsPublicUrl + '/' + desktopImage;
   const mobileUrl = config.awsPublicUrl + '/' + ad.mobile_image;
 
-  const impressionUrl = `${config.apiUrl}/v1/campaigns/track/impression/${ad.id}`;
-  const clickUrl = `${config.apiUrl}/v1/campaigns/track/click/${ad.id}`;
+  const impressionUrl = `${config.apiUrl}/campaigns/track/impression/${ad.id}`;
+  const clickUrl = `${config.apiUrl}/campaigns/track/click/${ad.id}`;
 
   const adCode = `<a href="${clickUrl}" rel="nofollow">
                           <img class="ad-image rounded-lg" src="${desktopUrl}" alt="Advertisement">
@@ -170,8 +170,8 @@ const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
     return res.status(204).send();
   }
 
-  const clickUrl = `${config.apiUrl}/v1/campaigns/track/click/${ad.id}`;
-  const impressionUrl = `${config.apiUrl}/v1/campaigns/track/impression/${ad.id}`;
+  const clickUrl = `${config.apiUrl}/campaigns/track/click/${ad.id}`;
+  const impressionUrl = `${config.apiUrl}/campaigns/track/impression/${ad.id}`;
   let adCode = `<div class="ad-text-content" style="font-size: 14px;font-family: Manrope, sans-serif; text-align: left;">
                           <p><b>Sponsored: </b>
                           <img src="${impressionUrl}" style="display:none">`;
