@@ -833,14 +833,19 @@ export function parseOutcomeOld(outcome: ParseOutcomeInfo) {
     tokensBurnt: outcome.outcome.tokens_burnt,
   };
 }
-
 export function parseEventLogs(event: TransactionLog): {} | any {
   let parsedEvent: {} | any = {};
 
   try {
-    parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+    const logData = event?.logs?.replace('EVENT_JSON:', '').trim();
+
+    if (logData) {
+      parsedEvent = JSON.parse(logData);
+    } else {
+      console.log('Event logs are empty or invalid JSON format:', event?.logs);
+    }
   } catch (error) {
-    console.error('Failed to parse event logs:', error);
+    console.log('Failed to parse event logs:', error);
   }
 
   return parsedEvent;

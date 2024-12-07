@@ -42,6 +42,7 @@ import {
 } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
+import { Ad } from '../Ad';
 import TxnStatus from '../common/Status';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
@@ -182,6 +183,8 @@ const Details = (props: Props) => {
   };
 
   const parsedEvents = useMemo(() => {
+    if (!Array.isArray(logs)) return [];
+
     return (
       logs?.filter((log: TransactionLog) => {
         const parsedLog: MtEventLogData = parseEventLogs(log);
@@ -361,7 +364,6 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
             <div className="flex flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -414,6 +416,34 @@ const Details = (props: Props) => {
                   >
                     {txn?.receiver_account_id}
                   </Link>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 hidden md:!block overflow-x-hidden">
+            <div className="flex flex-wrap p-4">
+              <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
+                <Tooltip
+                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 top-0"
+                  label={`Sponsored banner advertisement`}
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip>
+                Sponsored:
+              </div>
+              {!txn?.signer_account_id ? (
+                <div className="w-full md:w-3/4">
+                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-all overflow-auto">
+                  <Ad
+                    className="w-[720px] h-[90px] bg-no-repeat "
+                    format="Leaderboard"
+                    unitId="IbT2RAk1Cdc36JPkKEfCJQ=="
+                  />
                 </div>
               )}
             </div>
