@@ -129,19 +129,19 @@ const rateLimiter = catchAsync(
         const now = dayjs.utc().toISOString();
         await userSql`
           INSERT INTO
-            api_key_usages (user_id, key_id, TIME, count, plan_id)
+            api__key_usages (user_id, key_id, TIME, count, plan_id)
           VALUES
             (
               ${id},
               ${keyId},
               ${now},
               1,
-              ${plan.id}
+              ${selectedPlan.id}
             )
           ON CONFLICT (user_id, key_id, TIME) DO
           UPDATE
           SET
-            count = api_key_usages.count + ${consumeCount}
+            count = api__key_usages.count + ${consumeCount}
         `;
         await rateLimit.consume(tokenKey, consumeCount);
       }
@@ -195,7 +195,7 @@ const useFreePlan = async (
       const now = dayjs.utc().toISOString();
       await userSql`
         INSERT INTO
-          api_key_usages (user_id, key_id, TIME, count, plan_id)
+          api__key_usages (user_id, key_id, TIME, count, plan_id)
         VALUES
           (
             ${key},
@@ -207,7 +207,7 @@ const useFreePlan = async (
         ON CONFLICT (user_id, key_id, TIME) DO
         UPDATE
         SET
-          count = api_key_usages.count + EXCLUDED.count
+          count = api__key_usages.count + EXCLUDED.count
       `;
       await rateLimit.consume(tokenKey, consumeCount);
     }
