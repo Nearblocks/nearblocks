@@ -1,10 +1,10 @@
 import { headers } from 'next/headers';
 
 import Buttons from '@/components/app/Icons/Button';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
-import FaCheckCircle from '@/components/Icons/FaCheckCircle';
-import ListCheck from '@/components/Icons/ListCheck';
 import { appUrl, networkId } from '@/utils/app/config';
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 

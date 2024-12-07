@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import React from 'react';
 import { toast } from 'react-toastify';
 
-import RateLimitDialog from '@/components/RateLimitDialog';
+import RateLimitDialog from '@/components/app/RateLimitDialog';
 import { userApiURL } from '@/utils/app/config';
 
 import { useSWR } from '../../utils/app/swrExport';

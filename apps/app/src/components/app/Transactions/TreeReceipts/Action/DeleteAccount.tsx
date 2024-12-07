@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import FaUser from '@/components/Icons/FaUser';
+import FaUser from '@/components/app/Icons/FaUser';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';

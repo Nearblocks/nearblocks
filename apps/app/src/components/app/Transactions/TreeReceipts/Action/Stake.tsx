@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import FaCoins from '@/components/Icons/FaCoins';
+import FaCoins from '@/components/app/Icons/FaCoins';
 import { shortenHex, yoctoToNear } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 

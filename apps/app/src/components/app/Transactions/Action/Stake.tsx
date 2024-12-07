@@ -1,9 +1,10 @@
 import { useParams } from 'next/navigation';
 
-import FaRight from '@/components/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
+
+import FaRight from '../../Icons/FaRight';
 
 const Stake = (props: ActionPropsInfo) => {
   const params = useParams();

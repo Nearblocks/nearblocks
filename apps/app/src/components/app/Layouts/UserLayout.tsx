@@ -6,10 +6,8 @@ import useAuth from '@/hooks/app/useAuth';
 import { Link, usePathname } from '@/i18n/routing';
 import { docsUrl } from '@/utils/app/config';
 
-import Arrow from '../../Icons/Arrow';
-import Menu from '../../Icons/Menu';
-import User from '../../Icons/User';
 import ActiveLink from '../ActiveLink';
+import Arrow from '../Icons/Arrow';
 import Campaign from '../Icons/Campaign';
 import Close from '../Icons/Close';
 import Create from '../Icons/Create';
@@ -17,7 +15,9 @@ import FaFileInvoiceDollar from '../Icons/FaFileInvoiceDollar';
 import FileSearch from '../Icons/FileSearch';
 import Home from '../Icons/Home';
 import Key from '../Icons/Key';
+import Menu from '../Icons/Menu';
 import Plan from '../Icons/Plan';
+import User from '../Icons/User';
 import Skeleton, { Loader } from '../skeleton/common/Skeleton';
 import UserLogout from './Logout';
 

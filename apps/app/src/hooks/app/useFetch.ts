@@ -4,9 +4,9 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import useSWR from 'swr';
 
-import RateLimitDialog from '@/components/RateLimitDialog';
+import RateLimitDialog from '@/components/app/RateLimitDialog';
 
-const fetchKey = env('NEXT_PUBLIC_API_FETCH_KEY');
+const fetchKey = env('API_ACCESS_KEY');
 const baseURL = env('NEXT_PUBLIC_API_URL');
 
 export const defaultOptions = {

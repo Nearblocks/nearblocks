@@ -6,8 +6,8 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useAuthStore } from '@/stores/app/auth';
 import { useRpcStore } from '@/stores/app/rpc';
-import { useAuthStore } from '@/stores/auth';
 import { verifierConfig } from '@/utils/app/config';
 import {
   ContractCodeInfo,

@@ -7,11 +7,11 @@ import Edit from '@/components/app/Icons/Edit';
 import EmailCircle from '@/components/app/Icons/EmailCircle';
 import LoginCircle from '@/components/app/Icons/LoginCircle';
 import UserLayout from '@/components/app/Layouts/UserLayout';
-import Clock from '@/components/Icons/Clock';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
-import dayjs from '@/utils/dayjs';
+import dayjs from '@/utils/app/dayjs';
 
+import Clock from '../Icons/Clock';
 import Skeleton from '../skeleton/common/Skeleton';
 import withAuth from '../stores/withAuth';
 

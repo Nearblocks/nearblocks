@@ -3,9 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
-import ListCheck from '@/components/Icons/ListCheck';
 import { networkId } from '@/utils/app/config';
 import { appUrl } from '@/utils/app/config';
 

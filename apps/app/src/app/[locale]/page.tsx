@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import Home from '@/components/app/Home';
 import HomePageSkeleton from '@/components/app/skeleton/home/Home';
-import { appUrl } from '@/utils/config';
+import { appUrl } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 

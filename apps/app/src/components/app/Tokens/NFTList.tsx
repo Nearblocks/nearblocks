@@ -5,15 +5,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useEffect, useRef, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TokenImage from '@/components/common/TokenImage';
-import FaInbox from '@/components/Icons/FaInbox';
-import SortIcon from '@/components/Icons/SortIcon';
 import { Link, usePathname } from '@/i18n/routing';
 import { localFormat, serialNumber } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
 
+import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
+import TokenImage from '../common/TokenImage';
+import FaInbox from '../Icons/FaInbox';
+import SortIcon from '../Icons/SortIcon';
 const initialSorting: Sorting = {
   order: 'desc',
   sort: 'txns_day',

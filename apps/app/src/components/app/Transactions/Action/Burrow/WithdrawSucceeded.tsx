@@ -1,11 +1,12 @@
 import { useParams } from 'next/navigation';
 
 import AddressLink from '@/components/app/common/AddressLink';
-import TokenInfo from '@/components/common/TokenInfo';
-import FaRight from '@/components/Icons/FaRight';
-import { useActionContext } from '@/components/Transactions/Action/ActionContext';
+import TokenInfo from '@/components/app/common/TokenInfo';
+import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { DepositPropsInfo } from '@/utils/types';
+
+import { useActionContext } from '../ActionContext';
 
 const WithdrawSucceeded = (props: DepositPropsInfo) => {
   const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();

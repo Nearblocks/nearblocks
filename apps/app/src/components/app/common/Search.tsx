@@ -177,7 +177,7 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
         <ComboboxInput
           className={`search ${
             disabled ? 'opacity-100' : ''
-          } !bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
+          } !bg-white dark:!bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
           disabled={disabled}
           id="searchInput"
           onChange={handleChange}

@@ -7,7 +7,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
 import { isAction, localFormat } from '@/utils/app/libs';
 import { txnMethod } from '@/utils/app/near';
 import { truncateString, yoctoToNear } from '@/utils/libs';
@@ -21,6 +20,7 @@ import Table from '../common/Table';
 import TimeStamp from '../common/TimeStamp';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
+import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 

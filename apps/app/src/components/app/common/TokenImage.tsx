@@ -7,23 +7,23 @@ const placeholder = '/images/tokenplaceholder.svg';
 
 const getMediaUrl = async (base: string, media: string, reference: string) => {
   if (
-    media.startsWith('https://') ||
-    media.startsWith('http://') ||
-    media.startsWith('data:image')
+    media?.startsWith('https://') ||
+    media?.startsWith('http://') ||
+    media?.startsWith('data:image')
   )
     return media;
 
   if (
     reference &&
-    (base.startsWith('https://arweave.net') ||
-      reference.startsWith('https://arweave.net'))
+    (base?.startsWith('https://arweave.net') ||
+      reference?.startsWith('https://arweave.net'))
   ) {
     try {
       const resp = await axios.get(
         base ? `${base.replace(/\/+$/, '')}/${reference}` : `${reference}`,
       );
 
-      return resp.data.media;
+      return resp?.data?.media;
     } catch (error) {
       //
     }

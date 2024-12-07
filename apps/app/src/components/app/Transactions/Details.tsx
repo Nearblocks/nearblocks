@@ -13,9 +13,6 @@ import { useEffect, useMemo, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaRight from '@/components/Icons/FaRight';
-import { ActionProvider } from '@/components/Transactions/Action/ActionContext';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { parseEventLogs } from '@/utils/app/near';
@@ -44,15 +41,18 @@ import {
   TransactionLog,
 } from '@/utils/types';
 
+import ErrorMessage from '../common/ErrorMessage';
 import TxnStatus from '../common/Status';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
 import ArrowUp from '../Icons/ArrowUp';
 import Bolt from '../Icons/Bolt';
+import FaRight from '../Icons/FaRight';
 import FileSlash from '../Icons/FileSlash';
 import Question from '../Icons/Question';
 import { Loader } from '../skeleton/common/Skeleton';
 import EventLogs from './Action';
+import { ActionProvider } from './Action/ActionContext';
 import Actions from './Actions';
 import NEPTokenTransactions from './NEPTokenTransactions';
 
