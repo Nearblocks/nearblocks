@@ -11,7 +11,6 @@ import {
   dollarFormat,
   dollarNonCentFormat,
   localFormat,
-  priceFormat,
   serialNumber,
 } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
@@ -24,6 +23,7 @@ import ArrowUp from '../Icons/ArrowUp';
 import FaInbox from '../Icons/FaInbox';
 import Question from '../Icons/Question';
 import SortIcon from '../Icons/SortIcon';
+import TokenPrice from './FT/TokenPrice';
 
 const initialForm = {
   search: '',
@@ -225,13 +225,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
     },
     {
       cell: (row: Token) => (
-        <span>
-          {row?.price === null ? (
-            <span className="text-xs">N/A</span>
-          ) : (
-            `$${priceFormat(row?.price)}`
-          )}
-        </span>
+        <TokenPrice token={row?.contract} tokenPrice={row?.price} />
       ),
       header: <span>{t ? t('fts.top.price') : 'PRICE'}</span>,
       key: 'price',

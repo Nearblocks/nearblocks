@@ -77,8 +77,7 @@ export function tokenAmount(amount: string, decimal: string, format: boolean) {
 
   const formattedValue = format
     ? near?.toFixed(8).replace(/\.?0+$/, '')
-    : // @ts-ignore
-      near?.toFixed(Big(decimal, 10))?.replace(/\.?0+$/, '');
+    : near?.toFixed(Big(decimal).toNumber())?.replace(/\.?0+$/, '');
 
   return formattedValue;
 }

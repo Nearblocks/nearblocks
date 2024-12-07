@@ -22,6 +22,8 @@ import ListCheck from '../../Icons/ListCheck';
 import Question from '../../Icons/Question';
 import WarningIcon from '../../Icons/WarningIcon';
 import Skeleton from '../../skeleton/common/Skeleton';
+import MarketCap from './MarketCap';
+import TokenPrice from './TokenPrice';
 
 interface Props {
   holders: string;
@@ -208,22 +210,29 @@ const OverviewActions = ({
                       <div className="w-20">
                         <Skeleton className="h-4" />
                       </div>
-                    ) : token?.price !== null && token?.price !== undefined ? (
+                    ) : (
                       <div className="w-full break-words flex flex-wrap text-sm">
-                        ${localFormat(token?.price)}
-                        {stats?.near_price && (
-                          <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
-                            @{' '}
-                            {localFormat(
-                              Big(token?.price)
-                                .div(Big(stats?.near_price))
-                                .toNumber()
-                                .toString(),
-                            )}{' '}
-                            Ⓝ
-                          </div>
-                        )}
-                        {token?.change_24 !== null &&
+                        <TokenPrice
+                          token={token?.contract}
+                          tokenPrice={token?.price}
+                        />
+                        {token?.price !== null &&
+                          token?.price !== undefined &&
+                          stats?.near_price && (
+                            <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
+                              @{' '}
+                              {localFormat(
+                                Big(token?.price)
+                                  .div(Big(stats?.near_price))
+                                  .toNumber()
+                                  .toString(),
+                              )}{' '}
+                              Ⓝ
+                            </div>
+                          )}
+                        {token?.price !== null &&
+                        token?.price !== undefined &&
+                        token?.change_24 !== null &&
                         token?.change_24 !== undefined ? (
                           Number(token?.change_24) > 0 ? (
                             <div className="text-neargreen text-sm flex flex-row items-center">
@@ -238,8 +247,6 @@ const OverviewActions = ({
                           )
                         ) : null}
                       </div>
-                    ) : (
-                      'N/A'
                     )}
                   </div>
                   <div className="flex-col flex-1 flex-wrap py-1 px-3">
@@ -264,52 +271,12 @@ const OverviewActions = ({
                       <div className="w-20">
                         <Skeleton className="h-4" />
                       </div>
-                    ) : Number(token?.fully_diluted_market_cap) > 0 ||
-                      Number(token?.market_cap) > 0 ? (
-                      <div className="w-full break-words flex flex-wrap text-sm">
-                        {Number(token?.fully_diluted_market_cap) > 0 &&
-                        Number(token?.market_cap) > 0 ? (
-                          <Tooltip
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                            label={
-                              showMarketCap
-                                ? 'Click to switch back'
-                                : 'Click to switch'
-                            }
-                          >
-                            <p
-                              className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200"
-                              onClick={onToggle}
-                            >
-                              {showMarketCap
-                                ? '$' + dollarNonCentFormat(token?.market_cap)
-                                : '$' +
-                                  dollarNonCentFormat(
-                                    token?.fully_diluted_market_cap,
-                                  )}
-                            </p>
-                          </Tooltip>
-                        ) : (
-                          <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200">
-                            {'$' +
-                              dollarNonCentFormat(
-                                Number(token?.market_cap)
-                                  ? token?.market_cap
-                                  : token?.fully_diluted_market_cap,
-                              )}
-                          </p>
-                        )}
-                      </div>
                     ) : (
-                      <div className="w-full break-words flex flex-wrap text-sm">
-                        {token?.onchain_market_cap ? (
-                          <p className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200">
-                            ${dollarNonCentFormat(token?.onchain_market_cap)}
-                          </p>
-                        ) : (
-                          'N/A'
-                        )}
-                      </div>
+                      <MarketCap
+                        onToggle={onToggle}
+                        showMarketCap={showMarketCap}
+                        token={token}
+                      />
                     )}
                   </div>
                 </div>
