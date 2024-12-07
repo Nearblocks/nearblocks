@@ -11,6 +11,7 @@ interface VerifierConfig {
 
 export const useConfig = () => {
   const {
+    API_ACCESS_KEY,
     NEXT_PUBLIC_BOS_NETWORK,
     NEXT_PUBLIC_MAINNET_URL,
     NEXT_PUBLIC_NETWORK_ID,
@@ -77,7 +78,10 @@ export const useConfig = () => {
           },
         ];
 
+  const apiAccessKey = API_ACCESS_KEY;
+
   return {
+    apiAccessKey,
     apiUrl,
     appUrl,
     aurorablocksUrl,

@@ -80,7 +80,7 @@ const OverviewActions = ({
       const tokenImage = token?.icon;
 
       if (window.ethereum) {
-        await window.ethereum.request({
+        await (window.ethereum as any).request({
           method: 'wallet_watchAsset',
           params: {
             options: {
