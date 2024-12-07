@@ -4,17 +4,18 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
-import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
-import { hexy } from '@/utils/hexy';
+import { hexy } from '@/utils/app/hexy';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import {
   Action,
   FunctionCallActionView,
   ReceiptsPropsInfo,
 } from '@/utils/types';
+
+import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
+import Question from '../../Icons/Question';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;

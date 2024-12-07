@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import FaCode from '@/components/Icons/FaCode';
+import FaCode from '@/components/app/Icons/FaCode';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';

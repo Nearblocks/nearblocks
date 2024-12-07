@@ -37,8 +37,8 @@ import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { useEthersProviderContext } from '@/data/web3';
-import { useAuthStore } from '@/stores/auth';
-import { useVmStore } from '@/stores/vm';
+import { useAuthStore } from '@/stores/app/auth';
+import { useVmStore } from '@/stores/app/vm';
 import { networkId } from '@/utils/app/config';
 import { wagmiConfig, web3Modal } from '@/utils/app/web3modal';
 

@@ -8,16 +8,16 @@ import {
 import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
-import TokenImage, { NFTImage } from '@/components/common/TokenImage';
-import ArrowDown from '@/components/Icons/ArrowDown';
-import ArrowUp from '@/components/Icons/ArrowUp';
-import Question from '@/components/Icons/Question';
-import WarningIcon from '@/components/Icons/WarningIcon';
-import { useFetch } from '@/hooks/useFetch';
+import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { SpamToken, Token, TransactionInfo } from '@/utils/types';
 
+import TokenImage, { NFTImage } from '../../common/TokenImage';
+import ArrowDown from '../../Icons/ArrowDown';
+import ArrowUp from '../../Icons/ArrowUp';
+import Question from '../../Icons/Question';
+import WarningIcon from '../../Icons/WarningIcon';
 import TokenTransfers from './TokenTransfers';
 interface Props {
   error: boolean;

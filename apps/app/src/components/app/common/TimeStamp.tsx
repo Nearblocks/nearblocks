@@ -1,8 +1,8 @@
 import { Tooltip } from '@reach/tooltip';
 
-import { nanoToMilli } from '@/utils/app/libs';
+import { nanoToMilli } from '@/utils/libs';
 
-import dayjs from '../../../utils/dayjs';
+import dayjs from '../../../utils/app/dayjs';
 
 const TimeStamp = ({ showAge = true, timestamp }: any) => {
   return (

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
 
-import { aurorablocksUrl } from '@/utils/config';
+import { useConfig } from '@/hooks/app/useConfig';
 import { jsonParser, jsonStringify } from '@/utils/libs';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const RlpTransaction = ({ method, pretty, receiver }: Props) => {
+  const { aurorablocksUrl } = useConfig();
   const decoded =
     method === 'submit' && receiver?.includes('aurora')
       ? pretty

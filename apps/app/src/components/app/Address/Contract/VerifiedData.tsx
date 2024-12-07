@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaCode from '@/components/Icons/FaCode';
-import FaInbox from '@/components/Icons/FaInbox';
 import { verifierConfig } from '@/utils/app/config';
 import { ContractMetadata, VerifierData } from '@/utils/types';
 
+import ErrorMessage from '../../common/ErrorMessage';
+import FaCode from '../../Icons/FaCode';
+import FaInbox from '../../Icons/FaInbox';
 import CodeViewer from './CodeViewer';
 
 type VerifiedDataProps = {

@@ -1,16 +1,17 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import LoadingCircular from '@/components/common/LoadingCircular';
-import ArrowDown from '@/components/Icons/ArrowDown';
-import FaInbox from '@/components/Icons/FaInbox';
+import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
-import { verifierConfig } from '@/utils/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractMetadata } from '@/utils/types';
+
+import ErrorMessage from '../../common/ErrorMessage';
+import LoadingCircular from '../../common/LoadingCircular';
+import ArrowDown from '../../Icons/ArrowDown';
+import FaInbox from '../../Icons/FaInbox';
 
 type ContractFormProps = {
   accountId: string;
@@ -37,6 +38,7 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
   const initializedRef = useRef(false);
+  const { verifierConfig } = useConfig();
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import ArrowDown from '@/components/Icons/ArrowDown';
 import { TransactionReceiptInfo } from '@/utils/types';
 
+import ArrowDown from '../../Icons/ArrowDown';
 import ReceiptInfo from './ReceiptInfo';
 import ReceiptKind from './ReceiptKind';
 

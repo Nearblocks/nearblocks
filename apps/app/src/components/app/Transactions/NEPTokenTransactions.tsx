@@ -1,11 +1,12 @@
 import React from 'react';
 
-import TokenInfo from '@/components/common/TokenInfo';
-import FaRight from '@/components/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/app/libs';
 import { parseEventLogs } from '@/utils/app/near';
 import { MtEventLogData, TransactionLog } from '@/utils/types';
+
+import TokenInfo from '../common/TokenInfo';
+import FaRight from '../Icons/FaRight';
 
 interface ParsedEventListProps {
   events: TransactionLog[];

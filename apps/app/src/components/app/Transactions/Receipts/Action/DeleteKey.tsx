@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import FaKey from '@/components/Icons/FaKey';
+import FaKey from '@/components/app/Icons/FaKey';
 import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 

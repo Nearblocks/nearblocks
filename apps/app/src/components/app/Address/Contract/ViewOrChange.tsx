@@ -8,15 +8,16 @@ import { Tooltip } from '@reach/tooltip';
 import uniqueId from 'lodash/uniqueId';
 import { useState } from 'react';
 
-import ArrowRight from '@/components/Icons/ArrowRight';
-import CloseCircle from '@/components/Icons/CloseCircle';
-import Question from '@/components/Icons/Question';
-import { fetcher } from '@/hooks/useFetch';
+import { fetcher } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
-import { useAuthStore } from '@/stores/auth';
-import { useVmStore } from '@/stores/vm';
+import { useAuthStore } from '@/stores/app/auth';
+import { useVmStore } from '@/stores/app/vm';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
+
+import ArrowRight from '../../Icons/ArrowRight';
+import CloseCircle from '../../Icons/CloseCircle';
+import Question from '../../Icons/Question';
 
 interface Props {
   accountId?: string;

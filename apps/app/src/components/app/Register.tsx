@@ -8,10 +8,10 @@ import * as Yup from 'yup';
 import Visibility from '@/components/app/Icons/Visibility';
 import VisibilityOff from '@/components/app/Icons/VisibilityOff';
 import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { removeProtocol } from '@/utils/app/libs';
 import { catchErrors } from '@/utils/app/libs';
-import { appUrl } from '@/utils/config';
 
 export const Register = () => {
   const [verify, setverify] = useState(false);
@@ -22,6 +22,7 @@ export const Register = () => {
     password2: false,
   });
   const router = useRouter();
+  const { appUrl } = useConfig();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()

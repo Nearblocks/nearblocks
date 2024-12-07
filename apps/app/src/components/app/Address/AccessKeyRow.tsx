@@ -3,7 +3,7 @@ import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
-import useRpc from '@/hooks/useRpc';
+import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import {
   capitalizeWords,

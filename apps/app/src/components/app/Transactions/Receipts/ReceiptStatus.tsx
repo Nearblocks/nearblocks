@@ -1,4 +1,4 @@
-import { hexy } from '@/utils/hexy';
+import { hexy } from '@/utils/app/hexy';
 import { ReceiptStatsProps } from '@/utils/types';
 
 const ReceiptStatus = (props: ReceiptStatsProps) => {

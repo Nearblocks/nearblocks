@@ -9,11 +9,11 @@ import CircleTimer from '@/components/app/Icons/CircleTimer';
 import Refresh from '@/components/app/Icons/Refresh';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
-import FaCheckCircle from '@/components/Icons/FaCheckCircle';
-import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
 import useAuth, { request } from '@/hooks/app/useAuth';
 import { localFormat } from '@/utils/libs';
 
+import FaCheckCircle from '../Icons/FaCheckCircle';
+import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import withAuth from '../stores/withAuth';
 
 const Plan = ({ role, status }: { role?: string; status?: string }) => {

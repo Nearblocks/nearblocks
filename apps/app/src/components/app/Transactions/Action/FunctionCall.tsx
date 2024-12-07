@@ -2,10 +2,11 @@ import { Tooltip } from '@reach/tooltip';
 import { useParams } from 'next/navigation';
 
 import AddressLink from '@/components/app/common/AddressLink';
-import FaRight from '@/components/Icons/FaRight';
-import { useActionContext } from '@/components/Transactions/Action/ActionContext';
 import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
+
+import FaRight from '../../Icons/FaRight';
+import { useActionContext } from './ActionContext';
 
 const FunctionCall = (props: ActionPropsInfo) => {
   const params = useParams();

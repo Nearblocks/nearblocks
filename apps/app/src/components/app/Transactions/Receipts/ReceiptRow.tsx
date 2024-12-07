@@ -2,8 +2,6 @@ import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
-import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
-import Question from '@/components/Icons/Question';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
 import useRpc from '@/hooks/app/useRpc';
@@ -12,6 +10,8 @@ import { fiatValue } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
+import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
+import Question from '../../Icons/Question';
 import { Loader } from '../../skeleton/common/Skeleton';
 import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';

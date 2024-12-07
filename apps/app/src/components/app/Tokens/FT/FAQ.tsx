@@ -1,6 +1,3 @@
-import ErrorMessage from '@/components/common/ErrorMessage';
-import FaInbox from '@/components/Icons/FaInbox';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link } from '@/i18n/routing';
 import {
   convertToUTC,
@@ -17,6 +14,10 @@ import {
   HoldersPropsInfo,
   Token,
 } from '@/utils/types';
+
+import ErrorMessage from '../../common/ErrorMessage';
+import FaInbox from '../../Icons/FaInbox';
+import Skeleton from '../../skeleton/common/Skeleton';
 
 interface Props {
   account: AccountInfo;

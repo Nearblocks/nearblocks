@@ -3,19 +3,19 @@ import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TxnStatus from '@/components/common/Status';
-import TimeStamp from '@/components/common/TimeStamp';
-import Clock from '@/components/Icons/Clock';
-import FaInbox from '@/components/Icons/FaInbox';
-import FaLongArrowAltRight from '@/components/Icons/FaLongArrowAltRight';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../../common/AddressLink';
+import ErrorMessage from '../../common/ErrorMessage';
+import TxnStatus from '../../common/Status';
 import Table from '../../common/Table';
+import TimeStamp from '../../common/TimeStamp';
+import Clock from '../../Icons/Clock';
+import FaInbox from '../../Icons/FaInbox';
+import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
+import Skeleton from '../../skeleton/common/Skeleton';
 interface Props {
   count: any;
   cursor: any;

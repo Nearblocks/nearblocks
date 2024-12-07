@@ -1,1 +1,1 @@
-export { default } from '../../components/Error';
+export { default } from '../../components/app/Error';

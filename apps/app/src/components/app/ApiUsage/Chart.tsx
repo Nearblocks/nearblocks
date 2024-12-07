@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import useAuth from '@/hooks/app/useAuth';
-import dayjs from '@/utils/dayjs';
+import dayjs from '@/utils/app/dayjs';
 
 import Plan from '../Icons/Plan';
 import CircularLoader from '../skeleton/common/CircularLoader';

@@ -2,8 +2,8 @@ import { Suspense } from 'react';
 
 import Buttons from '@/components/app/Address/Button';
 import Delegators from '@/components/app/NodeExplorer/Delegators';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import DelegatorSkeleton from '@/components/app/skeleton/node-explorer/Delegator';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 
 export default async function Delegator(props: {
   params: Promise<{ id: string }>;

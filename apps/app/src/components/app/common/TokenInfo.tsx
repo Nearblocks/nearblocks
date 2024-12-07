@@ -10,7 +10,7 @@ import {
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 
-import Skeleton from '../app/skeleton/common/Skeleton';
+import Skeleton from '../skeleton/common/Skeleton';
 import TokenImage from './TokenImage';
 
 const TokenInfo = (props: TokenInfoProps) => {

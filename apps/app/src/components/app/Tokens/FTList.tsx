@@ -6,13 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useEffect, useRef, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TokenImage from '@/components/common/TokenImage';
-import ArrowDown from '@/components/Icons/ArrowDown';
-import ArrowUp from '@/components/Icons/ArrowUp';
-import FaInbox from '@/components/Icons/FaInbox';
-import Question from '@/components/Icons/Question';
-import SortIcon from '@/components/Icons/SortIcon';
 import { Link, usePathname } from '@/i18n/routing';
 import {
   dollarFormat,
@@ -23,7 +16,14 @@ import {
 } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
 
+import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
+import TokenImage from '../common/TokenImage';
+import ArrowDown from '../Icons/ArrowDown';
+import ArrowUp from '../Icons/ArrowUp';
+import FaInbox from '../Icons/FaInbox';
+import Question from '../Icons/Question';
+import SortIcon from '../Icons/SortIcon';
 
 const initialForm = {
   search: '',

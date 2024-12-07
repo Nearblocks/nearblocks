@@ -1,7 +1,8 @@
 import { Fragment } from 'react';
 
-import FaTimesCircle from '@/components/Icons/FaTimesCircle';
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
+
+import FaTimesCircle from '../../Icons/FaTimesCircle';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;
