@@ -12,6 +12,7 @@ export interface Config {
   delta: number;
   endBlockHeight: number;
   fastnearEndpoint?: string;
+  fastnearRawEndpoint?: string;
   genesisFile: string;
   genesisHeight: number;
   genesisTimestamp: string;

@@ -8,10 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service:
-          [
-            indexer-base,
-          ]
+        service: [indexer-base]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4

@@ -19,6 +19,7 @@ const env = cleanEnv(process.env, {
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   FASTNEAR_ENDPOINT: str({ default: undefined }),
+  FASTNEAR_RAW_ENDPOINT: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -62,6 +63,7 @@ const config: Config = {
   delta: 1_000, // start from blocks earlier on sync interuption
   endBlockHeight: env.BASE_END_BLOCK,
   fastnearEndpoint: env.FASTNEAR_ENDPOINT,
+  fastnearRawEndpoint: env.FASTNEAR_RAW_ENDPOINT,
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,

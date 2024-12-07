@@ -1,7 +1,7 @@
-import { stream, types } from 'near-lake-framework';
+import { types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
-import { streamBlock } from 'nb-neardata';
+import { streamBlock } from 'nb-neardata-raw';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -10,19 +10,6 @@ import { storeBlock } from '#services/block';
 import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
-import { DataSource } from '#types/enum';
-
-const lakeConfig: types.LakeConfig = {
-  blocksPreloadPoolSize: config.preloadSize,
-  s3BucketName: config.s3BucketName,
-  s3RegionName: config.s3RegionName,
-  startBlockHeight: config.startBlockHeight,
-};
-
-if (config.s3Endpoint) {
-  lakeConfig.s3ForcePathStyle = true;
-  lakeConfig.s3Endpoint = config.s3Endpoint;
-}
 
 export const syncData = async () => {
   const settings = await knex('settings')
@@ -30,46 +17,23 @@ export const syncData = async () => {
     .first();
   const block = settings?.value?.sync;
 
-  if (config.dataSource === DataSource.FAST_NEAR) {
-    let startBlockHeight = config.startBlockHeight;
+  let startBlockHeight = config.startBlockHeight;
 
-    if (!startBlockHeight && block) {
-      const next = +block - config.delta / 2;
-      startBlockHeight = next;
-      logger.info(`last synced block: ${block}`);
-      logger.info(`syncing from block: ${next}`);
-    }
+  if (!startBlockHeight && block) {
+    startBlockHeight = +block + 1;
+  }
 
-    const stream = streamBlock({
-      limit: config.preloadSize / 2,
-      network: config.network,
-      start: startBlockHeight || config.genesisHeight,
-      url: config.fastnearEndpoint,
-    });
+  logger.info(`syncing from block: ${startBlockHeight}`);
 
-    for await (const message of stream) {
-      await onMessage(message);
-    }
+  const stream = streamBlock({
+    end: config.endBlockHeight,
+    network: 'mainnet',
+    start: startBlockHeight || config.genesisHeight,
+    url: config.fastnearRawEndpoint,
+  });
 
-    stream.on('end', () => {
-      logger.error('stream ended');
-      process.exit();
-    });
-    stream.on('error', (error: Error) => {
-      logger.error(error);
-      process.exit();
-    });
-  } else {
-    if (!lakeConfig.startBlockHeight && block) {
-      const next = +block - config.delta;
-      lakeConfig.startBlockHeight = next;
-      logger.info(`last synced block: ${block}`);
-      logger.info(`syncing from block: ${next}`);
-    }
-
-    for await (const message of stream(lakeConfig)) {
-      await onMessage(message);
-    }
+  for await (const message of stream) {
+    await onMessage(message);
   }
 };
 

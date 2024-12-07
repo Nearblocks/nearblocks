@@ -34,6 +34,7 @@
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-neardata": "*",
+    "nb-neardata-raw": "*",
     "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
