@@ -18,6 +18,7 @@ import {
 import ErrorMessage from '../../common/ErrorMessage';
 import FaInbox from '../../Icons/FaInbox';
 import Skeleton from '../../skeleton/common/Skeleton';
+import TokenPrice from './TokenPrice';
 
 interface Props {
   account: AccountInfo;
@@ -107,11 +108,10 @@ const FAQ = ({
                     itemProp="text"
                   >
                     The live price of {name} is{' '}
-                    {token?.price !== null && token?.price !== undefined ? (
-                      `$${dollarFormat(token?.price)} (${tokenTicker} / USD)`
-                    ) : (
-                      <span className="text-xs">N/A</span>
-                    )}{' '}
+                    <TokenPrice
+                      token={token?.contract}
+                      tokenPrice={token?.price}
+                    />{' '}
                     today with a current circulating market cap of{' '}
                     {token?.market_cap !== null &&
                     token?.market_cap !== undefined ? (
