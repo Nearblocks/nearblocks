@@ -20,6 +20,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  OTEL_EXPORTER_OTLP_ENDPOINT: str({ default: '' }),
   REDIS_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_NAME: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
@@ -64,6 +65,7 @@ const config: Config = {
   genesisTimestamp,
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,
+  otelEndpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT,
   preloadSize: 100, // blocks to preload in nearlake
   redisPassword: env.REDIS_PASSWORD,
   redisSentinelName: env.REDIS_SENTINEL_NAME,

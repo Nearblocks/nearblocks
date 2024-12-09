@@ -16,6 +16,8 @@ export interface Config {
   genesisTimestamp: string;
   insertLimit: number;
   network: Network;
+  otelEndpoint?: string;
+  otelServiceName?: string;
   preloadSize: number;
   redisPassword: string;
   redisSentinelName: string;

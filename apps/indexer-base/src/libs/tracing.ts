@@ -1,0 +1,47 @@
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { Resource } from '@opentelemetry/resources';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { SEMRESATTRS_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+
+import { logger } from 'nb-logger';
+
+import config from '#config';
+
+export const setupTracing = () => {
+  const sdk = new NodeSDK({
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        '@opentelemetry/instrumentation-http': {
+          enabled: true,
+        },
+        '@opentelemetry/instrumentation-knex': {
+          enabled: true,
+        },
+      }),
+    ],
+    resource: new Resource({
+      data_source: config.dataSource,
+      network: config.network,
+      [SEMRESATTRS_SERVICE_NAME]: 'base-indexer',
+    }),
+    spanProcessor: new BatchSpanProcessor(
+      new OTLPTraceExporter({
+        url: config.otelEndpoint,
+      }),
+    ),
+  });
+
+  sdk
+    .start()
+    .then(() => {
+      logger.info('OpenTelemetry tracing initialized');
+    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .catch((error: any) => {
+      logger.error({ error }, 'Failed to initialize OpenTelemetry');
+    });
+
+  return sdk;
+};
