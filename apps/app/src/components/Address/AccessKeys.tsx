@@ -13,9 +13,10 @@ interface Props {
   count: number;
   error: boolean;
   tab: string;
+  rpcLoading: boolean;
 }
 
-const AccessKeys = ({ keys, count, error, tab }: Props) => {
+const AccessKeys = ({ keys, count, tab, rpcLoading }: Props) => {
   const router = useRouter();
   const [showWhen, setShowWhen] = useState(true);
   const toggleShowWhen = () => setShowWhen((s) => !s);
@@ -102,52 +103,51 @@ const AccessKeys = ({ keys, count, error, tab }: Props) => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-                {!keys &&
-                  [...Array(25)].map((_, i) => (
-                    <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-tiny ">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
-                        <Skeleton className="w-full h-4" />
-                      </td>
-                    </tr>
-                  ))}
-                {error ||
-                  (keys && keys?.length === 0 && (
-                    <tr className="h-[57px]">
-                      <td
-                        colSpan={100}
-                        className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
-                      >
-                        <ErrorMessage
-                          icons={<FaInbox />}
-                          message="No access keys"
-                          mutedText="Please try again later"
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                {!error &&
-                  keys &&
+                {!keys ||
+                  (rpcLoading &&
+                    [...Array(25)].map((_, i) => (
+                      <tr key={i} className="hover:bg-blue-900/5 h-[57px]">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-tiny ">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
+                          <Skeleton className="w-full h-4" />
+                        </td>
+                      </tr>
+                    )))}
+                {keys && keys?.length === 0 && (
+                  <tr className="h-[57px]">
+                    <td
+                      colSpan={100}
+                      className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
+                    >
+                      <ErrorMessage
+                        icons={<FaInbox />}
+                        message="No access keys"
+                        mutedText="Please try again later"
+                      />
+                    </td>
+                  </tr>
+                )}
+                {keys &&
                   keys.map((key: any) => (
                     <AccessKeyRow
                       key={key?.account_id + key?.public_key}
@@ -158,7 +158,7 @@ const AccessKeys = ({ keys, count, error, tab }: Props) => {
               </tbody>
             </table>
           </div>
-          {keys.length > 0 && (
+          {keys?.length > 0 && (
             <Paginator count={count} limit={25} pageLimit={200} />
           )}
         </>

@@ -18,6 +18,7 @@ import {
   AccountDataInfo,
   ContractCodeInfo,
   FtInfo,
+  KeysInfo,
   SpamToken,
   TokenListInfo,
 } from '@/utils/types';
@@ -256,6 +257,9 @@ const Address = ({
   const [rpcError, setRpcError] = useState(false);
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const [accessKeys, setAccessKeys] = useState<KeysInfo | []>([]);
+  const [account, setAccount] = useState<AccountDataInfo | null>(null);
+  const [rpcLoading, setRpcLoading] = useState(false);
 
   const components = useBosComponents();
   const { data: spamList } = useFetch(
@@ -265,7 +269,7 @@ const Address = ({
   const contractInfo = parseDetails?.contract?.[0]?.contract;
   const schema = parseDetails?.contract?.[0]?.schema;
   const statsData = statsDetails?.stats?.[0];
-  const accountData = accountDetails?.account?.[0];
+  const accountData = accountDetails?.account?.[0] || account;
   const deploymentData = contractData?.deployments?.[0];
   const tokenData = tokenDetails?.contracts?.[0];
   const nftTokenData = nftTokenDetails?.contracts?.[0];
@@ -280,7 +284,7 @@ const Address = ({
   const count = dataCount?.txns?.[0]?.count;
   const txnCursor = data?.cursor;
 
-  const keys = data?.keys || [];
+  const keys = data?.keys || accessKeys;
   const keysCount = dataCount?.keys?.[0]?.count || 0;
 
   useEffect(() => {
@@ -289,6 +293,7 @@ const Address = ({
 
       try {
         setRpcError(false);
+        setRpcLoading(true);
         const [code, keys, account]: any = await Promise.all([
           contractCode(id as string).catch((error: any) => {
             console.error(`Error fetching contract code for ${id}:`, error);
@@ -303,6 +308,14 @@ const Address = ({
             return null;
           }),
         ]);
+
+        if (keys) {
+          setAccessKeys(keys?.keys);
+        }
+        if (account) {
+          setAccount(account);
+        }
+
         if (code && code?.code_base64) {
           setContract({
             block_hash: code.block_hash,
@@ -316,7 +329,7 @@ const Address = ({
           setIsContractLoading(false);
         }
 
-        const locked = (keys.keys || []).every(
+        const locked = (keys?.keys || []).every(
           (key: {
             access_key: {
               nonce: string;
@@ -334,6 +347,7 @@ const Address = ({
           setIsAccountLoading(false);
         }
         setIsLocked(locked);
+        setRpcLoading(false);
       } catch (error) {
         // Handle errors appropriately
         setRpcError(true);
@@ -344,7 +358,7 @@ const Address = ({
     loadSchema();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, rpcUrl]);
+  }, [id, rpcUrl, error]);
 
   useEffect(() => {
     if (rpcError) {
@@ -718,8 +732,9 @@ const Address = ({
                       <AccessKeys
                         keys={keys}
                         count={keysCount}
-                        error={error}
+                        error={error || rpcError}
                         tab={tab}
+                        rpcLoading={rpcLoading}
                       />
                     </TabPanel>
                     <TabPanel>
