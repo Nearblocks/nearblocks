@@ -12,6 +12,7 @@ const env = cleanEnv(process.env, {
     default: DataSource.NEAR_LAKE,
   }),
   BASE_START_BLOCK: num({ default: 0 }),
+  BASELIME_API_KEY: str({ default: '' }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -52,6 +53,7 @@ if (env.S3_ENDPOINT) {
 }
 
 const config: Config = {
+  baselimeApiKey: env.BASELIME_API_KEY,
   cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
   dataSource: env.BASE_DATA_SOURCE,
   dbCa: env.DATABASE_CA,

@@ -28,20 +28,16 @@ export const setupTracing = () => {
     }),
     spanProcessor: new BatchSpanProcessor(
       new OTLPTraceExporter({
+        headers: {
+          'x-api-key': config.baselimeApiKey || '',
+        },
         url: config.otelEndpoint,
       }),
     ),
   });
 
-  sdk
-    .start()
-    .then(() => {
-      logger.info('OpenTelemetry tracing initialized');
-    })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .catch((error: any) => {
-      logger.error({ error }, 'Failed to initialize OpenTelemetry');
-    });
+  sdk.start();
+  logger.info('OpenTelemetry tracing initialized');
 
   return sdk;
 };

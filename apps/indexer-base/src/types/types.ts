@@ -3,6 +3,7 @@ import { types } from 'near-lake-framework';
 import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
 export interface Config {
+  baselimeApiKey?: string;
   cacheExpiry: number;
   dataSource: string;
   dbCa: string;

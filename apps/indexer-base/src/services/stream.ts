@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { stream, types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
@@ -74,34 +75,108 @@ export const syncData = async () => {
   }
 };
 
+const tracer = trace.getTracer('block-processor');
+
 export const onMessage = async (message: types.StreamerMessage) => {
+  // Create a span for processing each block
+  const span = tracer.startSpan('process.block', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.prev_hash': message.block.header.prevHash,
+      'block.timestamp': message.block.header.timestamp,
+    },
+  });
+
   try {
-    if (message.block.header.height % 1000 === 0)
-      logger.info(`syncing block: ${message.block.header.height}`);
+    // Set the current span as active for this async context
+    return await context.with(
+      trace.setSpan(context.active(), span),
+      async () => {
+        if (message.block.header.height % 1000 === 0)
+          logger.info(`syncing block: ${message.block.header.height}`);
 
-    const start = performance.now();
+        const start = performance.now();
 
-    await prepareCache(message);
-    await storeBlock(knex, message);
-    await storeChunks(knex, message);
-    await storeTransactions(knex, message);
-    await storeReceipts(knex, message);
-    await Promise.all([
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
-    ]);
+        // Create child spans for each major operation
+        const cacheSpan = tracer.startSpan('prepare.cache');
+        try {
+          await prepareCache(message);
+          cacheSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          cacheSpan.end();
+        }
 
-    logger.info({
-      block: message.block.header.height,
-      time: `${performance.now() - start} ms`,
-    });
+        const blockSpan = tracer.startSpan('store.block');
+        try {
+          await storeBlock(knex, message);
+          blockSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          blockSpan.end();
+        }
+
+        const chunksSpan = tracer.startSpan('store.chunks');
+        try {
+          await storeChunks(knex, message);
+          chunksSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          chunksSpan.end();
+        }
+
+        const txnsSpan = tracer.startSpan('store.transactions');
+        try {
+          await storeTransactions(knex, message);
+          txnsSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          txnsSpan.end();
+        }
+
+        const receiptsSpan = tracer.startSpan('store.receipts');
+        try {
+          await storeReceipts(knex, message);
+          receiptsSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          receiptsSpan.end();
+        }
+
+        // Create a parent span for parallel operations
+        const parallelSpan = tracer.startSpan('store.parallel_operations');
+        try {
+          await Promise.all([
+            storeExecutionOutcomes(knex, message),
+            storeAccounts(knex, message),
+            storeAccessKeys(knex, message),
+          ]);
+          parallelSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          parallelSpan.end();
+        }
+
+        const processingTime = performance.now() - start;
+        span.setAttribute('processing.time_ms', processingTime);
+
+        logger.info({
+          block: message.block.header.height,
+          time: `${processingTime} ms`,
+        });
+
+        span.setStatus({ code: SpanStatusCode.OK });
+      },
+    );
   } catch (error) {
     logger.error(
       `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
     );
     logger.error(error);
     sentry.captureException(error);
+
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+
     process.exit();
+  } finally {
+    span.end();
   }
 };
