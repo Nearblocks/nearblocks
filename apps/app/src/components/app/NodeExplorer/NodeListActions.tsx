@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
@@ -20,6 +19,7 @@ import {
 
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
+import Tooltip from '../common/Tooltip';
 import ArrowDown from '../Icons/ArrowDown';
 import FaInbox from '../Icons/FaInbox';
 import Question from '../Icons/Question';
@@ -168,10 +168,23 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
       cell: (row: ValidatorEpochData) =>
         row?.description?.country_code ? (
           <div className="relative">
-            <Tooltip
-              className="absolute top-0 left-0  h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={row?.description?.country}
-            >
+            {row?.description?.country &&
+            row?.description?.country?.length > 0 ? (
+              <Tooltip
+                className={'max-w-[200px]'}
+                position="top"
+                tooltip={row?.description?.country}
+              >
+                <Image
+                  alt={(row?.description?.country as string) || 'location'}
+                  height={20}
+                  layout="fixed"
+                  src={`https://flagcdn.com/48x36/${row?.description?.country_code?.toLowerCase()}.png`}
+                  unoptimized
+                  width={20}
+                />
+              </Tooltip>
+            ) : (
               <Image
                 alt={(row?.description?.country as string) || 'location'}
                 height={20}
@@ -180,7 +193,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 unoptimized
                 width={20}
               />
-            </Tooltip>
+            )}
           </div>
         ) : (
           <div className="w-4 h-4 bg-gray-300 text-black flex items-center justify-center text-xs dark:bg-black-200 dark:text-white">
@@ -216,8 +229,9 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
         <>
           <button>
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={row.accountId}
+              className={'left-1/2 max-w-[210px]'}
+              position="top"
+              tooltip={row.accountId}
             >
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
@@ -229,8 +243,9 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
           </button>
 
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            label={row.publicKey}
+            className={'max-w-[210px] -left-6'}
+            position="top"
+            tooltip={row.publicKey}
           >
             <span>{row.publicKey ? shortenAddress(row.publicKey) : ''}</span>
           </Tooltip>
@@ -432,13 +447,14 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
           {telemetry && (
             <>
               <td className="pl-8 py-2" colSpan={2}>
-                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
-                  <div className="flex uppercase">
-                    <div>Uptime</div>
+                <div className="flex flex-wrap text-xs text-left text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex">
+                    <div className="uppercase font-semibold">Uptime</div>
                     <div className="relative">
                       <Tooltip
-                        className="absolute top-0 left-0 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={
+                        className={'left-20 max-w-[300px] w-56'}
+                        position="top"
+                        tooltip={
                           'Uptime is estimated by the ratio of the number of produced blocks to the number of expected blocks. '
                         }
                       >
@@ -460,12 +476,15 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 </div>
               </td>
               <td className="px-4 py-2" colSpan={2}>
-                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
-                  <div className="flex uppercase whitespace-nowrap">
-                    <div>Latest block</div>
+                <div className="flex flex-wrap text-xs text-left text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex">
+                    <div className="font-semibold uppercase whitespace-nowrap">
+                      Latest block
+                    </div>
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={
+                      className={'left-20 max-w-[300px] w-56'}
+                      position="top"
+                      tooltip={
                         'The block height the validation node reported in the most recent telemetry heartbeat.'
                       }
                     >
@@ -493,12 +512,15 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 </div>
               </td>
               <td className="px-4 py-2" colSpan={3}>
-                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
-                  <div className="flex uppercase whitespace-nowrap">
-                    <div>Latest Telemetry Update</div>
+                <div className="flex flex-wrap text-xs text-left text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex">
+                    <div className="uppercase font-semibold whitespace-nowrap">
+                      Latest Telemetry Update
+                    </div>
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                      label={
+                      className={'left-20 max-w-[300px] w-56'}
+                      position="top"
+                      tooltip={
                         'Telemetry is a regular notification coming from the nodes which includes generic information like the latest known block height, and the version of NEAR Protocol agent (nearcore).'
                       }
                     >
@@ -515,13 +537,16 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 </div>
               </td>
               <td className="px-4 py-2" colSpan={2}>
-                <div className="flex flex-wrap text-xs text-left font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
-                  <div className="flex uppercase whitespace-nowrap">
-                    <div>Node Agent Name</div>
+                <div className="flex flex-wrap text-xs text-left text-nearblue-600 dark:text-neargray-10 tracking-wider py-2">
+                  <div className="flex">
+                    <div className="uppercase font-semibold whitespace-nowrap">
+                      Node Agent Name
+                    </div>
                     <div className="relative">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={
+                        className={'left-20 max-w-[300px] w-56'}
+                        position="top"
+                        tooltip={
                           <span>
                             NEAR Protocol could have multiple implementations,
                             so agent is the name of that implementation, where
@@ -863,8 +888,11 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                     {
                       <div className="relative">
                         <Tooltip
-                          className="absolute top-0 left-1/2 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          label={totalSupply?.stats[0].total_supply + ' yoctoⓃ'}
+                          className={'left-16 max-w-[300px] w-32'}
+                          position="top"
+                          tooltip={
+                            totalSupply?.stats[0].total_supply + ' yoctoⓃ'
+                          }
                         >
                           <button>
                             {TotalSupply ? formatNumber(TotalSupply) : ''}

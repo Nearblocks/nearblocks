@@ -1,12 +1,15 @@
 'use client';
-import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useState } from 'react';
 
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
@@ -18,6 +21,7 @@ import TxnStatus from '../common/Status';
 import Table from '../common/Table';
 import TableSummary from '../common/TableSummary';
 import TokenImage from '../common/TokenImage';
+import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
@@ -150,8 +154,9 @@ const NFTTransactionActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
@@ -174,8 +179,9 @@ const NFTTransactionActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.cause}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -184,15 +190,26 @@ const NFTTransactionActions = ({
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none">
-            {t('type') || 'METHOD'}{' '}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              {t('type') || 'METHOD'}{' '}
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
+            marginTop={-1.5}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
             <form className="flex flex-col" onSubmit={onFilter}>
               <input
-                className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-gray-500 dark:text-neargray-10  text-xs"
                 name="event"
                 onChange={onChange}
                 placeholder="Search by method"
@@ -200,14 +217,14 @@ const NFTTransactionActions = ({
               />
               <div className="flex">
                 <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                   type="submit"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                   {t('filter.filter') || 'Filter'}
                 </button>
                 <button
-                  className="flex-1 rounded bg-gray-300 text-xs h-7"
+                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                   name="event"
                   onClick={onClear}
                   type="button"
@@ -216,8 +233,8 @@ const NFTTransactionActions = ({
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </PopoverContent>
+        </PopoverRoot>
       ),
       key: 'cause',
       tdClassName:
@@ -228,8 +245,9 @@ const NFTTransactionActions = ({
         <>
           {row?.affected_account_id ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-              label={row?.affected_account_id}
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.affected_account_id}
             >
               <span>
                 <AddressLink
@@ -281,8 +299,9 @@ const NFTTransactionActions = ({
         <>
           {row.involved_account_id ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-              label={row.involved_account_id}
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row.involved_account_id}
             >
               <span>
                 <AddressLink
@@ -301,15 +320,26 @@ const NFTTransactionActions = ({
         </>
       ),
       header: (
-        <Menu>
-          <MenuButton className="flex items-center px-2 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            Involved
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center px-2 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              Involved
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+            marginTop={-1.5}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
             <form className="flex flex-col" onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 name="involved"
                 onChange={onChange}
                 placeholder={
@@ -319,7 +349,7 @@ const NFTTransactionActions = ({
               />
               <div className="flex">
                 <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                   type="submit"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
@@ -335,8 +365,8 @@ const NFTTransactionActions = ({
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </PopoverContent>
+        </PopoverRoot>
       ),
       key: 'involved_account_id',
       tdClassName:
@@ -347,8 +377,9 @@ const NFTTransactionActions = ({
     {
       cell: (row: TransactionInfo) => (
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          label={row?.token_id}
+          className={'left-1/2 max-w-[200px]'}
+          position="top"
+          tooltip={row?.token_id}
         >
           <span>
             <Link
@@ -380,8 +411,9 @@ const NFTTransactionActions = ({
                 />
               </span>
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                label={row?.nft?.name}
+                className={'left-1/2 max-w-[200px] whitespace-nowrap'}
+                position="top"
+                tooltip={row?.nft?.name}
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate whitespace-nowrap">
                   <Link
@@ -395,8 +427,9 @@ const NFTTransactionActions = ({
 
               {row?.nft?.symbol && (
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                  label={row?.nft?.symbol}
+                  className={'left-1/2 max-w-[200px]'}
+                  position="top"
+                  tooltip={row?.nft?.symbol}
                 >
                   <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate whitespace-nowrap">
                     &nbsp; {row?.nft?.symbol}
@@ -422,8 +455,9 @@ const NFTTransactionActions = ({
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={
+            className={'left-1/2 max-w-[200px] whitespace-nowrap'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 
+import Tooltip from '../common/Tooltip';
 import CopyIcon from '../Icons/CopyIcon';
 
 interface ApiKey {
@@ -165,20 +165,26 @@ const Keys = ({ role }: { role?: string }) => {
 
                   {keys?.data.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 overflow-hidden text-ellipsis">
+                      <td className="px-6 py-4  text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black dark:bg-black-200 dark:text-neargray-10 bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                          label={key?.name}
+                          className={'left-1/2 max-w-[200px] '}
+                          position="top"
+                          tooltip={key?.name}
                         >
-                          <span>{key?.name}</span>
+                          <span className="whitespace-nowrap overflow-hidden">
+                            {key?.name}
+                          </span>
                         </Tooltip>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black pt-6 dark:text-neargray-10 align-top max-w-52 overflow-hidden text-ellipsis">
+                      <td className="px-6 py-4  text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black dark:bg-black-200 dark:text-neargray-10 bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                          label={key?.user?.username}
+                          className={'left-1/2 max-w-[200px]'}
+                          position="top"
+                          tooltip={key?.user?.username}
                         >
-                          <span>{key?.user?.email}</span>
+                          <span className="whitespace-nowrap overflow-hidden">
+                            {key?.user?.email}
+                          </span>
                         </Tooltip>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-green-500 dark:text-green-250 align-top">

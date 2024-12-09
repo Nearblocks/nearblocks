@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
 import { Link } from '@/i18n/routing';
@@ -8,6 +7,7 @@ import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 
 import ErrorMessage from '../../common/ErrorMessage';
+import Tooltip from '../../common/Tooltip';
 import FaInbox from '../../Icons/FaInbox';
 import Question from '../../Icons/Question';
 import VerificationStatus from './VerificationStatus';
@@ -67,8 +67,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      label={'Contract version'}
+                      className={'left-16 max-w-[200px] w-28'}
+                      position="top"
+                      tooltip={'Contract version'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -90,8 +91,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      label={'Standards used by the contract'}
+                      className={'left-20 max-w-[200px] w-36'}
+                      position="top"
+                      tooltip={'Standards used by the contract'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -120,8 +122,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      label={
+                      className={'left-24 max-w-[200px] w-44'}
+                      position="top"
+                      tooltip={
                         'Snapshot of the source code used for the contract'
                       }
                     >
@@ -171,8 +174,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      label={'The environment in which the contract was built'}
+                      className={'left-25 max-w-[200px] w-48'}
+                      position="top"
+                      tooltip={
+                        'The environment in which the contract was built'
+                      }
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />
@@ -198,8 +204,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                      label={'Build commands used to compile the contract'}
+                      className={'left-[5.5rem] max-w-[200px] w-40'}
+                      position="top"
+                      tooltip={'Build commands used to compile the contract'}
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />

@@ -10,7 +10,6 @@ interface ActiveLinkProps {
   exact?: boolean | null;
   href: string | UrlObject;
   inActiveClassName?: string;
-  legacyBehavior?: boolean;
   locale?: any;
 }
 
@@ -20,7 +19,6 @@ const ActiveLink = ({
   exact,
   href,
   inActiveClassName,
-  legacyBehavior,
   ...props
 }: ActiveLinkProps) => {
   const asPath = usePathname();
@@ -41,7 +39,7 @@ const ActiveLink = ({
     : `${childClassName} ${inActiveClassName}`;
 
   return (
-    <Link href={href} {...props} legacyBehavior>
+    <Link href={href} {...props}>
       {React.cloneElement(child, {
         className: className || null,
       })}
