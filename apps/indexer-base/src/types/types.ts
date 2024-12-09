@@ -17,7 +17,6 @@ export interface Config {
   insertLimit: number;
   network: Network;
   otelEndpoint?: string;
-  otelServiceName?: string;
   preloadSize: number;
   redisPassword: string;
   redisSentinelName: string;
