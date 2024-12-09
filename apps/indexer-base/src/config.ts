@@ -12,6 +12,7 @@ const env = cleanEnv(process.env, {
     default: DataSource.NEAR_LAKE,
   }),
   BASE_START_BLOCK: num({ default: 0 }),
+  BASELIME_API_KEY: str({ default: '' }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -20,6 +21,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  OTEL_EXPORTER_OTLP_ENDPOINT: str({ default: '' }),
   REDIS_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_NAME: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
@@ -51,6 +53,7 @@ if (env.S3_ENDPOINT) {
 }
 
 const config: Config = {
+  baselimeApiKey: env.BASELIME_API_KEY,
   cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
   dataSource: env.BASE_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
@@ -64,6 +67,7 @@ const config: Config = {
   genesisTimestamp,
   insertLimit: 1_000, // records to insert into the db at a time
   network: env.NETWORK,
+  otelEndpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT,
   preloadSize: 100, // blocks to preload in nearlake
   redisPassword: env.REDIS_PASSWORD,
   redisSentinelName: env.REDIS_SENTINEL_NAME,

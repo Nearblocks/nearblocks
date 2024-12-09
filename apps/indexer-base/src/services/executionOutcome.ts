@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
@@ -6,20 +7,69 @@ import { retry } from 'nb-utils';
 
 import { jsonStringify, mapExecutionStatus } from '#libs/utils';
 
+const outcomeTracer = trace.getTracer('outcome-processor');
+
 export const storeExecutionOutcomes = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
-  await Promise.all(
-    message.shards.map(async (shard) => {
-      await storeChunkExecutionOutcomes(
-        knex,
-        shard.shardId,
-        message.block.header.timestampNanosec,
-        shard.receiptExecutionOutcomes,
-      );
-    }),
-  );
+  const span = outcomeTracer.startSpan('store.execution.outcomes', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.timestamp': message.block.header.timestampNanosec,
+    },
+  });
+
+  try {
+    return await context.with(
+      trace.setSpan(context.active(), span),
+      async () => {
+        await Promise.all(
+          message.shards.map(async (shard) => {
+            const shardSpan = outcomeTracer.startSpan(
+              'process.shard.outcomes',
+              {
+                attributes: {
+                  'outcomes.count': shard.receiptExecutionOutcomes.length,
+                  'shard.id': shard.shardId,
+                },
+              },
+            );
+
+            try {
+              await storeChunkExecutionOutcomes(
+                knex,
+                shard.shardId,
+                message.block.header.timestampNanosec,
+                shard.receiptExecutionOutcomes,
+              );
+              shardSpan.setStatus({ code: SpanStatusCode.OK });
+            } catch (error) {
+              shardSpan.setStatus({
+                code: SpanStatusCode.ERROR,
+                message:
+                  error instanceof Error ? error.message : 'Unknown error',
+              });
+              throw error;
+            } finally {
+              shardSpan.end();
+            }
+          }),
+        );
+
+        span.setStatus({ code: SpanStatusCode.OK });
+      },
+    );
+  } catch (error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
+  } finally {
+    span.end();
+  }
 };
 
 export const storeChunkExecutionOutcomes = async (
