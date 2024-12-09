@@ -5,7 +5,6 @@ import {
   AccordionItem,
   AccordionPanel,
 } from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
 import { useFetch } from '@/hooks/app/useFetch';
@@ -14,6 +13,7 @@ import { shortenAddress } from '@/utils/libs';
 import { SpamToken, Token, TransactionInfo } from '@/utils/types';
 
 import TokenImage, { NFTImage } from '../../common/TokenImage';
+import Tooltip from '../../common/Tooltip';
 import ArrowDown from '../../Icons/ArrowDown';
 import ArrowUp from '../../Icons/ArrowUp';
 import Question from '../../Icons/Question';
@@ -149,8 +149,9 @@ const NFTDetails = ({
                     <div className="flex p-4">
                       <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          label="Current owner of this NFT"
+                          className={'left-[5.5rem] w-40 max-w-[300px]'}
+                          position="bottom"
+                          tooltip="Current owner of this NFT"
                         >
                           <div>
                             <Question className="w-4 h-4 fill-current mr-1" />
@@ -172,8 +173,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="Address of this NFT contract"
+                        className={'left-24 w-44 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="Address of this NFT contract"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -193,8 +195,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="This NFT's unique token ID"
+                        className={'left-[5.5rem] w-40 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="This NFT's unique token ID"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -207,8 +210,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="The standard followed by this NFT"
+                        className={'left-[5.5rem] w-40 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="The standard followed by this NFT"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />

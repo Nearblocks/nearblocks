@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import React from 'react';
@@ -18,6 +17,7 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 
+import Tooltip from '../common/Tooltip';
 import withAuth from '../stores/withAuth';
 
 interface ApiKey {
@@ -151,12 +151,13 @@ const Keys = ({ role }: { role?: string }) => {
 
                   {keys?.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 overflow-hidden text-ellipsis">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black dark:bg-black-200 dark:text-neargray-10 bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                          label={key?.name}
+                          className={'left-1/2 max-w-[200px]'}
+                          position="top"
+                          tooltip={key?.name}
                         >
-                          <span>{key?.name}</span>
+                          <span className="overflow-hidden">{key?.name}</span>
                         </Tooltip>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-green-500 dark:text-green-250 align-top">

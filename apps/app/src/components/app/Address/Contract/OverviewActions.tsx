@@ -1,6 +1,5 @@
 'use client';
 import { Accordion } from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import { useEffect, useRef, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
@@ -18,6 +17,7 @@ import {
   VerifierStatus,
 } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import ContractCode from './ContractCode';
 import Info from './Info';
 import ViewOrChange from './ViewOrChange';
@@ -219,8 +219,9 @@ const OverviewActions = (props: Props) => {
           <div className="border-t p-4 mt-3">
             {signedIn ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                label="Disconnect Wallet"
+                className={'left-1/2 mt-3 max-w-[200px] whitespace-nowrap'}
+                position="bottom"
+                tooltip="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
@@ -277,8 +278,9 @@ const OverviewActions = (props: Props) => {
           <div className="border-t p-4 mt-3">
             {signedIn ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                label="Disconnect Wallet"
+                className={'left-1/2 mt-3 max-w-[200px] whitespace-nowrap'}
+                position="bottom"
+                tooltip="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"

@@ -1,9 +1,14 @@
 'use client';
-import { Menu, MenuButton, MenuItems, MenuPopover } from '@reach/menu-button';
+
 import { useTranslations } from 'next-intl';
 import React, { useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { shortenHex } from '@/utils/app/libs';
 
@@ -70,92 +75,89 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
                 : 'addresses'}{' '}
               {t ? t('foundOn') : 'found on:'}
             </span>
-            <div className="relative flex-1 group">
-              <Menu>
-                <MenuButton
-                  className={`min-w-[8rem] h-8 text-sm px-2 rounded border dark:border-black-200 outline-none flex items-center justify-between ${
-                    multiChainAccounts?.length
-                      ? 'cursor-pointer'
-                      : 'cursor-not-allowed'
-                  }`}
-                  disabled={!multiChainAccounts?.length}
-                  onClick={handleMenuOpen}
-                  ref={buttonRef}
-                >
+            <PopoverRoot positioning={{ sameWidth: true }}>
+              <PopoverTrigger
+                asChild
+                className={`relative min-w-[8rem] h-8 text-sm px-2 rounded border dark:border-black-200 flex items-center focus:outline-none justify-between ${
+                  multiChainAccounts?.length
+                    ? 'cursor-pointer'
+                    : 'cursor-not-allowed'
+                }`}
+                disabled={!multiChainAccounts?.length}
+                onClick={handleMenuOpen}
+                ref={buttonRef}
+              >
+                <button>
                   <span>{t ? t('foreignChain') : 'Foreign Chain'}</span>
                   <ArrowDown className="w-4 h-4 ml-2 fill-current text-gray-500 pointer-events-none" />
-                </MenuButton>
-                <MenuPopover className="relative " portal={false}>
-                  <MenuItems
-                    className={`absolute min-w-fit ${positionClass} bg-white rounded-lg shadow border z-50 dark:border-black-200 dark:bg-black p-2`}
-                  >
-                    <div className="dark:bg-black">
-                      <PerfectScrollbar>
-                        <div className="max-h-60 dark:bg-black">
-                          {multiChainAccounts?.map(
-                            (address: any, index: any) => (
-                              <div
-                                className="pb-2 dark:bg-black flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
-                                key={index}
-                                onClick={() =>
-                                  handleChainSelect(
-                                    address.chain.toLowerCase(),
-                                    address.derived_address,
-                                  )
-                                }
-                                onMouseEnter={() => setHoveredIndex(index)}
-                                onMouseLeave={() => setHoveredIndex(null)}
-                              >
-                                {address?.chain && (
-                                  <div className="flex items-center justify-between w-full ">
-                                    <div className="flex items-center">
-                                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                                        {address.chain === 'BITCOIN' && (
-                                          <Bitcoin className="w-4 h-4 text-orange-400" />
-                                        )}
-                                        {address.chain === 'ETHEREUM' && (
-                                          <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                                        )}
-                                      </div>
-                                      <span className="ml-2">
-                                        {address.path
-                                          .toLowerCase()
-                                          .includes(
-                                            address.chain.toLowerCase() + ',',
-                                          ) ||
-                                        address.path
-                                          .toLowerCase()
-                                          .includes(
-                                            address.chain.toLowerCase() + '-',
-                                          )
-                                          ? address.path
-                                          : address.chain}
-                                      </span>
-                                      <span className="ml-1 text-gray-400">
-                                        ({shortenHex(address.derived_address)})
-                                      </span>
-                                    </div>
-                                    <span
-                                      className={`ml-4 text-gray-400 ${
-                                        hoveredIndex === index
-                                          ? 'opacity-100'
-                                          : 'opacity-0'
-                                      }`}
-                                    >
-                                      <FaExternalLinkAlt />
-                                    </span>
-                                  </div>
-                                )}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={`focus:outline-none -mt-2  min-w-fit ${positionClass} bg-white shadow border z-20 dark:border-black-200 dark:bg-black p-2 overflow-hidden`}
+                rounded={'lg'}
+                width={'48'}
+              >
+                <div className="dark:bg-black">
+                  <PerfectScrollbar>
+                    <div className="max-h-60 dark:bg-black">
+                      {multiChainAccounts?.map((address: any, index: any) => (
+                        <div
+                          className="pb-2 dark:bg-black flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
+                          key={index}
+                          onClick={() =>
+                            handleChainSelect(
+                              address.chain.toLowerCase(),
+                              address.derived_address,
+                            )
+                          }
+                          onMouseEnter={() => setHoveredIndex(index)}
+                          onMouseLeave={() => setHoveredIndex(null)}
+                        >
+                          {address?.chain && (
+                            <div className="flex items-center justify-between w-full ">
+                              <div className="flex items-center">
+                                <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                                  {address.chain === 'BITCOIN' && (
+                                    <Bitcoin className="w-4 h-4 text-orange-400" />
+                                  )}
+                                  {address.chain === 'ETHEREUM' && (
+                                    <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                                  )}
+                                </div>
+                                <span className="ml-2">
+                                  {address.path
+                                    .toLowerCase()
+                                    .includes(
+                                      address.chain.toLowerCase() + ',',
+                                    ) ||
+                                  address.path
+                                    .toLowerCase()
+                                    .includes(address.chain.toLowerCase() + '-')
+                                    ? address.path
+                                    : address.chain}
+                                </span>
+                                <span className="ml-1 text-gray-400">
+                                  ({shortenHex(address.derived_address)})
+                                </span>
                               </div>
-                            ),
+                              <span
+                                className={`ml-4 text-gray-400 ${
+                                  hoveredIndex === index
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                }`}
+                              >
+                                <FaExternalLinkAlt />
+                              </span>
+                            </div>
                           )}
                         </div>
-                      </PerfectScrollbar>
+                      ))}
                     </div>
-                  </MenuItems>
-                </MenuPopover>
-              </Menu>
-            </div>
+                  </PerfectScrollbar>
+                </div>
+              </PopoverContent>
+            </PopoverRoot>
           </div>
         </div>
       </div>

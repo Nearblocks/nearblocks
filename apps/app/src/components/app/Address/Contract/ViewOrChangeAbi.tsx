@@ -4,7 +4,6 @@ import {
   AccordionItem,
   AccordionPanel,
 } from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import uniqueId from 'lodash/uniqueId';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +13,7 @@ import { useVmStore } from '@/stores/app/vm';
 import { capitalize, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import ArrowRight from '../../Icons/ArrowRight';
 import CloseCircle from '../../Icons/CloseCircle';
 import Question from '../../Icons/Question';
@@ -190,8 +190,9 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex items-center dark:text-neargray-10">
             Arguments
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Specify an arguments schema."
+              className={'left-14 max-w-[200px] w-20'}
+              position="bottom"
+              tooltip="Specify an arguments schema."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -246,8 +247,9 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex items-center dark:text-neargray-10">
             Options
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Optional arguments for write operations."
+              className={'left-20 max-w-[200px] w-32'}
+              position="bottom"
+              tooltip="Optional arguments for write operations."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -313,8 +315,9 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
             View txn details:{' '}
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={txn}
+              className={'left-1/2 max-w-[200px] w-96 mt-3'}
+              position="bottom"
+              tooltip={txn}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                 <Link href={`/txns/${txn}`}>{txn}</Link>
