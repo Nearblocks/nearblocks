@@ -20,6 +20,7 @@ interface Props {
     sync: true;
     timestamp: '';
   };
+  theme: string;
   token: Token;
   transfers: string;
 }
@@ -28,6 +29,7 @@ const NFTOverviewActions = ({
   holders,
   id,
   status,
+  theme,
   token,
   transfers,
 }: Props) => {
@@ -227,7 +229,7 @@ const NFTOverviewActions = ({
                     {!token ? (
                       <Skeleton className="h-4 w-32" />
                     ) : (
-                      <Links meta={token} />
+                      <Links meta={token} theme={theme} />
                     )}
                   </div>
                 </div>

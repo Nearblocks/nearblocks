@@ -2,7 +2,7 @@
 import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
@@ -21,12 +21,13 @@ interface Props {
   };
   chartTypes?: string;
   poweredBy?: boolean;
+  theme: string;
 }
 
 const Chart = (props: Props) => {
-  const { chartsData, chartTypes, poweredBy } = props;
+  const { chartsData, chartTypes, poweredBy, theme: cookieTheme } = props;
   const t = useTranslations();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     description: '',
@@ -34,6 +35,10 @@ const Chart = (props: Props) => {
   });
   const [logView, setLogView] = useState(false);
   const { networkId } = useConfig();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);

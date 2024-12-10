@@ -20,15 +20,20 @@ interface Props {
     status: number;
   };
   poweredBy?: boolean;
+  theme: string;
 }
 const TpsChart = (props: Props) => {
-  const { chartTypes, data, poweredBy } = props;
-  const { theme } = useTheme();
+  const { chartTypes, data, poweredBy, theme: cookieTheme } = props;
+  let { theme } = useTheme();
   const t = useTranslations();
   const { networkId } = useConfig();
 
   const [chartTpsData, setChartTpsData] = useState<any>([]);
   const [logView, setLogView] = useState(false);
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);

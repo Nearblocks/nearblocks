@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
@@ -54,6 +54,7 @@ export default async function TxnVolumeChart(props: {
   params: Promise<{ locale: string }>;
 }) {
   const params = await props.params;
+  const theme = (await cookies()).get('theme')?.value || 'light';
 
   const { locale } = params;
 
@@ -76,6 +77,7 @@ export default async function TxnVolumeChart(props: {
                 chartsData={data}
                 chartTypes={'txn-volume'}
                 poweredBy={false}
+                theme={theme}
               />
             </Suspense>
           </div>

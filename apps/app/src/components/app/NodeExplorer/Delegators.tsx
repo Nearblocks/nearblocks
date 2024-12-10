@@ -23,9 +23,10 @@ import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
   accountId: string;
+  theme: string;
 }
 
-const Delegators = ({ accountId }: Props) => {
+const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
   const {
     getAccount,
     getAccounts,
@@ -37,7 +38,7 @@ const Delegators = ({ accountId }: Props) => {
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =
@@ -51,6 +52,10 @@ const Delegators = ({ accountId }: Props) => {
   const [count, setCount] = useState<number>();
   const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
   const initializedRef = useRef(false);
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);

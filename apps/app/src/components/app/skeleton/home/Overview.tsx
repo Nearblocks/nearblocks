@@ -3,17 +3,21 @@
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 
 import Skeleton from '../common/Skeleton';
 
-const HomeOverview = forwardRef(() => {
+const HomeOverview = ({ theme: cookieTheme }: { theme: string }) => {
   const { networkId } = useConfig();
   const t = useTranslations();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   return (
     <div className="container-xxl mx-auto px-5">
@@ -141,6 +145,6 @@ const HomeOverview = forwardRef(() => {
       </div>
     </div>
   );
-});
+};
 HomeOverview.displayName = 'Overview';
 export default HomeOverview;

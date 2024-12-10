@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
@@ -12,6 +13,7 @@ export default async function ChartIndex(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
+  const theme = (await cookies()).get('theme')?.value || 'light';
 
   return (
     <>
@@ -26,7 +28,7 @@ export default async function ChartIndex(props: {
         <div className="container-xxl mx-auto px-5 -mt-36">
           <div className="relative">
             <Suspense fallback={<ChartSkeletion />}>
-              <Chart poweredBy={false} />
+              <Chart poweredBy={false} theme={theme} />
             </Suspense>
           </div>
         </div>

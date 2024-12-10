@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers';
+
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
@@ -17,6 +19,7 @@ const NFTOverview = async ({ id }: any) => {
   const token: Token = tokenResult?.contracts?.[0];
   const transfers = transferResult?.txns?.[0]?.count;
   const holders = holderResult?.holders?.[0]?.count;
+  const theme = (await cookies()).get('theme')?.value || 'light';
   const status = syncResult?.status?.aggregates.ft_holders || {
     height: '0',
     sync: true,
@@ -28,6 +31,7 @@ const NFTOverview = async ({ id }: any) => {
         holders={holders}
         id={id}
         status={status}
+        theme={theme}
         token={token}
         transfers={transfers}
       />
