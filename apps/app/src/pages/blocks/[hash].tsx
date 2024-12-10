@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import useTranslation from 'next-translate/useTranslation';
 import { appUrl } from '@/utils/config';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
@@ -9,6 +9,9 @@ import fetcher from '@/utils/fetcher';
 import { nanoToMilli } from '@/utils/libs';
 import Details from '@/components/Blocks/Detail';
 import { fetchData } from '@/utils/fetchData';
+import useRpc from '@/hooks/useRpc';
+import { BlocksInfo } from '@/utils/types';
+
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
@@ -76,6 +79,9 @@ export const getServerSideProps: GetServerSideProps<{
   }
 };
 
+interface BlockData {
+  blocks: BlocksInfo[];
+}
 const Block = ({
   hash,
   blockInfo,
@@ -83,8 +89,66 @@ const Block = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
-  const blockHeight = Number(blockInfo?.blocks[0]?.block_height);
-  const blockHash = blockInfo?.blocks[0]?.block_hash;
+
+  const { getBlockDetails } = useRpc();
+
+  const [rpcData, setRpcData] = useState<BlockData | null>(null);
+  const [rpcError, setRpcError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchBlockData = async () => {
+      setIsLoading(true);
+      if (!blockInfo) {
+        try {
+          const res = await getBlockDetails(hash);
+
+          if (res) {
+            let limit = 0;
+            let used = 0;
+            limit = res?.chunks.reduce((acc, curr) => acc + curr.gas_limit, 0);
+            used = res.chunks.reduce((acc, curr) => acc + curr.gas_used, 0);
+            const rpcBlockData = {
+              blocks: [
+                {
+                  block_height: res?.header?.height,
+                  block_hash: res?.header?.hash,
+                  block_timestamp: res?.header?.timestamp,
+                  author_account_id: res?.author,
+                  gas_price: res?.header?.gas_price,
+                  prev_block_hash: res?.header?.prev_hash,
+                  chunks_agg: {
+                    shards: res?.header?.chunks_included,
+                    gas_limit: limit,
+                    gas_used: used,
+                  },
+                },
+              ],
+            };
+            setRpcData(rpcBlockData as unknown as BlockData);
+            setIsLoading(false);
+          }
+        } catch (err) {
+          setRpcError(true);
+          setIsLoading(false);
+          console.error('Error fetching block data:', err);
+        } finally {
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchBlockData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockInfo, error, hash]);
+
+  const blockHeight =
+    Number(blockInfo?.blocks[0]?.block_height) ??
+    Number(rpcData?.blocks[0]?.block_height);
+  const blockHash =
+    blockInfo?.blocks[0]?.block_hash ?? rpcData?.blocks[0]?.block_hash;
+
+  const block = blockInfo || rpcData;
 
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
 
@@ -95,33 +159,39 @@ const Block = ({
           {`${network === 'testnet' ? 'TESTNET' : ''} ${t(
             'blocks:block.metaTitle',
             {
-              block: blockHash,
+              block: blockHash ?? '',
             },
           )}`}
         </title>
         <meta
           name="title"
-          content={t('blocks:block.metaTitle', { block: blockHash })}
+          content={t('blocks:block.metaTitle', { block: blockHash ?? '' })}
         />
         <meta
           name="description"
-          content={t('blocks:block.metaDescription', { block: blockHash })}
+          content={t('blocks:block.metaDescription', {
+            block: blockHash ?? '',
+          })}
         />
         <meta
           property="og:title"
-          content={t('blocks:block.metaTitle', { block: blockHash })}
+          content={t('blocks:block.metaTitle', { block: blockHash ?? '' })}
         />
         <meta
           property="og:description"
-          content={t('blocks:block.metaDescription', { block: blockHash })}
+          content={t('blocks:block.metaDescription', {
+            block: blockHash ?? '',
+          })}
         />
         <meta
           property="twitter:title"
-          content={t('blocks:block.metaTitle', { block: blockHash })}
+          content={t('blocks:block.metaTitle', { block: blockHash ?? '' })}
         />
         <meta
           property="twitter:description"
-          content={t('blocks:block.metaDescription', { block: blockHash })}
+          content={t('blocks:block.metaDescription', {
+            block: blockHash ?? '',
+          })}
         />
         <meta property="og:image" content={thumbnail} />
         <meta property="og:image:secure_url" content={thumbnail} />
@@ -131,9 +201,10 @@ const Block = ({
       <div className="relative container mx-auto px-3">
         <Details
           hash={hash}
-          blockInfo={blockInfo}
+          blockInfo={block}
           price={price}
-          error={error}
+          error={error && rpcError}
+          isLoading={isLoading}
         />
       </div>
       <div className="py-8"></div>
