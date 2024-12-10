@@ -1,11 +1,10 @@
 import {
-  RPC,
   RpcResponse,
   RpcResultAccount,
   RpcResultBlock,
   RpcResultReceipt,
   RpcResultTxn,
-} from 'nb-near';
+} from '@/types/types';
 import { Network } from 'nb-types';
 
 export const getProviders = (netwrok: string) => {
@@ -56,7 +55,7 @@ export const getProviders = (netwrok: string) => {
       ];
 };
 
-export const getAccount = async (rpc: RPC, accountId: string) => {
+export const getAccount = async (rpc: any, accountId: string) => {
   try {
     const { data } = await rpc.query({
       account_id: accountId,
@@ -71,7 +70,7 @@ export const getAccount = async (rpc: RPC, accountId: string) => {
   }
 };
 
-export const getBlock = async (rpc: RPC, blockId: number | string) => {
+export const getBlock = async (rpc: any, blockId: number | string) => {
   try {
     const { data } = await rpc.query({ block_id: blockId }, 'block');
 
@@ -82,7 +81,7 @@ export const getBlock = async (rpc: RPC, blockId: number | string) => {
   }
 };
 
-export const getTxn = async (rpc: RPC, txnHash: string) => {
+export const getTxn = async (rpc: any, txnHash: string) => {
   try {
     const { data } = await rpc.query(
       { sender_account_id: 'bowen', tx_hash: txnHash, wait_until: 'NONE' },
@@ -96,7 +95,7 @@ export const getTxn = async (rpc: RPC, txnHash: string) => {
   }
 };
 
-export const getReceipt = async (rpc: RPC, receiptId: string) => {
+export const getReceipt = async (rpc: any, receiptId: string) => {
   try {
     const { data } = await rpc.query(
       { receipt_id: receiptId },
