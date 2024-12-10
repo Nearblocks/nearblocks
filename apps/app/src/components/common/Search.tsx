@@ -17,7 +17,8 @@ import { networkId } from '@/utils/config';
 import ArrowDown from '../Icons/ArrowDown';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import SearchIcon from '../Icons/SearchIcon';
-import search from '@/utils/search';
+import search, { rpcSearch } from '@/utils/search';
+import { useRpcStore } from '@/stores/rpc';
 
 export const SearchToast = () => {
   if (networkId === 'testnet') {
@@ -64,6 +65,7 @@ const Search = ({ header = false }) => {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState({} as any);
   const [filter, setFilter] = useState('all');
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
 
   const homeSearch = router.pathname === '/';
 
@@ -76,7 +78,25 @@ const Search = ({ header = false }) => {
 
   useEffect(() => {
     if (filter && keyword) {
-      search(keyword, filter).then((data) => setResult(data || {}));
+      (async () => {
+        try {
+          const data = await search(keyword, filter);
+          if (data) {
+            setResult(data);
+          } else {
+            const fallbackData = await rpcSearch(rpcUrl, keyword);
+            setResult(fallbackData || {});
+          }
+        } catch (error) {
+          try {
+            const fallbackData = await rpcSearch(rpcUrl, keyword);
+            setResult(fallbackData || {});
+          } catch (rpcError) {
+            console.log('RPC Search fallback error:', rpcError);
+            setResult({});
+          }
+        }
+      })();
     }
   }, [filter, keyword]);
 
@@ -110,6 +130,12 @@ const Search = ({ header = false }) => {
 
     if (route) {
       return redirect(route);
+    }
+
+    const rpcRoute = await rpcSearch(rpcUrl, query, true);
+
+    if (rpcRoute) {
+      return redirect(rpcRoute);
     }
 
     return toast.error(SearchToast);
