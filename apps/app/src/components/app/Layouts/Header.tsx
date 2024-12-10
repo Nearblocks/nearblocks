@@ -2,7 +2,7 @@
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -158,6 +158,7 @@ const Header = ({
   handleFilterAndKeyword,
   role,
   stats: statsDetails,
+  theme: cookieTheme,
   token,
   user,
 }: any) => {
@@ -189,7 +190,11 @@ const Header = ({
   const pathname = usePathname();
   const isMobile = useScreenSize();
   const router = useRouter();
-  const { setTheme, theme } = useTheme();
+  let { setTheme, theme } = useTheme();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {

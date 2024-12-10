@@ -1,16 +1,20 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 
 import { Link } from '@/i18n/routing';
 
 import Arrow from '../Icons/Arrow';
 
-const Footer = () => {
+const Footer = ({ theme: cookieTheme }: { theme: string }) => {
   const currentDate = new Date();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const t = useTranslations();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   return (
     <footer className="footer dark:bg-black-600  ">
@@ -36,7 +40,7 @@ const Footer = () => {
                 <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
                   {t('footer.description')}
                 </p>
-                <div>
+                <div className="flex">
                   <a
                     href="https://twitter.com/nearblocks"
                     rel="noreferrer nofollow noopener"

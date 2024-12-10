@@ -10,7 +10,13 @@ import SponserdText from './SponserdText';
 import LatestTransactions from './Transactions/Latest';
 import Overview from './Transactions/Overview';
 
-export default async function Home({ locale }: { locale: string }) {
+export default async function Home({
+  locale,
+  theme,
+}: {
+  locale: string;
+  theme: string;
+}) {
   const t = await getTranslations({ locale });
   const statsDetails = await getRequest('stats', {});
   const blockDetails = await getRequest('blocks/latest');
@@ -98,7 +104,12 @@ export default async function Home({ locale }: { locale: string }) {
         </div>
       </div>
       <div className="relative -mt-14 ">
-        <Overview chartsDetails={charts} error={!stats} stats={stats} />
+        <Overview
+          chartsDetails={charts}
+          error={!stats}
+          stats={stats}
+          theme={theme}
+        />
       </div>
       <div className="py-8">
         <div className="lg:!hidden block container mx-auto px-3">

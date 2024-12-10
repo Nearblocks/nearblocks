@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
@@ -59,6 +59,7 @@ export default async function BlocksChart(props: {
 
   const t = await getTranslations({ locale });
   const data = await getRequest('charts');
+  const theme = (await cookies()).get('theme')?.value || 'light';
   return (
     <section>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
@@ -76,6 +77,7 @@ export default async function BlocksChart(props: {
                 chartsData={data}
                 chartTypes={'blocks'}
                 poweredBy={false}
+                theme={theme}
               />
             </Suspense>
           </div>

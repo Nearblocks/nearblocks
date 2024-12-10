@@ -2,7 +2,7 @@
 import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
@@ -20,14 +20,19 @@ interface Props {
   chartsDetails: { charts: ChartInfo[] };
   error: boolean;
   stats: StatusInfo;
+  theme: string;
 }
 
-const Overview = ({ chartsDetails, stats }: Props) => {
+const Overview = ({ chartsDetails, stats, theme: cookieTheme }: Props) => {
   const t = useTranslations();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
   const { networkId } = useConfig();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const charts = chartsDetails?.charts;
 
@@ -331,7 +336,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                     alt={t ? t('homePage.activeValidator') : 'activeValidator'}
                     height={24}
                     src={`/images/${
-                      (theme === 'dark' && 'pickaxe_dark.svg') || 'pickaxe.svg'
+                      theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
                     }`}
                     width={24}
                   />

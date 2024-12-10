@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import TpsChart from '@/components/app/Charts/TpsChart';
@@ -53,6 +53,7 @@ export async function generateMetadata(props: {
 
 export default async function Tps() {
   const data = await getRequest('charts/tps');
+  const theme = (await cookies()).get('theme')?.value || 'light';
   return (
     <section>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
@@ -66,7 +67,12 @@ export default async function Tps() {
         <div className="container-xxl mx-auto px-5 -mt-36">
           <div className="relative">
             <Suspense fallback={<ChartDetails chartTypes="near-tps" />}>
-              <TpsChart chartTypes={'near-tps'} data={data} poweredBy={false} />
+              <TpsChart
+                chartTypes={'near-tps'}
+                data={data}
+                poweredBy={false}
+                theme={theme}
+              />
             </Suspense>
           </div>
         </div>

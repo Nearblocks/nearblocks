@@ -81,7 +81,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
           <NextIntlClientProvider messages={messages}>
             <ThemeProvider attribute="class" defaultTheme={theme}>
               <ToastContainer />
-              <LayoutActions>{children}</LayoutActions>
+              <LayoutActions theme={theme}>{children}</LayoutActions>
             </ThemeProvider>
           </NextIntlClientProvider>
         </PublicEnvProvider>
