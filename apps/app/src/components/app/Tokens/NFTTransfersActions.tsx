@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +13,7 @@ import TxnStatus from '../common/Status';
 import Table from '../common/Table';
 import TimeStamp from '../common/TimeStamp';
 import TokenImage from '../common/TokenImage';
+import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
@@ -98,8 +98,9 @@ const NFTTransfersActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
@@ -122,8 +123,9 @@ const NFTTransfersActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.cause}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -144,8 +146,9 @@ const NFTTransfersActions = ({
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -168,8 +171,9 @@ const NFTTransfersActions = ({
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -219,8 +223,9 @@ const NFTTransfersActions = ({
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -243,8 +248,9 @@ const NFTTransfersActions = ({
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -276,8 +282,9 @@ const NFTTransfersActions = ({
       cell: (row: TransactionInfo) => (
         <div className="whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.token_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.token_id}
           >
             <span>
               <Link
@@ -309,8 +316,9 @@ const NFTTransfersActions = ({
                 />
               </span>
               <Tooltip
-                className="h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.nft?.name}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.nft?.name}
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate">
                   <Link
@@ -323,8 +331,9 @@ const NFTTransfersActions = ({
               </Tooltip>
               {row?.nft?.symbol && (
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                  label={row?.nft?.symbol}
+                  className={'left-1/2 max-w-[200px]'}
+                  position="top"
+                  tooltip={row?.nft?.symbol}
                 >
                   <div className="text-sm text-nearblue-700 max-w-[80px] inline-block truncate">
                     &nbsp; {row?.nft?.symbol}
@@ -355,8 +364,8 @@ const NFTTransfersActions = ({
       header: (
         <div className="w-full inline-flex px-5 py-4">
           <Tooltip
-            className="absolute h-auto max-w-[10rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'whitespace-nowrap max-w-[200px]'}
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

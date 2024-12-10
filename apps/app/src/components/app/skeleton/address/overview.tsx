@@ -1,7 +1,7 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
+import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
 
 const Loader = (props: { className?: string; wrapperClassName?: string }) => {
@@ -41,8 +41,9 @@ const OverviewActionsSkeleton = () => {
             <div className="flex flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                  label={'Latest time the contract deployed.'}
+                  className={'left-[5.6rem] max-w-[200px] w-40'}
+                  position="bottom"
+                  tooltip={'Latest time the contract deployed.'}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -57,8 +58,9 @@ const OverviewActionsSkeleton = () => {
             <div className="flex flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                  label={`The transaction unique identifier (hash) that the contract is latest deployed.`}
+                  className={'left-28 max-w-[200px] w-80'}
+                  position="bottom"
+                  tooltip={`The transaction unique identifier (hash) that the contract is latest deployed.`}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -71,8 +73,9 @@ const OverviewActionsSkeleton = () => {
             <div className="flex flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                  label={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
+                  className={'left-28 max-w-[200px] w-80'}
+                  position="bottom"
+                  tooltip={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />
@@ -85,8 +88,9 @@ const OverviewActionsSkeleton = () => {
             <div className="flex flex-wrap p-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                  label={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
+                  className={'left-28 max-w-[200px] w-80'}
+                  position="bottom"
+                  tooltip={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
                 >
                   <div>
                     <Question className="w-4 h-4 fill-current mr-1" />

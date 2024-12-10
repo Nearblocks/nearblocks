@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import Buttons from '@/components/app/Address/Button';
+import Buttons from '@/components/app/common/Button';
 import Delegators from '@/components/app/NodeExplorer/Delegators';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import DelegatorSkeleton from '@/components/app/skeleton/node-explorer/Delegator';

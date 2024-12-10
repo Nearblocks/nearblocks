@@ -1,10 +1,10 @@
-import { Tooltip } from '@reach/tooltip';
 import { useParams } from 'next/navigation';
 
 import AddressLink from '@/components/app/common/AddressLink';
 import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import FaRight from '../../Icons/FaRight';
 import { useActionContext } from './ActionContext';
 
@@ -27,8 +27,9 @@ const FunctionCall = (props: ActionPropsInfo) => {
         Call{' '}
         <span className="font-normal pl-1">
           <Tooltip
-            className="absolute top-0 left-0  h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            label={props.action.args.method_name}
+            className={'left-32 max-w-[200px] w-36'}
+            position="bottom"
+            tooltip={props.action.args.method_name}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[240px] inline-flex truncate">
               <span className="block truncate">

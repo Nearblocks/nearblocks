@@ -1,6 +1,8 @@
 'use client';
 import { usePathname } from 'next/navigation';
 
+import Provider from '@/components/Layouts/Provider';
+
 import Footer from './Footer';
 
 interface LayoutProps {
@@ -19,7 +21,9 @@ const LayoutActions = ({ children, notice }: LayoutProps) => {
   return (
     <div className={className}>
       {notice}
-      <main>{children}</main>
+      <Provider>
+        <main>{children}</main>
+      </Provider>
       <Footer />
     </div>
   );

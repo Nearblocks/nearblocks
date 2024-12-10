@@ -79,9 +79,9 @@ const UserMenu = ({
             {profile.map((menu: any) => (
               <li key={menu.id}>
                 <ActiveLink href={menu.link}>
-                  <a className="block w-full hover:text-green-500 dark:hover:text-green-250 font-medium text-sm dark:text-white text-black-600 py-2 px-4">
+                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 font-medium text-sm dark:text-white text-black-600 py-2 px-4">
                     {menu.title}
-                  </a>
+                  </div>
                 </ActiveLink>
               </li>
             ))}
@@ -126,9 +126,9 @@ const UserMenu = ({
             {profile.map((menu: any) => (
               <li key={menu.id}>
                 <ActiveLink href={menu.link}>
-                  <a className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-white text-black-600">
+                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-white text-black-600">
                     {menu.title}
-                  </a>
+                  </div>
                 </ActiveLink>
               </li>
             ))}
