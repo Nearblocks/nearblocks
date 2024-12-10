@@ -1,9 +1,9 @@
-import { Tooltip } from '@reach/tooltip';
 import React, { useEffect, useState } from 'react';
 
 import { useFetch } from '@/hooks/app/useFetch';
 import { dollarNonCentFormat } from '@/utils/app/libs';
 
+import Tooltip from '../../common/Tooltip';
 import Skeleton from '../../skeleton/common/Skeleton';
 
 interface MarketCapProps {
@@ -50,8 +50,11 @@ const MarketCap = ({ onToggle, showMarketCap, token }: MarketCapProps) => {
         <div className="w-full break-words flex flex-wrap text-sm">
           {fullyDilutedMarketCap > 0 && marketCap > 0 ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-              label={showMarketCap ? 'Click to switch back' : 'Click to switch'}
+              className={'left-1/2 max-w-[200px] whitespace-nowrap'}
+              position="bottom"
+              tooltip={
+                showMarketCap ? 'Click to switch back' : 'Click to switch'
+              }
             >
               <p
                 className="px-1 py-1 text-xs cursor-pointer rounded bg-gray-100 dark:bg-black-200"

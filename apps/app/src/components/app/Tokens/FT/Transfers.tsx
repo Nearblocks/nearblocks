@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -17,6 +16,7 @@ import Filters from '../../common/Filters';
 import TxnStatus from '../../common/Status';
 import Table from '../../common/Table';
 import TimeStamp from '../../common/TimeStamp';
+import Tooltip from '../../common/Tooltip';
 import Clock from '../../Icons/Clock';
 import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
@@ -73,8 +73,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       cell: (row: TransactionInfo) => (
         <>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
@@ -117,8 +118,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       cell: (row: TransactionInfo) => (
         <>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.cause}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -139,8 +141,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
           <>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -163,8 +166,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
           <>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -213,8 +217,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -237,8 +242,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -296,8 +302,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       header: (
         <>
           <Tooltip
-            className="absolute h-auto max-w-[10rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'max-w-[200px] whitespace-nowrap'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

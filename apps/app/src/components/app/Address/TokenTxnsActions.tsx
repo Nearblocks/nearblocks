@@ -1,11 +1,14 @@
 'use client';
-import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useState } from 'react';
 
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/app/libs';
 import { tokenAmount } from '@/utils/app/near';
@@ -19,6 +22,7 @@ import Table from '../common/Table';
 import TableSummary from '../common/TableSummary';
 import TimeStamp from '../common/TimeStamp';
 import TokenImage from '../common/TokenImage';
+import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
@@ -149,8 +153,9 @@ const TokenTxnsActions = ({
       cell: (row: TransactionInfo) => (
         <span className="relative">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-            label={row.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row.transaction_hash}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
               <Link
@@ -173,8 +178,9 @@ const TokenTxnsActions = ({
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-            label={row?.cause}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -184,15 +190,26 @@ const TokenTxnsActions = ({
       ),
       header: (
         <>
-          <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t('type') || 'METHOD'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <PopoverRoot>
+            <PopoverTrigger
+              asChild
+              className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+            >
+              <button>
+                {t('type') || 'METHOD'}{' '}
+                <Filter className="h-4 w-4 fill-current ml-2" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+              marginTop={-1.5}
+              roundedBottom={'lg'}
+              roundedTop={'none'}
+              width={'48'}
+            >
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
-                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="event"
                   onChange={onChange}
                   placeholder="Search by method"
@@ -200,14 +217,14 @@ const TokenTxnsActions = ({
                 />
                 <div className="flex">
                   <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t('filter.filter') || 'Filter'}
                   </button>
                   <button
-                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                     name="event"
                     onClick={onClear}
                     type="button"
@@ -216,8 +233,8 @@ const TokenTxnsActions = ({
                   </button>
                 </div>
               </form>
-            </MenuList>
-          </Menu>
+            </PopoverContent>
+          </PopoverRoot>
         </>
       ),
       key: 'cause',
@@ -229,8 +246,9 @@ const TokenTxnsActions = ({
         <span>
           {row?.affected_account_id ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={row?.affected_account_id}
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.affected_account_id}
             >
               <span>
                 <AddressLink
@@ -282,8 +300,9 @@ const TokenTxnsActions = ({
         <span>
           {row.involved_account_id ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={row.involved_account_id}
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row.involved_account_id}
             >
               <span>
                 <AddressLink
@@ -302,15 +321,26 @@ const TokenTxnsActions = ({
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            Involved
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              Involved
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+            marginTop={-1.5}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
             <form className="flex flex-col" onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 name="involved"
                 onChange={onChange}
                 placeholder={
@@ -320,14 +350,14 @@ const TokenTxnsActions = ({
               />
               <div className="flex">
                 <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                   type="submit"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                   {t('filter.filter') || 'Filter'}
                 </button>
                 <button
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
+                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                   name="involved"
                   onClick={onClear}
                   type="button"
@@ -336,8 +366,8 @@ const TokenTxnsActions = ({
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </PopoverContent>
+        </PopoverRoot>
       ),
       key: 'involved_account_id',
       tdClassName:
@@ -384,8 +414,9 @@ const TokenTxnsActions = ({
                 />
               </span>
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                label={row?.ft?.name}
+                className={'left-1/2 max-w-[200px] whitespace-nowrap'}
+                position="top"
+                tooltip={row?.ft?.name}
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10  max-w-[110px] inline-flex truncate whitespace-nowrap">
                   <Link
@@ -398,8 +429,9 @@ const TokenTxnsActions = ({
               </Tooltip>
               {row?.ft?.symbol && (
                 <Tooltip
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                  label={row?.ft.symbol}
+                  className={'left-1/2 max-w-[200px]'}
+                  position="top"
+                  tooltip={row?.ft.symbol}
                 >
                   <div className="text-sm text-nearblue-700 max-w-[80px] inline-flex truncate">
                     &nbsp; {row?.ft.symbol}
@@ -426,8 +458,9 @@ const TokenTxnsActions = ({
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-            label={
+            className={'left-1/2 max-w-[200px] whitespace-nowrap'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

@@ -1,4 +1,3 @@
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -16,6 +15,7 @@ import AddressLink from '../../common/AddressLink';
 import ErrorMessage from '../../common/ErrorMessage';
 import TxnStatus from '../../common/Status';
 import Table from '../../common/Table';
+import Tooltip from '../../common/Tooltip';
 import Clock from '../../Icons/Clock';
 import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
@@ -66,10 +66,11 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250">
+            <span className="truncate max-w-[120px] whitespace-nowrap inline-block align-bottom text-green-500 dark:text-green-250">
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
@@ -82,8 +83,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       ),
       header: <span>Txn Hash</span>,
       key: 'hash',
-      tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -91,8 +91,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.cause}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl max-w-[120px] px-2 py-1 inline-flex truncate">
               <span className="block truncate">{row?.cause}</span>
@@ -113,8 +114,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -135,8 +137,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -184,8 +187,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
           <span>
             {row?.involved_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.involved_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
               >
                 <span>
                   <AddressLink
@@ -206,8 +210,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
           <span>
             {row?.affected_account_id ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-                label={row?.affected_account_id}
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
               >
                 <span>
                   <AddressLink
@@ -257,8 +262,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-            label={
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={
               showAge
                 ? row?.block_timestamp
                   ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
@@ -283,8 +289,9 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       header: (
         <div>
           <Tooltip
-            className="absolute h-auto max-w-[8rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'whitespace-nowrap max-w-[200px]'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
