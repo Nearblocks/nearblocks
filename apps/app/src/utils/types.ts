@@ -1708,3 +1708,34 @@ export type MultiChainTxnInfo = {
   transaction_hash: string;
   status: boolean;
 };
+
+export type MtTransferLog = {
+  authorized_id?: string;
+  old_owner_id: string;
+  new_owner_id: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtBurnLog = {
+  owner_id: string;
+  authorized_id?: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtMintLog = {
+  owner_id: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtEventLogData = {
+  standard: string;
+  version: string;
+  event: string;
+  data: MtMintLog[] | MtBurnLog[] | MtTransferLog[];
+};
