@@ -151,7 +151,7 @@ const mapValidators = (
   }
 
   for (const nextValidator of epochStatus.next_validators) {
-    const validator = validatorsMap.get(nextValidator.account_id) || {
+    const validator: any = validatorsMap.get(nextValidator.account_id) || {
       accountId: nextValidator.account_id,
       publicKey: nextValidator.public_key,
     };
@@ -162,7 +162,7 @@ const mapValidators = (
   }
 
   for (const nextProposal of epochStatus.current_proposals) {
-    const validator = validatorsMap.get(nextProposal.account_id) || {
+    const validator: any = validatorsMap.get(nextProposal.account_id) || {
       accountId: nextProposal.account_id,
       publicKey: nextProposal.public_key,
     };
@@ -491,11 +491,18 @@ export const validatorsTelemetryCheck = async () => {
     const currentProposals = validators.current_proposals ?? [];
 
     const accountIds = [
-      ...currentValidators.map(({ account_id }) => account_id),
-      ...nextValidators.map(({ account_id }) => account_id),
-      ...currentProposals.map(({ account_id }) => account_id),
+      ...currentValidators.map(
+        ({ account_id }: { account_id: string }) => account_id,
+      ),
+      ...nextValidators.map(
+        ({ account_id }: { account_id: string }) => account_id,
+      ),
+      ...currentProposals.map(
+        ({ account_id }: { account_id: string }) => account_id,
+      ),
       ...(poolIds ?? []),
     ];
+
     const nodesInfo = await db('nodes')
       .select(
         'ip_address',
