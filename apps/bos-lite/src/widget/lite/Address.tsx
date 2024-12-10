@@ -1,12 +1,10 @@
-import type { RpcResultAccount } from 'nb-near';
-
 import type { KeysProps } from '@/Address/Keys';
 import type { CopyProps } from '@/Atoms/Copy';
 import type { ErrorProps } from '@/Atoms/Error';
 import type { ConvertorModule } from '@/libs/convertor';
 import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
-import type { Stats, StatsResponse } from '@/types/types';
+import type { RpcResultAccount, Stats, StatsResponse } from '@/types/types';
 
 type AddressProps = {
   id: string;

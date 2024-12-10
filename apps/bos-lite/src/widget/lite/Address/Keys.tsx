@@ -1,12 +1,10 @@
-import type { RpcResultAccessKey } from 'nb-near';
-
 import type { CopyProps } from '@/Atoms/Copy';
 import type { TooltipProps } from '@/Atoms/Tooltip';
 import type { ConvertorModule } from '@/libs/convertor';
 import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
 import type { UtilsModule } from '@/libs/utils';
-import type { Keys } from '@/types/types';
+import type { Keys, RpcResultAccessKey } from '@/types/types';
 
 export type KeysProps = {
   id: string;

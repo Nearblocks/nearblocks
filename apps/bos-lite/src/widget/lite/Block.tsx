@@ -1,5 +1,3 @@
-import type { RpcResultBlock } from 'nb-near';
-
 import type { CopyProps } from '@/Atoms/Copy';
 import type { ErrorProps } from '@/Atoms/Error';
 import type { TooltipProps } from '@/Atoms/Tooltip';
@@ -7,6 +5,7 @@ import type { ConvertorModule } from '@/libs/convertor';
 import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
 import type { UtilsModule } from '@/libs/utils';
+import { RpcResultBlock } from '@/types/types';
 
 export type BlockProps = {
   hash: string;

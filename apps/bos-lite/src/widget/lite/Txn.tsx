@@ -1,5 +1,3 @@
-import type { RpcResultBlock, RpcResultTxn } from 'nb-near';
-
 import type { CopyProps } from '@/Atoms/Copy';
 import type { ErrorProps } from '@/Atoms/Error';
 import type { TooltipProps } from '@/Atoms/Tooltip';
@@ -8,6 +6,7 @@ import type { FetcherModule } from '@/libs/fetcher';
 import type { FormatterModule } from '@/libs/formatter';
 import type { UtilsModule } from '@/libs/utils';
 import type { TabsProps } from '@/Txn/Tabs';
+import type { RpcResultBlock, RpcResultTxn } from '@/types/types';
 
 type TxnProps = {
   hash: string;

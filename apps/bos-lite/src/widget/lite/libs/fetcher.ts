@@ -1,4 +1,4 @@
-import type { RpcResponse } from 'nb-near';
+import type { RpcResponse } from '@/types/types';
 
 type RetryFetch = (
   url: string,
