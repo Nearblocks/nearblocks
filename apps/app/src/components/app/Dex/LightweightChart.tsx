@@ -53,6 +53,7 @@ const LightweightChart: React.FC = () => {
   );
   const [tooltip, setTooltip] = useState<any>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -163,7 +164,7 @@ const LightweightChart: React.FC = () => {
         vertLines: { color: isDark ? '#444' : '#eee', style: 2 },
       },
       handleScroll: { pressedMouseMove: false },
-      height: 400,
+      height: 300,
       layout: {
         background: { color: isDark ? '#000' : 'white' },
         textColor: isDark ? '#ddd' : '#333',
@@ -211,15 +212,26 @@ const LightweightChart: React.FC = () => {
         selectedChartOption === 'Price' ||
         selectedChartOption === 'Token Price'
       ) {
-        candlestickSeriesRef.current.setData(candlesticks);
-        volumeSeriesRef.current.setData([]);
-        candlestickSeriesRef.current.applyOptions({ visible: true });
-        volumeSeriesRef.current.applyOptions({ visible: false });
+        candlestickSeriesRef?.current?.setData(candlesticks);
+        volumeSeriesRef?.current?.setData([]);
+        candlestickSeriesRef?.current?.applyOptions({ visible: true });
+        volumeSeriesRef?.current?.applyOptions({ visible: false });
+
+        // Update current price (close of the last candlestick)
+        if (candlesticks?.length > 0) {
+          const latestCandle = candlesticks[candlesticks?.length - 1];
+          setCurrentPrice(latestCandle?.close);
+        }
       } else if (selectedChartOption === 'Volume') {
-        volumeSeriesRef.current.setData(volumes);
-        candlestickSeriesRef.current.setData([]);
-        candlestickSeriesRef.current.applyOptions({ visible: false });
-        volumeSeriesRef.current.applyOptions({ visible: true });
+        volumeSeriesRef?.current?.setData(volumes);
+        candlestickSeriesRef?.current?.setData([]);
+        candlestickSeriesRef?.current?.applyOptions({ visible: false });
+        volumeSeriesRef?.current?.applyOptions({ visible: true });
+
+        if (volumes?.length > 0) {
+          const latestCandle = volumes[volumes?.length - 1];
+          setCurrentPrice(latestCandle?.value);
+        }
       }
 
       chartRef.current?.timeScale().fitContent();
@@ -245,9 +257,17 @@ const LightweightChart: React.FC = () => {
               <div>Close: {close}</div>
             </>,
           );
+          setCurrentPrice(close);
         }
       } else {
         setTooltip(null);
+        const seriesData = candlestickSeriesRef.current?.data();
+        if (seriesData && seriesData?.length > 0) {
+          const latestCandle: any = seriesData[seriesData.length - 1];
+          if (latestCandle && latestCandle?.close !== undefined) {
+            setCurrentPrice(latestCandle?.close);
+          }
+        }
       }
     };
 
@@ -310,8 +330,14 @@ const LightweightChart: React.FC = () => {
     );
 
   return (
-    <div className="h-[500px] items-center justify-between">
-      <div className="relative h-[400px]" ref={chartContainerRef}>
+    <div className="h-[385px] items-center justify-between">
+      <div className="relative h-[300px]" ref={chartContainerRef}>
+        {/* Heading */}
+        <div className="absolute top-1.5 bottom-2.5 left-2.5 z-10">
+          <span className="text-3xl font-bold">
+            {currentPrice !== null ? `$${currentPrice.toFixed(2)}` : ''}
+          </span>
+        </div>
         {/* Tooltip */}
         {tooltip && (
           <div

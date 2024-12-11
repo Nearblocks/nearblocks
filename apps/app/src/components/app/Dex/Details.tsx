@@ -1,9 +1,6 @@
 'use client';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
-
-import TokenImage from '@/components/common/TokenImage';
-import Arrow from '@/components/Icons/Arrow';
 import { Link } from '@/i18n/routing';
 import {
   dollarNonCentFormat,
@@ -14,6 +11,8 @@ import { DexInfo, DexTransactionInfo } from '@/utils/types';
 
 import LightweightChart from './LightweightChart';
 import TokenTransfers from './TokenTransfers';
+import TokenImage from '../common/TokenImage';
+import Arrow from '../Icons/Arrow';
 
 interface Props {
   dexInfo: { pairs: DexInfo[] };
@@ -76,7 +75,12 @@ const DexDetails = ({
         </div>
       </div>
       <div className="grid md:grid-cols-12 mb-2 pt-4">
-        <div className="md:col-span-4 lg:col-span-4">
+        <div className="md:col-span-7 lg:col-span-7 ">
+          <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl soft-shadow p-3">
+            <LightweightChart />
+          </div>
+        </div>
+        <div className="md:col-span-5 lg:col-span-5 md:pl-4 lg:!pl-8">
           <div className="bg-white dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 border rounded-xl soft-shadow">
             <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
               <div className="flex p-4">
@@ -205,11 +209,6 @@ const DexDetails = ({
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="md:col-span-8 lg:col-span-8 md:pl-4 lg:!pl-8">
-          <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl soft-shadow p-3">
-            <LightweightChart />
           </div>
         </div>
       </div>

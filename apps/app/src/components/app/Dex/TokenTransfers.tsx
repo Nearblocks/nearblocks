@@ -4,20 +4,20 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TableSummary from '@/components/common/TableSummary';
-import Clock from '@/components/Icons/Clock';
-import FaInbox from '@/components/Icons/FaInbox';
-import Skeleton from '@/components/skeleton/common/Skeleton';
 import { Link } from '@/i18n/routing';
 import { priceFormat } from '@/utils/app/libs';
 import { localFormat, truncateString } from '@/utils/libs';
 import { DexTransactionInfo } from '@/utils/types';
 
-import dayjs from '../../../utils/dayjs';
+import dayjs from '../../../utils/app/dayjs';
 import Filters from '../common/Filters';
 import Table from '../common/Table';
 import Filter from '../Icons/Filter';
+import Skeleton from '../skeleton/common/Skeleton';
+import TableSummary from '../common/TableSummary';
+import ErrorMessage from '../common/ErrorMessage';
+import FaInbox from '../Icons/FaInbox';
+import Clock from '../Icons/Clock';
 
 interface Props {
   data: {

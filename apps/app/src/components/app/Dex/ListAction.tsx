@@ -1,13 +1,11 @@
 'use client';
+
 import { debounce } from 'lodash';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { Suspense, useEffect, useRef, useState } from 'react';
 
-import ErrorMessage from '@/components/common/ErrorMessage';
-import TokenImage from '@/components/common/TokenImage';
-import FaInbox from '@/components/Icons/FaInbox';
 import { Link, usePathname } from '@/i18n/routing';
 import {
   dollarNonCentFormat,
@@ -17,7 +15,10 @@ import {
 } from '@/utils/libs';
 import { DexInfo, Sorting } from '@/utils/types';
 
+import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
+import TokenImage from '../common/TokenImage';
+import FaInbox from '../Icons/FaInbox';
 import SortIcon from '../Icons/SortIcon';
 import Skeleton from '../skeleton/common/Skeleton';
 
@@ -191,21 +192,21 @@ const ListActions = ({ data, dataCount, error, handleSearch }: Props) => {
       header: <span>#</span>,
       key: '',
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-20',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       cell: (row: DexInfo) => (
         <>
-          <div className="flex items-center w-72">
+          <div className="flex items-center">
             <Link
               className={`flex text-green-500 dark:text-green-250 hover:no-underline p-1 border rounded-md ${
                 row?.base_meta?.name === address
                   ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
                   : 'text-green-500 dark:text-green-250 border-transparent'
               }`}
-              href={`/token/${row?.base}`}
+              href={`/dex/${row?.base}`}
               onMouseLeave={handleMouseLeave}
               onMouseOver={(e) => onHandleMouseOver(e, row?.base_meta?.name)}
             >
