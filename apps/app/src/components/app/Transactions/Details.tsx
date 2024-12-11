@@ -801,7 +801,7 @@ const Details = (props: Props) => {
             id="action-row"
           >
             <div className="flex items-start flex-wrap px-4 py-2">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7 py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7 py-0 sm:!py-2">
                 <Tooltip
                   className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                   label={'Highlighted events of the transaction'}

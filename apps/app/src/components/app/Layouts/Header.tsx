@@ -4,14 +4,15 @@ import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { setCurrentTheme } from '@/utils/app/actions';
-import { dollarFormat, nanoToMilli } from '@/utils/libs';
-import { BlocksInfo, Stats } from '@/utils/types';
+import { nanoToMilli } from '@/utils/app/libs';
+import { dollarFormat } from '@/utils/libs';
+import { Stats } from '@/utils/types';
 
 import ActiveLink from '../ActiveLink';
 import Collapse from '../Collapse';
@@ -154,16 +155,16 @@ const languages = [
 ];
 
 const Header = ({
-  block: latestBlocks,
   handleFilterAndKeyword,
   role,
   stats: statsDetails,
+  sync,
   token,
   user,
 }: any) => {
   const stats: Stats | undefined = statsDetails?.stats?.[0];
-  const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
   const [open, setOpen] = useState<boolean>(false);
+  const [syncStatus, setSyncStatus] = useState(true);
 
   const profile = [
     {
@@ -191,19 +192,19 @@ const Header = ({
   const router = useRouter();
   const { setTheme, theme } = useTheme();
 
-  const status = useMemo(() => {
-    if (block?.block_timestamp) {
-      const timestamp = nanoToMilli(block?.block_timestamp);
+  useEffect(() => {
+    if (sync) {
+      const timestamp = nanoToMilli(sync);
 
       const utcDate = Date.parse(new Date(timestamp).toISOString());
       const currentTime = Date.now();
 
       if ((currentTime - utcDate) / (1000 * 60) > 10) {
-        return false;
+        return setSyncStatus(false);
       }
     }
-    return true;
-  }, [block]);
+    return setSyncStatus(true);
+  }, [sync]);
 
   const showSearch = pathname !== '/';
 
@@ -377,7 +378,7 @@ const Header = ({
       </div>
 
       <header className="dark:bg-black-600 bg-white shadow-sm">
-        {!status && (
+        {!syncStatus && (
           <div className="flex flex-wrap">
             <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
               {t('outofSync') ||

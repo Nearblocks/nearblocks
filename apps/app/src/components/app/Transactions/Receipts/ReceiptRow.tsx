@@ -70,7 +70,9 @@ const ReceiptRow = (props: Props) => {
     if (id && receipt?.receipt_id === id) {
       requestAnimationFrame(() => {
         setTimeout(() => {
-          rowRef.current?.scrollIntoView({ behavior: 'smooth' });
+          rowRef.current?.scrollIntoView({
+            behavior: 'smooth',
+          });
         }, 100);
       });
     }
@@ -89,7 +91,10 @@ const ReceiptRow = (props: Props) => {
   }, [receipt?.receipt_id, pageHash]);
 
   return (
-    <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
+    <div
+      className="scroll-mt-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y"
+      ref={rowRef}
+    >
       <div
         className={
           borderFlag
@@ -97,7 +102,6 @@ const ReceiptRow = (props: Props) => {
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
         id={`${receipt?.receipt_id}`}
-        ref={rowRef}
       >
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">

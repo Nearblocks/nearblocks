@@ -177,7 +177,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
 
   const getClassName = (selected: boolean) =>
     classNames(
-      'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
+      'text-xs leading-4 font-medium inline-block whitespace-nowrap cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
         'bg-green-600 dark:bg-green-250 text-white': selected,
         'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
@@ -187,7 +187,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
 
   return (
     <>
-      <div className="relative container-xxl mx-auto px-5">
+      <div className="container-xxl mx-auto px-5 -z">
         {rpcError && (!txn || allRpcProviderError) ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
@@ -201,35 +201,37 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
         ) : (
           <>
             <div className="md:flex justify-between">
-              <div className="w-fit md:flex md:gap-2">
-                {tabs?.map(({ label, name }) => {
-                  return (
-                    <Link
-                      className={getClassName(name === tab)}
-                      href={
-                        name === 'overview'
-                          ? `/txns/${hash}`
-                          : `/txns/${hash}?tab=${name}`
-                      }
-                      key={name}
-                      prefetch={true}
-                    >
-                      <h2>
-                        {label}
-                        {name === 'enhanced' && (
-                          <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md  -mt-3 px-1">
-                            NEW
-                          </div>
-                        )}
-                      </h2>
-                    </Link>
-                  );
-                })}
+              <div className="w-full overflow-x-auto">
+                <div className="flex  min-w-full min-h-fit pt-2">
+                  {tabs?.map(({ label, name }) => {
+                    return (
+                      <Link
+                        className={`${getClassName(name === tab)} `}
+                        href={
+                          name === 'overview'
+                            ? `/txns/${hash}`
+                            : `/txns/${hash}?tab=${name}`
+                        }
+                        key={name}
+                        prefetch={true}
+                      >
+                        <h2 className="!relative">
+                          {label}
+                          {name === 'enhanced' && (
+                            <div className="!absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -mt-3 px-1">
+                              NEW
+                            </div>
+                          )}
+                        </h2>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             </div>
             <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl">
               <>
-                {tab === 'overview' ? (
+                {tab === 'overview' && (
                   <Details
                     hash={hash}
                     isContract={isContract}
@@ -239,26 +241,26 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                   />
-                ) : null}
-                {tab === 'execution' ? (
+                )}
+                {tab === 'execution' && (
                   <Receipt
                     hash={hash}
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                   />
-                ) : null}
-                {tab === 'enhanced' ? (
+                )}
+                {tab === 'enhanced' && (
                   <Execution
                     hash={hash}
                     rpcTxn={rpcTxn}
                     txn={txn ? txn : rpcData}
                   />
-                ) : null}
-                {tab === 'tree' ? (
+                )}
+                {tab === 'tree' && (
                   <Tree hash={hash} rpcTxn={rpcTxn} txn={txn ? txn : rpcData} />
-                ) : null}
-                {tab === 'summary' ? (
+                )}
+                {tab === 'summary' && (
                   <ReceiptSummary
                     hash={hash}
                     loading={false}
@@ -267,12 +269,13 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                   />
-                ) : null}
+                )}
               </>
             </div>
           </>
         )}
       </div>
+
       <div className="py-8"></div>
     </>
   );
