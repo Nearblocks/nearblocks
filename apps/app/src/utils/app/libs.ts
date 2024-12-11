@@ -159,7 +159,7 @@ export function formatCustomDate(inputDate: string) {
 export function localFormat(number: string) {
   const bigNumber = number && new Big(number); // Instantiate Big correctly
   const formattedNumber =
-    bigNumber && bigNumber.toFixed(5).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
+    bigNumber && bigNumber.toFixed(6).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
 
   return formattedNumber && formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
 }

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
 
+import { space_mono } from '@/fonts/font';
 import { useConfig } from '@/hooks/app/useConfig';
 import { jsonParser, jsonStringify } from '@/utils/libs';
 
@@ -154,7 +155,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
         </div>
       ) : (
         <textarea
-          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+          className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y ${space_mono.className}`}
           readOnly
           rows={4}
           style={{ height: '150px' }}

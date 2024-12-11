@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 
 import FaCode from '@/components/app/Icons/FaCode';
+import { space_mono } from '@/fonts/font';
 import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/app/hexy';
 import { shortenAddress } from '@/utils/libs';
@@ -57,7 +58,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         />
       ) : (
         <textarea
-          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+          className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y ${space_mono.className}`}
           defaultValue={displayArgs(args.args_base64 || args.args)}
           readOnly
           rows={4}

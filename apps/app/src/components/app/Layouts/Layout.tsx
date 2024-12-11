@@ -2,12 +2,12 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { PublicEnvProvider } from 'next-runtime-env';
 import { ThemeProvider } from 'next-themes';
-import { Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { manrope } from '@/fonts/font';
 import { GTMID } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
@@ -17,12 +17,6 @@ interface LayoutProps {
   locale: string;
   notice?: React.ReactNode;
 }
-
-const manrope = Manrope({
-  display: 'swap',
-  subsets: ['latin'],
-  weight: ['200', '300', '400', '500', '600'],
-});
 
 const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();

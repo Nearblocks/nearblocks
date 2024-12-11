@@ -2,6 +2,7 @@ import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
+import { space_mono } from '@/fonts/font';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
 import useRpc from '@/hooks/app/useRpc';
@@ -383,13 +384,35 @@ const ReceiptRow = (props: Props) => {
             <div className="w-full md:w-3/4 break-words space-y-4">
               {receipt?.outcome?.logs?.length > 0 ? (
                 <textarea
-                  className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
-                  defaultValue={receipt?.outcome?.logs?.join('\n')}
+                  className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y ${space_mono.className}`}
+                  defaultValue={receipt.outcome.logs
+                    .map((log: any) => {
+                      if (typeof log === 'string') {
+                        const match = log.match(/EVENT_JSON:(\{.*\})/);
+                        if (match) {
+                          try {
+                            const parsed = JSON.parse(match[1]);
+                            return JSON.stringify(
+                              { EVENT_JSON: parsed },
+                              null,
+                              2,
+                            );
+                          } catch (error) {
+                            console.log('Error parsing JSON:', error, log);
+                            return `Invalid JSON log: ${log}`;
+                          }
+                        } else {
+                          return `${log}`;
+                        }
+                      }
+                      return `${log || ''}`;
+                    })
+                    .join('\n\n')}
                   readOnly
-                  rows={4}
-                ></textarea>
+                  rows={10}
+                />
               ) : (
-                'No Logs'
+                <p>No Logs</p>
               )}
             </div>
           )}
