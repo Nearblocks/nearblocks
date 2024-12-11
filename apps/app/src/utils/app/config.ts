@@ -91,12 +91,14 @@ export const chain = {
 
 const evmWalletChains = {
   mainnet: {
+    caipNetworkId: '397',
     chainId: 397,
     explorer: 'https://nearblocks.io',
     name: 'Near Mainnet',
     rpc: 'https://eth-rpc.mainnet.near.org',
   },
   testnet: {
+    caipNetworkId: '398',
     chainId: 398,
     explorer: 'https://testnet.nearblocks.io',
     name: 'Near Testnet',
