@@ -6,8 +6,8 @@ import {
   localFormat,
   shortenToken,
   shortenTokenSymbol,
-  tokenAmount,
-} from '@/utils/libs';
+} from '@/utils/app/libs';
+import { tokenAmount } from '@/utils/app/near';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 
 import Skeleton from '../skeleton/common/Skeleton';
