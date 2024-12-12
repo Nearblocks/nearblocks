@@ -3,10 +3,9 @@ import {
   dollarFormat,
   dollarNonCentFormat,
   localFormat,
-  priceFormat,
   serialNumber,
 } from '@/utils/libs';
-import { Sorting, Token } from '@/utils/types';
+import { Sorting, StatusInfo, Token } from '@/utils/types';
 import Link from 'next/link';
 import { fetcher } from '@/hooks/useFetch';
 import { useRouter } from 'next/router';
@@ -21,6 +20,7 @@ import SortIcon from '@/components/Icons/SortIcon';
 import Table from '@/components/common/Table';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import FaInbox from '@/components/Icons/FaInbox';
+import TokenPrice from './FT/TokenPrice';
 
 const initialForm = {
   search: '',
@@ -40,9 +40,10 @@ interface Props {
     tokens: { count: number }[];
   };
   error: boolean;
+  stats: StatusInfo;
 }
 
-const List = ({ data, tokensCount, error }: Props) => {
+const List = ({ data, tokensCount, error, stats }: Props) => {
   const { t } = useTranslation('token');
   const router = useRouter();
   const { page, search }: any = router.query;
@@ -176,7 +177,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         <span>{serialNumber(i, pagination.page, pagination.per_page)}</span>
       ),
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'pl-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -206,7 +207,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         </>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-80 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-80 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -214,16 +215,14 @@ const List = ({ data, tokensCount, error }: Props) => {
       header: <span>{t ? t('token:fts.top.price') : 'PRICE'}</span>,
       key: 'price',
       cell: (row: Token) => (
-        <span>
-          {row?.price === null ? (
-            <span className="text-xs">N/A</span>
-          ) : (
-            `$${priceFormat(row?.price)}`
-          )}
-        </span>
+        <TokenPrice
+          token={row?.contract}
+          tokenPrice={row?.price}
+          nearPrice={stats?.near_price}
+        />
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-48 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -252,7 +251,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-60 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -269,7 +268,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-52 text-left text-xs whitespace-nowrap font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -301,7 +300,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
     },
@@ -345,7 +344,7 @@ const List = ({ data, tokensCount, error }: Props) => {
         </span>
       ),
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
     },
   ];
   return (

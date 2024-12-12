@@ -17,6 +17,7 @@ import {
   Token,
 } from '@/utils/types';
 import Link from 'next/link';
+import TokenPrice from './TokenPrice';
 
 interface Props {
   id: string;
@@ -106,11 +107,10 @@ const FAQ = ({
                     className="text-sm text-nearblue-600 dark:text-neargray-10 py-2"
                   >
                     The live price of {name} is{' '}
-                    {token?.price !== null && token?.price !== undefined ? (
-                      `$${dollarFormat(token?.price)} (${tokenTicker} / USD)`
-                    ) : (
-                      <span className="text-xs">N/A</span>
-                    )}{' '}
+                    <TokenPrice
+                      token={token?.contract}
+                      tokenPrice={token?.price}
+                    />{' '}
                     today with a current circulating market cap of{' '}
                     {token?.market_cap !== null &&
                     token?.market_cap !== undefined ? (
