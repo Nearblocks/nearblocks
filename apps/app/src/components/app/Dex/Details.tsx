@@ -5,7 +5,6 @@ import { Link } from '@/i18n/routing';
 import {
   dollarNonCentFormat,
   localFormat,
-  priceFormat,
 } from '@/utils/app/libs';
 import { DexInfo, DexTransactionInfo } from '@/utils/types';
 
@@ -13,6 +12,7 @@ import LightweightChart from './LightweightChart';
 import TokenTransfers from './TokenTransfers';
 import TokenImage from '../common/TokenImage';
 import Arrow from '../Icons/Arrow';
+import Widget from './Widget';
 
 interface Props {
   dexInfo: { pairs: DexInfo[] };
@@ -82,7 +82,7 @@ const DexDetails = ({
         </div>
         <div className="md:col-span-5 lg:col-span-5 md:pl-4 lg:!pl-8">
           <div className="bg-white dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 border rounded-xl soft-shadow">
-            <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
+            {/* <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
               <div className="flex p-4">
                 <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                   <span>
@@ -129,6 +129,9 @@ const DexDetails = ({
                   )}
                 </div>
               </div>
+            </div> */}
+             <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
+             <Widget/>
             </div>
           </div>
           <div className="bg-white dark:bg-black-600 dark:border-black-200 dark:text-neargray-10 border rounded-xl soft-shadow mt-4">

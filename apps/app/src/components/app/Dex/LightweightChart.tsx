@@ -188,7 +188,7 @@ const LightweightChart: React.FC = () => {
       priceFormat: {
         type: 'volume',
       },
-      priceScaleId: 'volume',
+      priceScaleId: '',
     });
 
     chartRef.current.timeScale().fitContent();
@@ -212,40 +212,30 @@ const LightweightChart: React.FC = () => {
         selectedChartOption === 'Price' ||
         selectedChartOption === 'Token Price'
       ) {
-        candlestickSeriesRef?.current?.setData(candlesticks);
-        volumeSeriesRef?.current?.setData([]);
-        candlestickSeriesRef?.current?.applyOptions({ visible: true });
-        volumeSeriesRef?.current?.applyOptions({ visible: false });
-
-        // Update current price (close of the last candlestick)
-        if (candlesticks?.length > 0) {
-          const latestCandle = candlesticks[candlesticks?.length - 1];
-          setCurrentPrice(latestCandle?.close);
-        }
+        candlestickSeriesRef.current.setData(candlesticks);
+        candlestickSeriesRef.current.applyOptions({ visible: true });
+        volumeSeriesRef.current.applyOptions({ visible: false });
+        setCurrentPrice(candlesticks?.[candlesticks.length - 1]?.close || null);
       } else if (selectedChartOption === 'Volume') {
-        volumeSeriesRef?.current?.setData(volumes);
-        candlestickSeriesRef?.current?.setData([]);
-        candlestickSeriesRef?.current?.applyOptions({ visible: false });
-        volumeSeriesRef?.current?.applyOptions({ visible: true });
-
-        if (volumes?.length > 0) {
-          const latestCandle = volumes[volumes?.length - 1];
-          setCurrentPrice(latestCandle?.value);
-        }
+        volumeSeriesRef.current.setData(volumes);
+        volumeSeriesRef.current.applyOptions({ visible: true });
+        candlestickSeriesRef.current.applyOptions({ visible: false });
+        setCurrentPrice(volumes?.[volumes.length - 1]?.value || null);
       }
 
       chartRef.current?.timeScale().fitContent();
     };
 
     updateChart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTimeframe, selectedChartOption]);
 
   useEffect(() => {
     const handleMouseMove = (param: MouseEventParams) => {
       if (param.time) {
         const seriesData = candlestickSeriesRef.current?.data();
-        const priceData = seriesData?.find((data) => data.time === param.time);
+        const priceData = seriesData?.find(
+          (data: any) => data.time === param.time,
+        );
 
         if (priceData) {
           const { close, high, low, open } = priceData as CandlestickData;
@@ -333,13 +323,13 @@ const LightweightChart: React.FC = () => {
     <div className="h-[385px] items-center justify-between">
       <div className="relative h-[300px]" ref={chartContainerRef}>
         {/* Heading */}
-        <div className="absolute top-1.5 bottom-2.5 left-2.5 z-10">
+        <div className="absolute top-1.5 bottom-5 left-2.5 z-50">
           <span className="text-3xl font-bold">
             {currentPrice !== null ? `$${currentPrice.toFixed(2)}` : ''}
           </span>
         </div>
         {/* Tooltip */}
-        {tooltip && (
+        {tooltip && selectedChartOption !== 'Volume' && (
           <div
             className="absolute bg-gray-800 text-white px-3 py-1 rounded shadow-md pointer-events-none text-xs items-center"
             ref={tooltipRef}
