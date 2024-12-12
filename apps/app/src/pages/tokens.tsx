@@ -79,7 +79,9 @@ const TopFTTokens = ({
   data,
   dataCount,
   error,
+  statsDetails,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const stats = statsDetails?.stats[0];
   const thumbnail = `${ogUrl}/thumbnail/basic?title=Near%20Protocol%20NEP-141%20Tokens&brand=near`;
   return (
     <>
@@ -128,7 +130,12 @@ const TopFTTokens = ({
         <div className="container mx-auto px-3 -mt-48 ">
           <div className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">
-              <List data={data} tokensCount={dataCount} error={error} />
+              <List
+                data={data}
+                tokensCount={dataCount}
+                error={error}
+                stats={stats}
+              />
             </div>
           </div>
         </div>
