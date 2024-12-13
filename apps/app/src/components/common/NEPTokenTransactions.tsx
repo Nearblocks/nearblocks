@@ -26,12 +26,8 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
           ) {
             return parsedEvent?.data?.map((data: any, j: any) => {
               const apiTokenInfo = ftsEvents?.find((ft: any) => {
-                return (
-                  ft?.affected_account_id === data?.old_owner_id &&
-                  ft?.involved_account_id === data?.new_owner_id
-                );
+                return ft?.ft_meta?.contract === event?.contract;
               });
-
               const contract =
                 Array?.isArray(data?.token_ids) && data?.token_ids?.length > 0
                   ? data?.token_ids?.[0]?.split(':')[1]
@@ -45,7 +41,8 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                 <div className="flex" key={`${index}-${j}`}>
                   <div className="flex items-center flex-wrap break-all leading-7">
                     <FaRight className="inline-flex text-gray-400 text-xs" />
-                    {['mt_mint'].includes(parsedEvent.event) ? (
+                    {['mt_mint'].includes(parsedEvent.event) ||
+                    ['MINT'].includes(apiTokenInfo?.cause) ? (
                       <>
                         <div className="font-semibold text-gray px-1">
                           From{' '}
@@ -74,7 +71,8 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                           )}
                         </div>
                       </>
-                    ) : ['mt_burn'].includes(parsedEvent.event) ? (
+                    ) : ['mt_burn'].includes(parsedEvent.event) ||
+                      ['BURN'].includes(apiTokenInfo?.cause) ? (
                       <>
                         <div className="font-semibold text-gray px-1">
                           From{' '}
