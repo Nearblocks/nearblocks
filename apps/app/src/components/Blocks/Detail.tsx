@@ -221,8 +221,12 @@ const Details = (props: Props) => {
                 {t ? t('blocks:block.gasUsed') : 'GAS Used'}
               </div>
               <div className="w-full md:w-3/4 break-words">
-                {gasUsed
+                {gasUsed !== undefined &&
+                gasUsed !== null &&
+                Number(gasUsed) !== 0
                   ? convertToMetricPrefix(gasUsed.toString()) + 'gas'
+                  : Number(gasUsed) === 0
+                  ? gasUsed + ' gas'
                   : ''}
               </div>
             </div>
@@ -251,7 +255,7 @@ const Details = (props: Props) => {
                 {t ? t('blocks:block.gasFee') : 'Gas Fee'}
               </div>
               <div className="w-full md:w-3/4 break-words">
-                {gasUsed && block?.gas_price
+                {gasUsed !== undefined && gasUsed !== null && block?.gas_price
                   ? gasFee(gasUsed.toString(), block?.gas_price.toString()) +
                     ' Ⓝ'
                   : ''}
