@@ -1,6 +1,9 @@
 import Big from 'big.js';
 import { FieldType, GuessableTypeString } from './types';
 
+const ACCOUNT_ID_REGEX =
+  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
   Object.entries(obj).reduce((a, [k, v]) => {
     if (k === 'id') return a;
@@ -626,4 +629,12 @@ export const parseLink = (link: string) => {
   } catch {
     return null;
   }
+};
+
+export const isValidAccount = (accountId: string) => {
+  return (
+    accountId.length >= 2 &&
+    accountId.length <= 64 &&
+    ACCOUNT_ID_REGEX.test(accountId)
+  );
 };

@@ -1,8 +1,15 @@
 import Layout from '@/components/Layouts';
-import { apiUrl } from '@/utils/config';
+import { apiUrl, networkId } from '@/utils/config';
+import { getReceipt } from '@/utils/rpc';
 import { ReactElement } from 'react';
 
 const Receipt = () => null;
+
+const receiptRpc =
+  networkId === 'mainnet'
+    ? `https://beta.rpc.mainnet.near.org`
+    : `https://beta.rpc.testnet.near.org')`;
+
 const fetcher = async (url: string, options: any) => {
   try {
     const response = await fetch(url, options);
@@ -36,6 +43,20 @@ export const getServerSideProps = async (context: any) => {
   };
 
   let txn = await fetchData();
+
+  if (!txn) {
+    try {
+      const rpcResponse = await getReceipt(receiptRpc, receipt);
+      if (rpcResponse) {
+        txn = rpcResponse?.parent_transaction_hash;
+      }
+    } catch (rpcError) {
+      console.log('RPC call failed:', rpcError);
+      return {
+        notFound: true,
+      };
+    }
+  }
 
   if (txn) {
     return {
