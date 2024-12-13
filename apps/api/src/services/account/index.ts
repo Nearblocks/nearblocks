@@ -25,7 +25,7 @@ const EXPIRY = 60; // 1 mins
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const account = req.validator.data.account;
-  const rpc = req.validator.data.rpc;
+  // const rpc = req.validator.data.rpc;
   // const provider = getProvider(rpc);
 
   const query = sql`
@@ -53,26 +53,30 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       a.account_id = ${account}
   `;
 
-  const [actions] = await Promise.all([
-    redis.cache(
-      `account:${account}:action:${rpc}`,
-      async () => query,
-      EXPIRY * 1, // 1 mins
-    ),
-    // redis.cache(
-    //   `account:${account}:${rpc}`,
-    //   async () => {
-    //     try {
-    //       return await viewAccount(provider, account);
-    //     } catch (error) {
-    //       return null;
-    //     }
-    //   },
-    //   EXPIRY * 1, // 1 mins
-    // ),
-  ]);
+  const queryResult = await query;
 
-  const action = actions?.[0] || {};
+  const action = queryResult[0] || {};
+
+  // const [actions, info] = await Promise.all([
+  //   redis.cache(
+  //     `account:${account}:action:${rpc}`,
+  //     async () => query,
+  //     EXPIRY * 1, // 1 mins
+  //   ),
+  //   redis.cache(
+  //     `account:${account}:${rpc}`,
+  //     async () => {
+  //       try {
+  //         return await viewAccount(provider, account);
+  //       } catch (error) {
+  //         return null;
+  //       }
+  //     },
+  //     EXPIRY * 1, // 1 mins
+  //   ),
+  // ]);
+
+  // const action = actions?.[0] || {};
 
   return res.status(200).json({ account: [{ ...action }] });
 });
