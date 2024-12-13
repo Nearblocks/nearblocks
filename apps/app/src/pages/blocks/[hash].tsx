@@ -99,7 +99,10 @@ const Block = ({
   useEffect(() => {
     const fetchBlockData = async () => {
       setIsLoading(true);
-      if (!blockInfo) {
+      if (
+        !blockInfo ||
+        (Array.isArray(blockInfo.blocks) && blockInfo.blocks.length === 0)
+      ) {
         try {
           const res = await getBlockDetails(hash);
 
@@ -108,6 +111,7 @@ const Block = ({
             let used = 0;
             limit = res?.chunks.reduce((acc, curr) => acc + curr.gas_limit, 0);
             used = res.chunks.reduce((acc, curr) => acc + curr.gas_used, 0);
+
             const rpcBlockData = {
               blocks: [
                 {
@@ -125,17 +129,18 @@ const Block = ({
                 },
               ],
             };
+
             setRpcData(rpcBlockData as unknown as BlockData);
-            setIsLoading(false);
           }
         } catch (err) {
           setRpcError(true);
-          setIsLoading(false);
           console.error('Error fetching block data:', err);
         } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchBlockData();
@@ -148,7 +153,10 @@ const Block = ({
   const blockHash =
     blockInfo?.blocks[0]?.block_hash ?? rpcData?.blocks[0]?.block_hash;
 
-  const block = blockInfo || rpcData;
+  const block =
+    Array.isArray(blockInfo.blocks) && blockInfo.blocks.length === 0
+      ? rpcData
+      : blockInfo;
 
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
 
