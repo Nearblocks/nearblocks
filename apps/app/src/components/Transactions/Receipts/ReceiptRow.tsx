@@ -423,8 +423,30 @@ const ReceiptRow = (props: Props) => {
                 <textarea
                   readOnly
                   rows={4}
-                  defaultValue={receipt?.outcome?.logs?.join('\n')}
-                  className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+                  defaultValue={receipt.outcome.logs
+                    .map((log: any) => {
+                      if (typeof log === 'string') {
+                        const match = log.match(/EVENT_JSON:(\{.*\})/);
+                        if (match) {
+                          try {
+                            const parsed = JSON.parse(match[1]);
+                            return JSON.stringify(
+                              { EVENT_JSON: parsed },
+                              null,
+                              2,
+                            );
+                          } catch (error) {
+                            console.log('Error parsing JSON:', error, log);
+                            return `Invalid JSON log: ${log}`;
+                          }
+                        } else {
+                          return `${log}`;
+                        }
+                      }
+                      return `${log || ''}`;
+                    })
+                    .join('\n\n')}
+                  className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y font-space-mono`}
                 ></textarea>
               ) : (
                 'No Logs'

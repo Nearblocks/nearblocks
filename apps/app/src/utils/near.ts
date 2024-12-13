@@ -921,3 +921,15 @@ export const txnFee = (
     .map((receipt) => receipt.outcome.tokens_burnt)
     .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
 };
+
+export function parseEventLogs(event: TransactionLog): any | {} {
+  let parsedEvent: any | {} = {};
+
+  try {
+    parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+  } catch (error) {
+    console.error('Failed to parse event logs:', error);
+  }
+
+  return parsedEvent;
+}

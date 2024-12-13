@@ -747,6 +747,7 @@ export type TokenInfoProps = {
   contract: string;
   amount: string;
   decimals?: any;
+  apiTokenInfo?: any;
 };
 
 export type ValidatorFullData = {
@@ -1718,4 +1719,35 @@ export type Account = {
   storage_paid_at: number;
   storage_usage: number;
   account_id: string;
+};
+
+export type MtTransferLog = {
+  authorized_id?: string;
+  old_owner_id: string;
+  new_owner_id: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtBurnLog = {
+  owner_id: string;
+  authorized_id?: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtMintLog = {
+  owner_id: string;
+  token_ids: string[];
+  amounts: string[];
+  memo?: string;
+};
+
+export type MtEventLogData = {
+  standard: string;
+  version: string;
+  event: string;
+  data: MtMintLog[] | MtBurnLog[] | MtTransferLog[];
 };

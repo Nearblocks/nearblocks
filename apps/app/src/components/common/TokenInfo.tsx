@@ -9,32 +9,71 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
 import TokenImage from './TokenImage';
+import Big from 'big.js';
 
 const TokenInfo = (props: TokenInfoProps) => {
-  const { contract, amount, decimals } = props;
+  const { contract, amount, decimals, apiTokenInfo } = props;
+
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    ftMetadata(contract).then(setMeta).catch(console.error);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
-  const Loader = (props: { className?: string; wrapperClassName?: string }) => {
-    return (
-      <div
-        className={`bg-gray-200 dark:bg-black-200 h-5 rounded shadow-sm animate-pulse ${props.className} ${props?.wrapperClassName}`}
-      ></div>
-    );
+  const apiMeta = {
+    icon: apiTokenInfo?.ft_meta?.icon,
+    name: apiTokenInfo?.ft_meta?.name,
+    symbol: apiTokenInfo?.ft_meta?.symbol,
+    decimals: apiTokenInfo?.ft_meta?.decimals,
+    delta_amount: apiTokenInfo?.delta_amount,
   };
 
-  return !meta?.name ? (
+  function absoluteValue(number: string) {
+    return new Big(number).abs().toString();
+  }
+  const rpcAmount = localFormat(
+    tokenAmount(amount, decimals || meta?.decimals, true),
+  );
+
+  const apiAmount =
+    apiMeta?.delta_amount && apiMeta?.decimals && tokenAmount
+      ? tokenAmount(
+          absoluteValue(apiMeta?.delta_amount),
+          apiMeta?.decimals,
+          true,
+        )
+      : '';
+
+  useEffect(() => {
+    setLoading(true);
+    ftMetadata(contract)
+      .then((data) => {
+        setMeta(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract]);
+
+  const Loader = ({
+    className = '',
+    wrapperClassName = '',
+  }: {
+    className?: string;
+    wrapperClassName?: string;
+  }) => (
+    <div
+      className={`bg-gray-200 dark:bg-black-200 h-5 w-full max-w-xs rounded shadow-sm animate-pulse ${className} ${wrapperClassName}`}
+    ></div>
+  );
+
+  return loading ? (
     <Loader wrapperClassName="flex w-full max-w-xs" />
   ) : (
     <>
       <span className="font-normal px-1">
-        {amount
-          ? localFormat(tokenAmount(amount, decimals || meta?.decimals, true))
-          : amount ?? ''}
+        {Number(rpcAmount) === 0 ? apiAmount : rpcAmount}
       </span>
       <Link
         href={`/token/${contract}`}
@@ -42,12 +81,14 @@ const TokenInfo = (props: TokenInfoProps) => {
       >
         <span className="flex items-center">
           <TokenImage
-            src={meta?.icon}
-            alt={meta?.name}
+            src={meta?.icon || apiMeta?.icon}
+            alt={meta?.name || apiMeta?.name}
             className="w-4 h-4 mx-1"
           />
-          {shortenToken(meta?.name)}
-          <span>&nbsp;({shortenTokenSymbol(meta?.symbol)})</span>
+          {shortenToken(meta?.name || apiMeta?.name)}
+          <span>
+            &nbsp;({shortenTokenSymbol(meta?.symbol || apiMeta?.symbol)})
+          </span>
         </span>
       </Link>
     </>
