@@ -305,8 +305,8 @@ const Contact = () => {
                 {[
                   {
                     id: Math.random(),
-                    title: 'Pending Transaction',
-                    description: `We do not process transactions and are therefore unable to expedite, cancel or replace them.`,
+                    title: 'Refund Transaction',
+                    description: ` We do not process transactions and are therefore unable to revert, refund, expedite, cancel or replace them.`,
                   },
                   {
                     id: Math.random(),
@@ -330,6 +330,15 @@ const Contact = () => {
                   </div>
                 ))}
               </div>
+              <p className="text-sm">
+                Near community support can be found here
+                <Link
+                  href={`https://dev.near.org/communities`}
+                  className="ml-1 font-semibold"
+                >
+                  https://dev.near.org/communities
+                </Link>
+              </p>
             </div>
             <div className="col-span-6 ">
               <div className="mt-8">
