@@ -430,11 +430,7 @@ const ReceiptRow = (props: Props) => {
                         if (match) {
                           try {
                             const parsed = JSON.parse(match[1]);
-                            return JSON.stringify(
-                              { EVENT_JSON: parsed },
-                              null,
-                              2,
-                            );
+                            return JSON.stringify(parsed, null, 2);
                           } catch (error) {
                             console.log('Error parsing JSON:', error, log);
                             return `Invalid JSON log: ${log}`;
