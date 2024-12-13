@@ -16,16 +16,19 @@ import { BlocksInfo } from '@/utils/types';
 import { networkId } from '@/utils/config';
 import ListCheck from '../Icons/ListCheck';
 import FaCheckCircle from '../Icons/FaCheckCircle';
+import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
   hash: string;
   blockInfo?: any;
   error: boolean;
   price: string;
+  isLoading: boolean;
 }
 
 const Details = (props: Props) => {
-  const { hash, blockInfo, price, error } = props;
+  const { hash, blockInfo, price, error, isLoading } = props;
+
   const { t } = useTranslation();
 
   interface Props {
@@ -44,36 +47,39 @@ const Details = (props: Props) => {
 
   const block: BlocksInfo | null = blockInfo?.blocks?.[0];
 
-  const gasUsed = block?.chunks_agg?.gas_used ?? '';
-  const gasLimit = block?.chunks_agg?.gas_limit ?? '';
-
   return (
     <>
       <div className="flex items-center justify-between flex-wrap">
-        <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
-          {t ? (
-            <>
-              {t('blocks:block.heading.0')}
-              <span key={1} className="font-semibold pl-1">
-                {t('blocks:block.heading.1', {
-                  block: block?.block_height
+        {isLoading ? (
+          <div className="w-80 max-w-xs px-3 py-5">
+            <Skeleton className="h-7" />
+          </div>
+        ) : (
+          <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
+            {t ? (
+              <>
+                {t('blocks:block.heading.0')}
+                <span key={1} className="font-semibold pl-1">
+                  {t('blocks:block.heading.1', {
+                    block: block?.block_height
+                      ? localFormat(block?.block_height.toString())
+                      : '',
+                  })}
+                </span>
+              </>
+            ) : (
+              <>
+                Block
+                <span key={1} className="font-semibold">
+                  #
+                  {block?.block_height
                     ? localFormat(block?.block_height.toString())
-                    : '',
-                })}
-              </span>
-            </>
-          ) : (
-            <>
-              Block
-              <span key={1} className="font-semibold">
-                #
-                {block?.block_height
-                  ? localFormat(block?.block_height.toString())
-                  : ''}
-              </span>
-            </>
-          )}
-        </h1>
+                    : ''}
+                </span>
+              </>
+            )}
+          </h1>
+        )}
         <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
           <li className="ml-3 max-md:mb-2">
             <span className="group flex w-full relative h-full">
@@ -103,7 +109,7 @@ const Details = (props: Props) => {
           </li>
         </ul>
       </div>
-      {error || !block ? (
+      {error || (!isLoading && !block) ? (
         <div className="text-nearblue-700 text-xs px-2 mb-5">
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
@@ -129,104 +135,138 @@ const Details = (props: Props) => {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.height') : 'Block Height'}
               </div>
-              <div className="w-full md:w-3/4 font-semibold break-words">
-                {block?.block_height
-                  ? localFormat(block?.block_height.toString())
-                  : block?.block_height ?? ''}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-20 h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 font-semibold break-words">
+                  {block?.block_height
+                    ? localFormat(block?.block_height.toString())
+                    : block?.block_height ?? ''}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.hash') : 'Hash'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                {block?.block_hash}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-xl h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.block_hash}
+                </div>
+              )}
             </div>
-
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.timestamp') : 'Timestamp'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                {block?.block_timestamp &&
-                  `${getTimeAgoString(
-                    nanoToMilli(block?.block_timestamp),
-                  )} (${convertToUTC(
-                    nanoToMilli(block?.block_timestamp),
-                    true,
-                  )}) +UTC`}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-sm h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.block_timestamp &&
+                    `${getTimeAgoString(
+                      nanoToMilli(block?.block_timestamp),
+                    )} (${convertToUTC(
+                      nanoToMilli(block?.block_timestamp),
+                      true,
+                    )}) +UTC`}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.transactions.0') : 'Transactions'}
               </div>
-              {block?.transactions_agg?.count && (
-                <div className="w-full md:w-3/4 break-words">
-                  {t ? (
-                    <>
-                      <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                        {t('blocks:block.transactions.1', {
-                          txns: block?.transactions_agg?.count
-                            ? localFormat(
-                                block?.transactions_agg?.count?.toString(),
-                              )
-                            : block?.transactions_agg?.count?.toString() ?? '',
-                        })}
-                      </LinkWrapper>
-                      &nbsp;
-                      {t('blocks:block.transactions.2', {
-                        receipts: block?.receipts_agg?.count
-                          ? localFormat(block?.receipts_agg?.count?.toString())
-                          : block?.receipts_agg?.count?.toString() ?? '',
-                      })}
-                    </>
-                  ) : (
-                    <>
-                      (
-                      <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                        {block?.transactions_agg?.count
-                          ? localFormat(
-                              block?.transactions_agg?.count.toString(),
-                            )
-                          : block?.transactions_agg?.count.toString() ??
-                            '' + ' transactions'}
-                      </LinkWrapper>
-                      ) + `and $
-                      {block?.receipts_agg?.count
-                        ? localFormat(block?.receipts_agg?.count.toString())
-                        : block?.receipts_agg?.count ?? ''}{' '}
-                      receipts`
-                    </>
-                  )}
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
+              ) : (
+                block?.transactions_agg?.count && (
+                  <div className="w-full md:w-3/4 break-words">
+                    {t ? (
+                      <>
+                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                          {t('blocks:block.transactions.1', {
+                            txns: block?.transactions_agg?.count
+                              ? localFormat(
+                                  block?.transactions_agg?.count?.toString(),
+                                )
+                              : block?.transactions_agg?.count?.toString() ??
+                                '',
+                          })}
+                        </LinkWrapper>
+                        &nbsp;
+                        {t('blocks:block.transactions.2', {
+                          receipts: block?.receipts_agg?.count
+                            ? localFormat(
+                                block?.receipts_agg?.count?.toString(),
+                              )
+                            : block?.receipts_agg?.count?.toString() ?? '',
+                        })}
+                      </>
+                    ) : (
+                      <>
+                        (
+                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                          {block?.transactions_agg?.count
+                            ? localFormat(
+                                block?.transactions_agg?.count.toString(),
+                              )
+                            : block?.transactions_agg?.count.toString() ??
+                              '' + ' transactions'}
+                        </LinkWrapper>
+                        ) + `and $
+                        {block?.receipts_agg?.count
+                          ? localFormat(block?.receipts_agg?.count.toString())
+                          : block?.receipts_agg?.count ?? ''}{' '}
+                        receipts`
+                      </>
+                    )}
+                  </div>
+                )
               )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.author') : 'Author'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                <Link
-                  href={`/address/${block?.author_account_id}`}
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
-                >
-                  {block?.author_account_id}
-                </Link>
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-lg h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  <Link
+                    href={`/address/${block?.author_account_id}`}
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                  >
+                    {block?.author_account_id}
+                  </Link>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.gasUsed') : 'GAS Used'}
               </div>
               <div className="w-full md:w-3/4 break-words">
-                {gasUsed !== undefined &&
-                gasUsed !== null &&
-                Number(gasUsed) !== 0
-                  ? convertToMetricPrefix(gasUsed.toString()) + 'gas'
-                  : Number(gasUsed) === 0
-                  ? gasUsed + ' gas'
+                {block?.chunks_agg?.gas_used !== undefined &&
+                block?.chunks_agg?.gas_used !== null &&
+                Number(block?.chunks_agg?.gas_used) !== 0
+                  ? convertToMetricPrefix(
+                      block?.chunks_agg?.gas_used.toString(),
+                    ) + 'gas'
+                  : Number(block?.chunks_agg?.gas_used) === 0
+                  ? block?.chunks_agg?.gas_used + ' gas'
                   : ''}
               </div>
             </div>
@@ -234,30 +274,48 @@ const Details = (props: Props) => {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.gasLimit') : 'Gas Limit'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                {gasLimit
-                  ? convertToMetricPrefix(gasLimit.toString()) + 'gas'
-                  : ''}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-lg h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.chunks_agg?.gas_limit
+                    ? convertToMetricPrefix(
+                        block?.chunks_agg?.gas_limit.toString(),
+                      ) + 'gas'
+                    : ''}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.gasPrice') : 'GAS Price'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                {block?.gas_price
-                  ? gasPrice(block?.gas_price.toString())
-                  : block?.gas_price ?? ''}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-lg h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.gas_price
+                    ? gasPrice(block?.gas_price.toString())
+                    : block?.gas_price ?? ''}
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.gasFee') : 'Gas Fee'}
               </div>
               <div className="w-full md:w-3/4 break-words">
-                {gasUsed !== undefined && gasUsed !== null && block?.gas_price
-                  ? gasFee(gasUsed.toString(), block?.gas_price.toString()) +
-                    ' Ⓝ'
+                {block?.chunks_agg?.gas_used !== undefined &&
+                block?.chunks_agg?.gas_used !== null &&
+                block?.gas_price
+                  ? gasFee(
+                      block?.chunks_agg?.gas_used.toString(),
+                      block?.gas_price.toString(),
+                    ) + ' Ⓝ'
                   : ''}
               </div>
             </div>
@@ -265,31 +323,49 @@ const Details = (props: Props) => {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.parenthash') : 'Parent Hash'}
               </div>
-              <div className="w-full md:w-3/4 break-words">
-                <Link
-                  href={`/blocks/${block?.prev_block_hash}`}
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
-                >
-                  {block?.prev_block_hash}
-                </Link>
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-lg h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  <Link
+                    href={`/blocks/${block?.prev_block_hash}`}
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                  >
+                    {block?.prev_block_hash}
+                  </Link>
+                </div>
+              )}
             </div>
             {networkId === 'mainnet' && price && (
               <div className="flex flex-wrap p-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t ? t('blocks:block.price') : 'Price'}
                 </div>
-                <div className="w-full md:w-3/4 break-words">
-                  {price ? `$${dollarFormat(price)} / Ⓝ` : 'N/A'}
-                </div>
+                {isLoading ? (
+                  <div className="w-full md:w-3/4">
+                    <Skeleton className="flex w-full max-w-lg h-4" />
+                  </div>
+                ) : (
+                  <div className="w-full md:w-3/4 break-words">
+                    {price ? `$${dollarFormat(price)} / Ⓝ` : 'N/A'}
+                  </div>
+                )}
               </div>
             )}
             <div className="flex flex-wrap p-4">
               <div className="w-full md:w-1/4 mb-2 md:mb-0">Shard Number</div>
-              <div className="w-full md:w-3/4 break-words">
-                {block?.chunks_agg?.shards?.toString() &&
-                  localFormat(block?.chunks_agg?.shards?.toString())}
-              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-lg h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.chunks_agg?.shards?.toString() &&
+                    localFormat(block?.chunks_agg?.shards?.toString())}
+                </div>
+              )}
             </div>
           </div>
         </>
