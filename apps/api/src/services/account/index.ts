@@ -6,7 +6,7 @@ import {
 import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
-import { getProvider, viewAccessKeys, viewAccount, viewCode } from '#libs/near';
+import { getProvider, viewAccessKeys, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import {
@@ -26,7 +26,7 @@ const EXPIRY = 60; // 1 mins
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const account = req.validator.data.account;
   const rpc = req.validator.data.rpc;
-  const provider = getProvider(rpc);
+  // const provider = getProvider(rpc);
 
   const query = sql`
     SELECT
@@ -53,28 +53,28 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       a.account_id = ${account}
   `;
 
-  const [actions, info] = await Promise.all([
+  const [actions] = await Promise.all([
     redis.cache(
       `account:${account}:action:${rpc}`,
       async () => query,
       EXPIRY * 1, // 1 mins
     ),
-    redis.cache(
-      `account:${account}:${rpc}`,
-      async () => {
-        try {
-          return await viewAccount(provider, account);
-        } catch (error) {
-          return null;
-        }
-      },
-      EXPIRY * 1, // 1 mins
-    ),
+    // redis.cache(
+    //   `account:${account}:${rpc}`,
+    //   async () => {
+    //     try {
+    //       return await viewAccount(provider, account);
+    //     } catch (error) {
+    //       return null;
+    //     }
+    //   },
+    //   EXPIRY * 1, // 1 mins
+    // ),
   ]);
 
   const action = actions?.[0] || {};
 
-  return res.status(200).json({ account: [{ ...info, ...action }] });
+  return res.status(200).json({ account: [{ ...action }] });
 });
 
 const contract = catchAsync(
