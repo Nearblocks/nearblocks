@@ -269,7 +269,13 @@ const Address = ({
   const contractInfo = parseDetails?.contract?.[0]?.contract;
   const schema = parseDetails?.contract?.[0]?.schema;
   const statsData = statsDetails?.stats?.[0];
-  const accountData = accountDetails?.account?.[0] || account;
+  const accountInfo = accountDetails?.account?.[0];
+
+  const accountData = {
+    ...account,
+    ...accountInfo,
+  };
+
   const deploymentData = contractData?.deployments?.[0];
   const tokenData = tokenDetails?.contracts?.[0];
   const nftTokenData = nftTokenDetails?.contracts?.[0];
