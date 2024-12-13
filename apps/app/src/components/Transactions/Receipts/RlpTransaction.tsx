@@ -153,7 +153,7 @@ const RlpTransaction = ({ pretty, method, receiver }: Props) => {
               ? jsonParser(displayedArgs).tx_bytes_b64
               : displayedArgs
           }
-          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
+          className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y font-space-mono"
           style={{ height: '150px' }}
         ></textarea>
       )}

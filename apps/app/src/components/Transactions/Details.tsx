@@ -25,6 +25,7 @@ import {
 import {
   FtsInfo,
   InventoryInfo,
+  MtEventLogData,
   NftsInfo,
   RPCTransactionInfo,
   TransactionInfo,
@@ -40,11 +41,17 @@ import useTranslation from 'next-translate/useTranslation';
 import TxnStatus from '../common/Status';
 import FaRight from '../Icons/FaRight';
 import { Tooltip } from '@reach/tooltip';
-import { txnActions, txnErrorMessage, txnLogs } from '@/utils/near';
+import {
+  parseEventLogs,
+  txnActions,
+  txnErrorMessage,
+  txnLogs,
+} from '@/utils/near';
 import EventLogs from './Action';
 import Actions from './Actions';
 import TokenImage, { NFTImage } from '../common/TokenImage';
 import { isEmpty } from 'lodash';
+import NEPTokenTransactions from '../common/NEPTokenTransactions';
 
 interface Props {
   loading: boolean;
@@ -57,6 +64,7 @@ interface Props {
 
 const Details = (props: Props) => {
   const { loading, txn, rpcTxn, statsData, price, isContract = false } = props;
+
   const [more, setMore] = useState(false);
   const { t } = useTranslation();
   const { fts, nfts } = useMemo(() => {
@@ -125,6 +133,37 @@ const Details = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
+
+  const parsedEvents = useMemo(() => {
+    return (
+      logs?.filter((log: TransactionLog) => {
+        const parsedLog: MtEventLogData = parseEventLogs(log);
+
+        return parsedLog?.standard === 'nep245';
+      }) ?? []
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logs]);
+
+  const allEvents = useMemo(() => {
+    if (
+      logs?.some(
+        (log: TransactionLog) => parseEventLogs(log)?.standard === 'nep245',
+      )
+    ) {
+      return logs ?? [];
+    }
+
+    return (
+      logs?.filter((log: TransactionLog) => {
+        const parsedLog: MtEventLogData = parseEventLogs(log);
+        return parsedLog?.standard === 'nep245';
+      }) ?? []
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logs]);
+
+  const showRow = parsedEvents && parsedEvents.length > 0;
 
   useEffect(() => {
     // Hide txn actions row
@@ -379,7 +418,7 @@ const Details = (props: Props) => {
           )}
         </div>
       </div>
-      {(fts?.length > 0 || nfts?.length > 0) && (
+      {(fts?.length > 0 || nfts?.length > 0 || showRow) && (
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
             <Tooltip
@@ -400,102 +439,123 @@ const Details = (props: Props) => {
             <div className="relative w-full md:w-3/4">
               <PerfectScrollbar>
                 <div className="max-h-[302px] break-words space-y-3">
-                  {fts?.map((ft: any, i: number) => (
-                    <div
-                      className="flex items-center flex-wrap break-all leading-7"
-                      key={i}
-                    >
-                      <FaRight className="inline-flex text-gray-400 text-xs" />
-                      {ft?.cause === 'MINT' ? (
-                        <>
+                  {!allEvents ||
+                    (allEvents.length === 0 &&
+                      fts?.map((ft: any, i: number) => (
+                        <div
+                          className="flex items-center flex-wrap break-all leading-7"
+                          key={i}
+                        >
+                          <FaRight className="inline-flex text-gray-400 text-xs" />
+                          {ft?.cause === 'MINT' ? (
+                            <>
+                              <div className="font-semibold text-gray px-1">
+                                From{' '}
+                                {ft?.involved_account_id ? (
+                                  <Link
+                                    href={`/address/${ft?.involved_account_id}`}
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                  >
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </Link>
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray px-1">
+                                To{' '}
+                                {ft?.affected_account_id ? (
+                                  <Link
+                                    href={`/address/${ft?.affected_account_id}`}
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                  >
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </Link>
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="font-semibold text-gray px-1">
+                                From{' '}
+                                {ft?.affected_account_id ? (
+                                  <Link
+                                    href={`/address/${ft?.affected_account_id}`}
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                  >
+                                    {shortenAddress(
+                                      ft?.affected_account_id ?? '',
+                                    )}
+                                  </Link>
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray px-1">
+                                To{' '}
+                                {ft?.involved_account_id ? (
+                                  <Link
+                                    href={`/address/${ft?.involved_account_id}`}
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                  >
+                                    {shortenAddress(
+                                      ft?.involved_account_id ?? '',
+                                    )}
+                                  </Link>
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          )}
                           <div className="font-semibold text-gray px-1">
-                            From{' '}
-                            {ft?.involved_account_id ? (
-                              <Link
-                                href={`/address/${ft?.involved_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                              >
-                                {shortenAddress(ft?.involved_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
+                            For{' '}
+                            <span className="pl-1 font-normal">
+                              {ft?.delta_amount &&
+                              ft?.ft_meta?.decimals &&
+                              tokenAmount
+                                ? tokenAmount(
+                                    absoluteValue(ft?.delta_amount),
+                                    ft?.ft_meta?.decimals,
+                                    true,
+                                  )
+                                : ''}
+                            </span>
                           </div>
-                          <div className="font-semibold text-gray px-1">
-                            To{' '}
-                            {ft?.affected_account_id ? (
-                              <Link
-                                href={`/address/${ft?.affected_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1"
-                              >
-                                {shortenAddress(ft?.affected_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="font-semibold text-gray px-1">
-                            From{' '}
-                            {ft?.affected_account_id ? (
-                              <Link
-                                href={`/address/${ft?.affected_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                              >
-                                {shortenAddress(ft?.affected_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                          <div className="font-semibold text-gray px-1">
-                            To{' '}
-                            {ft?.involved_account_id ? (
-                              <Link
-                                href={`/address/${ft?.involved_account_id}`}
-                                className="text-green-500 dark:text-green-250 font-normal pl-1"
-                              >
-                                {shortenAddress(ft?.involved_account_id ?? '')}
-                              </Link>
-                            ) : (
-                              <span className="font-normal pl-1">system</span>
-                            )}
-                          </div>
-                        </>
-                      )}
-                      <div className="font-semibold text-gray px-1">
-                        For{' '}
-                        <span className="pl-1 font-normal">
-                          {ft?.delta_amount &&
-                          ft?.ft_meta?.decimals &&
-                          tokenAmount
-                            ? tokenAmount(
-                                absoluteValue(ft?.delta_amount),
-                                ft?.ft_meta?.decimals,
-                                true,
-                              )
-                            : ''}
-                        </span>
-                      </div>
 
-                      <Link
-                        href={`/token/${ft?.ft_meta?.contract}`}
-                        className="text-green dark:text-green-250 flex items-center hover:no-underline"
-                      >
-                        <TokenImage
-                          src={ft?.ft_meta?.icon}
-                          alt={ft?.ft_meta?.name}
-                          className="w-4 h-4 mx-1"
-                        />
-                        {shortenToken(ft?.ft_meta?.name ?? '')}
-                        <span>
-                          {`(${shortenTokenSymbol(ft?.ft_meta?.symbol ?? '')})`}
-                        </span>
-                      </Link>
-                    </div>
-                  ))}
+                          <Link
+                            href={`/token/${ft?.ft_meta?.contract}`}
+                            className="text-green dark:text-green-250 flex items-center hover:no-underline"
+                          >
+                            <TokenImage
+                              src={ft?.ft_meta?.icon}
+                              alt={ft?.ft_meta?.name}
+                              className="w-4 h-4 mx-1"
+                            />
+                            {shortenToken(ft?.ft_meta?.name ?? '')}
+                            <span>
+                              {`(${shortenTokenSymbol(
+                                ft?.ft_meta?.symbol ?? '',
+                              )})`}
+                            </span>
+                          </Link>
+                        </div>
+                      )))}
+
                   {nfts?.map((nft: any) => (
                     <div className="flex" key={nft?.key}>
                       <div className="flex justify-start items-start">
@@ -593,7 +653,6 @@ const Details = (props: Props) => {
                                   ]
                                 </span>
                               </div>
-
                               <Link
                                 href={`/nft-token/${nft?.nft_meta?.contract}`}
                                 className="text-green flex items-center hover:no-underline dark:text-green-250"
@@ -634,6 +693,7 @@ const Details = (props: Props) => {
                       </div>
                     </div>
                   ))}
+                  <NEPTokenTransactions ftsEvents={fts} events={allEvents} />
                 </div>
               </PerfectScrollbar>
             </div>
