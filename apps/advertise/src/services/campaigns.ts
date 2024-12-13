@@ -79,8 +79,8 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const desktopImage =
     type === 'center' ? ad.mobile_image : ad.desktop_image_right;
 
-  const desktopUrl = config.awsPublicUrl + '/' + desktopImage;
-  const mobileUrl = config.awsPublicUrl + '/' + ad.mobile_image;
+  const desktopUrl = config.awsUrl + '/' + desktopImage;
+  const mobileUrl = config.awsUrl + '/' + ad.mobile_image;
 
   const impressionUrl = `${config.apiUrl}/campaigns/track/impression/${ad.id}`;
   const clickUrl = `${config.apiUrl}/campaigns/track/click/${ad.id}`;
@@ -177,7 +177,7 @@ const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
                           <img src="${impressionUrl}" style="display:none">`;
 
   if (ad.icon) {
-    const iconUrl = config.awsPublicUrl + '/' + ad.icon;
+    const iconUrl = config.awsUrl + '/' + ad.icon;
     adCode += `<img src="${iconUrl}" alt="Icon" class="ad-icon" style="display: inline;"> `;
   }
 

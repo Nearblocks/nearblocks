@@ -1,6 +1,6 @@
 export type Config = {
   apiUrl: string;
-  awsPublicUrl: string;
+  awsUrl: string;
   dbUrl: string;
   port: number;
 };

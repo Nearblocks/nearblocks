@@ -8,5 +8,5 @@ Update environment variables in `advertise.env`
 
 ```
 DATABASE_URL=
-AWS_PUBLIC_URL=
+AWS_URL=
 ```
