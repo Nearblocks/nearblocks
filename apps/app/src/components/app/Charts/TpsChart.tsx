@@ -1,9 +1,11 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
@@ -21,19 +23,19 @@ interface Props {
   };
   poweredBy?: boolean;
 }
-const TpsChart = (props: Props) => {
-  const { chartTypes, data, poweredBy } = props;
+
+const TpsChart: React.FC<Props> = ({ chartTypes, data }) => {
   const { theme } = useTheme();
   const t = useTranslations();
   const { networkId } = useConfig();
 
-  const [chartTpsData, setChartTpsData] = useState<any>([]);
+  const [chartTpsData, setChartTpsData] = useState<any[]>([]);
   const [logView, setLogView] = useState(false);
+  const [chartOptions, setChartOptions] = useState<Highcharts.Options>({});
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);
   };
-
   const charts = [
     {
       exclude: `${networkId}` === 'testnet',
@@ -100,14 +102,20 @@ const TpsChart = (props: Props) => {
       link: '/charts/tps',
       text: 'Near Transactions per Second Chart',
     },
+    {
+      exclude: false,
+      image: `/images/charts/multi-chain-txns.svg`,
+      image_dark: `/images/charts/multi-chain-txns_dark.svg`,
+      link: '/charts/multi-chain-txns',
+      text: t ? t('multichainTxns.heading') : 'Multi Chain Transactions Chart',
+    },
   ];
 
   useEffect(() => {
     if (data) {
-      const seriesByShard: {
-        [shard: number]: any[];
-      } = {};
+      const seriesByShard: { [shard: number]: any[] } = {};
       let totalTransactions: any[] = [];
+
       data.charts.forEach((dataPoint: chartDataInfo) => {
         let totalTxns = 0;
         dataPoint?.shards?.forEach((shard: any) => {
@@ -120,139 +128,106 @@ const TpsChart = (props: Props) => {
           ]);
           totalTxns += shard.txns;
         });
+
         totalTransactions.push([
           new Date(parseInt(dataPoint.date) * 1000).valueOf(),
           totalTxns,
         ]);
       });
 
-      const series = Object.keys(seriesByShard).map((shard) => ({
+      const series: Highcharts.SeriesOptionsType[] = Object.keys(
+        seriesByShard,
+      ).map((shard) => ({
         data: seriesByShard[parseInt(shard)].reverse(),
         name: `Shard ${shard}`,
         type: 'line',
       }));
 
-      data &&
-        series.push({
-          data: totalTransactions.reverse(),
-          name: 'Total Transactions',
-          type: 'line',
-        });
+      series.push({
+        data: totalTransactions.reverse(),
+        name: 'Total Transactions',
+        type: 'line',
+      });
+
+      const baseOptions: Highcharts.Options = {
+        accessibility: {
+          enabled: false,
+        },
+        boost: {
+          useGPUTranslations: true,
+        },
+        chart: {
+          backgroundColor: 'transparent',
+          height: 430,
+          panKey: 'shift',
+          zooming: {
+            type: 'x',
+          },
+        },
+        credits: {
+          enabled: false,
+        },
+        legend: {
+          align: 'right',
+          itemHoverStyle: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
+          },
+          itemStyle: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
+          },
+          layout: 'vertical',
+          verticalAlign: 'middle',
+        },
+        plotOptions: {
+          series: {
+            label: {
+              connectorAllowed: false,
+            },
+          },
+        },
+        series: series,
+        subtitle: {
+          text: 'Source: NearBlocks.io',
+        },
+        title: {
+          style: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
+          },
+          text: 'Near Transactions per Second Chart',
+        },
+        tooltip: {
+          headerFormat:
+            '<span style="color: rgb(51, 51, 51); font-size: 0.8em; fill: rgb(51, 51, 51);">{point.key:%A, %e %b %Y, %H:%M:%S}</span><br/>',
+          valueDecimals: 2,
+        },
+        xAxis: {
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+          type: 'datetime',
+        },
+        yAxis: {
+          gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
+          labels: {
+            style: {
+              color: theme === 'dark' ? '#e0e0e0' : '#333333',
+            },
+          },
+          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+          title: {
+            text: 'Transactions per Second',
+          },
+          type: logView ? 'logarithmic' : 'linear',
+        },
+      };
+
       setChartTpsData(series);
+      setChartOptions(baseOptions);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  const chartConfig = {
-    accessibility: {
-      enabled: false,
-    },
-    boost: {
-      useGPUTranslations: true,
-    },
-    chart: {
-      backgroundColor: 'transparent',
-      height: 430,
-      panKey: 'shift',
-      panning: true,
-      zoomType: 'x',
-    },
-    credits: {
-      enabled: false,
-    },
-    legend: {
-      align: 'right',
-      itemHoverStyle: {
-        color: theme === 'dark' ? '#e0e0e0' : '#333333',
-      },
-      itemStyle: {
-        color: theme === 'dark' ? '#e0e0e0' : '#333333',
-      },
-      layout: 'vertical',
-      verticalAlign: 'middle',
-    },
-    plotOptions: {
-      series: {
-        label: {
-          connectorAllowed: false,
-        },
-      },
-    },
-    series: chartTpsData,
-    subtitle: {
-      text: 'Source: NearBlocks.io',
-    },
-    title: {
-      style: {
-        color: theme === 'dark' ? '#e0e0e0' : '#333333',
-      },
-      text: `Near Transactions per Second Chart`,
-    },
-    tooltip: {
-      headerFormat:
-        '<span style="color: rgb(51, 51, 51); font-size: 0.8em; fill: rgb(51, 51, 51);">{point.key:%A, %e %b %Y, %H:%M:%S}</span><br/>',
-      valueDecimals: 2,
-    },
-    xAxis: {
-      labels: {
-        style: {
-          color: theme === 'dark' ? '#e0e0e0' : '#333333',
-        },
-      },
-      lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-      type: 'datetime',
-    },
-    yAxis: {
-      gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
-      labels: {
-        style: {
-          color: theme === 'dark' ? '#e0e0e0' : '#333333',
-        },
-      },
-      lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-      title: {
-        text: 'Transactions per Second',
-      },
-    },
-  };
-
-  const iframeSrc = `
-  <html>
-    <head>
-      <script src="https://code.highcharts.com/highcharts.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
-      <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/big.js@5.2.2"></script>
-      <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <style>
-      body {
-        background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};
-        margin: 0;
-        padding: 0;
-      }
-      html{
-
-        background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};
-      }
-    </style>
-    </head>
-    <body >
-      <div id="chart-container" style="width: 100%; height: 100%;"></div>
-      ${
-        poweredBy
-          ? '<p style="text-align: center; color: #000; font-size: 0.75rem; padding-top: 1rem; padding-bottom: 1rem; font-family: sans-serif;">Powered by <a href="https://nearblocks.io/?utm_source=bos_widget&utm_medium=Charts" target="_blank" style="font-weight: 600; font-family: sans-serif; color: #000; text-decoration: none;">NearBlocks</a></p>'
-          : ''
-      }
-      <script type="text/javascript">
-        const chartConfig = ${JSON.stringify(chartConfig)};
-        if (${logView}) {
-          chartConfig.yAxis.type = 'logarithmic'
-        }
-        Highcharts.chart('chart-container', chartConfig);
-      </script>
-    </body>
-  </html>
-`;
+  }, [data, theme, logView]);
 
   return (
     <div>
@@ -295,16 +270,17 @@ const TpsChart = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="pl-2 pr-2 py-8 h-full ">
+            <div className="pl-2 pr-2 py-8 h-full">
               {chartTpsData && chartTpsData?.length ? (
-                <iframe
-                  srcDoc={iframeSrc}
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#0D0D0D' : '#FFFF',
-                    border: 'none',
-                    height: '100%',
-                    width: '100%',
+                <HighchartsReact
+                  containerProps={{
+                    style: {
+                      height: '100%',
+                      width: '100%',
+                    },
                   }}
+                  highcharts={Highcharts}
+                  options={chartOptions}
                 />
               ) : (
                 <Skeleton className="h-[93%] w-full" />
@@ -347,4 +323,5 @@ const TpsChart = (props: Props) => {
     </div>
   );
 };
+
 export default TpsChart;
