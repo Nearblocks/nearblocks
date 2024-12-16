@@ -44,6 +44,7 @@ const Balance = ({
   deploymentData,
   nftTokenData,
   multiChainAccounts,
+  accessKeys,
 }: any) => {
   const router = useRouter();
   const { id } = router.query;
@@ -111,6 +112,7 @@ const Balance = ({
         accountData &&
         accountData?.deleted?.transaction_hash === null &&
         contract === null &&
+        accessKeys?.length > 0 &&
         !isContractLoading && (
           <>
             <div className="block lg:flex lg:space-x-2">

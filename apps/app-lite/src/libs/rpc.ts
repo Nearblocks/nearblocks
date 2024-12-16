@@ -20,10 +20,6 @@ export const getProviders = (netwrok: string) => {
           url: 'https://rpc.mainnet.near.org',
         },
         {
-          name: 'NEAR (Beta)',
-          url: 'https://beta.rpc.mainnet.near.org',
-        },
-        {
           name: 'FASTNEAR Free',
           url: 'https://free.rpc.fastnear.com',
         },
