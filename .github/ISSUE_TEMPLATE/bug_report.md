@@ -5,6 +5,14 @@ title: ''
 assignees: ''
 ---
 
+## ⚠️ PLEASE READ BEFORE POSTING ⚠️
+
+NearBlocks is an independent block explorer and cannot assist with issues related to tokens, lost funds, or transactions.  
+For support, please contact your wallet provider, exchange, or the project/contract owner, as they are best equipped to help.  
+For developer resources and community support, visit: [https://dev.near.org/communities](https://dev.near.org/communities)
+
+---
+
 ## Bug Report
 
 **Current Behavior**
