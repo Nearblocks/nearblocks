@@ -17,12 +17,13 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
   return (
     <>
       {events &&
+        ftsEvents &&
         events?.map((event: any, index: number) => {
           const parsedEvent: any = parseEventLogs(event);
           if (
             parsedEvent?.standard === 'nep245' ||
             (parsedEvent?.standard === 'nep141' &&
-              Array.isArray(parsedEvent.data))
+              Array.isArray(parsedEvent?.data))
           ) {
             return parsedEvent?.data?.map((data: any, j: any) => {
               const apiTokenInfo = ftsEvents?.find((ft: any) => {
@@ -41,7 +42,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                 <div className="flex" key={`${index}-${j}`}>
                   <div className="flex items-center flex-wrap break-all leading-7">
                     <FaRight className="inline-flex text-gray-400 text-xs" />
-                    {['mt_mint'].includes(parsedEvent.event) ||
+                    {['mt_mint'].includes(parsedEvent?.event) ||
                     ['MINT'].includes(apiTokenInfo?.cause) ? (
                       <>
                         <div className="font-semibold text-gray px-1">

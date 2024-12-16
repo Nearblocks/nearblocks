@@ -134,17 +134,6 @@ const Details = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const parsedEvents = useMemo(() => {
-    return (
-      logs?.filter((log: TransactionLog) => {
-        const parsedLog: MtEventLogData = parseEventLogs(log);
-
-        return parsedLog?.standard === 'nep245';
-      }) ?? []
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logs]);
-
   const allEvents = useMemo(() => {
     if (
       logs?.some(
@@ -163,7 +152,7 @@ const Details = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logs]);
 
-  const showRow = parsedEvents && parsedEvents.length > 0;
+  const showRow = allEvents && allEvents?.length > 0;
 
   useEffect(() => {
     // Hide txn actions row
@@ -440,7 +429,7 @@ const Details = (props: Props) => {
               <PerfectScrollbar>
                 <div className="max-h-[302px] break-words space-y-3">
                   {!allEvents ||
-                    (allEvents.length === 0 &&
+                    (allEvents?.length === 0 &&
                       fts?.map((ft: any, i: number) => (
                         <div
                           className="flex items-center flex-wrap break-all leading-7"
