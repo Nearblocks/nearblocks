@@ -25,10 +25,8 @@ const EXPIRY = 60; // 1 mins
 
 const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const account = req.validator.data.account;
-  // const rpc = req.validator.data.rpc;
-  // const provider = getProvider(rpc);
 
-  const query = sql`
+  const actionQuery = sql`
     SELECT
       a.account_id,
       JSON_BUILD_OBJECT(
@@ -53,32 +51,40 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       a.account_id = ${account}
   `;
 
-  const queryResult = await query;
+  const infoQuery = sql`
+    SELECT
+      be.absolute_staked_amount,
+      be.absolute_nonstaked_amount,
+      be.block_height,
+      b.block_hash
+    FROM
+      balance_events AS be
+      JOIN blocks AS b ON be.block_height = b.block_height
+    WHERE
+      be.affected_account_id = ${account}
+    ORDER BY
+      be.event_index DESC
+    LIMIT
+      1;
+  `;
 
-  const action = queryResult[0] || {};
+  const [actionResult, infoResult] = await Promise.all([
+    actionQuery,
+    infoQuery,
+  ]);
 
-  // const [actions, info] = await Promise.all([
-  //   redis.cache(
-  //     `account:${account}:action:${rpc}`,
-  //     async () => query,
-  //     EXPIRY * 1, // 1 mins
-  //   ),
-  //   redis.cache(
-  //     `account:${account}:${rpc}`,
-  //     async () => {
-  //       try {
-  //         return await viewAccount(provider, account);
-  //       } catch (error) {
-  //         return null;
-  //       }
-  //     },
-  //     EXPIRY * 1, // 1 mins
-  //   ),
-  // ]);
+  const info = infoResult[0]
+    ? {
+        amount: infoResult[0].absolute_nonstaked_amount || '0',
+        block_hash: infoResult[0].block_hash || null,
+        block_height: Number(infoResult[0].block_height) || null,
+        locked: infoResult[0].absolute_staked_amount || '0',
+      }
+    : {};
 
-  // const action = actions?.[0] || {};
+  const action = actionResult[0] || {};
 
-  return res.status(200).json({ account: [{ ...action }] });
+  return res.status(200).json({ account: [{ ...action, ...info }] });
 });
 
 const contract = catchAsync(
