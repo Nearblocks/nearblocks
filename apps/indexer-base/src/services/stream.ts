@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { stream, types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
@@ -27,6 +28,9 @@ if (config.s3Endpoint) {
   lakeConfig.s3ForcePathStyle = true;
   lakeConfig.s3Endpoint = config.s3Endpoint;
 }
+
+// Create the tracer for OpenTelemetry
+const tracer = trace.getTracer('block-processor');
 
 export const syncData = async () => {
   const block = await knex('blocks').orderBy('block_height', 'desc').first();
@@ -75,26 +79,56 @@ export const syncData = async () => {
 };
 
 export const onMessage = async (message: types.StreamerMessage) => {
+  // Create a span for processing each block
+  const span = tracer.startSpan('process.block', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.prev_hash': message.block.header.prevHash,
+      'block.timestamp': message.block.header.timestamp,
+    },
+  });
+
   try {
-    if (message.block.header.height % 1000 === 0)
-      logger.info(`syncing block: ${message.block.header.height}`);
+    // Set the current span as active for this async context
+    await context.with(trace.setSpan(context.active(), span), async () => {
+      if (message.block.header.height % 1000 === 0)
+        logger.info(`syncing block: ${message.block.header.height}`);
 
-    const start = performance.now();
+      const start = performance.now();
 
-    await prepareCache(message);
-    await storeBlock(knex, message);
-    await storeChunks(knex, message);
-    await storeTransactions(knex, message);
-    await storeReceipts(knex, message);
-    await Promise.all([
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
-    ]);
+      await prepareCache(message);
 
-    logger.info({
-      block: message.block.header.height,
-      time: `${performance.now() - start} ms`,
+      await storeBlock(knex, message);
+
+      await storeChunks(knex, message);
+
+      await storeTransactions(knex, message);
+
+      await storeReceipts(knex, message);
+
+      // Create a parent span for parallel operations
+      const parallelSpan = tracer.startSpan('store.parallel_operations');
+      try {
+        await Promise.all([
+          storeExecutionOutcomes(knex, message),
+          storeAccounts(knex, message),
+          storeAccessKeys(knex, message),
+        ]);
+        parallelSpan.setStatus({ code: SpanStatusCode.OK });
+      } finally {
+        parallelSpan.end();
+      }
+
+      const processingTime = performance.now() - start;
+      span.setAttribute('processing.time_ms', processingTime);
+
+      logger.info({
+        block: message.block.header.height,
+        time: `${processingTime} ms`,
+      });
+
+      span.setStatus({ code: SpanStatusCode.OK });
     });
   } catch (error) {
     logger.error(
@@ -102,6 +136,14 @@ export const onMessage = async (message: types.StreamerMessage) => {
     );
     logger.error(error);
     sentry.captureException(error);
+
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+
     process.exit();
+  } finally {
+    span.end();
   }
 };

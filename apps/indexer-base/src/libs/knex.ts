@@ -22,7 +22,7 @@ const knex: Knex = createKnex({
     ssl: ssl?.ca ? ssl : false,
     statement_timeout: 60 * 1000, // 60s
   },
-  pool: { max: 10, min: 1 },
+  pool: { max: 15, min: 1 },
 });
 
 export default knex;

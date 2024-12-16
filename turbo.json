@@ -30,7 +30,8 @@
         "TURNSTILE_SECRET_KEY",
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_RUNTIME",
-        "CI"
+        "CI",
+        "OTEL_EXPORTER_OTLP_ENDPOINT"
       ]
     },
     "pages:build": {

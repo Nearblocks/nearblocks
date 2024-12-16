@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { difference, uniq } from 'lodash-es';
 import { types } from 'near-lake-framework';
 
@@ -15,25 +16,54 @@ import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
+const receiptTracer = trace.getTracer('receipt-processor');
+
 export const storeReceipts = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
-  const chunks = message.shards.flatMap((shard) => shard.chunk || []);
+  const span = receiptTracer.startSpan('store.receipts', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.timestamp': message.block.header.timestampNanosec,
+    },
+  });
 
-  await Promise.all(
-    chunks.map(async (chunk) => {
-      if (chunk.receipts.length) {
-        await storeChunkReceipts(
-          knex,
-          chunk.header.chunkHash,
-          message.block.header.hash,
-          message.block.header.timestampNanosec,
-          chunk.receipts,
+  try {
+    return await context.with(
+      trace.setSpan(context.active(), span),
+      async () => {
+        const chunks = message.shards.flatMap((shard) => shard.chunk || []);
+
+        span.setAttribute('chunks.count', chunks.length);
+
+        await Promise.all(
+          chunks.map(async (chunk) => {
+            if (chunk.receipts.length) {
+              await storeChunkReceipts(
+                knex,
+                chunk.header.chunkHash,
+                message.block.header.hash,
+                message.block.header.timestampNanosec,
+                chunk.receipts,
+              );
+            }
+          }),
         );
-      }
-    }),
-  );
+
+        span.setStatus({ code: SpanStatusCode.OK });
+      },
+    );
+  } catch (error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
+  } finally {
+    span.end();
+  }
 };
 
 const storeChunkReceipts = async (
@@ -43,149 +73,209 @@ const storeChunkReceipts = async (
   blockTimestamp: string,
   receipts: types.Receipt[],
 ) => {
-  const receiptOrDataIds = receipts.map((receipt) =>
-    'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
-  );
-  const txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
-
-  const receiptData: Receipt[] = [];
-  const receiptActionsData: ActionReceiptAction[] = [];
-  const receiptInputData: ActionReceiptInputData[] = [];
-  const receiptOutputData: ActionReceiptOutputData[] = [];
-
-  receipts.forEach((receipt, receiptIndex) => {
-    const receiptOrDataId: string =
-      'Data' in receipt.receipt
-        ? receipt.receipt.Data.dataId
-        : receipt.receiptId;
-    const txnHash = txnHashes.get(receiptOrDataId);
-
-    if (!txnHash) {
-      throw new Error(`no parent transaction for receipt: ${receiptOrDataId}`);
-    }
-
-    let publicKey = null;
-
-    if ('Action' in receipt.receipt) {
-      publicKey = receipt.receipt.Action.signerPublicKey;
-
-      receipt.receipt.Action.inputDataIds.forEach((dataId) => {
-        receiptInputData.push(
-          getActionReceiptInputData(receiptOrDataId, dataId),
-        );
-      });
-      receipt.receipt.Action.outputDataReceivers.forEach((receiver) => {
-        receiptOutputData.push(
-          getActionReceiptOutputData(receiptOrDataId, receiver),
-        );
-      });
-
-      let actionIndex = 0;
-      receipt.receipt.Action.actions.forEach((action) => {
-        if (isDelegateAction(action)) {
-          receiptActionsData.push(
-            getActionReceiptActionData(
-              blockTimestamp,
-              receiptOrDataId,
-              actionIndex,
-              action,
-              receipt.predecessorId,
-              receipt.receiverId,
-            ),
-          );
-          actionIndex += 1;
-
-          action.Delegate.delegateAction.actions.forEach((action) => {
-            receiptActionsData.push(
-              getActionReceiptActionData(
-                blockTimestamp,
-                receiptOrDataId,
-                actionIndex,
-                action,
-                receipt.predecessorId,
-                receipt.receiverId,
-              ),
-            );
-            actionIndex += 1;
-          });
-
-          return;
-        }
-
-        receiptActionsData.push(
-          getActionReceiptActionData(
-            blockTimestamp,
-            receiptOrDataId,
-            actionIndex,
-            action,
-            receipt.predecessorId,
-            receipt.receiverId,
-          ),
-        );
-        actionIndex += 1;
-      });
-    }
-
-    receiptData.push(
-      getReceiptData(
-        receipt,
-        chunkHash,
-        blockHash,
-        blockTimestamp,
-        txnHash,
-        receiptIndex,
-        publicKey,
-      ),
-    );
+  const span = receiptTracer.startSpan('store.chunk.receipts', {
+    attributes: {
+      'chunk.hash': chunkHash,
+      'receipts.count': receipts.length,
+    },
   });
 
-  const promises = [];
+  try {
+    return await context.with(
+      trace.setSpan(context.active(), span),
+      async () => {
+        const fetchHashesSpan = receiptTracer.startSpan(
+          'fetch.transaction.hashes',
+        );
+        const receiptOrDataIds = receipts.map((receipt) =>
+          'Data' in receipt.receipt
+            ? receipt.receipt.Data.dataId
+            : receipt.receiptId,
+        );
+        let txnHashes: Map<string, string>;
 
-  if (receiptData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('receipts')
-          .insert(receiptData)
-          .onConflict(['receipt_id'])
-          .ignore();
-      }),
+        try {
+          txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
+          fetchHashesSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          fetchHashesSpan.end();
+        }
+
+        const processSpan = receiptTracer.startSpan('process.receipts.data');
+        const receiptData: Receipt[] = [];
+        const receiptActionsData: ActionReceiptAction[] = [];
+        const receiptInputData: ActionReceiptInputData[] = [];
+        const receiptOutputData: ActionReceiptOutputData[] = [];
+
+        try {
+          // Processing each receipt
+          receipts.forEach((receipt, receiptIndex) => {
+            const receiptOrDataId: string =
+              'Data' in receipt.receipt
+                ? receipt.receipt.Data.dataId
+                : receipt.receiptId;
+            const txnHash = txnHashes.get(receiptOrDataId);
+
+            if (!txnHash) {
+              throw new Error(
+                `no parent transaction for receipt: ${receiptOrDataId}`,
+              );
+            }
+
+            let publicKey = null;
+
+            if ('Action' in receipt.receipt) {
+              publicKey = receipt.receipt.Action.signerPublicKey;
+
+              receipt.receipt.Action.inputDataIds.forEach((dataId) => {
+                receiptInputData.push(
+                  getActionReceiptInputData(receiptOrDataId, dataId),
+                );
+              });
+              receipt.receipt.Action.outputDataReceivers.forEach((receiver) => {
+                receiptOutputData.push(
+                  getActionReceiptOutputData(receiptOrDataId, receiver),
+                );
+              });
+
+              let actionIndex = 0;
+              receipt.receipt.Action.actions.forEach((action) => {
+                if (isDelegateAction(action)) {
+                  receiptActionsData.push(
+                    getActionReceiptActionData(
+                      blockTimestamp,
+                      receiptOrDataId,
+                      actionIndex,
+                      action,
+                      receipt.predecessorId,
+                      receipt.receiverId,
+                    ),
+                  );
+                  actionIndex += 1;
+
+                  action.Delegate.delegateAction.actions.forEach((action) => {
+                    receiptActionsData.push(
+                      getActionReceiptActionData(
+                        blockTimestamp,
+                        receiptOrDataId,
+                        actionIndex,
+                        action,
+                        receipt.predecessorId,
+                        receipt.receiverId,
+                      ),
+                    );
+                    actionIndex += 1;
+                  });
+
+                  return;
+                }
+
+                receiptActionsData.push(
+                  getActionReceiptActionData(
+                    blockTimestamp,
+                    receiptOrDataId,
+                    actionIndex,
+                    action,
+                    receipt.predecessorId,
+                    receipt.receiverId,
+                  ),
+                );
+                actionIndex += 1;
+              });
+            }
+
+            receiptData.push(
+              getReceiptData(
+                receipt,
+                chunkHash,
+                blockHash,
+                blockTimestamp,
+                txnHash,
+                receiptIndex,
+                publicKey,
+              ),
+            );
+          });
+
+          processSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          processSpan.end();
+        }
+
+        const dbSpan = receiptTracer.startSpan('store.receipts.data', {
+          attributes: {
+            'actions.count': receiptActionsData.length,
+            'inputs.count': receiptInputData.length,
+            'outputs.count': receiptOutputData.length,
+            'receipts.count': receiptData.length,
+          },
+        });
+
+        try {
+          const promises = [];
+
+          if (receiptData.length) {
+            promises.push(
+              retry(async () => {
+                await knex('receipts')
+                  .insert(receiptData)
+                  .onConflict(['receipt_id'])
+                  .ignore();
+              }),
+            );
+          }
+
+          if (receiptActionsData.length) {
+            promises.push(
+              retry(async () => {
+                await knex('action_receipt_actions')
+                  .insert(receiptActionsData)
+                  .onConflict(['receipt_id', 'index_in_action_receipt'])
+                  .ignore();
+              }),
+            );
+          }
+
+          if (receiptInputData.length) {
+            promises.push(
+              retry(async () => {
+                await knex('action_receipt_input_data')
+                  .insert(receiptInputData)
+                  .onConflict(['input_data_id', 'input_to_receipt_id'])
+                  .ignore();
+              }),
+            );
+          }
+
+          if (receiptOutputData.length) {
+            promises.push(
+              retry(async () => {
+                await knex('action_receipt_output_data')
+                  .insert(receiptOutputData)
+                  .onConflict(['output_data_id', 'output_from_receipt_id'])
+                  .ignore();
+              }),
+            );
+          }
+
+          await Promise.all(promises);
+          dbSpan.setStatus({ code: SpanStatusCode.OK });
+        } finally {
+          dbSpan.end();
+        }
+
+        span.setStatus({ code: SpanStatusCode.OK });
+      },
     );
+  } catch (error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
+  } finally {
+    span.end();
   }
-
-  if (receiptActionsData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_actions')
-          .insert(receiptActionsData)
-          .onConflict(['receipt_id', 'index_in_action_receipt'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptInputData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_input_data')
-          .insert(receiptInputData)
-          .onConflict(['input_data_id', 'input_to_receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptOutputData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('action_receipt_output_data')
-          .insert(receiptOutputData)
-          .onConflict(['output_data_id', 'output_from_receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  await Promise.all(promises);
 };
 
 const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {

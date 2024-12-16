@@ -1,18 +1,42 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 
+const blockTracer = trace.getTracer('block-processor');
+
 export const storeBlock = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
-  const data = getBlockData(message);
-
-  await retry(async () => {
-    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
+  const blockSpan = blockTracer.startSpan('store.block', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.timestamp': message.block.header.timestampNanosec,
+    },
   });
+
+  try {
+    await context.with(trace.setSpan(context.active(), blockSpan), async () => {
+      const data = getBlockData(message);
+
+      await retry(async () => {
+        await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
+      });
+
+      blockSpan.setStatus({ code: SpanStatusCode.OK });
+    });
+  } catch (error) {
+    blockSpan.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    blockSpan.end();
+  }
 };
 
 const getBlockData = (message: types.StreamerMessage): Block => {
