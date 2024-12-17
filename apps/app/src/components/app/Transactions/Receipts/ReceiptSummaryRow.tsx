@@ -83,9 +83,8 @@ const ReceiptSummaryRow = (props: Props) => {
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
-                  href={`#execution#${receipt.id}`}
+                  href={`?tab=execution#${receipt.id}`}
                 >
-                  {' '}
                   {receipt.id}
                 </Link>
               </Tooltip>
@@ -111,7 +110,6 @@ const ReceiptSummaryRow = (props: Props) => {
               )}
             </td>
             <td>
-              {' '}
               <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
                 <FaLongArrowAltRight />
               </div>

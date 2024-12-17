@@ -12,10 +12,13 @@ export default async function Template({
   const role = (await cookies()).get('role')?.value;
   const user = (await cookies()).get('user')?.value;
   const token = (await cookies()).get('token')?.value;
-  const [stats, blocks] = await Promise.all([
+  const [stats, sync] = await Promise.all([
     getRequest(`stats`),
-    getRequest(`blocks/latest`, { limit: 1 }),
+    getRequest(`sync/status`),
   ]);
+
+  const syncTimestamp = sync?.status?.indexers?.base?.timestamp;
+
   const handleFilterAndKeyword = async (
     keyword: string,
     filter: string,
@@ -72,10 +75,10 @@ export default async function Template({
   return (
     <>
       <Header
-        block={blocks}
         handleFilterAndKeyword={handleFilterAndKeyword}
         role={role}
         stats={stats}
+        sync={syncTimestamp}
         theme={theme}
         token={token}
         user={user}
