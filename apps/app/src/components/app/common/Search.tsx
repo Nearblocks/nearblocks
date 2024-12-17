@@ -1,15 +1,8 @@
 'use client';
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxList,
-  ComboboxOption,
-  ComboboxPopover,
-} from '@reach/combobox';
 import debounce from 'lodash/debounce';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
@@ -25,8 +18,8 @@ export const SearchToast = ({ networkId }: any) => {
     return (
       <div>
         No results. Try on{' '}
-        <Link href="https://nearblocks.io" legacyBehavior>
-          <a className="text-green-500">Mainnet</a>
+        <Link className="text-green-500" href="https://nearblocks.io">
+          Mainnet
         </Link>
       </div>
     );
@@ -35,8 +28,8 @@ export const SearchToast = ({ networkId }: any) => {
   return (
     <div>
       No results. Try on{' '}
-      <Link href="https://testnet.nearblocks.io" legacyBehavior>
-        <a className="text-green-500">Testnet</a>
+      <Link className="text-green-500" href="https://testnet.nearblocks.io">
+        Testnet
       </Link>
     </div>
   );
@@ -54,6 +47,9 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef: any = useRef<HTMLDivElement>(null);
+
   const isLocale = (value: null | string): any => {
     return routing?.locales?.includes(value as any);
   };
@@ -107,16 +103,20 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
   const onSelect = (item: any) => redirect(item);
 
   useEffect(() => {
-    const handleKeyDown = (event: any) => {
-      if (event.key === '/') {
-        event.preventDefault();
-        const searchInput = document.getElementById('searchInput');
-        searchInput?.focus();
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        event.target &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
       }
     };
-    document.addEventListener('keydown', handleKeyDown);
+
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -173,67 +173,71 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
         />
       </label>
 
-      <Combobox className="flex-grow">
-        <ComboboxInput
-          className={`search ${
+      <div className="flex-grow w-full relative" ref={containerRef}>
+        <input
+          className={`search relative ${
             disabled ? 'opacity-100' : ''
-          } !bg-white dark:!bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
+          } bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
           disabled={disabled}
           id="searchInput"
           onChange={handleChange}
+          onFocus={() => setIsOpen(true)}
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }
         />
-        {showResults && (
-          <ComboboxPopover className="z-50 dark:bg-black-600">
-            <ComboboxList className="text-xs rounded-b-lg  bg-gray-50 py-2 shadow border dark:border-black-200 dark:bg-black-600">
+        {isOpen && showResults && (
+          <div className="z-50 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-3 shadow border dark:border-black-200">
+            <>
               {result?.accounts?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.address') || 'Account'}
                   </h3>
                   {result?.accounts?.map((address: any) => (
-                    <ComboboxOption
-                      className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
-                      key={address.account_id}
-                      onClick={() =>
-                        onSelect({ path: address.account_id, type: 'address' })
-                      }
-                      value={address.account_id}
-                    >
-                      {shortenAddress(address.account_id)}
-                    </ComboboxOption>
+                    <div className="px-2 py-2" key={address.account_id}>
+                      <div
+                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
+                        key={address.account_id}
+                        onClick={() =>
+                          onSelect({
+                            path: address.account_id,
+                            type: 'address',
+                          })
+                        }
+                      >
+                        {shortenAddress(address.account_id)}
+                      </div>
+                    </div>
                   ))}
                 </>
               )}
               {result?.txns?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.txns') || 'Txns'}
                   </h3>
                   {result.txns.map((txn: any) => (
-                    <ComboboxOption
-                      className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                    <div
+                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={txn.transaction_hash}
                       onClick={() =>
                         onSelect({ path: txn.transaction_hash, type: 'txn' })
                       }
-                      value={txn.transaction_hash}
                     >
                       {shortenHex(txn.transaction_hash)}
-                    </ComboboxOption>
+                    </div>
                   ))}
                 </>
               )}
               {result?.receipts?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.receipts') || 'Receipts'}
                   </h3>
                   {result.receipts.map((receipt: any) => (
-                    <ComboboxOption
-                      className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                    <div
+                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={receipt.receipt_id}
                       onClick={() =>
                         onSelect({
@@ -241,37 +245,35 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
                           type: 'receipt',
                         })
                       }
-                      value={receipt.receipt_id}
                     >
                       {shortenHex(receipt.receipt_id)}
-                    </ComboboxOption>
+                    </div>
                   ))}
                 </>
               )}
               {result?.blocks?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 my-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.blocks') || 'Blocks'}
                   </h3>
                   {result.blocks.map((block: any) => (
-                    <ComboboxOption
-                      className="mx-2 px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                    <div
+                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={block.block_hash}
                       onClick={() =>
                         onSelect({ path: block.block_hash, type: 'block' })
                       }
-                      value={block.block_hash}
                     >
                       #{localFormat(block.block_height)} (0x
                       {shortenHex(block.block_hash)})
-                    </ComboboxOption>
+                    </div>
                   ))}
                 </>
               )}
-            </ComboboxList>
-          </ComboboxPopover>
+            </>
+          </div>
         )}
-      </Combobox>
+      </div>
       <button
         className={`${
           homeSearch

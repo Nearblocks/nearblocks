@@ -1,10 +1,9 @@
 'use client';
 
-import { Accordion } from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
+import { AccordionRoot } from '@/components/ui/accordion';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
@@ -18,6 +17,7 @@ import {
   VerifierStatus,
 } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import { NearContext } from '../../wallet/near-context';
 import ContractCode from './ContractCode';
 import Info from './Info';
@@ -180,20 +180,20 @@ const OverviewActions = (props: Props) => {
     >
       <TabList className={'flex flex-wrap'}>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2 text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2 mr-1 md:px-3 border dark:border-black-200 py-2 text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:dark:text-green-250 hover:border-green-500 hover:dark:border-green-250 cursor-pointer outline-none`}
+          selectedClassName="text-green-500 border-green-500 dark:border-green-250  dark:text-neargray-10"
         >
           Contract Info
         </Tab>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2 mr-1 md:px-3 border dark:border-black-200 py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:dark:text-green-250 hover:border-green-500 hover:dark:border-green-250 cursor-pointer outline-none`}
+          selectedClassName="text-green-500 border-green-500 dark:border-green-250 dark:text-neargray-10"
         >
           Contract Code
         </Tab>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2 mr-1 md:px-3 border dark:border-black-200  py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:dark:text-green-250 hover:border-green-500 hover:dark:border-green-250 cursor-pointer outline-none`}
+          selectedClassName="text-green-500 border-green-500 dark:border-green-250 dark:text-neargray-10"
         >
           Contract Methods
         </Tab>
@@ -212,11 +212,12 @@ const OverviewActions = (props: Props) => {
       </TabPanel>
       {!schema && (
         <TabPanel>
-          <div className="border-t p-4 mt-3">
+          <div className="border-t dark:border-t-black-200 p-4 mt-3">
             {signedAccountId ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                label="Disconnect Wallet"
+                className={'left-1/2 mt-3 max-w-[200px] whitespace-nowrap'}
+                position="bottom"
+                tooltip="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
@@ -237,7 +238,7 @@ const OverviewActions = (props: Props) => {
             )}
           </div>
           {!schema && (
-            <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+            <p className="text-xs mx-4 text-gray-500 dark:text-neargray-10 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
               {`Near ABI schema not found, We have provide a best effort “auto detect” facility to find successful methods and parameters from past transactions. If you are the contract owner please consider recompiling your contract with Near`}{' '}
               <a
                 className="text-green-500 dark:text-green-250"
@@ -251,8 +252,8 @@ const OverviewActions = (props: Props) => {
             </p>
           )}
           {contractInfo?.methodNames?.length > 0 && (
-            <Accordion
-              className="contract-accordian text-gray-600 px-4 pt-4 border-t"
+            <AccordionRoot
+              className="contract-accordian text-gray-600 px-4 pt-4 border-t dark:border-black-200"
               collapsible
               multiple
             >
@@ -264,7 +265,7 @@ const OverviewActions = (props: Props) => {
                   method={method}
                 />
               ))}
-            </Accordion>
+            </AccordionRoot>
           )}
         </TabPanel>
       )}
@@ -273,8 +274,9 @@ const OverviewActions = (props: Props) => {
           <div className="border-t p-4 mt-3">
             {signedAccountId ? (
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                label="Disconnect Wallet"
+                className={'left-1/2 mt-3 max-w-[200px] whitespace-nowrap'}
+                position="bottom"
+                tooltip="Disconnect Wallet"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
@@ -294,7 +296,7 @@ const OverviewActions = (props: Props) => {
               </button>
             )}
           </div>
-          <p className="text-xs mx-4 text-gray-500 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
+          <p className="text-xs mx-4 text-gray-500 dark:text-neargray-10 mb-4 bg-gray-100 dark:bg-black-200 px-2 py-2  w-fit rounded shadow">
             Methods and parameters are automatically shown from the embedded
             Near{' '}
             <a
@@ -307,8 +309,8 @@ const OverviewActions = (props: Props) => {
             </a>{' '}
             {`Schema.`}
           </p>
-          <Accordion
-            className="contract-accordian text-gray-600 px-4 pt-4 border-t"
+          <AccordionRoot
+            className="contract-accordian text-gray-600 px-4 pt-4 border-t dark:border-black-200"
             collapsible
             multiple
           >
@@ -321,7 +323,7 @@ const OverviewActions = (props: Props) => {
                 schema={schema}
               />
             ))}
-          </Accordion>
+          </AccordionRoot>
         </TabPanel>
       )}
     </Tabs>

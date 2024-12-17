@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
 
 import { NearContext } from '../wallet/near-context';
@@ -36,7 +37,9 @@ const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
     <div className={className}>
       <NearContext.Provider value={{ signedAccountId, wallet }}>
         {notice}
-        <main>{children}</main>
+        <Provider>
+          <main>{children}</main>
+        </Provider>
         <Footer theme={theme} />
       </NearContext.Provider>
     </div>

@@ -61,7 +61,7 @@ const Overview = ({ role }: { role?: string }) => {
                 {user?.email}
               </p>
               <div className=" flex justify-end">
-                <Link href={`/user/settings`} legacyBehavior>
+                <Link href={`/user/settings`}>
                   <div className="w-1/3 flex justify-center	items-center text-center border-2 text-md pl-4 pr-6 py-1 rounded focus:outline-none font-semibold hover:bg-green-400 bg-green-500 text-white border-green cursor-pointer">
                     <Edit className="h-3 w-3 " />
                     <span className="text-[13px] font-semibold ml-2">Edit</span>

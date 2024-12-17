@@ -1,7 +1,7 @@
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
+import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
 
 const Loader = ({ className, wrapperClassName }: any) => (
@@ -19,8 +19,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Transaction Hash"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.hash.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -36,8 +36,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap items-start p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Transaction Status"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.status.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -53,8 +53,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap pt-3 pb-3.5 px-4 mt-[0.38rem]">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Block Height"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.block.tooltip')}
             >
               <div>
                 <Question className="w-4 h-6 fill-current mr-1" />
@@ -70,8 +70,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Transaction Timestamp"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.timestamp.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -87,8 +87,10 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Shard Number"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={
+                'The shard number in which the transaction was executed in'
+              }
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -106,8 +108,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="From Address"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.from.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -123,8 +125,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="To Address"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.to.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -142,8 +144,8 @@ const OverviewSkeleton = () => {
       <div className="flex items-start flex-wrap p-4">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            label="Tokens Transferred"
+            className={'w-96 left-25 max-w-[200px]'}
+            tooltip={'List of tokens transferred in the transaction'}
           >
             <div>
               <Question className="w-4 h-4 fill-current mr-1" />
@@ -160,8 +162,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Deposit Value"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.deposit.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -177,8 +179,8 @@ const OverviewSkeleton = () => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label="Transaction Fee"
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.fee.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -196,8 +198,8 @@ const OverviewSkeleton = () => {
       <div className="flex flex-wrap p-4">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            label="Ⓝ Price"
+            className={'w-96 left-25 max-w-[200px]'}
+            tooltip={t('txnDetails.price.tooltip')}
           >
             <div>
               <Question className="w-4 h-4 fill-current mr-1" />
@@ -215,8 +217,8 @@ const OverviewSkeleton = () => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
             <Tooltip
-              label="Transaction Actions"
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              className={"w-96 left-25 max-w-[200px]"}
+              tooltip={'Highlighted events of the transaction'}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -236,8 +238,8 @@ const OverviewSkeleton = () => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
-                label="Gas"
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                className={"w-96 left-25 max-w-[200px]"}
+                tooltip={t('txnDetails.gas.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -252,8 +254,8 @@ const OverviewSkeleton = () => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
-                label="Burnt"
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                className={"w-96 left-25 max-w-[200px]"}
+                tooltip={t('txnDetails.burnt.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />

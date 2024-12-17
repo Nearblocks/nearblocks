@@ -1,4 +1,3 @@
-import { Tooltip } from '@reach/tooltip';
 import Clipboard from 'clipboard';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,6 +8,7 @@ import {
 } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 import ErrorMessage from '../../common/ErrorMessage';
+import Tooltip from '../../common/Tooltip';
 import CopyIcon from '../../Icons/CopyIcon';
 import FaExpand from '../../Icons/FaExpand';
 import FaInbox from '../../Icons/FaInbox';
@@ -64,8 +64,9 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
         <span className="flex items-center">{name}</span>
         <div className="flex items-center">
           <Tooltip
-            className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label="Copy code to clipboard"
+            className={'left-1/2 max-w-[200px] w-36'}
+            position="top"
+            tooltip="Copy code to clipboard"
           >
             <span className="relative">
               {copied && (
@@ -82,8 +83,9 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
             </span>
           </Tooltip>
           <Tooltip
-            className="absolute h-auto max-w-[6rem] sm:max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={showFullCode ? 'Minimize' : 'Maximize'}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={showFullCode ? 'Minimize' : 'Maximize'}
           >
             <button
               className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"

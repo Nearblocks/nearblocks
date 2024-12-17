@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import React from 'react';
@@ -15,9 +14,11 @@ import Edit from '@/components/app/Icons/Edit';
 import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 
+import Tooltip from '../common/Tooltip';
 import withAuth from '../stores/withAuth';
 
 interface ApiKey {
@@ -29,8 +30,6 @@ interface ApiKey {
 }
 
 const Keys = ({ role }: { role?: string }) => {
-  const [isOpen, setOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selected, setSelected] = useState<any>();
 
   const { data, loading, mutate } = useAuth('/keys');
@@ -38,23 +37,16 @@ const Keys = ({ role }: { role?: string }) => {
   const keys = get(data, 'keys') || null;
 
   const onToggleEdit = (id: string) => {
-    setOpen((open) => !open);
     setSelected(id);
   };
 
   const onToggleAdd = () => {
     setSelected(undefined);
-    setOpen((open) => !open);
   };
 
   const onToggleDelete = (key?: ApiKey) => {
     setSelected(key);
-    setIsDeleteOpen((open) => !open);
   };
-
-  /* const onToggleView = (id:string) => {
-      setSelected(id);
-    }; */
 
   const onCopy = async (key: ApiKey) => {
     await navigator.clipboard.writeText(key?.token);
@@ -151,12 +143,13 @@ const Keys = ({ role }: { role?: string }) => {
 
                   {keys?.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 overflow-hidden text-ellipsis">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black dark:bg-black-200 dark:text-neargray-10 bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-                          label={key?.name}
+                          className={'left-1/2 max-w-[200px]'}
+                          position="top"
+                          tooltip={key?.name}
                         >
-                          <span>{key?.name}</span>
+                          <span className="overflow-hidden">{key?.name}</span>
                         </Tooltip>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-green-500 dark:text-green-250 align-top">
@@ -178,15 +171,20 @@ const Keys = ({ role }: { role?: string }) => {
                         {key.usage}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap flex  items-center text-xs text-gray-600 dark:text-neargray-10 align-top">
-                        <div
-                          className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
-                          onClick={() => onToggleEdit(key.id)}
-                        >
-                          <Edit className="text- dark:text-neargray-10" />{' '}
-                          <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
-                            Edit
-                          </p>
-                        </div>
+                        <DialogRoot placement={'center'} size="xs">
+                          <DialogTrigger asChild>
+                            <button
+                              className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
+                              onClick={() => onToggleEdit(key.id)}
+                            >
+                              <Edit className="text- dark:text-neargray-10" />{' '}
+                              <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
+                                Edit
+                              </p>
+                            </button>
+                          </DialogTrigger>
+                          <AddKeys mutate={mutate} selected={selected} />
+                        </DialogRoot>
                         <div className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200 ml-3">
                           <Link
                             className="flex items-center"
@@ -198,12 +196,17 @@ const Keys = ({ role }: { role?: string }) => {
                             </p>
                           </Link>
                         </div>
-                        <div
-                          className="border border-green-500 dark:border-green-250 ml-3 rounded-md  cursor-pointer hover:bg-red-100 dark:hover:bg-black-200 "
-                          onClick={() => onToggleDelete(key)}
-                        >
-                          <Delete className="text-red-600 dark:text-red-400 w-3 h-3 m-1.5" />
-                        </div>
+                        <DialogRoot placement={'center'} size="xs">
+                          <DialogTrigger asChild>
+                            <button
+                              className="border border-green-500 dark:border-green-250 ml-3 rounded-md  cursor-pointer hover:bg-red-100 dark:hover:bg-black-200 "
+                              onClick={() => onToggleDelete(key)}
+                            >
+                              <Delete className="text-red-600 dark:text-red-400 w-3 h-3 m-1.5" />
+                            </button>
+                          </DialogTrigger>
+                          <DeleteKey mutate={mutate} selected={selected} />
+                        </DialogRoot>
                       </td>
                     </tr>
                   ))}
@@ -212,27 +215,20 @@ const Keys = ({ role }: { role?: string }) => {
             </div>
           </div>
           <div className="flex items-center justify-end px-6 py-4">
-            <button
-              className="text-[13px] text-white font-semibold px-6 py-2 bg-green-500 dark:bg-green-250 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500 rounded"
-              onClick={onToggleAdd}
-            >
-              Add key
-            </button>
+            <DialogRoot placement={'center'} size="xs">
+              <DialogTrigger asChild>
+                <button
+                  className="text-[13px] text-white font-semibold px-6 py-2 bg-green-500 dark:bg-green-250 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500 rounded"
+                  onClick={onToggleAdd}
+                >
+                  Add key
+                </button>
+              </DialogTrigger>
+              <AddKeys mutate={mutate} selected={selected} />
+            </DialogRoot>
           </div>
         </div>
       </UserLayout>
-      <AddKeys
-        isOpen={isOpen}
-        mutate={mutate}
-        onToggleAdd={onToggleAdd}
-        selected={selected}
-      />
-      <DeleteKey
-        isDeleteOpen={isDeleteOpen}
-        mutate={mutate}
-        onToggleDelete={onToggleDelete}
-        selected={selected}
-      />
     </>
   );
 };

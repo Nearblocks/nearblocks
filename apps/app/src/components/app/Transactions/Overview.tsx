@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import dayjs from 'dayjs';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -14,6 +13,8 @@ import { dollarFormat } from '@/utils/app/libs';
 import { currency, localFormat } from '@/utils/libs';
 import { gasPrice } from '@/utils/near';
 import { ChartInfo, StatusInfo } from '@/utils/types';
+
+import Tooltip from '../common/Tooltip';
 
 interface Props {
   chartsDetails: { charts: ChartInfo[] };
@@ -269,8 +270,9 @@ const Overview = ({ chartsDetails, stats, theme: cookieTheme }: Props) => {
                     </p>
                     <div className="leading-6 text-nearblue-700">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                        label={'Transactions per second'}
+                        className={'left-1/2 whitespace-nowrap max-w-[200px]'}
+                        position="top"
+                        tooltip={'Transactions per second'}
                       >
                         <div>
                           <Link

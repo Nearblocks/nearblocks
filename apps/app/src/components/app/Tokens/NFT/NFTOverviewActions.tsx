@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
 import { useFetch } from '@/hooks/app/useFetch';
@@ -9,6 +8,7 @@ import { SpamToken, Token } from '@/utils/types';
 
 import Links from '../../common/Links';
 import TokenImage from '../../common/TokenImage';
+import Tooltip from '../../common/Tooltip';
 import WarningIcon from '../../Icons/WarningIcon';
 import Skeleton from '../../skeleton/common/Skeleton';
 
@@ -151,8 +151,9 @@ const NFTOverviewActions = ({
                         {holders ? localFormat(holders) : ''}
                         {!status?.sync && status && (
                           <Tooltip
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-                            label={
+                            className={'left-28 max-w-[200px] w-40'}
+                            position="top"
+                            tooltip={
                               <>
                                 Holders count is out of sync. Last synced block
                                 is

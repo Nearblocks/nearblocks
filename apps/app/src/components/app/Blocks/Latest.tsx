@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -14,6 +13,7 @@ import {
 } from '@/utils/libs';
 import { BlocksInfo } from '@/utils/types';
 
+import Tooltip from '../common/Tooltip';
 import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
@@ -135,8 +135,9 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                        label="Gas used"
+                        className={'top-4 whitespace-nowrap max-w-[200px]'}
+                        position="left"
+                        tooltip="Gas used"
                       >
                         <span className="u-label--badge-in text-nearblue-700 truncate">
                           {block?.chunks_agg?.gas_used

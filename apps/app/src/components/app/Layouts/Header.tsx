@@ -495,11 +495,11 @@ const Header = ({
                                     activeClassName="text-green-500 dark:text-green-250"
                                     href={submenu?.link}
                                   >
-                                    <a className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-black-600">
+                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-black-600">
                                       {submenu?.title
                                         ? t(submenu?.title)
                                         : submenu.fallbackText}
-                                    </a>
+                                    </div>
                                   </ActiveLink>
                                 </li>
                               ))}
@@ -511,9 +511,9 @@ const Header = ({
                           activeClassName="text-green-500 dark:text-green-250"
                           href={menu.link || ''}
                         >
-                          <a className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600">
+                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600">
                             {t(menu.title) || menu.fallbackText}
-                          </a>
+                          </div>
                         </ActiveLink>
                       )}
                     </li>

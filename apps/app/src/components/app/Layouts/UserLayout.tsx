@@ -98,7 +98,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                     property="itemListElement"
                     typeof="ListItem"
                   >
-                    <Link href={`/`} passHref>
+                    <Link href={`/`}>
                       <span
                         className="cursor-pointer"
                         property="item"
@@ -118,7 +118,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                         property="itemListElement"
                         typeof="ListItem"
                       >
-                        <Link href={`/campaign`} legacyBehavior>
+                        <Link href={`/campaign`}>
                           <span
                             className="cursor-pointer"
                             property="item"

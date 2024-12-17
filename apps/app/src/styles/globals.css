@@ -257,7 +257,7 @@ a {
 
 @keyframes slide-down {
   0% {
-    max-height: 0;
+    max-height: 35px;
     overflow: hidden;
   }
 
@@ -270,11 +270,6 @@ a {
 
 .slide-down[data-reach-accordion-panel][data-state='open'] {
   animation: slide-down 4s ease forwards;
-}
-
-.contact-accordian [data-reach-accordion-button][data-state='open'] .contact-icon {
-  transform: rotate(-180deg);
-  color: #31766a;
 }
 
 @media (min-width: 1400px) {

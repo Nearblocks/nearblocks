@@ -1,13 +1,13 @@
 'use client';
-import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-} from '@reach/accordion';
 import { useSearchParams } from 'next/navigation';
 import React, { ReactNode, useEffect, useState } from 'react';
 
+import {
+  AccordionItem,
+  AccordionItemContent,
+  AccordionItemTrigger,
+  AccordionRoot,
+} from '@/components/ui/accordion';
 import { Link } from '@/i18n/routing';
 
 import ArrowDown from '../Icons/ArrowDown';
@@ -44,23 +44,29 @@ const ContactActions = ({ getContactDetails }: any) => {
 
   const Items = ({ className, description, index, title }: itemProps) => {
     return (
-      <AccordionItem index={index}>
-        <AccordionButton
+      <AccordionItem
+        _open={{
+          animation: 'slide-down 4s ease forwards',
+        }}
+        key={index}
+        value={index.toString()}
+      >
+        <AccordionItemTrigger
+          buttonColor={
+            indices.includes(index) ? 'text-green-500 dark:text-green-250' : ''
+          }
           className={`w-full flex justify-between items-center text-sm text-gray-600 dark:text-neargray-10 focus:outline-none p-3 ${
             indices.includes(index) ? 'bg-gray-50 dark:bg-black-200' : className
           }`}
           onClick={() => toggleItem(index)}
         >
           <h2 className="text-green-250 text-left">{title}</h2>
-          <div className="ml-8">
-            <ArrowDown className="contact-icon fill-current" />
-          </div>
-        </AccordionButton>
-        <AccordionPanel
-          className={`text-sm text-left  text-neargray-600 dark:text-neargray-10 px-3 slide-down ${className}`}
+        </AccordionItemTrigger>
+        <AccordionItemContent
+          className={`text-sm text-left  text-neargray-600 dark:text-neargray-10 px-3 ${className}`}
         >
-          <div className="py-3 mr-3">{description}</div>
-        </AccordionPanel>
+          <div className="mr-3">{description}</div>
+        </AccordionItemContent>
       </AccordionItem>
     );
   };
@@ -280,7 +286,7 @@ const ContactActions = ({ getContactDetails }: any) => {
         )}
       </div>
       {selectedValue === '1' && isOpen && (
-        <Accordion className="contact-accordian" collapsible>
+        <AccordionRoot collapsible>
           <div className="text-sm font-semibold text-neargray-600 dark:text-neargray-10 mt-4 mb-1">
             Introduction
           </div>
@@ -365,7 +371,7 @@ const ContactActions = ({ getContactDetails }: any) => {
               title={' Where can I go and ask additional questions?'}
             />
           </div>
-        </Accordion>
+        </AccordionRoot>
       )}
       {showFormContact && <FormContact getContactDetails={getContactDetails} />}
       {selectedValue === '2' && (

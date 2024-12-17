@@ -1,11 +1,14 @@
 'use client';
-import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { localFormat } from '@/utils/app/libs';
@@ -18,6 +21,7 @@ import TxnStatus from '../common/Status';
 import Table from '../common/Table';
 import TableSummary from '../common/TableSummary';
 import TimeStamp from '../common/TimeStamp';
+import Tooltip from '../common/Tooltip';
 import Bitcoin from '../Icons/Bitcoin';
 import Clock from '../Icons/Clock';
 import Ethereum from '../Icons/Ethereum';
@@ -158,8 +162,9 @@ const MultiChainTxns = ({
       cell: (row: MultiChainTxnInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.receipt_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.receipt_id}
           >
             <span className="truncate max-w-[150px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
@@ -182,8 +187,9 @@ const MultiChainTxns = ({
       cell: (row: MultiChainTxnInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
             <span>
               <AddressLink
@@ -221,8 +227,9 @@ const MultiChainTxns = ({
       cell: (row: MultiChainTxnInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.account_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.account_id}
           >
             <span>
               <AddressLink
@@ -250,15 +257,26 @@ const MultiChainTxns = ({
       ),
       header: (
         <>
-          <Menu>
-            <MenuButton className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t ? t('from') : 'FROM'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <PopoverRoot positioning={{ sameWidth: true }}>
+            <PopoverTrigger
+              asChild
+              className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+            >
+              <button>
+                {t ? t('from') : 'FROM'}{' '}
+                <Filter className="h-4 w-4 fill-current ml-2" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
+              marginTop={2.5}
+              roundedBottom={'lg'}
+              roundedTop={'none'}
+              width={'48'}
+            >
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="from"
                   onChange={onChange}
                   placeholder={
@@ -268,14 +286,14 @@ const MultiChainTxns = ({
                 />
                 <div className="flex">
                   <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10  text-xs h-7"
                     name="from"
                     onClick={onClear}
                     type="button"
@@ -284,13 +302,13 @@ const MultiChainTxns = ({
                   </button>
                 </div>
               </form>
-            </MenuList>
-          </Menu>
+            </PopoverContent>
+          </PopoverRoot>
         </>
       ),
       key: 'from',
       tdClassName:
-        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium ',
+        'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName: 'px-4 py-4',
     },
     {
@@ -328,8 +346,9 @@ const MultiChainTxns = ({
       cell: (row: MultiChainTxnInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.derived_address}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.derived_address}
           >
             <span>
               <AddressLink
@@ -368,15 +387,26 @@ const MultiChainTxns = ({
       ),
       header: (
         <>
-          <Menu>
-            <MenuButton className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none whitespace-nowrap ">
-              {t ? t('destinationAddress') : 'DESTINATION ADDRESS'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <PopoverRoot positioning={{ sameWidth: true }}>
+            <PopoverTrigger
+              asChild
+              className="flex items-center  text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none whitespace-nowrap "
+            >
+              <button>
+                {t ? t('destinationAddress') : 'DESTINATION ADDRESS'}{' '}
+                <Filter className="h-4 w-4 fill-current ml-2" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
+              marginTop={2.5}
+              roundedBottom={'lg'}
+              roundedTop={'none'}
+              width={'48'}
+            >
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="multichain_address"
                   onChange={onChange}
                   placeholder={
@@ -386,14 +416,14 @@ const MultiChainTxns = ({
                 />
                 <div className="flex">
                   <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('filter.filter') : 'Filter'}
                   </button>
                   <button
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10  text-xs h-7"
                     name="multichain_address"
                     onClick={onClear}
                     type="button"
@@ -402,8 +432,8 @@ const MultiChainTxns = ({
                   </button>
                 </div>
               </form>
-            </MenuList>
-          </Menu>
+            </PopoverContent>
+          </PopoverRoot>
         </>
       ),
       key: 'multichain_address',
@@ -420,8 +450,9 @@ const MultiChainTxns = ({
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'left-1/2 max-w-[200px]'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'

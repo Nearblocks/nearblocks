@@ -1,4 +1,3 @@
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
@@ -11,6 +10,7 @@ import { fiatValue } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
 import Question from '../../Icons/Question';
 import { Loader } from '../../skeleton/common/Skeleton';
@@ -107,8 +107,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.receipts.receipt.tooltip')}
+              className={'w-48 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.receipts.receipt.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -129,8 +129,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex flex-wrap items-start p-4 py-6 md:h-16">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.status.tooltip')}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.status.tooltip')}
             >
               <div>
                 <div>
@@ -155,8 +155,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={'Block height'}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.block.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -185,8 +185,8 @@ const ReceiptRow = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                label={t('txnDetails.receipts.from.tooltip')}
+                className={'w-96 left-25 max-w-[200px]'}
+                tooltip={t('txnDetails.receipts.from.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -214,8 +214,8 @@ const ReceiptRow = (props: Props) => {
           <div className="flex flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                label={t('txnDetails.receipts.to.tooltip')}
+                className={'w-96 left-25 max-w-[200px]'}
+                tooltip={t('txnDetails.receipts.to.tooltip')}
               >
                 <div>
                   <Question className="w-4 h-4 fill-current mr-1" />
@@ -244,8 +244,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex flex-wrap p-4 md:h-16">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.receipts.burnt.tooltip')}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.receipts.burnt.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -280,8 +280,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.receipts.actions.tooltip')}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.receipts.actions.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -314,8 +314,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={'Deposit value attached with the receipt'}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={'Deposit value attached with the receipt'}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -345,8 +345,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.receipts.result.tooltip')}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.receipts.result.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />
@@ -369,8 +369,8 @@ const ReceiptRow = (props: Props) => {
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={t('txnDetails.receipts.logs.tooltip')}
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={t('txnDetails.receipts.logs.tooltip')}
             >
               <div>
                 <Question className="w-4 h-4 fill-current mr-1" />

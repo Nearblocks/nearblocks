@@ -3,6 +3,7 @@ import { FormikValues, useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
 import { textCampaignValidation } from '@/utils/app/validationSchema';
@@ -28,7 +29,6 @@ const TextAdForm = ({
   const [icon, setIcon] = useState<object>();
   const [iconPreview, setIconPreview] = useState<{ icon?: string }>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isOpen, setOpen] = useState(false);
 
   useEffect(() => {
     if (campaignData?.data?.subscription?.status === 'canceled') {
@@ -112,10 +112,6 @@ const TextAdForm = ({
     validateOnChange: true,
     validationSchema,
   });
-
-  const handlePreview = () => {
-    setOpen((open) => !open);
-  };
 
   return (
     <>
@@ -335,13 +331,17 @@ const TextAdForm = ({
               campaignData?.data?.site_name &&
               campaignData?.data?.link_name &&
               campaignData?.data?.icon && (
-                <button
-                  className="mx-2 text-sm bg-green-500 dark:bg-green-250 text-[13px] px-10  focus:outline-none text-white text-center font-semibold py-2 rounded  hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500"
-                  onClick={handlePreview}
-                  type="button"
-                >
-                  Preview
-                </button>
+                <DialogRoot placement={'center'} size="xs">
+                  <DialogTrigger asChild>
+                    <button
+                      className="mx-2 text-sm bg-green-500 dark:bg-green-250 text-[13px] px-10  focus:outline-none text-white text-center font-semibold py-2 rounded  hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500"
+                      type="button"
+                    >
+                      Preview
+                    </button>
+                  </DialogTrigger>
+                  <PreviewAd campaignData={campaignData?.data} />
+                </DialogRoot>
               )}
 
             <button
@@ -360,11 +360,6 @@ const TextAdForm = ({
           </div>
         </div>
       </div>
-      <PreviewAd
-        campaignData={campaignData?.data}
-        isOpen={isOpen}
-        onToggleAdd={handlePreview}
-      />
       <div className="mt-6">
         <StartForm
           campaignData={campaignData}

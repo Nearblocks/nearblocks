@@ -1,11 +1,14 @@
 'use client';
-import { Menu, MenuButton, MenuList } from '@reach/menu-button';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { txnMethod } from '@/utils/app/near';
 import {
@@ -23,6 +26,7 @@ import TxnStatus from '../common/Status';
 import Table from '../common/Table';
 import TableSummary from '../common/TableSummary';
 import TimeStamp from '../common/TimeStamp';
+import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
@@ -167,8 +171,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.receipt_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.receipt_id}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
@@ -191,8 +196,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-            label={row?.transaction_hash}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
           >
             <span>
               <AddressLink
@@ -220,8 +226,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={txnMethod(row.actions, t)}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={txnMethod(row.actions, t)}
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[120px] inline-flex truncate">
               <span className="block truncate">
@@ -232,15 +239,26 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
         </span>
       ),
       header: (
-        <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-            {t('type') || 'METHOD'}
-            <Filter className="h-4 w-4 fill-current ml-2" />
-          </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              {t('type') || 'METHOD'}
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
+            marginTop={-1.5}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
             <form className="flex flex-col" onSubmit={onFilter}>
               <input
-                className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                 name="type"
                 onChange={onChange}
                 placeholder="Search by method"
@@ -248,7 +266,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
               />
               <div className="flex">
                 <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                   type="submit"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
@@ -264,8 +282,8 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
                 </button>
               </div>
             </form>
-          </MenuList>
-        </Menu>
+          </PopoverContent>
+        </PopoverRoot>
       ),
       key: 'actions',
       tdClassName:
@@ -307,8 +325,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row.predecessor_account_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row.predecessor_account_id}
           >
             <span>
               <AddressLink
@@ -325,15 +344,26 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       ),
       header: (
         <>
-          <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t('from') || 'FROM'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <PopoverRoot>
+            <PopoverTrigger
+              asChild
+              className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+            >
+              <button>
+                {t('from') || 'FROM'}{' '}
+                <Filter className="h-4 w-4 fill-current ml-2" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
+              marginTop={-1.5}
+              roundedBottom={'lg'}
+              roundedTop={'none'}
+              width={'48'}
+            >
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
-                  className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="from"
                   onChange={onChange}
                   placeholder={
@@ -343,14 +373,14 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
                 />
                 <div className="flex">
                   <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t('filter.filter') || 'Filter'}
                   </button>
                   <button
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                     name="from"
                     onClick={onClear}
                     type="button"
@@ -359,8 +389,8 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
                   </button>
                 </div>
               </form>
-            </MenuList>
-          </Menu>
+            </PopoverContent>
+          </PopoverRoot>
         </>
       ),
       key: 'predecessor_account_id',
@@ -390,8 +420,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row.receiver_account_id}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row.receiver_account_id}
           >
             <span>
               <AddressLink
@@ -408,14 +439,26 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       ),
       header: (
         <>
-          <Menu>
-            <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
-              {t('to') || 'To'} <Filter className="h-4 w-4 fill-current ml-2" />
-            </MenuButton>
-            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
+          <PopoverRoot>
+            <PopoverTrigger
+              asChild
+              className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+            >
+              <button>
+                {t('to') || 'To'}
+                <Filter className="h-4 w-4 fill-current ml-2" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+              marginTop={-1.5}
+              roundedBottom={'lg'}
+              roundedTop={'none'}
+              width={'48'}
+            >
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
-                  className="border dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                  className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
                   name="to"
                   onChange={onChange}
                   placeholder={
@@ -425,14 +468,14 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
                 />
                 <div className="flex">
                   <button
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
                     type="submit"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t('filter.filter') || 'Filter'}
                   </button>
                   <button
-                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
                     name="to"
                     onClick={onClear}
                     type="button"
@@ -441,8 +484,8 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
                   </button>
                 </div>
               </form>
-            </MenuList>
-          </Menu>
+            </PopoverContent>
+          </PopoverRoot>
         </>
       ),
       key: 'receiver_account_id',
@@ -478,8 +521,9 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={
+            className={'left-1/2 max-w-[200px] whitespace-nowrap min-w-[130px]'}
+            position="bottom"
+            tooltip={
               showAge
                 ? 'Click to show Datetime Format'
                 : 'Click to show Age Format'
@@ -506,7 +550,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
       key: 'block_timestamp',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
-      thClassName: 'whitespace-nowrap',
+      thClassName: '',
     },
   ];
 

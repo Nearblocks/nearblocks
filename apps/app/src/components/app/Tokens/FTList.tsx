@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import debounce from 'lodash/debounce';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -18,6 +17,7 @@ import { Sorting, Token } from '@/utils/types';
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
 import TokenImage from '../common/TokenImage';
+import Tooltip from '../common/Tooltip';
 import ArrowDown from '../Icons/ArrowDown';
 import ArrowUp from '../Icons/ArrowUp';
 import FaInbox from '../Icons/FaInbox';
@@ -295,8 +295,9 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
         <span className="flex">
           <span className="uppercase whitespace-nowrap">Circulating MC</span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-            label={
+            className={'w-96 -mr-28 right-1/2 max-w-[200px]'}
+            position="bottom"
+            tooltip={
               'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
             }
           >
@@ -340,8 +341,9 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
             )}
             <span className="uppercase whitespace-nowrap">On-Chain MC</span>
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              label={`Calculated by multiplying the token's  Total Supply on Near with the current market price per token`}
+              className={'w-96 -mr-28 right-1/2 max-w-[200px]'}
+              position="bottom"
+              tooltip={`Calculated by multiplying the token's  Total Supply on Near with the current market price per token`}
             >
               <div>
                 <Question className="w-4 h-4 fill-current ml-1" />

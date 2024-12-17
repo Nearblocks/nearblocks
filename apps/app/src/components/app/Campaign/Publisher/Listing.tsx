@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/app/libs';
@@ -12,7 +13,6 @@ import CampaignPagination from '../CampaignPagination';
 import ConfirmModal from './ConfirmModal';
 
 const CampaignListing = () => {
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [currentCampaign, setCurrentCampaign] =
     useState<currentCampaign | null>(null);
   const [url, setUrl] = useState(`publisher/campaigns?page=1`);
@@ -34,7 +34,6 @@ const CampaignListing = () => {
   };
 
   const onApprove = (item: currentCampaign) => {
-    setConfirmOpen(true);
     setCurrentCampaign(item);
   };
 
@@ -240,14 +239,22 @@ const CampaignListing = () => {
                           Approved
                         </span>
                       ) : (
-                        <div
-                          className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
-                          onClick={() => onApprove(item)}
-                        >
-                          <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
-                            Approve
-                          </p>
-                        </div>
+                        <DialogRoot placement={'center'} size="xs">
+                          <DialogTrigger asChild>
+                            <button
+                              className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
+                              onClick={() => onApprove(item)}
+                            >
+                              <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
+                                Approve
+                              </p>
+                            </button>
+                          </DialogTrigger>
+                          <ConfirmModal
+                            currentCampaign={currentCampaign}
+                            mutate={mutate}
+                          />
+                        </DialogRoot>
                       ))
                     )}
                   </td>
@@ -267,13 +274,6 @@ const CampaignListing = () => {
           />
         )}
       </div>
-      {confirmOpen && (
-        <ConfirmModal
-          currentCampaign={currentCampaign}
-          mutate={mutate}
-          setConfirmOpen={setConfirmOpen}
-        />
-      )}
     </>
   );
 };

@@ -9,10 +9,11 @@ export const Content = () => {
         Sorry! We encountered an unexpected error.
       </div>
       <div className="flex justify-center pt-12 z-10">
-        <Link href="/" legacyBehavior>
-          <a className="bg-button hover:bg-blue-500 text-white text-xs py-2 rounded focus:outline-none text-center px-3 w-auto">
-            Go back home
-          </a>
+        <Link
+          className="bg-button hover:bg-blue-500 text-white text-xs py-2 rounded focus:outline-none text-center px-3 w-auto"
+          href="/"
+        >
+          Go back home
         </Link>
       </div>
     </>

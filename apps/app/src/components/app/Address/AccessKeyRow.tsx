@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
@@ -13,6 +12,8 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
+
+import Tooltip from '../common/Tooltip';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -115,8 +116,9 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={txn?.transaction_hash}
+              className={'left-1/2 max-w-[200px] w-[150px]'}
+              position="top"
+              tooltip={txn?.transaction_hash}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 font-medium whitespace-nowrap">
                 <Link
@@ -133,8 +135,9 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         </td>
         <td className="pl-4 pr-1 py-4 text-sm text-nearblue-600  dark:text-neargray-10">
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-            label={accessKey?.public_key}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={accessKey?.public_key}
           >
             <span className="truncate max-w-[120px] inline-block align-bottom ">
               {accessKey?.public_key}
@@ -188,8 +191,9 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={
                 !showWhen
                   ? txn?.block_timestamp
                     ? getTimeAgoString(nanoToMilli(txn?.block_timestamp))

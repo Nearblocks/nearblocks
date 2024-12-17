@@ -1,18 +1,17 @@
 'use client';
-import {
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-} from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import uniqueId from 'lodash/uniqueId';
 import { useContext, useEffect, useState } from 'react';
 
+import {
+  AccordionItem,
+  AccordionItemContent,
+  AccordionItemTrigger,
+} from '@/components/ui/accordion';
 import { Link } from '@/i18n/routing';
 import { capitalize, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
 
-import ArrowRight from '../../Icons/ArrowRight';
+import Tooltip from '../../common/Tooltip';
 import CloseCircle from '../../Icons/CloseCircle';
 import Question from '../../Icons/Question';
 import { NearContext } from '../../wallet/near-context';
@@ -166,23 +165,27 @@ const ViewOrChangeAbi = (props: Props) => {
     <AccordionItem
       className="flex flex-col text-gray-600 text-sm mb-3"
       key={index}
+      value={index.toString()}
     >
-      <AccordionButton className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10">
+      <AccordionItemTrigger
+        buttonColor="fill-gray-600"
+        className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
+      >
         <span>
           <span className="text-gray-400 dark:text-neargray-10">
             {index + 1}.
           </span>{' '}
           {toSnakeCase(method.name ?? '')}
         </span>
-        <ArrowRight className="contract-icon fill-gray-600" />
-      </AccordionButton>
-      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
+      </AccordionItemTrigger>
+      <AccordionItemContent className="border dark:border-black-200 p-4 rounded">
         <div className="flex max-w-xl justify-between mb-3">
           <div className="flex items-center dark:text-neargray-10">
             Arguments
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Specify an arguments schema."
+              className={'left-14 max-w-[200px] w-20'}
+              position="bottom"
+              tooltip="Specify an arguments schema."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -237,8 +240,9 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex items-center dark:text-neargray-10">
             Options
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Optional arguments for write operations."
+              className={'left-20 max-w-[200px] w-32'}
+              position="bottom"
+              tooltip="Optional arguments for write operations."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -304,8 +308,9 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
             View txn details:{' '}
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={txn}
+              className={'left-1/2 max-w-[200px] w-96 mt-3'}
+              position="bottom"
+              tooltip={txn}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                 <Link href={`/txns/${txn}`}>{txn}</Link>
@@ -321,7 +326,7 @@ const ViewOrChangeAbi = (props: Props) => {
             value={result}
           />
         )}
-      </AccordionPanel>
+      </AccordionItemContent>
     </AccordionItem>
   );
 };
