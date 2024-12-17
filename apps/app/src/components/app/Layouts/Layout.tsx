@@ -11,6 +11,7 @@ import { manrope } from '@/fonts/font';
 import { GTMID } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
+import ThemeInitializer from './ThemeInitializer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -74,8 +75,9 @@ const Layout = async ({ children, locale }: LayoutProps) => {
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
             <ThemeProvider attribute="class" defaultTheme={theme}>
+              <ThemeInitializer initialTheme={theme} />
               <ToastContainer />
-              <LayoutActions>{children}</LayoutActions>
+              <LayoutActions theme={theme}>{children}</LayoutActions>
             </ThemeProvider>
           </NextIntlClientProvider>
         </PublicEnvProvider>

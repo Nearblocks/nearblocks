@@ -1,16 +1,18 @@
 import { Tooltip } from '@reach/tooltip';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 
 import { urlHostName } from '@/utils/libs';
 
 const Links = (props: any) => {
-  const { meta } = props;
+  const { meta, theme: cookieTheme } = props;
   const twitter = urlHostName && urlHostName(meta?.twitter);
   const facebook = urlHostName && urlHostName(meta?.facebook);
   const telegram = urlHostName && urlHostName(meta?.telegram);
-  const { theme } = useTheme();
-
+  let { theme } = useTheme();
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
   return (
     <div className="flex space-x-4">
       {meta?.twitter && (
@@ -29,6 +31,7 @@ const Links = (props: any) => {
             <Image
               alt="Twitter"
               height={16}
+              loading="eager"
               src={
                 theme === 'dark'
                   ? '/images/twitter_icon_black.svg'
@@ -58,6 +61,7 @@ const Links = (props: any) => {
               alt="Facebook"
               className="w-4 h-4"
               height={16}
+              loading="eager"
               src={
                 theme === 'dark'
                   ? '/images/facebook_icon_black.svg'
@@ -83,6 +87,7 @@ const Links = (props: any) => {
               alt="Telegram"
               className="w-4 h-4"
               height={16}
+              loading="eager"
               src={
                 theme === 'dark'
                   ? '/images/telegram_black.svg'
@@ -108,6 +113,7 @@ const Links = (props: any) => {
               alt="coingecko"
               className="w-4 h-4"
               height={16}
+              loading="eager"
               src="/images/coingecko_icon.svg"
               width={16}
             />

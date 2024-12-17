@@ -23,9 +23,10 @@ import Skeleton from '../skeleton/common/Skeleton';
 
 interface Props {
   accountId: string;
+  theme: string;
 }
 
-const Delegators = ({ accountId }: Props) => {
+const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
   const {
     getAccount,
     getAccounts,
@@ -37,7 +38,7 @@ const Delegators = ({ accountId }: Props) => {
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentEpochInfo, setCurrentEpochInfo] =
@@ -51,6 +52,10 @@ const Delegators = ({ accountId }: Props) => {
   const [count, setCount] = useState<number>();
   const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
   const initializedRef = useRef(false);
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
@@ -371,6 +376,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Web"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       src={
                                         theme === 'dark'
                                           ? '/images/web_icon_black.svg'
@@ -391,6 +397,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Email"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       src={
                                         theme === 'dark'
                                           ? '/images/email_icon_black.svg'
@@ -416,6 +423,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Twitter"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       priority
                                       src={
                                         theme === 'dark'
@@ -442,6 +450,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Discord"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       src={
                                         theme === 'dark'
                                           ? '/images/discord_icon_black.svg'
@@ -467,6 +476,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Github"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       priority
                                       src={
                                         theme === 'dark'
@@ -498,6 +508,7 @@ const Delegators = ({ accountId }: Props) => {
                                       alt="Telegram"
                                       className="w-5 h-5"
                                       height={16}
+                                      loading="eager"
                                       src={
                                         theme === 'dark'
                                           ? '/images/telegram_black.svg'

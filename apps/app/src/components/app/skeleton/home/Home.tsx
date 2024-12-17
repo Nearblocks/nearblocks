@@ -6,7 +6,7 @@ import Search from '../../common/Search';
 import Latest from './Latest';
 import HomeOverview from './Overview';
 
-const HomePageSkeleton = () => {
+const HomePageSkeleton = ({ theme }: { theme: string }) => {
   const t = useTranslations();
 
   return (
@@ -29,7 +29,7 @@ const HomePageSkeleton = () => {
         </div>
       </div>
       <div className="relative -mt-14 ">
-        <HomeOverview />
+        <HomeOverview theme={theme} />
       </div>
       <div className="py-8">
         <div className="lg:!hidden block container mx-auto px-3"></div>

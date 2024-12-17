@@ -5,7 +5,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import React, { useMemo } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
@@ -19,12 +19,18 @@ interface Props {
   chartsDetails: { charts: ChartInfo[] };
   error: boolean;
   stats: StatusInfo;
+  theme: string;
 }
 
-const TransactionChart: React.FC<{ chartData: ChartInfo[] }> = ({
-  chartData,
-}) => {
-  const { theme } = useTheme();
+const TransactionChart: React.FC<{
+  chartData: ChartInfo[];
+  cookieTheme: string;
+}> = ({ chartData, cookieTheme }) => {
+  let { theme } = useTheme();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const chartOptions = useMemo(() => {
     // Sort data by date
@@ -128,10 +134,14 @@ const TransactionChart: React.FC<{ chartData: ChartInfo[] }> = ({
   );
 };
 
-const Overview = ({ chartsDetails, stats }: Props) => {
+const Overview = ({ chartsDetails, stats, theme: cookieTheme }: Props) => {
   const t = useTranslations();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const { networkId } = useConfig();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const charts = chartsDetails?.charts;
 
@@ -157,6 +167,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                   <Image
                     alt={t ? t('homePage.nearPrice') : 'nearPrice'}
                     height={24}
+                    loading="eager"
                     src={`/images/${
                       theme === 'dark'
                         ? 'near_price_dark.svg'
@@ -209,6 +220,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                   <Image
                     alt={t ? t('homePage.marketCap') : 'marketCap'}
                     height={24}
+                    loading="eager"
                     src={`/images/${
                       theme === 'dark' ? 'market_dark.svg' : 'market.svg'
                     }`}
@@ -238,6 +250,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                   <Image
                     alt={t ? t('homePage.transactions') : 'transactions'}
                     height={24}
+                    loading="eager"
                     src={`/images/${
                       theme === 'dark'
                         ? 'transactions_dark.svg'
@@ -289,8 +302,9 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                   <Image
                     alt={t ? t('homePage.activeValidator') : 'activeValidator'}
                     height={24}
+                    loading="eager"
                     src={`/images/${
-                      (theme === 'dark' && 'pickaxe_dark.svg') || 'pickaxe.svg'
+                      theme === 'dark' ? 'pickaxe_dark.svg' : 'pickaxe.svg'
                     }`}
                     width={24}
                   />
@@ -337,7 +351,10 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                 </p>
               )}
               <div className="mt-1 h-28 dark:bg-black-600">
-                <TransactionChart chartData={charts || []} />
+                <TransactionChart
+                  chartData={charts || []}
+                  cookieTheme={cookieTheme}
+                />
               </div>
             </div>
           </div>

@@ -1,13 +1,18 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import React from 'react';
 
 import { Link } from '@/i18n/routing';
 
-export const Policy = () => {
-  const { theme } = useTheme();
+export const Policy = ({ theme: cookieTheme }: { theme: string }) => {
+  let { theme } = useTheme();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
+
   return (
     <div className="relative container-xxl mx-auto px-5 py-10">
       <div className="row justify-content-center">
@@ -26,6 +31,7 @@ export const Policy = () => {
                               className="block"
                               height="40"
                               layout="fixed"
+                              loading="eager"
                               src={'/images/nearblocksblack_dark.svg'}
                               width="174"
                             />
@@ -37,6 +43,7 @@ export const Policy = () => {
                               className="block"
                               height="40"
                               layout="fixed"
+                              loading="eager"
                               src={'/images/nearblocksblack.svg'}
                               width="174"
                             />

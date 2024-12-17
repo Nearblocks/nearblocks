@@ -22,16 +22,25 @@ interface Props {
     status: number;
   };
   poweredBy?: boolean;
+  theme: string;
 }
 
-const TpsChart: React.FC<Props> = ({ chartTypes, data }) => {
-  const { theme } = useTheme();
+const TpsChart: React.FC<Props> = ({
+  chartTypes,
+  data,
+  theme: cookieTheme,
+}) => {
+  let { theme } = useTheme();
   const t = useTranslations();
   const { networkId } = useConfig();
 
   const [chartTpsData, setChartTpsData] = useState<any[]>([]);
   const [logView, setLogView] = useState(false);
   const [chartOptions, setChartOptions] = useState<Highcharts.Options>({});
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);
@@ -311,6 +320,7 @@ const TpsChart: React.FC<Props> = ({ chartTypes, data }) => {
                     <Image
                       alt={chart?.text}
                       height={550}
+                      loading="eager"
                       src={theme === 'dark' ? chart?.image_dark : chart?.image}
                       width={600}
                     />

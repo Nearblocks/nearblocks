@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import ThemeImage from '@/components/app/Advertise/ThemeImage';
 import { Link } from '@/i18n/routing';
@@ -47,6 +47,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function Advertise() {
+  const theme = (await cookies()).get('theme')?.value || 'light';
   return (
     <div className="container-xxl mx-auto herobg flex flex-col items-center p-4.5 lg:!py-16 px-6">
       <div className="w-full flex ">
@@ -77,7 +78,7 @@ export default async function Advertise() {
           </Link>
         </div>
         <div className="md:w-3/6 w-full justify-start md:block hidden">
-          <ThemeImage />
+          <ThemeImage theme={theme} />
         </div>
       </div>
       <div className="sm:w-[90%] flex flex-col lg:flex-row text-center lg:border mt-4 lg:!mt-16 py-4 text-neargray-600 dark:text-neargray-10">

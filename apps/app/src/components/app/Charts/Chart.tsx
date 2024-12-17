@@ -4,7 +4,7 @@ import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts/highstock';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
@@ -25,12 +25,13 @@ interface Props {
   };
   chartTypes?: string;
   poweredBy?: boolean;
+  theme: string;
 }
 
 const Chart = (props: Props) => {
-  const { chartsData, chartTypes } = props;
+  const { chartsData, chartTypes, theme: cookieTheme } = props;
   const t = useTranslations();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     description: '',
     title: '',
@@ -41,6 +42,10 @@ const Chart = (props: Props) => {
     null,
   );
   const { networkId } = useConfig();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   const handleToggle = () => {
     setLogView((prevState) => !prevState);
@@ -495,6 +500,7 @@ const Chart = (props: Props) => {
                     <Image
                       alt={chart?.text}
                       height={550}
+                      loading="eager"
                       src={theme === 'dark' ? chart?.image_dark : chart?.image}
                       width={600}
                     />

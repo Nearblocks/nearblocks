@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
 import Buttons from '@/components/app/Address/Button';
@@ -9,6 +10,7 @@ export default async function Delegator(props: {
   params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
+  const theme = (await cookies()).get('theme')?.value || 'light';
 
   const { id } = params;
 
@@ -41,7 +43,7 @@ export default async function Delegator(props: {
       </div>
       <div>
         <Suspense fallback={<DelegatorSkeleton />}>
-          <Delegators accountId={id} />
+          <Delegators accountId={id} theme={theme} />
         </Suspense>
       </div>
     </div>

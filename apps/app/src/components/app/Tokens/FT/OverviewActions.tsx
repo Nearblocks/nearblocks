@@ -1,7 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
 import Big from 'big.js';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -34,6 +34,7 @@ interface Props {
     sync: true;
     timestamp: '';
   };
+  theme: string;
   token: Token;
   transfers: string;
 }
@@ -43,6 +44,7 @@ const OverviewActions = ({
   id,
   stats,
   status,
+  theme,
   token,
   transfers,
 }: Props) => {
@@ -417,7 +419,7 @@ const OverviewActions = ({
                         <Skeleton className="h-4" />
                       </div>
                     ) : (
-                      <Links meta={token} />
+                      <Links meta={token} theme={theme} />
                     )}
                   </div>
                 </div>
