@@ -54,12 +54,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const infoQuery = sql`
     SELECT
       be.absolute_staked_amount,
-      be.absolute_nonstaked_amount,
-      be.block_height,
-      b.block_hash
+      be.absolute_nonstaked_amount
     FROM
       balance_events AS be
-      JOIN blocks AS b ON be.block_height = b.block_height
     WHERE
       be.affected_account_id = ${account}
     ORDER BY
@@ -68,9 +65,22 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       1;
   `;
 
-  const [actionResult, infoResult] = await Promise.all([
+  const blockQuery = sql`
+    SELECT
+      block_height,
+      block_hash
+    FROM
+      blocks
+    ORDER BY
+      block_height DESC
+    LIMIT
+      1
+  `;
+
+  const [actionResult, infoResult, blockResult] = await Promise.all([
     actionQuery,
     infoQuery,
+    blockQuery,
   ]);
 
   const info = infoResult[0]
@@ -83,8 +93,9 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
     : {};
 
   const action = actionResult[0] || {};
+  const block = blockResult[0] || {};
 
-  return res.status(200).json({ account: [{ ...action, ...info }] });
+  return res.status(200).json({ account: [{ ...action, ...info, ...block }] });
 });
 
 const contract = catchAsync(
