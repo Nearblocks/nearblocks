@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { useSearchParams } from 'next/navigation';
 
 import { Link } from '@/i18n/routing';
@@ -14,6 +13,7 @@ import { HoldersPropsInfo, Token } from '@/utils/types';
 
 import ErrorMessage from '../../common/ErrorMessage';
 import Table from '../../common/Table';
+import Tooltip from '../../common/Tooltip';
 import FaInbox from '../../Icons/FaInbox';
 import Skeleton from '../../skeleton/common/Skeleton';
 
@@ -52,8 +52,9 @@ const NFTHolders = ({ count, error, holder, status, tab, tokens }: Props) => {
       cell: (row: HoldersPropsInfo) => (
         <span>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.account}
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.account}
           >
             <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link

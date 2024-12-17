@@ -1,11 +1,12 @@
 import { headers } from 'next/headers';
 
-import Buttons from '@/components/app/Icons/Button';
+import Buttons from '@/components/app/common/Button';
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import SponserdText from '@/components/app/SponserdText';
 import { appUrl, networkId } from '@/utils/app/config';
+
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {

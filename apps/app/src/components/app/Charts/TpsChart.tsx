@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
@@ -11,6 +10,7 @@ import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { chartDataInfo } from '@/utils/types';
 
+import Tooltip from '../common/Tooltip';
 import Question from '../Icons/Question';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
@@ -246,7 +246,7 @@ const TpsChart: React.FC<Props> = ({
             className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden mb-10"
             style={{ height: 580 }}
           >
-            <div className="border-b dark:border-black-200 flex justify-between items-center text-center">
+            <div className="border-b dark:border-black-200 flex justify-between items-center">
               {chartTpsData?.length > 0 ? (
                 <>
                   <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
@@ -255,8 +255,9 @@ const TpsChart: React.FC<Props> = ({
                   </p>
                   <div className="flex items-center text-nearblue-600 dark:text-neargray-10">
                     <Tooltip
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2"
-                      label="Toggle between Log View and Normal View. Log View uses logarithmic scale."
+                      className={'left-1/2 max-w-[200px] w-40'}
+                      position="bottom"
+                      tooltip="Toggle between Log View and Normal View. Log View uses logarithmic scale."
                     >
                       <span>
                         <Question className="w-4 h-4 fill-current mr-2" />

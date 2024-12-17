@@ -1,8 +1,9 @@
-import { Tooltip } from '@reach/tooltip';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 
 import { urlHostName } from '@/utils/libs';
+
+import Tooltip from './Tooltip';
 
 const Links = (props: any) => {
   const { meta, theme: cookieTheme } = props;
@@ -17,8 +18,9 @@ const Links = (props: any) => {
     <div className="flex space-x-4">
       {meta?.twitter && (
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          label={'Twitter'}
+          className={'left-1/2 max-w-[200px]'}
+          position="top"
+          tooltip={'Twitter'}
         >
           <a
             className="flex"
@@ -44,8 +46,9 @@ const Links = (props: any) => {
       )}
       {meta?.facebook && (
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          label={'Facebook'}
+          className={'left-1/2 max-w-[200px]'}
+          position="top"
+          tooltip={'Facebook'}
         >
           <a
             className="flex"
@@ -74,8 +77,9 @@ const Links = (props: any) => {
       )}
       {meta?.telegram && (
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          label={'Telegram'}
+          className={'left-1/2 max-w-[200px]'}
+          position="top"
+          tooltip={'Telegram'}
         >
           <a
             className="flex"
@@ -100,8 +104,9 @@ const Links = (props: any) => {
       )}
       {meta?.coingecko_id && (
         <Tooltip
-          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
-          label={'CoinGecko'}
+          className={'left-1/2 max-w-[200px]'}
+          position="top"
+          tooltip={'CoinGecko'}
         >
           <a
             className="flex"

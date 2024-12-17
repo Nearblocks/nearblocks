@@ -1,9 +1,9 @@
-import { Tooltip } from '@reach/tooltip';
 import { Fragment } from 'react';
 
 import { Link } from '@/i18n/routing';
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
 
+import Tooltip from '../../common/Tooltip';
 import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
 import TreeNode from './TreeNode';
 import TreeTxnsActions from './TreeTxnsActions';
@@ -67,8 +67,9 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="w-full pl-3 py-2 flex items-center">
                       From:{' '}
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={receipt.predecessor_id}
+                        className={'left-1/2 max-w-[200px]'}
+                        position="top"
+                        tooltip={receipt.predecessor_id}
                       >
                         <Link
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
@@ -81,8 +82,9 @@ const TreeReceiptDetails = (props: Props) => {
                     <div className="w-full pl-3 py-2 flex items-center">
                       To:{' '}
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label={receipt.receiver_id}
+                        className={'left-1/2 max-w-[200px]'}
+                        position="top"
+                        tooltip={receipt.receiver_id}
                       >
                         <Link
                           className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"

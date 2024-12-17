@@ -167,7 +167,7 @@ export default function AccountOverview({
             <div className="w-full md:w-1/4 mb-2">
               {t('tokens') || 'Tokens:'}
             </div>
-            <div className="w-full md:w-3/4 break-words -my-1 z-10">
+            <div className="w-full break-words -my-1 z-10">
               <TokenHoldings
                 data={inventoryData}
                 ft={ft}

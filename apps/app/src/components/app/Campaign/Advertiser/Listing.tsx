@@ -1,6 +1,7 @@
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
+import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import useAuth, { request } from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/app/libs';
@@ -19,7 +20,6 @@ type Props = {
 };
 
 const Listing = ({ statsMutate }: Props) => {
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [currentCampaign, setCurrentCampaign] =
     useState<currentCampaign | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -50,7 +50,6 @@ const Listing = ({ statsMutate }: Props) => {
   };
 
   const onCancel = (item: currentCampaign) => {
-    setConfirmOpen(true);
     setCurrentCampaign(item);
   };
 
@@ -231,14 +230,26 @@ const Listing = ({ statsMutate }: Props) => {
                             Cancelled
                           </span>
                         ) : (
-                          <div
-                            className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
-                            onClick={() => onCancel(item)}
-                          >
-                            <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
-                              Cancel Campaign
-                            </p>
-                          </div>
+                          <DialogRoot placement={'center'} size="xs">
+                            <DialogTrigger asChild>
+                              <button
+                                className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 py-1 hover:bg-neargreen/5 dark:hover:bg-black-200"
+                                onClick={() => onCancel(item)}
+                              >
+                                <p className="ml-1 text-green-500 dark:text-green-250 cursor-pointer">
+                                  Cancel Campaign
+                                </p>
+                              </button>
+                            </DialogTrigger>
+                            <ConfirmModal
+                              buttonLoading={buttonLoading}
+                              handleCampaignCancellation={
+                                handleCampaignCancellation
+                              }
+                              mutate={mutate}
+                              setButtonLoading={setButtonLoading}
+                            />
+                          </DialogRoot>
                         )}
                       </td>
                     </tr>
@@ -259,16 +270,6 @@ const Listing = ({ statsMutate }: Props) => {
           </div>
         </div>
       </div>
-      {confirmOpen && (
-        <ConfirmModal
-          buttonLoading={buttonLoading}
-          currentCampaign={currentCampaign}
-          handleCampaignCancellation={handleCampaignCancellation}
-          mutate={mutate}
-          setButtonLoading={setButtonLoading}
-          setConfirmOpen={setConfirmOpen}
-        />
-      )}
     </>
   );
 };

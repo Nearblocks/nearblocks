@@ -1,21 +1,19 @@
 'use client';
-import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-} from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import { useState } from 'react';
 
+import {
+  AccordionItem,
+  AccordionItemContent,
+  AccordionItemTrigger,
+  AccordionRoot,
+} from '@/components/ui/accordion';
 import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { SpamToken, Token, TransactionInfo } from '@/utils/types';
 
 import TokenImage, { NFTImage } from '../../common/TokenImage';
-import ArrowDown from '../../Icons/ArrowDown';
-import ArrowUp from '../../Icons/ArrowUp';
+import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
 import WarningIcon from '../../Icons/WarningIcon';
 import TokenTransfers from './TokenTransfers';
@@ -125,32 +123,29 @@ const NFTDetails = ({
             </span>
             <span>{token?.nft?.name}</span>
           </Link>
-          <Accordion
+          <AccordionRoot
             className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-xl  soft-shadow mt-4"
             collapsible
-            defaultIndex={indices}
+            defaultValue={indices.map((num) => num.toString())}
             multiple
           >
-            <AccordionItem index={1}>
-              <AccordionButton
+            <AccordionItem key={1} value="1">
+              <AccordionItemTrigger
+                buttonColor={'text-gray-600 dark:text-neargray-10'}
                 className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
                 onChange={() => toggleItem(1)}
               >
                 <h2>Details</h2>
-                {indices?.includes(1) ? (
-                  <ArrowUp className="fill-current" />
-                ) : (
-                  <ArrowDown className="fill-current" />
-                )}
-              </AccordionButton>
-              <AccordionPanel className="text-sm text-nearblue-600 dark:text-neargray-10">
+              </AccordionItemTrigger>
+              <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
                   {token?.asset && (
                     <div className="flex p-4">
                       <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                         <Tooltip
-                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          label="Current owner of this NFT"
+                          className={'left-[5.5rem] w-40 max-w-[300px]'}
+                          position="bottom"
+                          tooltip="Current owner of this NFT"
                         >
                           <div>
                             <Question className="w-4 h-4 fill-current mr-1" />
@@ -172,8 +167,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="Address of this NFT contract"
+                        className={'left-24 w-44 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="Address of this NFT contract"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -193,8 +189,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="This NFT's unique token ID"
+                        className={'left-[5.5rem] w-40 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="This NFT's unique token ID"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -207,8 +204,9 @@ const NFTDetails = ({
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
                       <Tooltip
-                        className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        label="The standard followed by this NFT"
+                        className={'left-[5.5rem] w-40 max-w-[300px]'}
+                        position="bottom"
+                        tooltip="The standard followed by this NFT"
                       >
                         <div>
                           <Question className="w-4 h-4 fill-current mr-1" />
@@ -219,27 +217,23 @@ const NFTDetails = ({
                     <div className="w-full xl:w-3/4 word-break">NEP-171</div>
                   </div>
                 </div>
-              </AccordionPanel>
+              </AccordionItemContent>
             </AccordionItem>
             {token?.description && (
-              <AccordionItem index={2}>
-                <AccordionButton
+              <AccordionItem key={2} value="2">
+                <AccordionItemTrigger
+                  buttonColor={'text-gray-600 dark:text-neargray-10'}
                   className="w-full flex justify-between items-center text-sm font-semibold text-gray-600 dark:text-neargray-10 border-b dark:border-black-200 focus:outline-none p-3"
                   onClick={() => toggleItem(2)}
                 >
                   <h2>Description</h2>
-                  {indices.includes(2) ? (
-                    <ArrowUp className="fill-current" />
-                  ) : (
-                    <ArrowDown className="fill-current" />
-                  )}
-                </AccordionButton>
-                <AccordionPanel className="text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 p-3">
+                </AccordionItemTrigger>
+                <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 p-3">
                   {token.description}
-                </AccordionPanel>
+                </AccordionItemContent>
               </AccordionItem>
             )}
-          </Accordion>
+          </AccordionRoot>
         </div>
       </div>
       <div className="py-6"></div>

@@ -143,7 +143,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
                 {inventoryLoading ? (
                   <Skeleton className="w-40" />
                 ) : (
-                  <p className="text-sm my-1 flex">
+                  <div className="text-sm my-1 flex">
                     {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
                     <span>
                       {filterToken?.ft_meta?.price && (
@@ -152,7 +152,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
                         </div>
                       )}
                     </span>
-                  </p>
+                  </div>
                 )}
               </div>
             </div>

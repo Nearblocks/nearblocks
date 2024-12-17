@@ -18,7 +18,7 @@ export default function ContractTabSleleton() {
         </div>
       </TabPanel>
       <TabPanel>
-        <div className="border-t p-4 mt-3">
+        <div className="border-t dark:border-t-black-200 p-4 mt-3">
           <Skeleton className="w-32 h-8 mb-4" />
           <Skeleton className="w-full h-6 mb-2" />
           <Skeleton className="w-full h-6 mb-2" />

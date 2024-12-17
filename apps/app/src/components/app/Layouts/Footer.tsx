@@ -114,23 +114,19 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
-                    <Link href="/advertise" legacyBehavior>
-                      <a>{t('footer.links.advertise')}</a>
-                    </Link>
+                    <Link href="/advertise">{t('footer.links.advertise')}</Link>
                   </li>
                   <li>
-                    <Link href="/apis" legacyBehavior>
-                      <a>{t('footer.links.api')}</a>
-                    </Link>
+                    <Link href="/apis">{t('footer.links.api')}</Link>
                   </li>
                   <li>
-                    <Link href="https://lite.nearblocks.io/" legacyBehavior>
-                      <a className="flex">
+                    <Link href="https://lite.nearblocks.io/">
+                      <span className="flex">
                         NEAR Validate
                         <span>
                           <Arrow className="-rotate-45 -mt-1 h-4 w-4" />
                         </span>
-                      </a>
+                      </span>
                     </Link>
                   </li>
                 </ul>
@@ -141,23 +137,17 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200 ">
                   <li>
-                    <Link href="/blocks" legacyBehavior>
-                      <a>{t('footer.links.latestBlocks')}</a>
-                    </Link>
+                    <Link href="/blocks">{t('footer.links.latestBlocks')}</Link>
                   </li>
                   <li>
-                    <Link href="/txns" legacyBehavior>
-                      <a>{t('footer.links.latestTxns')}</a>
-                    </Link>
+                    <Link href="/txns">{t('footer.links.latestTxns')}</Link>
                   </li>
                   <li>
-                    <Link href="/charts" legacyBehavior>
-                      <a>{t('footer.links.charts')}</a>
-                    </Link>
+                    <Link href="/charts">{t('footer.links.charts')}</Link>
                   </li>
                   <li>
-                    <Link href="/node-explorer" legacyBehavior>
-                      <a>{t('footer.links.nearValidator')}</a>
+                    <Link href="/node-explorer">
+                      {t('footer.links.nearValidator')}
                     </Link>
                   </li>
                 </ul>
@@ -168,34 +158,28 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </div>
                 <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
                   <li>
-                    <Link href="/about" legacyBehavior>
-                      <a>{t('footer.links.about')}</a>
-                    </Link>
+                    <Link href="/about">{t('footer.links.about')}</Link>
                   </li>
 
                   <li>
-                    <Link href="/contact" legacyBehavior>
-                      <a>{t('footer.links.contact')}</a>
+                    <Link href="/contact">{t('footer.links.contact')}</Link>
+                  </li>
+                  <li>
+                    <Link href="/terms-and-conditions">
+                      {t('footer.links.terms')}
                     </Link>
                   </li>
                   <li>
-                    <div className="flex">
-                      <Link href="/terms-and-conditions">
-                        {t('footer.links.terms')}
-                      </Link>
-                      <span className="mx-1">&</span>
-                      <Link href="/privacy-policy">Policy</Link>
-                    </div>
+                    <Link href="/privacy-policy">Privacy Policy</Link>
                   </li>
                   <li>
-                    <Link href="https://status.nearblocks.io/" legacyBehavior>
-                      <a
-                        className="flex"
-                        rel="noreferrer nofollow noopener"
-                        target="_blank"
-                      >
-                        Status
-                      </a>
+                    <Link
+                      className="flex"
+                      href="https://status.nearblocks.io/"
+                      rel="noreferrer nofollow noopener"
+                      target="_blank"
+                    >
+                      Status
                     </Link>
                   </li>
                 </ul>
@@ -209,23 +193,19 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
             <div className="text-gray-400 text-xs flex items-center flex-wrap pb-1">
               Price feeds aggregated by{' '}
               <Link
+                className="mx-1  flex items-center"
                 href="http://coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
-                legacyBehavior
+                rel="noreferrer nofollow noopener"
+                target="_blank"
               >
-                <a
-                  className="mx-1  flex items-center"
-                  rel="noreferrer nofollow noopener"
-                  target="_blank"
-                >
-                  <Image
-                    alt="CoinGecko"
-                    className="inline-flex w-5 h-5"
-                    height={20}
-                    loading="eager"
-                    src="/images/coingecko_logo_black.svg"
-                    width={20}
-                  />
-                </a>
+                <Image
+                  alt="CoinGecko"
+                  className="inline-flex w-5 h-5"
+                  height={20}
+                  loading="eager"
+                  src="/images/coingecko_logo_black.svg"
+                  width={20}
+                />
               </Link>
             </div>
             <div>

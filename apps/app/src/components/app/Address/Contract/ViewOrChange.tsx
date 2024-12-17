@@ -1,19 +1,18 @@
 'use client';
-import {
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-} from '@reach/accordion';
-import { Tooltip } from '@reach/tooltip';
 import uniqueId from 'lodash/uniqueId';
 import { useContext, useState } from 'react';
 
+import {
+  AccordionItem,
+  AccordionItemContent,
+  AccordionItemTrigger,
+} from '@/components/ui/accordion';
 import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
 
-import ArrowRight from '../../Icons/ArrowRight';
+import Tooltip from '../../common/Tooltip';
 import CloseCircle from '../../Icons/CloseCircle';
 import Question from '../../Icons/Question';
 import { NearContext } from '../../wallet/near-context';
@@ -191,50 +190,57 @@ const ViewOrChange = (props: Props) => {
     <AccordionItem
       className="flex flex-col text-gray-600 text-sm mb-3"
       key={index}
+      value={index.toString()}
     >
-      <AccordionButton className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10">
+      <AccordionItemTrigger
+        buttonColor="fill-gray-600"
+        className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
+      >
         <span>
           <span className="text-gray-400 dark:text-neargray-10">
             {index + 1}.
           </span>{' '}
           {toSnakeCase(method ?? '')}
         </span>
-        <ArrowRight className="contract-icon fill-gray-600" />
-      </AccordionButton>
-      <AccordionPanel className="border dark:border-black-200 p-4 rounded">
-        <div className="flex max-w-xl justify-between mb-3">
-          <div className="flex items-center dark:text-neargray-10">
+      </AccordionItemTrigger>
+      <AccordionItemContent className="border dark:border-black-200 p-4 rounded">
+        <div className="max-w-xl justify-between mb-3 sm:flex flex-nowrap">
+          <div className="flex items-center dark:text-neargray-10 mb-2">
             Arguments
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Specify an arguments schema."
+              className={'left-14 max-w-[200px] w-20'}
+              position="bottom"
+              tooltip="Specify an arguments schema."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
               </span>
             </Tooltip>
           </div>
-          <button
-            className="mx-3 px-3 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white"
-            onClick={onAdd}
-          >
-            Add
-          </button>
-          <button
-            className="flex ml-2 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-            disabled={loading}
-            onClick={onDetect}
-          >
-            Auto detect
-            <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Scan the blockchain to find successful method calls and copy the parameter schema. Auto-detect might not work on every method."
+          <div className="flex mb-2">
+            <button
+              className="mx-3 px-3 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white"
+              onClick={onAdd}
             >
-              <span>
-                <Question className="w-4 h-4 fill-current mx-1 " />
-              </span>
-            </Tooltip>
-          </button>
+              Add
+            </button>
+            <button
+              className="flex ml-2 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading}
+              onClick={onDetect}
+            >
+              Auto detect
+              <Tooltip
+                className={'left-1/2 max-w-[200px] w-44 text-left mt-3'}
+                position="bottom"
+                tooltip="Scan the blockchain to find successful method calls and copy the parameter schema. Auto-detect might not work on every method."
+              >
+                <span>
+                  <Question className="w-4 h-4 fill-current mx-1 " />
+                </span>
+              </Tooltip>
+            </button>
+          </div>
         </div>
         {fields.map((field) => (
           <div className="flex max-w-xl items-center" key={field.id}>
@@ -281,8 +287,9 @@ const ViewOrChange = (props: Props) => {
           <div className="flex items-center">
             Options
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 ml-2"
-              label="Optional arguments for write operations."
+              className={'left-20 max-w-[200px] w-32'}
+              position="bottom"
+              tooltip="Optional arguments for write operations."
             >
               <span>
                 <Question className="w-4 h-4 fill-current ml-1" />
@@ -328,8 +335,9 @@ const ViewOrChange = (props: Props) => {
             <div className="flex items-center mx-4 text-gray-400">
               OR{' '}
               <Tooltip
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                label="We cant differentiate read/write methods for this contract, so you should choose the appropriate action"
+                className={'left-1/2 max-w-[200px] w-56 mb-3'}
+                position="top"
+                tooltip="We cant differentiate read/write methods for this contract, so you should choose the appropriate action"
               >
                 <span>
                   <Question className="w-4 h-4 fill-current ml-1" />
@@ -357,8 +365,9 @@ const ViewOrChange = (props: Props) => {
           <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
             View txn details:{' '}
             <Tooltip
-              className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
-              label={txn}
+              className={'left-1/2 max-w-[200px] w-96 mt-3'}
+              position="bottom"
+              tooltip={txn}
             >
               <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
                 <Link href={`/txns/${txn}`}>{txn}</Link>
@@ -374,7 +383,7 @@ const ViewOrChange = (props: Props) => {
             value={result}
           />
         )}
-      </AccordionPanel>
+      </AccordionItemContent>
     </AccordionItem>
   );
 };

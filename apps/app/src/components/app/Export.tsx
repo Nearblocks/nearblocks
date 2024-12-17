@@ -1,10 +1,10 @@
 'use client';
-
-import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useFetch } from '@/hooks/app/useFetch';
+
+import Tooltip from './common/Tooltip';
 
 interface Props {
   exportType: string;
@@ -113,7 +113,7 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
   };
 
   return (
-    <div className="bg-neargray-25 dark:bg-black-300 py-16 flex flex-col items-center">
+    <div className="bg-neargray-25 dark:bg-black-300 py-16 flex flex-col items-center text-center">
       <h2 className="text-black dark:text-white text-2xl font-medium">
         Download Data ({exportInfo.tittle})
       </h2>
@@ -133,8 +133,9 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
 
           <div className="lg:flex justify-between items-center text-center">
             <Tooltip
-              className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 absolute"
-              label={'Select Start Date'}
+              className={'ml-4 max-w-[200px] whitespace-nowrap'}
+              position="top"
+              tooltip={'Select Start Date'}
             >
               <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                 <input
@@ -149,8 +150,9 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
             </Tooltip>
             <p className="text-center">To</p>
             <Tooltip
-              className="-mt-20 h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 absolute"
-              label={'Select End Date'}
+              className={'ml-5 max-w-[200px] whitespace-nowrap'}
+              position="top"
+              tooltip={'Select End Date'}
             >
               <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
                 <input

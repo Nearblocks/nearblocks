@@ -38,7 +38,7 @@ export default function BalanceSkeleton() {
               <div className="w-full md:w-1/4 mb-1.5">
                 {t('tokens') || 'Tokens:'}
               </div>
-              <div className="w-full md:w-3/4 break-words z-10">
+              <div className="w-full break-words z-10">
                 <Skeleton className="h-7 w-full" />
               </div>
             </div>

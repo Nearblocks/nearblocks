@@ -339,15 +339,6 @@ export const Policy = ({ theme: cookieTheme }: { theme: string }) => {
                   online account and update your personal data.
                 </p>
 
-                <p>
-                  Please note that depending on the information requested, a
-                  nominal fee may be charged and/or backed by the Ethereum
-                  signed message. We will endeavour to provide the information
-                  back to you as soon as practicable. However we also reserve
-                  the right to validate all requests for the authenticity of the
-                  request.
-                </p>
-
                 <p className="font-semibold">6. WITHDRAWING CONSENT</p>
 
                 <p>

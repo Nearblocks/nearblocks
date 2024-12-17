@@ -1,5 +1,4 @@
 'use client';
-import { Tooltip } from '@reach/tooltip';
 import { debounce } from 'lodash';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
@@ -18,6 +17,7 @@ import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
+import Tooltip from '../common/Tooltip';
 import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
 
@@ -254,8 +254,9 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
       cell: (row: DelegatorInfo) => (
         <>
           <Tooltip
-            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2 break-words"
-            label={row?.account_id}
+            className={'left-24 max-w-[200px]'}
+            position="top"
+            tooltip={row?.account_id}
           >
             <Link
               className="text-green-500 dark:text-green-250 hover:no-underline"
