@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers';
+
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
@@ -28,6 +30,7 @@ const Overview = async ({ id, searchParams }: any) => {
     ? await getRequest(`account/${searchParams?.a}/inventory`)
     : Promise.resolve(null);
   const inventoryData = inventoryDataPromise?.inventory;
+  const theme = (await cookies()).get('theme')?.value || 'light';
 
   return (
     <>
@@ -36,6 +39,7 @@ const Overview = async ({ id, searchParams }: any) => {
         id={id}
         stats={stats}
         status={status}
+        theme={theme}
         token={token}
         transfers={transfers}
       />

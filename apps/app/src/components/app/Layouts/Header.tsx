@@ -2,7 +2,7 @@
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -159,6 +159,7 @@ const Header = ({
   role,
   stats: statsDetails,
   sync,
+  theme: cookieTheme,
   token,
   user,
 }: any) => {
@@ -190,7 +191,11 @@ const Header = ({
   const pathname = usePathname();
   const isMobile = useScreenSize();
   const router = useRouter();
-  const { setTheme, theme } = useTheme();
+  let { setTheme, theme } = useTheme();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   useEffect(() => {
     if (sync) {
@@ -320,6 +325,7 @@ const Header = ({
                           alt="NearBlocks"
                           className="dark:filter dark:invert"
                           height="14"
+                          loading="eager"
                           src="/images/near.svg"
                           width="14"
                         />
@@ -367,6 +373,7 @@ const Header = ({
                   <Image
                     alt="NearBlocks"
                     height="14"
+                    loading="eager"
                     src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
                     width="14"
                   />
@@ -399,6 +406,7 @@ const Header = ({
                     className="block"
                     height="41"
                     layout="fixed"
+                    loading="eager"
                     src={
                       theme === 'dark'
                         ? '/images/nearblocksblack_dark.svg'
@@ -416,6 +424,7 @@ const Header = ({
                   <Image
                     alt="NearBlocks"
                     height="14"
+                    loading="eager"
                     src={`/images/${theme === 'dark' ? 'moon.svg' : 'sun.svg'}`}
                     width="14"
                   />
@@ -571,6 +580,7 @@ const Header = ({
                         alt="NearBlocks"
                         height="41"
                         layout="fixed"
+                        loading="eager"
                         src="/images/pipe.svg"
                         width="2"
                       />
@@ -599,6 +609,7 @@ const Header = ({
                               alt="NearBlocks"
                               className="dark:filter dark:invert"
                               height="14"
+                              loading="eager"
                               src="/images/near.svg"
                               width="14"
                             />

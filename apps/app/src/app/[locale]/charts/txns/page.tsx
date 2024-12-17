@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
@@ -59,6 +59,8 @@ export default async function TxnsChart(props: {
 
   const t = await getTranslations({ locale });
   const data = await getRequest('charts');
+  const theme = (await cookies()).get('theme')?.value || 'light';
+
   return (
     <section>
       <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
@@ -72,7 +74,12 @@ export default async function TxnsChart(props: {
         <div className="container-xxl mx-auto px-5 -mt-36">
           <div className="relative">
             <Suspense fallback={<ChartDetails chartTypes="txns" />}>
-              <Chart chartsData={data} chartTypes={'txns'} poweredBy={false} />
+              <Chart
+                chartsData={data}
+                chartTypes={'txns'}
+                poweredBy={false}
+                theme={theme}
+              />
             </Suspense>
           </div>
         </div>

@@ -11,9 +11,10 @@ import Footer from './Footer';
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
+  theme: string;
 }
 
-const LayoutActions = ({ children, notice }: LayoutProps) => {
+const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
   const pathname = usePathname();
   const [signedAccountId, setSignedAccountId] = useState('');
   const wallet = useWallet();
@@ -36,7 +37,7 @@ const LayoutActions = ({ children, notice }: LayoutProps) => {
       <NearContext.Provider value={{ signedAccountId, wallet }}>
         {notice}
         <main>{children}</main>
-        <Footer />
+        <Footer theme={theme} />
       </NearContext.Provider>
     </div>
   );

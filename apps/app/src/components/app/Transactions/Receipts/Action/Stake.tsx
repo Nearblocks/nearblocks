@@ -11,12 +11,16 @@ const Stake = (props: TransactionActionInfo) => {
 
   return (
     <div className="py-1">
-      <FaCoins className="inline-flex text-yellow-500 mr-1" />
-      {t ? t('txnDetails.actions.stake.0') : 'Staked'}
-      <span className="font-bold">
+      <span className="whitespace-nowrap">
+        <FaCoins className="inline-flex text-yellow-500 mr-1" />
+        {t ? t('txnDetails.actions.stake.0') : 'Staked'}
+      </span>
+      <span className="font-bold mx-1">
         {args.stake ? yoctoToNear(args.stake, true) : args.stake ?? ''}Ⓝ
-      </span>{' '}
-      {t ? t('txnDetails.actions.stake.1') : 'with'}{' '}
+      </span>
+      <span className="mx-1">
+        {t ? t('txnDetails.actions.stake.1') : 'with'}
+      </span>
       {shortenHex(args.public_key)}
     </div>
   );

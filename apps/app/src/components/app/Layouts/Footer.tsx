@@ -1,16 +1,20 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
-import Image from 'next/legacy/image';
+import Image from 'next/image';
 
 import { Link } from '@/i18n/routing';
 
 import Arrow from '../Icons/Arrow';
 
-const Footer = () => {
+const Footer = ({ theme: cookieTheme }: { theme: string }) => {
   const currentDate = new Date();
-  const { theme } = useTheme();
+  let { theme } = useTheme();
   const t = useTranslations();
+
+  if (theme == undefined) {
+    theme = cookieTheme;
+  }
 
   return (
     <footer className="footer dark:bg-black-600  ">
@@ -25,6 +29,7 @@ const Footer = () => {
                     className="block"
                     height="40"
                     layout="fixed"
+                    loading="eager"
                     src={
                       theme === 'dark'
                         ? '/images/nearblocksblack_dark.svg'
@@ -36,7 +41,7 @@ const Footer = () => {
                 <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
                   {t('footer.description')}
                 </p>
-                <div>
+                <div className="flex">
                   <a
                     href="https://twitter.com/nearblocks"
                     rel="noreferrer nofollow noopener"
@@ -45,6 +50,7 @@ const Footer = () => {
                     <Image
                       alt="Twitter"
                       height={24}
+                      loading="eager"
                       src={
                         theme === 'dark'
                           ? '/images/twitter_icon_black.svg'
@@ -62,6 +68,7 @@ const Footer = () => {
                     <Image
                       alt="Github"
                       height={24}
+                      loading="eager"
                       src={
                         theme === 'dark'
                           ? '/images/github_icon_black.svg'
@@ -79,6 +86,7 @@ const Footer = () => {
                     <Image
                       alt="Telegram"
                       height={24}
+                      loading="eager"
                       src={
                         theme === 'dark'
                           ? '/images/telegram_black.svg'
@@ -213,6 +221,7 @@ const Footer = () => {
                     alt="CoinGecko"
                     className="inline-flex w-5 h-5"
                     height={20}
+                    loading="eager"
                     src="/images/coingecko_logo_black.svg"
                     width={20}
                   />
