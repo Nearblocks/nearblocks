@@ -300,20 +300,31 @@ const Address = ({
       try {
         setRpcError(false);
         setRpcLoading(true);
+        const currentId = id;
+        let hasError = false;
         const [code, keys, account]: any = await Promise.all([
-          contractCode(id as string).catch((error: any) => {
-            console.error(`Error fetching contract code for ${id}:`, error);
+          contractCode(currentId as string).catch((error: any) => {
+            console.log(
+              `Error fetching contract code for ${currentId}:`,
+              error,
+            );
             return null;
           }),
-          viewAccessKeys(id as string).catch((error: any) => {
-            console.error(`Error fetching access keys for ${id}:`, error);
+          viewAccessKeys(currentId as string).catch((error: any) => {
+            console.log(`Error fetching access keys for ${currentId}:`, error);
+            hasError = true;
             return null;
           }),
-          viewAccount(id as string).catch((error: any) => {
-            console.error(`Error fetching account for ${id}:`, error);
+          viewAccount(currentId as string).catch((error: any) => {
+            console.log(`Error fetching account for ${currentId}:`, error);
+            hasError = true;
             return null;
           }),
         ]);
+
+        if (currentId !== id) return;
+
+        if (hasError) setRpcError(true);
 
         if (keys) {
           setAccessKeys(keys?.keys);
@@ -620,6 +631,7 @@ const Address = ({
           deploymentData={deploymentData}
           nftTokenData={nftTokenData}
           multiChainAccounts={multiChainAccounts}
+          accessKeys={accessKeys}
         />
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-10">
