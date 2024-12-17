@@ -1,3 +1,4 @@
+import { context, SpanStatusCode, trace } from '@opentelemetry/api';
 import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
@@ -6,36 +7,80 @@ import { retry } from 'nb-utils';
 
 import { mapExecutionStatus } from '#libs/utils';
 
+const txnTracer = trace.getTracer('transaction-processor');
+
 export const storeTransactions = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
-  const chunks = message.shards.flatMap((shard) => shard.chunk || []);
-  const transactions = chunks.flatMap((chunk) => {
-    return chunk.transactions.map((txn, index) =>
-      getTransactionData(
-        txn,
-        chunk.header.chunkHash,
-        message.block.header.hash,
-        message.block.header.timestampNanosec,
-        index,
-      ),
-    );
+  const span = txnTracer.startSpan('store.transactions', {
+    attributes: {
+      'block.hash': message.block.header.hash,
+      'block.height': message.block.header.height,
+      'block.timestamp': message.block.header.timestampNanosec,
+    },
   });
 
-  if (transactions.length) {
-    await retry(async () => {
-      const batchSize = 1000;
+  try {
+    return await context.with(
+      trace.setSpan(context.active(), span),
+      async () => {
+        const chunks = message.shards.flatMap((shard) => shard.chunk || []);
+        const transactions = chunks.flatMap((chunk) => {
+          return chunk.transactions.map((txn, index) =>
+            getTransactionData(
+              txn,
+              chunk.header.chunkHash,
+              message.block.header.hash,
+              message.block.header.timestampNanosec,
+              index,
+            ),
+          );
+        });
 
-      for (let i = 0; i < transactions.length; i += batchSize) {
-        const batch = transactions.slice(i, i + batchSize);
+        if (transactions.length) {
+          await retry(async () => {
+            const batchSize = 1000;
 
-        await knex('transactions')
-          .insert(batch)
-          .onConflict(['transaction_hash'])
-          .ignore();
-      }
+            for (let i = 0; i < transactions.length; i += batchSize) {
+              span.addEvent('start.batch', {
+                'batch.size': Math.min(batchSize, transactions.length - i),
+                'batch.start': i,
+              });
+
+              try {
+                const batch = transactions.slice(i, i + batchSize);
+                span.setAttribute('transactions.count', batch.length);
+
+                await knex('transactions')
+                  .insert(batch)
+                  .onConflict(['transaction_hash'])
+                  .ignore();
+
+                span.addEvent('end.batch', { 'batch.size': batch.length });
+              } catch (error) {
+                span.setStatus({
+                  code: SpanStatusCode.ERROR,
+                  message:
+                    error instanceof Error ? error.message : 'Unknown error',
+                });
+                throw error;
+              }
+            }
+          });
+        }
+
+        span.setStatus({ code: SpanStatusCode.OK });
+      },
+    );
+  } catch (error) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
+    throw error;
+  } finally {
+    span.end();
   }
 };
 
