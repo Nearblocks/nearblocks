@@ -1,20 +1,19 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
+import dayjs from 'dayjs';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
-import {
-  currency,
-  dollarFormat,
-  formatCustomDate,
-  localFormat,
-} from '@/utils/libs';
+import { dollarFormat } from '@/utils/app/libs';
+import { currency, localFormat } from '@/utils/libs';
 import { gasPrice } from '@/utils/near';
-import { ChartConfigType, ChartInfo, StatusInfo } from '@/utils/types';
+import { ChartInfo, StatusInfo } from '@/utils/types';
 
 interface Props {
   chartsDetails: { charts: ChartInfo[] };
@@ -22,161 +21,119 @@ interface Props {
   stats: StatusInfo;
 }
 
-const Overview = ({ chartsDetails, stats }: Props) => {
-  const t = useTranslations();
+const TransactionChart: React.FC<{ chartData: ChartInfo[] }> = ({
+  chartData,
+}) => {
   const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [chartConfig, setChartConfig] = useState<ChartConfigType>(null);
-  const { networkId } = useConfig();
 
-  const charts = chartsDetails?.charts;
+  const chartOptions = useMemo(() => {
+    // Sort data by date
+    const sortedData = [...chartData].sort(
+      (a: ChartInfo, b: ChartInfo) =>
+        new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+    // Prepare series and categories
+    const series = sortedData.map((stat) => ({
+      date: stat.date,
+      price: stat.near_price,
+      y: Number(stat.txns),
+    }));
 
-  const chartData = useMemo(() => {
-    try {
-      const series = charts?.map((stat: any) => ({
-        date: stat.date,
-        price: stat.near_price,
-        y: Number(stat.txns),
-      }));
-      series.sort(
-        (a: any, b: any) =>
-          new Date(a.date).getTime() - new Date(b.date).getTime(),
-      );
-      const categories = series.map((stat: any) => formatCustomDate(stat.date));
-      return {
-        categories,
-        series,
-      };
-    } catch (error) {
-      return {
-        categories: [],
-        series: [],
-      };
-    }
+    const categories = sortedData.map((stat) =>
+      dayjs(stat.date).format('MMM DD'),
+    );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [charts]);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    function fetchData() {
-      const fetchedData = {
-        accessibility: {
-          enabled: false,
-        },
-        chart: {
-          backgroundColor: 'transparent',
-          height: 110,
-          spacingBottom: 0,
-          spacingLeft: 0,
-          spacingRight: 10,
-          spacingTop: 10,
-        },
-        credits: {
-          enabled: false,
-        },
-        exporting: {
-          enabled: false,
-        },
-        legend: {
-          enabled: false,
-        },
-        plotOptions: {
-          spline: {
-            lineWidth: 1,
-            marker: {
-              radius: 0,
-            },
-            states: {
-              hover: {
-                lineWidth: 1,
-              },
+    return {
+      chart: {
+        backgroundColor: 'transparent',
+        height: 110,
+        spacingBottom: 0,
+        spacingLeft: 0,
+        spacingRight: 10,
+        spacingTop: 10,
+        type: 'spline',
+      },
+      credits: {
+        enabled: false,
+      },
+      legend: {
+        enabled: false,
+      },
+      plotOptions: {
+        spline: {
+          lineWidth: 1,
+          marker: {
+            radius: 0,
+          },
+          states: {
+            hover: {
+              lineWidth: 1,
             },
           },
         },
-        series: [
-          {
-            color: '#80D1BF',
-            data: chartData.series,
-            type: 'spline',
+      },
+      series: [
+        {
+          color: '#80D1BF',
+          data: series,
+          type: 'spline',
+        },
+      ],
+      title: {
+        text: null,
+      },
+      tooltip: {
+        formatter: function (this: Highcharts.TooltipFormatterContextObject) {
+          const point = this.point as any;
+          return `
+            <span style="font-size:10px">${dayjs(point.date).format(
+              'dddd, MMMM DD, YYYY',
+            )}</span><br/>
+            Transactions: <strong>${dollarFormat(Number(point.y))}</strong><br/>
+            Price: $${dollarFormat((point as any).price)}
+          `;
+        },
+      },
+      xAxis: {
+        categories: categories,
+        labels: {
+          step: 7,
+          style: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
           },
-        ],
+        },
+        lineWidth: 0,
+        tickLength: 0,
+        type: 'datetime',
+      },
+      yAxis: {
+        gridLineWidth: 0,
+        labels: {
+          style: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
+          },
+        },
         title: {
           text: null,
         },
-        xAxis: {
-          categories: chartData.categories,
-          labels: {
-            step: 7,
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          lineWidth: 0,
-          tickLength: 0,
-          type: 'datetime',
-        },
-        yAxis: {
-          gridLineWidth: 0,
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          title: {
-            text: null,
-          },
-        },
-      };
-      setChartConfig(fetchedData);
-    }
+      },
+    };
+  }, [chartData, theme]);
 
-    fetchData();
-  }, [chartData, theme, mounted]);
+  return (
+    <div className="transaction-chart">
+      <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+    </div>
+  );
+};
 
-  const iframeSrc = chartConfig
-    ? `
-    <html>
-      <head>
-      <style>
-      body, html{
-        background-color: ${theme === 'dark' ? '#0D0D0D' : '#ffff'};
-      }
-      </style>
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
-        <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
-        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-      </head>
-      <body>
-        <div id="chart-container" style="width: 100%; height: 100%;"></div>
-        <script type="text/javascript">
-          const chartConfig = ${JSON.stringify(chartConfig)};
-          chartConfig.tooltip = {
-            formatter: function () {
-              const item= this.point
-              function dollarFormat(value) {
-                return numeral(value).format('0,0.00');
-               }
-               return \`<span style="font-size:10px">\${dayjs(this.point.date).format(
-                 'dddd, MMMM DD, YYYY'
-               )}</span><br/>Transactions: <strong>\${dollarFormat(
-               this.point.y
-             )}</strong><br/>Price: $\${dollarFormat(this.point.price)}
-             \`;
-            }
-          };
-          Highcharts.chart('chart-container', chartConfig);
-        </script>
-      </body>
-    </html>
-  `
-    : ``;
+const Overview = ({ chartsDetails, stats }: Props) => {
+  const t = useTranslations();
+  const { theme } = useTheme();
+  const { networkId } = useConfig();
+
+  const charts = chartsDetails?.charts;
 
   const nearPrice = stats?.near_price ?? '';
   const nearBtcPrice = stats?.near_btc_price ?? '';
@@ -185,7 +142,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
 
   return (
     <div className="container-xxl mx-auto px-5">
-      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-2 sm:px-5 md:py lg:px-0  dark:bg-black-600">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-2 sm:px-5 md:py lg:px-0 dark:bg-black-600">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             networkId === 'mainnet'
@@ -216,7 +173,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                     className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center"
                     href="/charts/near-price"
                   >
-                    {nearPrice ? '$' + dollarFormat(nearPrice) : ''}
+                    {nearPrice ? '$' + dollarFormat(Number(nearPrice)) : ''}
                     <span className="text-nearblue-700">
                       &nbsp;
                       {nearBtcPrice
@@ -229,14 +186,16 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                           <span className="text-neargreen text-sm">
                             &nbsp;
                             {stats?.change_24
-                              ? '(' + dollarFormat(stats?.change_24) + '%)'
+                              ? '(' +
+                                dollarFormat(Number(stats?.change_24)) +
+                                '%)'
                               : stats?.change_24 ?? ''}
                           </span>
                         ) : (
                           <span className="text-red-500 text-sm">
                             &nbsp;
                             {change24
-                              ? '(' + dollarFormat(change24) + '%)'
+                              ? '(' + dollarFormat(Number(change24)) + '%)'
                               : ''}
                           </span>
                         )}
@@ -265,7 +224,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                     href="/charts/market-cap"
                   >
                     {stats?.market_cap
-                      ? '$' + dollarFormat(stats?.market_cap ?? 0)
+                      ? '$' + dollarFormat(Number(stats?.market_cap) ?? 0)
                       : ''}
                   </Link>
                 </div>
@@ -370,7 +329,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
           </div>
           <div className="md:col-span-2 lg:col-span-1 flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:px-5 dark:bg-black-600">
             <div className="flex-1 py-4 lg:px-0">
-              {chartConfig && (
+              {charts && charts.length > 0 && (
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm dark:bg-black-600">
                   {t
                     ? t('homePage.transactionHistory', { days: 14 })
@@ -378,14 +337,7 @@ const Overview = ({ chartsDetails, stats }: Props) => {
                 </p>
               )}
               <div className="mt-1 h-28 dark:bg-black-600">
-                <iframe
-                  className="dark:bg-black-600"
-                  srcDoc={iframeSrc}
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#0D0D0D' : '#ffff',
-                    width: '100%',
-                  }}
-                />
+                <TransactionChart chartData={charts || []} />
               </div>
             </div>
           </div>

@@ -1,5 +1,7 @@
 'use client';
 import { Tooltip } from '@reach/tooltip';
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts/highstock';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/legacy/image';
@@ -7,8 +9,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
+import dayjs from '@/utils/app/dayjs';
+import { dollarFormat } from '@/utils/app/libs';
 import { yoctoToNear } from '@/utils/libs';
-import { ChartConfig, ChartStat, ChartTypeInfo } from '@/utils/types';
+import { ChartStat, ChartTypeInfo } from '@/utils/types';
 
 import Question from '../Icons/Question';
 import Skeleton from '../skeleton/common/Skeleton';
@@ -24,15 +28,18 @@ interface Props {
 }
 
 const Chart = (props: Props) => {
-  const { chartsData, chartTypes, poweredBy } = props;
+  const { chartsData, chartTypes } = props;
   const t = useTranslations();
   const { theme } = useTheme();
-  const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
     description: '',
     title: '',
   });
   const [logView, setLogView] = useState(false);
+
+  const [chartOptions, setChartOptions] = useState<Highcharts.Options | null>(
+    null,
+  );
   const { networkId } = useConfig();
 
   const handleToggle = () => {
@@ -193,307 +200,209 @@ const Chart = (props: Props) => {
   }));
 
   useEffect(() => {
-    const fetchData = () => {
-      let titleText = '';
-      let yLabel = '';
-      let description = '';
-      switch (chartTypes) {
-        case 'market-cap':
-          titleText = 'Near Market Capitalization Chart';
-          yLabel = 'Near Market Cap (USD)';
-          description =
-            'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
-          break;
-        case 'txns':
-          titleText = 'Near Daily Transactions Chart';
-          yLabel = 'Transactions per Day';
-          description =
-            'The chart highlights the total number of transactions on Near blockchain with daily individual breakdown for total blocks and total new account seen.';
-          break;
-        case 'near-supply':
-          titleText = 'Near Supply Growth Chart';
-          yLabel = 'Near Supply';
-          description =
-            'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
-          break;
-        case 'blocks':
-          titleText = 'New Blocks';
-          yLabel = 'Blocks per Day';
-          description =
-            'New Blocks Chart shows the historical number of blocks produced daily on Near blockchain.';
-          break;
-        case 'addresses':
-          titleText = 'Near Unique Accounts Chart';
-          yLabel = 'Accounts per Day';
-          description =
-            'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.';
-          break;
-        case 'txn-fee':
-          titleText = 'Transaction Fee Chart';
-          yLabel = 'Transaction Fee (USD)';
-          description =
-            'The chart shows the daily amount in USD spent per transaction on Near blockchain.';
-          break;
-        case 'txn-volume':
-          titleText = 'Transaction Volume Chart';
-          yLabel = 'Transaction Volume (USD)';
-          description =
-            'The chart shows the daily amount in USD spent per transaction on Near blockchain.            ';
-          break;
-        case 'near-price':
-          titleText = 'Near Daily Price (USD) Chart';
-          yLabel = 'Near Price (USD)';
-          description =
-            'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
-          break;
-        case 'multi-chain-txns':
-          titleText = 'Multi Chain Transactions Chart';
-          yLabel = 'Multichain Transactions per Day';
-          description =
-            'The chart highlights the total number of multichain transactions on Near blockchain.';
-          break;
-        default:
-      }
-      setChartInfo({
-        description: description,
-        title: titleText,
-      });
+    if (!chartTypes || chartData.length === 0) return;
 
-      const fetchedData = {
-        accessibility: {
-          enabled: false,
+    let titleText = '';
+    let yLabel = '';
+    let description = '';
+
+    switch (chartTypes) {
+      case 'market-cap':
+        titleText = 'Near Market Capitalization Chart';
+        yLabel = 'Near Market Cap (USD)';
+        description =
+          'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
+        break;
+      case 'txns':
+        titleText = 'Near Daily Transactions Chart';
+        yLabel = 'Transactions per Day';
+        description =
+          'The chart highlights the total number of transactions on Near blockchain with daily individual breakdown for total blocks and total new account seen.';
+        break;
+      case 'near-supply':
+        titleText = 'Near Supply Growth Chart';
+        yLabel = 'Near Supply';
+        description =
+          'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
+        break;
+      case 'blocks':
+        titleText = 'New Blocks';
+        yLabel = 'Blocks per Day';
+        description =
+          'New Blocks Chart shows the historical number of blocks produced daily on Near blockchain.';
+        break;
+      case 'addresses':
+        titleText = 'Near Unique Accounts Chart';
+        yLabel = 'Accounts per Day';
+        description =
+          'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.';
+        break;
+      case 'txn-fee':
+        titleText = 'Transaction Fee Chart';
+        yLabel = 'Transaction Fee (USD)';
+        description =
+          'The chart shows the daily amount in USD spent per transaction on Near blockchain.';
+        break;
+      case 'txn-volume':
+        titleText = 'Transaction Volume Chart';
+        yLabel = 'Transaction Volume (USD)';
+        description =
+          'The chart shows the daily amount in USD spent per transaction on Near blockchain.';
+        break;
+      case 'near-price':
+        titleText = 'Near Daily Price (USD) Chart';
+        yLabel = 'Near Price (USD)';
+        description =
+          'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
+        break;
+      case 'multi-chain-txns':
+        titleText = 'Multi Chain Transactions Chart';
+        yLabel = 'Multichain Transactions per Day';
+        description =
+          'The chart highlights the total number of multichain transactions on Near blockchain.';
+        break;
+      default:
+        titleText = 'Near Blockchain Chart';
+        yLabel = 'Value';
+        description = 'Chart displaying Near blockchain metrics';
+    }
+
+    setChartInfo({ description, title: titleText });
+
+    const options: Highcharts.Options = {
+      accessibility: {
+        enabled: false,
+      },
+      boost: {
+        useGPUTranslations: true,
+      },
+      chart: {
+        backgroundColor: 'transparent',
+        height: 430,
+        panKey: 'shift',
+        type: 'area',
+        zooming: {
+          type: 'x',
         },
-        chart: {
-          backgroundColor: 'transparent',
-          height: 430,
-          zoomType: 'x',
-        },
-        credits: {
-          enabled: false,
-        },
-        exporting: {
-          buttons: {
-            contextButton: {
-              menuItems: [
-                'viewFullscreen',
-                'printChart',
-                'separator',
-                'downloadPNG',
-                'downloadJPEG',
-                'downloadPDF',
-                'downloadSVG',
-                'separator',
-                'embed',
-              ],
-            },
+      },
+      credits: { enabled: false },
+      plotOptions: {
+        area: {
+          connectNulls: logView,
+          fillColor: {
+            linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+            stops: [
+              [0, 'rgba(3, 63, 64, 0.8)'],
+              [1, 'rgba(3, 63, 64, 0)'],
+            ],
           },
+          lineWidth: 1,
+          marker: { enabled: false },
+          threshold: null,
         },
-        legend: {
-          enabled: false,
-        },
-        plotOptions: {
-          area: {
-            fillColor: {
-              linearGradient: {
-                x1: 0,
-                x2: 0,
-                y1: 0,
-                y2: 1,
-              },
-              stops: [
-                [0, 'rgba(3, 63, 64, 0.8)'],
-                [1, 'rgba(3, 63, 64, 0)'],
-              ],
-            },
-            lineWidth: 1,
-            marker: {
+        series: {
+          label: {
+            connectorAllowed: false,
+          },
+          lineWidth: 1,
+          states: {
+            hover: {
               enabled: false,
             },
-            states: {
-              hover: {
-                lineWidth: 1,
-              },
-            },
-            threshold: null,
-            turboThreshold: 3650,
-          },
-          series: {
-            connectNulls: false,
           },
         },
-        series: [
-          {
-            color: 'rgba(3, 63, 64, 1)',
-            type: 'area',
-          },
-        ],
-        subtitle: {
-          text: 'Source: NearBlocks.io',
+      },
+      series: [
+        {
+          color: 'rgba(3, 63, 64, 1)',
+          data: logView ? replaceWithNull : chartData,
+          name: titleText,
+          showInLegend: false,
+          type: 'area',
         },
-        title: {
+      ],
+      subtitle: {
+        text: 'Source: NearBlocks.io',
+      },
+      title: {
+        style: {
+          color: theme === 'dark' ? '#e0e0e0' : '#333333',
+        },
+        text: titleText,
+      },
+      tooltip: {
+        formatter: function (this: Highcharts.TooltipFormatterContextObject) {
+          const point = this.point;
+
+          const formatTooltip = () => {
+            switch (chartTypes) {
+              case 'market-cap':
+                return `
+                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
+                  Market Cap: <strong>$${dollarFormat(
+                    Number(point.y),
+                  )}</strong><br/>
+                  Near Price: <strong>$${dollarFormat(
+                    (point as any).price,
+                  )}</strong>
+                `;
+              case 'txns':
+                return `
+                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
+                  Total Transactions: <strong>${dollarFormat(
+                    Number(point.y),
+                  )}</strong><br/>
+                  Total Blocks Count: <strong>${dollarFormat(
+                    (point as any).blocks,
+                  )}</strong><br/>
+                  New Addresses Seen: <strong>${dollarFormat(
+                    (point as any).addresses,
+                  )}</strong>
+                `;
+              case 'near-supply':
+                return `
+                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
+                  Total Supply: <strong>${dollarFormat(
+                    Number(point.y),
+                  )} Ⓝ</strong>
+                `;
+              // Add similar formatting for other chart types
+              default:
+                return `
+                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
+                  Value: <strong>${dollarFormat(Number(point.y))}</strong>
+                `;
+            }
+          };
+
+          return formatTooltip();
+        },
+      },
+      xAxis: {
+        labels: {
           style: {
             color: theme === 'dark' ? '#e0e0e0' : '#333333',
           },
-          text: titleText,
         },
-        xAxis: {
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-          type: 'datetime',
-        },
-        yAxis: {
-          gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
-          labels: {
-            style: {
-              color: theme === 'dark' ? '#e0e0e0' : '#333333',
-            },
-          },
-          lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-          title: {
-            text: yLabel,
+        lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+        type: 'datetime',
+      },
+      yAxis: {
+        gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
+        labels: {
+          style: {
+            color: theme === 'dark' ? '#e0e0e0' : '#333333',
           },
         },
-      };
-      setChartConfig(fetchedData);
+        lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
+        title: { text: yLabel },
+        type: logView ? 'logarithmic' : 'linear',
+      },
     };
 
-    fetchData();
-
+    setChartOptions(options);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartData, chartTypes, theme]);
-
-  const iframeSrc = chartConfig
-    ? `
-    <html>
-      <head>
-        <script src="https://code.highcharts.com/highcharts.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4"></script>
-        <script src="https://cdn.jsdelivr.net/npm/numeral@2.0.6/numeral.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/big.js@5.2.2"></script>
-        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-      <style>
-        body {
-          background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};
-          margin: 0;
-          padding: 0;
-        }
-        html{
-  
-          background-color: ${theme === 'dark' ? '#0d0d0d' : '#ffffff'};
-        }
-      </style>
-      </head>
-      <body >
-        <div id="chart-container" style="width: 100%; height: 100%;"></div>
-        ${
-          poweredBy
-            ? '<p style="text-align: center; color: #000; font-size: 0.75rem; padding-top: 1rem; padding-bottom: 1rem; font-family: sans-serif;">Powered by <a href="https://beta.nearblocks.io/?utm_source=bos_widget&utm_medium=Charts" target="_blank" style="font-weight: 600; font-family: sans-serif; color: #000; text-decoration: none;">NearBlocks</a></p>'
-            : ''
-        }
-        <script type="text/javascript">
-          const chartConfig = ${JSON.stringify(chartConfig)};
-          if (${logView}) {
-            chartConfig.yAxis.type = 'logarithmic';
-            chartConfig.series[0].data = ${JSON.stringify(replaceWithNull)};
-            chartConfig.plotOptions.series.connectNulls = ${true};
-          }
-          else{
-           chartConfig.series[0].data = ${JSON.stringify(chartData)};
-          }
-          chartConfig.tooltip = {
-            formatter: function () {
-              const item= this.point;
-              function dollarFormat(value) {
-                return numeral(value).format('0,0.00');
-              }
-  
-              function yoctoToNear(yocto, format) {
-                const YOCTO_PER_NEAR = Big(10).pow(24).toString();
-                const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
-                return format ? dollarFormat(near) : near;
-              }
-  
-              let tooltipContent = "";
-  
-              switch ("${chartTypes}") {
-                case "market-cap":
-                  tooltipContent = \`
-                    \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                    Market Cap: <strong>$\${dollarFormat(item.y)}</strong><br/>
-                    Near Price: <strong>$\${dollarFormat(item.price)}</strong>
-                  \`;
-                  break;
-                  case "txns":
-                    tooltipContent = \`
-                      \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                      Total Transactions: <strong>\${dollarFormat(item.y)}</strong><br/>
-                      Total Blocks Count: <strong>\${dollarFormat(item.blocks)}</strong><br/>
-                      New Addresses Seen: <strong>\${dollarFormat(item.addresses)}</strong>
-                    \`;
-                    break;
-                  case "near-supply":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Total Supply: <strong>\${dollarFormat(item.y)} Ⓝ</strong>
-                      \`;
-                    break;
-                  case "blocks":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Total Blocks: <strong>\${dollarFormat(item.y)}</strong><br/>\`;
-                    break;
-                  case "addresses":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Total Unique Addresses: <strong>\${dollarFormat(item.y)}</strong>\`;
-                    break;
-                    case "txn-fee":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Txn Fee: <strong>$\${dollarFormat(item.y)}</strong><br/>
-                        Txn Fee (Ⓝ): <strong>\${yoctoToNear(item.fee,true)} Ⓝ</strong><br/>
-                        \`;
-                    break;
-                  case "txn-volume":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Txn Fee: <strong>$\${dollarFormat(item.y)}</strong><br/>
-                        Txn Fee (Ⓝ): <strong>\${yoctoToNear(item.volume,true)} Ⓝ</strong><br/>
-                        \`;
-                    break;
-                  case "near-price":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Near Price: <strong>$\${dollarFormat(item.y)}</strong>
-                        \`;
-                    break;
-                  case "multi-chain-txns":
-                      tooltipContent = \`
-                        \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                        Total Multichain Transactions: <strong>$\{(item.y)}</strong>
-                        \`;
-                    break;
-                default:
-                  // Handle other cases or set a default tooltip content
-                  tooltipContent = \`
-                    \${dayjs(item.date).format('dddd, MMMM DD, YYYY')}<br/>
-                    \${item.y}
-                  \`;
-              }
-  
-              return tooltipContent;
-            }
-          };
-          Highcharts.chart('chart-container', chartConfig);
-        </script>
-      </body>
-    </html>
-  `
-    : ``;
+  }, [chartTypes, chartData, theme, logView]);
 
   return (
     <div>
@@ -537,14 +446,25 @@ const Chart = (props: Props) => {
             </div>
             <div className="pl-2 pr-2 py-8 h-full ">
               {chartData?.length ? (
-                <iframe
-                  srcDoc={iframeSrc}
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#0D0D0D' : '#FFFF',
-                    border: 'none',
-                    height: '100%',
-                    width: '100%',
+                // <iframe
+                //   srcDoc={iframeSrc}
+                //   style={{
+                //     backgroundColor: theme === 'dark' ? '#0D0D0D' : '#FFFF',
+                //     border: 'none',
+                //     height: '100%',
+                //     width: '100%',
+                //   }}
+                // />
+
+                <HighchartsReact
+                  containerProps={{
+                    style: {
+                      height: '100%',
+                      width: '100%',
+                    },
                   }}
+                  highcharts={Highcharts}
+                  options={chartOptions}
                 />
               ) : (
                 <Skeleton className="h-[93%] w-full" />
