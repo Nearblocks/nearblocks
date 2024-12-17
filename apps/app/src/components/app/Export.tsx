@@ -4,7 +4,7 @@ import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { fetcher } from '@/hooks/app/useFetch';
+import { useFetch } from '@/hooks/app/useFetch';
 
 interface Props {
   exportType: string;
@@ -30,6 +30,7 @@ const initial = {
 };
 
 const Export: React.FC<Props> = ({ exportType, id }) => {
+  const { fetcher } = useFetch();
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);
   const [endDate, setEndDate] = useState(initial.end);

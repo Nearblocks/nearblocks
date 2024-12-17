@@ -24,7 +24,7 @@ import UserLogout from './Logout';
 interface MenuItemProps {
   exact?: boolean | null;
   href: string;
-  icon: React.ElementType;
+  icon: FC<React.SVGProps<SVGSVGElement>>;
   text: string;
 }
 
