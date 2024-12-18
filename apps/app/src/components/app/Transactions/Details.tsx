@@ -40,6 +40,7 @@ import {
   TransactionLog,
 } from '@/utils/types';
 
+import { Ad } from '../Ad';
 import ErrorMessage from '../common/ErrorMessage';
 import TxnStatus from '../common/Status';
 import TokenImage, { NFTImage } from '../common/TokenImage';
@@ -415,6 +416,34 @@ const Details = (props: Props) => {
                   >
                     {txn?.receiver_account_id}
                   </Link>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 hidden md:!block overflow-x-hidden">
+            <div className="flex flex-wrap p-4">
+              <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
+                <Tooltip
+                  className={'w-96 left-[103px] max-w-[202px]'}
+                  tooltip={'Sponsored banner advertisement'}
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip>
+                Sponsored:
+              </div>
+              {!txn?.signer_account_id ? (
+                <div className="w-full md:w-3/4">
+                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-all overflow-auto h-[90px]">
+                  <Ad
+                    className="w-[720px] h-[90px] bg-no-repeat "
+                    format="Leaderboard"
+                    unitId="IbT2RAk1Cdc36JPkKEfCJQ=="
+                  />
                 </div>
               )}
             </div>
