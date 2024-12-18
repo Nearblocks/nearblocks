@@ -17,6 +17,8 @@ import useRpc from '@/hooks/useRpc';
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
 import useHash from '@/hooks/useHash';
 import { networkId } from '@/utils/config';
+import FaMinimize from '@/components/Icons/FaMinimize';
+import FaExpand from '@/components/Icons/FaExpand';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -41,6 +43,8 @@ const ReceiptRow = (props: Props) => {
 
   const lastBlockHash = useRef<string | null>(null);
   const rowRef = useRef<HTMLDivElement | null>(null);
+  const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
@@ -101,6 +105,44 @@ const ReceiptRow = (props: Props) => {
     Array.isArray(receipt?.actions) && receipt.actions.length > 0
       ? receipt.actions[0]?.args?.deposit ?? 0
       : 0;
+
+  const logs =
+    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
+      ? receipt.outcome.logs.filter(Boolean)
+      : [];
+
+  const receiptLog =
+    viewMode === 'raw'
+      ? logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              try {
+                const parsed = JSON.parse(log);
+                return JSON.stringify(parsed, null, 2);
+              } catch (error) {
+                return `${log}`;
+              }
+            }
+            return `${log}`;
+          })
+          .join('\n\n')
+      : logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              const match = log.match(/EVENT_JSON:({.*})/);
+              if (match) {
+                try {
+                  const parsed = JSON.parse(match[1]);
+                  return JSON.stringify(parsed, null, 2);
+                } catch (error) {
+                  return `${log}`;
+                }
+              }
+              return log;
+            }
+            return `${log}`;
+          })
+          .join('\n\n');
 
   return (
     <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
@@ -343,7 +385,6 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-
         <div className="flex items-start flex-wrap p-4">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
@@ -420,30 +461,69 @@ const ReceiptRow = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
               {receipt && receipt?.outcome?.logs?.length > 0 ? (
-                <textarea
-                  readOnly
-                  rows={4}
-                  defaultValue={receipt.outcome.logs
-                    .map((log: any) => {
-                      if (typeof log === 'string') {
-                        const match = log.match(/EVENT_JSON:(\{.*\})/);
-                        if (match) {
-                          try {
-                            const parsed = JSON.parse(match[1]);
-                            return JSON.stringify(parsed, null, 2);
-                          } catch (error) {
-                            console.log('Error parsing JSON:', error, log);
-                            return `Invalid JSON log: ${log}`;
-                          }
-                        } else {
-                          return `${log}`;
-                        }
-                      }
-                      return `${log || ''}`;
-                    })
-                    .join('\n\n')}
-                  className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y font-space-mono`}
-                ></textarea>
+                <div className="relative w-full pt-1">
+                  <div className="absolute top-2 mt-1 mr-4 right-2 hidden sm:!flex">
+                    <button
+                      onClick={() => setViewMode('auto')}
+                      className={`px-3 py-1 rounded-l-lg text-sm ${
+                        viewMode === 'auto'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Auto
+                    </button>
+                    <button
+                      onClick={() => setViewMode('raw')}
+                      className={`px-3 py-1 rounded-r-lg text-sm ${
+                        viewMode === 'raw'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Raw
+                    </button>
+                    <button
+                      onClick={() => setIsExpanded((prev) => !prev)}
+                      className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+                    >
+                      {!isExpanded ? (
+                        <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                      ) : (
+                        <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <div
+                    className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto  ${
+                      !isExpanded ? 'h-[8rem]' : ''
+                    }`}
+                  >
+                    {receiptLog}
+                    <div className="mt-4 right-2 flex sm:!hidden">
+                      <button
+                        onClick={() => setViewMode('auto')}
+                        className={`px-3 py-1 rounded-l-lg text-sm ${
+                          viewMode === 'auto'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Auto
+                      </button>
+                      <button
+                        onClick={() => setViewMode('raw')}
+                        className={`px-3 py-1 rounded-r-lg text-sm ${
+                          viewMode === 'raw'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Raw
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 'No Logs'
               )}

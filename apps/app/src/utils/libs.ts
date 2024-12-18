@@ -638,3 +638,13 @@ export const isValidAccount = (accountId: string) => {
     ACCOUNT_ID_REGEX.test(accountId)
   );
 };
+
+export function isValidJson(value: string): boolean {
+  try {
+    const parsed = JSON.parse(value);
+
+    return parsed && typeof parsed === 'object';
+  } catch (e) {
+    return false;
+  }
+}

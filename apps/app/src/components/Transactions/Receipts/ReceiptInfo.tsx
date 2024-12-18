@@ -1,4 +1,6 @@
 import TxnsReceiptStatus from '@/components/common/TxnsReceiptStatus';
+import FaExpand from '@/components/Icons/FaExpand';
+import FaMinimize from '@/components/Icons/FaMinimize';
 import Question from '@/components/Icons/Question';
 import useRpc from '@/hooks/useRpc';
 import { networkId } from '@/utils/config';
@@ -38,6 +40,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
   const [receiptKey, setReceiptKey] = useState<any>(null);
+  const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
+  const [isExpanded, setIsExpanded] = useState(false);
   const { t } = useTranslation();
   const onTab = (index: number) => {
     setHash(hashes[index]);
@@ -217,6 +221,44 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
       ? receipt.actions[0]?.args?.deposit ?? 0
       : 0;
 
+  const logs =
+    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
+      ? receipt.outcome.logs.filter(Boolean)
+      : [];
+
+  const receiptLog =
+    viewMode === 'raw'
+      ? logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              try {
+                const parsed = JSON.parse(log);
+                return JSON.stringify(parsed, null, 2);
+              } catch (error) {
+                return `${log}`;
+              }
+            }
+            return `${log}`;
+          })
+          .join('\n\n')
+      : logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              const match = log.match(/EVENT_JSON:({.*})/);
+              if (match) {
+                try {
+                  const parsed = JSON.parse(match[1]);
+                  return JSON.stringify(parsed, null, 2);
+                } catch (error) {
+                  return `${log}`;
+                }
+              }
+              return log;
+            }
+            return `${log}`;
+          })
+          .join('\n\n');
+
   return (
     <div className="flex flex-col">
       <Tabs selectedIndex={tabIndex} onSelect={(index) => onTab(index)}>
@@ -257,13 +299,46 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
               </h2>
               <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
                 {receipt?.outcome?.logs?.length > 0 ? (
-                  <div className="w-full  break-words  space-y-4">
-                    <textarea
-                      readOnly
-                      rows={4}
-                      defaultValue={receipt?.outcome?.logs.join('\n')}
-                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 resize-y"
-                    ></textarea>
+                  <div className="relative w-full">
+                    <div className="absolute top-2 mt-1 mr-4 right-2 flex">
+                      <button
+                        onClick={() => setViewMode('auto')}
+                        className={`px-3 py-1 rounded-l-lg text-sm ${
+                          viewMode === 'auto'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Auto
+                      </button>
+                      <button
+                        onClick={() => setViewMode('raw')}
+                        className={`px-3 py-1 rounded-r-lg text-sm ${
+                          viewMode === 'raw'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Raw
+                      </button>
+                      <button
+                        onClick={() => setIsExpanded((prev) => !prev)}
+                        className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+                      >
+                        {!isExpanded ? (
+                          <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                        ) : (
+                          <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                    <div
+                      className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto ${
+                        !isExpanded ? 'h-[8rem]' : ''
+                      }`}
+                    >
+                      {receiptLog}
+                    </div>
                   </div>
                 ) : (
                   <div className="w-full  break-words p-5 font-medium space-y-4">

@@ -922,11 +922,13 @@ export const txnFee = (
     .reduce((acc, fee) => Big(acc).add(fee).toString(), txnTokensBurnt);
 };
 
-export function parseEventLogs(event: TransactionLog): any | {} {
-  let parsedEvent: any | {} = {};
+export function parseEventLogs(event: TransactionLog): {} | any {
+  let parsedEvent: {} | any = {};
 
   try {
-    parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+    if (event?.logs?.startsWith('EVENT_JSON:')) {
+      parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+    }
   } catch (error) {
     console.error('Failed to parse event logs:', error);
   }

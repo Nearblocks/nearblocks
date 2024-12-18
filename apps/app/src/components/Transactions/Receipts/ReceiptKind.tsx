@@ -1,9 +1,12 @@
 import { hexy } from '@/utils/hexy';
-import { yoctoToNear } from '@/utils/libs';
+import { isValidJson, yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
 import RlpTransaction from './RlpTransaction';
 import useTranslation from 'next-translate/useTranslation';
 import FaTimesCircle from '@/components/Icons/FaTimesCircle';
+import { useState } from 'react';
+import FaMinimize from '@/components/Icons/FaMinimize';
+import FaExpand from '@/components/Icons/FaExpand';
 
 const backgroundColorClasses: Record<string, string> = {
   transfer: 'bg-green-50 dark:bg-green-200',
@@ -20,30 +23,73 @@ const backgroundColorClasses: Record<string, string> = {
 const ReceiptKind = (props: ReceiptKindInfo) => {
   const { action, onClick, isTxTypeActive, receiver, receipt } = props;
   const { t } = useTranslation();
+  const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const args = action?.args?.args;
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
       ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
       : action?.args.args_base64 || action?.args.args;
 
+  function parseNestedJSON(obj: any): any {
+    if (typeof obj !== 'object' || obj === null) return obj;
+
+    if (Array.isArray(obj)) {
+      return obj.map((item) => parseNestedJSON(item));
+    }
+
+    const result: any = {};
+    for (const key in obj) {
+      if (typeof obj[key] === 'string') {
+        try {
+          result[key] = JSON.parse(obj[key]);
+        } catch {
+          result[key] = obj[key];
+        }
+      } else if (typeof obj[key] === 'object') {
+        result[key] = parseNestedJSON(obj[key]);
+      } else {
+        result[key] = obj[key];
+      }
+    }
+
+    return result;
+  }
+
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
 
-    let pretty = '';
-    const decoded = Buffer.from(args, 'base64');
+    let decoded;
     try {
-      const parsed = JSON.parse(decoded.toString());
-      if (parsed) {
-        pretty = JSON.stringify(parsed, null, 2);
-      } else {
-        pretty = hexy(decoded, { format: 'twos' });
+      decoded = Buffer.from(args, 'base64');
+    } catch (e) {
+      return '';
+    }
+
+    let pretty = '';
+    const decodedStr = decoded.toString();
+
+    if (isValidJson(decodedStr)) {
+      try {
+        const parsed = JSON.parse(decodedStr);
+
+        const parsedWithNestedJSON = parseNestedJSON(parsed);
+
+        pretty = JSON.stringify(parsedWithNestedJSON, null, 2);
+      } catch (err) {
+        return '';
       }
-    } catch {
+    } else {
       pretty = hexy(decoded, { format: 'twos' });
     }
 
     return pretty;
   }
+
+  const decodedData = args;
+  const jsonStringifiedData = displayArgs(decodedData);
+  const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -104,14 +150,49 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
               receiver={receiver}
             />
           ) : (
-            <div className="py-3">
-              <textarea
-                readOnly
-                rows={4}
-                defaultValue={displayArgs(args?.args_base64 || args)}
-                className="block appearance-none outline-none w-full border dark:border-black-200 dark:bg-black-200 rounded-lg bg-gray-100 p-3 resize-y"
-              ></textarea>
-            </div>
+            <>
+              <div className="relative w-full pt-1">
+                <div className="absolute top-2 mt-1 mr-4 right-2 flex">
+                  <button
+                    onClick={() => setViewMode('auto')}
+                    className={`px-3 py-1 rounded-l-lg text-sm ${
+                      viewMode === 'auto'
+                        ? 'bg-gray-500 text-white'
+                        : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                    }`}
+                  >
+                    Auto
+                  </button>
+                  <button
+                    onClick={() => setViewMode('raw')}
+                    className={`px-3 py-1 rounded-r-lg text-sm ${
+                      viewMode === 'raw'
+                        ? 'bg-gray-500 text-white'
+                        : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                    }`}
+                  >
+                    Raw
+                  </button>
+                  <button
+                    onClick={() => setIsExpanded((prev) => !prev)}
+                    className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+                  >
+                    {!isExpanded ? (
+                      <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                    ) : (
+                      <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <div
+                  className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto  ${
+                    !isExpanded ? 'h-[8rem]' : ''
+                  }`}
+                >
+                  {actionLogData}
+                </div>
+              </div>
+            </>
           )
         ) : action?.kind === 'delegateAction' ? (
           <div className="pt-2">
