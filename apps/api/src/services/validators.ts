@@ -2,8 +2,10 @@ import Big from 'big.js';
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import logger from '#libs/logger';
 import { getProvider, viewBlock } from '#libs/near';
 import sql from '#libs/postgres';
+import redis from '#libs/redis';
 import { List } from '#libs/schema/validators';
 import {
   calculateAPY,
@@ -137,21 +139,79 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     );
 
     let lastEpochApy = '0';
+    const EPOCH_EXPIRY = 43200;
 
     try {
       const provider = getProvider(rpc);
-      const block = await viewBlock(provider, { finality: 'final' });
-      const [prevEpoch, epoch] = await Promise.all([
-        viewBlock(provider, { blockId: block.header.epoch_id }),
-        viewBlock(provider, { blockId: block.header.next_epoch_id }),
-      ]);
 
-      lastEpochApy = calculateAPY(
-        totalStake,
-        epoch.header.timestamp_nanosec,
-        prevEpoch.header.timestamp_nanosec,
-        block.header.total_supply,
-      );
+      const cacheKey = `lastEpochApy`;
+
+      const data = await redis.get(cacheKey);
+      const cachedData = data ? JSON.parse(data) : null;
+
+      let latestBlockResult = null;
+      let latestBlockHeight = 0;
+      let expireThreshold = 0;
+
+      if (cachedData) {
+        lastEpochApy = cachedData.apy;
+        const cachedEpochId = cachedData.epochId;
+
+        const blockQuery = sql`
+          SELECT
+            block_height
+          FROM
+            blocks
+          WHERE
+            block_hash = ${cachedEpochId}
+          LIMIT
+            1
+        `;
+
+        const blockResult = await blockQuery;
+        const cachedBlockHeight = blockResult[0]?.block_height || 0;
+
+        const latestBlockQuery = sql`
+          SELECT
+            block_height,
+            block_hash
+          FROM
+            blocks
+          ORDER BY
+            block_height DESC
+          LIMIT
+            1
+        `;
+
+        [latestBlockResult] = await Promise.all([latestBlockQuery]);
+        latestBlockHeight = latestBlockResult[0]?.block_height || {};
+
+        expireThreshold = EPOCH_EXPIRY + parseInt(cachedBlockHeight, 10);
+      }
+
+      if (latestBlockHeight >= expireThreshold || !cachedData) {
+        const block = await viewBlock(provider, { finality: 'final' });
+
+        const [prevEpoch, epoch] = await Promise.all([
+          viewBlock(provider, { blockId: block.header.epoch_id }),
+          viewBlock(provider, { blockId: block.header.next_epoch_id }),
+        ]);
+
+        const apy = calculateAPY(
+          totalStake,
+          epoch.header.timestamp_nanosec,
+          prevEpoch.header.timestamp_nanosec,
+          block.header.total_supply,
+        );
+
+        const cacheData = {
+          apy: apy,
+          epochId: block.header.epoch_id,
+        };
+
+        await redis.set(cacheKey, JSON.stringify(cacheData));
+        logger.info('Cache updated:', cacheData);
+      }
     } catch (error) {
       console.log({ error });
       //
