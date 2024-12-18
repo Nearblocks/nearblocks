@@ -4,7 +4,10 @@ import { Knex } from 'nb-knex';
 import { Transaction } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import { mapExecutionStatus } from '#libs/utils';
+
+const batchSize = config.insertLimit;
 
 export const storeTransactions = async (
   knex: Knex,
@@ -25,8 +28,6 @@ export const storeTransactions = async (
 
   if (transactions.length) {
     await retry(async () => {
-      const batchSize = 1000;
-
       for (let i = 0; i < transactions.length; i += batchSize) {
         const batch = transactions.slice(i, i + batchSize);
 

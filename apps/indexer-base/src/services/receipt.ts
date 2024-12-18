@@ -11,9 +11,12 @@ import {
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
+
+const batchSize = config.insertLimit;
 
 export const storeReceipts = async (
   knex: Knex,
@@ -155,10 +158,14 @@ const storeChunkReceipts = async (
   if (receiptActionsData.length) {
     promises.push(
       retry(async () => {
-        await knex('action_receipt_actions')
-          .insert(receiptActionsData)
-          .onConflict(['receipt_id', 'index_in_action_receipt'])
-          .ignore();
+        for (let i = 0; i < receiptActionsData.length; i += batchSize) {
+          const batch = receiptActionsData.slice(i, i + batchSize);
+
+          await knex('action_receipt_actions')
+            .insert(batch)
+            .onConflict(['receipt_id', 'index_in_action_receipt'])
+            .ignore();
+        }
       }),
     );
   }
@@ -166,10 +173,14 @@ const storeChunkReceipts = async (
   if (receiptInputData.length) {
     promises.push(
       retry(async () => {
-        await knex('action_receipt_input_data')
-          .insert(receiptInputData)
-          .onConflict(['input_data_id', 'input_to_receipt_id'])
-          .ignore();
+        for (let i = 0; i < receiptInputData.length; i += batchSize) {
+          const batch = receiptInputData.slice(i, i + batchSize);
+
+          await knex('action_receipt_input_data')
+            .insert(batch)
+            .onConflict(['input_data_id', 'input_to_receipt_id'])
+            .ignore();
+        }
       }),
     );
   }
@@ -177,10 +188,14 @@ const storeChunkReceipts = async (
   if (receiptOutputData.length) {
     promises.push(
       retry(async () => {
-        await knex('action_receipt_output_data')
-          .insert(receiptOutputData)
-          .onConflict(['output_data_id', 'output_from_receipt_id'])
-          .ignore();
+        for (let i = 0; i < receiptOutputData.length; i += batchSize) {
+          const batch = receiptOutputData.slice(i, i + batchSize);
+
+          await knex('action_receipt_output_data')
+            .insert(batch)
+            .onConflict(['output_data_id', 'output_from_receipt_id'])
+            .ignore();
+        }
       }),
     );
   }

@@ -126,7 +126,6 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
             if (result) {
               if (!this.push(camelCaseKeys(result))) {
-                logger.warn(`paused: ${block}`);
                 this.pause();
               }
             }

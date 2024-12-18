@@ -35,14 +35,14 @@ export const syncData = async () => {
     let startBlockHeight = config.startBlockHeight;
 
     if (!startBlockHeight && block) {
-      const next = +block.block_height - config.delta / 2;
+      const next = +block.block_height - 10;
       startBlockHeight = next;
       logger.info(`last synced block: ${block.block_height}`);
       logger.info(`syncing from block: ${next}`);
     }
 
     const stream = streamBlock({
-      limit: config.preloadSize / 2,
+      limit: 50,
       network: config.network,
       start: startBlockHeight || config.genesisHeight,
       url: config.fastnearEndpoint,
@@ -82,11 +82,11 @@ export const onMessage = async (message: types.StreamerMessage) => {
     const start = performance.now();
 
     await prepareCache(message);
-    await storeBlock(knex, message);
-    await storeChunks(knex, message);
-    await storeTransactions(knex, message);
-    await storeReceipts(knex, message);
     await Promise.all([
+      storeBlock(knex, message),
+      storeChunks(knex, message),
+      storeTransactions(knex, message),
+      storeReceipts(knex, message),
       storeExecutionOutcomes(knex, message),
       storeAccounts(knex, message),
       storeAccessKeys(knex, message),

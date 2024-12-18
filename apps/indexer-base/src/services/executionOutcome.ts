@@ -4,7 +4,10 @@ import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import { jsonStringify, mapExecutionStatus } from '#libs/utils';
+
+const batchSize = config.insertLimit;
 
 export const storeExecutionOutcomes = async (
   knex: Knex,
@@ -59,10 +62,14 @@ export const storeChunkExecutionOutcomes = async (
   if (outcomes.length) {
     promises.push(
       retry(async () => {
-        await knex('execution_outcomes')
-          .insert(outcomes)
-          .onConflict(['receipt_id'])
-          .ignore();
+        for (let i = 0; i < outcomes.length; i += batchSize) {
+          const batch = outcomes.slice(i, i + batchSize);
+
+          await knex('execution_outcomes')
+            .insert(batch)
+            .onConflict(['receipt_id'])
+            .ignore();
+        }
       }),
     );
   }
@@ -70,14 +77,18 @@ export const storeChunkExecutionOutcomes = async (
   if (outcomeReceipts.length) {
     promises.push(
       retry(async () => {
-        await knex('execution_outcome_receipts')
-          .insert(outcomeReceipts)
-          .onConflict([
-            'executed_receipt_id',
-            'index_in_execution_outcome',
-            'produced_receipt_id',
-          ])
-          .ignore();
+        for (let i = 0; i < outcomeReceipts.length; i += batchSize) {
+          const batch = outcomeReceipts.slice(i, i + batchSize);
+
+          await knex('execution_outcome_receipts')
+            .insert(batch)
+            .onConflict([
+              'executed_receipt_id',
+              'index_in_execution_outcome',
+              'produced_receipt_id',
+            ])
+            .ignore();
+        }
       }),
     );
   }
