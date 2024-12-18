@@ -22,6 +22,11 @@ export interface Config {
   genesisHeight: number;
   lcwApiKey: string;
   network: Network;
+  ratelimiterRedisPassword: string;
+  ratelimiterRedisSentinelName: string;
+  ratelimiterRedisSentinelPassword: string;
+  ratelimiterRedisSentinelUrls: string;
+  ratelimiterRedisUrl: string;
   redisPassword: string;
   redisSentinelName: string;
   redisSentinelUrls: string;
@@ -29,6 +34,7 @@ export interface Config {
   rpcUrl: string;
   rpcUrl2: string;
   sentryDsn?: string;
+  userdbUrl: string;
 }
 
 export type SnapshotStartParams = {
