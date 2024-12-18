@@ -1,9 +1,10 @@
 'use client';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { AccountContractInfo } from '@/utils/types';
+import useRpc from '@/hooks/app/useRpc';
+import { AccountContractInfo, KeysInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import Paginator from '../common/Paginator';
@@ -14,17 +15,44 @@ import AccessKeyRow from './AccessKeyRow';
 interface Props {
   count: number;
   error: boolean;
+  id?: string;
   keys: AccountContractInfo[];
   tab?: string;
 }
 
-const AccessKeysActions = ({ count, error, keys }: Props) => {
+const AccessKeysActions = ({ count, error, id, keys }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { viewAccessKeys } = useRpc();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [showWhen, setShowWhen] = useState(true);
   const toggleShowWhen = () => setShowWhen((s) => !s);
+  const [accessKeys, setAccessKeys] = useState<KeysInfo[]>([]);
+
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      if (!keys || keys?.length === 0) {
+        try {
+          const [accessKeyInfo]: any = await Promise.all([
+            viewAccessKeys(id as string).catch((error: any) => {
+              console.log(`Error fetching access keys for ${id}:`, error);
+              return null;
+            }),
+          ]);
+
+          if (Array.isArray(accessKeyInfo?.keys)) {
+            setAccessKeys(accessKeyInfo.keys);
+          }
+        } catch (error) {
+          console.log('Error loading schema:', error);
+        }
+      }
+    };
+
+    fetchAccountData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keys, id]);
 
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';
@@ -36,6 +64,8 @@ const AccessKeysActions = ({ count, error, keys }: Props) => {
 
     router.push(`${pathname}?${newQueryString}`);
   };
+
+  const accessKeysInfo = keys || accessKeys;
 
   return (
     <>
@@ -135,8 +165,8 @@ const AccessKeysActions = ({ count, error, keys }: Props) => {
               ))}
 
             {!error &&
-              keys &&
-              keys?.map((key: any) => (
+              accessKeysInfo &&
+              accessKeysInfo?.map((key: any) => (
                 <AccessKeyRow
                   accessKey={key}
                   key={key?.account_id + key?.public_key}

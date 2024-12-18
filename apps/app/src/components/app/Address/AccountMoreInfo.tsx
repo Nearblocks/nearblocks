@@ -33,15 +33,15 @@ export default function AccountMoreInfo({
     const loadSchema = async () => {
       try {
         const [code, keys, account]: any = await Promise.all([
-          contractCode(id as string).catch(() => {
+          contractCode(id).catch((error: any) => {
+            console.log(`Error fetching contract code for ${id}:`, error);
             return null;
           }),
-
-          viewAccessKeys(id as string).catch(() => {
+          viewAccessKeys(id).catch((error: any) => {
+            console.log(`Error fetching access keys for ${id}:`, error);
             return null;
           }),
-
-          viewAccount(id as string).catch(() => {
+          viewAccount(id).catch(() => {
             return null;
           }),
         ]);
@@ -78,6 +78,8 @@ export default function AccountMoreInfo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  const accountInfo = accountData || accountView;
+
   let genesis =
     accountView !== null &&
     accountView?.block_hash === undefined &&
@@ -90,6 +92,7 @@ export default function AccountMoreInfo({
       : false;
 
   const tokenTracker = tokenData?.name || nftTokenData?.name;
+  const storageUsed = accountInfo?.storage_usage ?? accountView?.storage_usage;
 
   return (
     <div className="w-full">
@@ -105,9 +108,9 @@ export default function AccountMoreInfo({
                   Staked {t('balance') || 'Balance'}
                 </div>
                 <div className="flex whitespace-nowrap">
-                  {accountData?.locked
-                    ? yoctoToNear(accountData?.locked, true) + ' Ⓝ'
-                    : accountData?.locked ?? ''}
+                  {accountInfo?.locked
+                    ? yoctoToNear(accountInfo?.locked, true) + ' Ⓝ'
+                    : accountInfo?.locked ?? ''}
                 </div>
               </div>
             </div>
@@ -117,9 +120,7 @@ export default function AccountMoreInfo({
                   {t('storageUsed') || 'Storage used'}
                 </div>
                 <div className="flex whitespace-nowrap">
-                  {accountData?.storage_usage
-                    ? weight(accountData?.storage_usage)
-                    : accountData?.storage_usage ?? ''}
+                  {storageUsed ? weight(storageUsed) : storageUsed ?? ''}
                 </div>
               </div>
             </div>
@@ -306,7 +307,7 @@ export default function AccountMoreInfo({
                       </span>
                     )}
                   </div>
-                ) : accountData?.code_hash ? (
+                ) : accountInfo?.code_hash ? (
                   'Genesis'
                 ) : (
                   'N/A'
