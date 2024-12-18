@@ -1,12 +1,17 @@
 'use client';
+
+import Big from 'big.js';
 import { useEffect, useState } from 'react';
 
 import { useFetch } from '@/hooks/app/useFetch';
 import { priceFormat } from '@/utils/app/libs';
+import { localFormat } from '@/utils/app/near';
 
 interface Props {
+  isShowMargin?: boolean;
+  nearPrice?: string;
   token: string;
-  tokenPrice: null | string;
+  tokenPrice: string;
 }
 
 interface TokenPriceData {
@@ -15,7 +20,7 @@ interface TokenPriceData {
   symbol: string;
 }
 
-const TokenPrice = ({ token, tokenPrice }: Props) => {
+const TokenPrice = ({ isShowMargin, nearPrice, token, tokenPrice }: Props) => {
   const { data, error } = useFetch(
     'https://indexer.ref.finance/list-token-price',
   );
@@ -34,13 +39,28 @@ const TokenPrice = ({ token, tokenPrice }: Props) => {
   const finalPrice = tokenPrice || price?.price;
 
   return (
-    <span>
-      {finalPrice ? (
-        `$${priceFormat(finalPrice)}`
-      ) : (
-        <span className="text-xs">N/A</span>
+    <>
+      <span>
+        {finalPrice ? (
+          `$${priceFormat(finalPrice)}`
+        ) : (
+          <span className="text-xs">N/A</span>
+        )}
+      </span>
+      {finalPrice !== null && finalPrice !== undefined && nearPrice && (
+        <div
+          className={`text-nearblue-700 ${
+            isShowMargin ? 'mx-1' : ''
+          } text-sm flex flex-row items-center`}
+        >
+          @{' '}
+          {localFormat(
+            Big(finalPrice).div(Big(nearPrice)).toNumber().toString(),
+          )}{' '}
+          Ⓝ
+        </div>
       )}
-    </span>
+    </>
   );
 };
 

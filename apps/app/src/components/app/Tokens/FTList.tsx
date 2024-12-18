@@ -12,7 +12,7 @@ import {
   localFormat,
   serialNumber,
 } from '@/utils/libs';
-import { Sorting, Token } from '@/utils/types';
+import { Sorting, StatusInfo, Token } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
@@ -41,12 +41,13 @@ interface Props {
   };
   error: boolean;
   handleSearch: any;
+  stats: StatusInfo;
   tokensCount: {
     tokens: { count: number }[];
   };
 }
 
-const List = ({ data, error, handleSearch, tokensCount }: Props) => {
+const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
   const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
@@ -189,7 +190,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       header: <span>#</span>,
       key: '',
       tdClassName:
-        'pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'pl-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -219,18 +220,22 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       header: <span>{t ? t('fts.top.token') : 'TOKEN'}</span>,
       key: 'name',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-80 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-80 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       cell: (row: Token) => (
-        <TokenPrice token={row?.contract} tokenPrice={row?.price} />
+        <TokenPrice
+          nearPrice={stats?.near_price}
+          token={row?.contract}
+          tokenPrice={row?.price}
+        />
       ),
       header: <span>{t ? t('fts.top.price') : 'PRICE'}</span>,
       key: 'price',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-48 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -259,7 +264,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       ),
       key: 'change_24',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-60 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -276,7 +281,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       header: <span>{t ? t('fts.top.volume') : 'VOLUME'} (24H)</span>,
       key: 'volume_24h',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 w-52 text-left text-xs whitespace-nowrap font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -309,7 +314,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       ),
       key: 'market_cap',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 tracking-wider',
     },
@@ -354,7 +359,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       ),
       key: 'onchain_market_cap',
       tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
     },
   ];
   return (
