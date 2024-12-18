@@ -37,26 +37,60 @@ const useRpc = () => {
     }
   };
 
-  const contractCode = async (address: string) =>
-    provider.query({
-      account_id: address,
-      finality: 'final',
-      request_type: 'view_code',
-    });
+  const contractCode = async (address: string) => {
+    return provider
+      ?.query({
+        account_id: address,
+        finality: 'final',
+        request_type: 'view_code',
+      })
+      .then((result) => {
+        console.log(`Successfully fetched contract code for ${address}`);
+        return result;
+      })
+      .catch((error: any) => {
+        if (
+          error.message?.includes('Server error') &&
+          error.message?.includes('Contract code for contract ID') &&
+          error.message?.includes('has never been observed on the node')
+        ) {
+          console.warn(`No contract code found for address ${address}.`);
+          return null;
+        }
 
-  const viewAccessKeys = async (address: string) =>
-    provider.query({
-      account_id: address,
-      finality: 'final',
-      request_type: 'view_access_key_list',
-    });
+        console.warn(
+          `Error fetching contract code for address ${address}:`,
+          error.message || error,
+        );
+        return null;
+      });
+  };
 
-  const viewAccount = async (accountId: string) =>
-    provider.query({
-      account_id: accountId,
-      finality: 'final',
-      request_type: 'view_account',
-    });
+  const viewAccessKeys = async (address: string) => {
+    try {
+      const result = await provider.query({
+        account_id: address,
+        finality: 'final',
+        request_type: 'view_access_key_list',
+      });
+      return result;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const viewAccount = async (accountId: string) => {
+    try {
+      const result = await provider.query({
+        account_id: accountId,
+        finality: 'final',
+        request_type: 'view_account',
+      });
+      return result;
+    } catch (error) {
+      return null;
+    }
+  };
 
   const ftBalanceOf = async (
     contract: string,
@@ -81,14 +115,19 @@ const useRpc = () => {
   const viewAccessKey = async (
     address: string,
     key: string,
-  ): Promise<AccessInfo> => {
-    const response = await provider.query({
-      account_id: address,
-      finality: 'final',
-      public_key: key,
-      request_type: 'view_access_key',
-    });
-    return response as unknown as AccessInfo;
+  ): Promise<AccessInfo | null> => {
+    try {
+      const response = await provider.query({
+        account_id: address,
+        finality: 'final',
+        public_key: key,
+        request_type: 'view_access_key',
+      });
+      return response as unknown as AccessInfo;
+    } catch (error) {
+      console.log(`Error fetching access key for address ${address}:`, error);
+      return null; // Return `null` in case of an error
+    }
   };
 
   const getAccount = async (poolId: string, account_id: string | undefined) => {
