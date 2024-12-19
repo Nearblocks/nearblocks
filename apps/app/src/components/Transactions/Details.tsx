@@ -682,7 +682,7 @@ const Details = (props: Props) => {
                       </div>
                     </div>
                   ))}
-                  <NEPTokenTransactions ftsEvents={fts} events={allEvents} />
+                  <NEPTokenTransactions events={allEvents} />
                 </div>
               </PerfectScrollbar>
             </div>
