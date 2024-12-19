@@ -447,30 +447,40 @@ export const stakingPoolMetadataCheck = async () => {
   const VALIDATOR_DESCRIPTION_QUERY_AMOUNT = 100;
   let currentIndex = 0;
   const stakingPoolsDescriptions = [];
+  let hasMoreData = true;
 
-  const { data } = await RPC.callFunction(
-    'pool-details.near',
-    'get_all_fields',
-    RPC.encodeArgs({
-      from_index: currentIndex,
-      limit: VALIDATOR_DESCRIPTION_QUERY_AMOUNT,
-    }),
-  );
+  while (hasMoreData) {
+    const { data } = await RPC.callFunction(
+      'pool-details.near',
+      'get_all_fields',
+      RPC.encodeArgs({
+        from_index: currentIndex,
+        limit: VALIDATOR_DESCRIPTION_QUERY_AMOUNT,
+      }),
+    );
 
-  if (data.result) {
-    const metadataInfo = JSON.parse(Buffer.from(data.result.result).toString());
-    const entries: [string, PoolMetadataAccountInfo][] =
-      Object.entries(metadataInfo);
+    if (data.result) {
+      const metadataInfo = JSON.parse(
+        Buffer.from(data.result.result).toString(),
+      );
+      const entries: [string, PoolMetadataAccountInfo][] =
+        Object.entries(metadataInfo);
 
-    if (entries.length > 0) {
-      for (const [accountId, poolMetadataInfo] of entries) {
-        const entryObject: { [accountId: string]: PoolMetadataAccountInfo } = {
-          [accountId]: poolMetadataInfo,
-        };
-        stakingPoolsDescriptions.push(entryObject);
+      if (entries.length > 0) {
+        for (const [accountId, poolMetadataInfo] of entries) {
+          const entryObject: { [accountId: string]: PoolMetadataAccountInfo } =
+            {
+              [accountId]: poolMetadataInfo,
+            };
+          stakingPoolsDescriptions.push(entryObject);
+        }
+
+        currentIndex += entries.length;
+      } else {
+        hasMoreData = false;
       }
-
-      currentIndex += VALIDATOR_DESCRIPTION_QUERY_AMOUNT;
+    } else {
+      hasMoreData = false;
     }
   }
 
