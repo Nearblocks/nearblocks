@@ -431,10 +431,16 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                   <>
                     <Collapse
                       trigger={({ show, onClick }) => (
-                        <a
+                        <button
                           className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-                          href="#"
-                          onClick={onClick}
+                          onClick={(event: any) => {
+                            event.preventDefault();
+                            if (!user && !userLoading) {
+                              requestSignInWithWallet();
+                            } else {
+                              onClick(event);
+                            }
+                          }}
                         >
                           <div className="w-full">
                             {user ? (
@@ -451,7 +457,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                                 />
                               </div>
                             ) : (
-                              <div onClick={requestSignInWithWallet}>
+                              <div>
                                 <div className="w-full flex items-center">
                                   <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
                                   Sign In
@@ -459,7 +465,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                               </div>
                             )}
                           </div>
-                        </a>
+                        </button>
                       )}
                     >
                       {user && (
@@ -476,10 +482,12 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                       )}
                     </Collapse>
 
-                    <span className="group hidden md:flex h-full w-full relative">
-                      <a
+                    <div className="group hidden md:flex h-full w-full relative">
+                      <button
                         className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
-                        href="#"
+                        onClick={() =>
+                          !user && !userLoading && requestSignInWithWallet()
+                        }
                       >
                         {user ? (
                           <>
@@ -490,7 +498,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </>
                         ) : (
-                          <div onClick={requestSignInWithWallet}>
+                          <div>
                             <div className="flex items-center">
                               {userLoading ? (
                                 <>
@@ -506,7 +514,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                             </div>
                           </div>
                         )}
-                      </a>
+                      </button>
 
                       {user && (
                         <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
@@ -520,7 +528,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                           </li>
                         </ul>
                       )}
-                    </span>
+                    </div>
                   </>
                 </li>
               </ul>
