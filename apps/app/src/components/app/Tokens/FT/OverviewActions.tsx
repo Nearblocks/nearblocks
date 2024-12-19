@@ -1,5 +1,5 @@
 'use client';
-import Big from 'big.js';
+
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -215,26 +215,12 @@ const OverviewActions = ({
                     ) : (
                       <div className="w-full break-words flex flex-wrap text-sm">
                         <TokenPrice
+                          isShowMargin={true}
+                          nearPrice={stats?.near_price}
                           token={token?.contract}
                           tokenPrice={token?.price}
                         />
-                        {token?.price !== null &&
-                          token?.price !== undefined &&
-                          stats?.near_price && (
-                            <div className="text-nearblue-700 mx-1 text-sm flex flex-row items-center">
-                              @{' '}
-                              {localFormat(
-                                Big(token?.price)
-                                  .div(Big(stats?.near_price))
-                                  .toNumber()
-                                  .toString(),
-                              )}{' '}
-                              Ⓝ
-                            </div>
-                          )}
-                        {token?.price !== null &&
-                        token?.price !== undefined &&
-                        token?.change_24 !== null &&
+                        {token?.change_24 !== null &&
                         token?.change_24 !== undefined ? (
                           Number(token?.change_24) > 0 ? (
                             <div className="text-neargreen text-sm flex flex-row items-center">

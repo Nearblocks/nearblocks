@@ -58,7 +58,7 @@ export default function TokensSkeleton() {
           </thead>
           <tbody className="bg-white dark:bg-black-600 dark:divide-black-200  divide-y divide-gray-200">
             {[...Array(50)].map((_, i) => (
-              <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
+              <tr className="hover:bg-blue-900/5 h-[65px]" key={i}>
                 <td className="pl-6 py-4 whitespace-nowrap text-sm text-nearblue-600">
                   <Skeleton className="h-4 w-6" />
                 </td>
