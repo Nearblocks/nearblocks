@@ -33,6 +33,8 @@ type BalanceChanges = {
   validators: AccountBalance[];
 };
 
+const batchSize = 1000;
+
 export const storeBalance = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
@@ -85,10 +87,14 @@ export const storeChunkBalance = async (
   }
 
   await retry(async () => {
-    await knex('balance_events')
-      .insert(changes)
-      .onConflict(['event_index'])
-      .merge();
+    for (let i = 0; i < changes.length; i += batchSize) {
+      const batch = changes.slice(i, i + batchSize);
+
+      await knex('balance_events')
+        .insert(batch)
+        .onConflict(['event_index'])
+        .merge();
+    }
   });
 };
 
