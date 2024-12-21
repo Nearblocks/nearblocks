@@ -747,7 +747,8 @@ export type TokenInfoProps = {
   contract: string;
   amount: string;
   decimals?: any;
-  apiTokenInfo?: any;
+  transferAmount?: string;
+  isShowText?: boolean;
 };
 
 export type ValidatorFullData = {
