@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { capitalize, toSnakeCase, mapFeilds } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
 import uniqueId from 'lodash/uniqueId';
-import { useVmStore } from '@/stores/vm';
 import { useRouter } from 'next/router';
 import {
   AccordionButton,
@@ -14,13 +13,12 @@ import { Tooltip } from '@reach/tooltip';
 import CloseCircle from '@/components/Icons/CloseCircle';
 import Question from '@/components/Icons/Question';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/auth';
+import { NearContext } from '@/components/Wallet/near-context';
 
 interface Props {
   index: number;
   method: any;
   schema: any;
-  connected?: boolean;
 }
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -37,10 +35,9 @@ const sortFields = (fields: FieldType[]) => {
 
 const ViewOrChangeAbi = (props: Props) => {
   const router = useRouter();
-  const { near } = useVmStore();
   const { id: contract } = router.query;
-  const account = useAuthStore((store) => store.account);
-  const { index, method, schema, connected } = props;
+  const { signedAccountId, wallet } = useContext(NearContext);
+  const { index, method, schema } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
@@ -78,61 +75,54 @@ const ViewOrChangeAbi = (props: Props) => {
 
     try {
       const args = mapFeilds(fields);
-      near
-        .viewCall(contract, toSnakeCase(method?.name), args)
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
+      if (!wallet) return;
 
-    setLoading(false);
+      const response = await wallet.viewMethod({
+        args,
+        contractId: contract as string,
+        method: toSnakeCase(method?.name),
+      });
+
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling view method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onWrite = async () => {
     setLoading(true);
 
     try {
-      if (!account) throw new Error('Error in wallet connection');
+      if (!wallet) return;
+      if (!signedAccountId) throw new Error('Error in wallet connection');
 
       const args = mapFeilds(fields);
-      near
-        .functionCall(
-          contract,
-          toSnakeCase(method?.name),
-          args,
-          options?.gas,
-          options?.attachedDeposit,
-        )
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
 
-    setLoading(false);
+      const response: any = await wallet.callMethod({
+        args,
+        contractId: contract as string,
+        deposit: options?.attachedDeposit,
+        gas: options?.gas,
+        method: toSnakeCase(method?.name),
+      });
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -293,7 +283,7 @@ const ViewOrChangeAbi = (props: Props) => {
             <button
               type="submit"
               onClick={onWrite}
-              disabled={loading || !connected}
+              disabled={loading || !signedAccountId}
               className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
             >
               Write

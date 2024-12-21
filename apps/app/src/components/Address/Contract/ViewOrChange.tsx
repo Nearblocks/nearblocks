@@ -1,6 +1,6 @@
 import { capitalize, toSnakeCase, isJson, mapFeilds } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import uniqueId from 'lodash/uniqueId';
 import {
   AccordionButton,
@@ -12,16 +12,14 @@ import { Tooltip } from '@reach/tooltip';
 import Question from '@/components/Icons/Question';
 import CloseCircle from '@/components/Icons/CloseCircle';
 import Link from 'next/link';
-import { useVmStore } from '@/stores/vm';
 import { useRouter } from 'next/router';
 import { fetcher } from '@/hooks/useFetch';
-import { useAuthStore } from '@/stores/auth';
+import { NearContext } from '@/components/Wallet/near-context';
+import { stringify } from 'querystring';
 
 interface Props {
-  connected?: boolean;
   index: number;
   method: string;
-  accountId?: string;
 }
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
@@ -44,26 +42,17 @@ const sortFields = (fields: FieldType[]) => {
   return fields;
 };
 
-const getDataType = (data: string) => {
-  if (isJson(data)) {
-    return 'json';
-  }
-
-  return isNaN(+data) ? typeof data : 'number';
-};
-
 const ViewOrChange = (props: Props) => {
   const router = useRouter();
-  const { near } = useVmStore();
   const { id: contract } = router.query;
-  const account = useAuthStore((store) => store.account);
-  const { index, method, connected } = props;
+  const { index, method } = props;
   const [txn, setTxn] = useState<string | null>(null);
   const [error, setError] = useState(null);
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<string | null>(null);
+  const { signedAccountId, wallet } = useContext(NearContext);
   const [loading, setLoading] = useState(false);
-  const [hideQuery, setHideQuery] = useState(false);
+  const [hideQuery, _setHideQuery] = useState(false);
   const [options, setOptions] = useState({
     attachedDeposit: '0',
     gas: '30000000000000',
@@ -97,61 +86,65 @@ const ViewOrChange = (props: Props) => {
 
     try {
       const args = mapFeilds(fields);
-      near
-        .viewCall(contract, toSnakeCase(method), args)
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
+      if (!wallet) return;
 
-    setLoading(false);
+      const response = await wallet.viewMethod({
+        args,
+        contractId: contract as string,
+        method: toSnakeCase(method),
+      });
+
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling view method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onWrite = async () => {
     setLoading(true);
 
     try {
-      if (!account) throw new Error('Error in wallet connection');
+      if (!wallet) return;
+      if (!signedAccountId) throw new Error('Error in wallet connection');
 
       const args = mapFeilds(fields);
-      near
-        .functionCall(
-          contract,
-          toSnakeCase(method),
-          args,
-          options?.gas,
-          options?.attachedDeposit,
-        )
-        .then((resp: { transaction_outcome: { id: string } } | null | any) => {
-          setError(null);
-          setTxn(resp?.transaction_outcome?.id);
-          setResult(JSON.stringify(resp, null, 2));
-        })
-        .catch((error: any) => {
-          console.log(error);
-          setTxn(null);
-          setError(error?.message);
-          setResult(null);
-        });
-    } catch (error: any) {
-      setTxn(null);
-      setError(error);
-      setResult(null);
-    }
 
-    setLoading(false);
+      const response: any = await wallet.callMethod({
+        args,
+        contractId: contract as string,
+        deposit: options?.attachedDeposit,
+        gas: options?.gas,
+        method: toSnakeCase(method),
+      });
+
+      setError(null);
+      setTxn(response?.transaction_outcome?.id || null);
+      setResult(JSON.stringify(response, null, 2));
+    } catch (error: any) {
+      console.error('Error calling method:', error);
+      setTxn(null);
+      setError(error?.message || 'An unknown error occurred');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDataType = (
+    data: any,
+  ): 'json' | 'string' | 'number' | 'boolean' | 'null' => {
+    if (data === null) return 'null';
+    if (typeof data === 'boolean') return 'boolean';
+    if (typeof data === 'object') return 'json';
+    if (typeof data === 'string') return isJson(data) ? 'json' : 'string';
+    return 'number';
   };
 
   const onDetect = async () => {
@@ -167,25 +160,24 @@ const ViewOrChange = (props: Props) => {
         gas: args?.gas || optns.gas,
       }));
 
-      for (const arg in argJson) {
-        const value = argJson[arg];
-
-        if (value) {
-          const type = getDataType(value);
+      for (const key of Object.keys(argJson)) {
+        const fieldValue = argJson[key];
+        if (key) {
+          const type = getDataType(fieldValue);
           const field = {
             id: uniqueId(),
-            name: arg,
+            name: key,
             type: type,
             value: '',
             placeholder:
               type === 'number'
-                ? value
-                : typeof value === 'object'
-                ? JSON.stringify(value)
-                : value,
+                ? fieldValue
+                : typeof fieldValue === 'object'
+                ? JSON.stringify(fieldValue)
+                : fieldValue,
           };
           setFields((flds) => [...flds, field]);
-          setHideQuery(true);
+          /*  setHideQuery(true); */
         }
       }
     } catch (error) {
@@ -273,7 +265,13 @@ const ViewOrChange = (props: Props) => {
                 name="value"
                 value={field.value}
                 onChange={onChange(field.id)}
-                placeholder={field.placeholder || 'Argument value'}
+                placeholder={
+                  field.placeholder != null
+                    ? typeof field.placeholder === 'object'
+                      ? stringify(field.placeholder)
+                      : field.placeholder.toString()
+                    : 'Argument value'
+                }
                 className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
               />
             </div>
@@ -347,7 +345,7 @@ const ViewOrChange = (props: Props) => {
           )}
           <button
             onClick={onWrite}
-            disabled={loading || !connected}
+            disabled={loading || !signedAccountId}
             className="bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
           >
             Write

@@ -105,11 +105,6 @@ const Overview = forwardRef(
                 >
                   Inventory
                 </div>{' '}
-                <div
-                  className={`text-nearblue-600 dark:text-neargray-10 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 rounded-lg hover:text-nearblue-600 text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none`}
-                >
-                  Comments
-                </div>
               </div>
               <div className="relative">
                 <div

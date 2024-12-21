@@ -1,7 +1,6 @@
 import React, { Ref, forwardRef } from 'react';
 import Skeleton from '../common/Skeleton';
 import useTranslation from 'next-translate/useTranslation';
-import Comment from '../common/Comment';
 import Info from './Info';
 import FAQ from './FAQ';
 interface Props {
@@ -160,7 +159,6 @@ const Overview = forwardRef(
                 </div>{' '}
                 <div className={buttonStyles('Info')}>Info</div>{' '}
                 <div className={buttonStyles('FAQ')}>FAQ</div>{' '}
-                <div className={buttonStyles('Comments')}>Comments</div>
               </div>
 
               <div className="relative">
@@ -172,8 +170,6 @@ const Overview = forwardRef(
                     <Info />
                   ) : pageTab === 'FAQ' ? (
                     <FAQ />
-                  ) : pageTab === 'Comments' ? (
-                    <Comment />
                   ) : (
                     <>
                       <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 dark:text-neargray-10 px-3 py-2">
