@@ -6,18 +6,18 @@ import {
   VerificationData,
   VerifierStatus,
 } from '@/utils/types';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Info from './Info';
 import { Tooltip } from '@reach/tooltip';
 import { Accordion } from '@reach/accordion';
 import ViewOrChange from './ViewOrChange';
-import { useAuthStore } from '@/stores/auth';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import ContractCode from './ContractCode';
 import useRpc from '@/hooks/useRpc';
 import { verifierConfig } from '@/utils/config';
 import { useRpcStore } from '@/stores/rpc';
+import { NearContext } from '@/components/Wallet/near-context';
 
 interface Props {
   contract: ContractCodeInfo;
@@ -42,11 +42,7 @@ const ContractOverview = (props: Props) => {
   const { contract, isLocked, schema, contractInfo, deployments, accountId } =
     props;
 
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
-  const signedIn = useAuthStore((store) => store.signedIn);
-  const logOut = useAuthStore((store) => store.logOut);
+  const { signedAccountId, wallet } = useContext(NearContext);
 
   const [tab, setTab] = useState(0);
 
@@ -207,14 +203,14 @@ const ContractOverview = (props: Props) => {
       {!schema && (
         <TabPanel>
           <div className="border-t p-4 mt-3">
-            {signedIn ? (
+            {signedAccountId ? (
               <Tooltip
                 label="Disconnect Wallet"
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                  onClick={logOut}
+                  onClick={wallet?.signOut}
                 >
                   <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white" />
                   Connected
@@ -223,7 +219,7 @@ const ContractOverview = (props: Props) => {
             ) : (
               <button
                 className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                onClick={requestSignInWithWallet}
+                onClick={wallet?.signIn}
               >
                 <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white animate-pulse" />
                 Connect to Contract
@@ -251,12 +247,7 @@ const ContractOverview = (props: Props) => {
               className="contract-accordian text-gray-600 px-4 pt-4 border-t"
             >
               {contractInfo?.methodNames?.map((method, index) => (
-                <ViewOrChange
-                  key={index}
-                  index={index}
-                  method={method}
-                  connected={signedIn}
-                />
+                <ViewOrChange key={index} index={index} method={method} />
               ))}
             </Accordion>
           )}
@@ -265,14 +256,14 @@ const ContractOverview = (props: Props) => {
       {schema && schema?.body?.functions.length > 0 && (
         <TabPanel>
           <div className="border-t p-4 mt-3">
-            {signedIn ? (
+            {signedAccountId ? (
               <Tooltip
                 label="Disconnect Wallet"
                 className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-white text-xs p-2 break-words"
               >
                 <button
                   className="px-2 mr-1 md:px-3 bg-neargreen py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                  onClick={logOut}
+                  onClick={wallet?.signOut}
                 >
                   <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white" />
                   Connected
@@ -281,7 +272,7 @@ const ContractOverview = (props: Props) => {
             ) : (
               <button
                 className="px-2 mr-1 md:px-3 bg-red-400 py-2 text-xs font-medium rounded-md text-white inline-flex items-center"
-                onClick={requestSignInWithWallet}
+                onClick={wallet?.signIn}
               >
                 <span className="h-3 w-3 inline-block rounded-full mr-2 bg-white animate-pulse" />
                 Connect to Contract
@@ -312,7 +303,6 @@ const ContractOverview = (props: Props) => {
                 index={index}
                 method={func}
                 schema={schema}
-                connected={signedIn}
               />
             ))}
           </Accordion>

@@ -15,6 +15,23 @@ export const networkId: NetworkId =
 export const bosNetworkId: NetworkId =
   (env('NEXT_PUBLIC_BOS_NETWORK') as NetworkId) || 'testnet';
 
+const evmWalletChains = {
+  mainnet: {
+    caipNetworkId: '397',
+    chainId: 397,
+    explorer: 'https://nearblocks.io',
+    name: 'Near Mainnet',
+    rpc: 'https://eth-rpc.mainnet.near.org',
+  },
+  testnet: {
+    caipNetworkId: '398',
+    chainId: 398,
+    explorer: 'https://testnet.nearblocks.io',
+    name: 'Near Testnet',
+    rpc: 'https://eth-rpc.testnet.near.org',
+  },
+};
+
 export const network = networks[networkId];
 
 export const apiUrl: string =
@@ -82,3 +99,5 @@ export const chainAbstractionExplorerUrl =
             `https://blockexplorer.one/bitcoin/testnet/address/${address}`,
         },
       };
+
+export const EVMWalletChain = evmWalletChains[networkId];

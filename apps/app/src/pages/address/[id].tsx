@@ -30,10 +30,6 @@ import NFTTransactions from '@/components/Address/NFTTransactions';
 import AccessKeys from '@/components/Address/AccessKeys';
 import fetcher from '@/utils/fetcher';
 import { useFetch } from '@/hooks/useFetch';
-import { VmComponent } from '@/components/vm/VmComponent';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import Comment from '@/components/skeleton/common/Comment';
-import { useAuthStore } from '@/stores/auth';
 import ContractOverview from '@/components/Address/Contract/ContractOverview';
 import ListCheck from '@/components/Icons/ListCheck';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
@@ -59,7 +55,6 @@ const tabs = [
   'accesskeys',
   'multichaintxns',
   'contract',
-  'comments',
 ];
 
 type TabType =
@@ -69,8 +64,7 @@ type TabType =
   | 'nfttokentxns'
   | 'accesskeys'
   | 'multichaintxns'
-  | 'contract'
-  | 'comments';
+  | 'contract';
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
@@ -141,7 +135,6 @@ export const getServerSideProps: GetServerSideProps<{
       count: `chain-abstraction/${address}/txns/count`,
     },
     contract: { api: '' },
-    comments: { api: '' },
   };
 
   const apiUrls = urlMapping[tab as TabType];
@@ -189,25 +182,21 @@ export const getServerSideProps: GetServerSideProps<{
   let dataResult = null;
   let dataCountResult = null;
 
-  if (tab !== 'comments') {
-    // Fetch tab-specific data with reduced overhead
-    const tabApi = urlMapping[tab as TabType];
-    const fetchUrl = `${tabApi.api}${
-      qs ? `?${queryString.stringify(qs)}` : ''
-    }`;
-    const countUrl =
-      tabApi.count &&
-      `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
+  // Fetch tab-specific data with reduced overhead
+  const tabApi = urlMapping[tab as TabType];
+  const fetchUrl = `${tabApi.api}${qs ? `?${queryString.stringify(qs)}` : ''}`;
+  const countUrl =
+    tabApi.count &&
+    `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
 
-    // Fetch data in parallel but limit the number of calls
-    const tabResults = await Promise.allSettled([
-      fetchCommonData(fetchUrl),
-      fetchCommonData(countUrl),
-    ]);
+  // Fetch data in parallel but limit the number of calls
+  const tabResults = await Promise.allSettled([
+    fetchCommonData(fetchUrl),
+    fetchCommonData(countUrl),
+  ]);
 
-    dataResult = getResult(tabResults[0]);
-    dataCountResult = getResult(tabResults[1]);
-  }
+  dataResult = getResult(tabResults[0]);
+  dataCountResult = getResult(tabResults[1]);
 
   // Return props with better error handling
   return {
@@ -261,7 +250,6 @@ const Address = ({
   const [account, setAccount] = useState<AccountDataInfo | null>(null);
   const [rpcLoading, setRpcLoading] = useState(false);
 
-  const components = useBosComponents();
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -281,10 +269,6 @@ const Address = ({
   const nftTokenData = nftTokenDetails?.contracts?.[0];
   const inventoryData = inventoryDetails?.inventory;
   const multiChainAccounts = multiChainAccountsData?.multiChainAccounts;
-
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
 
   const txns = data?.txns || [];
   const count = dataCount?.txns?.[0]?.count;
@@ -638,15 +622,7 @@ const Address = ({
           <div className="w-full ">
             <>
               <div>
-                <Tabs
-                  onSelect={onTab}
-                  selectedIndex={
-                    tab === 'comments' &&
-                    contractInfo?.methodNames?.length === undefined
-                      ? tabs?.indexOf(tab) - 1
-                      : tabs?.indexOf(tab)
-                  }
-                >
+                <Tabs onSelect={onTab} selectedIndex={tabs?.indexOf(tab)}>
                   <TabList className="flex flex-wrap">
                     {[
                       { key: 0, label: t ? t('address:txns') : 'Transactions' },
@@ -680,28 +656,13 @@ const Address = ({
                                 </div>
                               ),
                             },
-                            {
-                              key: 7,
-                              label: t ? t('address:comments') : 'Comments',
-                            },
                           ]
-                        : [
-                            {
-                              key: 8,
-                              label: t ? t('address:comments') : 'Comments',
-                            },
-                          ]),
+                        : []),
                     ].map(({ key, label }) => (
                       <Tab
                         key={key}
                         className={getClassName(
-                          tabs[key] ===
-                            tabs[
-                              tab === 'comments' &&
-                              contractInfo?.methodNames?.length === undefined
-                                ? tabs?.indexOf(tab) - 1
-                                : tabs?.indexOf(tab)
-                            ],
+                          tabs[key] === tabs[tabs?.indexOf(tab)],
                         )}
                         selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
                       >
@@ -780,19 +741,6 @@ const Address = ({
                         )}
                       </TabPanel>
                     )}
-                    <TabPanel>
-                      <VmComponent
-                        src={components?.commentsFeed}
-                        defaultSkelton={<Comment />}
-                        props={{
-                          network: network,
-                          path: `nearblocks.io/address/${id}`,
-                          limit: 10,
-                          requestSignInWithWallet,
-                        }}
-                        loading={<Comment />}
-                      />
-                    </TabPanel>
                   </div>
                 </Tabs>
               </div>

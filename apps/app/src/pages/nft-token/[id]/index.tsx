@@ -13,16 +13,12 @@ import classNames from 'classnames';
 import Transfers from '@/components/Tokens/NFT/Transfers';
 import Holders from '@/components/Tokens/NFT/Holders';
 import Inventory from '@/components/Tokens/NFT/Inventory';
-import { VmComponent } from '@/components/vm/VmComponent';
-import Comment from '@/components/skeleton/common/Comment';
-import { useBosComponents } from '@/hooks/useBosComponents';
-import { useAuthStore } from '@/stores/auth';
 import { fetchData } from '@/utils/fetchData';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
-const tabs = ['transfers', 'holders', 'inventory', 'comments'];
+const tabs = ['transfers', 'holders', 'inventory'];
 
 export const getServerSideProps: GetServerSideProps<{
   tokenDetails: any;
@@ -61,7 +57,6 @@ export const getServerSideProps: GetServerSideProps<{
         qs.per_page = '24';
       },
     },
-    comments: { api: `` },
   };
 
   const commonApiUrls = {
@@ -94,21 +89,19 @@ export const getServerSideProps: GetServerSideProps<{
     let dataResult = null;
     let dataCountResult = null;
 
-    if (tab !== 'comments') {
-      // Fetch tab-specific data
-      const tabApi = tabApiUrls[tab as string];
-      const fetchUrl = `${tabApi.api}${
-        qs ? `?${queryString.stringify(qs)}` : ''
-      }`;
-      const countUrl =
-        tabApi.count &&
-        `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
+    // Fetch tab-specific data
+    const tabApi = tabApiUrls[tab as string];
+    const fetchUrl = `${tabApi.api}${
+      qs ? `?${queryString.stringify(qs)}` : ''
+    }`;
+    const countUrl =
+      tabApi.count &&
+      `${tabApi.count}${qs ? `?${queryString.stringify(qs)}` : ''}`;
 
-      [dataResult, dataCountResult] = await Promise.allSettled([
-        fetchCommonData(fetchUrl),
-        fetchCommonData(countUrl),
-      ]);
-    }
+    [dataResult, dataCountResult] = await Promise.allSettled([
+      fetchCommonData(fetchUrl),
+      fetchCommonData(countUrl),
+    ]);
 
     const getResult = (result: PromiseSettledResult<any>) =>
       result.status === 'fulfilled' ? result.value : null;
@@ -160,8 +153,6 @@ const NFToken = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
-  const components = useBosComponents();
-
   const token = tokenDetails?.contracts?.[0];
   const transfers = transfersDetails?.txns?.[0]?.count;
   const holders = holdersDetails?.holders?.[0]?.count;
@@ -175,11 +166,6 @@ const NFToken = ({
     sync: true,
     timestamp: '',
   };
-
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
-
   const tokens = data?.tokens || [];
   const inventoryCount = dataCount?.tokens?.[0]?.count;
 
@@ -258,12 +244,6 @@ const NFToken = ({
                 >
                   <h2>Inventory</h2>
                 </Tab>
-                <Tab
-                  className={getClassName(tabs[3] === tabs[tabs?.indexOf(tab)])}
-                  selectedClassName="rounded-lg bg-green-600 dark:bg-green-250 text-white"
-                >
-                  <h2>Comments</h2>
-                </Tab>
               </TabList>
               <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
                 <TabPanel>
@@ -292,19 +272,6 @@ const NFToken = ({
                     count={inventoryCount}
                     error={error}
                     tab={tab}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <VmComponent
-                    src={components?.commentsFeed}
-                    defaultSkelton={<Comment />}
-                    props={{
-                      network: network,
-                      path: `nearblocks.io/nft-token/${id}`,
-                      limit: 10,
-                      requestSignInWithWallet,
-                    }}
-                    loading={<Comment />}
                   />
                 </TabPanel>
               </div>

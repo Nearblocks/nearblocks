@@ -4,7 +4,6 @@ import useTranslation from 'next-translate/useTranslation';
 import Summary from '../txns/Summary';
 import Execution from '../txns/Execution';
 import Tree from '../txns/Tree';
-import Comment from './Comment';
 interface Props {
   network: string;
   txns?: boolean;
@@ -55,11 +54,6 @@ const Detail = forwardRef(
             <div className={buttonStyles('summary')}>
               <h2 className="p-2">Receipt Summary</h2>
             </div>
-            <div className={buttonStyles('comments')}>
-              <h2 className="p-2">
-                {t ? t('txns:txn.tabs.comments') : 'Comments'}
-              </h2>
-            </div>
           </div>
         )}
         <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 divide-solid dark:divide-black-200  divide-gray-200 divide-y soft-shadow rounded-xl mr-4">
@@ -69,8 +63,6 @@ const Detail = forwardRef(
             <Execution />
           ) : pageTab === 'tree' ? (
             <Tree />
-          ) : pageTab === 'comments' ? (
-            <Comment />
           ) : (
             <>
               {network === 'testnet' && (

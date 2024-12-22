@@ -75,7 +75,7 @@ export default function Overview({
       const tokenImage = token?.icon;
 
       if (window.ethereum) {
-        await window.ethereum.request({
+        await await (window.ethereum as any).request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC20',

@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { useAuthStore } from '@/stores/auth';
 import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
 import Menu from '../Icons/Menu';
@@ -15,6 +14,7 @@ import { dollarFormat, nanoToMilli } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
+import { NearContext } from '../Wallet/near-context';
 
 const menus = [
   {
@@ -148,13 +148,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const requestSignInWithWallet = useAuthStore(
-    (store) => store.requestSignInWithWallet,
-  );
-  const signedIn = useAuthStore((store) => store.signedIn);
-  const accountId = useAuthStore((store) => store.accountId);
-  const logOut = useAuthStore((store) => store.logOut);
-  const user = signedIn;
+  const { signedAccountId, wallet } = useContext(NearContext);
 
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
@@ -176,9 +170,6 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
   const showSearch = router.pathname !== '/';
   const userLoading = false;
 
-  const onSignOut = () => {
-    logOut();
-  };
   const nearPrice = stats?.near_price ?? '';
   return (
     <div className="dark:bg-black-600 soft-shadow">
@@ -435,19 +426,19 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                           className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           onClick={(event: any) => {
                             event.preventDefault();
-                            if (!user && !userLoading) {
-                              requestSignInWithWallet();
+                            if (!signedAccountId && !userLoading) {
+                              wallet?.signIn();
                             } else {
                               onClick(event);
                             }
                           }}
                         >
                           <div className="w-full">
-                            {user ? (
+                            {signedAccountId ? (
                               <div className="flex justify-between">
                                 <div className="flex items-center">
                                   <span className="truncate max-w-[110px]">
-                                    {accountId}
+                                    {signedAccountId}
                                   </span>
                                 </div>
                                 <ArrowDown
@@ -468,11 +459,11 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                         </button>
                       )}
                     >
-                      {user && (
+                      {signedAccountId && (
                         <ul className="border-l-2 border-green-500 md:hidden ml-2">
                           <li className="px-4 pb-1">
                             <button
-                              onClick={onSignOut}
+                              onClick={wallet?.signOut}
                               className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
                             >
                               Sign Out
@@ -486,14 +477,14 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                       <button
                         className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
                         onClick={() =>
-                          !user && !userLoading && requestSignInWithWallet()
+                          !signedAccountId && !userLoading && wallet?.signIn()
                         }
                       >
-                        {user ? (
+                        {signedAccountId ? (
                           <>
                             <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
                             <span className="truncate max-w-[110px]">
-                              {accountId}
+                              {signedAccountId}
                             </span>
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </>
@@ -516,11 +507,11 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                         )}
                       </button>
 
-                      {user && (
+                      {signedAccountId && (
                         <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                           <li className="px-8 pb-1">
                             <button
-                              onClick={onSignOut}
+                              onClick={wallet?.signOut}
                               className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                             >
                               Sign Out
