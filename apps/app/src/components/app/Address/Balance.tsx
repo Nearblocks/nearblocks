@@ -43,7 +43,7 @@ export default async function Balance({ id }: { id: string }) {
 
   return (
     <>
-      <AccountAlerts accountData={accountData} id={id} />
+      <AccountAlerts accountData={accountData?.account?.[0]} id={id} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <AccountOverview
           accountData={accountData?.account?.[0]}
