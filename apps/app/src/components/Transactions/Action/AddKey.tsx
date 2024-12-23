@@ -10,17 +10,16 @@ const AddKey = (props: TransactionActionInfo) => {
   const router = useRouter();
   const { hash } = router.query;
 
-  const handleClick = () => {
-    router.push(`/txns/${hash}#execution#${props.action?.receiptId}`);
-  };
-
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">
         {props?.action?.receiptId && hash ? (
-          <span onClick={handleClick} className="cursor-pointer">
+          <Link
+            href={`/txns/${hash}#execution#${props.action?.receiptId}`}
+            className="cursor-pointer"
+          >
             <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
-          </span>
+          </Link>
         ) : (
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
         )}
@@ -45,9 +44,12 @@ const AddKey = (props: TransactionActionInfo) => {
     return (
       <div className="py-1">
         {props?.action?.receiptId && hash ? (
-          <span onClick={handleClick} className="cursor-pointer">
+          <Link
+            href={`/txns/${hash}#execution#${props.action?.receiptId}`}
+            className="cursor-pointer"
+          >
             <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
-          </span>
+          </Link>
         ) : (
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
         )}
@@ -71,9 +73,12 @@ const AddKey = (props: TransactionActionInfo) => {
   return (
     <div className="py-1">
       {props?.action?.receiptId && hash ? (
-        <span onClick={handleClick} className="cursor-pointer">
+        <Link
+          href={`/txns/${hash}#execution#${props.action?.receiptId}`}
+          className="cursor-pointer"
+        >
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
-        </span>
+        </Link>
       ) : (
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
       )}

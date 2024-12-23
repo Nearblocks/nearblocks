@@ -128,6 +128,27 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
 
   const outcomes = txn?.receipts_outcome || [];
 
+  for (let i = 1; i < outcomes.length; i++) {
+    const outcome = outcomes[i];
+    let logs = outcome?.outcome?.logs || [];
+
+    if (logs.length > 0) {
+      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
+        contract: outcome?.outcome?.executor_id || '',
+        logs: log,
+        receiptId: outcome.id,
+      }));
+      txLogs = [...txLogs, ...mappedLogs];
+    }
+  }
+  return txLogs;
+}
+
+export function txnActionLogs(txn: RPCTransactionInfo): TransactionLog[] {
+  let txLogs: TransactionLog[] = [];
+
+  const outcomes = txn?.receipts_outcome || [];
+
   for (let i = 0; i < outcomes.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
@@ -168,7 +189,7 @@ export function txnActions(txn: RPCTransactionInfo) {
   const txActions = [];
   const receipts = txn?.receipts || [];
 
-  for (let i = 0; i < receipts.length; i++) {
+  for (let i = 1; i < receipts.length; i++) {
     const receipt = receipts[i];
     const from = receipt?.predecessor_id;
     const to = receipt?.receiver_id;
@@ -193,6 +214,27 @@ export function txnActions(txn: RPCTransactionInfo) {
         txActions.push({ from, to, receiptId, ...action });
       }
     }
+  }
+
+  return txActions;
+}
+
+export function mainActions(txn: any) {
+  const txActions = [];
+  const transaction = txn?.transaction.actions || [];
+  const receipt = txn?.receipts[0]?.receipt_id;
+  const from = txn?.transaction?.signer_id;
+  const to = txn?.transaction?.receiver_id;
+  const logs = txn?.receipts_outcome[0]?.outcome?.logs?.map((log: any) => ({
+    logs: log,
+    contract: to,
+    receiptId: receipt,
+  }));
+
+  for (let i = 0; i < transaction.length; i++) {
+    const action = mapRpcActionToAction(transaction[i]);
+
+    txActions?.push({ to, from, receipt, logs, ...action });
   }
 
   return txActions;
