@@ -27,16 +27,22 @@ export const storeTransactions = async (
   });
 
   if (transactions.length) {
-    await retry(async () => {
-      for (let i = 0; i < transactions.length; i += batchSize) {
-        const batch = transactions.slice(i, i + batchSize);
+    const promises = [];
 
-        await knex('transactions')
-          .insert(batch)
-          .onConflict(['transaction_hash'])
-          .ignore();
-      }
-    });
+    for (let i = 0; i < transactions.length; i += batchSize) {
+      const batch = transactions.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('transactions')
+            .insert(batch)
+            .onConflict(['transaction_hash'])
+            .ignore();
+        }),
+      );
+    }
+
+    await Promise.all(promises);
   }
 };
 

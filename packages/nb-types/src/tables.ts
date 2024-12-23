@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 import {
   AccessKeyPermissionKind,
   ActionKind,
@@ -101,6 +103,7 @@ export type BalanceEvent = {
 
 export type Block = {
   author_account_id: string;
+  block_bytea: Buffer;
   block_hash: string;
   block_height: number;
   block_json: JsonValue;
