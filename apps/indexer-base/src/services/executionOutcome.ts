@@ -13,20 +13,62 @@ export const storeExecutionOutcomes = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
+  let outcomes: ExecutionOutcome[] = [];
+  let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
+
   await Promise.all(
     message.shards.map(async (shard) => {
-      await storeChunkExecutionOutcomes(
-        knex,
+      const executions = storeChunkExecutionOutcomes(
         shard.shardId,
         message.block.header.timestampNanosec,
         shard.receiptExecutionOutcomes,
       );
+
+      outcomes = outcomes.concat(executions.outcomes);
+      outcomeReceipts = outcomeReceipts.concat(executions.outcomeReceipts);
     }),
   );
+
+  const promises = [];
+
+  if (outcomes.length) {
+    for (let i = 0; i < outcomes.length; i += batchSize) {
+      const batch = outcomes.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('execution_outcomes')
+            .insert(batch)
+            .onConflict(['receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (outcomeReceipts.length) {
+    for (let i = 0; i < outcomeReceipts.length; i += batchSize) {
+      const batch = outcomeReceipts.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('execution_outcome_receipts')
+            .insert(batch)
+            .onConflict([
+              'executed_receipt_id',
+              'index_in_execution_outcome',
+              'produced_receipt_id',
+            ])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  await Promise.all(promises);
 };
 
-export const storeChunkExecutionOutcomes = async (
-  knex: Knex,
+export const storeChunkExecutionOutcomes = (
   shardId: number,
   blockTimestamp: string,
   executionOutcomes: types.ExecutionOutcomeWithReceipt[],
@@ -44,56 +86,20 @@ export const storeChunkExecutionOutcomes = async (
       ),
     );
 
-    const executionOutcomeReceipts =
-      executionOutcome.executionOutcome.outcome.receiptIds.map(
-        (receiptId, receiptIndex) =>
+    executionOutcome.executionOutcome.outcome.receiptIds.forEach(
+      (receiptId, receiptIndex) => {
+        outcomeReceipts.push(
           getExecutionOutcomeReceiptData(
             executionOutcome.executionOutcome.id,
             receiptId,
             receiptIndex,
           ),
-      );
-
-    outcomeReceipts.push(...executionOutcomeReceipts);
+        );
+      },
+    );
   });
 
-  const promises = [];
-
-  if (outcomes.length) {
-    promises.push(
-      retry(async () => {
-        for (let i = 0; i < outcomes.length; i += batchSize) {
-          const batch = outcomes.slice(i, i + batchSize);
-
-          await knex('execution_outcomes')
-            .insert(batch)
-            .onConflict(['receipt_id'])
-            .ignore();
-        }
-      }),
-    );
-  }
-
-  if (outcomeReceipts.length) {
-    promises.push(
-      retry(async () => {
-        for (let i = 0; i < outcomeReceipts.length; i += batchSize) {
-          const batch = outcomeReceipts.slice(i, i + batchSize);
-
-          await knex('execution_outcome_receipts')
-            .insert(batch)
-            .onConflict([
-              'executed_receipt_id',
-              'index_in_execution_outcome',
-              'produced_receipt_id',
-            ])
-            .ignore();
-        }
-      }),
-    );
-  }
-
-  await Promise.all(promises);
+  return { outcomeReceipts, outcomes };
 };
 
 const getExecutionOutcomeData = (

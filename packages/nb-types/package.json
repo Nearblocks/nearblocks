@@ -1,6 +1,6 @@
 {
   "name": "nb-types",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "devDependencies": {
+    "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
     "nb-tsconfig": "*",
     "typescript": "~5.2"

@@ -66,7 +66,7 @@ const fetch = async (url: string, block: number): Promise<Message> => {
   return await retry(
     async () => {
       const response = await axios.get(`${url}/v0/block/${block}`, {
-        timeout: 5000,
+        timeout: 30000,
       });
 
       return response.data;
@@ -79,7 +79,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
       const response = await axios.get(`${url}/v0/last_block/final`, {
-        timeout: 5000,
+        timeout: 30000,
       });
 
       return response.data;

@@ -21,9 +21,10 @@ const getBlockData = (message: types.StreamerMessage): Block => {
 
   return {
     author_account_id: block.author,
+    block_bytea: Buffer.from(blockJson),
     block_hash: block.header.hash,
     block_height: block.header.height,
-    block_json: blockJson,
+    block_json: null,
     block_timestamp: block.header.timestampNanosec,
     gas_price: block.header.gasPrice,
     prev_block_hash: block.header.prevHash,
