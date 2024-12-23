@@ -6,7 +6,7 @@ import { useConfig } from '@/hooks/app/useConfig';
 
 import Skeleton from '../common/Skeleton';
 
-export default function BalanceSkeleton() {
+export default function BalanceSkeleton({ error = false }) {
   const t = useTranslations();
   const { networkId } = useConfig();
   return (
@@ -17,21 +17,21 @@ export default function BalanceSkeleton() {
             <h2 className="leading-6 text-sm font-semibold">
               {t('overview') || 'Overview'}
             </h2>
-            <Skeleton className="h-4 w-16" />
+            {error ? '' : <Skeleton className="h-4 w-16" />}
           </div>
           <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
             <div className="flex-1 flex-wrap py-4">
               <div className="w-full md:w-1/4 mb-0.5">
                 {t('balance') || 'Balance'}:
               </div>
-              <Skeleton className="h-4 w-32 mb-0.5" />
+              {error ? '' : <Skeleton className="h-4 w-32 mb-0.5" />}
             </div>
             {networkId === 'mainnet' && (
               <div className="flex-1 flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="w-full md:w-1/4 mb-0.5">
                   {t('value') || 'Value:'}
                 </div>
-                <Skeleton className="h-4 w-32 mb-0.5" />
+                {error ? '' : <Skeleton className="h-4 w-32 mb-0.5" />}
               </div>
             )}
             <div className="flex-1 flex-wrap pt-4 text-sm text-nearblue-600 dark:text-neargray-10">
@@ -39,7 +39,7 @@ export default function BalanceSkeleton() {
                 {t('tokens') || 'Tokens:'}
               </div>
               <div className="w-full break-words z-10">
-                <Skeleton className="h-7 w-full" />
+                {error ? '' : <Skeleton className="h-7 w-full" />}
               </div>
             </div>
           </div>
@@ -58,7 +58,7 @@ export default function BalanceSkeleton() {
                     Staked {t('balance') || 'Balance'}:
                   </div>
                   <div className="w-full break-words">
-                    <Skeleton className="h-4 w-32" />
+                    {error ? '' : <Skeleton className="h-4 w-32" />}
                   </div>
                 </div>
               </div>
@@ -68,7 +68,7 @@ export default function BalanceSkeleton() {
                     {t('storageUsed') || 'Storage Used'}:
                   </div>
                   <div className="flex break-words">
-                    <Skeleton className="h-4 w-28" />
+                    {error ? '' : <Skeleton className="h-4 w-28" />}
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export default function BalanceSkeleton() {
                 Contract Creator:
               </div>
               <div className="w-full md:w-3/4 break-words">
-                <Skeleton className="h-4 w-full" />
+                {error ? '' : <Skeleton className="h-4 w-full" />}
               </div>
             </div>
             <div className="flex-1 justify-between">
@@ -87,7 +87,7 @@ export default function BalanceSkeleton() {
                   Created At
                 </div>
                 <div className="w-full break-words">
-                  <Skeleton className="h-4 w-full" />
+                  {error ? '' : <Skeleton className="h-4 w-full" />}
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function BalanceSkeleton() {
           </h2>
           <div className="px-3 py-4 text-sm text-nearblue-600 dark:text-neargray-10 flex items-center">
             <div className="w-full md:w-3/4 break-words my-1">
-              <Skeleton className="h-4 w-72" />
+              {error ? '' : <Skeleton className="h-4 w-72" />}
             </div>
           </div>
         </div>
