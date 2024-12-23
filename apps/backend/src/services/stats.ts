@@ -76,17 +76,17 @@ const marketData = async () => {
 };
 
 const networkData = async () => {
-  let validators = null;
-
   try {
-    validators = await near.query([null], 'validators');
+    const validators = await near.query([null], 'validators');
+
+    return {
+      nodes_online: validators?.data?.result?.current_validators?.length ?? 0,
+    };
   } catch (error) {
     console.log({ error });
   }
 
-  return {
-    nodes_online: validators?.data?.result?.current_validators?.length ?? 0,
-  };
+  return {};
 };
 
 export const txnData = async () => {
