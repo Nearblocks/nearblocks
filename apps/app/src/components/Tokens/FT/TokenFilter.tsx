@@ -126,7 +126,7 @@ export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
                 {inventoryLoading ? (
                   <Skeleton className="w-40" />
                 ) : (
-                  <p className="text-sm my-1">
+                  <p className="text-sm my-1 dark:text-neargray-10">
                     {Number(filterToken?.rpcAmount)
                       ? localFormat(filterToken?.rpcAmount)
                       : ''}
@@ -140,7 +140,7 @@ export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
                 {inventoryLoading ? (
                   <Skeleton className="w-40" />
                 ) : (
-                  <p className="text-sm my-1 flex">
+                  <p className="text-sm my-1 flex dark:text-neargray-10">
                     {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
                     <span>
                       {filterToken?.ft_meta?.price && (

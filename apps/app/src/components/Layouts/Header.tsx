@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
@@ -15,6 +15,7 @@ import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
 import { NearContext } from '../Wallet/near-context';
+import { cookieStorage } from '@wagmi/core';
 
 const menus = [
   {
@@ -139,19 +140,37 @@ const languages = [
 interface Props {
   statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
+  signedAccountId: string;
 }
 
-const Header = ({ statsDetails, latestBlocks }: Props) => {
+const Header = ({
+  statsDetails,
+  latestBlocks,
+  signedAccountId: accountId,
+}: Props) => {
   /* eslint-disable @next/next/no-img-element */
 
   const router = useRouter();
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { signedAccountId, wallet } = useContext(NearContext);
-
+  let { wallet, signedAccountId } = useContext(NearContext);
+  const [accountName, SetAccountName] = useState<undefined | string>(accountId);
   const stats: Stats | undefined = statsDetails?.stats?.[0];
   const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
+
+  useEffect(() => {
+    if (signedAccountId && signedAccountId?.length > 0) {
+      cookieStorage.setItem('signedAccountId', signedAccountId);
+      SetAccountName(signedAccountId);
+    }
+  }, [signedAccountId]);
+
+  const signOut = () => {
+    wallet?.signOut();
+    cookieStorage.removeItem('signedAccountId');
+    SetAccountName(undefined);
+  };
 
   const status = useMemo(() => {
     if (block?.block_timestamp) {
@@ -426,7 +445,7 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                           className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
                           onClick={(event: any) => {
                             event.preventDefault();
-                            if (!signedAccountId && !userLoading) {
+                            if (!accountName && !userLoading) {
                               wallet?.signIn();
                             } else {
                               onClick(event);
@@ -434,11 +453,11 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                           }}
                         >
                           <div className="w-full">
-                            {signedAccountId ? (
+                            {accountName ? (
                               <div className="flex justify-between">
                                 <div className="flex items-center">
                                   <span className="truncate max-w-[110px]">
-                                    {signedAccountId}
+                                    {accountName}
                                   </span>
                                 </div>
                                 <ArrowDown
@@ -459,11 +478,11 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                         </button>
                       )}
                     >
-                      {signedAccountId && (
+                      {accountName && (
                         <ul className="border-l-2 border-green-500 md:hidden ml-2">
                           <li className="px-4 pb-1">
                             <button
-                              onClick={wallet?.signOut}
+                              onClick={signOut}
                               className="bg-green-200/70 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
                             >
                               Sign Out
@@ -477,14 +496,14 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                       <button
                         className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
                         onClick={() =>
-                          !signedAccountId && !userLoading && wallet?.signIn()
+                          !accountName && !userLoading && wallet?.signIn()
                         }
                       >
-                        {signedAccountId ? (
+                        {accountName ? (
                           <>
                             <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
                             <span className="truncate max-w-[110px]">
-                              {signedAccountId}
+                              {accountName}
                             </span>
                             <ArrowDown className="fill-current w-4 h-4 ml-2" />
                           </>
@@ -507,11 +526,11 @@ const Header = ({ statsDetails, latestBlocks }: Props) => {
                         )}
                       </button>
 
-                      {signedAccountId && (
+                      {accountName && (
                         <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-[99]">
                           <li className="px-8 pb-1">
                             <button
-                              onClick={wallet?.signOut}
+                              onClick={signOut}
                               className="bg-green-200/70 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                             >
                               Sign Out

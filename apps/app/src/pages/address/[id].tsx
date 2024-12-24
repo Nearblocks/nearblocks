@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps<{
   tab: string;
   latestBlocks: any;
   multiChainAccountsData: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...qs },
@@ -97,6 +98,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   const address = id.toLowerCase();
   const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
+  const signedAccountId = getCookieFromRequest('signedAccountId', req) || null;
 
   const commonApiUrls = {
     account: id && `account/${address}?rpc=${rpcUrl}`,
@@ -211,6 +213,7 @@ export const getServerSideProps: GetServerSideProps<{
       data: dataResult,
       dataCount: dataCountResult,
       error: !dataResult, // Set error to true only if dataResult is null
+      signedAccountId,
       tab,
       latestBlocks: latestBlocks,
       multiChainAccountsData: getResult(multiChainAccountsResult),
@@ -765,6 +768,7 @@ Address.getLayout = (page: ReactElement) => (
     <Layout
       statsDetails={page?.props?.statsDetails}
       latestBlocks={page?.props?.latestBlocks}
+      signedAccountId={page?.props?.signedAccountId}
     >
       {page}
     </Layout>

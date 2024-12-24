@@ -24,6 +24,7 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlock: any;
   error: boolean;
   statsDetails: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { ...qs },
@@ -40,6 +41,8 @@ export const getServerSideProps: GetServerSideProps<{
     const error = dataResult.status === 'rejected';
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
@@ -47,6 +50,7 @@ export const getServerSideProps: GetServerSideProps<{
         latestBlock: latestBlocks,
         error,
         statsDetails,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -57,6 +61,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         latestBlock: null,
         statsDetails: null,
+        signedAccountId: null,
       },
     };
   }
@@ -116,6 +121,7 @@ NodeExplorer.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlock}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

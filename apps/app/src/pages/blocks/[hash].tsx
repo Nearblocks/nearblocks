@@ -6,7 +6,7 @@ import Layout from '@/components/Layouts';
 import { env } from 'next-runtime-env';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import fetcher from '@/utils/fetcher';
-import { nanoToMilli } from '@/utils/libs';
+import { getCookieFromRequest, nanoToMilli } from '@/utils/libs';
 import Details from '@/components/Blocks/Detail';
 import { fetchData } from '@/utils/fetchData';
 import useRpc from '@/hooks/useRpc';
@@ -22,9 +22,11 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { hash },
+    req,
   }: any = context;
 
   try {
@@ -33,6 +35,9 @@ export const getServerSideProps: GetServerSideProps<{
     ]);
 
     const { statsDetails, latestBlocks } = await fetchData();
+
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     const blockInfo =
       blockInfoResult.status === 'fulfilled' ? blockInfoResult.value : null;
@@ -62,6 +67,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -74,6 +80,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -223,6 +230,7 @@ Block.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

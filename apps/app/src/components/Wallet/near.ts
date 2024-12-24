@@ -12,7 +12,7 @@ import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
 import { setupNarwallets } from '@near-wallet-selector/narwallets';
 import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet';
 import { setupNearFi } from '@near-wallet-selector/nearfi';
-import { setupNightly } from '@near-wallet-selector/nightly';
+/* import { setupNightly } from '@near-wallet-selector/nightly'; */
 import { setupRamperWallet } from '@near-wallet-selector/ramper-wallet';
 import { setupSender } from '@near-wallet-selector/sender';
 import { setupWelldoneWallet } from '@near-wallet-selector/welldone-wallet';
@@ -144,7 +144,7 @@ export class Wallet {
         setupNearMobileWallet(),
         setupMyNearWallet(),
         setupNarwallets(),
-        setupNightly(),
+        /* setupNightly(), */
         setupRamperWallet(),
         setupSender(),
         setupWelldoneWallet(),

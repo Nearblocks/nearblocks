@@ -9,6 +9,7 @@ import queryString from 'qs';
 import List from '@/components/Transactions/List';
 import Layout from '@/components/Layouts';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -20,9 +21,11 @@ export const getServerSideProps: GetServerSideProps<{
   apiUrl: string;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { ...qs },
+    req,
   }: any = context;
 
   const apiUrl = `txns`;
@@ -36,6 +39,8 @@ export const getServerSideProps: GetServerSideProps<{
     ]);
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -50,6 +55,7 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -62,6 +68,7 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl: '',
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -119,6 +126,7 @@ TransactionList.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

@@ -9,6 +9,7 @@ import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
 import Transfers from '@/components/Tokens/FTTransfers';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -20,9 +21,11 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { ...qs },
+    req,
   }: any = context;
   const apiUrl = 'fts/txns';
   const fetchUrl = `${apiUrl}?${queryString.stringify(qs)}`;
@@ -36,6 +39,8 @@ export const getServerSideProps: GetServerSideProps<{
 
     const { statsDetails, latestBlocks } = await fetchData();
 
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
       dataCountResult.status === 'fulfilled' ? dataCountResult.value : null;
@@ -52,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -65,6 +71,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -137,6 +144,7 @@ ToxenTxns.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

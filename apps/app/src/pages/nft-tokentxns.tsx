@@ -9,6 +9,7 @@ import queryString from 'qs';
 import Layout from '@/components/Layouts';
 import TransfersList from '@/components/Tokens/NFTTransfers';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -19,10 +20,12 @@ export const getServerSideProps: GetServerSideProps<{
   syncDetails: any;
   error: boolean;
   statsDetails: any;
+  signedAccountId: any;
   latestBlocks: any;
 }> = async (context) => {
   const {
     query: { ...qs },
+    req,
   }: any = context;
 
   const apiUrl = 'nfts/txns';
@@ -43,6 +46,9 @@ export const getServerSideProps: GetServerSideProps<{
 
     const { statsDetails, latestBlocks } = await fetchData();
 
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
+
     return {
       props: {
         data,
@@ -51,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -63,6 +70,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -136,6 +144,7 @@ NftToxenTxns.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

@@ -545,15 +545,18 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       thClassName: 'whitespace-nowrap',
     },
   ];
+  function getFilteredQueryParams() {
+    const requiredKeys = ['action', 'from', 'to'];
+    const query = router?.query || {};
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
+    const filteredParams = Object.fromEntries(
+      Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
+    );
+
+    return Object.keys(filteredParams).length ? filteredParams : {};
   }
 
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams();
 
   return (
     <>
