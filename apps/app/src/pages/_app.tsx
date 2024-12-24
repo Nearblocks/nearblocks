@@ -12,7 +12,7 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const [signedAccountId, setSignedAccountId] = useState('');
+  const [signedAccountId, setSignedAccountId] = useState();
   const wallet = useWallet();
   useEffect(() => {
     if (wallet) {

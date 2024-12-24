@@ -153,13 +153,18 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     setAddress('');
   };
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, keyword, query, filter, ...rest } = queryParams;
-    return rest;
+  function getFilteredQueryParams() {
+    const requiredKeys = ['method', 'from', 'to', 'block'];
+    const query = router?.query || {};
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
+    );
+
+    return Object.keys(filteredParams).length ? filteredParams : {};
   }
 
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams();
 
   const columns: any = [
     {

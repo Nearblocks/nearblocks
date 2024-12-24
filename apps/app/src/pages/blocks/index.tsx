@@ -9,6 +9,7 @@ import { appUrl } from '@/utils/config';
 import fetcher from '@/utils/fetcher';
 import queryString from 'qs';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
@@ -19,9 +20,11 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { keyword = '', filter = 'all', query = '', ...qs },
+    req,
   }: any = context;
 
   const apiUrl = 'blocks';
@@ -38,6 +41,8 @@ export const getServerSideProps: GetServerSideProps<{
     const error = dataResult.status === 'rejected';
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
@@ -47,6 +52,7 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -59,6 +65,7 @@ export const getServerSideProps: GetServerSideProps<{
         apiUrl: '',
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -119,6 +126,7 @@ Blocks.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

@@ -468,14 +468,18 @@ const NFTTransactions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
+  function getFilteredQueryParams() {
+    const requiredKeys = ['event', 'involved'];
+    const query = router?.query || {};
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
+    );
+
+    return Object.keys(filteredParams).length ? filteredParams : {};
   }
 
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams();
 
   return (
     <>
