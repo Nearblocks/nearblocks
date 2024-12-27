@@ -22,21 +22,98 @@ export const storeReceipts = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
+  let receiptData: Receipt[] = [];
+  let receiptActionsData: ActionReceiptAction[] = [];
+  let receiptInputData: ActionReceiptInputData[] = [];
+  let receiptOutputData: ActionReceiptOutputData[] = [];
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
 
   await Promise.all(
     chunks.map(async (chunk) => {
       if (chunk.receipts.length) {
-        await storeChunkReceipts(
+        const receipts = await storeChunkReceipts(
           knex,
           chunk.header.chunkHash,
           message.block.header.hash,
           message.block.header.timestampNanosec,
           chunk.receipts,
         );
+
+        receiptData = receiptData.concat(receipts.receiptData);
+        receiptActionsData = receiptActionsData.concat(
+          receipts.receiptActionsData,
+        );
+        receiptInputData = receiptInputData.concat(receipts.receiptInputData);
+        receiptOutputData = receiptOutputData.concat(
+          receipts.receiptOutputData,
+        );
       }
     }),
   );
+
+  const promises = [];
+
+  if (receiptData.length) {
+    for (let i = 0; i < receiptData.length; i += batchSize) {
+      const batch = receiptData.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('receipts')
+            .insert(batch)
+            .onConflict(['receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (receiptActionsData.length) {
+    for (let i = 0; i < receiptActionsData.length; i += batchSize) {
+      const batch = receiptActionsData.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('action_receipt_actions')
+            .insert(batch)
+            .onConflict(['receipt_id', 'index_in_action_receipt'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (receiptInputData.length) {
+    for (let i = 0; i < receiptInputData.length; i += batchSize) {
+      const batch = receiptInputData.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('action_receipt_input_data')
+            .insert(batch)
+            .onConflict(['input_data_id', 'input_to_receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (receiptOutputData.length) {
+    for (let i = 0; i < receiptOutputData.length; i += batchSize) {
+      const batch = receiptOutputData.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('action_receipt_output_data')
+            .insert(batch)
+            .onConflict(['output_data_id', 'output_from_receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  await Promise.all(promises);
 };
 
 const storeChunkReceipts = async (
@@ -142,65 +219,12 @@ const storeChunkReceipts = async (
     );
   });
 
-  const promises = [];
-
-  if (receiptData.length) {
-    promises.push(
-      retry(async () => {
-        await knex('receipts')
-          .insert(receiptData)
-          .onConflict(['receipt_id'])
-          .ignore();
-      }),
-    );
-  }
-
-  if (receiptActionsData.length) {
-    promises.push(
-      retry(async () => {
-        for (let i = 0; i < receiptActionsData.length; i += batchSize) {
-          const batch = receiptActionsData.slice(i, i + batchSize);
-
-          await knex('action_receipt_actions')
-            .insert(batch)
-            .onConflict(['receipt_id', 'index_in_action_receipt'])
-            .ignore();
-        }
-      }),
-    );
-  }
-
-  if (receiptInputData.length) {
-    promises.push(
-      retry(async () => {
-        for (let i = 0; i < receiptInputData.length; i += batchSize) {
-          const batch = receiptInputData.slice(i, i + batchSize);
-
-          await knex('action_receipt_input_data')
-            .insert(batch)
-            .onConflict(['input_data_id', 'input_to_receipt_id'])
-            .ignore();
-        }
-      }),
-    );
-  }
-
-  if (receiptOutputData.length) {
-    promises.push(
-      retry(async () => {
-        for (let i = 0; i < receiptOutputData.length; i += batchSize) {
-          const batch = receiptOutputData.slice(i, i + batchSize);
-
-          await knex('action_receipt_output_data')
-            .insert(batch)
-            .onConflict(['output_data_id', 'output_from_receipt_id'])
-            .ignore();
-        }
-      }),
-    );
-  }
-
-  await Promise.all(promises);
+  return {
+    receiptActionsData,
+    receiptData,
+    receiptInputData,
+    receiptOutputData,
+  };
 };
 
 const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {

@@ -27,7 +27,7 @@ const fetch = async (knex: Knex, block: number, limit: number) => {
   return await retry(
     async () => {
       const blocks = await knex('blocks')
-        .select('block_json')
+        .select('block_json', 'block_bytea')
         .whereBetween('block_height', [block, block + limit - 1]);
 
       return blocks;
@@ -78,9 +78,9 @@ export const streamBlock = (config: BlockStreamConfig) => {
             continue whileLoop;
           }
 
-          const results = await fetch(knex, block, concurrency);
+          const responses = await fetch(knex, block, concurrency);
 
-          if (!results.length) {
+          if (!responses.length) {
             if (concurrency !== 1) {
               throw Error('missing blocks');
             }
@@ -89,12 +89,16 @@ export const streamBlock = (config: BlockStreamConfig) => {
             continue whileLoop;
           }
 
-          for (const result of results) {
-            if (!result.block_json) {
+          for (const response of responses) {
+            if (!response.block_json && !response.block_bytea) {
               throw Error('missing block json');
             }
 
-            if (!this.push(result.block_json)) {
+            const blockData =
+              response.block_json ||
+              JSON.parse(response.block_bytea.toString());
+
+            if (!this.push(blockData)) {
               this.pause();
             }
           }
