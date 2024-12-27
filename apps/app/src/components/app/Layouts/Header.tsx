@@ -241,8 +241,6 @@ const Header = ({
     return <Link {...props} />;
   };
 
-  const dynamicClass = !showSearch && isMobile ? 'hidden' : '';
-
   useEffect(() => {
     router.refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,15 +249,23 @@ const Header = ({
   return (
     <>
       <div
-        className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
+        className="w-full sticky top-0 dark:bg-black-600 bg-white z-[9999] justify-center border-b-[1px] dark:border-gray-800"
       >
-        <div className="container-xxl w-full mx-auto flex justify-between">
+        {!syncStatus && (
+        <div className="flex flex-wrap md:flex w-full top-0">
+          <div className="flex items-center justify-center text-center w-full border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm">
+            {t('outofSync') ||
+              'This blockchain explorer is out of sync. Some blocks or transactions may be delayed.'}
+          </div>
+        </div>
+      )}
+        <div className={`${!showSearch ? 'hidden md:block' : 'px-2'} md:!flex container-xxl p-0.5 w-full mx-auto flex justify-between`}>
           <div className="hidden md:!flex md:!w-[35%] h-10">
             <div className="dark:!bg-black-600 h-full md:!pt-2 w-32 flex items-center">
               <div className="h-11 flex items-center">
                 {networkId === 'mainnet' && nearPrice ? (
-                  <div className="h-10 py-1 rounded-lg flex justify-center items-center w-52">
-                    <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1 whitespace-nowrap">
+                  <div className="h-10 py-1 rounded-lg flex justify-center items-center pl-2">
+                    <p className={`text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 whitespace-nowrap ${!showSearch ? 'px-3' : 'px-1.5'}`}>
                       NEAR Price:
                     </p>
                     <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1">
@@ -363,7 +369,7 @@ const Header = ({
             </ul>
             <span className="hidden md:!flex  relative h-full mr-2">
               <span
-                className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 `}
+                className={` flex justify-start  items-center md:justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline py-2 ${!showSearch ? 'pr-2.5' : 'pr-1'}`}
               >
                 <div
                   className="py-2 px-3 h-9 w-[38px] bg-gray-100 dark:bg-black-200 rounded cursor-pointer flex items-center"
@@ -383,19 +389,10 @@ const Header = ({
           </div>
         </div>
       </div>
-
       <header className="dark:bg-black-600 bg-white shadow-sm">
-        {!syncStatus && (
+        <div className="container-xxl w-full mx-auto md:pt-0 pt-1">
           <div className="flex flex-wrap">
-            <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
-              {t('outofSync') ||
-                'This blockchain explorer is out of sync. Some blocks or transactions may be delayed.'}
-            </div>
-          </div>
-        )}
-        <div className="container-xxl w-full mx-auto">
-          <div className="flex flex-wrap">
-            <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
+            <div className="flex items-center justify-between w-full md:!w-auto px-3">
               <div>
                 <Link
                   className="flex justify-start items-center hover:no-underline"
@@ -416,7 +413,7 @@ const Header = ({
                   />
                 </Link>
               </div>
-              <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
+              <div className="flex md:!hidden items-center justify-center ml-auto py-3 md:p-4">
                 <button
                   className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
                   onClick={toggleTheme}
@@ -586,7 +583,7 @@ const Header = ({
                       />
                     </span>
                   </li>
-                  <li>
+                  <li className='pr-1'>
                     <UserMenu
                       onSignOut={onSignOut}
                       profile={profile}

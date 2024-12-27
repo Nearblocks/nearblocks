@@ -1,4 +1,5 @@
 import Export from '@/components/app/Export';
+import { notFound } from 'next/navigation';
 
 export default async function NftTokenExportData(props: {
   searchParams: Promise<{
@@ -12,7 +13,7 @@ export default async function NftTokenExportData(props: {
 
   return (
     <div className="relative">
-      {address && <Export exportType={'tokentransactions'} id={address} />}
+      {address ? <Export exportType={'tokentransactions'} id={address} /> : notFound()}
     </div>
   );
 }
