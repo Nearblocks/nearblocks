@@ -655,7 +655,8 @@ const full = catchAsync(async (req: RequestValidator<Full>, res: Response) => {
                     WHEN status = 'SUCCESS_RECEIPT_ID'
                     OR status = 'SUCCESS_VALUE' THEN TRUE
                     ELSE FALSE
-                  END AS status
+                  END AS status,
+                  logs
                 FROM
                   execution_outcomes
                 WHERE
