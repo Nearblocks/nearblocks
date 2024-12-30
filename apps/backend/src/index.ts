@@ -25,7 +25,7 @@ const errorHandler = (error: unknown) => {
 const jobs: Bree.JobOptions[] = [
   { cron: '*/15 * * * * *', hasSeconds: true, name: 'stats' }, // every 15s
   // { cron: '1 0 * * *', name: 'daily-stats', timeout: '5s' }, // every day at 00:01:00
-  { cron: '1 0 * * *', name: 'daily-stats-new', timeout: '15s' }, // run every 30m for now
+  { cron: '1 0 * * *', name: 'daily-stats-new', timeout: '15s' }, // every day at 00:01:00
   { cron: '0 */12 * * *', name: 'circulating-supply', timeout: '30s' }, // run every 12h for now
   { cron: '* * * * *', name: 'ft-meta' }, // every minute
   { cron: '* * * * *', name: 'ft-market-data' }, // every minute
@@ -41,8 +41,8 @@ const jobs: Bree.JobOptions[] = [
   { cron: '0 0 * * *', name: 'genesis-config', timeout: '10s' }, // every day
   { cron: '0 * * * *', name: 'protocol-config', timeout: '10s' }, // every hour
   { cron: '*/10 * * * * *', hasSeconds: true, name: 'latest-block' }, // every 10s
-  { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes' }, // every 10s
-  { cron: '*/10 * * * * *', hasSeconds: true, name: 'nodes-telemetry' }, // every 10s
+  { cron: '* * * * *', name: 'nodes' }, // every minute
+  { cron: '* * * * *', name: 'nodes-telemetry' }, // every minute
   // { cron: '* * * * *', name: 'ft-meta-hex-address' }, // every minute
 ];
 
