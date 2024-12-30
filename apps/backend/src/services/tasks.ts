@@ -407,7 +407,7 @@ export const validatorsCheck = async () => {
     );
 
     if (genesisConfig && protocolConfig) {
-      const seatPrice = await validatorApi.findSeatPrice(
+      const seatPrice = validatorApi.findSeatPrice(
         validators.current_validators,
         protocolConfig.maxNumberOfSeats,
         genesisConfig.minStakeRatio,
