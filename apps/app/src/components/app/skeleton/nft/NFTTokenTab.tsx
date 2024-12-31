@@ -9,11 +9,12 @@ import TransferSkeleton from './NFTTransfers';
 
 interface Props {
   className?: string;
+  error?: boolean;
   id: string;
   tab: string;
 }
 const NFTTokenTabSkeletion = forwardRef(
-  ({ className, id, tab }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ className, error, id, tab }: Props, ref: Ref<HTMLDivElement>) => {
     const getClassName = (selected: boolean) =>
       classNames(
         'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
@@ -31,85 +32,89 @@ const NFTTokenTabSkeletion = forwardRef(
     ];
     return (
       <div className={`w-full z-50 ${className}`} ref={ref}>
-        <div className="flex items-center justify-between flex-wrap pt-4">
-          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
-            <Skeleton className="h-6" />
-          </div>{' '}
-        </div>
-        <div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mb-0.5">
-            <div className="w-full">
-              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
-                  <div className="py-.5 text-sm font-semibold">
-                    <Skeleton className="h-5 w-28" />
-                  </div>
-                </div>
-                <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
-                  <div className="flex flex-wrap py-4">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-
-                  <div className="flex flex-wrap py-5 text-sm text-gray-600">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-
-                  <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-3.5 w-28" />
-                    </div>
-                    <div className="w-full md:w-3/4 break-words">
-                      <Skeleton className="h-3.5 w-40" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="w-full">
-              <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
-                  <div className="py-.5 text-sm font-semibold">
-                    <Skeleton className="h-5 w-28" />
-                  </div>
-                </div>
-
-                <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
-                  <div className="flex flex-wrap py-4">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-
-                  <div className="flex flex-wrap py-5 text-sm text-gray-600">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-
-                  <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                      <Skeleton className="h-3.5 w-28" />
-                    </div>
-                    <div className="w-full md:w-3/4 break-words">
-                      <Skeleton className="h-3.5 w-40" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {!error && (
+          <div className="flex items-center justify-between flex-wrap pt-4">
+            <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
+              <Skeleton className="h-6" />
+            </div>{' '}
           </div>
+        )}
+        <div>
+          {!error && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mb-0.5">
+              <div className="w-full">
+                <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+                  <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
+                    <div className="py-.5 text-sm font-semibold">
+                      <Skeleton className="h-5 w-28" />
+                    </div>
+                  </div>
+                  <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
+                    <div className="flex flex-wrap py-4">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-5 w-28" />
+                      </div>
+
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+
+                    <div className="flex flex-wrap py-5 text-sm text-gray-600">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-5 w-28" />
+                      </div>
+
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+
+                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-3.5 w-28" />
+                      </div>
+                      <div className="w-full md:w-3/4 break-words">
+                        <Skeleton className="h-3.5 w-40" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-full">
+                <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+                  <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
+                    <div className="py-.5 text-sm font-semibold">
+                      <Skeleton className="h-5 w-28" />
+                    </div>
+                  </div>
+
+                  <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
+                    <div className="flex flex-wrap py-4">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-5 w-28" />
+                      </div>
+
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+
+                    <div className="flex flex-wrap py-5 text-sm text-gray-600">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-5 w-28" />
+                      </div>
+
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+
+                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
+                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                        <Skeleton className="h-3.5 w-28" />
+                      </div>
+                      <div className="w-full md:w-3/4 break-words">
+                        <Skeleton className="h-3.5 w-40" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="py-6"></div>
           <div className="block lg:flex lg:space-x-2 mb-4 sm:mt-0 -mt-0.5">
             <div className="w-full">
@@ -134,9 +139,15 @@ const NFTTokenTabSkeletion = forwardRef(
                 <div
                   className={`bg-white dark:bg-black-600 border soft-shadow rounded-xl overflow-hidden`}
                 >
-                  {tab === 'transfers' ? <TransferSkeleton /> : null}
-                  {tab === 'holders' ? <TransferSkeleton /> : null}
-                  {tab === 'inventory' ? <InventorySkeleton /> : null}
+                  {tab === 'transfers' ? (
+                    <TransferSkeleton error={error} />
+                  ) : null}
+                  {tab === 'holders' ? (
+                    <TransferSkeleton error={error} />
+                  ) : null}
+                  {tab === 'inventory' ? (
+                    <InventorySkeleton error={error} />
+                  ) : null}
                 </div>
               </div>
             </div>

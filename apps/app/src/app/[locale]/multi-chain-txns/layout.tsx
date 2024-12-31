@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import MultiChainSkeleton from '@/components/app/skeleton/Multichain/multiChainSkeleton';
 import { appUrl } from '@/utils/app/config';
@@ -68,7 +69,9 @@ export default async function TokensLayout(props: {
       <div className="container-xxl mx-auto px-5">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
-            <Suspense fallback={<MultiChainSkeleton />}>{children}</Suspense>
+            <ErrorBoundary fallback={<MultiChainSkeleton error />}>
+              <Suspense fallback={<MultiChainSkeleton />}>{children}</Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </div>

@@ -1,14 +1,17 @@
 import { getTranslations } from 'next-intl/server';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { getRequest } from '@/utils/app/api';
 
-import Banner from './Banner';
+import Banner from '../Banner';
+import ErrorMessage from '../common/ErrorMessage';
 // import Banner from './Banner';
-import LatestBlocks from './Blocks/Latest';
-import Search from './common/Search';
-import SponserdText from './SponserdText';
-import LatestTransactions from './Transactions/Latest';
-import Overview from './Transactions/Overview';
+import Search from '../common/Search';
+import FaInbox from '../Icons/FaInbox';
+import SponserdText from '../SponserdText';
+import HomeLatestBlocks from './LatestBlocks';
+import HomeLatestTxns from './LatestTxns';
+import HomeOverview from './Overview';
 
 export default async function Home({
   locale,
@@ -18,14 +21,6 @@ export default async function Home({
   theme: string;
 }) {
   const t = await getTranslations({ locale });
-  const statsDetails = await getRequest('stats', {});
-  const blockDetails = await getRequest('blocks/latest');
-  const txnsDetails = await getRequest('txns/latest');
-  const charts = await getRequest('charts/latest');
-
-  const stats = statsDetails?.stats?.[0];
-  const blocks = blockDetails?.blocks || [];
-  const txns = txnsDetails?.txns || [];
 
   const handleFilterAndKeyword = async (
     keyword: string,
@@ -80,6 +75,15 @@ export default async function Home({
 
     return returnPath ? null : data;
   };
+
+  const errorBoundaryFallback = (
+    <ErrorMessage
+      icons={<FaInbox />}
+      message={''}
+      mutedText="Please try again later"
+      reset
+    />
+  );
   return (
     <div>
       <div className="flex items-center justify-center bg-hero-pattern dark:bg-hero-pattern-dark">
@@ -103,14 +107,19 @@ export default async function Home({
           </div>
         </div>
       </div>
-      <div className="relative -mt-14 ">
-        <Overview
-          chartsDetails={charts}
-          error={!stats}
-          stats={stats}
-          theme={theme}
-        />
-      </div>
+      <ErrorBoundary
+        fallback={
+          <div className="relative -mt-14 ">
+            <div className="container-xxl mx-auto px-5">
+              <div className="h-56 flex justify-center items-center bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
+                {errorBoundaryFallback}
+              </div>
+            </div>
+          </div>
+        }
+      >
+        <HomeOverview theme={theme} />
+      </ErrorBoundary>
       <div className="py-8">
         <div className="lg:!hidden block container mx-auto px-3">
           <Banner type="center" />
@@ -124,9 +133,9 @@ export default async function Home({
                 <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   {t('homePage.latestBlocks')}
                 </h2>
-                <div className="relative">
-                  <LatestBlocks blocks={blocks} error={!blocks} />
-                </div>
+                <ErrorBoundary fallback={errorBoundaryFallback}>
+                  <HomeLatestBlocks />
+                </ErrorBoundary>
               </div>
             </div>
             <div className="h-full  w-full">
@@ -134,9 +143,9 @@ export default async function Home({
                 <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   {t('homePage.latestTxns')}
                 </h2>
-                <div className="relative">
-                  <LatestTransactions error={!txns} txns={txns} />
-                </div>
+                <ErrorBoundary fallback={errorBoundaryFallback}>
+                  <HomeLatestTxns />
+                </ErrorBoundary>
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
 import { Suspense } from 'react';
 
-import Home from '@/components/app/Home';
+import Home from '@/components/app/Home/Home';
 import HomePageSkeleton from '@/components/app/skeleton/home/Home';
 import { appUrl } from '@/utils/app/config';
 

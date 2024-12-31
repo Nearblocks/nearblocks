@@ -5,12 +5,22 @@ import { Link } from '@/i18n/routing';
 export const Content = () => {
   return (
     <>
-      <div className="text-center text-black dark:text-neargray-10 text-2xl pt-10 top-4">
-        Sorry! We encountered an unexpected error.
+      <div className="text-center text-black dark:text-neargray-10 mt-4">
+        The requested URL was not found on this server.
       </div>
-      <div className="flex justify-center pt-12 z-10">
+
+      <div className="text-center text-black dark:text-neargray-10 mt-2">
+        If you think this is a problem,{' '}
         <Link
-          className="bg-button hover:bg-blue-500 text-white text-xs py-2 rounded focus:outline-none text-center px-3 w-auto"
+          className="text-green-100 hover:text-green-200 underline"
+          href="/contact"
+        >
+          please tell us
+        </Link>
+      </div>
+      <div className="flex justify-center pt-8 z-10">
+        <Link
+          className="bg-green-500 dark:bg-green-250 hover:bg-green-200 text-white text-xs py-2 rounded focus:outline-none text-center px-3 w-auto"
           href="/"
         >
           Go back home
@@ -28,9 +38,9 @@ const Error = () => {
           <title>NearBlocks - Page not Found </title>
         </Head>
         <div className="errorContainer flex flex-col items-center justify-center">
-          <div className="px-3 pt-12 errorContent absolute flex flex-col justify-center">
-            <div className="text-center text-black dark:text-neargray-10 text-8xl pt-20 font-semibold">
-              404
+          <div className="px-3  errorContent absolute flex flex-col justify-center">
+            <div className="text-center text-black dark:text-neargray-10 text-3xl pt-20 font-semibold">
+              Page not found
             </div>
             {<Content />}
           </div>

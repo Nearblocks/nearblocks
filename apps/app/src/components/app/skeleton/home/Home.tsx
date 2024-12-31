@@ -6,7 +6,13 @@ import Search from '../../common/Search';
 import Latest from './Latest';
 import HomeOverview from './Overview';
 
-const HomePageSkeleton = ({ theme }: { theme: string }) => {
+const HomePageSkeleton = ({
+  error,
+  theme,
+}: {
+  error?: boolean;
+  theme: string;
+}) => {
   const t = useTranslations();
 
   return (
@@ -43,7 +49,7 @@ const HomePageSkeleton = ({ theme }: { theme: string }) => {
                   {t('homePage.latestBlocks')}
                 </h2>
                 <div className="relative">
-                  <Latest />
+                  <Latest error={error} />
                 </div>
               </div>
             </div>
@@ -53,7 +59,7 @@ const HomePageSkeleton = ({ theme }: { theme: string }) => {
                   {t('homePage.latestTxns')}
                 </h2>
                 <div className="relative">
-                  <Latest />
+                  <Latest error={error} />
                 </div>
               </div>
             </div>

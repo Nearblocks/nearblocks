@@ -1,9 +1,16 @@
+'use client';
+
+import { useErrorBoundary } from 'react-error-boundary';
+
 interface Props {
   icons: any | SVGElement;
   message: string;
   mutedText: string;
+  reset?: any;
 }
-const ErrorMessage = ({ icons, message, mutedText }: Props) => {
+const ErrorMessage = ({ icons, message, mutedText, reset }: Props) => {
+  const { resetBoundary } = useErrorBoundary();
+
   return (
     <div className="text-center py-24">
       <div className="mb-4 flex justify-center">
@@ -17,6 +24,15 @@ const ErrorMessage = ({ icons, message, mutedText }: Props) => {
       </h3>
 
       <p className="mb-0 py-1 font-bold break-words px-2">{mutedText}</p>
+
+      {reset && (
+        <button
+          className="mx-3 px-3 mr-1 bg-green dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white"
+          onClick={() => resetBoundary()}
+        >
+          Retry
+        </button>
+      )}
     </div>
   );
 };

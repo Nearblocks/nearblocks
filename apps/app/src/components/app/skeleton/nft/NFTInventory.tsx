@@ -1,36 +1,49 @@
 import React from 'react';
 
+import ErrorMessage from '../../common/ErrorMessage';
+import FaInbox from '../../Icons/FaInbox';
 import Skeleton from '../common/Skeleton';
 
-export default function InventorySkeleton() {
+export default function InventorySkeleton({ error }: { error?: boolean }) {
   return (
     <>
       <div className="pl-6 max-w-lg w-full py-5 ">
-        <Skeleton className="h-4" />
+        {!error ? <Skeleton className=" h-4" /> : ''}
       </div>
-      <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
-        {[...Array(24)].map((_, i) => (
-          <div
-            className="max-w-full border rounded p-3 mx-auto md:mx-0"
-            key={i}
-          >
-            <a
-              className="flex items-center justify-center m-auto overflow-hidden"
-              href="#"
+      {!error ? (
+        <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
+          {[...Array(24)].map((_, i) => (
+            <div
+              className="max-w-full border rounded p-3 mx-auto md:mx-0"
+              key={i}
             >
-              <div className="w-40 h-40 ">
-                <Skeleton className="h-40" />
+              <a
+                className="flex items-center justify-center m-auto overflow-hidden"
+                href="#"
+              >
+                <div className="w-40 h-40 ">
+                  <Skeleton className="h-40" />
+                </div>
+              </a>
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
+                <Skeleton className="h-4" />
               </div>
-            </a>
-            <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
-              <Skeleton className="h-4" />
+              <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
+                <Skeleton className="h-4" />
+              </div>
             </div>
-            <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
-              <Skeleton className="h-4" />
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="w-full">
+          <ErrorMessage
+            icons={<FaInbox />}
+            message={''}
+            mutedText="Please try again later"
+            reset
+          />
+        </div>
+      )}
     </>
   );
 }

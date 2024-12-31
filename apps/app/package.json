@@ -68,6 +68,7 @@
     "qs": "^6.12.3",
     "react": "19.0.0-rc.1",
     "react-dom": "19.0.0-rc.1",
+    "react-error-boundary": "^5.0.0",
     "react-icons": "^5.4.0",
     "react-perfect-scrollbar": "^1.5.8",
     "react-singleton-hook": "4.0.1",
