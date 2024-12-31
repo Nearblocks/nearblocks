@@ -24,4 +24,16 @@ const knex: Knex = createKnex({
   pool: { max: 10, min: 1 },
 });
 
+const userKnex: Knex = createKnex({
+  client: 'pg',
+  connection: {
+    application_name: 'userdb',
+    connectionString: config.userdbUrl,
+    ssl: ssl?.ca ? ssl : false,
+  },
+  pool: { max: 10, min: 1 },
+});
+
+export { userKnex };
+
 export default knex;

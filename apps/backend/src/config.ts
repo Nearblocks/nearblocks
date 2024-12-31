@@ -15,6 +15,11 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  RATELIMITER_REDIS_PASSWORD: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_NAME: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_PASSWORD: str({ default: '' }),
+  RATELIMITER_REDIS_SENTINEL_URLS: str({ default: '' }),
+  RATELIMITER_REDIS_URL: url({ default: '' }),
   REDIS_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_NAME: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
@@ -22,6 +27,7 @@ const env = cleanEnv(process.env, {
   RPC_URL: str(),
   RPC_URL2: str(),
   SENTRY_DSN: str({ default: '' }),
+  USER_DB_URL: str({ default: '' }),
 });
 
 const genesisHeight = env.NETWORK === Network.MAINNET ? 9820210 : 42376888;
@@ -40,6 +46,11 @@ const config: Config = {
   genesisHeight,
   lcwApiKey: env.LIVECOINWATCH_API_KEY,
   network: env.NETWORK,
+  ratelimiterRedisPassword: env.RATELIMITER_REDIS_PASSWORD,
+  ratelimiterRedisSentinelName: env.RATELIMITER_REDIS_SENTINEL_NAME,
+  ratelimiterRedisSentinelPassword: env.RATELIMITER_REDIS_SENTINEL_PASSWORD,
+  ratelimiterRedisSentinelUrls: env.RATELIMITER_REDIS_SENTINEL_URLS,
+  ratelimiterRedisUrl: env.RATELIMITER_REDIS_URL,
   redisPassword: env.REDIS_PASSWORD,
   redisSentinelName: env.REDIS_SENTINEL_NAME,
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
@@ -47,6 +58,7 @@ const config: Config = {
   rpcUrl: env.RPC_URL,
   rpcUrl2: env.RPC_URL2,
   sentryDsn,
+  userdbUrl: env.USER_DB_URL,
 };
 
 export default config;

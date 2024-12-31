@@ -44,6 +44,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '* * * * *', name: 'nodes' }, // every minute
   { cron: '* * * * *', name: 'nodes-telemetry' }, // every minute
   // { cron: '* * * * *', name: 'ft-meta-hex-address' }, // every minute
+  { cron: '0 0 * * *', name: 'transfer-usage-to-db', timeout: '60s' }, // Runs daily at midnight
 ];
 
 const bree = new Bree({ errorHandler, jobs, logger, root });
