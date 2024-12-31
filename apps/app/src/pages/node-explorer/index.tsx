@@ -9,9 +9,7 @@ import fetcher from '@/utils/fetcher';
 import NodeList from '@/components/NodeExplorer/NodeList';
 import dynamic from 'next/dynamic';
 import { useRpcStore } from '@/stores/rpc';
-import { RpcProviders } from '@/utils/rpc';
 import { useRouter } from 'next/router';
-import { getCookieFromRequest } from '@/utils/libs';
 import { fetchData } from '@/utils/fetchData';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -27,12 +25,9 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context) => {
   const {
     query: { ...qs },
-    req,
   }: any = context;
 
-  const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
-
-  const fetchUrl = `validators?${queryString.stringify(qs)}&rpc=${rpcUrl}`;
+  const fetchUrl = `validators?${queryString.stringify(qs)}`;
   try {
     const [dataResult] = await Promise.allSettled([fetcher(fetchUrl)]);
 

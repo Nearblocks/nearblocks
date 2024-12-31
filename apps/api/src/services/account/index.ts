@@ -101,12 +101,11 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
 const contract = catchAsync(
   async (req: RequestValidator<Contract>, res: Response) => {
     const account = req.validator.data.account;
-    const rpc = req.validator.data.rpc;
-    const provider = getProvider(rpc);
+    const provider = getProvider();
 
     const [contract, key] = await Promise.all([
       redis.cache(
-        `contract:${account}:${rpc}`,
+        `contract:${account}`,
         async () => {
           try {
             return await viewCode(provider, account);
@@ -117,7 +116,7 @@ const contract = catchAsync(
         EXPIRY * 5, // 5 mins
       ),
       redis.cache(
-        `contract:${account}:keys:${rpc}`,
+        `contract:${account}:keys`,
         async () => viewAccessKeys(provider, account),
         EXPIRY * 5, // 5 mins
       ),
@@ -139,17 +138,16 @@ const parse = catchAsync(
     let contract = null;
     let schema = null;
     const account = req.validator.data.account;
-    const rpc = req.validator.data.rpc;
-    const provider = getProvider(rpc);
+    const provider = getProvider();
 
     [contract, schema] = await Promise.all([
       redis.cache(
-        `contract:${account}:${rpc}`,
+        `contract:${account}`,
         async () => {
           try {
             const code: QueryResponseKind & { code_base64?: string } =
               await redis.cache(
-                `contract:${account}:${rpc}`,
+                `contract:${account}`,
                 async () => viewCode(provider, account),
                 EXPIRY * 5, // 5 mins
               );
@@ -166,7 +164,7 @@ const parse = catchAsync(
         EXPIRY * 5, // 5 mins
       ),
       redis.cache(
-        `contract:${account}:abi:${rpc}`,
+        `contract:${account}:abi`,
         async () => {
           try {
             return await abiSchema(provider, account);
