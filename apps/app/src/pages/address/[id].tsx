@@ -35,8 +35,6 @@ import ListCheck from '@/components/Icons/ListCheck';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import { useRpcStore } from '@/stores/rpc';
 import dynamic from 'next/dynamic';
-import { getCookieFromRequest } from '@/utils/libs';
-import { RpcProviders } from '@/utils/rpc';
 import { fetchData } from '@/utils/fetchData';
 import Receipts from '@/components/Address/Receipts';
 import MultiChainTxns from '@/components/Address/MultiChainTxns';
@@ -83,7 +81,6 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...qs },
-    req,
   }: {
     query: {
       id?: string;
@@ -96,14 +93,13 @@ export const getServerSideProps: GetServerSideProps<{
   } = context;
 
   const address = id.toLowerCase();
-  const rpcUrl = getCookieFromRequest('rpcUrl', req) || RpcProviders?.[0]?.url;
 
   const commonApiUrls = {
-    account: id && `account/${address}?rpc=${rpcUrl}`,
-    deployments: id && `account/${address}/contract/deployments?rpc=${rpcUrl}`,
+    account: id && `account/${address}`,
+    deployments: id && `account/${address}/contract/deployments`,
     fts: id && `fts/${address}`,
     nfts: id && `nfts/${address}`,
-    parse: id && `account/${address}/contract/parse?rpc=${rpcUrl}`,
+    parse: id && `account/${address}/contract/parse`,
     inventory: id && `account/${address}/inventory`,
     multiChainAccounts:
       id && `chain-abstraction/${address}/multi-chain-accounts`,
