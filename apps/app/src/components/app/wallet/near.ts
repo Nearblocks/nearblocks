@@ -83,7 +83,7 @@ export class Wallet {
     const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
 
     // Retrieve account state from the network
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
     const keys: any = await provider.query({
       account_id: accountId,
       finality: 'final',
@@ -107,7 +107,7 @@ export class Wallet {
   };
 
   networkId: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   selector: any; // Make sure this is initialized later
 
   /**
@@ -115,7 +115,7 @@ export class Wallet {
    * @param {Object[]} transactions - the transactions to sign and send
    * @returns {Promise<Transaction[]>} - the resulting transactions
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   signAndSendTransactions = async ({ transactions }: any) => {
     const selectedWallet = await (await this.selector).wallet();
     return selectedWallet.signAndSendTransactions({ transactions });
@@ -157,7 +157,7 @@ export class Wallet {
    * @param {Function} accountChangeHook - a function that is called when the user signs in or out
    * @returns {Promise<string>} - the accountId of the signed-in user
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   startUp = async (accountChangeHook: (arg0: any) => void) => {
     // Initialize the wallet selector
     this.selector = setupWalletSelector({
@@ -199,7 +199,7 @@ export class Wallet {
       : '';
 
     walletSelector.store.observable.subscribe(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line
       async (state: { accounts: any[] }) => {
         const signedAccount = state?.accounts.find((account) => account.active)
           ?.accountId;
@@ -229,7 +229,7 @@ export class Wallet {
   }) => {
     const url = `https://rpc.${this.networkId}.near.org`;
     const provider = new providers.JsonRpcProvider({ url });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
     const res: any = await provider.query({
       account_id: contractId,
       args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
