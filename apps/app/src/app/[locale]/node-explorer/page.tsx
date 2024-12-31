@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import NodeList from '@/components/app/NodeExplorer/NodeList';
 import ExplorerIndex from '@/components/app/skeleton/node-explorer/Index';
@@ -16,9 +17,11 @@ export default async function NodeExplorer(props: any) {
       </div>
       <div className="container-xxl mx-auto px-5 -mt-48">
         <div className="relative">
-          <Suspense fallback={<ExplorerIndex />}>
-            <NodeList searchParams={searchParams} />
-          </Suspense>
+          <ErrorBoundary fallback={<ExplorerIndex error reset />}>
+            <Suspense fallback={<ExplorerIndex />}>
+              <NodeList searchParams={searchParams} />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </>

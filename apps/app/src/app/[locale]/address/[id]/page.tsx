@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
 import Balance from '@/components/app/Address/Balance';
@@ -40,9 +41,11 @@ export default async function AddressIndex(props: {
 
       <div className="py-3"></div>
 
-      <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
-        <AccountTabs id={id} parse={parse} searchParams={searchParams} />
-      </Suspense>
+      <ErrorBoundary fallback={<TabSkeletion error reset />}>
+        <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
+          <AccountTabs id={id} parse={parse} searchParams={searchParams} />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }

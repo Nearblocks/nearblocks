@@ -1,9 +1,12 @@
 import { cookies } from 'next/headers';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { getRequest } from '@/utils/app/api';
 import { RpcProviders } from '@/utils/app/rpc';
 import { SpamToken } from '@/utils/types';
 
+import ErrorMessage from '../common/ErrorMessage';
+import FaInbox from '../Icons/FaInbox';
 import AccountAlerts from './AccountAlerts';
 import AccountMoreInfo from './AccountMoreInfo';
 import AccountOverview from './AccountOverview';
@@ -41,28 +44,48 @@ export default async function Balance({ id }: { id: string }) {
       return null;
     });
 
+  const errorBoundaryFallback = (
+    <div className="w-full">
+      <div className="bg-white soft-shadow rounded-xl dark:bg-black-600">
+        <ErrorMessage
+          icons={<FaInbox />}
+          message={''}
+          mutedText="Please try again later"
+          reset
+        />
+      </div>
+    </div>
+  );
   return (
     <>
       <AccountAlerts accountData={accountData} id={id} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AccountOverview
-          accountData={accountData?.account?.[0]}
-          id={id}
-          inventoryData={inventoryData?.inventory}
-          spamTokens={spamList}
-          statsData={statsData?.stats?.[0]}
-          tokenData={tokenDetails?.contracts?.[0]}
-        />
-        <AccountMoreInfo
-          accountData={accountData?.account?.[0]}
-          deploymentData={deploymentData?.deployments?.[0]}
-          id={id}
-          nftTokenData={nftTokenData?.contracts?.[0]}
-          tokenData={tokenDetails?.contracts?.[0]}
-        />
-        <MultichainInfo
-          multiChainAccounts={multiChainAccountsData?.multiChainAccounts}
-        />
+        <ErrorBoundary fallback={errorBoundaryFallback}>
+          <AccountOverview
+            accountData={accountData?.account?.[0]}
+            id={id}
+            inventoryData={inventoryData?.inventory}
+            spamTokens={spamList}
+            statsData={statsData?.stats?.[0]}
+            tokenData={tokenDetails?.contracts?.[0]}
+          />
+        </ErrorBoundary>
+
+        <ErrorBoundary fallback={errorBoundaryFallback}>
+          <AccountMoreInfo
+            accountData={accountData?.account?.[0]}
+            deploymentData={deploymentData?.deployments?.[0]}
+            id={id}
+            nftTokenData={nftTokenData?.contracts?.[0]}
+            tokenData={tokenDetails?.contracts?.[0]}
+          />
+        </ErrorBoundary>
+
+        <ErrorBoundary fallback={errorBoundaryFallback}>
+          <MultichainInfo
+            multiChainAccounts={multiChainAccountsData?.multiChainAccounts}
+          />
+        </ErrorBoundary>
       </div>
     </>
   );

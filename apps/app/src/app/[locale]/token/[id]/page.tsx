@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import TokenTabSkeleton from '@/components/app/skeleton/ft/TokenTabSkeleton';
 import Overview from '@/components/app/Tokens/FT/Overview';
@@ -19,9 +20,11 @@ export default async function TokenIndex(props: {
   const { id } = params;
 
   return (
-    <Suspense fallback={<TokenTabSkeleton />}>
-      <Overview id={id} searchParams={searchParams} />
-      <TokenTabs id={id} searchParams={searchParams} />
-    </Suspense>
+    <ErrorBoundary fallback={<TokenTabSkeleton error />}>
+      <Suspense fallback={<TokenTabSkeleton />}>
+        <Overview id={id} searchParams={searchParams} />
+        <TokenTabs id={id} searchParams={searchParams} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

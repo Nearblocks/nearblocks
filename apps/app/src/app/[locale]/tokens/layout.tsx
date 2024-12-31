@@ -1,7 +1,10 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
 import TokensSkeleton from '@/components/app/skeleton/ft/Tokens';
 import { appUrl } from '@/utils/app/config';
 
@@ -41,6 +44,33 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const errorBoundaryFallback = (
+  <div className="overflow-x-auto">
+    <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
+      <div className="pl-6 max-w-lg w-full py-5 ">
+        <div className="pl-6 max-w-sm leading-7 h-4" />
+      </div>
+      <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+        <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
+          <tr className="h-[57px]">
+            <td
+              className="px-6 py-4 text-gray-400 text-xs rounded-b-xl"
+              colSpan={100}
+            >
+              <ErrorMessage
+                icons={<FaInbox />}
+                message={''}
+                mutedText="Please try again later"
+                reset
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
 export default async function TokensLayout({
   children,
 }: {
@@ -59,7 +89,9 @@ export default async function TokensLayout({
         <div className="container-xxl mx-auto px-5 -mt-48 ">
           <div className="relative block lg:flex lg:space-x-2">
             <div className="w-full ">
-              <Suspense fallback={<TokensSkeleton />}>{children}</Suspense>
+              <ErrorBoundary fallback={errorBoundaryFallback}>
+                <Suspense fallback={<TokensSkeleton />}>{children}</Suspense>
+              </ErrorBoundary>
             </div>
           </div>
         </div>

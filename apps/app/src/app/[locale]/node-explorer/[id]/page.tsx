@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import Buttons from '@/components/app/common/Button';
 import Delegators from '@/components/app/NodeExplorer/Delegators';
@@ -42,9 +43,11 @@ export default async function Delegator(props: {
         )}
       </div>
       <div>
-        <Suspense fallback={<DelegatorSkeleton />}>
-          <Delegators accountId={id} theme={theme} />
-        </Suspense>
+        <ErrorBoundary fallback={<DelegatorSkeleton error reset />}>
+          <Suspense fallback={<DelegatorSkeleton />}>
+            <Delegators accountId={id} theme={theme} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </div>
   );
