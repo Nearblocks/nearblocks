@@ -1,5 +1,6 @@
 'use client';
 import classNames from 'classnames';
+import { isEmpty } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -14,7 +15,12 @@ import {
   calculateTotalGas,
   txnFee,
 } from '@/utils/near';
-import { ExecutionOutcomeWithIdView } from '@/utils/types';
+import { mapRpcActionToAction } from '@/utils/near';
+import {
+  ExecutionOutcomeWithIdView,
+  ReceiptsPropsInfo,
+  RPCTransactionInfo,
+} from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
@@ -41,9 +47,93 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
   const router = useRouter();
   const pathname = usePathname();
 
+  const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
+  const lastBlockHash = useRef<null | string>(null);
+  const [block, setBlock] = useState<{ height: string }>({ height: '' });
+
+  useEffect(() => {
+    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
+      lastBlockHash.current = receipt.block_hash;
+
+      getBlockDetails(receipt?.block_hash)
+        .then((resp: any) => {
+          setBlock(resp?.header);
+        })
+        .catch(() => {});
+    }
+  }, [receipt?.block_hash, getBlockDetails]);
+
+  function transactionReceipts(txn: RPCTransactionInfo) {
+    const actions: any =
+      txn?.transaction?.actions &&
+      txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
+    const receipts = txn?.receipts;
+    const receiptsOutcome = txn?.receipts_outcome;
+
+    if (
+      receipts?.length === 0 ||
+      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
+    ) {
+      receipts?.unshift({
+        predecessor_id: txn?.transaction?.signer_id,
+        receipt: actions,
+        receipt_id: receiptsOutcome[0]?.id,
+        receiver_id: txn?.transaction?.receiver_id,
+      });
+    }
+
+    const receiptOutcomesByIdMap = new Map();
+    const receiptsByIdMap = new Map();
+
+    receiptsOutcome &&
+      receiptsOutcome?.forEach((receipt) => {
+        receiptOutcomesByIdMap?.set(receipt?.id, receipt);
+      });
+
+    receipts &&
+      receipts?.forEach((receiptItem) => {
+        receiptsByIdMap?.set(receiptItem?.receipt_id, {
+          ...receiptItem,
+          actions:
+            receiptItem?.receipt_id === receiptsOutcome[0]?.id
+              ? actions
+              : receiptItem?.receipt?.Action?.actions &&
+                receiptItem?.receipt?.Action?.actions.map((receipt) =>
+                  mapRpcActionToAction(receipt),
+                ),
+        });
+      });
+
+    const collectReceipts = (receiptHash: any) => {
+      const receipt = receiptsByIdMap?.get(receiptHash);
+      const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
+
+      return {
+        ...receipt,
+        ...receiptOutcome,
+        outcome: {
+          ...receiptOutcome?.outcome,
+          outgoing_receipts:
+            receiptOutcome?.outcome?.receipt_ids &&
+            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
+        },
+      };
+    };
+
+    return collectReceipts(receiptsOutcome[0]?.id);
+  }
+
+  useEffect(() => {
+    if (!isEmpty(rpcTxn)) {
+      setReceipt(transactionReceipts(rpcTxn));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcTxn]);
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
     const { RpcProviders } = useRpcProvider();
+
     useEffect(() => {
       if (!initializedRef.current) {
         initializedRef.current = true;
@@ -244,7 +334,9 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                 )}
                 {tab === 'execution' && (
                   <Receipt
+                    block={block}
                     hash={hash}
+                    receipt={receipt}
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}

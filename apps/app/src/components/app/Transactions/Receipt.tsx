@@ -1,9 +1,7 @@
 'use client';
-import { isEmpty } from 'lodash';
-import { useEffect, useState } from 'react';
 
-import { mapRpcActionToAction } from '@/utils/near';
 import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ReceiptsPropsInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import FaHourglassStart from '../Icons/FaHourglassStart';
@@ -11,7 +9,9 @@ import FileSlash from '../Icons/FileSlash';
 import ReceiptRow from './Receipts/ReceiptRow';
 
 interface Props {
+  block: { height: string };
   hash: string;
+  receipt: null | ReceiptsPropsInfo;
   rpcTxn: RPCTransactionInfo;
   statsData: {
     stats: Array<{
@@ -22,77 +22,8 @@ interface Props {
 }
 
 const Receipt = (props: Props) => {
-  const { hash, rpcTxn, statsData, txn } = props;
+  const { block, hash, receipt, statsData, txn } = props;
 
-  const [receipt, setReceipt] = useState(null);
-
-  function transactionReceipts(txn: RPCTransactionInfo) {
-    const actions: any =
-      txn?.transaction?.actions &&
-      txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
-    const receipts = txn?.receipts;
-    const receiptsOutcome = txn?.receipts_outcome;
-
-    if (
-      receipts?.length === 0 ||
-      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
-    ) {
-      receipts?.unshift({
-        predecessor_id: txn?.transaction?.signer_id,
-        receipt: actions,
-        receipt_id: receiptsOutcome[0]?.id,
-        receiver_id: txn?.transaction?.receiver_id,
-      });
-    }
-
-    const receiptOutcomesByIdMap = new Map();
-    const receiptsByIdMap = new Map();
-
-    receiptsOutcome &&
-      receiptsOutcome?.forEach((receipt) => {
-        receiptOutcomesByIdMap?.set(receipt?.id, receipt);
-      });
-
-    receipts &&
-      receipts?.forEach((receiptItem) => {
-        receiptsByIdMap?.set(receiptItem?.receipt_id, {
-          ...receiptItem,
-          actions:
-            receiptItem?.receipt_id === receiptsOutcome[0]?.id
-              ? actions
-              : receiptItem?.receipt?.Action?.actions &&
-                receiptItem?.receipt?.Action?.actions.map((receipt) =>
-                  mapRpcActionToAction(receipt),
-                ),
-        });
-      });
-
-    const collectReceipts = (receiptHash: any) => {
-      const receipt = receiptsByIdMap?.get(receiptHash);
-      const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
-
-      return {
-        ...receipt,
-        ...receiptOutcome,
-        outcome: {
-          ...receiptOutcome?.outcome,
-          outgoing_receipts:
-            receiptOutcome?.outcome?.receipt_ids &&
-            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
-        },
-      };
-    };
-
-    return collectReceipts(receiptsOutcome[0]?.id);
-  }
-
-  useEffect(() => {
-    if (!isEmpty(rpcTxn)) {
-      setReceipt(transactionReceipts(rpcTxn));
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcTxn]);
   const txnsPending = txn?.outcomes?.status === null;
 
   return (
@@ -123,7 +54,7 @@ const Receipt = (props: Props) => {
               </div>
             </div>
           ) : (
-            <ReceiptRow receipt={receipt} statsData={statsData} />
+            <ReceiptRow block={block} receipt={receipt} statsData={statsData} />
           )}
         </div>
       )}
