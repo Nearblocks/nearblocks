@@ -232,7 +232,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
           .map((log: any) => {
             if (typeof log === 'string') {
               try {
-                const parsed = JSON.parse(log);
+                const parsed = JSON.parse(atob(log));
                 return JSON.stringify(parsed, null, 2);
               } catch (error) {
                 return `${log}`;
@@ -300,7 +300,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
               <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
                 {receipt?.outcome?.logs?.length > 0 ? (
                   <div className="relative w-full">
-                    <div className="absolute top-2 mt-1 mr-4 right-2 flex">
+                    <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                       <button
                         onClick={() => setViewMode('auto')}
                         className={`px-3 py-1 rounded-l-lg text-sm ${

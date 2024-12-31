@@ -26,7 +26,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
     for (const key in obj) {
       if (typeof obj[key] === 'string') {
         try {
-          result[key] = JSON.parse(obj[key]);
+          result[key] = JSON.parse(atob(obj[key]));
         } catch {
           result[key] = obj[key];
         }
@@ -101,7 +101,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
       ) : (
         <>
           <div className="relative w-full pt-1">
-            <div className="absolute top-2 mt-1 mr-4 right-2 flex">
+            <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
               <button
                 onClick={() => setViewMode('auto')}
                 className={`px-3 py-1 rounded-l-lg text-sm ${

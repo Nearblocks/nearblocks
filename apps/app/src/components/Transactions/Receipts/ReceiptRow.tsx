@@ -117,7 +117,7 @@ const ReceiptRow = (props: Props) => {
           .map((log: any) => {
             if (typeof log === 'string') {
               try {
-                const parsed = JSON.parse(log);
+                const parsed = JSON.parse(atob(log));
                 return JSON.stringify(parsed, null, 2);
               } catch (error) {
                 return `${log}`;
@@ -462,7 +462,7 @@ const ReceiptRow = (props: Props) => {
             <div className="w-full md:w-3/4 break-words space-y-4">
               {receipt && receipt?.outcome?.logs?.length > 0 ? (
                 <div className="relative w-full pt-1">
-                  <div className="absolute top-2 mt-1 mr-4 right-2 hidden sm:!flex">
+                  <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                     <button
                       onClick={() => setViewMode('auto')}
                       className={`px-3 py-1 rounded-l-lg text-sm ${
@@ -500,28 +500,6 @@ const ReceiptRow = (props: Props) => {
                     }`}
                   >
                     {receiptLog}
-                    <div className="mt-4 right-2 flex sm:!hidden">
-                      <button
-                        onClick={() => setViewMode('auto')}
-                        className={`px-3 py-1 rounded-l-lg text-sm ${
-                          viewMode === 'auto'
-                            ? 'bg-gray-500 text-white'
-                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                        }`}
-                      >
-                        Auto
-                      </button>
-                      <button
-                        onClick={() => setViewMode('raw')}
-                        className={`px-3 py-1 rounded-r-lg text-sm ${
-                          viewMode === 'raw'
-                            ? 'bg-gray-500 text-white'
-                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                        }`}
-                      >
-                        Raw
-                      </button>
-                    </div>
                   </div>
                 </div>
               ) : (
