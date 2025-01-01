@@ -9,6 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
 import Chart from '@/components/Charts/Chart';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
@@ -17,13 +18,17 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const [dataResult] = await Promise.allSettled([fetcher('charts')]);
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const error = dataResult.status === 'rejected';
     const { statsDetails, latestBlocks } = await fetchData();
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
@@ -31,6 +36,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -41,6 +47,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -105,6 +112,7 @@ BlocksChart.getLayout = (page: ReactElement) => (
     notice={<Notice />}
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

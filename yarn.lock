@@ -4975,15 +4975,6 @@
     "@near-js/utils" "1.0.1"
     borsh "1.0.0"
 
-"@near-wallet-selector/bitget-wallet@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/bitget-wallet/-/bitget-wallet-8.9.15.tgz#5bfdd7340d29111808abe2c70e428cfa9a39ecb1"
-  integrity sha512-zM9NQlOdle32Gq6yRqhbiSrJEZioAoG600SYwwlLVGHC6UCPyHiofTk3+YuBXiMr5JjimU7ms5OqoH0aXq7t5w==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
 "@near-wallet-selector/bitte-wallet@^8.9.15":
   version "8.9.15"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/bitte-wallet/-/bitte-wallet-8.9.15.tgz#2b4274d4f0447cc54bcf4a574e401adcffa107ac"
@@ -5063,16 +5054,6 @@
     near-api-js "4.0.3"
     ts-essentials "7.0.3"
 
-"@near-wallet-selector/math-wallet@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/math-wallet/-/math-wallet-8.9.15.tgz#0b208f132f575fcf0db913737186b1ba173be9c2"
-  integrity sha512-Jnfrs1xM+2Zc3M+no5GxvJTVtKpylwSDnjGk8UCXsiAwEznHaojiQ/Q4sr8iBOAg0geSYd6KF4UUYXkEBW1DuA==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    "@near-wallet-selector/wallet-utils" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
 "@near-wallet-selector/meteor-wallet@^8.9.15":
   version "8.9.15"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/meteor-wallet/-/meteor-wallet-8.9.15.tgz#51f58f915c1af407135717314e38f6943009d45e"
@@ -5109,14 +5090,6 @@
     "@near-wallet-selector/wallet-utils" "8.9.15"
     near-api-js "4.0.3"
 
-"@near-wallet-selector/narwallets@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/narwallets/-/narwallets-8.9.15.tgz#f34625142bc9927f0be5c8dd5b55af9cd30555eb"
-  integrity sha512-CGWGRoIsTz9aIMsp2IUfNaZzunhrXaI+IPX+4taWXcqYujt6TpUwf8GZODbzC3wDlTiWM7W2nzEHakrkHTSXRQ==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    is-mobile "4.0.0"
-
 "@near-wallet-selector/near-mobile-wallet@^8.9.15":
   version "8.9.15"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/near-mobile-wallet/-/near-mobile-wallet-8.9.15.tgz#95fa7b79615ecebc980646e50e28a56a41afc550"
@@ -5146,61 +5119,12 @@
     near-api-js "4.0.3"
     near-seed-phrase "0.2.0"
 
-"@near-wallet-selector/nightly@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/nightly/-/nightly-8.9.15.tgz#2d884a769a1c1dc1d4b568e82be5e0cddda0cb8b"
-  integrity sha512-kRoEKAz2b3Ct4J/eFFAgmqL/Ym9bSlzZ2VqSkWS/6EcNv/ZS4Y5gmE/dwDx+Ycwr/9VHpUmAtPud4/hdOtUJNw==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    "@near-wallet-selector/wallet-utils" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
-"@near-wallet-selector/ramper-wallet@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/ramper-wallet/-/ramper-wallet-8.9.15.tgz#649033bfb697a29633b22d12ede3aa8815435f42"
-  integrity sha512-cIqNG4Cxu1cAE0uYWMexctToGV/eUleN8x+hSrl79DpT5QW0BCPc5DiN4vUiqVYJnhvor9d95Lm1PDWxy/iYJQ==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    "@near-wallet-selector/wallet-utils" "8.9.15"
-    "@ramper/near" "0.0.30"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
-"@near-wallet-selector/sender@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/sender/-/sender-8.9.15.tgz#2d1064ff43ce8be0d7c8541206560f35d30583b7"
-  integrity sha512-Wx5dI14pA4Ke9Ib+zIi98EjEkX1XXwzqG7m9IhRteAXkb8qiERddaQFgJXAYekdjiDTRos7h8AePxigOHpiSsQ==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
 "@near-wallet-selector/wallet-utils@8.9.15", "@near-wallet-selector/wallet-utils@^8.9.12":
   version "8.9.15"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/wallet-utils/-/wallet-utils-8.9.15.tgz#4e3b051eb5f51a0d0af81932a0f8b10b925f140e"
   integrity sha512-8EpgIaHAh5OzSP7akEMgRM1EWKP8MXN9yMNLucuPvT28e9hHqou85XRBXz0rgjirZC2bFVhXj+/l08KxnlQ+Gw==
   dependencies:
     "@near-wallet-selector/core" "8.9.15"
-
-"@near-wallet-selector/welldone-wallet@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/welldone-wallet/-/welldone-wallet-8.9.15.tgz#610a19fe58fcb35840a36f453eaa9b11f22cfeac"
-  integrity sha512-dMLn+1Co/P92JHWRdt33bPxv2fEWay7aJgL0MC1EwytZnBfHTm27UxiN6V8SAejLiIOcqKo5/LSE9BEqymzC9g==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    "@near-wallet-selector/wallet-utils" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
-
-"@near-wallet-selector/xdefi@^8.9.15":
-  version "8.9.15"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/xdefi/-/xdefi-8.9.15.tgz#c90d8897370425ecb8a60f088078cbe98763c76d"
-  integrity sha512-QmTmnQBApoxvSXLH7x2QMk8dAxyCHiz+iRxFcLxiooSbsw59atalNC82dX+iRKjJa64oqlftc9rN5mVX7c0VyQ==
-  dependencies:
-    "@near-wallet-selector/core" "8.9.15"
-    is-mobile "4.0.0"
-    near-api-js "4.0.3"
 
 "@next/env@13.3.4":
   version "13.3.4"
@@ -7123,54 +7047,6 @@
   integrity sha512-fyrgCaedtvMg9NK3en0pnOYJdtfwxUcNolezkNPUsoX57X8oQk+NkqcvzHXD2uKNij6GXmWU9NDru2IWjrO4BQ==
   dependencies:
     "@babel/runtime" "^7.13.10"
-
-"@ramper/constants@0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@ramper/constants/-/constants-0.0.15.tgz#3246e1c62a36a2d48f5c6bf24fe188455bd2c5ae"
-  integrity sha512-xdM9F0w4rT9AW4DQwJAFDE9MUIj0IbrU1FtYbgkQueg+aOXVXf7tM3Jw+oVhhhfKnjahYgtxFchjEPOTInMHmA==
-  dependencies:
-    "@ramper/utils" "0.0.2"
-
-"@ramper/core@0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@ramper/core/-/core-0.0.30.tgz#e6b0421c319c634efcceb6a649026189597c4147"
-  integrity sha512-f0WzKV9uXmf9K0NvVAKg8z+W3u22WpA5SzS1rJ6zsBm80QZdwScFZhDYNfAHZpaHG1c0iaGpHcrYsl1FXe3PKg==
-  dependencies:
-    "@ramper/logger" "0.0.1"
-    "@ramper/utils" "0.0.2"
-    jwt-decode "^3.1.2"
-    jwt-simple "0.5.6"
-    postmate "1.5.2"
-
-"@ramper/logger@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@ramper/logger/-/logger-0.0.1.tgz#181a9b339e8ee2f942b29293c960ac73b0686cca"
-  integrity sha512-G1A/P9XSS+41VNE2VdOOj8OkYjKSJHdCMs2YOEGPFRZUzuQFaMWOkc2ZxEA9zTdJWpcX0Hptp/d4Y2tXYsZX/A==
-
-"@ramper/near@0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@ramper/near/-/near-0.0.30.tgz#5303d38627cad26ba2641949ab826233970770b6"
-  integrity sha512-Qp7fRF4yoBhBFjif2jBEbLj1l+5632JTP6YtokUh21CerNe7SRi7EEQzeTPxCvYG0cz7BFSlx9O9uQZ/6SC48g==
-  dependencies:
-    "@ramper/constants" "0.0.15"
-    "@ramper/core" "0.0.30"
-    "@ramper/sdk-loader" "0.0.1"
-    "@ramper/utils" "0.0.2"
-
-"@ramper/sdk-loader@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@ramper/sdk-loader/-/sdk-loader-0.0.1.tgz#b67f59f64c7c8775da9828f85b662afc0be26973"
-  integrity sha512-nmjsh23Gy0jh9xNmoqzYEz2UoPRFzDh1yqYr1/32pK20TPH6xDxEyYiDynLD+/Vpff2ThjDGEyUI67RnvVsiRQ==
-
-"@ramper/utils@0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@ramper/utils/-/utils-0.0.2.tgz#b7405db56ce0c6338f483a4dc0462e7219a9cfaa"
-  integrity sha512-EZTAFInMXO9UoBWTrgKV8LXQHiwgDe5big+b1at7q1I3xxxdsCOs/9KhvG7uKlmyiDiz2PLTJsnU4qZ3KTWtVQ==
-  dependencies:
-    "@types/ua-parser-js" "^0.7.36"
-    await-to-js "3.0.0"
-    slugify "^1.6.5"
-    ua-parser-js "^1.0.2"
 
 "@reach/accordion@^0.18.0":
   version "0.18.0"
@@ -9717,11 +9593,6 @@
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.7.tgz#baccb07a970b91707df3a3e8ba6896c57ead2d11"
   integrity sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==
 
-"@types/ua-parser-js@^0.7.36":
-  version "0.7.39"
-  resolved "https://registry.yarnpkg.com/@types/ua-parser-js/-/ua-parser-js-0.7.39.tgz#832c58e460c9435e4e34bb866e85e9146e12cdbb"
-  integrity sha512-P/oDfpofrdtF5xw433SPALpdSchtJmY7nsJItf8h3KXqOslkbySh8zq4dSWXH2oTjRvJ5PczVEoCZPow6GicLg==
-
 "@types/unist@^2", "@types/unist@^2.0.0":
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.9.tgz#72e164381659a49557b0a078b28308f2c6a3e1ce"
@@ -11008,11 +10879,6 @@ available-typed-arrays@^1.0.7:
   integrity sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==
   dependencies:
     possible-typed-array-names "^1.0.0"
-
-await-to-js@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/await-to-js/-/await-to-js-3.0.0.tgz#70929994185616f4675a91af6167eb61cc92868f"
-  integrity sha512-zJAaP9zxTcvTHRlejau3ZOY4V7SRpiByf3/dxx2uyKxxor19tpmpV2QRsTKikckwhaPmr2dVpxxMr7jOCYVp5g==
 
 axe-core@^4.6.2:
   version "4.8.2"
@@ -16566,16 +16432,6 @@ jsox@^1.2.118:
     object.assign "^4.1.4"
     object.values "^1.1.6"
 
-jwt-decode@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
-  integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
-
-jwt-simple@0.5.6:
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/jwt-simple/-/jwt-simple-0.5.6.tgz#3357adec55b26547114157be66748995b75b333a"
-  integrity sha512-40aUybvhH9t2h71ncA1/1SbtTNCVZHgsTsTgqPUxGWDmUDrXyDf2wMNQKEbdBjbf4AI+fQhbECNTV6lWxQKUzg==
-
 keccak@^3.0.3:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.4.tgz#edc09b89e633c0549da444432ecf062ffadee86d"
@@ -20008,11 +19864,6 @@ posthtml@^0.16.4, posthtml@^0.16.5:
     posthtml-parser "^0.11.0"
     posthtml-render "^3.0.0"
 
-postmate@1.5.2:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/postmate/-/postmate-1.5.2.tgz#d59a78b3780023c5d32225fd40633b364958bdb3"
-  integrity sha512-EHLlEmrUA/hALls49oBrtE7BzDXXjB9EiO4MZpsoO3R/jRuBmD+2WKQuYAbeuVEpTzrPpUTT79z2cz4qaFgPRg==
-
 preact@^10.16.0, preact@^10.24.2:
   version "10.25.2"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.25.2.tgz#e141e18a547ae0082dae48d044e0d8267e2547d2"
@@ -21343,7 +21194,7 @@ slash@^5.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-5.1.0.tgz#be3adddcdf09ac38eebe8dcdc7b1a57a75b095ce"
   integrity sha512-ZA6oR3T/pEyuqwMgAKT0/hAv8oAXckzbkmR0UkUosQ+Mc4RxGoJkRmwHgHufaenlyAgE1Mxgpdcrf75y6XcnDg==
 
-slugify@^1.6.5, slugify@^1.6.6:
+slugify@^1.6.6:
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.6.tgz#2d4ac0eacb47add6af9e04d3be79319cbcc7924b"
   integrity sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==
@@ -22349,11 +22200,6 @@ u3@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/u3/-/u3-0.1.1.tgz#5f52044f42ee76cd8de33148829e14528494b73b"
   integrity sha512-+J5D5ir763y+Am/QY6hXNRlwljIeRMZMGs0cT6qqZVVzzT3X3nFPXVyPOFRMOR4kupB0T8JnCdpWdp6Q/iXn3w==
-
-ua-parser-js@^1.0.2:
-  version "1.0.39"
-  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.39.tgz#bfc07f361549bf249bd8f4589a4cccec18fd2018"
-  integrity sha512-k24RCVWlEcjkdOxYmVJgeD/0a1TiSpqLg+ZalVGV9lsnr4yqu0w7tX/x2xX6G4zpkgQnRf89lxuZ1wsbjXM8lw==
 
 ufo@^1.5.4:
   version "1.5.4"

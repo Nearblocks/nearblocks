@@ -8,6 +8,7 @@ import fetcher from '@/utils/fetcher';
 import QueryString from 'qs';
 import List from '@/components/Tokens/FTList';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -18,9 +19,11 @@ export const getServerSideProps: GetServerSideProps<{
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { ...qs },
+    req,
   }: {
     query: {
       query?: string;
@@ -28,6 +31,7 @@ export const getServerSideProps: GetServerSideProps<{
       filter?: string;
       order?: string;
     };
+    req: any;
   } = context;
 
   const params = { ...qs, order: qs.order || 'desc' };
@@ -44,6 +48,8 @@ export const getServerSideProps: GetServerSideProps<{
     ]);
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     const data = dataResult.status === 'fulfilled' ? dataResult.value : null;
     const dataCount =
@@ -58,6 +64,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -70,6 +77,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -149,6 +157,7 @@ TopFTTokens.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

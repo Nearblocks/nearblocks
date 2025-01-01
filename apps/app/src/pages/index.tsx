@@ -17,6 +17,7 @@ import { fetchData } from '@/utils/fetchData';
 import { toast } from 'react-toastify';
 import search from '@/utils/search';
 import { useRouter } from 'next/router';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -27,8 +28,9 @@ export const getServerSideProps: GetServerSideProps<{
   blockDetails: any;
   txnsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
   error: boolean;
-}> = async () => {
+}> = async (context) => {
   try {
     const [chartResult, blockResult, txnsResult] = await Promise.allSettled([
       fetcher(`charts/latest`),
@@ -45,6 +47,10 @@ export const getServerSideProps: GetServerSideProps<{
 
     const { statsDetails, latestBlocks, error } = await fetchData();
 
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
+
     return {
       props: {
         statsDetails,
@@ -52,6 +58,7 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails,
         txnsDetails,
         latestBlocks,
+        signedAccountId,
         error,
       },
     };
@@ -64,6 +71,7 @@ export const getServerSideProps: GetServerSideProps<{
         blockDetails: null,
         txnsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
         error: true,
       },
     };
@@ -80,7 +88,6 @@ const HomePage = ({
   const { t } = useTranslation();
   const router = useRouter();
   const { q } = router.query;
-
   const stats = statsDetails?.stats?.[0];
   const charts = chartDetails;
   const blocks = blockDetails?.blocks || [];
@@ -199,6 +206,7 @@ HomePage.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

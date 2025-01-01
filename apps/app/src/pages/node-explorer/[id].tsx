@@ -10,6 +10,7 @@ import Delegators from '@/components/NodeExplorer/Delegators';
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
@@ -19,14 +20,19 @@ const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const { statsDetails, latestBlocks } = await fetchData();
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -35,6 +41,7 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -104,6 +111,7 @@ Delegator.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

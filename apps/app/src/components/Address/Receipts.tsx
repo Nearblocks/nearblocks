@@ -4,9 +4,10 @@ import {
   isAction,
   yoctoToNear,
   truncateString,
+  getFilteredQueryParams,
 } from '@/utils/libs';
 import { txnMethod } from '@/utils/near';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -546,14 +547,12 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [
+    FilterKind.ACTION,
+    FilterKind.METHOD,
+    FilterKind.FROM,
+    FilterKind.TO,
+  ]);
 
   return (
     <>
