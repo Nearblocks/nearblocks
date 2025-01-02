@@ -77,9 +77,7 @@ export const AddressKeysSkeleton = () => (
   </div>
 );
 
-export const AddressSkeleton = () => {
-  const network = useNetworkStore((state) => state.network);
-
+export const AddressSkeleton = ({ network }: { network: string }) => {
   return (
     <div className="relative container mx-auto">
       <div className="pt-7 pb-[26px] px-5">
@@ -146,8 +144,9 @@ const AddressSkeletonWrapper = ({ onFinish }: SkeletonProps) => {
       if (onFinish) onFinish();
     };
   }, [onFinish]);
+  const network = useNetworkStore((state) => state.network);
 
-  return <AddressSkeleton />;
+  return <AddressSkeleton network={network} />;
 };
 
 export default AddressSkeletonWrapper;
