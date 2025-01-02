@@ -1,10 +1,9 @@
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { space_mono } from '@/fonts/font';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
-import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { fiatValue } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
@@ -18,6 +17,7 @@ import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';
 
 interface Props {
+  block: { height: string };
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
   statsData: {
@@ -28,29 +28,14 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData } = props;
+  const { block, borderFlag, receipt, statsData } = props;
   const t = useTranslations();
-  const [block, setBlock] = useState<{ height: string } | null>(null);
-  const { getBlockDetails } = useRpc();
   const [pageHash] = useHash();
   const loading = false;
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
-  const lastBlockHash = useRef<null | string>(null);
   const rowRef = useRef<HTMLDivElement | null>(null);
   const { networkId } = useConfig();
-
-  useEffect(() => {
-    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
-      lastBlockHash.current = receipt.block_hash;
-
-      getBlockDetails(receipt.block_hash)
-        .then((resp: any) => {
-          setBlock(resp?.header);
-        })
-        .catch(() => {});
-    }
-  }, [receipt?.block_hash, getBlockDetails]);
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -427,7 +412,12 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
+                <ReceiptRow
+                  block={block}
+                  borderFlag
+                  receipt={rcpt}
+                  statsData={statsData}
+                />
               </div>
             </div>
           ))}
