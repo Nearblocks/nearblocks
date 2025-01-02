@@ -1,6 +1,10 @@
-import { localFormat, truncateString } from '@/utils/libs';
+import {
+  getFilteredQueryParams,
+  localFormat,
+  truncateString,
+} from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import { useState } from 'react';
 import TxnStatus from '../common/Status';
@@ -475,14 +479,10 @@ const TokenTransactions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [
+    FilterKind.EVENT,
+    FilterKind.INVOLVED,
+  ]);
 
   return (
     <>

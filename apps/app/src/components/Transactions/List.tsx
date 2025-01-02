@@ -9,10 +9,11 @@ import {
   truncateString,
   yoctoToNear,
   isAction,
+  getFilteredQueryParams,
 } from '@/utils/libs';
 import SortIcon from '../Icons/SortIcon';
 import Clock from '../Icons/Clock';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import Table from '../common/Table';
@@ -153,13 +154,13 @@ const List = ({ txnsData, txnsCount, error }: ListProps) => {
     setAddress('');
   };
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, keyword, query, filter, ...rest } = queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [
+    FilterKind.ACTION,
+    FilterKind.METHOD,
+    FilterKind.FROM,
+    FilterKind.TO,
+    FilterKind.BLOCK,
+  ]);
 
   const columns: any = [
     {

@@ -13,6 +13,7 @@ interface LayoutProps {
   notice?: ReactNode;
   statsDetails?: { stats: Stats[] };
   latestBlocks?: { blocks: BlocksInfo[] };
+  signedAccountId?: string;
 }
 
 const Layout = ({
@@ -20,6 +21,7 @@ const Layout = ({
   notice,
   statsDetails,
   latestBlocks,
+  signedAccountId,
 }: LayoutProps) => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
@@ -38,7 +40,11 @@ const Layout = ({
     <div className={className}>
       {notice}
       <header>
-        <Header statsDetails={statsDetails} latestBlocks={latestBlocks} />
+        <Header
+          statsDetails={statsDetails}
+          latestBlocks={latestBlocks}
+          signedAccountId={signedAccountId as string}
+        />
       </header>
       {isMounted && (
         <NextTopLoader color={`${theme === 'dark' ? '#31766A' : '#0d494a'}`} />

@@ -1,6 +1,10 @@
 import { Menu, MenuList, MenuButton } from '@reach/menu-button';
-import { localFormat, truncateString } from '@/utils/libs';
-import { MultiChainTxnInfo } from '@/utils/types';
+import {
+  getFilteredQueryParams,
+  localFormat,
+  truncateString,
+} from '@/utils/libs';
+import { FilterKind, MultiChainTxnInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -493,15 +497,11 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [
+    FilterKind.FROM,
+    FilterKind.CHAIN,
+    FilterKind.MULTICHAIN_ADDRESS,
+  ]);
 
   return (
     <>

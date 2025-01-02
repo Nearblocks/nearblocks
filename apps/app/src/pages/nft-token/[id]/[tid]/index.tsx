@@ -9,6 +9,7 @@ import QueryString from 'qs';
 import fetcher from '@/utils/fetcher';
 import Detail from '@/components/Tokens/NFT/Detail';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 
@@ -21,9 +22,11 @@ export const getServerSideProps: GetServerSideProps<{
   tid: string;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { id, tid, ...qs },
+    req,
   }: any = context;
   const apiUrl = `nfts/${id}/tokens/${tid}`;
   const fetchUrl = qs
@@ -46,6 +49,9 @@ export const getServerSideProps: GetServerSideProps<{
 
     const { statsDetails, latestBlocks } = await fetchData();
 
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
+
     return {
       props: {
         tokenInfo,
@@ -56,6 +62,7 @@ export const getServerSideProps: GetServerSideProps<{
         tid,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -70,6 +77,7 @@ export const getServerSideProps: GetServerSideProps<{
         tid: null,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -130,6 +138,7 @@ NFTokenInfo.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

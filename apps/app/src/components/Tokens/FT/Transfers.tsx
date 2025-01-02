@@ -1,8 +1,8 @@
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 import { Tooltip } from '@reach/tooltip';
 import useTranslation from 'next-translate/useTranslation';
 import { useState } from 'react';
-import { localFormat } from '@/utils/libs';
+import { getFilteredQueryParams, localFormat } from '@/utils/libs';
 import Link from 'next/link';
 import Big from 'big.js';
 import { tokenAmount } from '@/utils/near';
@@ -347,14 +347,7 @@ const Transfers = ({ txns, count, cursor, error, tab }: Props) => {
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [FilterKind.A]);
 
   return (
     <>

@@ -38,6 +38,7 @@ import dynamic from 'next/dynamic';
 import { fetchData } from '@/utils/fetchData';
 import Receipts from '@/components/Address/Receipts';
 import MultiChainTxns from '@/components/Address/MultiChainTxns';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -78,9 +79,11 @@ export const getServerSideProps: GetServerSideProps<{
   tab: string;
   latestBlocks: any;
   multiChainAccountsData: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...qs },
+    req,
   }: {
     query: {
       id?: string;
@@ -93,6 +96,7 @@ export const getServerSideProps: GetServerSideProps<{
   } = context;
 
   const address = id.toLowerCase();
+  const signedAccountId = getCookieFromRequest('signedAccountId', req) || null;
 
   const commonApiUrls = {
     account: id && `account/${address}`,
@@ -207,6 +211,7 @@ export const getServerSideProps: GetServerSideProps<{
       data: dataResult,
       dataCount: dataCountResult,
       error: !dataResult, // Set error to true only if dataResult is null
+      signedAccountId,
       tab,
       latestBlocks: latestBlocks,
       multiChainAccountsData: getResult(multiChainAccountsResult),
@@ -761,6 +766,7 @@ Address.getLayout = (page: ReactElement) => (
     <Layout
       statsDetails={page?.props?.statsDetails}
       latestBlocks={page?.props?.latestBlocks}
+      signedAccountId={page?.props?.signedAccountId}
     >
       {page}
     </Layout>

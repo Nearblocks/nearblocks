@@ -14,6 +14,7 @@ import Transfers from '@/components/Tokens/NFT/Transfers';
 import Holders from '@/components/Tokens/NFT/Holders';
 import Inventory from '@/components/Tokens/NFT/Inventory';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -31,9 +32,11 @@ export const getServerSideProps: GetServerSideProps<{
   tab: string;
   statsDetails: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'transfers', ...qs },
+    req,
   }: {
     query: {
       id?: string;
@@ -42,6 +45,7 @@ export const getServerSideProps: GetServerSideProps<{
       keyword?: string;
       filter?: string;
     } & Record<string, any>;
+    req: any;
   } = context;
 
   const tabApiUrls: Record<
@@ -107,6 +111,8 @@ export const getServerSideProps: GetServerSideProps<{
       result.status === 'fulfilled' ? result.value : null;
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
@@ -120,6 +126,7 @@ export const getServerSideProps: GetServerSideProps<{
         tab: tab as string,
         statsDetails: statsDetails,
         latestBlocks: latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -136,6 +143,7 @@ export const getServerSideProps: GetServerSideProps<{
         tab: 'transfers',
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -288,6 +296,7 @@ NFToken.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>
