@@ -57,10 +57,10 @@ export default async function TransactionList(props: {
 
   return (
     <>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className="h-72">
         <div className="container-xxl mx-auto px-5">
           <h1
-            className="mb-4 pt-8 sm:!text-2xl text-xl text-white font-medium"
+            className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-neargray-25 font-medium"
             suppressHydrationWarning={true}
           >
             {t('txnsHeading') || 'Latest Near Protocol Transactions'}

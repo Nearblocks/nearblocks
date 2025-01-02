@@ -51,8 +51,8 @@ export default async function AboutLayout({
 }) {
   return (
     <>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72 -mb-48"></div>
-      <div className="py-16 bg-white dark:bg-black-600 soft-shadow container-xxl sm:mx-auto rounded-md my-10">
+      <div className="h-72 -mb-48"></div>
+      <div className="py-16 bg-white dark:bg-black-600 soft-shadow container-xxl sm:mx-auto rounded-md mb-10">
         {children}
       </div>
     </>

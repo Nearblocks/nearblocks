@@ -8,32 +8,42 @@ interface ActiveLinkProps {
   activeClassName?: string;
   children: ReactNode;
   exact?: boolean | null;
+  hasSubmenu?: boolean;
   href: string | UrlObject;
   inActiveClassName?: string;
   locale?: any;
+  submenuPaths?: string[];
 }
 
 const ActiveLink = ({
   activeClassName,
   children,
   exact,
+  hasSubmenu = false,
   href,
   inActiveClassName,
+  submenuPaths = [],
   ...props
 }: ActiveLinkProps) => {
   const asPath = usePathname();
-
   const child = Children.only(children) as ReactElement<any>;
   const childClassName = child?.props?.className || ' ';
-
   const hrefString = typeof href === 'string' ? href : href.pathname || '';
 
-  let isActive = false;
-  if (exact) {
-    isActive = asPath === href;
-  } else {
-    isActive = href === '/' ? asPath === href : asPath.startsWith(hrefString);
-  }
+  const isActive = (() => {
+    if (hasSubmenu && submenuPaths.length > 0) {
+      return (
+        submenuPaths.some((path) => asPath === path) || asPath === hrefString
+      );
+    }
+
+    if (exact) {
+      return asPath === hrefString;
+    }
+
+    return hrefString === '/' ? asPath === hrefString : asPath === hrefString;
+  })();
+
   const className = isActive
     ? `${childClassName} ${activeClassName}`
     : `${childClassName} ${inActiveClassName}`;

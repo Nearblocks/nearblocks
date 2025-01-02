@@ -80,9 +80,9 @@ export default async function TokensLayout({
 }) {
   return (
     <section>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className="h-72">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10 font-medium">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-neargray-10 font-medium">
             Non-Fungible Token Tracker (NEP-171)
           </h1>
         </div>

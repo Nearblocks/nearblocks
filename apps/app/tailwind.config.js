@@ -2,7 +2,22 @@
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   darkMode: 'class',
-  plugins: [],
+  plugins: [
+    function ({ addUtilities, theme }) {
+      const newUtilities = {
+        '.text-green-250': {
+          color: theme('colors.neargreen.200') + ' !important',
+        },
+        '.text-nearblue-600': {
+          color: theme('colors.nearblue.600') + ' !important',
+        },
+        '.text-neargray-10': {
+          color: theme('colors.neargray.10') + ' !important',
+        },
+      };
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+  ],
   theme: {
     extend: {
       backgroundColor: {
@@ -59,7 +74,7 @@ module.exports = {
           DEFAULT: '#0d494a',
         },
         nearblue: {
-          600: '#4b5563',
+          600: '#000000', // Black color
           700: '#9CA3AF',
           DEFAULT: '#F1F9FF',
         },

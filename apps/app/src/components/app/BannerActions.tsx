@@ -27,7 +27,7 @@ const BannerActions = ({ htmlContent }: any) => {
         <div>
           {htmlContent && <div dangerouslySetInnerHTML={createMarkup()} />}
         </div>{' '}
-        <div className="absolute border text-nearblue-600 dark:text-white dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
+        <div className="absolute border text-nearblue-600 dark:!text-white dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
           Ad
         </div>
       </div>
@@ -41,7 +41,7 @@ const BannerActions = ({ htmlContent }: any) => {
         {htmlContent && (
           <div className="relative">
             <div dangerouslySetInnerHTML={createMarkup()} />
-            <div className="absolute border text-nearblue-600 dark:text-white dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
+            <div className="absolute border text-nearblue-600 dark:!text-white dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
               Ad
             </div>
           </div>

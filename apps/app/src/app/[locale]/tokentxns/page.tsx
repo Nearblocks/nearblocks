@@ -47,9 +47,9 @@ export default async function TokenTxns(props: {
 
   return (
     <section>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className="h-72">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white dark:text-neargray-10 font-medium">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-neargray-10 font-medium">
             {t ? t('fts.heading') : 'Token Transfers'}
           </h1>
         </div>
