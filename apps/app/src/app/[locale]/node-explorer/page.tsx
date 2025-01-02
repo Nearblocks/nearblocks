@@ -8,9 +8,9 @@ export default async function NodeExplorer(props: any) {
   const searchParams = await props.searchParams;
   return (
     <>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className="h-72">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white font-medium dark:text-neargray-10">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl font-medium dark:text-neargray-10">
             NEAR Protocol Validator Explorer
           </h1>
         </div>

@@ -250,6 +250,14 @@ const Header = ({
 
   return (
     <>
+      {!syncStatus && (
+        <div className="flex flex-wrap">
+          <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
+            {t('outofSync') ||
+              'This blockchain explorer is out of sync. Some blocks or transactions may be delayed.'}
+          </div>
+        </div>
+      )}
       <div
         className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
       >
@@ -385,14 +393,6 @@ const Header = ({
       </div>
 
       <header className="dark:bg-black-600 bg-white shadow-sm">
-        {!syncStatus && (
-          <div className="flex flex-wrap">
-            <div className="flex items-center justify-center text-center w-full  border-b-2 border-nearblue bg-nearblue dark:border-black-200 dark:bg-black-200 py-2 text-green dark:text-green-250 text-sm ">
-              {t('outofSync') ||
-                'This blockchain explorer is out of sync. Some blocks or transactions may be delayed.'}
-            </div>
-          </div>
-        )}
         <div className="container-xxl w-full mx-auto">
           <div className="flex flex-wrap">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
@@ -450,55 +450,78 @@ const Header = ({
                         <>
                           <Collapse
                             trigger={({ onClick, show }) => (
-                              <a
-                                className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 text-sm font-medium dark:text-neargray-10 text-black-600"
-                                href="#"
-                                onClick={onClick}
+                              <ActiveLink
+                                activeClassName="text-green-500 dark:text-green-250"
+                                hasSubmenu={true}
+                                href={menu.link || ''}
+                                submenuPaths={menu.submenu.map(
+                                  (item) => item.link,
+                                )}
                               >
-                                {t(menu.title) || menu.fallbackText}
-                                <ArrowDown
-                                  className={`fill-current transition-transform w-5 h-5 ${
-                                    show && 'transform rotate-180'
-                                  }`}
-                                />
-                              </a>
+                                <div
+                                  className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 text-sm font-medium dark:text-neargray-10 text-black-600"
+                                  onClick={(e: any) => onClick(e)}
+                                >
+                                  {t(menu.title) || menu.fallbackText}
+                                  <ArrowDown
+                                    className={`fill-current transition-transform w-5 h-5 ${
+                                      show && 'transform rotate-180'
+                                    }`}
+                                  />
+                                </div>
+                              </ActiveLink>
                             )}
                           >
                             <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
                               {menu?.submenu?.map((submenu) => (
                                 <li key={submenu?.id}>
-                                  <Link
-                                    className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs dark:text-neargray-10 text-black-600"
+                                  <ActiveLink
+                                    activeClassName="text-green-500 dark:text-green-250"
+                                    exact={true}
                                     href={submenu?.link}
-                                    onClick={() => setOpen(false)}
                                   >
-                                    {submenu?.title
-                                      ? t(submenu?.title)
-                                      : submenu.fallbackText}
-                                  </Link>
+                                    <div
+                                      className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs dark:text-neargray-10 text-black-600"
+                                      onClick={() => setOpen(false)}
+                                    >
+                                      {submenu?.title
+                                        ? t(submenu?.title)
+                                        : submenu.fallbackText}
+                                    </div>
+                                  </ActiveLink>
                                 </li>
                               ))}
                             </ul>
                           </Collapse>
                           <span className="group hidden md:flex h-full w-full relative">
-                            <a
-                              className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600`}
-                              href="#"
+                            <ActiveLink
+                              activeClassName="text-green-500 dark:!text-green-250"
+                              hasSubmenu={true}
+                              href={menu.link || ''}
+                              submenuPaths={menu.submenu.map(
+                                (item) => item.link,
+                              )}
                             >
-                              {t(menu?.title) || menu.fallbackText}
-                              <ArrowDown className="fill-current w-4 h-4 ml-2" />
-                            </a>
-                            <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-20">
-                              {menu?.submenu?.map((submenu) => (
-                                <li key={submenu?.id}>
+                              <div className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-25 text-black-600">
+                                {menu.fallbackText}
+                                <ArrowDown className="fill-current w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" />
+                              </div>
+                            </ActiveLink>
+
+                            <ul
+                              className="bg-white dark:bg-black-600 shadow-lg absolute top-full min-w-full rounded-b-lg border-t-2 border-t-green-500 
+                     transform opacity-0 -translate-y-2 invisible transition-all duration-200 ease-out
+                     group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible py-2 z-20"
+                            >
+                              {menu.submenu.map((submenu) => (
+                                <li key={submenu.id}>
                                   <ActiveLink
-                                    activeClassName="text-green-500 dark:text-green-250"
+                                    activeClassName="text-green-500 dark:text-green-250 font-medium"
+                                    exact={true}
                                     href={submenu?.link}
                                   >
-                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-black-600">
-                                      {submenu?.title
-                                        ? t(submenu?.title)
-                                        : submenu.fallbackText}
+                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-25 text-black-600">
+                                      {submenu.fallbackText}
                                     </div>
                                   </ActiveLink>
                                 </li>
@@ -509,9 +532,10 @@ const Header = ({
                       ) : (
                         <ActiveLink
                           activeClassName="text-green-500 dark:text-green-250"
+                          exact={true}
                           href={menu.link || ''}
                         >
-                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600">
+                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-25 text-black-600">
                             {t(menu.title) || menu.fallbackText}
                           </div>
                         </ActiveLink>
@@ -536,7 +560,7 @@ const Header = ({
                           </a>
                         )}
                       >
-                        <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
+                        <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4 ">
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
@@ -552,13 +576,18 @@ const Header = ({
                       </Collapse>
                       <span className="group hidden md:flex h-full w-full relative">
                         <a
-                          className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600`}
+                          className="hidden md:flex h-full items-center justify-between w-full py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600 
+  hover:text-green-500 dark:hover:text-green-250"
                           href="#"
                         >
                           {t('header.menu.languages') || 'Languages'}
-                          <ArrowDown className="fill-current w-4 h-4 ml-2" />
+                          <ArrowDown className="fill-current w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" />
                         </a>
-                        <ul className="bg-white  dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-20">
+                        <ul
+                          className="bg-white dark:bg-black-600 soft-shadow absolute top-full left-0 min-w-full rounded-b-lg !border-t-2 !border-t-green-500 
+  transform opacity-0 -translate-y-2 invisible transition-all duration-200 ease-out
+  group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible z-20 py-2"
+                        >
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink

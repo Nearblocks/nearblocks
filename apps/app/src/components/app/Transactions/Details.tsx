@@ -363,6 +363,47 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
+          <div
+            className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
+            id="action-row"
+          >
+            <div className="flex items-start flex-wrap px-4 py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7 py-0 sm:!py-2">
+                <Tooltip
+                  className={'w-96 left-25 max-w-[200px]'}
+                  tooltip={'Highlighted events of the transaction'}
+                >
+                  <div>
+                    <Bolt className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip>
+                Transaction Actions
+              </div>
+              {loading || (actions?.length === 0 && logs?.length === 0) ? (
+                <div className="w-full md:w-3/4">
+                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4">
+                  <PerfectScrollbar>
+                    <div
+                      className="max-h-[194px] break-words space-y-2 py-2"
+                      id="action-column"
+                    >
+                      <ActionProvider>
+                        {logs?.map((event: TransactionLog, i: number) => (
+                          <EventLogs event={event} key={i} />
+                        ))}
+                        {actions?.map((action: any, i: number) => (
+                          <Actions action={action} key={i} />
+                        ))}
+                      </ActionProvider>
+                    </div>
+                  </PerfectScrollbar>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
             <div className="flex flex-wrap p-4">
@@ -440,7 +481,7 @@ const Details = (props: Props) => {
               ) : (
                 <div className="w-full md:w-3/4 break-all overflow-auto h-[90px]">
                   <Ad
-                    className="w-[720px] h-[90px] bg-no-repeat "
+                    className="!max-w-[720px] h-[90px] bg-no-repeat "
                     format="Leaderboard"
                     unitId="IbT2RAk1Cdc36JPkKEfCJQ=="
                   />
@@ -826,47 +867,7 @@ const Details = (props: Props) => {
               )}
             </div>
           )}
-          <div
-            className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
-            id="action-row"
-          >
-            <div className="flex items-start flex-wrap px-4 py-2">
-              <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7 py-0 sm:!py-2">
-                <Tooltip
-                  className={'w-96 left-25 max-w-[200px]'}
-                  tooltip={'Highlighted events of the transaction'}
-                >
-                  <div>
-                    <Bolt className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip>
-                Transaction Actions
-              </div>
-              {loading || (actions?.length === 0 && logs?.length === 0) ? (
-                <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-full max-w-xl" />
-                </div>
-              ) : (
-                <div className="w-full md:w-3/4">
-                  <PerfectScrollbar>
-                    <div
-                      className="max-h-[194px] break-words space-y-2 py-2"
-                      id="action-column"
-                    >
-                      <ActionProvider>
-                        {logs?.map((event: TransactionLog, i: number) => (
-                          <EventLogs event={event} key={i} />
-                        ))}
-                        {actions?.map((action: any, i: number) => (
-                          <Actions action={action} key={i} />
-                        ))}
-                      </ActionProvider>
-                    </div>
-                  </PerfectScrollbar>
-                </div>
-              )}
-            </div>
-          </div>
+
           <AccordionRoot collapsible>
             <AccordionItem value="">
               <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b">

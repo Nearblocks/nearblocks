@@ -54,9 +54,9 @@ export default async function Blocks(props: {
 
   return (
     <>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72">
+      <div className=" h-72">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-white text-lg font-medium">
+          <h1 className="mb-4 pt-8 sm:!text-2xl dark:text-white text-lg font-medium">
             {t('blockHeading') || 'Latest Near Protocol Blocks'}
           </h1>
         </div>

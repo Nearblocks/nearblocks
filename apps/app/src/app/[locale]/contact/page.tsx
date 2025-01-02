@@ -56,9 +56,9 @@ export default async function Contact(props: {
 
   return (
     <>
-      <div className="bg-hero-pattern dark:bg-hero-pattern-dark h-72"></div>
+      <div className="h-72"></div>
       <div className="container-xxl mx-auto px-5 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
-        <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+        <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-white">
           {`Contact NearBlocks`}
         </h1>
         <div className="text-neargray-600 dark:text-neargray-10 pt-4 pb-8 gap-6 w-full soft-shadow rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">

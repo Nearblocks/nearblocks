@@ -53,9 +53,9 @@ export default async function AddressesChart() {
 
   return (
     <section>
-      <div className="bg-hero-pattern  dark:bg-hero-pattern-dark h-72">
+      <div className="h-72">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl text-white">
+          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-white font-medium">
             {'Multi Chain Transactions Chart'}
           </h1>
         </div>

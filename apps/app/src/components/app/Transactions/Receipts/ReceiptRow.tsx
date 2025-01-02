@@ -154,7 +154,7 @@ const ReceiptRow = (props: Props) => {
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
           ) : block?.height ? (
-            <div className="w-full md:w-3/4 word-break">
+            <div className="w-full md:w-3/4 word-break font-semibold">
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 href={`/blocks/${receipt.block_hash}`}
