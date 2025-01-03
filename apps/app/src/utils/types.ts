@@ -516,6 +516,8 @@ export type AccountContractInfo = {
 
 export type EventPropsInfo = {
   event: TransactionLog;
+  actionsLog?: any;
+  allActionLog?: any;
 };
 
 export type DepositPropsInfo = {
@@ -747,7 +749,8 @@ export type TokenInfoProps = {
   contract: string;
   amount: string;
   decimals?: any;
-  apiTokenInfo?: any;
+  transferAmount?: string;
+  isShowText?: boolean;
 };
 
 export type ValidatorFullData = {

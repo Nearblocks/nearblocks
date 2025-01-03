@@ -26,7 +26,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
 import { nanoToMilli } from '@/utils/libs';
 import ListCheck from '@/components/Icons/ListCheck';
-import { ExecutionOutcomeWithIdView } from '@/utils/types';
+import { AccountDataInfo, ExecutionOutcomeWithIdView } from '@/utils/types';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import {
   calculateGasUsed,
@@ -133,10 +133,11 @@ const Txn = ({
   const [tabIndex, setTabIndex] = useState(0);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { transactionStatus, getBlockDetails } = useRpc();
+  const { transactionStatus, getBlockDetails, viewAccount } = useRpc();
   const rpcUrl: string = useRpcStore((state) => state.rpc);
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
   const [allRpcProviderError, setAllRpcProviderError] = useState(false);
+  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
 
   const txn = data && data?.txns?.[0];
 
@@ -260,12 +261,37 @@ const Txn = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, hash, rpcUrl]);
 
-  const contract = useMemo(
-    () =>
-      isContract?.account?.[0]?.code_hash !==
-      '11111111111111111111111111111111',
-    [isContract],
-  );
+  useEffect(() => {
+    const loadSchema = async () => {
+      if (txn?.receiver_account_id) {
+        const [account]: any = await Promise.all([
+          viewAccount(txn?.receiver_account_id as string).catch(
+            (error: any) => {
+              console.log(
+                `Error fetching account for ${txn?.receiver_account_id}:`,
+                error,
+              );
+
+              return null;
+            },
+          ),
+        ]);
+
+        if (account) {
+          setAccountView(account);
+        }
+      }
+    };
+    loadSchema();
+  }, [txn]);
+
+  const contract = useMemo(() => {
+    const codeHash =
+      isContract?.account?.[0]?.code_hash || accountView?.code_hash;
+    return codeHash !== '11111111111111111111111111111111';
+  }, [isContract, accountView]);
+
+  console.log({ accountView });
 
   const buttonStyles = (selected: boolean) =>
     `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
