@@ -18,6 +18,8 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
+    "@baselime/node-opentelemetry": "0.5.8",
+    "@opentelemetry/instrumentation-pino": "0.46.0",
     "@sentry/node": "7.119.0",
     "big.js": "6.2.1",
     "cors": "2.8.5",
@@ -29,7 +31,6 @@
     "fzstd": "0.1.1",
     "geoip-lite": "1.4.10",
     "helmet": "7.1.0",
-    "ioredis": "5.4.1",
     "ip": "^2.0.1",
     "lodash-es": "4.17.21",
     "near-api-js": "1.1.0",

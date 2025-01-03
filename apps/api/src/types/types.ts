@@ -25,6 +25,9 @@ export type Config = {
   maxQueryCost: number;
   maxQueryRows: number;
   network: string;
+  otelExporterApiKey?: string;
+  otelExporterEndpoint?: string;
+  otelServiceName?: string;
   port: number;
   ratelimiterRedisPassword: string;
   ratelimiterRedisSentinelName: string;
