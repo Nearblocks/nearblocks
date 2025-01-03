@@ -8,16 +8,15 @@ const DeployContract = (props: ActionPropsInfo) => {
   const router = useRouter();
   const { hash } = router.query;
 
-  const handleClick = () => {
-    router.push(`/txns/${hash}#execution#${props.action?.receiptId}`);
-  };
-
   return (
     <div className="action flex flex-wrap items-center break-all leading-7">
       {props?.action?.receiptId && hash ? (
-        <span onClick={handleClick} className="cursor-pointer">
+        <Link
+          href={`/txns/${hash}#execution#${props.action?.receiptId}`}
+          className="cursor-pointer"
+        >
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
-        </span>
+        </Link>
       ) : (
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}

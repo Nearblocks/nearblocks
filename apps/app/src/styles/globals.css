@@ -270,3 +270,31 @@ a {
 .font-space-mono {
   font-family: 'Space Mono', monospace;
 }
+
+.visible-scrollbar,
+.invisible-scrollbar,
+.mostly-customized-scrollbar {
+  display: block;
+  overflow: auto;
+   /* outline: 2px dashed cornflowerblue; */
+}
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Demonstrate a "mostly customized" scrollbar
+ * (won't be visible otherwise if width/height is specified) */
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #bbb; /* or add it to the track */
+  border-radius: 12px;
+}
+
+/* Add a thumb */
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 12px;
+}
+

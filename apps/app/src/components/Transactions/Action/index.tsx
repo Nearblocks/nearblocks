@@ -2,6 +2,7 @@ import { EventPropsInfo } from '@/utils/types';
 import BurrowContract from './Burrow';
 import RefContract from './Ref';
 import WrapContract from './Wrap';
+import IntentsContract from './Intents';
 
 const EventLogs = (props: EventPropsInfo) => {
   const showContract = () => {
@@ -14,6 +15,14 @@ const EventLogs = (props: EventPropsInfo) => {
       case 'contract.main.burrow.near':
       case 'contract.1638481328.burrow.testnet':
         return <BurrowContract event={props.event} />;
+      case 'intents.near':
+        return (
+          <IntentsContract
+            event={props.event}
+            actionsLog={props?.actionsLog}
+            allActionLog={props?.allActionLog}
+          />
+        );
       default:
         return null;
     }
