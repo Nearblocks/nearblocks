@@ -39,7 +39,7 @@ if (config.ratelimiterRedisSentinelName) {
 }
 
 const ratelimiterRedis = new Redis(
-  `user-api:${config.network}`,
+  `user-api`,
   ratelimiterOptions,
 );
 

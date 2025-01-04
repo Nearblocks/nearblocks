@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  advertise:
+    container_name: advertise
+    build:
+      context: .
+      dockerfile: ./apps/advertise/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: advertise.env
+    ports:
+      - '3008:3008'
+
+volumes:
+  postgres_data:
