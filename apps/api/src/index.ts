@@ -3,6 +3,7 @@ import logger from '#libs/logger';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 import redis from '#libs/redis';
 import sentry from '#libs/sentry';
+import '#libs/tracing';
 
 import app from './app.js';
 
