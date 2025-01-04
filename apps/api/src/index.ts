@@ -1,3 +1,5 @@
+/* eslint-disable perfectionist/sort-imports */
+import '#libs/tracing';
 import config from '#config';
 import logger from '#libs/logger';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
