@@ -11,6 +11,9 @@ import dynamic from 'next/dynamic';
 import { useRpcStore } from '@/stores/rpc';
 import { useRouter } from 'next/router';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
+import { IncomingMessage } from 'http';
+import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const RpcMenu = dynamic(() => import('../../components/Layouts/RpcMenu'), {
@@ -25,10 +28,15 @@ export const getServerSideProps: GetServerSideProps<{
   signedAccountId: any;
 }> = async (context) => {
   const {
-    query: { ...qs },
-  }: any = context;
+    query: { qs },
+    req,
+  }: {
+    query: QueryParams;
+    req: IncomingMessage;
+  } = context;
 
   const fetchUrl = `validators?${queryString.stringify(qs)}`;
+
   try {
     const [dataResult] = await Promise.allSettled([fetcher(fetchUrl)]);
 
