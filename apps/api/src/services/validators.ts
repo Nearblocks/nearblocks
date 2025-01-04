@@ -25,7 +25,6 @@ import { RequestValidator } from '#types/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
-  const rpc = req.validator.data.rpc;
   const page = req.validator.data.page;
   const perPage = req.validator.data.per_page;
 
@@ -142,7 +141,7 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     const EPOCH_EXPIRY = 43200;
 
     try {
-      const provider = getProvider(rpc);
+      const provider = getProvider();
 
       const cacheKey = `lastEpochApy`;
 
