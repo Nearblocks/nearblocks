@@ -6,20 +6,26 @@ import { appUrl } from '@/utils/config';
 import { env } from 'next-runtime-env';
 import { GetServerSideProps } from 'next';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const { statsDetails, latestBlocks } = await fetchData();
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -28,6 +34,7 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -75,6 +82,7 @@ AboutPage.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

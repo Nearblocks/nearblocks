@@ -18,6 +18,7 @@ import Info from '@/components/Tokens/FT/Info';
 import FAQ from '@/components/Tokens/FT/FAQ';
 import TokenFilter from '@/components/Tokens/FT/TokenFilter';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -29,12 +30,14 @@ type TabType = 'transfers' | 'holders' | 'info' | 'faq';
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const {
     query: { id = '', a = '', tab = 'transfers', ...qs },
+    req,
   }: {
     query: {
       id?: string;
       a?: string;
       tab?: TabType;
     } & Record<string, any>;
+    req: any;
   } = context;
 
   const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
@@ -93,6 +96,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ]);
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     let dataResult = null;
     let dataCountResult = null;
@@ -139,6 +144,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         data: dataResult && getResult(dataResult),
         dataCount: dataCountResult && getResult(dataCountResult),
         error: dataResult && dataResult.status === 'rejected',
+        signedAccountId,
         tab,
       },
     };
@@ -161,6 +167,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         tab: 'transfers',
         searchResultDetails: null,
         searchRedirectDetails: null,
+        signedAccountId: null,
       },
     };
   }
@@ -349,6 +356,7 @@ TokenDetails.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

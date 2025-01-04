@@ -6,18 +6,24 @@ import Export from '@/components/Export';
 import { appUrl } from '@/utils/config';
 import { GetServerSideProps } from 'next';
 import { fetchData } from '@/utils/fetchData';
+import { getCookieFromRequest } from '@/utils/libs';
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const { statsDetails, latestBlocks } = await fetchData();
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -26,6 +32,7 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -73,6 +80,7 @@ ExportData.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

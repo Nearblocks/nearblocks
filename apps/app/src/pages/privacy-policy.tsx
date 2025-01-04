@@ -8,20 +8,26 @@ import { fetchData } from '@/utils/fetchData';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import { getCookieFromRequest } from '@/utils/libs';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const { statsDetails, latestBlocks } = await fetchData();
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -30,6 +36,7 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -535,6 +542,7 @@ PrivacyPolicy.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

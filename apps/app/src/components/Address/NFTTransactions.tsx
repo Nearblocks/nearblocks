@@ -1,5 +1,9 @@
-import { localFormat, truncateString } from '@/utils/libs';
-import { TransactionInfo } from '@/utils/types';
+import {
+  getFilteredQueryParams,
+  localFormat,
+  truncateString,
+} from '@/utils/libs';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -468,14 +472,10 @@ const NFTTransactions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = router.query;
-    const { cursor, order, p, tab, keyword, query, filter, ...rest } =
-      queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(router?.query, [
+    FilterKind.EVENT,
+    FilterKind.INVOLVED,
+  ]);
 
   return (
     <>

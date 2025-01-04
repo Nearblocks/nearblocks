@@ -1,5 +1,6 @@
 import Big from 'big.js';
 import { FieldType, GuessableTypeString } from './types';
+import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
 const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
@@ -600,6 +601,16 @@ export const getCookieFromRequest = (
 
   return cookie ? cookie.split('=')[1] : null;
 };
+
+export function getFilteredQueryParams(
+  query: QueryParams,
+  requiredKeys: string[],
+) {
+  const filteredParams = Object.fromEntries(
+    Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
+  );
+  return Object.keys(filteredParams).length ? filteredParams : {};
+}
 
 export const parseGitHubLink = (snapshot: string) => {
   const regex =

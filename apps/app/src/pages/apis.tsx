@@ -7,7 +7,12 @@ import FaRegTimesCircle from '@/components/Icons/FaRegTimesCircle';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
 import Arrow from '@/components/Icons/Arrow';
 import SwitchButton from '@/components/SwitchButton';
-import { dollarFormat, dollarNonCentFormat, localFormat } from '@/utils/libs';
+import {
+  dollarFormat,
+  dollarNonCentFormat,
+  getCookieFromRequest,
+  localFormat,
+} from '@/utils/libs';
 import { docsUrl } from '@/utils/config';
 import Layout from '@/components/Layouts';
 import { ToastContainer, toast } from 'react-toastify';
@@ -23,14 +28,18 @@ const userApiURL = env('NEXT_PUBLIC_USER_API_URL');
 export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const { statsDetails, latestBlocks } = await fetchData();
-
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
     return {
       props: {
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -39,6 +48,7 @@ export const getServerSideProps: GetServerSideProps<{
       props: {
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -583,6 +593,7 @@ ApiPlan.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

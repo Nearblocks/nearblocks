@@ -4,13 +4,15 @@ import useTranslation from 'next-translate/useTranslation';
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import { ReactElement } from 'react';
 import Chart from '@/components/Charts/Chart';
+import { getCookieFromRequest } from '@/utils/libs';
 
 export const getServerSideProps: GetServerSideProps<{
   data: any;
   error: boolean;
   statsDetails: any;
   latestBlocks: any;
-}> = async () => {
+  signedAccountId: any;
+}> = async (context) => {
   try {
     const [dataResult, statsResult, latestBlocksResult] =
       await Promise.allSettled([
@@ -27,6 +29,9 @@ export const getServerSideProps: GetServerSideProps<{
       latestBlocksResult.status === 'fulfilled'
         ? latestBlocksResult.value
         : null;
+    const { req } = context;
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     return {
       props: {
@@ -34,6 +39,7 @@ export const getServerSideProps: GetServerSideProps<{
         error,
         statsDetails,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -44,6 +50,7 @@ export const getServerSideProps: GetServerSideProps<{
         error: true,
         statsDetails: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -83,6 +90,7 @@ ActiveAccountsChart.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsDetails}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

@@ -24,7 +24,7 @@ import ReceiptSummary from '@/components/Transactions/ReceiptSummary';
 import useRpc from '@/hooks/useRpc';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import fetcher from '@/utils/fetcher';
-import { nanoToMilli } from '@/utils/libs';
+import { getCookieFromRequest, nanoToMilli } from '@/utils/libs';
 import ListCheck from '@/components/Icons/ListCheck';
 import { ExecutionOutcomeWithIdView } from '@/utils/types';
 import FaCheckCircle from '@/components/Icons/FaCheckCircle';
@@ -52,9 +52,11 @@ export const getServerSideProps: GetServerSideProps<{
   isContract: any;
   price: any;
   latestBlocks: any;
+  signedAccountId: any;
 }> = async (context) => {
   const {
     query: { hash = '' },
+    req,
   }: any = context;
 
   try {
@@ -66,6 +68,8 @@ export const getServerSideProps: GetServerSideProps<{
     const txn = data && data?.txns?.[0];
 
     const { statsDetails, latestBlocks } = await fetchData();
+    const signedAccountId =
+      getCookieFromRequest('signedAccountId', req) || null;
 
     let price: number | null = null;
     if (txn?.block_timestamp) {
@@ -99,6 +103,7 @@ export const getServerSideProps: GetServerSideProps<{
         isContract,
         price,
         latestBlocks,
+        signedAccountId,
       },
     };
   } catch (error) {
@@ -111,6 +116,7 @@ export const getServerSideProps: GetServerSideProps<{
         isContract: false,
         price: null,
         latestBlocks: null,
+        signedAccountId: null,
       },
     };
   }
@@ -438,6 +444,7 @@ Txn.getLayout = (page: ReactElement) => (
   <Layout
     statsDetails={page?.props?.statsData}
     latestBlocks={page?.props?.latestBlocks}
+    signedAccountId={page?.props?.signedAccountId}
   >
     {page}
   </Layout>

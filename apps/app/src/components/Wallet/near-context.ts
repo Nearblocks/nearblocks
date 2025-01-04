@@ -4,7 +4,7 @@ import { Wallet } from './near';
 
 // Define the context type
 interface NearContextType {
-  signedAccountId: string; // Account ID as a string
+  signedAccountId: string | undefined; // Account ID as a string
   wallet: null | Wallet; // wallet can be null
 }
 
