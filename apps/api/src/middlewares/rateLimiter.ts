@@ -171,7 +171,12 @@ const useFreePlan = async (
 
   const plan = await getPlan(baseUrl, token);
 
-  await ratelimiterRedisClient.set(`user_plan:${key}`, JSON.stringify(plan), 'EX', 86400);
+  await ratelimiterRedisClient.set(
+    `user_plan:${key}`,
+    JSON.stringify(plan),
+    'EX',
+    86400,
+  );
 
   const rateLimit = rateLimiterUnion(plan, baseUrl);
 
@@ -237,7 +242,12 @@ const getFreePlan = async () => {
     const freePlan = plans?.[0];
 
     if (freePlan) {
-      await ratelimiterRedisClient.set('free_plan', JSON.stringify(freePlan), 'EX', 86400);
+      await ratelimiterRedisClient.set(
+        'free_plan',
+        JSON.stringify(freePlan),
+        'EX',
+        86400,
+      );
     }
 
     return freePlan;
