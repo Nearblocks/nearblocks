@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
-import { localFormat } from '@/utils/app/libs';
-import { MultiChainTxnInfo } from '@/utils/types';
+import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
+import { FilterKind, MultiChainTxnInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
@@ -489,15 +489,11 @@ const MultiChainTxns = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, filter, keyword, order, p, query, tab, ...rest } =
-      queryParams;
-
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(currentParams, [
+    FilterKind.FROM,
+    FilterKind.CHAIN,
+    FilterKind.MULTICHAIN_ADDRESS,
+  ]);
 
   return (
     <>

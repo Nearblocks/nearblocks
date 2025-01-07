@@ -16,6 +16,7 @@ import Tooltip from '../../common/Tooltip';
 import CloseCircle from '../../Icons/CloseCircle';
 import Question from '../../Icons/Question';
 import { NearContext } from '../../wallet/near-context';
+import { stringify } from 'querystring';
 
 interface Props {
   id: string;
@@ -41,14 +42,6 @@ const sortFields = (fields: FieldType[]) => {
   });
 
   return fields;
-};
-
-const getDataType = (data: string) => {
-  if (isJson(data)) {
-    return 'json';
-  }
-
-  return isNaN(+data) ? typeof data : 'number';
 };
 
 const ViewOrChange = (props: Props) => {
@@ -145,6 +138,16 @@ const ViewOrChange = (props: Props) => {
     }
   };
 
+  const getDataType = (
+    data: any,
+  ): 'json' | 'string' | 'number' | 'boolean' | 'null' => {
+    if (data === null) return 'null';
+    if (typeof data === 'boolean') return 'boolean';
+    if (typeof data === 'object') return 'json';
+    if (typeof data === 'string') return isJson(data) ? 'json' : 'string';
+    return 'number';
+  };
+
   const onDetect = async () => {
     setLoading(true);
     setFields([]);
@@ -158,22 +161,21 @@ const ViewOrChange = (props: Props) => {
         gas: args?.gas || optns.gas,
       }));
 
-      for (const arg in argJson) {
-        const value = argJson[arg];
-
-        if (value) {
-          const type = getDataType(value);
+      for (const key of Object.keys(argJson)) {
+        const fieldValue = argJson[key];
+        if (key) {
+          const type = getDataType(fieldValue);
           const field = {
             id: uniqueId(),
-            name: arg,
-            placeholder:
-              type === 'number'
-                ? value
-                : typeof value === 'object'
-                ? JSON.stringify(value)
-                : value,
+            name: key,
             type: type,
             value: '',
+            placeholder:
+              type === 'number'
+                ? fieldValue
+                : typeof fieldValue === 'object'
+                ? JSON.stringify(fieldValue)
+                : fieldValue,
           };
           setFields((flds) => [...flds, field]);
           // setHideQuery(true);
@@ -270,9 +272,15 @@ const ViewOrChange = (props: Props) => {
               <input
                 className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
                 name="value"
-                onChange={onChange(field.id)}
-                placeholder={field.placeholder || 'Argument value'}
                 value={field.value}
+                onChange={onChange(field.id)}
+                placeholder={
+                  field.placeholder != null
+                    ? typeof field.placeholder === 'object'
+                      ? stringify(field.placeholder)
+                      : field.placeholder.toString()
+                    : 'Argument value'
+                }
               />
             </div>
             <button

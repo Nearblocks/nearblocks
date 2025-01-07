@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../../common/AddressLink';
 import ErrorMessage from '../../common/ErrorMessage';
@@ -21,6 +21,7 @@ import Clock from '../../Icons/Clock';
 import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
+import { getFilteredQueryParams } from '@/utils/app/libs';
 
 interface Props {
   count: number;
@@ -333,24 +334,8 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
     },
   ];
 
-  function removeCursor() {
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
-    const queryParams = currentParams;
-    const {
-      cursor,
-      filter,
-      keyword,
-      locale,
-      order,
-      page,
-      query,
-      tab,
-      ...rest
-    } = queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const currentParams = QueryString.parse(searchParams?.toString() || '');
+  const modifiedFilter = getFilteredQueryParams(currentParams, [FilterKind.A]);
 
   return (
     <>
@@ -361,9 +346,11 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
               <Skeleton className="h-4" />
             </div>
           ) : (
-            <div className={`flex flex-col lg:flex-row pt-4`}>
+            <div
+              className={`flex flex-wrap sm:!flex-nowrap justify-between py-4 items-center`}
+            >
               <div className="flex flex-col">
-                <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+                <p className="leading-7 px-6 text-sm text-nearblue-600 dark:text-neargray-10">
                   {txns &&
                     !error &&
                     `A total of ${

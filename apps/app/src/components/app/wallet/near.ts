@@ -1,25 +1,16 @@
 // wallet selector
-import { setupBitgetWallet } from '@near-wallet-selector/bitget-wallet';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
 import { setupCoin98Wallet } from '@near-wallet-selector/coin98-wallet';
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core';
 import { setupEthereumWallets } from '@near-wallet-selector/ethereum-wallets';
 import { setupLedger } from '@near-wallet-selector/ledger';
-import { setupMathWallet } from '@near-wallet-selector/math-wallet';
 import { setupMeteorWallet } from '@near-wallet-selector/meteor-wallet';
 import { setupMintbaseWallet } from '@near-wallet-selector/mintbase-wallet';
 import { setupModal } from '@near-wallet-selector/modal-ui';
 import '@near-wallet-selector/modal-ui/styles.css';
 import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
-import { setupNarwallets } from '@near-wallet-selector/narwallets';
 import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet';
 import { setupNearFi } from '@near-wallet-selector/nearfi';
-import { setupNightly } from '@near-wallet-selector/nightly';
-import { setupRamperWallet } from '@near-wallet-selector/ramper-wallet';
-import { setupSender } from '@near-wallet-selector/sender';
-import { setupWelldoneWallet } from '@near-wallet-selector/welldone-wallet';
-import { setupXDEFI } from '@near-wallet-selector/xdefi';
-// near api js
 import { providers } from 'near-api-js';
 
 import { wagmiAdapter, web3Modal } from './web3modal';
@@ -162,7 +153,6 @@ export class Wallet {
     // Initialize the wallet selector
     this.selector = setupWalletSelector({
       modules: [
-        setupBitgetWallet(),
         setupBitteWallet(),
         setupCoin98Wallet(),
         setupEthereumWallets({
@@ -170,18 +160,11 @@ export class Wallet {
           web3Modal: web3Modal as any,
         }),
         setupLedger(),
-        setupMathWallet(),
         setupMintbaseWallet(),
         setupMeteorWallet(),
         setupNearFi(),
         setupNearMobileWallet(),
         setupMyNearWallet(),
-        setupNarwallets(),
-        setupNightly(),
-        setupRamperWallet(),
-        setupSender(),
-        setupWelldoneWallet(),
-        setupXDEFI(),
       ],
       network: this.networkId as NetworkId,
     });
