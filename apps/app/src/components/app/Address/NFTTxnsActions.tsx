@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/libs';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
@@ -27,6 +27,7 @@ import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
+import { getFilteredQueryParams } from '@/utils/app/libs';
 
 const initialForm = {
   event: '',
@@ -62,6 +63,7 @@ const NFTTransactionActions = ({
   const t = useTranslations();
   const errorMessage = t('noTxns') || ' No transactions found!';
   const toggleShowAge = () => setShowAge((s) => !s);
+  const currentParams = QueryString.parse(searchParams?.toString() || '');
 
   const onChange = (e: any) => {
     const name = e.target.name;
@@ -73,8 +75,6 @@ const NFTTransactionActions = ({
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const newParams = { ...currentParams, order: newOrder };
     const newQueryString = QueryString.stringify(newParams);
 
@@ -87,7 +87,6 @@ const NFTTransactionActions = ({
     setPage(1);
 
     const { event, involved } = form;
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
@@ -104,7 +103,6 @@ const NFTTransactionActions = ({
     const { name } = e.currentTarget;
 
     setPage(1);
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...restQuery } = currentParams;
 
     if (name === 'type') {
@@ -122,8 +120,6 @@ const NFTTransactionActions = ({
 
   const onAllClear = () => {
     setForm(initialForm);
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, event, involved, page, ...newQuery } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
@@ -131,7 +127,6 @@ const NFTTransactionActions = ({
 
   const onHandleMouseOver = (e: any, id: string) => {
     e.preventDefault();
-
     setAddress(id);
   };
   const handleMouseLeave = () => {
@@ -489,12 +484,11 @@ const NFTTransactionActions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, order, page, tab, ...rest } = queryParams;
-    return rest;
-  }
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(currentParams, [
+    FilterKind.EVENT,
+    FilterKind.INVOLVED,
+  ]);
+
   return (
     <>
       <TableSummary
@@ -504,7 +498,7 @@ const NFTTransactionActions = ({
           txns.length > 0 && (
             <button className="hover:no-underline ">
               <Link
-                className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800"
+                className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border dark:border-black-200 border-neargray-700 px-4 rounded-md bg-white dark:bg-black-600  hover:bg-neargray-800 whitespace-nowrap"
                 href={`/nft-token/exportdata?address=${id}`}
               >
                 <p>CSV Export</p>

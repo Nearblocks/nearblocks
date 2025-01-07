@@ -2,6 +2,7 @@ import Big from 'big.js';
 import get from 'lodash/get';
 
 import { FieldType, GuessableTypeString } from '@/utils/types';
+import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
   Object.entries(obj).reduce((a, [k, v]) => {
@@ -524,3 +525,13 @@ export const centsToDollar = (val: number) => {
   const value = (val / 100).toFixed(2);
   return value;
 };
+
+export function getFilteredQueryParams(
+  query: QueryParams,
+  requiredKeys: string[],
+) {
+  const filteredParams = Object.fromEntries(
+    Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
+  );
+  return Object.keys(filteredParams).length ? filteredParams : {};
+}

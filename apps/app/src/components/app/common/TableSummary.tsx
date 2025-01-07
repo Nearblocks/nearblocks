@@ -6,19 +6,15 @@ const TableSummary = ({
   text = <></>,
 }: any) => {
   return (
-    <div
-      className={`md:flex sm:flex-1 flex-1 w-full items-center py-4 justify-center`}
-    >
-      <div className="flex w-full items-center">
-        <p className="flex leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10">
+    <div className={`flex flex-wrap py-4 w-full items-center justify-between`}>
+      <div className="flex flex-col">
+        <p className="flex leading-7 pl-6 pr-2 text-sm text-nearblue-600 dark:text-neargray-10">
           {text}
         </p>
       </div>
       <div className="sm:flex px-4 text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-between flex-nowrap">
-        <div className="flex pr-2 sm:whitespace-nowrap py-1">{filters}</div>
-        <div className="flex whitespace-nowrap items-center sm:mb-0">
-          {linkToDowload}
-        </div>
+        <div className="flex pr-2 py-1">{filters}</div>
+        <div className="flex items-center sm:mb-0">{linkToDowload}</div>
       </div>
     </div>
   );

@@ -1,30 +1,25 @@
 import { capitalize, stripEmpty } from '@/utils/libs';
-
 import CloseCircle from '../Icons/CloseCircle';
-
 interface FiltersProps {
   filters: { [key: string]: any };
   onClear?: () => void;
 }
-
 const Filters: React.FC<FiltersProps> = ({
   filters = {},
   onClear = () => {},
 }) => {
   const stripped = Object.keys(stripEmpty(filters));
-
   if (!stripped?.length) return null;
-
   return (
-    <div className="flex items-center text-sm text-gray-500 dark:text-neargray-10 lg:ml-auto mb-4 sm:mb-0">
-      Filtered By:
-      <span className="flex items-center bg-gray-100 dark:bg-black-200 rounded-full px-3 py-1 ml-1 space-x-2">
+    <div className="flex flex-wrap sm:!flex-nowrap items-center text-sm text-gray-500 dark:text-neargray-10 lg:ml-auto">
+      <span className="whitespace-nowrap mb-2 sm:!mb-0">Filtered By:</span>
+      <div className="flex flex-wrap sm:!flex-nowrap items-center bg-gray-100 dark:bg-black-200 rounded-lg px-3 py-1 ml-1 space-x-2">
         {stripped &&
           stripped.map((key) => (
-            <span className="flex" key={key}>
-              {capitalize(key)}:{' '}
-              <span className="inline-block truncate max-w-[120px]">
-                <span className="font-semibold">{filters[key]}</span>
+            <span className="flex items-center space-x-1" key={key}>
+              <span>{capitalize(key)}: </span>
+              <span className="font-semibold sm:!max-w-[100px] max-w-[80px] truncate">
+                <span>{filters[key]}</span>
               </span>
             </span>
           ))}
@@ -32,9 +27,8 @@ const Filters: React.FC<FiltersProps> = ({
           className="w-4 h-4 fill-current cursor-pointer"
           onClick={onClear}
         />
-      </span>
+      </div>
     </div>
   );
 };
-
 export default Filters;

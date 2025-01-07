@@ -1784,3 +1784,16 @@ export type currentCampaign = {
     username: string;
   };
 };
+
+export enum FilterKind {
+  ACTION = 'action',
+  METHOD = 'method',
+  FROM = 'from',
+  TO = 'to',
+  BLOCK = 'block',
+  CHAIN = 'chain',
+  MULTICHAIN_ADDRESS = 'multichain_address',
+  EVENT = 'event',
+  INVOLVED = 'involved',
+  A = 'a',
+}

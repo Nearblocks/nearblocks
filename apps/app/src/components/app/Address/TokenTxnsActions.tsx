@@ -10,9 +10,13 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
-import { localFormat, truncateString } from '@/utils/app/libs';
+import {
+  getFilteredQueryParams,
+  localFormat,
+  truncateString,
+} from '@/utils/app/libs';
 import { tokenAmount } from '@/utils/app/near';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
@@ -60,11 +64,11 @@ const TokenTxnsActions = ({
   const errorMessage = t('noTxns') || 'No transactions found!';
   const [address, setAddress] = useState('');
 
+  const currentParams = QueryString.parse(searchParams?.toString() || '');
+
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const newParams = { ...currentParams, order: newOrder };
     const newQueryString = QueryString.stringify(newParams);
 
@@ -95,7 +99,6 @@ const TokenTxnsActions = ({
     setPage(1);
 
     const { event, involved } = form;
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
@@ -112,7 +115,6 @@ const TokenTxnsActions = ({
     const { name } = e.currentTarget;
 
     setPage(1);
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...restQuery } = currentParams;
 
     if (name === 'type') {
@@ -130,8 +132,6 @@ const TokenTxnsActions = ({
 
   const onAllClear = () => {
     setForm(initialForm);
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, event, involved, page, ...newQuery } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
@@ -491,12 +491,10 @@ const TokenTxnsActions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, order, page, tab, ...rest } = queryParams;
-    return rest;
-  }
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(currentParams, [
+    FilterKind.EVENT,
+    FilterKind.INVOLVED,
+  ]);
 
   return (
     <>
@@ -507,7 +505,7 @@ const TokenTxnsActions = ({
           txns?.length > 0 && (
             <button className="hover:no-underline ">
               <Link
-                className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap"
                 href={`/token/exportdata?address=${id}`}
               >
                 <p>CSV Export</p>

@@ -10,10 +10,14 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { isAction, localFormat } from '@/utils/app/libs';
+import {
+  getFilteredQueryParams,
+  isAction,
+  localFormat,
+} from '@/utils/app/libs';
 import { txnMethod } from '@/utils/app/near';
 import { truncateString, yoctoToNear } from '@/utils/libs';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
@@ -62,6 +66,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
   const txns = txnsData?.txns;
   let cursor = txnsData?.cursor;
 
+  const currentParams = QueryString.parse(searchParams?.toString() || '');
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'type') {
@@ -83,7 +88,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
     setPage(1);
 
     const { action, from, method, to } = form;
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
@@ -103,7 +107,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
     const { name } = e.currentTarget;
 
     setPage(1);
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...restQuery } = currentParams;
 
     if (name === 'type') {
@@ -120,8 +123,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
   };
   const onAllClear = () => {
     setForm(initialForm);
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { action, block, cursor, from, method, page, to, ...newQuery } =
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
@@ -145,13 +146,13 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
     setAddress('');
   };
 
-  function removeCursor() {
-    const queryParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, order, page, ...rest } = queryParams;
-    return rest;
-  }
-
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(currentParams, [
+    FilterKind.ACTION,
+    FilterKind.METHOD,
+    FilterKind.FROM,
+    FilterKind.TO,
+    FilterKind.BLOCK,
+  ]);
 
   const columns: any = [
     {
@@ -532,10 +533,10 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
 
   return (
     <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
-      <div className={`flex flex-col lg:flex-row pt-4`}>
+      <div className={`flex flex-wrap py-4 items-center justify-between`}>
         <div className="flex flex-col">
           <p
-            className="leading-7 pl-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10"
+            className="leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10"
             suppressHydrationWarning={true}
           >
             {count &&
@@ -548,7 +549,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
           </p>
         </div>
         {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (
-          <div className="lg:ml-auto px-6 pb-1">
+          <div className="lg:ml-auto px-6">
             <Filters filters={modifiedFilter} onClear={onAllClear} />
           </div>
         )}

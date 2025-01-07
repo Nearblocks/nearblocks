@@ -17,7 +17,7 @@ import {
   truncateString,
   yoctoToNear,
 } from '@/utils/libs';
-import { TransactionInfo } from '@/utils/types';
+import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
@@ -32,6 +32,7 @@ import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
+import { getFilteredQueryParams } from '@/utils/app/libs';
 
 const initialForm = {
   action: '',
@@ -68,6 +69,8 @@ const TransactionActions = ({
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
+  const currentParams = QueryString.parse(searchParams?.toString() || '');
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -96,7 +99,6 @@ const TransactionActions = ({
     setPage(1);
 
     const { action, from, method, to } = form;
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
@@ -114,8 +116,6 @@ const TransactionActions = ({
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';
     const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const newParams = { ...currentParams, order: newOrder };
     const newQueryString = QueryString.stringify(newParams);
 
@@ -136,7 +136,6 @@ const TransactionActions = ({
     const { name } = e.currentTarget;
 
     setPage(1);
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { cursor, page, ...restQuery } = currentParams;
 
     if (name === 'type') {
@@ -154,8 +153,6 @@ const TransactionActions = ({
 
   const onAllClear = () => {
     setForm(initialForm);
-
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
     const { action, block, cursor, from, method, page, to, ...newQuery } =
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
@@ -487,12 +484,12 @@ const TransactionActions = ({
     },
   ];
 
-  function removeCursor() {
-    const queryParams = QueryString.parse(searchParams?.toString() || '');
-    const { cursor, order, page, tab, ...rest } = queryParams;
-    return rest;
-  }
-  const modifiedFilter = removeCursor();
+  const modifiedFilter = getFilteredQueryParams(currentParams, [
+    FilterKind.ACTION,
+    FilterKind.METHOD,
+    FilterKind.FROM,
+    FilterKind.TO,
+  ]);
 
   return (
     <>
@@ -504,7 +501,7 @@ const TransactionActions = ({
             <>
               <button className="hover:no-underline">
                 <Link
-                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800"
+                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap"
                   href={`/exportdata?address=${id}&type=transactions`}
                 >
                   <p>CSV Export</p>
