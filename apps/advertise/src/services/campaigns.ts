@@ -197,14 +197,14 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_metrics (time, campaign_ad_id, impressions)
+      campaign_ad_metrics (TIME, campaign_ad_id, impressions)
     VALUES
       (
         ${now},
         ${campaignId},
         1
       )
-    ON CONFLICT (campaign_ad_id, time) DO
+    ON CONFLICT (campaign_ad_id, TIME) DO
     UPDATE
     SET
       impressions = campaign_ad_metrics.impressions + 1
@@ -227,14 +227,14 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_metrics (time, campaign_ad_id, clicks)
+      campaign_ad_metrics (TIME, campaign_ad_id, clicks)
     VALUES
       (
         ${now},
         ${campaignId},
         1
       )
-    ON CONFLICT (campaign_ad_id, time) DO
+    ON CONFLICT (campaign_ad_id, TIME) DO
     UPDATE
     SET
       clicks = campaign_ad_metrics.clicks + 1
