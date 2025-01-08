@@ -2,7 +2,7 @@
   "name": "advertise",
   "version": "1.0.0",
   "author": "NearBlocks",
-  "license": "MIT",
+  "license": "Business Source License 1.1",
   "type": "module",
   "imports": {
     "#*": [
