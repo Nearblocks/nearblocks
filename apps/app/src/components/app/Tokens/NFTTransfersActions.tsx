@@ -104,7 +104,7 @@ const NFTTransfersActions = ({
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
@@ -288,7 +288,7 @@ const NFTTransfersActions = ({
           >
             <span>
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                 href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
               >
                 {row?.token_id}
@@ -322,7 +322,7 @@ const NFTTransfersActions = ({
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate">
                   <Link
-                    className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                    className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                     href={`/nft-token/${row?.nft?.contract}`}
                   >
                     {row?.nft?.name}

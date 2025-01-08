@@ -216,7 +216,7 @@ const Details = (props: Props) => {
               </div>
             )}
 
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 pt-4 pb-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -238,7 +238,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap items-start p-4">
+            <div className="flex flex-wrap items-start px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -273,7 +273,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -304,7 +304,7 @@ const Details = (props: Props) => {
                 ''
               )}
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -336,7 +336,7 @@ const Details = (props: Props) => {
                 ''
               )}
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -368,7 +368,7 @@ const Details = (props: Props) => {
             id="action-row"
           >
             <div className="flex items-start flex-wrap px-4 py-2">
-              <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7 py-0 sm:!py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7 py-0 sm:!py-">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
                   tooltip={'Highlighted events of the transaction'}
@@ -404,72 +404,15 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-
-          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-            <div className="flex flex-wrap p-4">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                <Tooltip
-                  className={'w-96 left-25 max-w-[200px]'}
-                  tooltip={t('txnDetails.from.tooltip')}
-                >
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip>
-                {t ? t('txnDetails.from.text.0') : 'From'}
-              </div>
-              {!txn?.signer_account_id ? (
-                <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-full max-w-xl" />
-                </div>
-              ) : (
-                <div className="w-full md:w-3/4 break-all">
-                  <Link
-                    className="text-green-500  dark:text-green-250 hover:no-underline"
-                    href={`/address/${txn?.signer_account_id}`}
-                  >
-                    {txn?.signer_account_id}
-                  </Link>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-wrap p-4">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-                <Tooltip
-                  className={'w-96 left-25 max-w-[200px]'}
-                  tooltip={t('txnDetails.to.tooltip')}
-                >
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
-                  </div>
-                </Tooltip>
-                {isContract ? 'To' : t ? t('txnDetails.to.text.0') : 'To'}
-              </div>
-              {!txn?.receiver_account_id ? (
-                <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-full max-w-xl" />
-                </div>
-              ) : (
-                <div className="w-full md:w-3/4 break-all">
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${txn?.receiver_account_id}`}
-                  >
-                    {txn?.receiver_account_id}
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 hidden md:!block overflow-x-hidden">
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-[103px] max-w-[202px]'}
                   tooltip={'Sponsored banner advertisement'}
                 >
                   <div>
-                    <Question className="w-4 h-4 fill-current mr-1" />
+                    <Question className="w-4 h-4 fill-current mr-1 !mt-[3px]" />
                   </div>
                 </Tooltip>
                 Sponsored:
@@ -489,8 +432,66 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
+
+          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
+            <div className="flex flex-wrap px-4 py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+                <Tooltip
+                  className={'w-96 left-25 max-w-[200px]'}
+                  tooltip={t('txnDetails.from.tooltip')}
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip>
+                {t ? t('txnDetails.from.text.0') : 'From'}
+              </div>
+              {!txn?.signer_account_id ? (
+                <div className="w-full md:w-3/4">
+                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-all">
+                  <Link
+                    className="text-green-500  dark:text-green-250 hover:no-underline font-semibold"
+                    href={`/address/${txn?.signer_account_id}`}
+                  >
+                    {txn?.signer_account_id}
+                  </Link>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap px-4 py-2">
+              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+                <Tooltip
+                  className={'w-96 left-25 max-w-[200px]'}
+                  tooltip={t('txnDetails.to.tooltip')}
+                >
+                  <div>
+                    <Question className="w-4 h-4 fill-current mr-1" />
+                  </div>
+                </Tooltip>
+                {isContract ? 'To' : t ? t('txnDetails.to.text.0') : 'To'}
+              </div>
+              {!txn?.receiver_account_id ? (
+                <div className="w-full md:w-3/4">
+                  <Loader wrapperClassName="flex w-full max-w-xl" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-all">
+                  <Link
+                    className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                    href={`/address/${txn?.receiver_account_id}`}
+                  >
+                    {txn?.receiver_account_id}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
           {(fts?.length > 0 || nfts?.length > 0 || showRow) && (
-            <div className="flex items-start flex-wrap p-4">
+            <div className="flex items-start flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -522,7 +523,7 @@ const Details = (props: Props) => {
                                 From{' '}
                                 {ft?.involved_account_id ? (
                                   <Link
-                                    className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                    className="text-green-500 dark:text-green-250 pl-1 hover:no-underline font-semibold"
                                     href={`/address/${ft?.involved_account_id}`}
                                   >
                                     {shortenAddress(
@@ -539,7 +540,7 @@ const Details = (props: Props) => {
                                 To{' '}
                                 {ft?.affected_account_id ? (
                                   <Link
-                                    className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                    className="text-green-500 dark:text-green-250 pl-1 font-semibold"
                                     href={`/address/${ft?.affected_account_id}`}
                                   >
                                     {shortenAddress(
@@ -559,7 +560,7 @@ const Details = (props: Props) => {
                                 From{' '}
                                 {ft?.affected_account_id ? (
                                   <Link
-                                    className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                                    className="text-green-500 dark:text-green-250 pl-1 hover:no-underline font-semibold"
                                     href={`/address/${ft?.affected_account_id}`}
                                   >
                                     {shortenAddress(
@@ -576,7 +577,7 @@ const Details = (props: Props) => {
                                 To{' '}
                                 {ft?.involved_account_id ? (
                                   <Link
-                                    className="text-green-500 dark:text-green-250 font-normal pl-1"
+                                    className="text-green-500 dark:text-green-250  pl-1 font-semibold"
                                     href={`/address/${ft?.involved_account_id}`}
                                   >
                                     {shortenAddress(
@@ -607,7 +608,7 @@ const Details = (props: Props) => {
                           </div>
 
                           <Link
-                            className="text-green dark:text-green-250 flex items-center hover:no-underline"
+                            className="text-green dark:text-green-250 flex items-center hover:no-underline font-semibold"
                             href={`/token/${ft?.ft_meta?.contract}`}
                           >
                             <TokenImage
@@ -770,7 +771,7 @@ const Details = (props: Props) => {
             </div>
           )}
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -808,7 +809,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -872,7 +873,7 @@ const Details = (props: Props) => {
             <AccordionItem value="">
               <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b">
                 <div>
-                  <div className="flex flex-wrap p-4">
+                  <div className="flex flex-wrap px-4 py-2">
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className={'w-96 left-25 max-w-[200px]'}
@@ -905,7 +906,7 @@ const Details = (props: Props) => {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-wrap p-4">
+                  <div className="flex flex-wrap px-4 py-2">
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className={'w-96 left-25 max-w-[200px]'}
@@ -946,7 +947,7 @@ const Details = (props: Props) => {
                   </div>
                 </div>
               </AccordionItemContent>
-              <div className="flex flex-wrap p-4">
+              <div className="flex flex-wrap px-4 pt-2 pb-4">
                 <AccordionItemTrigger
                   buttonColor="text-green-500 dark:text-green-250"
                   className="focus:outline-none text-green-500 dark:text-green-250 flex items-center cursor-pointer"

@@ -111,7 +111,7 @@ const NFTDetails = ({
             {token?.title || token?.token}
           </h1>
           <Link
-            className="break-all text-green dark:text-green-250 leading-6 text-sm hover:no-underline"
+            className="break-all text-green dark:text-green-250 leading-6 text-sm hover:no-underline font-semibold"
             href={`/nft-token/${id}`}
           >
             <span className="inline-flex align-middle h-5 w-5 mr-2.5">
@@ -155,7 +155,7 @@ const NFTDetails = ({
                       </div>
                       <div className="w-full xl:w-3/4 word-break">
                         <Link
-                          className="text-green dark:text-green-250 hover:no-underline"
+                          className="text-green dark:text-green-250 hover:no-underline font-semibold"
                           href={`/address/${token?.asset?.owner}`}
                         >
                           {shortenAddress &&
@@ -179,7 +179,7 @@ const NFTDetails = ({
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
                       <Link
-                        className="text-green  dark:text-green-250 hover:no-underline"
+                        className="text-green  dark:text-green-250 hover:no-underline font-semibold"
                         href={`/address/${id}`}
                       >
                         {shortenAddress && shortenAddress(id ?? '')}

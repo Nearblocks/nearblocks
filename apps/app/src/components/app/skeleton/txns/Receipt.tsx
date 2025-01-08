@@ -17,7 +17,7 @@ const ReceiptSkeleton = () => {
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
       <div className="divide-solid divide-gray-200 dark:divide-black-200 divide-y">
         <div className="border-l-4 border-green-400 dark:border-green-250 ml-8 my-2">
-          <div className="flex flex-wrap p-4">
+          <div className="flex flex-wrap px-4 pt-4 pb-2">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-48 left-25 max-w-[200px]'}
@@ -33,7 +33,7 @@ const ReceiptSkeleton = () => {
               <Loader wrapperClassName="flex w-80" />
             </div>
           </div>
-          <div className="flex flex-wrap items-start pt-6 pb-7 px-4 md:h-16">
+          <div className="flex flex-wrap items-start py-2 px-4 md:h-9">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -49,7 +49,7 @@ const ReceiptSkeleton = () => {
               <Loader wrapperClassName="flex w-16 " />
             </div>
           </div>
-          <div className="flex flex-wrap p-4">
+          <div className="flex flex-wrap px-4 py-2">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -66,7 +66,7 @@ const ReceiptSkeleton = () => {
             </div>
           </div>
           <div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -82,7 +82,7 @@ const ReceiptSkeleton = () => {
                 <Loader wrapperClassName="flex w-72 " />
               </div>
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -99,7 +99,8 @@ const ReceiptSkeleton = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap pt-4 pb-4 px-4 my-0.5 md:h-16">
+
+          <div className="flex flex-wrap px-4 py-2 md:h-9">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -117,7 +118,8 @@ const ReceiptSkeleton = () => {
               <Loader wrapperClassName="flex w-36" />
             </div>
           </div>
-          <div className="flex items-start flex-wrap px-4 py-3">
+
+          <div className="flex items-start flex-wrap px-4 py-2">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -131,11 +133,10 @@ const ReceiptSkeleton = () => {
             </div>
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-2 max-w-xs" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full !h-28" />
             </div>
           </div>
+
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
@@ -152,6 +153,7 @@ const ReceiptSkeleton = () => {
               <Loader wrapperClassName="flex w-72" />
             </div>
           </div>
+
           <div className="flex items-start flex-wrap p-4">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
@@ -181,9 +183,7 @@ const ReceiptSkeleton = () => {
               {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
             </div>
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full !h-20" />
             </div>
           </div>
         </div>

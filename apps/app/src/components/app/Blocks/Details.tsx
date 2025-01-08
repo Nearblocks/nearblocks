@@ -228,7 +228,7 @@ export default function Details(props: Props) {
               </div>
               <div className="w-full md:w-3/4 break-words">
                 <Link
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
+                  className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                   href={`/blocks/${block?.prev_block_hash}`}
                 >
                   {block?.prev_block_hash}

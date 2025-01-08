@@ -43,7 +43,7 @@ const TokenInfo = (props: TokenInfoProps) => {
           : amount ?? ''}
       </span>
       <Link
-        className="text-green flex items-center hover:no-underline dark:text-green-250"
+        className="text-green flex items-center hover:no-underline dark:text-green-250 font-semibold"
         href={`/token/${contract}`}
       >
         <span className="flex items-center">

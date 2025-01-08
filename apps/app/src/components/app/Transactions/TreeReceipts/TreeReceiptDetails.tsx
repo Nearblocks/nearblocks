@@ -1,8 +1,6 @@
 import { Fragment } from 'react';
-
 import { Link } from '@/i18n/routing';
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
-
 import Tooltip from '../../common/Tooltip';
 import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
 import TreeNode from './TreeNode';
@@ -13,6 +11,7 @@ interface Props {
   show: any | string;
   txn: TransactionInfo;
 }
+
 const TreeReceiptDetails = (props: Props) => {
   const { receipt, show, txn } = props;
 
@@ -31,6 +30,7 @@ const TreeReceiptDetails = (props: Props) => {
       ></div>
     );
   };
+
   return (
     <>
       {show === receipt.receipt_id && (
@@ -63,36 +63,40 @@ const TreeReceiptDetails = (props: Props) => {
                           )}
                         </div>
                       )}
-                    </div>{' '}
-                    <div className="w-full pl-3 py-2 flex items-center">
-                      From:{' '}
-                      <Tooltip
-                        className={'left-1/2 max-w-[200px]'}
-                        position="top"
-                        tooltip={receipt.predecessor_id}
-                      >
-                        <Link
-                          className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
-                          href={`/address/${receipt?.predecessor_id}`}
-                        >
-                          {receipt.predecessor_id}
-                        </Link>
-                      </Tooltip>
                     </div>
                     <div className="w-full pl-3 py-2 flex items-center">
-                      To:{' '}
-                      <Tooltip
-                        className={'left-1/2 max-w-[200px]'}
-                        position="top"
-                        tooltip={receipt.receiver_id}
-                      >
-                        <Link
-                          className="text-green-500 dark:text-green-250 font-medium inline-block truncate max-w-full ml-2"
-                          href={`/address/${receipt?.receiver_id}`}
+                      <span className="flex-shrink-0">From:</span>
+                      <div className="flex-1 min-w-0 ml-2">
+                        <Tooltip
+                          className="left-1/2 max-w-[200px]"
+                          position="top"
+                          tooltip={receipt.predecessor_id}
                         >
-                          {` ${receipt.receiver_id}`}
-                        </Link>
-                      </Tooltip>
+                          <Link
+                            className="text-green-500 dark:text-green-250 font-semibold block truncate"
+                            href={`/address/${receipt?.predecessor_id}`}
+                          >
+                            {receipt.predecessor_id}
+                          </Link>
+                        </Tooltip>
+                      </div>
+                    </div>
+                    <div className="w-full pl-3 py-2 flex items-center">
+                      <span className="flex-shrink-0">To:</span>
+                      <div className="flex-1 min-w-0 ml-2">
+                        <Tooltip
+                          className="left-1/2 max-w-[200px]"
+                          position="top"
+                          tooltip={receipt.receiver_id}
+                        >
+                          <Link
+                            className="text-green-500 dark:text-green-250 font-semibold block truncate"
+                            href={`/address/${receipt?.receiver_id}`}
+                          >
+                            {receipt.receiver_id}
+                          </Link>
+                        </Tooltip>
+                      </div>
                     </div>
                     <div className="w-full pl-3 word-break space-y-4">
                       <TreeTxnsActions
@@ -148,4 +152,5 @@ const TreeReceiptDetails = (props: Props) => {
     </>
   );
 };
+
 export default TreeReceiptDetails;

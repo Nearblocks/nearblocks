@@ -176,7 +176,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
           >
             <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500 dark:text-green-250">
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
@@ -467,7 +467,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            className="text-green-500 dark:text-green-250 hover:no-underline"
+            className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height

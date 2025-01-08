@@ -101,7 +101,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         >
           <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
             <Link
-              className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+              className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
               href={`/txns/${row?.transaction_hash}`}
             >
               {row?.transaction_hash}
@@ -314,7 +314,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate whitespace-nowrap">
                   <Link
-                    className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                    className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                     href={`/token/${row?.ft?.contract}`}
                   >
                     {row?.ft?.name}

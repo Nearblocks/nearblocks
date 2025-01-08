@@ -357,7 +357,7 @@ const OverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        className="text-green-500 dark:text-green-250"
+                        className="text-green-500 dark:text-green-250 font-semibold"
                         href={`/address/${token?.contract}`}
                       >
                         {token?.contract}
@@ -381,7 +381,7 @@ const OverviewActions = ({
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Official Site:
                   </div>
-                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words">
+                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words font-semibold">
                     {!token ? (
                       <div className="w-32">
                         <Skeleton className="h-4" />

@@ -204,7 +204,7 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
               src={row?.icon}
             />
             <Link
-              className=" text-green-500 dark:text-green-250 hover:no-underline flex items-center"
+              className=" text-green-500 dark:text-green-250 hover:no-underline flex items-center font-semibold"
               href={`/token/${row?.contract}`}
             >
               <span className="inline-block truncate max-w-[200px] mr-1">

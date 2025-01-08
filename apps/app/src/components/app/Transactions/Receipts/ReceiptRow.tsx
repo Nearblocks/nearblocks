@@ -29,6 +29,7 @@ interface Props {
 
 const ReceiptRow = (props: Props) => {
   const { block, borderFlag, receipt, statsData } = props;
+  console.log({ receipt });
   const t = useTranslations();
   const [pageHash] = useHash();
   const loading = false;
@@ -89,7 +90,7 @@ const ReceiptRow = (props: Props) => {
         }
         id={`${receipt?.receipt_id}`}
       >
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 pt-4 pb-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-48 left-25 max-w-[200px]'}
@@ -111,7 +112,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-start p-4 py-6 md:h-16">
+        <div className="flex flex-wrap items-start p-4 py-2 md:h-9">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -137,7 +138,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -167,7 +168,7 @@ const ReceiptRow = (props: Props) => {
           )}
         </div>
         <div>
-          <div className="flex flex-wrap p-4">
+          <div className="flex flex-wrap px-4 py-2">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -186,7 +187,7 @@ const ReceiptRow = (props: Props) => {
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <Link
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
+                  className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                   href={`/address/${receipt?.predecessor_id}`}
                 >
                   {receipt?.predecessor_id}
@@ -196,7 +197,7 @@ const ReceiptRow = (props: Props) => {
               ''
             )}
           </div>
-          <div className="flex flex-wrap p-4">
+          <div className="flex flex-wrap px-4 py-2">
             <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
@@ -215,7 +216,7 @@ const ReceiptRow = (props: Props) => {
             ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
                 <Link
-                  className="text-green-500 dark:text-green-250 hover:no-underline"
+                  className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                   href={`/address/${receipt?.receiver_id}`}
                 >
                   {receipt?.receiver_id}
@@ -226,7 +227,7 @@ const ReceiptRow = (props: Props) => {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap p-4 md:h-16">
+        <div className="flex flex-wrap px-4 py-2 md:h-9">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -262,7 +263,7 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-        <div className="flex items-start flex-wrap p-4">
+        <div className="flex items-start flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -277,9 +278,7 @@ const ReceiptRow = (props: Props) => {
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full !h-28" />
             </div>
           ) : receipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
@@ -296,7 +295,7 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-        <div className="flex items-start flex-wrap p-4">
+        <div className="flex items-start flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -310,9 +309,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
@@ -327,7 +324,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap p-4">
+        <div className="flex items-start flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -341,9 +338,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
@@ -351,7 +346,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap p-4">
+        <div className="flex items-start flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -365,9 +360,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
-              <Loader wrapperClassName="flex w-full" />
+              <Loader wrapperClassName="flex w-full !h-20" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">

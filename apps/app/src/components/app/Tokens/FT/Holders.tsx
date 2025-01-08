@@ -59,7 +59,7 @@ const Holders = ({ count, error, holder, status, tab, token }: Props) => {
           >
             <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 whitespace-nowrap">
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-undeline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-undeline"
                 href={`/address/${row.account}`}
               >
                 {row.account}

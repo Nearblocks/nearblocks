@@ -68,7 +68,7 @@ const AccountTabsActions = ({
                 prefetch={true}
                 scroll={false}
               >
-                <h2 className="relative">
+                <h2 className="relative font-semibold">
                   {message}
                   {name === 'contract' && (
                     <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md  -mt-3 px-1">

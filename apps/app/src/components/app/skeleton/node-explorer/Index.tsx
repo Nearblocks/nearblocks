@@ -17,7 +17,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
         <div className="w-full md:w-1/2">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
             <div>
-              <h2 className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600 dark:text-neargray-10 text-sm font-semibold">
+              <h2 className=" flex justify-between border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                 <span>Staking Overview</span>
               </h2>
             </div>
@@ -71,7 +71,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
         </div>
         <div className="w-full md:w-1/2">
           <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
-            <h2 className="border-b dark:border-black-200 dark:text-neargray-10 p-3 text-gray-600 text-sm font-semibold">
+            <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
               Epoch Information
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">

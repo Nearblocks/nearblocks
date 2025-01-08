@@ -81,7 +81,7 @@ const ChartSkeletion = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 key={chart.link}
               >
                 <div>
-                  <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b dark:border-black-200 truncate">
+                  <a className="block leading-7 p-3 text-sm text-nearblue-600 border-b dark:border-black-200 truncate font-semibold">
                     <h2>{t(chart.text)}</h2>
                   </a>
                 </div>
