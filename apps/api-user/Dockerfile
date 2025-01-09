@@ -4,7 +4,7 @@ FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
-RUN turbo prune advertise --docker
+RUN turbo prune api-user --docker
 
 FROM --platform=$BUILDPLATFORM base AS installer
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN apk add --no-cache git
 RUN yarn --immutable
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN yarn turbo run build --filter=advertise...
+RUN yarn turbo run build --filter=api-user...
 
 FROM base AS runner
 ENV NODE_ENV production
@@ -23,4 +23,4 @@ USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 
-CMD ["node", "apps/advertise/dist/index.js"]
+CMD ["node", "apps/api-user/dist/index.js"]

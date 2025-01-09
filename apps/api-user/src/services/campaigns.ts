@@ -79,25 +79,13 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const desktopImage =
     type === 'center' ? ad.mobile_image : ad.desktop_image_right;
 
-  const desktopUrl = config.awsUrl + '/' + desktopImage;
-  const mobileUrl = config.awsUrl + '/' + ad.mobile_image;
+  const adResponse = {
+    desktopImage: `${config.awsUrl}/${desktopImage}`,
+    id: ad.id,
+    mobileImage: `${config.awsUrl}/${ad.mobile_image}`,
+  };
 
-  const impressionUrl = `${config.apiUrl}/campaigns/track/impression/${ad.id}`;
-  const clickUrl = `${config.apiUrl}/campaigns/track/click/${ad.id}`;
-
-  const adCode = `<a href="${clickUrl}" rel="nofollow">
-                          <img class="ad-image rounded-lg" src="${desktopUrl}" alt="Advertisement">
-                      </a>
-                      <img src="${impressionUrl}" style="display:none">
-                      <style>
-                          @media (min-width: 501px) and (max-width: 1023px) {
-                              .ad-image {
-                                  content: url("${mobileUrl}");
-                              }
-                          }
-                      </style>`;
-
-  return res.header('Content-Type', 'text/html').send(adCode);
+  return res.json(adResponse);
 });
 
 const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
@@ -170,24 +158,15 @@ const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
     return res.status(204).send();
   }
 
-  const clickUrl = `${config.apiUrl}/campaigns/track/click/${ad.id}`;
-  const impressionUrl = `${config.apiUrl}/campaigns/track/impression/${ad.id}`;
-  let adCode = `<div class="ad-text-content" style="font-size: 14px;font-family: Manrope, sans-serif; text-align: left;">
-                          <p><b>Sponsored: </b>
-                          <img src="${impressionUrl}" style="display:none">`;
+  const adResponse = {
+    icon: ad.icon ? `${config.awsUrl}/${ad.icon}` : null,
+    id: ad.id,
+    linkName: ad.link_name,
+    siteName: ad.site_name,
+    text: ad.text,
+  };
 
-  if (ad.icon) {
-    const iconUrl = config.awsUrl + '/' + ad.icon;
-    adCode += `<img src="${iconUrl}" alt="Icon" class="ad-icon" style="display: inline;"> `;
-  }
-
-  adCode += `&nbsp;<b>${ad.site_name}</b>: ${ad.text.replace(/\n/g, '<br>')} 
-                   <a href="${clickUrl}" class="text-blue-500 dark:text-green-250 font-bold no-underline" target="_blank" rel="nofollow">${
-                     ad.link_name
-                   }</a>
-                   </p></div>`;
-
-  return res.header('Content-Type', 'text/html').send(adCode);
+  return res.json(adResponse);
 });
 
 const trackImpression = catchAsync(async (req: Request, res: Response) => {

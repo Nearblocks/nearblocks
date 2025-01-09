@@ -1,16 +1,16 @@
 version: '3.9'
 services:
-  advertise:
-    container_name: advertise
+  api-user:
+    container_name: api-user
     build:
       context: .
-      dockerfile: ./apps/advertise/Dockerfile
+      dockerfile: ./apps/api-user/Dockerfile
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
-    env_file: advertise.env
+    env_file: api.user.env
     ports:
-      - '3008:3008'
+      - '192.168.1.75:3008:3008'
 
 volumes:
   postgres_data:

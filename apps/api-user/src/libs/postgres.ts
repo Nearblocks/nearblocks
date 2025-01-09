@@ -10,7 +10,7 @@ const ssl: ConnectionOptions = {
 
 export const userSql = postgres(config.dbUrl, {
   connection: {
-    application_name: 'advertise-api',
+    application_name: 'api-user',
   },
   max: 60,
   ssl: ssl?.ca ? ssl : false,

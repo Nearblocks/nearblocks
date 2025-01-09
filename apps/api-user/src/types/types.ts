@@ -22,11 +22,10 @@ export type Config = {
   redisSentinelUrls: string;
   redisUrl: string;
   sentryDsn?: string;
-  smtpHost: string;
-  smtpMail: string;
-  smtpPass: string;
-  smtpPort: number;
-  smtpUser: string;
+  sesAccessKey: string;
+  sesEmailFrom: string;
+  sesRegion: string;
+  sesSecretKey: string;
 };
 
 export type Campaign = {

@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from 'envalid';
+import { cleanEnv, str } from 'envalid';
 
 import { Config } from '#types/types';
 
@@ -14,11 +14,10 @@ const env = cleanEnv(process.env, {
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: str(),
   SENTRY_DSN: str({ default: '' }),
-  SMTP_EMAIL: str(),
-  SMTP_HOST: str(),
-  SMTP_PASS: str(),
-  SMTP_PORT: num(),
-  SMTP_USER: str(),
+  SES_ACCESS_KEY: str(),
+  SES_EMAIL_FROM: str(),
+  SES_REGION: str(),
+  SES_SECRET_KEY: str(),
 });
 
 const config: Config = {
@@ -34,11 +33,10 @@ const config: Config = {
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
   sentryDsn: env.SENTRY_DSN,
-  smtpHost: env.SMTP_HOST,
-  smtpMail: env.SMTP_EMAIL,
-  smtpPass: env.SMTP_PASS,
-  smtpPort: env.SMTP_PORT,
-  smtpUser: env.SMTP_USER,
+  sesAccessKey: env.SES_ACCESS_KEY,
+  sesEmailFrom: env.SES_EMAIL_FROM,
+  sesRegion: env.SES_REGION,
+  sesSecretKey: env.SES_SECRET_KEY,
 };
 
 export default config;
