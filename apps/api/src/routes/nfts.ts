@@ -14,79 +14,196 @@ const routes = (app: Router) => {
   app.use('/nfts', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/nfts
-   * @summary Get top nfts by pagination
-   * @tags NFTs
-   * @param {string} search.query - search keyword
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 100, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts:
+   *   get:
+   *     summary: Get top NFTs by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: query
+   *         name: search.query
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 50
+   *           default: 50
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', validator(schema.list), nft.list);
 
   /**
-   * GET /v1/nfts/count
-   * @summary Get top nfts count
-   * @tags NFTs
-   * @param {string} search.query - search keyword
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/count:
+   *   get:
+   *     summary: Get top NFTs count
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: query
+   *         name: search.query
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/count', validator(schema.count), nft.count);
 
   /**
-   * GET /v1/nfts/txns
-   * @summary Get nft txns by pagination
-   * @tags NFTs
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/txns:
+   *   get:
+   *     summary: Get NFT transactions by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: query
+   *         name: cursor.query
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *           minLength: 36
+   *           maxLength: 36
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/txns', validator(schema.txns), nft.txns);
 
   /**
-   * GET /v1/nfts/txns/count
-   * @summary Get estimated nft txns count
-   * @tags NFTs
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/txns/count:
+   *   get:
+   *     summary: Get estimated NFT transactions count
+   *     tags:
+   *       - NFTs
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/txns/count', validator(schema.txnsCount), nft.txnsCount);
 
   /**
-   * GET /v1/nfts/{contract}
-   * @summary Get nft info
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}:
+   *   get:
+   *     summary: Get NFT info
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract', validator(schema.item), contract.item);
 
   /**
-   * GET /v1/nfts/{contract}/txns
-   * @summary Get nft txns by pagination
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/txns:
+   *   get:
+   *     summary: Get NFT transactions by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor.query
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *           minLength: 36
+   *           maxLength: 36
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
 
   /**
-   * GET /v1/nfts/{contract}/txns/count
-   * @summary Get estimated nft txns count
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/txns/count:
+   *   get:
+   *     summary: Get estimated NFT transaction count
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/txns/count',
@@ -95,24 +212,58 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/nfts/{contract}/holders
-   * @summary Get nft holders by pagination
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/holders:
+   *   get:
+   *     summary: Get NFT holders by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
 
   /**
-   * GET /v1/nfts/{contract}/holders/count
-   * @summary Get estimated nft holders count
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/holders/count:
+   *   get:
+   *     summary: Get estimated NFT holders count
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/holders/count',
@@ -121,26 +272,68 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/nfts/{contract}/tokens
-   * @summary Get nft tokens list by pagination
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} token.query - token id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/tokens:
+   *   get:
+   *     summary: Get NFT tokens list by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: token.query
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
 
   /**
-   * GET /v1/nfts/{contract}/tokens/count
-   * @summary Get estimated nft tokens count
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} token.query - token id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/tokens/count:
+   *   get:
+   *     summary: Get estimated NFT tokens count
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: token.query
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/tokens/count',
@@ -149,13 +342,28 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/nfts/{contract}/tokens/{token}
-   * @summary Get nft token info
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} token.query - token id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/tokens/{token}:
+   *   get:
+   *     summary: Get NFT token info
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/tokens/:token',
@@ -164,16 +372,51 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/nfts/{contract}/tokens/{token}/txns
-   * @summary Get nft token txns by pagination
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} token.query - token id
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/tokens/{token}/txns:
+   *   get:
+   *     summary: Get NFT token transactions by pagination
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor.query
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *           minLength: 36
+   *           maxLength: 36
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/tokens/:token/txns',
@@ -182,13 +425,27 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/nfts/{contract}/tokens/{token}/txns/count
-   * @summary Get estimated nft token txns count
-   * @tags NFTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} token.query - token id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/nfts/{contract}/tokens/{token}/txns/count:
+   *   get:
+   *     summary: Get estimated NFT token transactions count
+   *     tags:
+   *       - NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: token
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/tokens/:token/txns/count',

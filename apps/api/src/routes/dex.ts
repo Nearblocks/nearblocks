@@ -13,73 +13,193 @@ const routes = (app: Router) => {
   app.use('/dex', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/dex
-   * @summary Get top dex pairs by pagination
-   * @tags DEX
-   * @param {string} search.query - search keyword
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 100, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
-   * @param {string} sort.query - json:{"enum": ["volume", "txns", "makers"], "default": "volume"}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex:
+   *   get:
+   *     summary: Get top dex pairs by pagination
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 50
+   *           default: 50
+   *       - in: query
+   *         name: sort
+   *         description: Sort field
+   *         schema:
+   *           type: string
+   *           enum: [volume, txns, makers]
+   *           default: volume
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', validator(schema.list), dex.list);
 
   /**
-   * GET /v1/dex/count
-   * @summary Get top dex pairs count
-   * @tags DEX
-   * @param {number} search.query - search keyword
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex/count:
+   *   get:
+   *     summary: Get top dex pairs count
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/count', validator(schema.count), dex.count);
 
   /**
-   * GET /v1/dex/pairs/{pair}
-   * @summary Get dex pair info
-   * @tags DEX
-   * @param {number} pair.path.required - pair id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex/pairs/{pair}:
+   *   get:
+   *     summary: Get dex pair info
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: path
+   *         name: pair
+   *         required: true
+   *         description: Pair ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/pairs/:pair', validator(schema.item), pair.item);
 
   /**
-   * GET /v1/dex/pairs/{pair}/txns
-   * @summary Get dex pair txns by pagination
-   * @tags DEX
-   * @param {number} pair.path.required - pair id
-   * @param {string} a.query - maker account id
-   * @param {string} cursor.query - next page cursor
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex/pairs/{pair}/txns:
+   *   get:
+   *     summary: Get dex pair txns by pagination
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: path
+   *         name: pair
+   *         required: true
+   *         description: Pair ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: a
+   *         description: Maker account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit. For example, per page 50 will use 2 credits.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/pairs/:pair/txns', validator(schema.txns), pair.txns);
 
   /**
-   * GET /v1/dex/pairs/{pair}/txns/count
-   * @summary Get dex pair txns count
-   * @tags DEX
-   * @param {number} pair.path.required - pair id
-   * @param {string} a.query - maker account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex/pairs/{pair}/txns/count:
+   *   get:
+   *     summary: Get dex pair txns count
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: path
+   *         name: pair
+   *         required: true
+   *         description: Pair ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: a
+   *         description: Maker account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/pairs/:pair/txns/count', validator(schema.txns), pair.txnsCount);
 
   /**
-   * GET /v1/dex/pairs/{pair}/charts
-   * @summary Get dex pair chart data
-   * @tags DEX
-   * @param {number} pair.path.required - pair id
-   * @param {string} interval.query.required - json:{"enum": ["1m", "1h", "1d"], "default": "1m"}
-   * @param {number} to.query.required - end timestamp
-   * @param {number} limit.query.required - no of rows
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/dex/pairs/{pair}/charts:
+   *   get:
+   *     summary: Get dex pair chart data
+   *     tags:
+   *       - DEX
+   *     parameters:
+   *       - in: path
+   *         name: pair
+   *         required: true
+   *         description: Pair ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: interval
+   *         required: true
+   *         description: Time interval
+   *         schema:
+   *           type: string
+   *           enum: [1m, 1h, 1d]
+   *           default: 1m
+   *       - in: query
+   *         name: to
+   *         required: true
+   *         description: End timestamp
+   *         schema:
+   *           type: number
+   *       - in: query
+   *         name: limit
+   *         required: true
+   *         description: Number of rows
+   *         schema:
+   *           type: number
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/pairs/:pair/charts', validator(schema.charts), pair.charts);
 };

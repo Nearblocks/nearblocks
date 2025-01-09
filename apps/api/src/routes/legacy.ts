@@ -12,34 +12,79 @@ const routes = (app: Router) => {
   app.use('/legacy', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/legacy/total-supply
-   * @summary Get total near supply
-   * @tags Legacy
-   * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
-   * @param {string} format.query - json:{"enum": ["coingecko"], "default": null} - If 'coingecko', return { "result": value }
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/legacy/total-supply:
+   *   get:
+   *     summary: Get total near supply
+   *     tags:
+   *       - Legacy
+   *     parameters:
+   *       - in: query
+   *         name: unit
+   *         description: Unit of Near supply. Choosing NEAR will result in a text-only response
+   *         schema:
+   *           type: string
+   *           enum: [yoctonear, near]
+   *           default: yoctonear
+   *       - in: query
+   *         name: format
+   *         description: If 'coingecko', return value
+   *         schema:
+   *           type: string
+   *           enum: [coingecko]
+   *           default: null
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/total-supply', validator(schema.supply), legacy.total);
 
   /**
-   * GET /v1/legacy/circulating-supply
-   * @summary Get circulating near supply
-   * @tags Legacy
-   * @param {string} unit.query - json:{"enum": ["yoctonear", "near"], "default": "yoctonear"} - Unit of Near supply. Choosing NEAR will result in a text-only response
-   * @param {string} format.query - json:{"enum": ["coingecko"], "default": null} - If 'coingecko', return { "result": value }
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/legacy/circulating-supply:
+   *   get:
+   *     summary: Get circulating near supply
+   *     tags:
+   *       - Legacy
+   *     parameters:
+   *       - in: query
+   *         name: unit
+   *         description: Unit of Near supply. Choosing NEAR will result in a text-only response
+   *         schema:
+   *           type: string
+   *           enum: [yoctonear, near]
+   *           default: yoctonear
+   *       - in: query
+   *         name: format
+   *         description: If 'coingecko', returns value
+   *         schema:
+   *           type: string
+   *           enum: [coingecko]
+   *           default: null
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/circulating-supply', validator(schema.supply), legacy.supply);
 
   /**
-   * GET /v1/legacy/fees
-   * @summary Get tokens burnt per day
-   * @tags Legacy
-   * @param {string} period.query - json:{"enum": ["day", "week"], "default": "day"} - Data period
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/legacy/fees:
+   *   get:
+   *     summary: Get tokens burnt per day
+   *     tags:
+   *       - Legacy
+   *     parameters:
+   *       - in: query
+   *         name: period
+   *         description: Data period
+   *         schema:
+   *           type: string
+   *           enum: [day, week]
+   *           default: day
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/fees', validator(schema.fees), legacy.fees);
 

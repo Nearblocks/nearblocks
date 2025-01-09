@@ -12,62 +12,125 @@ const routes = (app: Router) => {
   app.use('/search', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/search
-   * @summary Search txn by hash, block by height / hash, account by id, receipt by id, tokens by hex address
-   * @tags Search
-   * @param {string} keyword.query.required - txn hash / block height / account id / receipt id / hex address
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search:
+   *   get:
+   *     summary: Search txn by hash, block by height/hash, account by id, receipt by id, tokens by hex address
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Transaction hash / block height / account ID / receipt ID / hex address
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', validator(schema.item), search.search);
 
   /**
-   * GET /v1/search/txns
-   * @summary Search txns by hash
-   * @tags Search
-   * @param {string} keyword.query.required - txn hash
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search/txns:
+   *   get:
+   *     summary: Search txns by hash
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Transaction hash
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/txns', validator(schema.item), search.txns);
 
   /**
-   * GET /v1/search/blocks
-   * @summary Search blocks by hash / height
-   * @tags Search
-   * @param {[string,number]} keyword.query.required - block height / hash
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search/blocks:
+   *   get:
+   *     summary: Search blocks by hash/height
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Block height or hash
+   *         schema:
+   *           type: array
+   *           items:
+   *             type: string
+   *           example: ["block-height", "block-hash"]
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/blocks', validator(schema.item), search.blocks);
 
   /**
-   * GET /v1/search/accounts
-   * @summary Search accounts by id
-   * @tags Search
-   * @param {string} keyword.query.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search/accounts:
+   *   get:
+   *     summary: Search accounts by id
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/accounts', validator(schema.item), search.accounts);
 
   /**
-   * GET /v1/search/receipts
-   * @summary Search receipts by id
-   * @tags Search
-   * @param {string} keyword.query.required - receipt id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search/receipts:
+   *   get:
+   *     summary: Search receipts by id
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Receipt ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/receipts', validator(schema.item), search.receipts);
 
   /**
-   * GET /v1/search/tokens
-   * @summary Search tokens by hex address
-   * @tags Search
-   * @param {string} keyword.query.required - token hex address
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/search/tokens:
+   *   get:
+   *     summary: Search tokens by hex address
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         required: true
+   *         description: Token hex address
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/tokens', validator(schema.item), search.tokens);
 };

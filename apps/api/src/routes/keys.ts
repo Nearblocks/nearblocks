@@ -12,12 +12,22 @@ const routes = (app: Router) => {
   app.use('/keys', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/keys/{key}
-   * @summary Get access key info by public key
-   * @tags Access Keys
-   * @param {string} key.path.required - public key
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/keys/{key}:
+   *   get:
+   *     summary: Get access key info by public key
+   *     tags:
+   *       - Access Keys
+   *     parameters:
+   *       - in: path
+   *         name: key
+   *         required: true
+   *         description: Public key
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:key', validator(schema.item), keys.item);
 };

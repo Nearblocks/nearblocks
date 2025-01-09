@@ -12,21 +12,34 @@ const routes = (app: Router) => {
   app.use('/stats', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/stats
-   * @summary Get stats
-   * @tags Stats
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/stats:
+   *   get:
+   *     summary: Get stats
+   *     tags:
+   *       - Stats
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', stats.latest);
 
   /**
-   * GET /v1/stats/price
-   * @summary Get near price
-   * @tags Stats
-   * @param {string} date.query - date in yyyy-mm-dd format
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/stats/price:
+   *   get:
+   *     summary: Get near price
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/price', validator(schema.price), stats.price);
 };
