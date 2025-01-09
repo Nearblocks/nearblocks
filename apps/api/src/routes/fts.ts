@@ -13,81 +13,206 @@ const routes = (app: Router) => {
   app.use('/fts', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/fts
-   * @summary Get top tokens by pagination
-   * @tags FTs
-   * @param {string} search.query - search keyword
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 100, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 50, "default": 50}
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts:
+   *   get:
+   *     summary: Get top tokens by pagination
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: query
+   *         name: search.query
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 50
+   *           default: 50
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', validator(schema.list), ft.list);
 
   /**
-   * GET /v1/fts/count
-   * @summary Get top tokens count
-   * @tags FTs
-   * @param {string} search.query - search keyword
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/count:
+   *   get:
+   *     summary: Get top tokens count
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: query
+   *         name: search.query
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/count', validator(schema.count), ft.count);
 
   /**
-   * GET /v1/fts/txns
-   * @summary Get token txns by pagination
-   * @tags FTs
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/txns:
+   *   get:
+   *     summary: Get token txns by pagination
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor. Takes precedence over 'page' if provided.
+   *         schema:
+   *           type: string
+   *           minLength: 36
+   *           maxLength: 36
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/txns', validator(schema.txns), ft.txns);
 
   /**
-   * GET /v1/fts/txns/count
-   * @summary Get estimated token txns count
-   * @tags FTs
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/txns/count:
+   *   get:
+   *     summary: Get estimated token txns count
+   *     tags:
+   *       - FTs
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/txns/count', validator(schema.txnsCount), ft.txnsCount);
 
   /**
-   * GET /v1/fts/{contract}
-   * @summary Get token info
-   * @tags FTs
-   * @param {string} contract.path.required - contract id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/{contract}:
+   *   get:
+   *     summary: Get token info
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract', validator(schema.item), contract.item);
 
   /**
-   * GET /v1/fts/{contract}/txns
-   * @summary Get token txns by pagination
-   * @tags FTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} account.query - affected account id
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided - json:{"minLength": 36, "maxLength": 36}
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/{contract}/txns:
+   *   get:
+   *     summary: Get token txns by pagination
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: account
+   *         description: Affected account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor. Takes precedence over 'page' if provided.
+   *         schema:
+   *           type: string
+   *           minLength: 36
+   *           maxLength: 36
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract/txns', validator(schema.ftTxns), contract.txns);
 
   /**
-   * GET /v1/fts/{contract}/txns/count
-   * @summary Get estimated token txns count
-   * @tags FTs
-   * @param {string} contract.path.required - contract id
-   * @param {string} account.query - affected account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/{contract}/txns/count:
+   *   get:
+   *     summary: Get estimated token txns count
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: account
+   *         description: Affected account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/txns/count',
@@ -96,24 +221,58 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/fts/{contract}/holders
-   * @summary Get token holders by pagination
-   * @tags FTs
-   * @param {string} contract.path.required - contract id
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/{contract}/holders:
+   *   get:
+   *     summary: Get token holders by pagination
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:contract/holders', validator(schema.holders), contract.holders);
 
   /**
-   * GET /v1/fts/{contract}/holders/count
-   * @summary Get estimated token holders count
-   * @tags FTs
-   * @param {string} contract.path.required - contract id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/fts/{contract}/holders/count:
+   *   get:
+   *     summary: Get estimated token holders count
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:contract/holders/count',

@@ -7,9 +7,9 @@ import helmet from 'helmet';
 import passport from 'passport';
 import qs from 'query-string';
 
+import apiDocumentation from '#libs/apiDocumentation';
 import logger from '#libs/logger';
 import sentry from '#libs/sentry';
-import swagger from '#libs/swagger';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import routes from '#routes/index';
 
@@ -33,7 +33,7 @@ app.set('query parser', (str: string) =>
 );
 
 app.use(sentry.Handlers.requestHandler());
-swagger(app, dir);
+apiDocumentation(app, dir);
 app.use(cors());
 app.use(helmet());
 passport.use(bearerStrategy);

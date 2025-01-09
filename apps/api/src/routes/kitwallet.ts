@@ -14,21 +14,35 @@ const routes = (app: Router) => {
   app.use('/kitwallet', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/kitwallet/stakingPools
-   * @summary Get all staking pools
-   * @tags Kitwallet
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/stakingPools:
+   *   get:
+   *     summary: Get all staking pools
+   *     tags:
+   *       - Kitwallet
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/stakingPools', kitwallet.pools);
 
   /**
-   * GET /v1/kitwallet/staking-deposits/{account}
-   * @summary Get staking deposits for an account
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/staking-deposits/{account}:
+   *   get:
+   *     summary: Get staking deposits for an account
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/staking-deposits/:account',
@@ -37,12 +51,22 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/publicKey/{key}/accounts
-   * @summary Get accounts by public key
-   * @tags Kitwallet
-   * @param {string} key.path.required - public key
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/publicKey/{key}/accounts:
+   *   get:
+   *     summary: Get accounts by public key
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: key
+   *         required: true
+   *         description: Public key
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/publicKey/:key/accounts',
@@ -51,12 +75,22 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/activities
-   * @summary Get activities for an account
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/activities:
+   *   get:
+   *     summary: Get activities for an account
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/activities',
@@ -65,12 +99,22 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/callReceivers
-   * @summary Get call receivers for an account
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/callReceivers:
+   *   get:
+   *     summary: Get call receivers for an account
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/callReceivers',
@@ -79,12 +123,22 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/likelyTokens
-   * @summary Get likely tokens for an account
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/likelyTokens:
+   *   get:
+   *     summary: Get likely tokens for an account
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/likelyTokens',
@@ -93,13 +147,27 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/likelyTokensFromBlock
-   * @summary Get likely tokens for an account from block
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @param {string} fromBlockTimestamp.query - block timestamp
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/likelyTokensFromBlock:
+   *   get:
+   *     summary: Get likely tokens for an account from block
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: fromBlockTimestamp
+   *         description: Block timestamp
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/likelyTokensFromBlock',
@@ -108,12 +176,22 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/likelyNFTs
-   * @summary Get likely nfts for an account
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/likelyNFTs:
+   *   get:
+   *     summary: Get likely NFTs for an account
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/likelyNFTs',
@@ -122,13 +200,27 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/likelyNFTsFromBlock
-   * @summary Get likely nfts for an account from block
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @param {string} fromBlockTimestamp.query - block timestamp
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/likelyNFTsFromBlock:
+   *   get:
+   *     summary: Get likely NFTs for an account from block
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: fromBlockTimestamp
+   *         description: Block timestamp
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/likelyNFTsFromBlock',
@@ -137,21 +229,72 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/receipts
-   * @summary Get account receipts
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} action.query - action kind
-   * @param {string} method.query - function call method
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/receipts:
+   *   get:
+   *     summary: Get account receipts
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: to
+   *         description: Receiver account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: action
+   *         description: Action kind
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: method
+   *         description: Function call method
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/receipts',
@@ -160,18 +303,52 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/kitwallet/account/{account}/receipts/count
-   * @summary Get estimated account receipts count
-   * @tags Kitwallet
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} to.query - receiver account id
-   * @param {string} action.query - action kind
-   * @param {string} method.query - function call method
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/kitwallet/account/{account}/receipts/count:
+   *   get:
+   *     summary: Get estimated account receipts count
+   *     tags:
+   *       - Kitwallet
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: to
+   *         description: Receiver account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: action
+   *         description: Action kind
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: method
+   *         description: Function call method
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/account/:account/receipts/count',

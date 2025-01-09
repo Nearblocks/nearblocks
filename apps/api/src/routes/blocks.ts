@@ -12,43 +12,92 @@ const routes = (app: Router) => {
   app.use('/blocks', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/blocks
-   * @summary Get blocks by pagination
-   * @tags Blocks
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/blocks:
+   *   get:
+   *     summary: Get blocks by pagination
+   *     tags:
+   *       - Blocks
+   *     parameters:
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit. For example, per page 50 will use 2 credits.
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/', validator(schema.list), blocks.list);
 
   /**
-   * GET /v1/blocks/count
-   * @summary Get estimated total blocks count
-   * @tags Blocks
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/blocks/count:
+   *   get:
+   *     summary: Get estimated total blocks count
+   *     tags:
+   *       - Blocks
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/count', blocks.count);
 
   /**
-   * GET /v1/blocks/latest
-   * @summary Get the latest blocks
-   * @tags Blocks
-   * @param {number} limit.query - json:{"minimum": 1, "maximum": 10, "default": 10}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/blocks/latest:
+   *   get:
+   *     summary: Get the latest blocks
+   *     tags:
+   *       - Blocks
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: Number of latest blocks to retrieve
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 10
+   *           default: 10
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/latest', validator(schema.latest), blocks.latest);
 
   /**
-   * GET /v1/blocks/{hash}
-   * @summary Get block info
-   * @tags Blocks
-   * @param {string} hash.path.required - block hash
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/blocks/{hash}:
+   *   get:
+   *     summary: Get block info
+   *     tags:
+   *       - Blocks
+   *     parameters:
+   *       - in: path
+   *         name: hash
+   *         required: true
+   *         description: Block hash
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get('/:hash', validator(schema.item), blocks.item);
 };

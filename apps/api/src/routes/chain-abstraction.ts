@@ -12,12 +12,22 @@ const routes = (app: Router) => {
   app.use('/chain-abstraction', bearerAuth, rateLimiter, route);
 
   /**
-   * GET /v1/chain-abstraction/{account}/multi-chain-accounts
-   * @summary Get multi chain accounts of an account
-   * @tags Chain Abstraction
-   * @param {string} account.path.required - account id
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/chain-abstraction/{account}/multi-chain-accounts:
+   *   get:
+   *     summary: Get multi chain accounts of an account
+   *     tags:
+   *       - Chain Abstraction
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:account/multi-chain-accounts',
@@ -26,23 +36,85 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/chain-abstraction/{account}/txns
-   * @summary Get multi chain txns of the account by pagination
-   * @tags Chain Abstraction
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} after_block.query - block height
-   * @param {string} before_block.query - block height
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {string} chain.query - foreign chain
-   * @param {string} multichain_address.query - multi chain address
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/chain-abstraction/{account}/txns:
+   *   get:
+   *     summary: Get multi chain txns of the account by pagination
+   *     tags:
+   *       - Chain Abstraction
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_block
+   *         description: Block height after which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_block
+   *         description: Block height before which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format to get transactions after this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format to get transactions before this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: chain
+   *         description: Foreign chain
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: multichain_address
+   *         description: Multi-chain address
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit. For example, per page 50 will use 2 credits.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:account/txns',
@@ -51,19 +123,57 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/chain-abstraction/{account}/txns/count
-   * @summary Get estimated multi chain txns count of the account
-   * @tags Chain Abstraction
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} after_block.query - block height
-   * @param {string} before_block.query - block height
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {string} chain.query - foreign chain
-   * @param {string} multichain_address.query - multi chain address
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/chain-abstraction/{account}/txns/count:
+   *   get:
+   *     summary: Get estimated multi chain txns count of the account
+   *     tags:
+   *       - Chain Abstraction
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_block
+   *         description: Block height after which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_block
+   *         description: Block height before which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format to get transactions after this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format to get transactions before this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: chain
+   *         description: Foreign chain
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: multichain_address
+   *         description: Multi-chain address
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/:account/txns/count',
@@ -72,23 +182,85 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/chain-abstraction/txns
-   * @summary Get multi chain txns by pagination
-   * @tags Chain Abstraction
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} after_block.query - block height
-   * @param {string} before_block.query - block height
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {string} chain.query - foreign chain
-   * @param {string} multichain_address.query - multi chain address
-   * @param {string} cursor.query - next page cursor, takes precedence over 'page' if provided
-   * @param {number} page.query - json:{"minimum": 1, "maximum": 200, "default": 1}
-   * @param {number} per_page.query - json:{"minimum": 1, "maximum": 250, "default": 25} - Default: 25, each increment of 25 will count towards rate limit. eg. per page 50 will use 2 credits
-   * @param {string} order.query - json:{"enum": ["desc", "asc"], "default": "desc"}
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/chain-abstraction/txns:
+   *   get:
+   *     summary: Get multi chain txns by pagination
+   *     tags:
+   *       - Chain Abstraction
+   *     parameters:
+   *       - in: query
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_block
+   *         description: Block height after which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_block
+   *         description: Block height before which to get transactions
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format to get transactions after this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format to get transactions before this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: chain
+   *         description: Foreign chain
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: multichain_address
+   *         description: Multi-chain address
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Next page cursor, takes precedence over 'page' if provided
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: page
+   *         description: Page number
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 200
+   *           default: 1
+   *       - in: query
+   *         name: per_page
+   *         description: Number of items per page. Each increment of 25 will count towards rate limit. For example, per page 50 will use 2 credits.
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 250
+   *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/txns',
@@ -97,19 +269,57 @@ const routes = (app: Router) => {
   );
 
   /**
-   * GET /v1/chain-abstraction/txns/count
-   * @summary Get estimated multi chain txns count
-   * @tags Chain Abstraction
-   * @param {string} account.path.required - account id
-   * @param {string} from.query - sender account id
-   * @param {string} after_block.query - block height
-   * @param {string} before_block.query - block height
-   * @param {string} after_date.query - date in YYYY-MM-DD format
-   * @param {string} before_date.query - date in YYYY-MM-DD format
-   * @param {string} chain.query - foreign chain
-   * @param {string} multichain_address.query - multi chain address
-   * @return 200 - success response
-   * @security BearerAuth
+   * @openapi
+   * /v1/chain-abstraction/txns/count:
+   *   get:
+   *     summary: Get estimated multi chain txns count
+   *     tags:
+   *       - Chain Abstraction
+   *     parameters:
+   *       - in: query
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: from
+   *         description: Sender account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_block
+   *         description: Block height after which to get transaction count
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_block
+   *         description: Block height before which to get transaction count
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_date
+   *         description: Date in YYYY-MM-DD format to get transaction count after this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_date
+   *         description: Date in YYYY-MM-DD format to get transaction count before this date
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: chain
+   *         description: Foreign chain
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: multichain_address
+   *         description: Multi-chain address
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
    */
   route.get(
     '/txns/count',
