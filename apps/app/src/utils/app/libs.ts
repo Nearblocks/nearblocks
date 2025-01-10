@@ -4,6 +4,9 @@ import get from 'lodash/get';
 import { FieldType, GuessableTypeString } from '@/utils/types';
 import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
+const ACCOUNT_ID_REGEX =
+  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
   Object.entries(obj).reduce((a, [k, v]) => {
     if (k === 'id') return a;
@@ -524,6 +527,14 @@ export const removeProtocol = (url?: string) => {
 export const centsToDollar = (val: number) => {
   const value = (val / 100).toFixed(2);
   return value;
+};
+
+export const isValidAccount = (accountId: string) => {
+  return (
+    accountId.length >= 2 &&
+    accountId.length <= 64 &&
+    ACCOUNT_ID_REGEX.test(accountId)
+  );
 };
 
 export function getFilteredQueryParams(

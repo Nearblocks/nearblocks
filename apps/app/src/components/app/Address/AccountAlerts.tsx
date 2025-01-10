@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
-import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
+import { AccountDataInfo, ContractCodeInfo, KeysInfo } from '@/utils/types';
 
 import WarningIcon from '../Icons/WarningIcon';
 
@@ -14,19 +14,24 @@ export default function AccountAlerts({
   accountData: any;
   id: string;
 }) {
-  const { contractCode, viewAccount } = useRpc();
+  const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [isContractLoading, setIsContractLoading] = useState(true);
+  const [accessKeys, setAccessKeys] = useState<[] | KeysInfo>([]);
 
   const loadSchema = useCallback(async () => {
     if (!id) return;
 
     try {
-      const [code, account]: any = await Promise.all([
+      const [code, keys, account]: any = await Promise.all([
         contractCode(id).catch(() => {
+          return null;
+        }),
+        viewAccessKeys(id).catch((error: any) => {
+          console.log(`Error fetching access keys for ${id}:`, error);
           return null;
         }),
         viewAccount(id).catch(() => {
@@ -71,10 +76,17 @@ export default function AccountAlerts({
         setAccountView((prev) => (prev ? null : prev));
         setIsAccountLoading(false);
       }
+
+      if (keys?.keys?.length > 0) {
+        setAccessKeys((prev) => {
+          const isSame = JSON.stringify(prev) === JSON.stringify(keys?.keys);
+          return isSame ? prev : keys?.keys;
+        });
+      }
     } catch (error) {
       console.error('Error loading schema:', error);
     }
-  }, [id, contractCode, viewAccount]);
+  }, [id, contractCode, viewAccount, viewAccessKeys]);
 
   useEffect(() => {
     loadSchema();
@@ -114,6 +126,7 @@ export default function AccountAlerts({
     isLocked &&
     accountData &&
     accountData?.deleted?.transaction_hash === null &&
+    Object.keys(accessKeys)?.length === 0 &&
     contract === null &&
     !isContractLoading
   ) {

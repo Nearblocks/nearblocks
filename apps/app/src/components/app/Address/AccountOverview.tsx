@@ -1,12 +1,14 @@
 'use client';
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useRpcStore } from '@/stores/app/rpc';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
-import { FtInfo, TokenListInfo } from '@/utils/types';
+import { AccountDataInfo, FtInfo, TokenListInfo } from '@/utils/types';
 
 import TokenHoldings from '../common/TokenHoldings';
 import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
@@ -20,12 +22,74 @@ export default function AccountOverview({
   statsData,
   tokenData,
 }: any) {
-  const { ftBalanceOf } = useRpc();
+  const { ftBalanceOf, viewAccount } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
   const { networkId } = useConfig();
-  const balance = accountData?.amount ?? '';
+  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const initializedRef = useRef(false);
+  const [rpcError, setRpcError] = useState(false);
+  const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
+
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
+
+  useEffect(() => {
+    if (rpcError) {
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        setAllRpcProviderError(true);
+        console.error('Failed to switch RPC:', error);
+      }
+    }
+  }, [rpcError, switchRpc]);
+
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      if (!accountData || accountData?.length === 0) {
+        try {
+          const [account]: any = await Promise.all([
+            viewAccount(id).catch(() => setRpcError(true)),
+          ]);
+
+          if (account) {
+            setAccountView((prev) => {
+              if (!prev || prev.account_id !== account?.account_id) {
+                return account as any;
+              }
+              return prev;
+            });
+          } else {
+            setAccountView(null);
+          }
+        } catch (error) {
+          setRpcError(true);
+          console.log('Error loading schema:', error);
+        }
+      }
+    };
+
+    fetchAccountData();
+  }, [accountData, id, viewAccount, rpcUrl]);
+
+  const accountInfo = accountData || accountView;
+  const balance = accountInfo?.amount ?? '';
   const nearPrice = statsData?.near_price ?? '';
+
   useEffect(() => {
     const loadBalances = async () => {
       const fts = inventoryData?.fts;
@@ -135,7 +199,7 @@ export default function AccountOverview({
             </div>
 
             <div className="w-full md:w-3/4 break-words">
-              {balance ? yoctoToNear(accountData?.amount, true) + ' Ⓝ' : ''}
+              {balance ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
             </div>
           </div>
           {networkId === 'mainnet' && (
@@ -145,21 +209,27 @@ export default function AccountOverview({
               </div>
 
               <div className="w-full md:w-3/4 break-words flex items-center">
-                <span>
-                  {accountData?.amount && statsData?.near_price
-                    ? '$' +
-                      fiatValue(
-                        yoctoToNear(accountData?.amount, false),
-                        statsData?.near_price,
-                      ) +
-                      ' '
-                    : ''}
-                </span>
-                <span className="text-xs">
-                  (@{' '}
-                  {nearPrice ? '$' + dollarFormat(statsData?.near_price) : ''} /
-                  Ⓝ)
-                </span>
+                {accountInfo?.amount && statsData?.near_price && (
+                  <>
+                    <span>
+                      {accountInfo?.amount && statsData?.near_price
+                        ? '$' +
+                          fiatValue(
+                            yoctoToNear(accountInfo?.amount, false),
+                            statsData?.near_price,
+                          ) +
+                          ' '
+                        : ''}
+                    </span>
+                    <span className="text-xs">
+                      (@{' '}
+                      {nearPrice
+                        ? '$' + dollarFormat(statsData?.near_price)
+                        : ''}{' '}
+                      / Ⓝ)
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           )}
