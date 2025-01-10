@@ -104,7 +104,11 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
       accessKey?.permission_kind === 'FUNCTION_CALL'
     ) {
       viewAccessKey(accessKey?.account_id, accessKey?.public_key)
-        .then(setKeyInfo)
+        .then((data) => {
+          if (data) {
+            setKeyInfo(data);
+          }
+        })
         .catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
