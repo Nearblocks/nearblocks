@@ -21,8 +21,8 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import TimeStamp from '../common/TimeStamp';
 import TableSummary from '../common/TableSummary';
-import Bitcoin from '../Icons/Bitcoin';
-import Ethereum from '../Icons/Ethereum';
+import Bitcoin from '../Icons/Networks/Bitcoin';
+import Ethereum from '../Icons/Networks/Ethereum';
 import { chainAbstractionExplorerUrl } from '@/utils/config';
 
 const initialForm = {
