@@ -259,7 +259,7 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
             tooltip={row?.account_id}
           >
             <Link
-              className="text-green-500 dark:text-green-250 hover:no-underline"
+              className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
               href={`/address/${row?.account_id}`}
             >
               {row?.account_id}

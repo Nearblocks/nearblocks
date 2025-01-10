@@ -196,7 +196,7 @@ const NFTOverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        className="text-green-500 dark:text-green-250 hover:no-underline"
+                        className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                         href={`/address/${token?.contract}`}
                       >
                         {token?.contract}

@@ -16,7 +16,7 @@ const OverviewSkeleton = () => {
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div className="text-sm text-nearblue-600 dark:text-neargray-10">
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 pt-4 pb-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -26,14 +26,14 @@ const OverviewSkeleton = () => {
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            Txn Hash
+            {t ? t('txnDetails.hash.text.0') : 'Txn Hash'}
           </div>
           <div className="w-full md:w-3/4">
             <Loader wrapperClassName="flex w-full max-w-xl" />
           </div>
         </div>
 
-        <div className="flex flex-wrap items-start p-4">
+        <div className="flex flex-wrap items-start px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -43,14 +43,14 @@ const OverviewSkeleton = () => {
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            Status
+            {t ? t('txnDetails.status.text.0') : 'Status'}
           </div>
           <div className="w-full md:w-3/4">
             <Loader wrapperClassName="flex w-24" />
           </div>
         </div>
 
-        <div className="flex flex-wrap pt-3 pb-3.5 px-4 mt-[0.38rem]">
+        <div className="flex flex-wrap pt-1 pb-3.5 px-4 mt-[0.38rem]">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -67,7 +67,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -77,14 +77,14 @@ const OverviewSkeleton = () => {
                 <Question className="w-4 h-4 fill-current mr-1" />
               </div>
             </Tooltip>
-            Timestamp
+            {t ? t('txnDetails.timestamp.text.0') : 'Timestamp'}
           </div>
           <div className="w-full md:w-3/4">
             <Loader wrapperClassName="flex w-full max-w-sm" />
           </div>
         </div>
 
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap p-4 ">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -105,7 +105,7 @@ const OverviewSkeleton = () => {
       </div>
 
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -122,7 +122,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -141,7 +141,7 @@ const OverviewSkeleton = () => {
       </div>
 
       {/* Tokens Transferred section skeleton */}
-      <div className="flex items-start flex-wrap p-4">
+      <div className="flex items-start flex-wrap px-4 py-2">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
           <Tooltip
             className={'w-96 left-25 max-w-[200px]'}
@@ -159,7 +159,7 @@ const OverviewSkeleton = () => {
       </div>
 
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -176,7 +176,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap p-4">
+        <div className="flex flex-wrap px-4 py-2">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -195,7 +195,7 @@ const OverviewSkeleton = () => {
       </div>
 
       {/* Ⓝ Price section skeleton */}
-      <div className="flex flex-wrap p-4">
+      <div className="flex flex-wrap px-4 py-2">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
           <Tooltip
             className={'w-96 left-25 max-w-[200px]'}

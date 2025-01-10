@@ -66,7 +66,7 @@ export default function TabSkeletion({
                     }
                     key={name}
                   >
-                    <h2> {message}</h2>
+                    <h2 className="font-semibold"> {message}</h2>
                   </Link>
                 );
               })}

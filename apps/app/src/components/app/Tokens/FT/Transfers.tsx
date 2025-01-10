@@ -80,7 +80,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}
@@ -99,7 +99,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       cell: (row: TransactionInfo) => (
         <>
           <Link
-            className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+            className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height

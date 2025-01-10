@@ -223,10 +223,10 @@ const ApiActions = ({
           </div>
         </div>
         <div className="text-center justify-center items-center pt-10 pb-4">
-          <h2 className="text-2xl my-2 text-center px-14 dark:text-neargray-10">
+          <h2 className="text-2xl my-2 text-center px-14 dark:text-neargray-10 font-medium">
             Choose a plan that&apos;s right for you.
           </h2>
-          <p className="text-gray-500 my-2 text-lg font-thin">
+          <p className="text-base text-gray-500 py-1">
             Data from the leading Near Protocol Block Explorer catered to your
             project&apos;s needs.
           </p>
@@ -234,7 +234,7 @@ const ApiActions = ({
             <p
               className={`${
                 !interval ? 'text-black dark:text-neargray-10' : 'text-gray-500'
-              } text-sm mx-2`}
+              } text-sm mx-2 font-medium`}
             >
               Monthly{' '}
             </p>
@@ -247,7 +247,7 @@ const ApiActions = ({
             <p
               className={`${
                 interval ? 'text-black dark:text-neargray-10' : 'text-gray-400'
-              } text-sm`}
+              } text-sm font-medium`}
             >
               Annually{' '}
               <span className="text-green-400 dark:text-green-250">
@@ -460,56 +460,60 @@ const ApiActions = ({
         </div>
         <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
           <div className="flex justify-center">
-            <h2 className="text-center px-5 border-t py-10 text-2xl text-black dark:text-neargray-10">
+            <h2 className="text-center px-5 border-t py-10 text-2xl font-medium text-black dark:text-neargray-10">
               Frequently Asked Questions
             </h2>
           </div>
-          <div className="grid justify-items-start grid-cols-1 sm:grid-cols-2 gap-6 font-thin">
+          <div className="grid justify-items-start grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="w-fit">
-              <h3 className="py-1 text-lg">
+              <h3 className="py-1 text-base font-medium">
                 How do I Subscribe to NearBlocks API services?
               </h3>
-              <p className="text-sm text-gray-500 py-1">
+              <p className="text-base text-gray-500 py-1">
                 Kindly visit the API self-checkout section above
               </p>
             </div>
             <div className="w-fit">
-              <h3 className="py-1 text-lg">
+              <h3 className="py-1 text-base font-medium">
                 What are the Payment Options available?
               </h3>
-              <p className="text-sm text-gray-500 py-1">
+              <p className="text-base text-gray-500 py-1">
                 We accept VISA and Mastercard credit card payments, via Stripe.
               </p>
             </div>
             <div className="w-fit">
-              <h3 className="py-1 text-lg">
+              <h3 className="py-1 text-base font-medium">
                 How do I Upgrade or Cancel an account?
               </h3>
-              <p className="text-sm text-gray-500 py-1">
+              <p className="text-base text-gray-500 py-1">
                 API Account upgrades and cancellations can be done through your
                 API user dashboard. Head to the &quot;Current plan&quot; section
                 in your dashboard for more details.
               </p>
             </div>
             <div className="w-fit">
-              <h3 className="py-1 text-lg">What is your refund policy?</h3>
-              <p className="text-sm text-gray-500 py-1">
+              <h3 className="py-1 text-base font-medium">
+                What is your refund policy?
+              </h3>
+              <p className="text-base text-gray-500 py-1">
                 Payments made are non-refundable and we do not provide refunds
                 or credits for any services already paid for.
               </p>
             </div>
             <div className="w-fit">
-              <h3 className="py-1 text-lg">How does Renewal work ? </h3>
-              <p className="text-sm text-gray-500 py-1">
+              <h3 className="py-1 text-base font-medium">
+                How does Renewal work ?{' '}
+              </h3>
+              <p className="text-base text-gray-500 py-1">
                 Reneawls are automatic, you will receive an email notification
                 coming up to your renewal date.
               </p>
             </div>
             <div className="w-fit">
-              <h3 className="py-1 text-lg">
+              <h3 className="py-1 text-base font-medium">
                 When will Account Activation occur?
               </h3>
-              <p className="text-sm text-gray-500 py-1">
+              <p className="text-base text-gray-500 py-1">
                 API Account activations are instant once the plan payment is
                 made. To setup an API key after the subscription payment is
                 made, head to API keys.
@@ -530,11 +534,12 @@ const ApiActions = ({
 
         <div className="bg-white flex justify-center my-4 dark:bg-black-200 dark:text-neargray-10">
           <form className="my-10 md:w-1/2 w-full mx-4" onSubmit={submitForm}>
-            <h2 className="text-2xl text-center py-2">
+            <h2 className="text-2xl text-center py-2 font-medium text-black dark:text-neargray-10">
               Contact us for any inquiries
             </h2>
+
             <div className="w-full px-20">
-              <p className="sm:text-lg text-xs text-gray-500 text-center pt-2  pb-5">
+              <p className="text-base text-gray-400 text-center pt-2 pb-5 font-medium">
                 If you have any questions on the NearBlocks APIs, ask them here!
               </p>
             </div>

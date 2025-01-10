@@ -28,7 +28,7 @@ const AddressLink = ({
 
   return (
     <Link
-      className={`text-green-500 dark:text-green-250 hover:no-underline p-0.5 px-1 border rounded-md ${
+      className={`text-green-500 dark:text-green-250 font-semibold hover:no-underline p-0.5 px-1 border rounded-md ${
         className ? className : ''
       } ${
         isActive

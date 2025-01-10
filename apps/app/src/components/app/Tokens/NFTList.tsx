@@ -191,7 +191,7 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
               src={row?.icon}
             />
             <Link
-              className="flex text-green-500 dark:text-green-250 hover:no-underline"
+              className="flex text-green-500 dark:text-green-250 hover:no-underline font-semibold"
               href={`/nft-token/${row?.contract}`}
             >
               <span className="inline-block truncate max-w-[200px] mr-1">

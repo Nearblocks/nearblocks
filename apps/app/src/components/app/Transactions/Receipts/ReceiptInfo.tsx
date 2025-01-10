@@ -196,7 +196,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   hash === 'output' ? 'ml-6' : 'ml-3'
                 } font-medium overflow-hidden inline-block cursor-pointer p-2 focus:outline-none ${
                   pageHash === hash
-                    ? 'rounded-lg bg-green-600 dark:bg-green-250 text-white'
+                    ? 'rounded-lg bg-green-600 dark:bg-green-250 !text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
                 }`}
                 key={index}
@@ -316,7 +316,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   <td className="py-2 pl-4">
                     {block && (
                       <Link
-                        className="text-green-500 dark:text-green-250"
+                        className="text-green-500 dark:text-green-250 font-semibold"
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                       >
                         {!loading &&
@@ -340,7 +340,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   </td>
                   <td className="py-2 pl-4">
                     <Link
-                      className="text-green-500 dark:text-green-250 hover:no-underline"
+                      className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                       href={`/address/${receipt?.predecessorId}`}
                     >
                       {receipt?.predecessorId}
@@ -361,7 +361,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                   </td>
                   <td className="py-2 pl-4">
                     <Link
-                      className="text-green-500 dark:text-green-250 hover:no-underline"
+                      className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                       href={`/address/${receipt?.receiverId}`}
                     >
                       {receipt?.receiverId}

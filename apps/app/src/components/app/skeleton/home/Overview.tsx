@@ -21,13 +21,13 @@ const HomeOverview = ({ theme: cookieTheme }: { theme: string }) => {
 
   return (
     <div className="container-xxl mx-auto px-5">
-      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-5 md:py lg:px-0 dark:bg-black-600">
+      <div className="bg-white soft-shadow rounded-xl overflow-hidden px-3 sm:px-5 md:py lg:px-0 dark:bg-black-600">
         <div
           className={`grid grid-flow-col grid-cols-1 ${
             networkId === 'mainnet'
               ? 'grid-rows-3 lg:grid-cols-3'
               : 'grid-rows-2 lg:grid-cols-2'
-          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x lg:py-3 dark:divide-black-200`}
+          } lg:grid-rows-1 divide-y lg:divide-y-0 lg:divide-x py-1 dark:divide-black-200`}
         >
           {networkId === 'mainnet' && (
             <div className="flex flex-col lg:flex-col lg:items-stretch divide-y lg:divide-y lg:divide-x-0 dark:divide-black-200 md:pt-0 md:pb-0 md:px-5">

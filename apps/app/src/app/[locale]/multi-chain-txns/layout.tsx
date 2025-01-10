@@ -61,7 +61,7 @@ export default async function TokensLayout(props: {
     <section>
       <div className="h-24">
         <div className="container-xxl mx-auto px-5">
-          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 ">
+          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 font-semibold">
             {t ? t('heading') : 'Latest Multichain Transactions'}
           </h1>
         </div>

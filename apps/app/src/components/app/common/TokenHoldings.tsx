@@ -76,16 +76,16 @@ const TokenHoldings = (props: Props) => {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="bg-white w-full -mt-2 rounded-b-lg shadow border z-10 pb-2 dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
+        className="bg-white w-full -mt-1 !rounded-lg shadow border z-10 pb-2  dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
         roundedBottom={'lg'}
         roundedTop={'none'}
       >
         <div className="dark:bg-black">
-          <PerfectScrollbar>
+          <PerfectScrollbar className="px-1">
             <div className="max-h-60 dark:bg-black">
               {props.ft?.tokens?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 py-2">
+                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 py-2 mx-2 mt-2 rounded-lg">
                     Tokens{' '}
                     <span className="font-normal">
                       ({props.ft?.tokens?.length})
@@ -174,8 +174,8 @@ const TokenHoldings = (props: Props) => {
               )}
               {nfts?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10 font-semibold px-3 py-2">
-                    NFT Tokens{' '}
+                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 py-2 mx-2 mt-2 rounded-lg">
+                    NFT Tokens
                     <span className="font-normal">({nfts?.length})</span>
                   </div>
                   <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">

@@ -20,9 +20,9 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
     <footer className="footer dark:bg-black-600  ">
       <div className="bg-bottom-right">
         <div className="bg-bottom-left">
-          <div className="container-xxl mx-auto px-5 pb-32">
+          <div className="container-xxl mx-auto px-5 pb-24">
             <div className="grid grid-cols-1 lg:!grid-cols-6 gap-5 py-5">
-              <div className="w-64">
+              <div className="w-72 sm:w-96">
                 <div className="text-sm text-grey-dark flex flex-col py-3">
                   <Image
                     alt="NearBlocks"
@@ -38,9 +38,10 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                     width="174"
                   />
                 </div>
-                <p className="max-w-xs text-black text-xs leading-6 pb-3 dark:text-gray-200">
+                <p className="max-w- text-black text-xs leading-6 pb-3 dark:text-gray-200 font-semibold">
                   {t('footer.description')}
                 </p>
+
                 <div className="flex">
                   <a
                     href="https://twitter.com/nearblocks"
@@ -109,10 +110,10 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   Tools
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
+                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/advertise">{t('footer.links.advertise')}</Link>
                   </li>
@@ -132,10 +133,10 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   {t('footer.links.explore')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200 ">
+                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200 ">
                   <li>
                     <Link href="/blocks">{t('footer.links.latestBlocks')}</Link>
                   </li>
@@ -153,10 +154,10 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 </ul>
               </div>
               <div className="">
-                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   {t('footer.links.company')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
+                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200">
                   <li>
                     <Link href="/about">{t('footer.links.about')}</Link>
                   </li>

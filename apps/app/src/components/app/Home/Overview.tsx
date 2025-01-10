@@ -7,7 +7,6 @@ export default async function HomeOverview({ theme }: { theme: any }) {
   const charts = await getRequest('charts/latest');
 
   const stats = statsDetails?.stats?.[0];
-
   return (
     <div className="relative -mt-14 ">
       <Overview

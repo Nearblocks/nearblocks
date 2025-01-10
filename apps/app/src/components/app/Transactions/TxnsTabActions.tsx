@@ -305,7 +305,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                         key={name}
                         prefetch={true}
                       >
-                        <h2 className="!relative">
+                        <h2 className="!relative font-semibold">
                           {label}
                           {name === 'enhanced' && (
                             <div className="!absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -mt-3 px-1">

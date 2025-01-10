@@ -34,7 +34,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
                             href={`/address/${data.old_owner_id}`}
                           >
                             {shortenAddress(data.old_owner_id)}
@@ -47,7 +47,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         To{' '}
                         {'owner_id' in data && data?.owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1"
+                            className="text-green-500 dark:text-green-250 pl-1 font-semibold"
                             href={`/address/${data.owner_id}`}
                           >
                             {shortenAddress(data.owner_id)}
@@ -63,7 +63,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         From{' '}
                         {'owner_id' in data && data?.owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
                             href={`/address/${data.owner_id}`}
                           >
                             {shortenAddress(data.owner_id)}
@@ -76,7 +76,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         To{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1"
+                            className="text-green-500 dark:text-green-250 font-semibold pl-1"
                             href={`/address/${data.old_owner_id}`}
                           >
                             {shortenAddress(data.old_owner_id)}
@@ -92,7 +92,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
+                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
                             href={`/address/${data.old_owner_id}`}
                           >
                             {shortenAddress(data.old_owner_id)}
@@ -105,7 +105,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                         To{' '}
                         {'new_owner_id' in data && data?.new_owner_id ? (
                           <Link
-                            className="text-green-500 dark:text-green-250 font-normal pl-1"
+                            className="text-green-500 dark:text-green-250 font-semibold pl-1"
                             href={`/address/${data.new_owner_id}`}
                           >
                             {shortenAddress(data.new_owner_id)}

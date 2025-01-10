@@ -64,7 +64,7 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
           >
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250  whitespace-nowrap">
               <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
                 href={`/txns/${row?.transaction_hash}`}
               >
                 {row?.transaction_hash}

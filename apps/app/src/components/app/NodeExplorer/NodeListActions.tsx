@@ -234,7 +234,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
               tooltip={row.accountId}
             >
               <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline"
+                className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
                 href={`/node-explorer/${row.accountId}`}
               >
                 {shortenAddress(row.accountId)}

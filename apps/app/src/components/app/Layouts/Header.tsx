@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import useScreenSize from '@/hooks/app/useScreenSize';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { setCurrentTheme } from '@/utils/app/actions';
 import { nanoToMilli } from '@/utils/app/libs';
@@ -189,7 +188,6 @@ const Header = ({
   const t = useTranslations();
   const { networkId } = useConfig();
   const pathname = usePathname();
-  const isMobile = useScreenSize();
   const router = useRouter();
   let { setTheme, theme } = useTheme();
 
@@ -241,8 +239,6 @@ const Header = ({
     return <Link {...props} />;
   };
 
-  const dynamicClass = !showSearch && isMobile ? 'hidden' : '';
-
   useEffect(() => {
     router.refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -259,14 +255,14 @@ const Header = ({
         </div>
       )}
       <div
-        className={`${dynamicClass} md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
+        className={`hidden md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
       >
         <div className="container-xxl w-full mx-auto flex justify-between">
           <div className="hidden md:!flex md:!w-[35%] h-10">
-            <div className="dark:!bg-black-600 h-full md:!pt-2 w-32 flex items-center">
+            <div className="dark:!bg-black-600 h-full w-32 flex items-center">
               <div className="h-11 flex items-center">
                 {networkId === 'mainnet' && nearPrice ? (
-                  <div className="h-10 py-1 rounded-lg flex justify-center items-center w-52">
+                  <div className="h-full py-1 rounded-lg flex justify-center items-center w-52">
                     <p className="text-xs text-gray-500 dark:text-neargray-10 font-medium leading-6 px-1 whitespace-nowrap">
                       NEAR Price:
                     </p>
@@ -394,9 +390,9 @@ const Header = ({
 
       <header className="dark:bg-black-600 bg-white shadow-sm">
         <div className="container-xxl w-full mx-auto">
-          <div className="flex flex-wrap">
+          <div className="flex flex-wrap-reverse">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
-              <div>
+              <div className="mb-1 sm:!mb-0">
                 <Link
                   className="flex justify-start items-center hover:no-underline"
                   href="/"
@@ -416,7 +412,7 @@ const Header = ({
                   />
                 </Link>
               </div>
-              <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4">
+              <div className="flex md:!hidden items-center justify-center ml-auto p-3 md:p-4 mb-1 sm:!mb-0">
                 <button
                   className="py-2 h-6 w-[36px] bg-gray-100 dark:bg-black-200 rounded mx-4 flex items-center justify-center"
                   onClick={toggleTheme}
@@ -604,7 +600,7 @@ const Header = ({
                     </>
                   </li>
                   <li>
-                    <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4">
+                    <span className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-">
                       <Image
                         alt="NearBlocks"
                         height="41"

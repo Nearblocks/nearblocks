@@ -53,7 +53,7 @@ const ListActions = ({
       cell: (row: BlocksInfo) => (
         <span>
           <Link
-            className="text-green-500 dark:text-green-250 hover:no-underline"
+            className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
             href={`/blocks/${row?.block_hash}`}
           >
             {row?.block_height
@@ -132,7 +132,7 @@ const ListActions = ({
       cell: (row: BlocksInfo) => (
         <span>
           <Link
-            className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
+            className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
             href={`/txns?block=${row?.block_hash}`}
           >
             {row?.transactions_agg?.count
