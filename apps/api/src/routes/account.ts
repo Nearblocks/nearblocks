@@ -31,6 +31,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -51,6 +54,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       '200':
    *         description: Success response
@@ -71,6 +77,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -95,6 +104,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -119,12 +131,18 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: path
    *         name: method
    *         required: true
    *         description: Method name
    *         schema:
    *           type: string
+   *         examples:
+   *           method:
+   *             value: example-method
    *     responses:
    *       200:
    *         description: Success response
@@ -149,6 +167,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -173,6 +194,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -193,6 +217,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: page
    *         description: Page number
@@ -236,6 +263,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -256,6 +286,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -344,6 +377,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -404,6 +440,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -466,6 +505,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -510,6 +552,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -580,6 +625,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -634,6 +682,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: involved
    *         description: Involved account ID
@@ -709,6 +760,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: involved
    *         description: Involved account ID
@@ -758,6 +812,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: involved
    *         description: Involved account ID
@@ -828,6 +885,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: involved
    *         description: Involved account ID
@@ -872,6 +932,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -940,6 +1003,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -984,6 +1050,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: cursor
    *         description: Next page cursor, takes precedence over 'page' if provided
@@ -1023,6 +1092,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response

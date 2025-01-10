@@ -25,6 +25,9 @@ const routes = (app: Router) => {
    *         description: Public key
    *         schema:
    *           type: string
+   *         examples:
+   *           key:
+   *             value: example-public-key
    *     responses:
    *       200:
    *         description: Success response

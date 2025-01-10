@@ -94,6 +94,9 @@ const routes = (app: Router) => {
    *         description: Pair ID
    *         schema:
    *           type: string
+   *         examples:
+   *           pair:
+   *             value: example-pair-id
    *     responses:
    *       200:
    *         description: Success response
@@ -114,6 +117,9 @@ const routes = (app: Router) => {
    *         description: Pair ID
    *         schema:
    *           type: string
+   *         examples:
+   *           pair:
+   *             value: example-pair-id
    *       - in: query
    *         name: a
    *         description: Maker account ID
@@ -152,6 +158,9 @@ const routes = (app: Router) => {
    *         description: Pair ID
    *         schema:
    *           type: string
+   *         examples:
+   *           pair:
+   *             value: example-pair-id
    *       - in: query
    *         name: a
    *         description: Maker account ID
@@ -177,6 +186,9 @@ const routes = (app: Router) => {
    *         description: Pair ID
    *         schema:
    *           type: string
+   *         examples:
+   *           pair:
+   *             value: example-pair-id
    *       - in: query
    *         name: interval
    *         required: true

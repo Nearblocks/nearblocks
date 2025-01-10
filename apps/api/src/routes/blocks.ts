@@ -95,6 +95,9 @@ const routes = (app: Router) => {
    *         description: Block hash
    *         schema:
    *           type: string
+   *         examples:
+   *           hash:
+   *             value: example-block-hash
    *     responses:
    *       200:
    *         description: Success response

@@ -125,21 +125,34 @@ const apiDocumentation = async (app: Application, dir: string) => {
     '/api-docs',
     apiReference({
       customCss: `
-         body.light-mode .introduction-section {
+         .light-mode .introduction-section {
           background: url(https://nearblocks.io/images/nearblocksblack.svg) no-repeat;
           background-size: auto;
+          padding-top: 60px;
+          margin-top: 12px;
         }
         
-        body.dark-mode .introduction-section {
+        .dark-mode .introduction-section {
           background: url(https://nearblocks.io/images/nearblocksblack_dark.svg) no-repeat;
           background-size: auto;
+          padding-top: 60px;
+          margin-top: 12px;
         }
+          
       `,
       favicon: 'https://nearblocks.io/favicon_32x32.png',
       hideDownloadButton: true,
       layout: 'modern',
       metaData: {
-        title: 'Near (Ⓝ) REST API | NearBlocks',
+        description:
+          'NearBlocks REST API documentation for the NEAR Protocol. Provides endpoints to access blockchain data and integrate seamlessly with NEAR.',
+        ogDescription:
+          'NearBlocks REST API documentation for the NEAR Protocol. Provides endpoints to access blockchain data and integrate seamlessly with NEAR.',
+        ogTitle: 'Near(Ⓝ) REST API | NearBlocks',
+        title: 'Near(Ⓝ) REST API | NearBlocks',
+        twitterDescription:
+          'NearBlocks REST API documentation for the NEAR Protocol. Provides endpoints to access blockchain data and integrate seamlessly with NEAR.',
+        twitterTitle: 'Near(Ⓝ) REST API | NearBlocks',
       },
       spec: {
         url: '/openapi.json',

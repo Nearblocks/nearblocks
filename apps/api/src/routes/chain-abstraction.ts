@@ -25,6 +25,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *     responses:
    *       200:
    *         description: Success response
@@ -49,6 +52,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID
@@ -136,6 +142,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
    *       - in: query
    *         name: from
    *         description: Sender account ID

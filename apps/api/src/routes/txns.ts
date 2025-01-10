@@ -173,6 +173,9 @@ const routes = (app: Router) => {
    *         description: Transaction hash
    *         schema:
    *           type: string
+   *         examples:
+   *           hash:
+   *             value: example-txn-hash
    *     responses:
    *       200:
    *         description: Success response
@@ -193,6 +196,9 @@ const routes = (app: Router) => {
    *         description: Transaction hash
    *         schema:
    *           type: string
+   *         examples:
+   *           hash:
+   *             value: example-txn-hash
    *     responses:
    *       200:
    *         description: Success response
