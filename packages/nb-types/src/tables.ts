@@ -15,18 +15,22 @@ import { JsonObject, JsonValue } from './types.js';
 
 export interface TTables {
   access_keys: AccessKey;
+  account_receipts: AccountReceipt;
+  account_transactions: AccountTransaction;
   accounts: Account;
   action_receipt_actions: ActionReceiptAction;
   action_receipt_input_data: ActionReceiptInputData;
   action_receipt_output_data: ActionReceiptOutputData;
   balance_events: BalanceEvent;
+  block_receipts: BlockReceipt;
+  block_transactions: BlockTransaction;
   blocks: Block;
   chunks: Chunk;
   daily_stats: DailyStats;
-  deployed_contracts: DeployedContracts;
+  deployed_contracts: DeployedContract;
   dex_events: DexEvents;
   dex_pairs: DexPairs;
-  errored_contracts: ErroredContracts;
+  errored_contracts: ErroredContract;
   execution_outcome_receipts: ExecutionOutcomeReceipt;
   execution_outcomes: ExecutionOutcome;
   ft_events: FTEvent;
@@ -40,6 +44,7 @@ export interface TTables {
   settings: Setting;
   stats: Stats;
   tps: TPS;
+  transaction_receipt: TransactionReceipt;
   transactions: Transaction;
   validator_data: ValidatorData;
 }
@@ -62,15 +67,39 @@ export type Account = {
   deleted_by_receipt_id: null | string;
 };
 
+export type AccountTransaction = {
+  account_id: string;
+  block_height: number;
+  block_timestamp: string;
+  index_in_block: number;
+  involved_account_id: string;
+  is_from: boolean;
+  transaction_hash: string;
+};
+
+export type AccountReceipt = {
+  account_id: string;
+  actions: JsonValue;
+  block_height: number;
+  block_timestamp: string;
+  index_in_block: number;
+  involved_account_id: string;
+  is_from: boolean;
+  methods: JsonValue;
+  receipt_id: string;
+  transaction_hash: string;
+};
+
 export type ActionReceiptAction = {
   action_kind: ActionKind;
   args: JsonValue;
+  block_height: number;
+  block_timestamp: string;
   index_in_action_receipt: number;
   nep518_rlp_hash: null | string;
+  predecessor_account_id: string;
   receipt_id: string;
-  receipt_included_in_block_timestamp: string;
-  receipt_predecessor_account_id: string;
-  receipt_receiver_account_id: string;
+  receiver_account_id: string;
 };
 
 export type ActionReceiptInputData = {
@@ -106,20 +135,29 @@ export type Block = {
   block_bytea: Buffer;
   block_hash: string;
   block_height: number;
-  block_json: JsonValue;
   block_timestamp: string;
   gas_price: string;
   prev_block_hash: string;
   total_supply: string;
 };
 
+export type BlockReceipt = {
+  block_height: number;
+  receipt_id: string;
+};
+
+export type BlockTransaction = {
+  block_height: number;
+  transaction_hash: string;
+};
+
 export type Chunk = {
   author_account_id: string;
+  block_height: number;
+  block_timestamp: string;
   chunk_hash: string;
   gas_limit: number;
   gas_used: number;
-  included_in_block_hash: string;
-  included_in_block_timestamp: string;
   shard_id: number;
 };
 
@@ -145,7 +183,7 @@ export type DailyStats = {
   unique_contracts: null | string;
 };
 
-export type DeployedContracts = {
+export type DeployedContract = {
   block_hash: string;
   block_timestamp: string;
   code_sha256: string;
@@ -179,7 +217,7 @@ export type DexPairs = {
   updated_at?: unknown;
 };
 
-export type ErroredContracts = {
+export type ErroredContract = {
   attempts: number;
   contract: string;
   id: number;
@@ -194,12 +232,12 @@ export type ExecutionOutcomeReceipt = {
 };
 
 export type ExecutionOutcome = {
-  executed_in_block_hash: string;
-  executed_in_block_timestamp: string;
+  block_height: number;
+  block_timestamp: string;
   executor_account_id: string;
   gas_burnt: number;
-  index_in_chunk: number;
-  logs: JsonValue;
+  index_in_block: number;
+  logs: Buffer;
   receipt_id: string;
   shard_id: number;
   status: ExecutionOutcomeStatus;
@@ -333,16 +371,16 @@ export type NFTTokenMeta = {
 };
 
 export type Receipt = {
-  included_in_block_hash: string;
-  included_in_block_timestamp: string;
-  included_in_chunk_hash: string;
-  index_in_chunk: number;
-  originated_from_transaction_hash: string;
+  block_height: number;
+  block_timestamp: string;
+  chunk_hash: string;
+  index_in_block: number;
   predecessor_account_id: string;
   public_key: null | string;
   receipt_id: string;
   receipt_kind: ReceiptKind;
   receiver_account_id: string;
+  transaction_hash: string;
 };
 
 export type Setting = {
@@ -376,16 +414,22 @@ export type TPS = {
 };
 
 export type Transaction = {
+  block_height: number;
   block_timestamp: string;
-  converted_into_receipt_id: string;
-  included_in_block_hash: string;
-  included_in_chunk_hash: string;
-  index_in_chunk: number;
-  receipt_conversion_gas_burnt: number;
-  receipt_conversion_tokens_burnt: string;
+  chunk_hash: string;
+  gas_burnt: number;
+  index_in_block: number;
+  receipt_id: string;
   receiver_account_id: string;
   signer_account_id: string;
   status: ExecutionOutcomeStatus;
+  tokens_burnt: string;
+  transaction_hash: string;
+};
+
+export type TransactionReceipt = {
+  block_height: number;
+  receipt_id: string;
   transaction_hash: string;
 };
 

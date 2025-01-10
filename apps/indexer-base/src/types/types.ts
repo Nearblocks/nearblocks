@@ -54,6 +54,7 @@ export type DataReceipt = {
 export type ReceiptAction = {
   args: string;
   kind: ActionKind;
+  method: null | string;
   rlpHash: null | string;
 };
 

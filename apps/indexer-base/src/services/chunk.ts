@@ -11,7 +11,7 @@ export const storeChunks = async (
   const data = message.shards.flatMap((shard) =>
     shard.chunk
       ? getChunkData(
-          message.block.header.hash,
+          message.block.header.height,
           message.block.header.timestampNanosec,
           shard.chunk,
         )
@@ -20,23 +20,26 @@ export const storeChunks = async (
 
   if (data.length) {
     await retry(async () => {
-      await knex('chunks').insert(data).onConflict(['chunk_hash']).ignore();
+      await knex('chunks')
+        .insert(data)
+        .onConflict(['block_height', 'chunk_hash'])
+        .ignore();
     });
   }
 };
 
 const getChunkData = (
-  blockHash: string,
+  blockHeight: number,
   blockTimestamp: string,
   chunk: types.Chunk,
 ): Chunk => {
   return {
     author_account_id: chunk.author,
+    block_height: blockHeight,
+    block_timestamp: blockTimestamp,
     chunk_hash: chunk.header.chunkHash,
     gas_limit: chunk.header.gasLimit,
     gas_used: chunk.header.gasUsed,
-    included_in_block_hash: blockHash,
-    included_in_block_timestamp: blockTimestamp,
     shard_id: chunk.header.shardId,
   };
 };

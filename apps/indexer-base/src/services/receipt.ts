@@ -4,17 +4,21 @@ import { types } from 'near-lake-framework';
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import {
+  AccountReceipt,
+  ActionKind,
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
+  BlockReceipt,
   Receipt,
+  TransactionReceipt,
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
-import { mapActionKind, mapReceiptKind } from '#libs/utils';
+import { getBlockIndex, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
@@ -22,6 +26,9 @@ export const storeReceipts = async (
   knex: Knex,
   message: types.StreamerMessage,
 ) => {
+  let blockReceipts: BlockReceipt[] = [];
+  let txnReceipts: TransactionReceipt[] = [];
+  let accountReceipts: AccountReceipt[] = [];
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
@@ -33,12 +40,16 @@ export const storeReceipts = async (
       if (chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
           knex,
+          chunk.header.shardId,
           chunk.header.chunkHash,
-          message.block.header.hash,
+          message.block.header.height,
           message.block.header.timestampNanosec,
           chunk.receipts,
         );
 
+        blockReceipts = blockReceipts.concat(receipts.blockReceipts);
+        txnReceipts = txnReceipts.concat(receipts.txnReceipts);
+        accountReceipts = accountReceipts.concat(receipts.accountReceipts);
         receiptData = receiptData.concat(receipts.receiptData);
         receiptActionsData = receiptActionsData.concat(
           receipts.receiptActionsData,
@@ -53,6 +64,51 @@ export const storeReceipts = async (
 
   const promises = [];
 
+  if (blockReceipts.length) {
+    for (let i = 0; i < blockReceipts.length; i += batchSize) {
+      const batch = blockReceipts.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('block_receipts')
+            .insert(batch)
+            .onConflict(['receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (txnReceipts.length) {
+    for (let i = 0; i < txnReceipts.length; i += batchSize) {
+      const batch = txnReceipts.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('transaction_receipts')
+            .insert(batch)
+            .onConflict(['transaction_hash', 'receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
+  if (accountReceipts.length) {
+    for (let i = 0; i < accountReceipts.length; i += batchSize) {
+      const batch = accountReceipts.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('account_receipts')
+            .insert(batch)
+            .onConflict(['account_id', 'receipt_id'])
+            .ignore();
+        }),
+      );
+    }
+  }
+
   if (receiptData.length) {
     for (let i = 0; i < receiptData.length; i += batchSize) {
       const batch = receiptData.slice(i, i + batchSize);
@@ -61,7 +117,7 @@ export const storeReceipts = async (
         retry(async () => {
           await knex('receipts')
             .insert(batch)
-            .onConflict(['receipt_id'])
+            .onConflict(['block_height', 'receipt_id'])
             .ignore();
         }),
       );
@@ -76,7 +132,11 @@ export const storeReceipts = async (
         retry(async () => {
           await knex('action_receipt_actions')
             .insert(batch)
-            .onConflict(['receipt_id', 'index_in_action_receipt'])
+            .onConflict([
+              'block_height',
+              'receipt_id',
+              'index_in_action_receipt',
+            ])
             .ignore();
         }),
       );
@@ -118,16 +178,20 @@ export const storeReceipts = async (
 
 const storeChunkReceipts = async (
   knex: Knex,
+  shardId: number,
   chunkHash: string,
-  blockHash: string,
+  blockHeight: number,
   blockTimestamp: string,
   receipts: types.Receipt[],
 ) => {
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
   );
-  const txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
+  const txnHashes = await getTxnHashes(knex, blockHeight, receiptOrDataIds);
 
+  const blockReceipts: BlockReceipt[] = [];
+  const txnReceipts: TransactionReceipt[] = [];
+  const accountReceipts: AccountReceipt[] = [];
   const receiptData: Receipt[] = [];
   const receiptActionsData: ActionReceiptAction[] = [];
   const receiptInputData: ActionReceiptInputData[] = [];
@@ -144,7 +208,19 @@ const storeChunkReceipts = async (
       throw new Error(`no parent transaction for receipt: ${receiptOrDataId}`);
     }
 
+    blockReceipts.push({
+      block_height: blockHeight,
+      receipt_id: receipt.receiptId,
+    });
+    txnReceipts.push({
+      block_height: blockHeight,
+      receipt_id: receipt.receiptId,
+      transaction_hash: txnHash,
+    });
+
     let publicKey = null;
+    const kinds: string[] = [];
+    const methods: string[] = [];
 
     if ('Action' in receipt.receipt) {
       publicKey = receipt.receipt.Action.signerPublicKey;
@@ -162,28 +238,50 @@ const storeChunkReceipts = async (
 
       let actionIndex = 0;
       receipt.receipt.Action.actions.forEach((action) => {
+        const { args, kind, method, rlpHash } = mapActionKind(action);
+
+        kinds.push(kind);
+
+        if (method) {
+          methods.push(method);
+        }
+
         if (isDelegateAction(action)) {
           receiptActionsData.push(
             getActionReceiptActionData(
+              blockHeight,
               blockTimestamp,
               receiptOrDataId,
               actionIndex,
-              action,
               receipt.predecessorId,
               receipt.receiverId,
+              args,
+              kind,
+              rlpHash,
             ),
           );
           actionIndex += 1;
 
           action.Delegate.delegateAction.actions.forEach((action) => {
+            const { args, kind, method, rlpHash } = mapActionKind(action);
+
+            kinds.push(kind);
+
+            if (method) {
+              methods.push(method);
+            }
+
             receiptActionsData.push(
               getActionReceiptActionData(
+                blockHeight,
                 blockTimestamp,
                 receiptOrDataId,
                 actionIndex,
-                action,
                 receipt.predecessorId,
                 receipt.receiverId,
+                args,
+                kind,
+                rlpHash,
               ),
             );
             actionIndex += 1;
@@ -194,40 +292,58 @@ const storeChunkReceipts = async (
 
         receiptActionsData.push(
           getActionReceiptActionData(
+            blockHeight,
             blockTimestamp,
             receiptOrDataId,
             actionIndex,
-            action,
             receipt.predecessorId,
             receipt.receiverId,
+            args,
+            kind,
+            rlpHash,
           ),
         );
         actionIndex += 1;
       });
     }
 
+    accountReceipts.push(
+      getAccountReceiptData(
+        blockHeight,
+        blockTimestamp,
+        txnHash,
+        receipt,
+        true,
+        getBlockIndex(shardId, receiptIndex),
+        JSON.stringify(methods),
+        JSON.stringify(kinds),
+      ),
+    );
     receiptData.push(
       getReceiptData(
         receipt,
         chunkHash,
-        blockHash,
+        blockHeight,
         blockTimestamp,
         txnHash,
-        receiptIndex,
+        getBlockIndex(shardId, receiptIndex),
         publicKey,
       ),
     );
   });
 
   return {
+    accountReceipts,
+    blockReceipts,
     receiptActionsData,
     receiptData,
     receiptInputData,
     receiptOutputData,
+    txnReceipts,
   };
 };
 
-const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
+const getTxnHashes = async (knex: Knex, blockHeight: number, ids: string[]) => {
   const receiptOrDataIds = uniq(ids);
   let txnHashes = await retry(async () => {
     return await fetchTxnHashesFromCache(receiptOrDataIds);
@@ -239,7 +355,7 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
 
   logger.warn(
     {
-      block: blockHash,
+      block: blockHeight,
       receiptOrDataIds: receiptOrDataIds,
       txnHashes: [...txnHashes.keys()],
     },
@@ -273,13 +389,10 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('input_data_id', receiptOrDataIds)
-    .select('input_data_id', 'originated_from_transaction_hash');
+    .select('input_data_id', 'transaction_hash');
 
   receiptInputs.forEach((outputReceipt) => {
-    txnHashes.set(
-      outputReceipt.input_data_id,
-      outputReceipt.originated_from_transaction_hash,
-    );
+    txnHashes.set(outputReceipt.input_data_id, outputReceipt.transaction_hash);
   });
 
   if (txnHashes.size === receiptOrDataIds.length) {
@@ -293,13 +406,10 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('output_data_id', receiptOrDataIds)
-    .select('output_data_id', 'originated_from_transaction_hash');
+    .select('output_data_id', 'transaction_hash');
 
   receiptOutputs.forEach((outputReceipt) => {
-    txnHashes.set(
-      outputReceipt.output_data_id,
-      outputReceipt.originated_from_transaction_hash,
-    );
+    txnHashes.set(outputReceipt.output_data_id, outputReceipt.transaction_hash);
   });
 
   if (txnHashes.size === receiptOrDataIds.length) {
@@ -313,12 +423,12 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('produced_receipt_id', receiptOrDataIds)
-    .select('produced_receipt_id', 'originated_from_transaction_hash');
+    .select('produced_receipt_id', 'transaction_hash');
 
   outcomeReceipts.forEach((outcomeReceipt) => {
     txnHashes.set(
       outcomeReceipt.produced_receipt_id,
-      outcomeReceipt.originated_from_transaction_hash,
+      outcomeReceipt.transaction_hash,
     );
   });
 
@@ -327,14 +437,11 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
   }
 
   const transactions = await knex('transactions')
-    .whereIn('converted_into_receipt_id', receiptOrDataIds)
-    .select('converted_into_receipt_id', 'transaction_hash');
+    .whereIn('receipt_id', receiptOrDataIds)
+    .select('receipt_id', 'transaction_hash');
 
   transactions.forEach((transaction) => {
-    txnHashes.set(
-      transaction.converted_into_receipt_id,
-      transaction.transaction_hash,
-    );
+    txnHashes.set(transaction.receipt_id, transaction.transaction_hash);
   });
 
   if (txnHashes.size === receiptOrDataIds.length) {
@@ -348,46 +455,70 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
   );
 };
 
+const getAccountReceiptData = (
+  blockHeight: number,
+  blockTimestamp: string,
+  txnHash: string,
+  receipt: types.Receipt,
+  isFrom: boolean,
+  indexInBlock: number,
+  methods: string,
+  actions: string,
+): AccountReceipt => ({
+  account_id: isFrom ? receipt.predecessorId : receipt.receiverId,
+  actions,
+  block_height: blockHeight,
+  block_timestamp: blockTimestamp,
+  index_in_block: indexInBlock,
+  involved_account_id: isFrom ? receipt.receiverId : receipt.predecessorId,
+  is_from: isFrom,
+  methods,
+  receipt_id: receipt.receiptId,
+  transaction_hash: txnHash,
+});
+
 const getReceiptData = (
   receipt: types.Receipt,
   chunkHash: string,
-  blockHash: string,
+  blockHeight: number,
   blockTimestamp: string,
   transactionHash: string,
-  indexInChunk: number,
+  indexInBlock: number,
   publicKey: null | string,
 ): Receipt => ({
-  included_in_block_hash: blockHash,
-  included_in_block_timestamp: blockTimestamp,
-  included_in_chunk_hash: chunkHash,
-  index_in_chunk: indexInChunk,
-  originated_from_transaction_hash: transactionHash,
+  block_height: blockHeight,
+  block_timestamp: blockTimestamp,
+  chunk_hash: chunkHash,
+  index_in_block: indexInBlock,
   predecessor_account_id: receipt.predecessorId,
   public_key: publicKey,
   receipt_id: receipt.receiptId,
   receipt_kind: mapReceiptKind(receipt.receipt),
   receiver_account_id: receipt.receiverId,
+  transaction_hash: transactionHash,
 });
 
 const getActionReceiptActionData = (
+  blockHeight: number,
   blockTimestamp: string,
   receiptId: string,
   actionIndex: number,
-  action: types.Action,
   predecessorId: string,
   receiverId: string,
+  args: string,
+  kind: ActionKind,
+  rlpHash: null | string,
 ): ActionReceiptAction => {
-  const { args, kind, rlpHash } = mapActionKind(action);
-
   return {
     action_kind: kind,
     args,
+    block_height: blockHeight,
+    block_timestamp: blockTimestamp,
     index_in_action_receipt: actionIndex,
     nep518_rlp_hash: rlpHash,
+    predecessor_account_id: predecessorId,
     receipt_id: receiptId,
-    receipt_included_in_block_timestamp: blockTimestamp,
-    receipt_predecessor_account_id: predecessorId,
-    receipt_receiver_account_id: receiverId,
+    receiver_account_id: receiverId,
   };
 };
 

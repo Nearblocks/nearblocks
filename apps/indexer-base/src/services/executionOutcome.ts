@@ -5,7 +5,7 @@ import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { jsonStringify, mapExecutionStatus } from '#libs/utils';
+import { getBlockIndex, jsonStringify, mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
@@ -20,6 +20,8 @@ export const storeExecutionOutcomes = async (
     message.shards.map(async (shard) => {
       const executions = storeChunkExecutionOutcomes(
         shard.shardId,
+        message.block.header.hash,
+        message.block.header.height,
         message.block.header.timestampNanosec,
         shard.receiptExecutionOutcomes,
       );
@@ -39,7 +41,7 @@ export const storeExecutionOutcomes = async (
         retry(async () => {
           await knex('execution_outcomes')
             .insert(batch)
-            .onConflict(['receipt_id'])
+            .onConflict(['block_height', 'receipt_id'])
             .ignore();
         }),
       );
@@ -70,6 +72,8 @@ export const storeExecutionOutcomes = async (
 
 export const storeChunkExecutionOutcomes = (
   shardId: number,
+  blockHash: string,
+  blockHeight: number,
   blockTimestamp: string,
   executionOutcomes: types.ExecutionOutcomeWithReceipt[],
 ) => {
@@ -77,11 +81,17 @@ export const storeChunkExecutionOutcomes = (
   const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
   executionOutcomes.forEach((executionOutcome, indexInChunk) => {
+    if (blockHash !== executionOutcome.executionOutcome.blockHash)
+      throw new Error(
+        `block hash mismatch: ${blockHash} - ${executionOutcome.executionOutcome.blockHash}`,
+      );
+
     outcomes.push(
       getExecutionOutcomeData(
         shardId,
+        blockHeight,
         blockTimestamp,
-        indexInChunk,
+        getBlockIndex(shardId, indexInChunk),
         executionOutcome,
       ),
     );
@@ -104,16 +114,17 @@ export const storeChunkExecutionOutcomes = (
 
 const getExecutionOutcomeData = (
   shardId: number,
+  blockHeight: number,
   blockTimestamp: string,
-  indexInChunk: number,
+  indexInBlock: number,
   outcome: types.ExecutionOutcomeWithReceipt,
 ): ExecutionOutcome => ({
-  executed_in_block_hash: outcome.executionOutcome.blockHash,
-  executed_in_block_timestamp: blockTimestamp,
+  block_height: blockHeight,
+  block_timestamp: blockTimestamp,
   executor_account_id: outcome.executionOutcome.outcome.executorId,
   gas_burnt: outcome.executionOutcome.outcome.gasBurnt,
-  index_in_chunk: indexInChunk,
-  logs: jsonStringify(outcome.executionOutcome.outcome.logs),
+  index_in_block: indexInBlock,
+  logs: Buffer.from(jsonStringify(outcome.executionOutcome.outcome.logs)),
   receipt_id: outcome.executionOutcome.id,
   shard_id: shardId,
   status: mapExecutionStatus(outcome.executionOutcome.outcome.status),

@@ -15,7 +15,10 @@ type AccountMap = Map<string, Account>;
 
 export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
   await retry(async () => {
-    await knex('accounts').insert(accounts).onConflict(['account_id']).ignore();
+    await knex('accounts')
+      .insert(accounts)
+      .onConflict(['account_id', 'created_by_block_height'])
+      .ignore();
   });
 };
 
@@ -119,7 +122,7 @@ export const storeChunkAccounts = async (
     await retry(async () => {
       await knex('accounts')
         .insert([...accounts.values()])
-        .onConflict(['account_id'])
+        .onConflict(['account_id', 'created_by_block_height'])
         .ignore();
     });
   }

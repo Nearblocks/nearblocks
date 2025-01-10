@@ -11,7 +11,7 @@ export const storeBlock = async (
   const data = getBlockData(message);
 
   await retry(async () => {
-    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
+    await knex('blocks').insert(data).onConflict(['block_height']).ignore();
   });
 };
 
@@ -24,7 +24,6 @@ const getBlockData = (message: types.StreamerMessage): Block => {
     block_bytea: Buffer.from(blockJson),
     block_hash: block.header.hash,
     block_height: block.header.height,
-    block_json: null,
     block_timestamp: block.header.timestampNanosec,
     gas_price: block.header.gasPrice,
     prev_block_hash: block.header.prevHash,

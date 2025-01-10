@@ -57,6 +57,7 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
   let kind = ActionKind.UNKNOWN;
   let args = {};
   let rlpHash = null;
+  let method: null | string = null;
 
   if (
     action === 'CreateAccount' ||
@@ -84,6 +85,7 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
 
     try {
       jsonArgs = decodeArgs(action.FunctionCall.args);
+      method = action.FunctionCall.methodName;
       rlpHash = getRlpHash(action.FunctionCall.methodName, jsonArgs);
     } catch (error) {
       base64Args = action.FunctionCall.args;
@@ -167,6 +169,7 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
   return {
     args: jsonStringify(args),
     kind,
+    method,
     rlpHash,
   };
 };
@@ -237,4 +240,13 @@ export const decodeRlp = (args: string) => {
   const hexString = hexlify(base64);
 
   return Transaction.from(hexString);
+};
+
+export const getBlockIndex = (shard: number, index: number) => {
+  return +`${shard}${String(index).padStart(5, '0')}`;
+};
+
+export const retryLogger = (attempt: number, error: unknown) => {
+  logger.error(error);
+  logger.error({ attempt });
 };
