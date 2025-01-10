@@ -137,6 +137,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *     responses:
    *       200:
    *         description: Success response
@@ -157,6 +160,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: account
    *         description: Affected account ID
@@ -205,6 +211,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: account
    *         description: Affected account ID
@@ -234,6 +243,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: page
    *         description: Page number
@@ -270,6 +282,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *     responses:
    *       200:
    *         description: Success response

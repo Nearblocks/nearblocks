@@ -138,6 +138,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *     responses:
    *       200:
    *         description: Success response
@@ -158,6 +161,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: cursor.query
    *         description: Next page cursor, takes precedence over 'page' if provided
@@ -201,6 +207,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *     responses:
    *       200:
    *         description: Success response
@@ -225,6 +234,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: page
    *         description: Page number
@@ -261,6 +273,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *     responses:
    *       200:
    *         description: Success response
@@ -285,6 +300,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: token.query
    *         description: Token ID
@@ -326,6 +344,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: token.query
    *         description: Token ID
@@ -355,12 +376,18 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: path
    *         name: token
    *         required: true
    *         description: Token ID
    *         schema:
    *           type: string
+   *         examples:
+   *           token:
+   *             value: example-token-id
    *     responses:
    *       200:
    *         description: Success response
@@ -385,12 +412,18 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: path
    *         name: token
    *         required: true
    *         description: Token ID
    *         schema:
    *           type: string
+   *         examples:
+   *           token:
+   *             value: example-token-id
    *       - in: query
    *         name: cursor.query
    *         description: Next page cursor, takes precedence over 'page' if provided
@@ -438,6 +471,9 @@ const routes = (app: Router) => {
    *         description: Contract ID
    *         schema:
    *           type: string
+   *         examples:
+   *           contract:
+   *             value: example-contract-id
    *       - in: query
    *         name: token
    *         description: Token ID
