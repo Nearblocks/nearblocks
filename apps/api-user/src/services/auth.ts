@@ -53,7 +53,7 @@ const login = catchAsync(
     let isPasswordValid = false;
 
     if (user.password.startsWith('$2y$')) {
-      return res.status(422).json({
+      return res.status(403).json({
         message:
           'Password mismatch. Please update your password using the forgot password link.',
       });
@@ -235,29 +235,79 @@ const register = catchAsync(
 
 const resend = catchAsync(
   async (req: RequestValidator<Resend>, res: Response) => {
+    const type = VerificationKind.VERIFY_EMAIL;
     const email = req.validator.data.email;
+    const date = dayjs.utc().toISOString();
+    const expires = dayjs.utc().add(1, 'hour').toISOString();
 
-    const verifyQuery = keyBinder(
+    const userQuery = keyBinder(
       `
-        SELECT
-          *
-        FROM
-          api__verifications
-        WHERE
-          email = :email
-      `,
-      { email },
+          SELECT
+            u.*,
+            v.verifications
+          FROM
+            api__users u
+            LEFT JOIN LATERAL (
+              SELECT
+                coalesce(json_agg(v_wrap), '[]') AS verifications
+              FROM
+                (
+                  SELECT
+                    *
+                  FROM
+                    api__verifications v
+                  WHERE
+                    v.type = :type
+                    AND v.user_id = u.id
+                ) as v_wrap
+            ) v ON TRUE
+          WHERE
+            u.email = :email
+        `,
+      { email, type },
     );
 
-    const verifyResp = await db.query(verifyQuery.query, verifyQuery.values);
-    const verify = verifyResp?.rows?.[0];
+    const userResp = await db.query(userQuery.query, userQuery.values);
+    const user = userResp?.rows?.[0];
 
-    if (!verify)
+    if (!user)
       return res
         .status(422)
         .json(validationErrors([{ message: 'Invalid email', path: 'email' }]));
 
-    await emailQueue.add(verify.type, { code: verify.code, email });
+    let code: string;
+
+    if (user.verifications?.length) {
+      code = user.verifications[0].code;
+    } else {
+      code = crypto.randomBytes(8).toString('hex');
+      const verifyQuery = keyBinder(
+        `
+            INSERT INTO
+              api__verifications(
+                user_id,
+                type,
+                email,
+                code,
+                created_at,
+                expires_at
+              )
+            VALUES(
+              :user,
+              :type,
+              :email,
+              :code,
+              :date,
+              :expires
+            )
+          `,
+        { code, date, email, expires, type, user: user.id },
+      );
+
+      await db.query(verifyQuery.query, verifyQuery.values);
+    }
+
+    await emailQueue.add(type, { code, email });
 
     return res.status(200).end();
   },

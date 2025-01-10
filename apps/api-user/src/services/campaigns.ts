@@ -3,78 +3,52 @@ import { Request, Response } from 'express';
 import config from '#config';
 import catchAsync from '#libs/async';
 import { userSql } from '#libs/postgres';
+import { redisClient } from '#libs/redis';
 import { Campaign } from '#types/types';
 
 const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
   const { type } = req.query;
+  const cachedAd = await getCachedBannerAd(type as string);
+
+  if (cachedAd) {
+    const desktopImage =
+      type === 'center' ? cachedAd.mobile_image : cachedAd.desktop_image_right;
+
+    const adResponse = {
+      desktopImage: `${config.awsUrl}/${desktopImage}`,
+      id: cachedAd.id,
+      mobileImage: `${config.awsUrl}/${cachedAd.mobile_image}`,
+    };
+
+    return res.json(adResponse);
+  }
   const query = userSql<Campaign[]>`
-    WITH
-      valid_ads AS (
-        SELECT
-          *
-        FROM
-          campaign__ads
-        WHERE
-          is_approved = TRUE
-          AND is_active = TRUE
-          AND api_subscription_id IN (
-            SELECT
-              id
-            FROM
-              api__subscriptions
-            WHERE
-              status = 'active'
-          )
-          AND text IS NULL
-      ),
-      rand_selection AS (
-        SELECT
-          CEIL(
-            RANDOM() * (
-              SELECT
-                MAX(id)
-              FROM
-                valid_ads
-            )
-          ) AS rand_id
-      )
     SELECT
       *
     FROM
-      valid_ads
+      campaign__ads
     WHERE
-      id >= (
+      is_approved = TRUE
+      AND is_active = TRUE
+      AND text IS NULL
+      AND api_subscription_id IN (
         SELECT
-          rand_id
+          id
         FROM
-          rand_selection
+          api__subscriptions
+        WHERE
+          status = 'active'
       )
-      OR id <= (
-        SELECT
-          rand_id
-        FROM
-          rand_selection
-      )
-    ORDER BY
-      CASE
-        WHEN id >= (
-          SELECT
-            rand_id
-          FROM
-            rand_selection
-        ) THEN 1
-        ELSE 2
-      END,
-      id
-    LIMIT
-      1;
   `;
   const result = await query;
-  const ad = result[0];
 
-  if (!ad) {
+  if (!result.length) {
     return res.status(204).send();
   }
+
+  await cacheApprovedBannerAds(result, type as string);
+
+  const ad = result[0];
 
   const desktopImage =
     type === 'center' ? ad.mobile_image : ad.desktop_image_right;
@@ -89,74 +63,47 @@ const getApprovedAds = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
+  const cachedAd = await getCachedTextAd();
+
+  if (cachedAd) {
+    const adResponse = {
+      icon: cachedAd.icon ? `${config.awsUrl}/${cachedAd.icon}` : null,
+      id: cachedAd.id,
+      linkName: cachedAd.link_name,
+      siteName: cachedAd.site_name,
+      text: cachedAd.text,
+    };
+
+    return res.json(adResponse);
+  }
+
   const query = userSql<Campaign[]>`
-    WITH
-      valid_ads AS (
-        SELECT
-          *
-        FROM
-          campaign__ads
-        WHERE
-          is_approved = TRUE
-          AND is_active = TRUE
-          AND api_subscription_id IN (
-            SELECT
-              id
-            FROM
-              api__subscriptions
-            WHERE
-              status = 'active'
-          )
-          AND text IS NOT NULL
-      ),
-      rand_selection AS (
-        SELECT
-          CEIL(
-            RANDOM() * (
-              SELECT
-                MAX(id)
-              FROM
-                valid_ads
-            )
-          ) AS rand_id
-      )
     SELECT
       *
     FROM
-      valid_ads
+      campaign__ads
     WHERE
-      id >= (
+      is_approved = TRUE
+      AND is_active = TRUE
+      AND text IS NOT NULL
+      AND api_subscription_id IN (
         SELECT
-          rand_id
+          id
         FROM
-          rand_selection
+          api__subscriptions
+        WHERE
+          status = 'active'
       )
-      OR id <= (
-        SELECT
-          rand_id
-        FROM
-          rand_selection
-      )
-    ORDER BY
-      CASE
-        WHEN id >= (
-          SELECT
-            rand_id
-          FROM
-            rand_selection
-        ) THEN 1
-        ELSE 2
-      END,
-      id
-    LIMIT
-      1;
   `;
-  const result = await query;
-  const ad = result[0];
 
-  if (!ad) {
+  const result = await query;
+  if (!result.length) {
     return res.status(204).send();
   }
+
+  await cacheApprovedTextAds(result);
+
+  const ad = result[0];
 
   const adResponse = {
     icon: ad.icon ? `${config.awsUrl}/${ad.icon}` : null,
@@ -176,7 +123,7 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_metrics (TIME, campaign_ad_id, impressions)
+      campaign__ad__statistics (TIME, campaign_ad_id, impressions)
     VALUES
       (
         ${now},
@@ -186,7 +133,7 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
     ON CONFLICT (campaign_ad_id, TIME) DO
     UPDATE
     SET
-      impressions = campaign_ad_metrics.impressions + 1
+      impressions = campaign__ad__statistics.impressions + 1
   `;
 
   const transparentPixel = Buffer.from(
@@ -196,6 +143,7 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
   );
 
   res.set('Content-Type', 'image/png');
+
   return res.status(200).send(transparentPixel);
 });
 
@@ -206,7 +154,7 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
 
   await userSql`
     INSERT INTO
-      campaign_ad_metrics (TIME, campaign_ad_id, clicks)
+      campaign__ad__statistics (TIME, campaign_ad_id, clicks)
     VALUES
       (
         ${now},
@@ -216,7 +164,7 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
     ON CONFLICT (campaign_ad_id, TIME) DO
     UPDATE
     SET
-      clicks = campaign_ad_metrics.clicks + 1
+      clicks = campaign__ad__statistics.clicks + 1
   `;
 
   const adResult = await userSql`
@@ -234,8 +182,49 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
   const targetUrl = adResult[0].url;
 
   res.setHeader('Location', targetUrl);
+
   return res.status(302).send();
 });
+
+const cacheApprovedBannerAds = async (ads: Campaign[], type: string) => {
+  const redisKey = `banner_ads_${type}`;
+  await redisClient.del(redisKey);
+  const adsData = ads.map((ad) => JSON.stringify(ad));
+  await redisClient.rpush(redisKey, ...adsData);
+  await redisClient.expire(redisKey, 3600);
+};
+
+const getCachedBannerAd = async (type: string): Promise<Campaign | null> => {
+  const redisKey = `banner_ads_${type}`;
+  const adsCount = await redisClient.llen(redisKey);
+
+  if (adsCount === 0) return null;
+
+  const randomIndex = Math.floor(Math.random() * adsCount);
+  const adString = await redisClient.lindex(redisKey, randomIndex);
+
+  return adString ? JSON.parse(adString) : null;
+};
+
+const cacheApprovedTextAds = async (ads: Campaign[]) => {
+  const redisKey = `text_ads`;
+  await redisClient.del(redisKey);
+  const adsData = ads.map((ad) => JSON.stringify(ad));
+  await redisClient.rpush(redisKey, ...adsData);
+  await redisClient.expire(redisKey, 3600);
+};
+
+const getCachedTextAd = async (): Promise<Campaign | null> => {
+  const redisKey = `text_ads`;
+  const adsCount = await redisClient.llen(redisKey);
+
+  if (adsCount === 0) return null;
+
+  const randomIndex = Math.floor(Math.random() * adsCount);
+  const adString = await redisClient.lindex(redisKey, randomIndex);
+
+  return adString ? JSON.parse(adString) : null;
+};
 
 export default {
   getApprovedAds,

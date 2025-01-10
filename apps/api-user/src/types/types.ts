@@ -11,7 +11,6 @@ export type RequestValidator<T> = Required<RequestValidators<T>>;
 
 export type Config = {
   adminUsername: string;
-  apiUrl: string;
   awsUrl: string;
   dbUrl: string;
   jwtSecret: string;

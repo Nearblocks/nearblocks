@@ -4,7 +4,6 @@ import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
   ADMIN_USERNAME: str({ default: 'nearblocks' }),
-  API_URL: str({ default: 'https://api.exploreblocks.io/api' }),
   AWS_URL: str(),
   DATABASE_URL: str(),
   JWT_SECRET: str(),
@@ -22,7 +21,6 @@ const env = cleanEnv(process.env, {
 
 const config: Config = {
   adminUsername: env.ADMIN_USERNAME,
-  apiUrl: env.API_URL,
   awsUrl: env.AWS_URL,
   dbUrl: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
