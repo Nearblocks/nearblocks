@@ -22,7 +22,6 @@
     "envalid": "8.0.0",
     "ethers": "6.13.2",
     "lodash-es": "4.17.21",
-    "near-lake-framework": "2.0.0",
     "stream-json": "1.8.0"
   },
   "devDependencies": {
@@ -33,11 +32,12 @@
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
-    "nb-neardata": "*",
+    "nb-neardata-raw": "*",
     "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
+    "near-lake-framework": "2.0.0",
     "rimraf": "~5.0",
     "typescript": "~5.2"
   }
