@@ -22,6 +22,14 @@ export function shortenAddress(address: string) {
   return `${string.substr(0, 10)}...${string.substr(-7)}`;
 }
 
+export function shortenText(text: string) {
+  const string = String(text);
+
+  if (string.length <= 20) return string;
+
+  return `${string.substr(0, 6)}...${string.substr(-4)}`;
+}
+
 export function isAction(type: string) {
   const actions = [
     'DEPLOY_CONTRACT',
@@ -658,4 +666,29 @@ export function isValidJson(value: string): boolean {
   } catch (e) {
     return false;
   }
+}
+
+export function parseNestedJSON(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => parseNestedJSON(item));
+  }
+
+  const result: any = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      try {
+        result[key] = JSON.parse(atob(obj[key]));
+      } catch {
+        result[key] = obj[key];
+      }
+    } else if (typeof obj[key] === 'object') {
+      result[key] = parseNestedJSON(obj[key]);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
 }

@@ -126,7 +126,6 @@ const Txn = ({
   data,
   error,
   statsData,
-  isContract,
   price,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
@@ -266,12 +265,15 @@ const Txn = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, hash, rpcUrl]);
 
-  const contract = useMemo(
-    () =>
-      isContract?.account?.[0]?.code_hash !==
-      '11111111111111111111111111111111',
-    [isContract],
-  );
+  const contract = useMemo(() => {
+    const containsDelegateOrFunctionCall =
+      Array.isArray(rpcTxn?.transaction?.actions) &&
+      rpcTxn?.transaction.actions.some(
+        (action: any) => 'Delegate' in action || 'FunctionCall' in action,
+      );
+
+    return containsDelegateOrFunctionCall;
+  }, [rpcTxn]);
 
   const buttonStyles = (selected: boolean) =>
     `relative text-nearblue-600  text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none ${
