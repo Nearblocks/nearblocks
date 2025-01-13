@@ -38,12 +38,9 @@ const login = z.object({
     .min(8, { message: 'Password must be at least 8 characters long.' })
     .max(100, { message: 'Password must not exceed 100 characters.' }),
   remember: z.boolean().optional(),
-  username_or_email: z
-    .string()
-    .trim()
-    .min(5, {
-      message: 'Username or email must be at least 5 characters long.',
-    }),
+  username_or_email: z.string().trim().min(5, {
+    message: 'Username or email must be at least 5 characters long.',
+  }),
 });
 
 const forgot = z.object({
