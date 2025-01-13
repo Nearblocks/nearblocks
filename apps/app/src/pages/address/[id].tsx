@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps<{
   latestBlocks: any;
   multiChainAccountsData: any;
   signedAccountId: any;
+  syncData: any;
 }> = async (context) => {
   const {
     query: { id = '', tab = 'txns', ...qs },
@@ -107,6 +108,7 @@ export const getServerSideProps: GetServerSideProps<{
     inventory: id && `account/${address}/inventory`,
     multiChainAccounts:
       id && `chain-abstraction/${address}/multi-chain-accounts`,
+    syncStatus: `sync/status`,
   };
 
   const urlMapping: Record<TabType, { api: string; count?: string }> = {
@@ -164,6 +166,7 @@ export const getServerSideProps: GetServerSideProps<{
     parseResult,
     inventoryResult,
     multiChainAccountsResult,
+    syncStatusResult,
   ] = await Promise.allSettled([
     fetchCommonData(commonApiUrls.account),
     fetchCommonData(commonApiUrls.deployments),
@@ -172,6 +175,7 @@ export const getServerSideProps: GetServerSideProps<{
     fetchCommonData(commonApiUrls.parse),
     fetchCommonData(commonApiUrls.inventory),
     fetchCommonData(commonApiUrls.multiChainAccounts),
+    fetchCommonData(commonApiUrls.syncStatus),
   ]);
 
   const { statsDetails, latestBlocks } = await fetchData();
@@ -215,6 +219,7 @@ export const getServerSideProps: GetServerSideProps<{
       tab,
       latestBlocks: latestBlocks,
       multiChainAccountsData: getResult(multiChainAccountsResult),
+      syncData: getResult(syncStatusResult),
     },
   };
 };
@@ -232,6 +237,7 @@ const Address = ({
   error,
   tab,
   multiChainAccountsData,
+  syncData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
@@ -260,8 +266,12 @@ const Address = ({
   const statsData = statsDetails?.stats?.[0];
   const accountInfo = accountDetails?.account?.[0];
 
+  const balanceIndexerStatus =
+    syncData && syncData?.status?.indexers?.balance?.sync;
+
   const accountData = {
     ...account,
+
     ...accountInfo,
   };
 
@@ -617,6 +627,7 @@ const Address = ({
           nftTokenData={nftTokenData}
           multiChainAccounts={multiChainAccounts}
           accessKeys={accessKeys}
+          status={balanceIndexerStatus}
         />
         <div className="py-6"></div>
         <div className="block lg:flex lg:space-x-2 mb-10">

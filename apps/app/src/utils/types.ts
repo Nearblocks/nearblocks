@@ -1633,6 +1633,7 @@ export type AccountDataInfo = {
   storage_paid_at: string;
   block_height: string;
   block_hash: string;
+  account_id: string;
 };
 export type SpamToken = {
   blacklist: string[];

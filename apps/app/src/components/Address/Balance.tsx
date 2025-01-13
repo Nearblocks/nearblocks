@@ -45,11 +45,16 @@ const Balance = ({
   nftTokenData,
   multiChainAccounts,
   accessKeys,
+  status,
 }: any) => {
   const router = useRouter();
   const { id } = router.query;
   const { t } = useTranslation();
-  const balance = accountData?.amount ?? '';
+  const balance = status ? accountData?.amount : accountView?.amount;
+  const stakedBalace = status ? accountData?.locked : accountView?.locked;
+  const storageUsed = status
+    ? accountData?.storage_usage
+    : accountView?.storage_usage;
   const nearPrice = statsData?.near_price ?? '';
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -162,9 +167,7 @@ const Balance = ({
                   <Skeleton className="h-4 w-32" />
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
-                    {balance
-                      ? yoctoToNear(accountData?.amount, true) + ' Ⓝ'
-                      : ''}
+                    {balance ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
                   </div>
                 )}
               </div>
@@ -235,9 +238,9 @@ const Balance = ({
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {accountData?.locked
-                        ? yoctoToNear(accountData?.locked, true) + ' Ⓝ'
-                        : accountData?.locked ?? ''}
+                      {stakedBalace
+                        ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
+                        : stakedBalace ?? ''}
                     </div>
                   )}
                 </div>
@@ -251,9 +254,7 @@ const Balance = ({
                     </div>
                   ) : (
                     <div className="w-full break-words xl:mt-0 mt-2">
-                      {accountData?.storage_usage
-                        ? weight(accountData?.storage_usage)
-                        : accountData?.storage_usage ?? ''}
+                      {storageUsed ? weight(storageUsed) : storageUsed ?? ''}
                     </div>
                   )}
                 </div>
