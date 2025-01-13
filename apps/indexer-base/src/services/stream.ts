@@ -6,14 +6,7 @@ import { streamBlock } from 'nb-neardata';
 import config from '#config';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
-import { storeAccessKeys } from '#services/accessKey';
-import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
-import { prepareCache } from '#services/cache';
-import { storeChunks } from '#services/chunk';
-import { storeExecutionOutcomes } from '#services/executionOutcome';
-import { storeReceipts } from '#services/receipt';
-import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
 const lakeConfig: types.LakeConfig = {
@@ -81,16 +74,7 @@ export const onMessage = async (message: types.StreamerMessage) => {
 
     const start = performance.now();
 
-    await prepareCache(message);
-    await Promise.all([
-      storeBlock(knex, message),
-      storeChunks(knex, message),
-      storeTransactions(knex, message),
-      storeReceipts(knex, message),
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
-    ]);
+    await storeBlock(knex, message);
 
     logger.info({
       block: message.block.header.height,
