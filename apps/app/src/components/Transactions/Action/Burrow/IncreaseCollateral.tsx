@@ -9,10 +9,6 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
   const router = useRouter();
   const { hash } = router.query;
 
-  const handleClick = () => {
-    router.push(`/txns/${hash}#execution#${props?.receiptId}`);
-  };
-
   const log = props.event?.[0];
 
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
@@ -20,9 +16,12 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
   return (
     <div className="action flex flex-wrap items-center break-all leading-7">
       {props?.receiptId && hash ? (
-        <span onClick={handleClick} className="cursor-pointer">
+        <Link
+          href={`/txns/${hash}#execution#${props?.receiptId}`}
+          className="cursor-pointer"
+        >
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
-        </span>
+        </Link>
       ) : (
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}

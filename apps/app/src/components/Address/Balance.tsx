@@ -23,8 +23,8 @@ import TokenImage from '../common/TokenImage';
 import ArrowDown from '../Icons/ArrowDown';
 import { Menu, MenuButton, MenuItems, MenuPopover } from '@reach/menu-button';
 import { useRef, useState } from 'react';
-import Bitcoin from '../Icons/Bitcoin';
-import Ethereum from '../Icons/Ethereum';
+import Bitcoin from '../Icons/Networks/Bitcoin';
+import Ethereum from '../Icons/Networks/Ethereum';
 
 const Balance = ({
   accountData,
@@ -228,7 +228,7 @@ const Balance = ({
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
               <div className="flex justify-between">
-                <div className="flex xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                <div className="flex xl:!flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
                     Staked {t ? t('address:balance') : 'Balance'}:
                   </div>
@@ -244,7 +244,7 @@ const Balance = ({
                     </div>
                   )}
                 </div>
-                <div className="flex ml-4  xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
+                <div className="flex ml-4 xl:flex-nowrap flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full mb-2 md:mb-0">
                     {t ? t('address:storageUsed') : 'Storage Used'}:
                   </div>

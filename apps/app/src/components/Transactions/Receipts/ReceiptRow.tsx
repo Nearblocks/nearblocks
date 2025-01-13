@@ -34,6 +34,7 @@ interface Props {
 
 const ReceiptRow = (props: Props) => {
   const { receipt, borderFlag, loading, statsData, rpcTxn } = props;
+
   const { t } = useTranslation();
   const [block, setBlock] = useState<{ height: string } | null>(null);
   const { getBlockDetails } = useRpc();

@@ -270,3 +270,27 @@ a {
 .font-space-mono {
   font-family: 'Space Mono', monospace;
 }
+
+.visible-scrollbar,
+.invisible-scrollbar,
+.mostly-customized-scrollbar {
+  display: block;
+  overflow: auto;
+}
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #bbb; 
+  border-radius: 12px;
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 12px;
+}
+
