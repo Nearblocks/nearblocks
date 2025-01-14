@@ -1,5 +1,7 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
 FROM node:20-bookworm-slim AS base
+FROM node:20-bookworm-slim AS base
+RUN apt update && apt install -y git curl iputils-ping
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
