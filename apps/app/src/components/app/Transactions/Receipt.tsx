@@ -9,7 +9,6 @@ import FileSlash from '../Icons/FileSlash';
 import ReceiptRow from './Receipts/ReceiptRow';
 
 interface Props {
-  block: { height: string };
   hash: string;
   receipt: null | ReceiptsPropsInfo;
   rpcTxn: RPCTransactionInfo;
@@ -22,7 +21,7 @@ interface Props {
 }
 
 const Receipt = (props: Props) => {
-  const { block, hash, receipt, statsData, txn } = props;
+  const { hash, receipt, statsData, txn } = props;
 
   const txnsPending = txn?.outcomes?.status === null;
 
@@ -54,7 +53,7 @@ const Receipt = (props: Props) => {
               </div>
             </div>
           ) : (
-            <ReceiptRow block={block} receipt={receipt} statsData={statsData} />
+            <ReceiptRow receipt={receipt} statsData={statsData} />
           )}
         </div>
       )}
