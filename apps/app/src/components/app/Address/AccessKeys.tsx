@@ -16,6 +16,7 @@ const AccessKeys = async ({ id, searchParams }: any) => {
       <AccessKeysActions
         count={count?.keys?.[0]?.count}
         error={!data || data === null}
+        id={id}
         keys={data?.keys}
       />
     </>

@@ -6,7 +6,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { routing, useIntlRouter } from '@/i18n/routing';
+import { useRpcStore } from '@/stores/app/rpc';
+import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId } from '@/utils/types';
 
@@ -54,6 +57,23 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
     return routing?.locales?.includes(value as any);
   };
 
+  const initializedRef = useRef(false);
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { rpc: rpcUrl } = useRpcStoreWithProviders();
+
   const { networkId } = useConfig();
 
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
@@ -81,10 +101,36 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
 
   useEffect(() => {
     if (keyword) {
-      handleFilterAndKeyword(keyword, filter).then((data: any) =>
-        setResult(data || {}),
-      );
+      (async () => {
+        try {
+          const data = await handleFilterAndKeyword(keyword, filter);
+
+          const isDataEmpty =
+            data &&
+            Object.values(data).every(
+              (value) => Array.isArray(value) && value.length === 0,
+            );
+
+          if (isDataEmpty) {
+            const rpcData = await rpcSearch(rpcUrl, keyword);
+            setResult(rpcData || {});
+          } else {
+            setResult(data);
+          }
+        } catch (error) {
+          console.log('Error in handleFilterAndKeyword:', error);
+
+          try {
+            const rpcData = await rpcSearch(rpcUrl, keyword);
+            setResult(rpcData || {});
+          } catch (rpcError) {
+            console.error('RPC Search fallback error:', rpcError);
+            setResult({});
+          }
+        }
+      })();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, keyword, handleFilterAndKeyword]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
