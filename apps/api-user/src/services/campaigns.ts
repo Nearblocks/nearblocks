@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import config from '#config';
 import catchAsync from '#libs/async';
-import { userSql } from '#libs/postgres';
+import db from '#libs/db';
 import { redisClient } from '#libs/redis';
 import { Campaign } from '#types/types';
 
@@ -20,33 +20,26 @@ const getApprovedAds = catchAsync(async (_req: Request, res: Response) => {
 
     return res.json(adResponse);
   }
-  const query = userSql<Campaign[]>`
-    SELECT
-      *
-    FROM
-      campaign__ads
-    WHERE
-      is_approved = TRUE
-      AND is_active = TRUE
-      AND text IS NULL
-      AND api_subscription_id IN (
-        SELECT
-          id
-        FROM
-          api__subscriptions
-        WHERE
-          status = 'active'
-      )
-  `;
-  const result = await query;
 
-  if (!result.length) {
+  const query = `
+  SELECT *
+  FROM campaign__ads
+  WHERE is_approved = TRUE
+    AND is_active = TRUE
+    AND text IS NULL
+    AND api_subscription_id IN (
+      SELECT id FROM api__subscriptions WHERE status = 'active'
+    )
+`;
+  const result = await db.query(query);
+
+  if (result.rows.length === 0) {
     return res.status(204).send();
   }
 
-  await cacheApprovedBannerAds(result);
+  await cacheApprovedBannerAds(result.rows);
 
-  const ad = result[0];
+  const ad = result.rows[0];
   const desktopImage = ad.desktop_image_right;
 
   const adResponse = {
@@ -73,33 +66,25 @@ const getApprovedTextAds = catchAsync(async (_req: Request, res: Response) => {
     return res.json(adResponse);
   }
 
-  const query = userSql<Campaign[]>`
-    SELECT
-      *
-    FROM
-      campaign__ads
-    WHERE
-      is_approved = TRUE
-      AND is_active = TRUE
-      AND text IS NOT NULL
-      AND api_subscription_id IN (
-        SELECT
-          id
-        FROM
-          api__subscriptions
-        WHERE
-          status = 'active'
-      )
-  `;
+  const query = `
+  SELECT *
+  FROM campaign__ads
+  WHERE is_approved = TRUE
+    AND is_active = TRUE
+    AND text IS NOT NULL
+    AND api_subscription_id IN (
+      SELECT id FROM api__subscriptions WHERE status = 'active'
+    )
+`;
+  const result = await db.query(query);
 
-  const result = await query;
-  if (!result.length) {
+  if (result.rows.length === 0) {
     return res.status(204).send();
   }
 
-  await cacheApprovedTextAds(result);
+  await cacheApprovedTextAds(result.rows);
 
-  const ad = result[0];
+  const ad = result.rows[0];
 
   const adResponse = {
     icon: ad.icon ? `${config.awsUrl}/${ad.icon}` : null,
@@ -117,20 +102,14 @@ const trackImpression = catchAsync(async (req: Request, res: Response) => {
 
   const now = new Date();
 
-  await userSql`
-    INSERT INTO
-      campaign__ad__statistics (TIME, campaign_ad_id, impressions)
-    VALUES
-      (
-        ${now},
-        ${campaignId},
-        1
-      )
-    ON CONFLICT (campaign_ad_id, TIME) DO
-    UPDATE
-    SET
-      impressions = campaign__ad__statistics.impressions + 1
+  const query = `
+    INSERT INTO campaign__ad__statistics (time, campaign_ad_id, impressions)
+    VALUES ($1, $2, 1)
+    ON CONFLICT (campaign_ad_id, time) DO UPDATE
+    SET impressions = campaign__ad__statistics.impressions + 1
   `;
+
+  await db.query(query, [now, campaignId]);
 
   const transparentPixel = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAUA\n' +
@@ -148,29 +127,24 @@ const trackClick = catchAsync(async (req: Request, res: Response) => {
 
   const now = new Date();
 
-  await userSql`
-    INSERT INTO
-      campaign__ad__statistics (TIME, campaign_ad_id, clicks)
-    VALUES
-      (
-        ${now},
-        ${campaignId},
-        1
-      )
-    ON CONFLICT (campaign_ad_id, TIME) DO
-    UPDATE
-    SET
-      clicks = campaign__ad__statistics.clicks + 1
-  `;
+  await db.query(
+    `
+    INSERT INTO campaign__ad__statistics (time, campaign_ad_id, clicks)
+    VALUES ($1, $2, 1)
+    ON CONFLICT (campaign_ad_id, time)
+    DO UPDATE SET clicks = campaign__ad__statistics.clicks + 1
+    `,
+    [now, campaignId],
+  );
 
-  const adResult = await userSql`
-    SELECT
-      url
-    FROM
-      campaign__ads
-    WHERE
-      id = ${campaignId}
-  `;
+  const { rows: adResult } = await db.query(
+    `
+    SELECT url
+    FROM campaign__ads
+    WHERE id = $1
+    `,
+    [campaignId],
+  );
 
   if (!adResult.length) {
     return res.status(404).json({ error: 'Ad not found.' });

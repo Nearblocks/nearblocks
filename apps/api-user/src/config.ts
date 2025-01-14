@@ -3,7 +3,7 @@ import { cleanEnv, str } from 'envalid';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
-  ADMIN_USERNAME: str({ default: 'nearblocks' }),
+  ADMIN_USERNAME: str({ default: '' }),
   AWS_URL: str(),
   DATABASE_URL: str(),
   JWT_SECRET: str(),
