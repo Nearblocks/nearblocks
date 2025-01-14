@@ -1,7 +1,7 @@
 import { stream, types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
-import { streamBlock } from 'nb-neardata';
+import { streamBlock } from 'nb-neardata-raw';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -35,7 +35,7 @@ export const syncData = async () => {
     }
 
     const stream = streamBlock({
-      limit: 50,
+      end: config.endBlockHeight,
       network: config.network,
       start: startBlockHeight || config.genesisHeight,
       url: config.fastnearEndpoint,
@@ -44,15 +44,6 @@ export const syncData = async () => {
     for await (const message of stream) {
       await onMessage(message);
     }
-
-    stream.on('end', () => {
-      logger.error('stream ended');
-      process.exit();
-    });
-    stream.on('error', (error: Error) => {
-      logger.error(error);
-      process.exit();
-    });
   } else {
     if (!lakeConfig.startBlockHeight && block) {
       const next = +block.block_height - config.delta;

@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
 import axios from 'axios';
@@ -7,6 +8,8 @@ import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import { camelCaseKeys } from './utils.js';
+
 export type BlockStreamConfig = {
   end: number;
   network: string;
@@ -15,6 +18,7 @@ export type BlockStreamConfig = {
 };
 
 const retries = 5;
+EventEmitter.defaultMaxListeners = 20;
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -48,12 +52,10 @@ export const streamFiles = async (file: string) => {
     async read(this) {
       try {
         const stream = new tar.Parser();
-        let files = 0;
 
         stream.on('entry', (entry: tar.ReadEntry) => {
           if (entry.type === 'File' && entry.path.endsWith('.json')) {
             const chunks: Buffer[] = [];
-            files++;
 
             entry.on('data', (chunk: Buffer) => chunks.push(chunk));
             entry.on('end', () => {
@@ -61,7 +63,7 @@ export const streamFiles = async (file: string) => {
                 const json = Buffer.concat(chunks).toString();
                 const parsed = JSON.parse(json);
 
-                this.push(parsed);
+                this.push(camelCaseKeys(parsed));
               } catch (error) {
                 this.emit('error', error);
                 this.push(null);
@@ -78,18 +80,7 @@ export const streamFiles = async (file: string) => {
           }
         });
 
-        stream.on('end', () => {
-          if (!files) {
-            this.emit(
-              'error',
-              new Error('No json files found', {
-                cause: { file },
-              }),
-            );
-          }
-
-          this.push(null);
-        });
+        stream.on('end', () => this.push(null));
 
         response.pipe(stream);
       } catch (error) {
