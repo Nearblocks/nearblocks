@@ -16,10 +16,9 @@ import {
   localFormat,
 } from '@/utils/app/libs';
 import { txnMethod } from '@/utils/app/near';
-import { truncateString, yoctoToNear } from '@/utils/libs';
+import { yoctoToNear } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -31,6 +30,7 @@ import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {
   error: boolean;
@@ -56,7 +56,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
   const pathname = usePathname();
   const order = searchParams?.get('order');
   const [showAge, setShowAge] = useState(true);
-  const [address, setAddress] = useState('');
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
   const t = useTranslations();
@@ -135,15 +134,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
     const newParams = { order: newOrder };
     const newQueryString = QueryString.stringify(newParams);
     router.push(`${pathname}?${newQueryString}`);
-  };
-
-  const onHandleMouseOver = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
   };
 
   const modifiedFilter = getFilteredQueryParams(currentParams, [
@@ -310,15 +300,12 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             tooltip={row?.signer_account_id}
           >
             <span>
-              <AddressLink
-                address={address}
+              <AddressDisplay
+                copy
+                currentAddress={row?.signer_account_id}
                 className={
                   'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
-                currentAddress={row?.signer_account_id}
-                name={row?.signer_account_id}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
               />
             </span>
           </Tooltip>
@@ -397,13 +384,12 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             tooltip={row?.receiver_account_id}
           >
             <span>
-              <AddressLink
-                address={address}
-                className={'whitespace-nowrap'}
+              <AddressDisplay
+                copy
                 currentAddress={row?.receiver_account_id}
-                name={truncateString(row?.receiver_account_id, 17, '...')}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+                }
               />
             </span>
           </Tooltip>

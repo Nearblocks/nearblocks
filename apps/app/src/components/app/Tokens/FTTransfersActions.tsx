@@ -14,7 +14,6 @@ import {
 import { tokenAmount } from '@/utils/near';
 import { TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import TxnStatus from '../common/Status';
 import Table from '../common/Table';
@@ -23,6 +22,7 @@ import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {
   data: {
@@ -44,7 +44,6 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
-  const [address, setAddress] = useState('');
   const { getBlockDetails } = useRpc();
   const [timestamp, setTimeStamp] = useState('');
   const tokens = data?.txns;
@@ -72,13 +71,6 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
   }, [status?.height]);
 
   const toggleShowAge = () => setShowAge((s) => !s);
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-    setAddress(id);
-  };
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
 
   const columns: any = [
     {
@@ -147,15 +139,12 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -172,15 +161,12 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -224,15 +210,12 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -249,15 +232,12 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>

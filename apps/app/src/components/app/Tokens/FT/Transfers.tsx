@@ -10,7 +10,6 @@ import { localFormat } from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../../common/AddressLink';
 import ErrorMessage from '../../common/ErrorMessage';
 import Filters from '../../common/Filters';
 import TxnStatus from '../../common/Status';
@@ -22,6 +21,7 @@ import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
 import { getFilteredQueryParams } from '@/utils/app/libs';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface Props {
   count: number;
@@ -38,20 +38,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
   const t = useTranslations();
   const [showAge, setShowAge] = useState(true);
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
-  const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
 
   const onAllClear = () => {
     // @ts-ignore: Unreachable code error
@@ -147,15 +136,12 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -172,15 +158,12 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -223,15 +206,12 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -248,15 +228,12 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>

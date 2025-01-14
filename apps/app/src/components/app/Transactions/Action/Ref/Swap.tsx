@@ -1,15 +1,13 @@
 import { useParams } from 'next/navigation';
 
-import AddressLink from '@/components/app/common/AddressLink';
 import TokenInfo from '@/components/app/common/TokenInfo';
 import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { EventPropsInfo } from '@/utils/types';
 
-import { useActionContext } from '../ActionContext';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const Swap = (props: EventPropsInfo) => {
-  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
   const params = useParams();
   const log = props.event.logs?.match(
     /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
@@ -34,14 +32,11 @@ const Swap = (props: EventPropsInfo) => {
       <span className="font-bold px-1">Swap </span>
       <TokenInfo amount={log[1]} contract={log[2]} />
       <TokenInfo amount={log[3]} contract={log[4].replace(/,$/, '')} />
-      <span className="font-bold text-gray px-1">
-        On{' '}
-        <AddressLink
-          address={address}
-          currentAddress={'v2.ref-finance.near'}
+      <span className="font-bold text-gray px-1 flex items-center">
+        On
+        <AddressDisplay
           name="Ref Finance"
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
+          currentAddress={'v2.ref-finance.near'}
         />
       </span>
     </div>

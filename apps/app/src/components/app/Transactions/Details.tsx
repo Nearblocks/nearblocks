@@ -24,7 +24,6 @@ import {
   getTimeAgoString,
   localFormat,
   nanoToMilli,
-  shortenAddress,
   shortenToken,
   shortenTokenSymbol,
   tokenAmount,
@@ -51,9 +50,9 @@ import FileSlash from '../Icons/FileSlash';
 import Question from '../Icons/Question';
 import { Loader } from '../skeleton/common/Skeleton';
 import EventLogs from './Action';
-import { ActionProvider } from './Action/ActionContext';
 import Actions from './Actions';
 import NEPTokenTransactions from './NEPTokenTransactions';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface Props {
   hash: string;
@@ -390,14 +389,12 @@ const Details = (props: Props) => {
                       className="max-h-[194px] break-words space-y-2 py-2"
                       id="action-column"
                     >
-                      <ActionProvider>
-                        {logs?.map((event: TransactionLog, i: number) => (
-                          <EventLogs event={event} key={i} />
-                        ))}
-                        {actions?.map((action: any, i: number) => (
-                          <Actions action={action} key={i} />
-                        ))}
-                      </ActionProvider>
+                      {logs?.map((event: TransactionLog, i: number) => (
+                        <EventLogs event={event} key={i} />
+                      ))}
+                      {actions?.map((action: any, i: number) => (
+                        <Actions action={action} key={i} />
+                      ))}
                     </div>
                   </PerfectScrollbar>
                 </div>
@@ -452,12 +449,10 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-all">
-                  <Link
-                    className="text-green-500  dark:text-green-250 hover:no-underline font-semibold"
-                    href={`/address/${txn?.signer_account_id}`}
-                  >
-                    {txn?.signer_account_id}
-                  </Link>
+                  <AddressDisplay
+                    copy
+                    currentAddress={txn?.signer_account_id}
+                  />
                 </div>
               )}
             </div>
@@ -479,12 +474,10 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-all">
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
-                    href={`/address/${txn?.receiver_account_id}`}
-                  >
-                    {txn?.receiver_account_id}
-                  </Link>
+                  <AddressDisplay
+                    copy
+                    currentAddress={txn?.receiver_account_id}
+                  />
                 </div>
               )}
             </div>
@@ -492,7 +485,7 @@ const Details = (props: Props) => {
 
           {(fts?.length > 0 || nfts?.length > 0 || showRow) && (
             <div className="flex items-start flex-wrap px-4 py-2">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-1">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
                   tooltip={'List of tokens transferred in the transaction'}
@@ -513,40 +506,32 @@ const Details = (props: Props) => {
                     <div className="max-h-[302px] break-words space-y-3">
                       {fts?.map((ft: any, i: number) => (
                         <div
-                          className="flex items-center flex-wrap break-all leading-7"
+                          className="flex items-center flex-wrap break-all leading-1"
                           key={i}
                         >
                           <FaRight className="inline-flex text-gray-400 text-xs" />
                           {ft?.cause === 'MINT' ? (
                             <>
-                              <div className="font-semibold text-gray px-1">
-                                From{' '}
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
                                 {ft?.involved_account_id ? (
-                                  <Link
-                                    className="text-green-500 dark:text-green-250 pl-1 hover:no-underline font-semibold"
-                                    href={`/address/${ft?.involved_account_id}`}
-                                  >
-                                    {shortenAddress(
-                                      ft?.involved_account_id ?? '',
-                                    )}
-                                  </Link>
+                                  <AddressDisplay
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.involved_account_id}
+                                  />
                                 ) : (
                                   <span className="font-normal pl-1">
                                     system
                                   </span>
                                 )}
                               </div>
-                              <div className="font-semibold text-gray px-1">
-                                To{' '}
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                To
                                 {ft?.affected_account_id ? (
-                                  <Link
-                                    className="text-green-500 dark:text-green-250 pl-1 font-semibold"
-                                    href={`/address/${ft?.affected_account_id}`}
-                                  >
-                                    {shortenAddress(
-                                      ft?.affected_account_id ?? '',
-                                    )}
-                                  </Link>
+                                  <AddressDisplay
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.affected_account_id}
+                                  />
                                 ) : (
                                   <span className="font-normal pl-1">
                                     system
@@ -556,34 +541,26 @@ const Details = (props: Props) => {
                             </>
                           ) : (
                             <>
-                              <div className="font-semibold text-gray px-1">
-                                From{' '}
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
                                 {ft?.affected_account_id ? (
-                                  <Link
-                                    className="text-green-500 dark:text-green-250 pl-1 hover:no-underline font-semibold"
-                                    href={`/address/${ft?.affected_account_id}`}
-                                  >
-                                    {shortenAddress(
-                                      ft?.affected_account_id ?? '',
-                                    )}
-                                  </Link>
+                                  <AddressDisplay
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.affected_account_id}
+                                  />
                                 ) : (
                                   <span className="font-normal pl-1">
                                     system
                                   </span>
                                 )}
                               </div>
-                              <div className="font-semibold text-gray px-1">
-                                To{' '}
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                To
                                 {ft?.involved_account_id ? (
-                                  <Link
-                                    className="text-green-500 dark:text-green-250  pl-1 font-semibold"
-                                    href={`/address/${ft?.involved_account_id}`}
-                                  >
-                                    {shortenAddress(
-                                      ft?.involved_account_id ?? '',
-                                    )}
-                                  </Link>
+                                  <AddressDisplay
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.involved_account_id}
+                                  />
                                 ) : (
                                   <span className="font-normal pl-1">
                                     system
@@ -593,7 +570,7 @@ const Details = (props: Props) => {
                             </>
                           )}
                           <div className="font-semibold text-gray px-1">
-                            For{' '}
+                            For
                             <span className="pl-1 font-normal">
                               {ft?.delta_amount &&
                               ft?.ft_meta?.decimals &&
@@ -634,34 +611,30 @@ const Details = (props: Props) => {
                                 <div className="sm:flex">
                                   {nft?.cause === 'MINT' ? (
                                     <>
-                                      <div className="font-semibold text-gray px-1">
-                                        From{' '}
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        From
                                         {nft?.involved_account_id ? (
-                                          <Link
-                                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                            href={`/address/${nft?.involved_account_id}`}
-                                          >
-                                            {shortenAddress(
-                                              nft?.involved_account_id ?? '',
-                                            )}
-                                          </Link>
+                                          <AddressDisplay
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.involved_account_id
+                                            }
+                                          />
                                         ) : (
                                           <span className="font-normal pl-1">
                                             system
                                           </span>
                                         )}
                                       </div>
-                                      <div className="font-semibold text-gray px-1">
-                                        To{' '}
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        To
                                         {nft?.affected_account_id ? (
-                                          <Link
-                                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                            href={`/address/${nft?.affected_account_id}`}
-                                          >
-                                            {shortenAddress(
-                                              nft?.affected_account_id ?? '',
-                                            )}
-                                          </Link>
+                                          <AddressDisplay
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.affected_account_id
+                                            }
+                                          />
                                         ) : (
                                           <span className="font-normal pl-1">
                                             system
@@ -671,34 +644,30 @@ const Details = (props: Props) => {
                                     </>
                                   ) : (
                                     <>
-                                      <div className="font-semibold text-gray px-1">
-                                        From{' '}
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        From
                                         {nft?.affected_account_id ? (
-                                          <Link
-                                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                            href={`/address/${nft?.affected_account_id}`}
-                                          >
-                                            {shortenAddress(
-                                              nft?.affected_account_id ?? '',
-                                            )}
-                                          </Link>
+                                          <AddressDisplay
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.affected_account_id
+                                            }
+                                          />
                                         ) : (
                                           <span className="font-normal pl-1">
                                             system
                                           </span>
                                         )}
                                       </div>
-                                      <div className="font-semibold text-gray px-1">
-                                        To{' '}
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        To
                                         {nft?.involved_account_id ? (
-                                          <Link
-                                            className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
-                                            href={`/address/${nft?.involved_account_id}`}
-                                          >
-                                            {shortenAddress(
-                                              nft?.involved_account_id ?? '',
-                                            )}
-                                          </Link>
+                                          <AddressDisplay
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.involved_account_id
+                                            }
+                                          />
                                         ) : (
                                           <span className="font-normal pl-1">
                                             system

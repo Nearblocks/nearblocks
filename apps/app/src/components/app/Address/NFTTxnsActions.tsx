@@ -14,7 +14,6 @@ import { Link } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -28,6 +27,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   event: '',
@@ -59,7 +59,6 @@ const NFTTransactionActions = ({
   const [page, setPage] = useState(1);
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
-  const [address, setAddress] = useState('');
   const t = useTranslations();
   const errorMessage = t('noTxns') || ' No transactions found!';
   const toggleShowAge = () => setShowAge((s) => !s);
@@ -123,14 +122,6 @@ const NFTTransactionActions = ({
     const { cursor, event, involved, page, ...newQuery } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
-  };
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-    setAddress(id);
-  };
-  const handleMouseLeave = () => {
-    setAddress('');
   };
 
   const columns = [
@@ -245,13 +236,10 @@ const NFTTransactionActions = ({
               tooltip={row?.affected_account_id}
             >
               <span>
-                <AddressLink
-                  address={address}
+                <AddressDisplay
+                  copy
                   className={'inline-block align-bottom whitespace-nowrap'}
                   currentAddress={row?.affected_account_id}
-                  name={truncateString(row?.affected_account_id, 15, '...')}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseOver={onHandleMouseOver}
                 />
               </span>
             </Tooltip>
@@ -299,13 +287,10 @@ const NFTTransactionActions = ({
               tooltip={row.involved_account_id}
             >
               <span>
-                <AddressLink
-                  address={address}
+                <AddressDisplay
+                  copy
                   className={'inline-block align-bottom whitespace-nowrap'}
                   currentAddress={row?.involved_account_id}
-                  name={truncateString(row?.involved_account_id, 15, '...')}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseOver={onHandleMouseOver}
                 />
               </span>
             </Tooltip>

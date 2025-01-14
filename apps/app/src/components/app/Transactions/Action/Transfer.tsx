@@ -1,16 +1,14 @@
 import { useParams } from 'next/navigation';
 
-import AddressLink from '@/components/app/common/AddressLink';
 import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
 
 import FaRight from '../../Icons/FaRight';
-import { useActionContext } from './ActionContext';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const Transfer = (props: ActionPropsInfo) => {
   const params = useParams();
-  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
 
   return (
     <div className="action flex flex-wrap items-center break-all leading-7">
@@ -29,22 +27,18 @@ const Transfer = (props: ActionPropsInfo) => {
           {yoctoToNear(props.action.args.deposit, true)} Ⓝ
         </span>
       </span>
-      <span className="font-bold text-gray px-1">
+      <span className="font-bold text-gray px-1 flex items-center">
         From{' '}
-        <AddressLink
-          address={address}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
           currentAddress={props.action.from}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
         />
       </span>
-      <span className="font-bold text-gray">
+      <span className="font-bold text-gray flex items-center">
         To{' '}
-        <AddressLink
-          address={address}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
           currentAddress={props.action.to}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
         />
       </span>
     </div>

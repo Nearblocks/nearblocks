@@ -17,6 +17,7 @@ import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';
 
 interface Props {
+  block: { height: string };
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
   statsData: {
@@ -27,7 +28,8 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData } = props;
+  const { block, borderFlag, receipt, statsData } = props;
+  console.log({ receipt });
   const t = useTranslations();
   const [pageHash] = useHash();
   const loading = false;
@@ -148,17 +150,17 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
-          {!receipt?.block_height || loading ? (
+          {!block?.height || loading ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
-          ) : receipt?.block_height ? (
+          ) : block?.height ? (
             <div className="w-full md:w-3/4 word-break font-semibold">
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={`/blocks/${receipt?.block_hash}`}
+                href={`/blocks/${receipt.block_hash}`}
               >
-                {localFormat(receipt?.block_height)}
+                {localFormat(block?.height)}
               </Link>
             </div>
           ) : (
@@ -403,7 +405,12 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
+                <ReceiptRow
+                  block={block}
+                  borderFlag
+                  receipt={rcpt}
+                  statsData={statsData}
+                />
               </div>
             </div>
           ))}

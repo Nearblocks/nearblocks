@@ -10,15 +10,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
-import {
-  getFilteredQueryParams,
-  localFormat,
-  truncateString,
-} from '@/utils/app/libs';
+import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
 import { tokenAmount } from '@/utils/app/near';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -32,6 +27,7 @@ import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   event: '',
@@ -62,7 +58,6 @@ const TokenTxnsActions = ({
   const [form, setForm] = useState(initialForm);
   const t = useTranslations();
   const errorMessage = t('noTxns') || 'No transactions found!';
-  const [address, setAddress] = useState('');
 
   const currentParams = QueryString.parse(searchParams?.toString() || '');
 
@@ -76,16 +71,6 @@ const TokenTxnsActions = ({
   };
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
 
   const onChange = (e: any) => {
     const name = e.target.name;
@@ -251,13 +236,10 @@ const TokenTxnsActions = ({
               tooltip={row?.affected_account_id}
             >
               <span>
-                <AddressLink
-                  address={address}
+                <AddressDisplay
+                  copy
                   className={'inline-flex align-bottom whitespace-nowrap'}
                   currentAddress={row?.affected_account_id}
-                  name={truncateString(row?.affected_account_id, 15, '...')}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseOver={onHandleMouseOver}
                 />
               </span>
             </Tooltip>
@@ -305,13 +287,10 @@ const TokenTxnsActions = ({
               tooltip={row.involved_account_id}
             >
               <span>
-                <AddressLink
-                  address={address}
+                <AddressDisplay
+                  copy
                   className={'inline-flex align-bottom whitespace-nowrap'}
-                  currentAddress={row.involved_account_id}
-                  name={truncateString(row.involved_account_id, 15, '...')}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseOver={onHandleMouseOver}
+                  currentAddress={row?.involved_account_id}
                 />
               </span>
             </Tooltip>

@@ -14,13 +14,13 @@ import {
 } from '@/utils/app/libs';
 import { BlocksInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Table from '../common/Table';
 import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const ListActions = ({
   countLoading,
@@ -33,15 +33,7 @@ const ListActions = ({
   const [page, setPage] = useState(1);
   const t = useTranslations();
   const errorMessage = t('noBlocks') || 'No blocks!';
-  const [address, setAddress] = useState('');
 
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-    setAddress(id);
-  };
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
   const blocks = data?.blocks;
   const start = data?.blocks?.[0];
   const end = data?.blocks?.[data?.blocks?.length - 1];
@@ -166,12 +158,7 @@ const ListActions = ({
     {
       cell: (row: BlocksInfo) => (
         <span>
-          <AddressLink
-            address={address}
-            currentAddress={row?.author_account_id}
-            onMouseLeave={handleMouseLeave}
-            onMouseOver={onHandleMouseOver}
-          />
+          <AddressDisplay copy currentAddress={row?.author_account_id} />
         </span>
       ),
       header: <span className="pl-1">{t('miner') || 'AUTHOR'}</span>,

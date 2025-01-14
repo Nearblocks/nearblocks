@@ -11,15 +11,9 @@ import {
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { txnMethod } from '@/utils/app/near';
-import {
-  isAction,
-  localFormat,
-  truncateString,
-  yoctoToNear,
-} from '@/utils/libs';
+import { isAction, localFormat, yoctoToNear } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -33,6 +27,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   action: '',
@@ -65,7 +60,6 @@ const TransactionActions = ({
   const [showAge, setShowAge] = useState(true);
   const t = useTranslations();
   const errorMessage = t('noTxns') || ' No transactions found!';
-  const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
 
@@ -120,16 +114,6 @@ const TransactionActions = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
-  };
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -260,13 +244,10 @@ const TransactionActions = ({
             tooltip={row?.signer_account_id}
           >
             <span>
-              <AddressLink
-                address={address}
+              <AddressDisplay
+                copy
                 className={'align-bottom whitespace-nowrap'}
                 currentAddress={row?.signer_account_id}
-                name={truncateString(row?.signer_account_id, 15, '...')}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
               />
             </span>
           </Tooltip>
@@ -355,13 +336,10 @@ const TransactionActions = ({
             tooltip={row.receiver_account_id}
           >
             <span>
-              <AddressLink
-                address={address}
+              <AddressDisplay
+                copy
                 className={'align-bottom whitespace-nowrap'}
-                currentAddress={row.receiver_account_id}
-                name={truncateString(row.receiver_account_id, 15, '...')}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
+                currentAddress={row?.receiver_account_id}
               />
             </span>
           </Tooltip>

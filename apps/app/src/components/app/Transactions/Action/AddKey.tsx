@@ -5,14 +5,12 @@ import { Link } from '@/i18n/routing';
 import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 
-import AddressLink from '../../common/AddressLink';
 import FaRight from '../../Icons/FaRight';
-import { useActionContext } from './ActionContext';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const AddKey = (props: TransactionActionInfo) => {
   const params = useParams();
   const t = useTranslations();
-  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
       <div className="py-1">
@@ -28,12 +26,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
         {t ? t('txnDetails.actions.addKey.2') : 'added for'}
-        <AddressLink
-          address={address}
-          currentAddress={props.receiver}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
-        />
+        <AddressDisplay currentAddress={props.receiver} />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
         <span className="font-bold ml-1">
           {props.args.access_key?.permission}
@@ -57,12 +50,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
         {t ? t('txnDetails.actions.addKey.2') : 'added for'}{' '}
-        <AddressLink
-          address={address}
-          currentAddress={props.receiver}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
-        />
+        <AddressDisplay currentAddress={props.receiver} />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}{' '}
         <span className="font-bold ml-1">
           {props.args.access_key.permission.permission_kind}
@@ -88,13 +76,10 @@ const AddKey = (props: TransactionActionInfo) => {
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.3') : 'contract'}
       </span>
-      <AddressLink
-        address={address}
+      <AddressDisplay
         currentAddress={
-          props.args.access_key.permission.FunctionCall.receiver_id
+          props?.args?.access_key?.permission?.FunctionCall?.receiver_id
         }
-        onMouseLeave={handleMouseLeave}
-        onMouseOver={onHandleMouseOver}
       />
       {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
       <span className="mx-1">
