@@ -268,8 +268,11 @@ const Txn = ({
   const contract = useMemo(() => {
     const containsDelegateOrFunctionCall =
       Array.isArray(rpcTxn?.transaction?.actions) &&
-      rpcTxn?.transaction.actions.some(
-        (action: any) => 'Delegate' in action || 'FunctionCall' in action,
+      rpcTxn?.transaction?.actions.some(
+        (action: any) =>
+          action &&
+          typeof action === 'object' &&
+          ('Delegate' in action || 'FunctionCall' in action),
       );
 
     return containsDelegateOrFunctionCall;
@@ -297,21 +300,21 @@ const Txn = ({
         <meta name="twitter:image:src" content={thumbnail} />
         <link rel="canonical" href={`${appUrl}/txns/${hash}`} />
       </Head>
-      <div className="md:flex items-center justify-between container mx-auto px-3">
-        <div className="flex justify-between dark:text-neargray-10 border-b w-full px-2 pt-3 dark:border-black-200">
+      <div className="container items-center justify-between px-3 mx-auto md:flex">
+        <div className="flex justify-between w-full px-2 pt-3 border-b dark:text-neargray-10 dark:border-black-200">
           <h1 className="py-2 space-x-2 text-xl leading-8 text-nearblue-600 dark:text-neargray-10">
             {t ? t('txns:txn.heading') : 'Transaction Details'}
           </h1>
 
-          <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+          <ul className="relative flex items-center pt-2 text-xs text-gray-500 md:pt-0">
             <RpcMenu />
             <li className="ml-3 max-md:mb-2">
-              <span className="group flex w-full relative h-full">
+              <span className="relative flex w-full h-full group">
                 <a
                   className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
                   href="#"
                 >
-                  <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
+                  <div className="h-8 px-2 py-2 bg-gray-100 border rounded dark:bg-black-200">
                     <ListCheck className="h-4 dark:filter dark:invert" />
                   </div>
                 </a>
@@ -334,16 +337,16 @@ const Txn = ({
           </ul>
         </div>
       </div>
-      <div className="container mx-auto pt-3 pb-6 px-5 text-nearblue-600">
+      <div className="container px-5 pt-3 pb-6 mx-auto text-nearblue-600">
         {/* <div className="min-h-[44px] md:min-h-[25px]">
           <SponserdText />
         </div> */}
       </div>
-      <div className="relative container mx-auto px-3">
+      <div className="container relative px-3 mx-auto">
         {/* <RpcMenu /> */}
         <Fragment key="hash">
           {rpcError && (error || allRpcProviderError) ? (
-            <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+            <div className="pb-1 bg-white dark:bg-black-600 soft-shadow rounded-xl">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage
                   icons={<FileSlash />}
@@ -354,7 +357,7 @@ const Txn = ({
             </div>
           ) : (
             <>
-              <div className="md:flex justify-between">
+              <div className="justify-between md:flex">
                 <div className="w-fit">
                   <button
                     onClick={() => onTab(0)}
@@ -395,7 +398,7 @@ const Txn = ({
                   </button>
                 </div>
               </div>
-              <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+              <div className="pb-1 bg-white dark:bg-black-600 soft-shadow rounded-xl">
                 <div className={`${tabIndex === 0 ? '' : 'hidden'} `}>
                   <Details
                     txn={txn ? txn : rpcData}
