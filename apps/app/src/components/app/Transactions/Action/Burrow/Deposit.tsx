@@ -1,15 +1,13 @@
 import { useParams } from 'next/navigation';
 
-import AddressLink from '@/components/app/common/AddressLink';
 import TokenInfo from '@/components/app/common/TokenInfo';
 import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { DepositPropsInfo } from '@/utils/types';
 
-import { useActionContext } from '../ActionContext';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const Deposit = (props: DepositPropsInfo) => {
-  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
   const params = useParams();
   const log = props.event?.[0];
 
@@ -26,23 +24,19 @@ const Deposit = (props: DepositPropsInfo) => {
       )}
       <span className="font-bold px-1">Deposit </span>
       <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
-      <span className="font-bold text-gray px-1">
+      <span className="font-bold text-gray px-1 flex items-center">
         From{' '}
-        <AddressLink
-          address={address}
-          currentAddress={log.account_id}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
+          currentAddress={log?.account_id}
         />
       </span>
-      <span className="font-bold text-gray px-1">
+      <span className="font-bold text-gray px-1 flex items-center">
         On{' '}
-        <AddressLink
-          address={address}
-          currentAddress={'contract.main.burrow.near'}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
           name="Burrow"
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
+          currentAddress={log?.account_id}
         />
       </span>
     </div>

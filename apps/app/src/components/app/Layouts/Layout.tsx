@@ -12,6 +12,7 @@ import { GTMID } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
+import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -74,11 +75,13 @@ const Layout = async ({ children, locale }: LayoutProps) => {
         </Script>
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
-            <ThemeProvider attribute="class" defaultTheme={theme}>
-              <ThemeInitializer initialTheme={theme} />
-              <ToastContainer />
-              <LayoutActions theme={theme}>{children}</LayoutActions>
-            </ThemeProvider>
+            <AddressHoverProvider>
+              <ThemeProvider attribute="class" defaultTheme={theme}>
+                <ThemeInitializer initialTheme={theme} />
+                <ToastContainer />
+                <LayoutActions theme={theme}>{children}</LayoutActions>
+              </ThemeProvider>
+            </AddressHoverProvider>
           </NextIntlClientProvider>
         </PublicEnvProvider>
       </body>

@@ -7,11 +7,9 @@ import {
   getTimeAgoString,
   localFormat,
   nanoToMilli,
-  truncateString,
 } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../../common/AddressLink';
 import ErrorMessage from '../../common/ErrorMessage';
 import TxnStatus from '../../common/Status';
 import Table from '../../common/Table';
@@ -20,6 +18,7 @@ import Clock from '../../Icons/Clock';
 import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface Props {
   data: {
@@ -35,7 +34,6 @@ interface Props {
 export default function TokenTransfers({ data, error, txnsCount }: Props) {
   const [showAge, setShowAge] = useState(true);
   const errorMessage = ' No token transfers found!';
-  const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);
   const count = txnsCount?.txns[0]?.count;
   const txns: TransactionInfo[] = data?.txns;
@@ -43,13 +41,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
   const t = useTranslations();
 
   const toggleShowAge = () => setShowAge((s) => !s);
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-    setAddress(id);
-  };
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
+
   const columns: any = [
     {
       cell: (row: TransactionInfo) => (
@@ -119,13 +111,10 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={'inline-block align-bottom whitespace-nowrap'}
                     currentAddress={row?.affected_account_id}
-                    name={truncateString(row?.affected_account_id, 15, '...')}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -142,13 +131,10 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={'inline-block align-bottom whitespace-nowrap'}
                     currentAddress={row?.involved_account_id}
-                    name={truncateString(row?.involved_account_id, 15, '...')}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -192,13 +178,10 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={'inline-block align-bottom whitespace-nowrap'}
                     currentAddress={row?.involved_account_id}
-                    name={truncateString(row?.involved_account_id, 15, '...')}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -215,13 +198,10 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={'inline-block align-bottom whitespace-nowrap'}
                     currentAddress={row?.affected_account_id}
-                    name={truncateString(row?.affected_account_id, 15, '...')}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>

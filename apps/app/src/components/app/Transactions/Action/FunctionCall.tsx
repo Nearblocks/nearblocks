@@ -1,16 +1,14 @@
 import { useParams } from 'next/navigation';
 
-import AddressLink from '@/components/app/common/AddressLink';
 import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
 
 import Tooltip from '../../common/Tooltip';
 import FaRight from '../../Icons/FaRight';
-import { useActionContext } from './ActionContext';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const FunctionCall = (props: ActionPropsInfo) => {
   const params = useParams();
-  const { address, handleMouseLeave, onHandleMouseOver } = useActionContext();
 
   return (
     <div className="action flex flex-wrap items-center break-all leading-7">
@@ -24,7 +22,7 @@ const FunctionCall = (props: ActionPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}
       <span className="font-bold px-1">
-        Call{' '}
+        Call
         <span className="font-normal pl-1">
           <Tooltip
             className={'left-32 max-w-[200px] w-36'}
@@ -39,22 +37,18 @@ const FunctionCall = (props: ActionPropsInfo) => {
           </Tooltip>
         </span>
       </span>
-      <span className="font-bold text-gray px-1">
+      <span className="font-bold text-gray px-1 flex items-center">
         By{' '}
-        <AddressLink
-          address={address}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
           currentAddress={props.action.from}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
         />
       </span>
-      <span className="font-bold text-gray">
+      <span className="font-bold text-gray flex items-center">
         On{' '}
-        <AddressLink
-          address={address}
+        <AddressDisplay
+          className="h-6 flex items-center ml-1"
           currentAddress={props.action.to}
-          onMouseLeave={handleMouseLeave}
-          onMouseOver={onHandleMouseOver}
         />
       </span>
     </div>

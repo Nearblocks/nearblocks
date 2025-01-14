@@ -48,8 +48,22 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
   const pathname = usePathname();
 
   const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
+  const lastBlockHash = useRef<null | string>(null);
+  const [block, setBlock] = useState<{ height: string }>({ height: '' });
 
-  async function transactionReceipts(txn: RPCTransactionInfo) {
+  useEffect(() => {
+    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
+      lastBlockHash.current = receipt.block_hash;
+
+      getBlockDetails(receipt?.block_hash)
+        .then((resp: any) => {
+          setBlock(resp?.header);
+        })
+        .catch(() => {});
+    }
+  }, [receipt?.block_hash, getBlockDetails]);
+
+  function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
       txn?.transaction?.actions &&
       txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
@@ -70,32 +84,11 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
 
     const receiptOutcomesByIdMap = new Map();
     const receiptsByIdMap = new Map();
-    const blockHeightCache = new Map();
 
-    const blockHashes = new Set();
-
-    receiptsOutcome?.forEach((receipt) => {
-      if (receipt?.block_hash) {
-        blockHashes.add(receipt?.block_hash);
-      }
-      receiptOutcomesByIdMap?.set(receipt?.id, receipt);
-    });
-
-    await Promise.all(
-      Array.from(blockHashes).map(async (blockHash: any) => {
-        try {
-          const blockDetails = await getBlockDetails(blockHash);
-          if (blockDetails?.header?.height) {
-            blockHeightCache.set(blockHash, blockDetails?.header?.height);
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching block height for hash ${blockHash}:`,
-            error,
-          );
-        }
-      }),
-    );
+    receiptsOutcome &&
+      receiptsOutcome?.forEach((receipt) => {
+        receiptOutcomesByIdMap?.set(receipt?.id, receipt);
+      });
 
     receipts &&
       receipts?.forEach((receiptItem) => {
@@ -111,36 +104,28 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
         });
       });
 
-    const collectReceipts = async (receiptHash: any) => {
+    const collectReceipts = (receiptHash: any) => {
       const receipt = receiptsByIdMap?.get(receiptHash);
       const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
-      const blockHash = receiptOutcome?.block_hash;
-
-      const blockHeight = blockHeightCache.get(blockHash);
-
-      const outgoingReceipts = await Promise.all(
-        (receiptOutcome?.outcome?.receipt_ids || []).map(collectReceipts),
-      );
 
       return {
         ...receipt,
         ...receiptOutcome,
-        block_height: blockHeight || '',
         outcome: {
           ...receiptOutcome?.outcome,
-          outgoing_receipts: outgoingReceipts,
+          outgoing_receipts:
+            receiptOutcome?.outcome?.receipt_ids &&
+            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
         },
       };
     };
 
-    return await collectReceipts(receiptsOutcome[0]?.id);
+    return collectReceipts(receiptsOutcome[0]?.id);
   }
 
   useEffect(() => {
     if (!isEmpty(rpcTxn)) {
-      transactionReceipts(rpcTxn).then((receiptData) => {
-        setReceipt(receiptData);
-      });
+      setReceipt(transactionReceipts(rpcTxn));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
@@ -349,6 +334,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                 )}
                 {tab === 'execution' && (
                   <Receipt
+                    block={block}
                     hash={hash}
                     receipt={receipt}
                     rpcTxn={rpcTxn}

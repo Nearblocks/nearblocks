@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { Link } from '@/i18n/routing';
-import { shortenAddress } from '@/utils/app/libs';
 import { parseEventLogs } from '@/utils/app/near';
 import { MtEventLogData, TransactionLog } from '@/utils/types';
 
 import TokenInfo from '../common/TokenInfo';
 import FaRight from '../Icons/FaRight';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface ParsedEventListProps {
   events: TransactionLog[];
@@ -26,32 +25,28 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
           ) {
             return parsedEvent?.data?.map((data, j) => (
               <div className="flex" key={`${index}-${j}`}>
-                <div className="flex items-center flex-wrap break-all leading-7">
+                <div className="flex items-center flex-wrap break-all leading-1">
                   <FaRight className="inline-flex text-gray-400 text-xs" />
                   {['mt_mint'].includes(parsedEvent.event) ? (
                     <>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
-                            href={`/address/${data.old_owner_id}`}
-                          >
-                            {shortenAddress(data.old_owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.old_owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}
                       </div>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'owner_id' in data && data?.owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 pl-1 font-semibold"
-                            href={`/address/${data.owner_id}`}
-                          >
-                            {shortenAddress(data.owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}
@@ -59,28 +54,24 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                     </>
                   ) : ['mt_burn'].includes(parsedEvent.event) ? (
                     <>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'owner_id' in data && data?.owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
-                            href={`/address/${data.owner_id}`}
-                          >
-                            {shortenAddress(data.owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}
                       </div>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-semibold pl-1"
-                            href={`/address/${data.old_owner_id}`}
-                          >
-                            {shortenAddress(data.old_owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.old_owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}
@@ -88,28 +79,24 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                     </>
                   ) : (
                     <>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-semibold pl-1 hover:no-underline"
-                            href={`/address/${data.old_owner_id}`}
-                          >
-                            {shortenAddress(data.old_owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.old_owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}
                       </div>
-                      <div className="font-semibold text-gray px-1">
+                      <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'new_owner_id' in data && data?.new_owner_id ? (
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-semibold pl-1"
-                            href={`/address/${data.new_owner_id}`}
-                          >
-                            {shortenAddress(data.new_owner_id)}
-                          </Link>
+                          <AddressDisplay
+                            className="h-6 flex items-center ml-1"
+                            currentAddress={data.new_owner_id}
+                          />
                         ) : (
                           <span className="font-normal pl-1">system</span>
                         )}

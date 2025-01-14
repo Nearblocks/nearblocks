@@ -7,7 +7,6 @@ import { Link } from '@/i18n/routing';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import TxnStatus from '../common/Status';
 import Table from '../common/Table';
@@ -17,6 +16,7 @@ import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {
   data: {
@@ -44,17 +44,7 @@ const NFTTransfersActions = ({
   const t = useTranslations();
   const { getBlockDetails } = useRpc();
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
-  const [address, setAddress] = useState('');
   const [timestamp, setTimeStamp] = useState('');
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
 
   const count = totalCount?.txns[0]?.count;
   const tokens: TransactionInfo[] = data?.txns;
@@ -151,15 +141,12 @@ const NFTTransfersActions = ({
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -176,15 +163,12 @@ const NFTTransfersActions = ({
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -228,15 +212,12 @@ const NFTTransfersActions = ({
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -253,15 +234,12 @@ const NFTTransfersActions = ({
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>

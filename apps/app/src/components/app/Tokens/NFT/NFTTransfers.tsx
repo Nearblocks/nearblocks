@@ -6,7 +6,6 @@ import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
-import AddressLink from '../../common/AddressLink';
 import ErrorMessage from '../../common/ErrorMessage';
 import TxnStatus from '../../common/Status';
 import Table from '../../common/Table';
@@ -16,6 +15,7 @@ import Clock from '../../Icons/Clock';
 import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 interface Props {
   count: any;
   cursor: any;
@@ -28,20 +28,9 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
   const t = useTranslations();
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [showAge, setShowAge] = useState(true);
-  const [address, setAddress] = useState('');
   const [page, setPage] = useState(1);
 
   const toggleShowAge = () => setShowAge((s) => !s);
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
-  };
 
   const columns = [
     {
@@ -111,15 +100,12 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -136,15 +122,12 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -188,15 +171,12 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.involved_account_id}
-                    name={row?.involved_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>
@@ -213,15 +193,12 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressLink
-                    address={address}
+                  <AddressDisplay
+                    copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                     }
                     currentAddress={row?.affected_account_id}
-                    name={row?.affected_account_id}
-                    onMouseLeave={handleMouseLeave}
-                    onMouseOver={onHandleMouseOver}
                   />
                 </span>
               </Tooltip>

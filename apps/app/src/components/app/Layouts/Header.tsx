@@ -255,7 +255,9 @@ const Header = ({
         </div>
       )}
       <div
-        className={`hidden md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
+        className={`${
+          !showSearch && 'hidden'
+        } md:!flex w-full sticky top-0 dark:bg-black-600 bg-white p-0.5 z-50 justify-center border-b-[1px] dark:border-gray-800`}
       >
         <div className="container-xxl w-full mx-auto flex justify-between">
           <div className="hidden md:!flex md:!w-[35%] h-10">

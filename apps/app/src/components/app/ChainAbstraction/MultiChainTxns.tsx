@@ -14,7 +14,6 @@ import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
 import { FilterKind, MultiChainTxnInfo } from '@/utils/types';
 
-import AddressLink from '../common/AddressLink';
 import ErrorMessage from '../common/ErrorMessage';
 import Filters from '../common/Filters';
 import TxnStatus from '../common/Status';
@@ -29,6 +28,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import Near from '../Icons/Near';
 import SortIcon from '../Icons/SortIcon';
+import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   chain: '',
@@ -61,7 +61,6 @@ const MultiChainTxns = ({
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
   const errorMessage = t ? t('noTxns') : ' No transactions found!';
-  const [address, setAddress] = useState('');
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const onChange = (e: any) => {
@@ -104,16 +103,6 @@ const MultiChainTxns = ({
     const newQueryString = QueryString.stringify(newParams);
 
     router.push(`${pathname}?${newQueryString}`);
-  };
-
-  const onHandleMouseOver = (e: any, id: string) => {
-    e.preventDefault();
-
-    setAddress(id);
-  };
-
-  const handleMouseLeave = () => {
-    setAddress('');
   };
 
   const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -191,27 +180,20 @@ const MultiChainTxns = ({
             position="top"
             tooltip={row?.transaction_hash}
           >
-            <span>
-              <AddressLink
-                address={address}
-                className={
-                  'inline-block align-bottom whitespace-nowrap font-medium'
-                }
+            <span className="flex items-center">
+              {row?.transaction_hash && (
+                <div className="flex items-center mr-1">
+                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                    <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                  </div>
+                </div>
+              )}
+              <AddressDisplay
+                copy
                 currentAddress={row?.transaction_hash}
-                name={
-                  row?.transaction_hash && (
-                    <div className="flex items-center w-full">
-                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                        <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                      </div>
-                      <span className="ml-2 truncate max-w-[150px]">
-                        {row?.transaction_hash}
-                      </span>
-                    </div>
-                  )
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
               />
             </span>
           </Tooltip>
@@ -231,25 +213,21 @@ const MultiChainTxns = ({
             position="top"
             tooltip={row?.account_id}
           >
-            <span>
-              <AddressLink
-                address={address}
-                className={'inline-block align-bottom whitespace-nowrap'}
+            <span className="flex items-center">
+              {row?.account_id && (
+                <div className="flex items-center mr-1">
+                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                    <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                  </div>
+                </div>
+              )}
+
+              <AddressDisplay
+                copy
                 currentAddress={row?.account_id}
-                name={
-                  row?.account_id && (
-                    <div className="flex items-center w-full">
-                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                        <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                      </div>
-                      <span className="ml-2 truncate max-w-[150px]">
-                        {row?.account_id}
-                      </span>
-                    </div>
-                  )
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
               />
             </span>
           </Tooltip>
@@ -350,36 +328,29 @@ const MultiChainTxns = ({
             position="top"
             tooltip={row?.derived_address}
           >
-            <span>
-              <AddressLink
-                address={address}
-                className={'inline-block align-bottom whitespace-nowrap'}
+            <span className="flex items-center">
+              {row?.derived_address && row?.chain && (
+                <div className="flex items-center mr-1">
+                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                    {row?.chain === 'BITCOIN' && (
+                      <Bitcoin className="w-4 h-4 text-orange-400" />
+                    )}
+                    {row?.chain === 'ETHEREUM' && (
+                      <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    )}
+                  </div>
+                </div>
+              )}
+              <AddressDisplay
+                copy
                 currentAddress={row?.derived_address}
                 href={handleChainSelect(
                   row?.chain?.toLowerCase(),
                   row?.derived_address,
                 )}
-                name={
-                  row?.derived_address &&
-                  row?.chain && (
-                    <div className="flex items-center w-full">
-                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                        {row?.chain === 'BITCOIN' && (
-                          <Bitcoin className="w-4 h-4 text-orange-400" />
-                        )}
-                        {row?.chain === 'ETHEREUM' && (
-                          <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
-                        )}
-                      </div>
-                      <span className="ml-2 truncate max-w-[150px]">
-                        {row?.derived_address}
-                      </span>
-                    </div>
-                  )
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={onHandleMouseOver}
-                target="_blank"
               />
             </span>
           </Tooltip>
