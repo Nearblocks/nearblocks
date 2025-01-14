@@ -7,7 +7,7 @@ const { Pool } = pg;
 
 const db = new Pool({
   connectionString: config.dbUrl,
-  max: 60,
+  max: 30,
 });
 
 db.on('error', (error) => Sentry.captureException(error));
