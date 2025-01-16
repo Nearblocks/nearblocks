@@ -1,6 +1,5 @@
 'use client';
-import Cookies from 'js-cookie';
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import useAuth from '@/hooks/app/useAuth';
 import { Link, usePathname } from '@/i18n/routing';
@@ -18,7 +17,7 @@ import Key from '../Icons/Key';
 import Menu from '../Icons/Menu';
 import Plan from '../Icons/Plan';
 import User from '../Icons/User';
-import Skeleton, { Loader } from '../skeleton/common/Skeleton';
+import Skeleton from '../skeleton/common/Skeleton';
 import UserLogout from './Logout';
 
 interface MenuItemProps {
@@ -55,22 +54,11 @@ interface UserLayoutProps {
   title: string;
 }
 
-const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
+const UserLayout = ({ children, role, title }: UserLayoutProps) => {
   const [showMenu, setShowMenu] = useState(true);
   const asPath = usePathname();
-  const { data: userData, loading } = useAuth('/profile');
-  const userDetails = userData?.data || null;
-  const [role, setRole] = useState<string | undefined>(cookieRole);
-
-  useEffect(() => {
-    const checkCookies = () => {
-      const r = Cookies.get('role');
-      if (r !== role) setRole(r);
-    };
-    checkCookies();
-    const intervalId = setInterval(checkCookies, 1000);
-    return () => clearInterval(intervalId);
-  }, [role]);
+  const { data: userData, loading } = useAuth('/users/me', {}, true);
+  const userDetails = userData?.user || null;
 
   return (
     <>
@@ -83,7 +71,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
           }}
         >
           <div className="container-xxl mx-auto pt-10">
-            <div className="flex items-center justify-between mr-3">
+            <div className="flex items-center justify-between mr-3 -mt-6">
               <div className="ml-3">
                 <h1 className="mb-4 pt-8 sm:text-2xl text-xl text-white ">
                   {title}
@@ -160,14 +148,18 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
               >
                 <div>
                   {loading || !userDetails ? (
-                    <Loader wrapperClassName="w-28 h-5" />
+                    <div className="py-1.5">
+                      <Skeleton className="w-28 h-4" />
+                    </div>
                   ) : (
                     <p className="text-black dark:text-neargray-100">
                       {userDetails?.username}
                     </p>
                   )}
                   {loading || !userDetails ? (
-                    <Skeleton className="flex w-full h-8" />
+                    <div className="pt-1.5 pb-0.5">
+                      <Skeleton className="flex w-48 h-4" />
+                    </div>
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-neargray-100 mt-2">
                       {userDetails?.email}
@@ -187,7 +179,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                 }`}
               >
                 <div className="px-4 py-2">
-                  <p className="text-nearblue-600 dark:text-neargray-100 uppercase text-xs py-2">
+                  <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
                     Account
                   </p>
 
@@ -206,7 +198,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
 
                 {role == 'advertiser' && (
                   <div className="px-4 py-2">
-                    <p className="text-nearblue-600 dark:text-neargray-100 uppercase text-xs py-2">
+                    <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
                       API
                     </p>
                     <MenuItem
@@ -220,7 +212,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                       icon={FaFileInvoiceDollar}
                       text="Invoices"
                     />
-                    <div className="flex py-2 hover:bg-neargreen/5 dark:hover:bg-black-200 hover:text-green-800/70 dark:hover:text-green-100  text-gray-600 dark:text-neargray-100 rounded-md cursor-pointer">
+                    <div className="flex py-2 hover:bg-neargreen/5 dark:hover:bg-black-200 hover:text-green-800/70 dark:hover:text-green-100  text-gray-600 dark:!text-neargray-100 rounded-md cursor-pointer">
                       <FileSearch className="h-4 w-4 mx-2" />
 
                       <a
@@ -240,7 +232,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                 )}
                 {role == 'publisher' && (
                   <div className="px-4 py-2">
-                    <p className="text-nearblue-600 dark:text-neargray-100 uppercase text-xs py-2">
+                    <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
                       API
                     </p>
                     <MenuItem
@@ -262,7 +254,7 @@ const UserLayout = ({ children, role: cookieRole, title }: UserLayoutProps) => {
                 )}
 
                 <div className="px-4 py-2">
-                  <p className="text-nearblue-600 dark:text-neargray-100 uppercase text-xs py-2">
+                  <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
                     Advertise
                   </p>
                   <MenuItem

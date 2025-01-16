@@ -5,7 +5,7 @@ import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
@@ -15,6 +15,7 @@ import { gasPrice } from '@/utils/near';
 import { ChartInfo, StatusInfo } from '@/utils/types';
 
 import Tooltip from '../common/Tooltip';
+import useStatsStore from '@/stores/app/syncStats';
 
 interface Props {
   chartsDetails: { charts: ChartInfo[] };
@@ -135,10 +136,22 @@ const TransactionChart: React.FC<{
   );
 };
 
-const Overview = ({ chartsDetails, stats, theme: cookieTheme }: Props) => {
+const Overview = ({
+  chartsDetails,
+  stats: initialStats,
+  theme: cookieTheme,
+}: Props) => {
   const t = useTranslations();
   let { theme } = useTheme();
   const { networkId } = useConfig();
+  let [stats, setStats] = useState(initialStats);
+  const latestStats = useStatsStore((state) => state.latestStats);
+
+  useEffect(() => {
+    if (latestStats) {
+      setStats(latestStats);
+    }
+  }, [latestStats]);
 
   if (theme == undefined) {
     theme = cookieTheme;

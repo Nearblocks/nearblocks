@@ -16,6 +16,7 @@ import { catchErrors } from '@/utils/app/libs';
 
 import Visibility from '../Icons/Visibility';
 import VisibilityOff from '../Icons/VisibilityOff';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -28,6 +29,7 @@ const Delete = () => {
   const [confirm, setConfirm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const { userAuthURL: baseURL } = useConfig();
 
   const onDelete = () => {
     formik.resetForm();
@@ -40,7 +42,9 @@ const Delete = () => {
 
   const onSubmit = async (values: FormikValues) => {
     try {
-      await request.post(`/profile/delete`, values);
+      await request(baseURL).delete(`users/me`, {
+        data: { password: values.password },
+      });
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('role');
@@ -121,7 +125,7 @@ const Delete = () => {
                             className="border w-full text-black-300 dark:text-white px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
                             name="password"
                             onChange={formik.handleChange}
-                            placeholder="e.g.,.."
+                            placeholder="Password"
                             type={showPassword ? 'text' : 'password'}
                             value={formik.values.password}
                           />

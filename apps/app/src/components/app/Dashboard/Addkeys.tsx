@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { DialogCloseTrigger, DialogContent } from '@/components/ui/dialog';
 import useAuth, { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Please enter name'),
@@ -18,21 +19,24 @@ interface Props {
 }
 
 const AddKeys = ({ mutate, selected }: Props) => {
-  const { data: keyData } = useAuth(selected ? `/keys/${selected}` : '');
+  const { data: keyData, mutate: keyMutate } = useAuth(
+    selected ? `/keys/${selected}` : '',
+  );
   const closeButton = useRef<HTMLButtonElement>(null);
+  const { userApiURL: baseURL } = useConfig();
   const key = get(keyData, 'key') || null;
   const onSubmit = async (values: FormikValues) => {
     try {
       if (selected) {
         values.id = key?.id;
-        await request.post(`/keys/${selected}`, values);
+        await request(baseURL).put(`/keys/${selected}`, values);
         if (!toast.isActive('key-updated')) {
           toast.success('Key Updated', {
             toastId: 'key-updated',
           });
         }
       } else {
-        await request.post('/keys', values);
+        await request(baseURL).post('/keys', values);
         if (!toast.isActive('key-added')) {
           toast.success('Key Added', {
             toastId: 'key-added',
@@ -40,6 +44,7 @@ const AddKeys = ({ mutate, selected }: Props) => {
         }
       }
       mutate();
+      keyMutate();
       formik.resetForm();
     } catch (error) {
       const message = catchErrors(error);

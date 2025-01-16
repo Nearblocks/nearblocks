@@ -11,13 +11,13 @@ type Props = {
 };
 
 const AdImpressions = ({ campaignId, isTextHide }: Props) => {
-  const { data, loading } = useAuth('publisher/stats');
+  const { data, loading } = useAuth('publisher/campaigns/stats');
   const { data: campaignStats, loading: campaignDataLoading } = useAuth(
-    campaignId ? `campaign/${campaignId}/stats` : '',
+    campaignId ? `campaigns/${campaignId}/current-month-stats` : '',
   );
 
   const { data: campaignOverAllStats, loading: campaignOverAllDataLoading } =
-    useAuth(campaignId ? `campaign/${campaignId}/overall-stats` : '');
+    useAuth(campaignId ? `campaigns/${campaignId}/total-stats` : '');
 
   let totalImpression = +data?.totalImpression ? +data?.totalImpression : '0';
   let totalClicks = +data?.totalClicks ? +data?.totalClicks : '0';
@@ -52,7 +52,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
                 )}
               </div>
             ) : (
-              <Skeleton className="w-10 h-8 mt-4 mb-8" />
+              <Skeleton className="w-10 h-9 mt-4 mb-8" />
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 border soft-shadow rounded-xl px-8">
@@ -77,7 +77,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
                 )}
               </div>
             ) : (
-              <Skeleton className="w-10 h-6 mt-4 mb-8" />
+              <Skeleton className="w-10 h-8 mt-4 mb-8" />
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 border soft-shadow rounded-xl px-8">
@@ -97,7 +97,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
                 )}
               </div>
             ) : (
-              <Skeleton className="w-10 h-6 mt-4 mb-8" />
+              <Skeleton className="w-10 h-8 mt-4 mb-8" />
             )}
           </div>
         </div>

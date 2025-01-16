@@ -111,4 +111,7 @@ export const EVMWalletChain = evmWalletChains[networkId];
 export const userApiURL =
   process.env.NEXT_PUBLIC_USER_API_URL || 'https://api.exploreblocks.io/api/';
 
+export const userAuthURL =
+  process.env.NEXT_PUBLIC_USER_AUTH_URL || 'https://api.exploreblocks.io/api/';
+
 export const GTMID = process.env.NEXT_PUBLIC_GTM_ID || 'G-XKTTC0Q819';

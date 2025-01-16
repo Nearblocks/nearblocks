@@ -15,7 +15,7 @@ import { request } from '@/hooks/app/useAuth';
 import { useConfig } from '@/hooks/app/useConfig';
 import useStorage from '@/hooks/app/useStorage';
 import { Link } from '@/i18n/routing';
-import { catchErrors } from '@/utils/app/libs';
+import { catchErrors, getUserDataFromToken } from '@/utils/app/libs';
 
 interface Props {
   id?: string;
@@ -33,6 +33,8 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   const [tokens, setTokens] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
   const [updatePassMsg, setUpdatePassMsg] = useState('');
+  const { userAuthURL } = useConfig();
+  const { userApiURL } = useConfig();
   const { theme } = useTheme();
   const { siteKey } = useConfig();
 
@@ -54,25 +56,28 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   const subscribePlan = async () => {
     try {
       const stripePlanId = localStorage.getItem('stripe-plan-id');
-      const interval = localStorage.getItem('interval');
+      const interval =
+        localStorage.getItem('interval') === 'year' ? 'year' : 'month';
 
-      const res = await request.post(`advertiser/subscribe`, {
-        interval: interval === 'year' ? 'year' : 'month',
+      const res = await request(userApiURL).post('advertiser/subscribe', {
+        interval,
         plan_id: stripePlanId,
       });
+
       localStorage.setItem('subscribe-called', 'true');
 
-      if (res?.data && res?.data['url ']) {
-        router.push(res?.data['url ']);
+      const redirectUrl = res?.data['url '];
+
+      if (redirectUrl) {
+        router.push(redirectUrl);
         return;
       }
-      if (res?.data && res?.data['message'] === 'upgraded') {
+
+      const status = res?.data?.message;
+      if (status) {
         resetStripePlan();
-        router.push('/user/plan?status=upgraded');
-      }
-      if (res?.data && res?.data['message'] === 'downgraded') {
-        resetStripePlan();
-        router.push('/user/plan?status=downgraded');
+        router.push(`/user/plan?status=${status}`);
+        return;
       }
       resetStripePlan();
       router.push('/user/plan');
@@ -82,8 +87,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
       if (statusCode === 422) {
         resetStripePlan();
         router.push('/user/plan?status=exists');
-      }
-      if (statusCode === 400) {
+      } else if (statusCode === 400) {
         resetStripePlan();
         router.push('/user/plan?status=invalid');
       }
@@ -122,26 +126,25 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
     const response: boolean = await turnstileSiteAuth(tokens);
     if (response) {
       try {
-        const res = await request.post(`login`, {
+        const res = await request(userAuthURL).post(`login`, {
           password: values.password,
           username_or_email: values.usernameOrEmail,
         });
+        const respToken = res?.data?.token;
 
-        if (
-          res?.data?.meta?.token &&
-          res?.data?.data?.role &&
-          res?.data?.data?.username
-        ) {
-          setToken(res?.data?.meta?.token);
-          setRole(res?.data?.data?.role[0].name);
-          setUser(res?.data?.data?.username);
-          Cookies.set('token', res?.data?.meta?.token, {
+        const userData: any = getUserDataFromToken(respToken);
+
+        if (userData) {
+          setToken(respToken);
+          setRole(userData?.role);
+          setUser(userData?.username);
+          Cookies.set('token', respToken, {
             expires: 30,
           });
-          Cookies.set('role', res?.data?.data?.role[0].name, {
+          Cookies.set('role', userData?.role, {
             expires: 30,
           });
-          Cookies.set('user', res?.data?.data?.username, {
+          Cookies.set('user', userData?.username, {
             expires: 30,
           });
           if (id && interval) {

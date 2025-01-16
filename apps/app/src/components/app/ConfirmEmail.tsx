@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 
 import { request } from '@/hooks/app/useAuth';
 import useStorage from '@/hooks/app/useStorage';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface ConfirmEmailClientProps {
   authToken: null | string;
@@ -24,7 +25,7 @@ const ConfirmEmail = ({
   const [, setToken] = useStorage('token');
   const [, setRole] = useStorage('role');
   const [, setUser] = useStorage('user');
-
+  const { userApiURL: baseURL } = useConfig();
   const onLogin = () => router.push('/login');
   const onResend = () => router.push('/resend');
 
@@ -38,31 +39,26 @@ const ConfirmEmail = ({
   const subscribePlan = async () => {
     try {
       const stripePlanId = localStorage.getItem('stripe-plan-id');
-      const interval = localStorage.getItem('interval');
+      const interval =
+        localStorage.getItem('interval') === 'year' ? 'year' : 'month';
 
-      const res = await request.post(`advertiser/subscribe`, {
-        interval: interval === 'year' ? 'year' : 'month',
+      const res = await request(baseURL).post('advertiser/subscribe', {
+        interval,
         plan_id: stripePlanId,
       });
       localStorage.setItem('subscribe-called', 'true');
 
-      if (res?.data && res?.data['url ']) {
-        router.push(res?.data['url ']);
+      const redirectUrl = res?.data['url '];
+      if (redirectUrl) {
+        router.push(redirectUrl);
         return;
       }
-
-      if (res?.data && res?.data['message'] === 'upgraded') {
+      const status = res?.data?.message;
+      if (status) {
         resetStripePlan();
-        router.push('/user/plan?status=upgraded');
+        router.push(`/user/plan?status=${status}`);
         return;
       }
-
-      if (res?.data && res?.data['message'] === 'downgraded') {
-        resetStripePlan();
-        router.push('/user/plan?status=downgraded');
-        return;
-      }
-
       resetStripePlan();
       router.push('/user/plan');
     } catch (error) {
@@ -71,12 +67,9 @@ const ConfirmEmail = ({
       if (statusCode === 422) {
         resetStripePlan();
         router.push('/user/plan?status=exists');
-        return;
-      }
-      if (statusCode === 400) {
+      } else if (statusCode === 400) {
         resetStripePlan();
         router.push('/user/plan?status=invalid');
-        return;
       }
     }
   };

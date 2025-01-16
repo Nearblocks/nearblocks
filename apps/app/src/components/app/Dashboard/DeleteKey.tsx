@@ -2,8 +2,9 @@ import React, { useRef } from 'react';
 import { toast } from 'react-toastify';
 
 import { DialogCloseTrigger, DialogContent } from '@/components/ui/dialog';
-import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
+import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface ApiKey {
   created_at: string;
@@ -20,10 +21,11 @@ interface Props {
 
 const DeleteKey = ({ mutate, selected }: Props) => {
   const closeButton = useRef<HTMLButtonElement>(null);
+  const { userApiURL: baseURL } = useConfig();
 
   const onDelete = async () => {
     try {
-      await request.post(`/keys/${selected?.id}/delete`);
+      await request(baseURL).delete(`/keys/${selected?.id}`);
       if (!toast.isActive('delete-key')) {
         toast.success('Key Deleted', {
           toastId: 'delete-key',

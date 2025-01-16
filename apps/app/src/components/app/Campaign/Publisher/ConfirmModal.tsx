@@ -2,8 +2,9 @@ import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { DialogCloseTrigger, DialogContent } from '@/components/ui/dialog';
-import { request } from '@/hooks/app/useAuth';
 import { currentCampaign } from '@/utils/types';
+import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 type Props = {
   currentCampaign: currentCampaign | null;
@@ -13,11 +14,14 @@ type Props = {
 const ConfirmModal = ({ currentCampaign, mutate }: Props) => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const { userApiURL: baseURL } = useConfig();
 
   const onSubmit = async () => {
     try {
       setButtonLoading(true);
-      await request.post(`publisher/campaign/${currentCampaign?.id}/approve`);
+      await request(baseURL).post(
+        `publisher/campaigns/${currentCampaign?.id}/approve`,
+      );
       if (!toast.isActive('campaign-approved')) {
         toast.success('The campaign has been approved successfully', {
           toastId: 'campaign-approved',

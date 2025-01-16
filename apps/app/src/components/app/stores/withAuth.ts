@@ -13,7 +13,8 @@ function withAuth<P>(Component: React.ComponentType<P>): React.FC<P> {
     const tokenCookie = Cookies.get('token');
     const [token] = useStorage('token');
     const [userName, setUserName] = useState<string>();
-    const { data: userData, error, loading } = useAuth('/profile');
+    const { data, error, loading } = useAuth('/users/me', {}, true);
+    const userData = data?.user;
     const statusCode = get(error, 'response.status') || null;
     const router = useRouter();
 
@@ -40,7 +41,7 @@ function withAuth<P>(Component: React.ComponentType<P>): React.FC<P> {
 
     useEffect(() => {
       if (!loading && userData) {
-        const name = userData?.data?.username;
+        const name = userData?.username;
         if (userName !== name) {
           router?.refresh();
         }

@@ -18,7 +18,7 @@ const CampaignEdit = ({
   campaignId?: string;
   userRole?: string;
 }) => {
-  const { mutate } = useAuth('/campaign/subscription-info');
+  const { mutate } = useAuth('/campaigns/subscription-info');
   const {
     data: campaignData,
     loading,

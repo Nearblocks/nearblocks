@@ -14,6 +14,7 @@ import Clock from '../Icons/Clock';
 import EmailCircle from '../Icons/EmailCircle';
 import LoginCircle from '../Icons/LoginCircle';
 import Skeleton from '../skeleton/common/Skeleton';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface User {
   email?: string;
@@ -29,6 +30,7 @@ interface UpdateEmailProps {
 
 const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
   const router = useRouter();
+  const { userAuthURL: baseURL } = useConfig();
 
   const validationSchema = user?.username
     ? Yup.object().shape({
@@ -48,7 +50,7 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
     { resetForm, setSubmitting }: FormikHelpers<any>,
   ): Promise<void> => {
     try {
-      const resp = await request.post(`/profile/email`, values);
+      const resp = await request(baseURL).post(`users/me/email`, values);
       if (resp?.status === 200) {
         mutate();
         if (!toast.isActive('update-email')) {
@@ -174,8 +176,14 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
           </div>
         ) : (
           <p className="text-sm text-black dark:text-neargray-10 flex col-span-2">
-            <Clock className="my-auto mr-1" />
-            {dayjs(user?.last_login_at).format('YYYY-MM-DD  HH:mm:ss')}
+            {user?.last_login_at ? (
+              <>
+                <Clock className="my-auto mr-1" />
+                {dayjs(user?.last_login_at).format('YYYY-MM-DD  HH:mm:ss')}
+              </>
+            ) : (
+              <>---</>
+            )}
           </p>
         )}
       </div>

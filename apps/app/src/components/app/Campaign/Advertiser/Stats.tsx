@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import useAuth from '@/hooks/app/useAuth';
 import { localFormat } from '@/utils/app/libs';
@@ -11,24 +11,18 @@ type Props = {
   statsMutate?: () => void;
 };
 
-const AdImpressions = ({ campaignId, isTextHide, statsMutate }: Props) => {
-  const { data, loading } = useAuth('advertiser/stats');
+const AdImpressions = ({ campaignId, isTextHide }: Props) => {
+  const { data, loading } = useAuth('advertiser/campaigns/stats');
   const { data: campaignStats, loading: campaignDataLoading } = useAuth(
-    campaignId ? `campaign/${campaignId}/stats` : '',
+    campaignId ? `campaigns/${campaignId}/current-month-stats` : '',
   );
 
   const { data: campaignOverAllStats, loading: campaignOverAllDataLoading } =
-    useAuth(campaignId ? `campaign/${campaignId}/overall-stats` : '');
+    useAuth(campaignId ? `campaigns/${campaignId}/total-stats` : '');
 
   let totalImpression = +data?.totalImpression ? +data?.totalImpression : '0';
   let totalClicks = +data?.totalClicks ? +data?.totalClicks : '0';
   let totalSpent = +data?.totalSpent / 100 ? +data?.totalSpent / 100 : '$0';
-
-  useEffect(() => {
-    if (statsMutate) {
-      statsMutate();
-    }
-  }, [statsMutate, campaignId]);
 
   return (
     <>

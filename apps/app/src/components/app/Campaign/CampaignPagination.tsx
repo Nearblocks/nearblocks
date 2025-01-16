@@ -10,6 +10,7 @@ type Props = {
   nextPageUrl: string;
   prevPageUrl: string;
   setUrl: (url: string) => void;
+  isLoading?: boolean;
 };
 
 const CampaignPagination = ({
@@ -19,6 +20,7 @@ const CampaignPagination = ({
   nextPageUrl,
   prevPageUrl,
   setUrl,
+  isLoading = false,
 }: Props) => {
   const handleNextPage = () => {
     setUrl(nextPageUrl);
@@ -45,24 +47,24 @@ const CampaignPagination = ({
             }`}
           >
             <button
-              className={`relative inline-flex items-center px-2 ml-1 md:px-3 text-xs py-2 font-medium ${
-                currentPage === 1
-                  ? 'text-gray-500 dark:text-neargray-10'
-                  : 'text-green-500 dark:text-green-250 hover:bg-green-500 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
+              className={`relative inline-flex items-center px-2 ml-1 md:px-3 text-xs py-2 font-medium disabled:cursor-not-allowed ${
+                !currentPage || currentPage === 1 || isLoading
+                  ? 'text-gray-500 dark:!text-neargray-10'
+                  : 'text-green-500 dark:!text-green-250 hover:bg-green-500 dark:hover:!bg-green-250 hover:text-white dark:hover:!text-black'
               } rounded-md bg-gray-100 dark:bg-black-200 dark:text-green-250`}
-              disabled={currentPage === 1}
+              disabled={!currentPage || currentPage === 1 || isLoading}
               onClick={onFirst}
               type="button"
             >
               First
             </button>
             <button
-              className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 font-medium ${
-                !prevPageUrl
+              className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 font-medium disabled:cursor-not-allowed ${
+                !prevPageUrl || isLoading
                   ? 'text-gray-500 dark:text-neargray-10'
-                  : 'text-green-500 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-500 dark:hover:bg-green-250'
+                  : 'text-green-500 dark:text-green-250 hover:text-white dark:hover:!text-black hover:bg-green-500 dark:hover:!bg-green-250'
               } rounded-md bg-gray-100 dark:text-green-250 dark:bg-black-200`}
-              disabled={!prevPageUrl}
+              disabled={!prevPageUrl || isLoading}
               onClick={handlePreviousPage}
               type="button"
             >
@@ -76,12 +78,12 @@ const CampaignPagination = ({
               Page {currentPage}
             </button>
             <button
-              className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium ${
-                nextPageUrl
-                  ? 'text-green-500 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-500 dark:hover:bg-green-250'
+              className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium disabled:cursor-not-allowed ${
+                nextPageUrl || isLoading
+                  ? 'text-green-500 dark:!text-green-250 hover:text-white dark:hover:!text-black hover:bg-green-500 dark:hover:!bg-green-250'
                   : 'text-gray-500 dark:text-neargray-10'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
-              disabled={!nextPageUrl}
+              disabled={!nextPageUrl || isLoading}
               onClick={handleNextPage}
               type="button"
             >

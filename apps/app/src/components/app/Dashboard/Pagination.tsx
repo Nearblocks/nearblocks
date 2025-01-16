@@ -46,6 +46,7 @@ interface PaginationProps {
   setPreviousPageParam: (params: QueueItem[]) => void;
   setUrl: (url: string) => void;
   size?: number;
+  isLoading?: boolean;
 }
 
 const Pagination = ({
@@ -58,6 +59,7 @@ const Pagination = ({
   setPreviousPageParam,
   setUrl,
   size,
+  isLoading = false,
 }: PaginationProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [disabled, setDisabled] = useState(false);
@@ -114,24 +116,24 @@ const Pagination = ({
             }`}
           >
             <button
-              className={`relative inline-flex items-center px-2 ml-1 md:px-3 text-xs py-2 font-medium ${
-                disabled
+              className={`relative inline-flex items-center px-2 ml-1 md:px-3 text-xs py-2 font-medium disabled:cursor-not-allowed ${
+                disabled || isLoading
                   ? 'text-gray-500 dark:text-neargray-10'
-                  : 'text-green-500 dark:text-green-250 hover:bg-green-500 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
+                  : 'text-green-500 dark:text-green-250 hover:bg-green-500 dark:hover:!bg-green-250 hover:text-white dark:hover:!text-black'
               } rounded-md bg-gray-100 dark:bg-black-200 dark:text-green-250`}
-              disabled={disabled}
+              disabled={disabled || isLoading}
               onClick={onFirst}
               type="button"
             >
               First
             </button>
             <button
-              className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 font-medium ${
-                disabled
+              className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2 font-medium disabled:cursor-not-allowed ${
+                disabled || isLoading
                   ? 'text-gray-500 dark:text-neargray-10'
-                  : 'text-green-500 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-500 dark:hover:bg-green-250'
+                  : 'text-green-500 dark:text-green-250 hover:text-white dark:hover:!text-black hover:bg-green-500 dark:hover:!bg-green-250'
               } rounded-md bg-gray-100 dark:text-green-250 dark:bg-black-200`}
-              disabled={disabled}
+              disabled={disabled || isLoading}
               onClick={handlePreviousPage}
               type="button"
             >
@@ -145,12 +147,12 @@ const Pagination = ({
               Page {currentPage}
             </button>
             <button
-              className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium ${
-                nextPageParams
-                  ? 'text-green-500 dark:text-green-250 hover:text-white dark:hover:text-black hover:bg-green-500 dark:hover:bg-green-250'
+              className={`relative inline-flex items-center ml-1 px-2 md:px-3 py-2 rounded-md font-medium disabled:cursor-not-allowed ${
+                nextPageParams || isLoading
+                  ? 'text-green-500 dark:text-green-250 hover:text-white dark:hover:!text-black hover:bg-green-500 dark:hover:!bg-green-250'
                   : 'text-gray-500 dark:text-neargray-10'
               }  bg-gray-100 dark:text-green-250 dark:bg-black-200`}
-              disabled={nextPageParams ? false : true}
+              disabled={nextPageParams ? false : true || isLoading}
               onClick={handleNextPage}
               type="button"
             >

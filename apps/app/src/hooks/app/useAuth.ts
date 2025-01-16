@@ -4,21 +4,16 @@ import React from 'react';
 import { toast } from 'react-toastify';
 
 import RateLimitDialog from '@/components/app/RateLimitDialog';
-import { userApiURL } from '@/utils/app/config';
 
 import { useSWR } from '../../utils/app/swrExport';
 import { useConfig } from './useConfig';
 import useStorage from './useStorage';
-
-const baseURL = userApiURL;
 
 export const defaultOptions = {
   revalidateOnFocus: false,
   revalidateOnReconnect: false,
   shouldRetryOnError: false,
 };
-
-export const request = axios.create({ baseURL });
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -31,61 +26,75 @@ declare module 'axios' {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-request.interceptors.request.use(
-  (conf) => {
-    let accessToken = null;
+const dynamicRequest = (baseUrl: string) => {
+  const instance = axios.create({
+    baseURL: baseUrl,
+  });
 
-    if (typeof window !== 'undefined') {
-      accessToken = localStorage.getItem('token');
-    }
+  // Request interceptor
+  instance.interceptors.request.use(
+    (config) => {
+      let accessToken = null;
 
-    if (accessToken) {
-      conf.headers.Authorization = `Bearer ${JSON.parse(accessToken)}`;
-    }
+      if (typeof window !== 'undefined') {
+        accessToken = localStorage.getItem('token');
+      }
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${JSON.parse(accessToken)}`;
+      }
 
-    return conf;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
 
-request.interceptors.response.use(undefined, async (error) => {
-  if (error?.response?.status === 429) {
-    toast.warn(React.createElement(RateLimitDialog), {
-      autoClose: false,
-      toastId: 'rateLimit',
-    });
-  }
+  instance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const { config, response } = error;
 
-  if (error?.response?.status === 403) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    Cookies.remove('token');
-    Cookies.remove('role');
-    Cookies.remove('user');
-  }
+      if (response?.status === 429) {
+        toast.warn(React.createElement(RateLimitDialog), {
+          autoClose: false,
+          toastId: 'rateLimit',
+        });
+      }
 
-  const { config } = error;
+      if (response?.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        Cookies.remove('token');
+        Cookies.remove('role');
+        Cookies.remove('user');
+      }
 
-  if (!config || !config.attempt) return Promise.reject(error);
+      if (!config || !config.attempt) return Promise.reject(error);
 
-  const retries = config.retries ?? 5;
-  const delay = 1000 * 2 ** config.attempt;
-  config.attempt += 1;
+      const retries = config.retries ?? 5;
+      config.attempt = (config.attempt || 0) + 1;
+      const delay = 1000 * 2 ** config.attempt;
+      config.attempt += 1;
 
-  if (config.attempt > retries) return Promise.reject(error);
+      if (config.attempt > retries) {
+        return Promise.reject(error);
+      }
 
-  await sleep(delay);
+      await sleep(delay);
+      return instance(config); // Retry the original request
+    },
+  );
+  return instance;
+};
 
-  return request.get(config.url, { attempt: config.attempt, retries });
-});
+export const request = dynamicRequest;
 
-const useAuth = (url: string, options = {}) => {
+const useAuth = (url: string, options = {}, userInfo: boolean = false) => {
   const [token] = useStorage('token');
   const config = { ...defaultOptions, ...options };
-  const { userApiURL: baseURL } = useConfig();
+  const { userApiURL, userAuthURL } = useConfig();
+
+  const baseURL = userInfo ? userAuthURL : userApiURL;
 
   const fetcher = async (
     [url, token]: [string, null | string],

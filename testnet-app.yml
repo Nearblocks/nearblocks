@@ -22,6 +22,7 @@ services:
       AWS_SES_TO_EMAIL: ${AWS_SES_TO_EMAIL}
       NEXT_PUBLIC_GTM_ID: GTM-P285ZPV2
       NEXT_PUBLIC_USER_API_URL: https://api.exploreblocks.io/api/
+      NEXT_PUBLIC_USER_AUTH_URL: ${NEXT_PUBLIC_USER_AUTH_URL}
       NEXT_PUBLIC_USER_DASHBOARD_URL: https://dash.nearblocks.io/
       NEXT_PUBLIC_API_URL: https://api-testnet.nearblocks.io/v1/
       API_URL: https://api-testnet.nearblocks.io/v1/

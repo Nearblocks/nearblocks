@@ -1,50 +1,24 @@
 'use client';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
-import React, { useEffect, useState } from 'react';
-
-import Pagination, {
-  paginationQueue,
-} from '@/components/app/Dashboard/Pagination';
+import React, { useState } from 'react';
 import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import SubscriptionStats from '@/components/app/Publisher/SubscriptionStats';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
-import { dollarFormat } from '@/utils/app/libs';
+import { dollarFormat, shortenAddress } from '@/utils/app/libs';
 
 import Tooltip from '../common/Tooltip';
-
-interface QueueItem {
-  id: string;
-  value: string;
-}
+import CampaignPagination from '../Campaign/CampaignPagination';
 
 const AdSubscription = ({ role }: { role?: string }) => {
   const apiUrl =
-    role === 'publisher' ? '/publisher/campaign-subscriptions?' : '';
+    role === 'publisher' ? '/publisher/subscriptions/campaigns?' : '';
   const [url, setUrl] = useState(apiUrl);
-  const [previousPageParam, setPreviousPageParam] = useState<QueueItem[]>([]);
-  const [nextPageParams, setNextPageParams] = useState<{}>();
-
-  const { dequeue, enqueue, size } = paginationQueue(
-    previousPageParam,
-    setPreviousPageParam,
-  );
-
   const { data, loading, mutate } = useAuth(url);
-
   const subscriptions = get(data, 'data') || null;
-
-  useEffect(() => {
-    if (subscriptions && subscriptions?.length > 0 && data?.has_more) {
-      setNextPageParams({
-        startingAfter: subscriptions[subscriptions?.length - 1]?.id,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subscriptions]);
 
   return (
     <>
@@ -106,22 +80,22 @@ const AdSubscription = ({ role }: { role?: string }) => {
                   {loading &&
                     [...Array(5)].map((_, i) => (
                       <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[6.3%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[5%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4 " />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[3%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4 " />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[2%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[2%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[2%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
                       </tr>
@@ -151,14 +125,14 @@ const AdSubscription = ({ role }: { role?: string }) => {
                   {subscriptions &&
                     subscriptions?.map((key: any) => (
                       <tr className="hover:bg-blue-900/5" key={key.id}>
-                        <td className="px-6 py-4 text-xs text-black dark:text-neargray-10 max-w-52 text-ellipsis">
+                        <td className="px-6 py-4 text-xs text-black dark:text-neargray-10">
                           <Tooltip
-                            className={'left-1/2 max-w-[200px]'}
+                            className={'ml-5 mb-3 left-1/2 max-w-[200px]'}
                             position="top"
                             tooltip={key?.user_email}
                           >
-                            <span className="whitespace-nowrap overflow-hidden">
-                              {key?.user_email}
+                            <span className="whitespace-nowrap">
+                              {shortenAddress(key?.user_email)}
                             </span>
                           </Tooltip>
                         </td>
@@ -196,19 +170,15 @@ const AdSubscription = ({ role }: { role?: string }) => {
               </table>
             </div>
           </div>
-          {subscriptions && subscriptions?.length > 0 && (
-            <Pagination
-              apiUrl={apiUrl}
-              dequeue={dequeue}
-              enqueue={enqueue}
-              isTopPagination={true}
-              mutate={mutate}
-              nextPageParams={nextPageParams}
-              setPreviousPageParam={setPreviousPageParam}
-              setUrl={setUrl}
-              size={size()}
-            />
-          )}
+          <CampaignPagination
+            nextPageUrl={data?.links?.next}
+            prevPageUrl={data?.links?.prev}
+            firstPageUrl={data?.links?.first}
+            currentPage={data?.meta?.current_page}
+            setUrl={setUrl}
+            mutate={mutate}
+            isLoading={loading}
+          />
         </div>
       </UserLayout>
     </>

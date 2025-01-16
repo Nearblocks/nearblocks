@@ -11,7 +11,6 @@ import { Link, routing, usePathname } from '@/i18n/routing';
 import { setCurrentTheme } from '@/utils/app/actions';
 import { nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
-import { Stats } from '@/utils/types';
 
 import ActiveLink from '../ActiveLink';
 import Collapse from '../Collapse';
@@ -19,6 +18,7 @@ import Search from '../common/Search';
 import ArrowDown from '../Icons/ArrowDown';
 import Menu from '../Icons/Menu';
 import UserMenu from './UserMenu';
+import useStatsStore from '@/stores/app/syncStats';
 
 const menus = [
   {
@@ -156,16 +156,17 @@ const languages = [
 const Header = ({
   handleFilterAndKeyword,
   role,
-  stats: statsDetails,
-  sync,
+  stats: initialStats,
   theme: cookieTheme,
   token,
   user,
+  getLatestStats,
+  getSyncStatus,
 }: any) => {
-  const stats: Stats | undefined = statsDetails?.stats?.[0];
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
-
+  const [stats, setStats] = useState(initialStats);
+  const [sync, setSync] = useState<string | null>(null);
   const profile = [
     {
       id: 1,
@@ -183,6 +184,55 @@ const Header = ({
       title: 'API Keys',
     },
   ];
+
+  const setLatestStats = useStatsStore((state) => state.setLatestStats);
+  const setSyncStat = useStatsStore((state) => state.setSyncStatus);
+
+  useEffect(() => {
+    const fetchSyncStats = async () => {
+      try {
+        const syncTimestamp = await getSyncStatus();
+        if (typeof syncTimestamp === 'string') {
+          setSync(syncTimestamp);
+          setSyncStat(syncTimestamp);
+        }
+      } catch (error) {
+        console.error('Error fetching syncStats:', error);
+      }
+    };
+    fetchSyncStats();
+    const syncInterval = setInterval(() => {
+      fetchSyncStats();
+    }, 180000);
+
+    return () => {
+      clearInterval(syncInterval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchLatestStats = async () => {
+      try {
+        const statsDetails = await getLatestStats();
+        if (statsDetails) {
+          setStats(statsDetails);
+          setLatestStats(statsDetails);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+
+    const statsInterval = setInterval(() => {
+      fetchLatestStats();
+    }, 60000);
+
+    return () => {
+      clearInterval(statsInterval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
@@ -238,11 +288,6 @@ const Header = ({
 
     return <Link {...props} />;
   };
-
-  useEffect(() => {
-    router.refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>

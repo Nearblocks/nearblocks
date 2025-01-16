@@ -12,8 +12,8 @@ interface Props {
 const SubscriptionStats = ({ type }: Props) => {
   const apiUrl =
     type === 'api'
-      ? '/publisher/api-subscriptions/stats'
-      : '/publisher/campaign-subscriptions/stats';
+      ? '/publisher/subscriptions/stats/api'
+      : '/publisher/subscriptions/stats/campaigns';
 
   const { data, loading } = useAuth(apiUrl);
 

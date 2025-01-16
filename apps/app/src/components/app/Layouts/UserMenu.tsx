@@ -33,7 +33,7 @@ const UserMenu = ({
       if (t !== token) setToken(t);
     };
     checkCookies();
-    const intervalId = setInterval(checkCookies, 1000);
+    const intervalId = setInterval(checkCookies, 500);
     return () => clearInterval(intervalId);
   }, [user, token]);
 
@@ -135,7 +135,7 @@ const UserMenu = ({
             <li className="border-t my-3"></li>
             <li className="px-4 pb-1">
               <button
-                className="bg-green-500 dark:bg-green-250 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
+                className="hover:bg-green-400 bg-green-500 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
                 onClick={onSignOut}
               >
                 Sign Out

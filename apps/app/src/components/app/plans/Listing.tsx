@@ -15,7 +15,7 @@ type Item = {
 };
 
 const PlanListing = ({ userRole }: { userRole?: string }) => {
-  const { data, loading } = useAuth('/campaign/plans');
+  const { data, loading } = useAuth('/campaigns/plans');
 
   return (
     <>
@@ -61,18 +61,18 @@ const PlanListing = ({ userRole }: { userRole?: string }) => {
                       </thead>
                       <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                         {loading &&
-                          [...Array(5)].map((_, i) => (
+                          [...Array(2)].map((_, i) => (
                             <tr
                               className="hover:bg-blue-900/5 h-[57px]"
                               key={i}
                             >
-                              <td className="pl-5 pr-2 py-4 whitespace-nowrap text-sm text-gray-600 ">
+                              <td className="pl-5 pr-2 w-[2%] py-4 whitespace-nowrap text-sm text-gray-600 ">
                                 <Skeleton className="h-4" />
                               </td>
-                              <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                              <td className="px-5 py-4 w-[2%] whitespace-nowrap text-sm text-gray-600">
                                 <Skeleton className="h-4" />
                               </td>
-                              <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                              <td className="px-5 py-4 w-[2%] whitespace-nowrap text-sm text-gray-600">
                                 <Skeleton className="h-4" />
                               </td>
                             </tr>

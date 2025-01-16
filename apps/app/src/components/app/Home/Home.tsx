@@ -1,17 +1,15 @@
 import { getTranslations } from 'next-intl/server';
 import { ErrorBoundary } from 'react-error-boundary';
-
 import { getRequest } from '@/utils/app/api';
-
-import Banner from '../Banner';
 import ErrorMessage from '../common/ErrorMessage';
-// import Banner from './Banner';
+import { userAuthURL } from '@/utils/app/config';
 import Search from '../common/Search';
 import FaInbox from '../Icons/FaInbox';
 import SponserdText from '../SponserdText';
 import HomeLatestBlocks from './LatestBlocks';
 import HomeLatestTxns from './LatestTxns';
 import HomeOverview from './Overview';
+import Banner from '../Banner';
 
 export default async function Home({
   locale,
@@ -21,6 +19,7 @@ export default async function Home({
   theme: string;
 }) {
   const t = await getTranslations({ locale });
+  const bannerData = await getRequest(`${userAuthURL}campaigns`, {}, {}, false);
 
   const handleFilterAndKeyword = async (
     keyword: string,
@@ -104,7 +103,7 @@ export default async function Home({
               </div>
             </div>
             <div className="lg:!flex hidden w-2/5 justify-center">
-              <Banner type="right" />
+              <Banner bannerInfo={bannerData} />
             </div>
           </div>
         </div>
@@ -124,7 +123,7 @@ export default async function Home({
       </ErrorBoundary>
       <div className="py-2">
         <div className="lg:!hidden block container mx-auto px-3 py-2">
-          <Banner type="center" />
+          <Banner bannerInfo={bannerData} />
         </div>
       </div>
       <section>
