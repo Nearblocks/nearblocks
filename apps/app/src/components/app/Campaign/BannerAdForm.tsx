@@ -3,7 +3,6 @@ import { FormikValues, useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { request } from '@/hooks/app/useAuth';
 import { bannerCampaignValidation } from '@/utils/app/validationSchema';
 import { CampaignProps } from '@/utils/types';
 
@@ -12,6 +11,8 @@ import EmailCircle from '../Icons/EmailCircle';
 import LoginCircle from '../Icons/LoginCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import StartForm from './StartForm';
+import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 type BannerPreview = {
   desktopRight?: string;
@@ -28,6 +29,7 @@ const BannerAdForm = ({
   const validationSchema = bannerCampaignValidation(campaignData);
   const [bannerPreview, setBannerPreview] = useState<BannerPreview>({});
   const [banner, setBanner] = useState({});
+  const { userApiURL: baseURL } = useConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscriptionCancelled, setIsSubscriptionCancelled] = useState(false);
 
@@ -69,7 +71,7 @@ const BannerAdForm = ({
     }
     setIsSubmitting(true);
     try {
-      await request.post(`/campaigns/${campaignId}`, formData);
+      await request(baseURL).post(`/campaigns/${campaignId}`, formData);
       if (!toast.isActive('campaign-update')) {
         toast.success('Campaign Information updated', {
           toastId: 'campaign-update',

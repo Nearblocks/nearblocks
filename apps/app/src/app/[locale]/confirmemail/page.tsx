@@ -1,13 +1,13 @@
 import { Metadata } from 'next';
-
 import ConfirmEmailClient from '@/components/app/ConfirmEmail';
 import { request } from '@/hooks/app/useAuth';
+import { getUserDataFromToken } from '@/utils/app/libs';
+import { userAuthURL } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = 'Confirmation Email | NearBlocks';
-
   const metaDescription =
     'Confirmation email from Nearblocks to verify your account.';
 
@@ -17,29 +17,35 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-interface Props {
+type Props = {
   searchParams: Promise<{
     code?: string;
     email?: string;
   }>;
-}
+};
 
 export default async function ConfirmMail({ searchParams }: Props) {
-  let status: number;
-  let token: null | string = null;
-  let role: null | string = null;
-  let username: null | string = null;
   const { code, email } = await searchParams;
+
+  let status: number;
+  let token: string | null = null;
+  let role: string | null = null;
+  let username: string | null = null;
+
   try {
-    const res = await request.post(`/verify`, { code, email });
-    if (
-      res?.data?.meta?.token &&
-      res?.data?.data?.role &&
-      res?.data?.data?.username
-    ) {
-      token = res?.data?.meta?.token;
-      role = res?.data?.data?.role[0]?.name || null;
-      username = res?.data?.data?.username;
+    const res = await request(userAuthURL).post('/verify', {
+      email: email,
+      code: code,
+    });
+
+    const respToken = res?.data?.token;
+    token = respToken;
+
+    const userData: any = getUserDataFromToken(respToken);
+
+    if (userData) {
+      role = userData?.role || null;
+      username = userData?.username;
     }
     status = res?.status;
   } catch (error: any) {

@@ -1,6 +1,5 @@
 'use client';
 import dayjs from 'dayjs';
-import { get } from 'lodash';
 import React from 'react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -20,6 +19,8 @@ import { Link } from '@/i18n/routing';
 
 import Tooltip from '../common/Tooltip';
 import withAuth from '../stores/withAuth';
+import CampaignPagination from '../Campaign/CampaignPagination';
+import { get } from 'lodash';
 
 interface ApiKey {
   created_at: string;
@@ -31,9 +32,8 @@ interface ApiKey {
 
 const Keys = ({ role }: { role?: string }) => {
   const [selected, setSelected] = useState<any>();
-
-  const { data, loading, mutate } = useAuth('/keys');
-
+  const [url, setUrl] = useState('keys?page=1');
+  const { data, loading, mutate } = useAuth(url);
   const keys = get(data, 'keys') || null;
 
   const onToggleEdit = (id: string) => {
@@ -60,16 +60,31 @@ const Keys = ({ role }: { role?: string }) => {
     <>
       <UserLayout role={role} title="API Keys">
         <ApiUsageStats />
-        <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
-          <div className="px-5 py-5">
-            <p className="text-black dark:text-neargray-10">API Keys</p>
-            <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
-              For developers interested in building applications using our API
-              Service, please create an API-Key Token usable for all API
-              requests.
-            </p>
+        <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
+          <div className="px-5 pt-2 pb-4 items-center sm:flex flex-nowrap justify-between">
+            <div>
+              <p className="text-black dark:text-neargray-10">API Keys</p>
+              <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
+                For developers interested in building applications using our API
+                Service, please create an API-Key Token usable for all API
+                requests.
+              </p>
+            </div>
+            <div className="flex items-center justify-end">
+              <DialogRoot placement={'center'} size="xs">
+                <DialogTrigger asChild>
+                  <button
+                    className="text-[13px] whitespace-nowrap text-white font-semibold px-6 py-2 bg-green-500 dark:bg-green-250 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500 rounded"
+                    onClick={onToggleAdd}
+                  >
+                    Add key
+                  </button>
+                </DialogTrigger>
+                <AddKeys mutate={mutate} selected={selected} />
+              </DialogRoot>
+            </div>
           </div>
-          <div className="flex border-b dark:border-black-200">
+          <div className="flex">
             <div className="overflow-x-auto w-full">
               <table className="w-full divide-y border-t dark:border-black-200 dark:divide-black-200">
                 <thead className="bg-gray-100 dark:bg-black-300 dark:text-neargray-10">
@@ -90,7 +105,7 @@ const Keys = ({ role }: { role?: string }) => {
                       className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 whitespace-nowrap uppercase tracking-wider"
                       scope="col"
                     >
-                      Usage (Monthly)
+                      Current Usage (Monthly)
                     </th>
                     <th
                       className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
@@ -102,24 +117,24 @@ const Keys = ({ role }: { role?: string }) => {
                 </thead>
                 <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                   {loading &&
-                    [...Array(5)].map((_, i) => (
+                    [...Array(2)].map((_, i) => (
                       <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[1.5%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider align-top">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4 " />
+                        <td className="px-6 py-4 w-[4.9%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider align-top">
+                          <Skeleton className="h-4 w-60" />
                           <Skeleton className="h-4 w-40 mt-2" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4" />
+                        <td className="px-6 py-4 w-[3.1%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider align-top">
+                          <Skeleton className="h-4 w-25" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4" />
+                        <td className="px-6 w-[2.6%] py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider align-top">
+                          <Skeleton className="h-4 w-40" />
                         </td>
                       </tr>
                     ))}
-                  {!loading && (!keys || keys?.length === 0) && (
+                  {!loading && (!keys || keys?.data.length === 0) && (
                     <tr className="h-[53px]">
                       <td className="text-gray-600 text-xs" colSpan={100}>
                         <div className="w-full bg-white dark:bg-black-600 h-fit">
@@ -141,7 +156,7 @@ const Keys = ({ role }: { role?: string }) => {
                     </tr>
                   )}
 
-                  {keys?.map((key: ApiKey) => (
+                  {keys?.data.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
@@ -214,19 +229,15 @@ const Keys = ({ role }: { role?: string }) => {
               </table>
             </div>
           </div>
-          <div className="flex items-center justify-end px-6 py-4">
-            <DialogRoot placement={'center'} size="xs">
-              <DialogTrigger asChild>
-                <button
-                  className="text-[13px] text-white font-semibold px-6 py-2 bg-green-500 dark:bg-green-250 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500 rounded"
-                  onClick={onToggleAdd}
-                >
-                  Add key
-                </button>
-              </DialogTrigger>
-              <AddKeys mutate={mutate} selected={selected} />
-            </DialogRoot>
-          </div>
+          <CampaignPagination
+            currentPage={keys?.current_page}
+            firstPageUrl={keys?.first_page_url}
+            mutate={mutate}
+            nextPageUrl={keys?.next_page_url}
+            prevPageUrl={keys?.prev_page_url}
+            setUrl={setUrl}
+            isLoading={loading}
+          />
         </div>
       </UserLayout>
     </>

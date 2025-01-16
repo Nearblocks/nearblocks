@@ -12,6 +12,7 @@ import LockCircle from '../Icons/LockCircle';
 import UnlockCircle from '../Icons/UnlockCircle';
 import Visibility from '../Icons/Visibility';
 import VisibilityOff from '../Icons/VisibilityOff';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   old_password: Yup.string()
@@ -20,13 +21,14 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, 'Password must be an 8 character')
     .required('Please enter  password'),
-  password_confirmation: Yup.string()
+  confirm_password: Yup.string()
     .oneOf([Yup.ref('password')], 'Your passwords do not match')
     .required('Please enter password confirmation'),
 });
 
 const UpdatePassword = () => {
   const router = useRouter();
+  const { userAuthURL: baseURL } = useConfig();
   const [showPasswords, setShowPasswords] = useState<{
     [key: string]: boolean;
   }>({
@@ -37,7 +39,7 @@ const UpdatePassword = () => {
 
   const onSubmit = async (values: FormikValues) => {
     try {
-      await request.post(`/profile/password`, values);
+      await request(baseURL).patch(`users/me/password`, values);
       if (!toast.isActive('password-changed')) {
         toast.success('Password Changed successfully', {
           toastId: 'password-changed',
@@ -70,7 +72,7 @@ const UpdatePassword = () => {
     initialValues: {
       old_password: '',
       password: '',
-      password_confirmation: '',
+      confirm_password: '',
     },
     onSubmit,
     validationSchema,
@@ -170,10 +172,10 @@ const UpdatePassword = () => {
             <input
               autoComplete="current-password"
               className="w-full px-3 py-2 border bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-sm"
-              name="password_confirmation"
+              name="confirm_password"
               onChange={formik.handleChange}
               type={showPasswords.password3 ? 'text' : 'password'}
-              value={formik.values.password_confirmation}
+              value={formik.values.confirm_password}
             />
             <button
               className="absolute top-0 right-0 h-full px-3"
@@ -186,10 +188,10 @@ const UpdatePassword = () => {
               )}
             </button>
           </div>
-          {formik.touched.password_confirmation &&
-            formik.errors.password_confirmation && (
+          {formik.touched.confirm_password &&
+            formik.errors.confirm_password && (
               <small className="text-red-500 text-center  my-1">
-                {formik.errors.password_confirmation}
+                {formik.errors.confirm_password}
               </small>
             )}
         </div>

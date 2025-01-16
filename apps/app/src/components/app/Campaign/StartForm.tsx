@@ -6,6 +6,7 @@ import { request } from '@/hooks/app/useAuth';
 import { CampaignProps } from '@/utils/types';
 
 import { Loader } from '../skeleton/common/Skeleton';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const StartForm = ({
   campaignData,
@@ -16,6 +17,7 @@ const StartForm = ({
 }: CampaignProps) => {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const { userApiURL: baseURL } = useConfig();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscriptionCancelled, setIsSubscriptionCancelled] = useState(false);
 
@@ -38,8 +40,8 @@ const StartForm = ({
         setChecked((curr) => !curr);
       } else {
         setIsSubmitting((curr) => !curr);
-        await request.post(
-          `/campaign/${campaignId}/${
+        await request(baseURL).post(
+          `/campaigns/${campaignId}/${
             campaignData && campaignData?.data?.is_active == 1
               ? 'stop'
               : 'start'

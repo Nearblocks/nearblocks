@@ -1,5 +1,4 @@
 'use client';
-import { get } from 'lodash';
 import React from 'react';
 
 import Avatar from '@/components/app/Icons/Avatar';
@@ -16,8 +15,8 @@ import Skeleton from '../skeleton/common/Skeleton';
 import withAuth from '../stores/withAuth';
 
 const Overview = ({ role }: { role?: string }) => {
-  const { data, loading } = useAuth('/profile');
-  const user = get(data, 'data') || null;
+  const { data, loading } = useAuth('/users/me', {}, true);
+  const user = data?.user || null;
 
   return (
     <UserLayout role={role} title="Account Overview">
@@ -60,9 +59,9 @@ const Overview = ({ role }: { role?: string }) => {
               <p className="text-sm text-black dark:text-neargray-100 font-bold">
                 {user?.email}
               </p>
-              <div className=" flex justify-end">
+              <div className="flex justify-end">
                 <Link href={`/user/settings`}>
-                  <div className="w-1/3 flex justify-center	items-center text-center border-2 text-md pl-4 pr-6 py-1 rounded focus:outline-none font-semibold hover:bg-green-400 bg-green-500 text-white border-green cursor-pointer">
+                  <div className="flex justify-center	items-center text-center border-2 text-md pl-4 pr-6 py-1 rounded focus:outline-none font-semibold hover:bg-green-400 bg-green-500 text-white border-green cursor-pointer">
                     <Edit className="h-3 w-3 " />
                     <span className="text-[13px] font-semibold ml-2">Edit</span>
                   </div>
@@ -81,8 +80,14 @@ const Overview = ({ role }: { role?: string }) => {
             </div>
           ) : (
             <p className="text-sm text-black dark:text-neargray-100 flex col-span-2">
-              <Clock className="my-auto mr-1" />
-              {dayjs(user?.last_login_at).format('YYYY-MM-DD  HH:mm:ss')}
+              {user?.last_login_at ? (
+                <>
+                  <Clock className="my-auto mr-1" />
+                  {dayjs(user?.last_login_at).format('YYYY-MM-DD  HH:mm:ss')}
+                </>
+              ) : (
+                <>---</>
+              )}
             </p>
           )}
         </div>

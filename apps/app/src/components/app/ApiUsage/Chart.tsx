@@ -5,21 +5,27 @@ import Highcharts from 'highcharts/highstock';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
-
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import useAuth from '@/hooks/app/useAuth';
 import dayjs from '@/utils/app/dayjs';
-
 import Plan from '../Icons/Plan';
 import CircularLoader from '../skeleton/common/CircularLoader';
 import withAuth from '../stores/withAuth';
+import { localFormat } from '@/utils/libs';
+import { shortenAddress } from '@/utils/app/libs';
 
-const ApiUsageChart = ({ keyId, role }: { keyId?: string; role?: string }) => {
+interface Props {
+  keyId?: string | string[];
+  role?: string;
+}
+const ApiUsageChart = ({ keyId, role }: Props) => {
   const [options, setOptions] = useState(null);
   const { theme } = useTheme();
-  const { data: chartData, loading: loadingChart } = useAuth(
-    keyId ? `/key-usage/${keyId}` : '',
-  );
+  const apiUrl = role === 'publisher' && keyId ? `keys/${keyId}/stats` : '';
+  const { data: keyData, loading: keyDataLoading } = useAuth(apiUrl);
+  const chartapiUrl = keyId ? `/keys/${keyId}/chart` : '';
+  const { data: chartData, loading: loadingChart } = useAuth(chartapiUrl);
+
   useEffect(() => {
     const isDarkTheme = theme === 'dark';
     if (!chartData) return;
@@ -208,6 +214,28 @@ const ApiUsageChart = ({ keyId, role }: { keyId?: string; role?: string }) => {
           </div>
         ) : chartData?.length > 0 ? (
           <div className="pl-2 pr-4 py-6 bg-white dark:bg-black-600 rounded-lg">
+            {role === 'publisher' && (
+              <div className="flex justify-between -mt-2 text-gray-500 p-2 flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap dark:text-neargray-10 text-sm">
+                {!keyDataLoading && keyData && (
+                  <div className="flex items-center flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap">
+                    <span className="whitespace-nowrap">Total Key Usage:</span>
+                    <span className="ml-0.5 font-semibold">
+                      {localFormat((keyData?.consumed).toString())}
+                    </span>
+                  </div>
+                )}
+                {!keyDataLoading && keyData && (
+                  <div className="flex items-center flex-wrap md:flex-nowrap lg:flex-wrap xl:flex-nowrap">
+                    <span className="whitespace-nowrap">API Key:</span>
+                    <span>
+                      <span className="ml-0.5 font-semibold">
+                        {shortenAddress(keyData?.key?.token)}
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
             <div>
               <HighchartsReact
                 className="highcharts-dark"

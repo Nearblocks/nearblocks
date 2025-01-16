@@ -1782,6 +1782,7 @@ export type currentCampaign = {
   title: string;
   user?: {
     username: string;
+    email: string;
   };
 };
 

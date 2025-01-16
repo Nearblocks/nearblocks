@@ -15,10 +15,12 @@ import { localFormat } from '@/utils/libs';
 import FaCheckCircle from '../Icons/FaCheckCircle';
 import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import withAuth from '../stores/withAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const Plan = ({ role, status }: { role?: string; status?: string }) => {
   const [loadingBilling, setLoadingBilling] = useState(false);
-  const { data, error, loading, mutate } = useAuth('/profile');
+  const { data, error, loading, mutate } = useAuth('/users/me', {}, true);
+  const { userApiURL: baseURL } = useConfig();
 
   useEffect(() => {
     if (!loading && data) {
@@ -45,7 +47,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
     setLoadingBilling(true);
 
     try {
-      const res = await request.post(
+      const res = await request(baseURL).post(
         `advertiser/stripe/create-billing-session`,
       );
       if (res?.data && res?.data?.url) {
@@ -131,7 +133,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
                 </div>
               ) : (
                 <p className="text-sm text-black dark:text-neargray-10 font-medium">
-                  {data?.currentPlan?.title} API Plan
+                  {data?.user?.plan?.title} API Plan
                 </p>
               )}
             </div>
@@ -147,7 +149,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
               </div>
             ) : (
               <p className="text-sm text-black dark:text-neargray-10 font-medium">
-                {localFormat(data?.currentPlan?.limit_per_minute)} Calls
+                {localFormat(data?.user?.plan?.limit_per_minute)} Calls
               </p>
             )}
           </div>

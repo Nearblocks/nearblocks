@@ -12,20 +12,18 @@ import Plan from '../../Icons/Plan';
 import Skeleton from '../../skeleton/common/Skeleton';
 import CampaignPagination from '../CampaignPagination';
 import ConfirmModal from './ConfirmModal';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-type Props = {
-  statsMutate: () => void;
-};
-
-const Listing = ({ statsMutate }: Props) => {
+const Listing = () => {
   const [currentCampaign, setCurrentCampaign] =
     useState<currentCampaign | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [url, setUrl] = useState(`advertiser/campaigns?page=1`);
   const { data, loading, mutate } = useAuth(url);
   const searchParams = useSearchParams();
+  const { userApiURL: baseURL } = useConfig();
   const status = searchParams?.get('status');
 
   useEffect(() => {
@@ -54,10 +52,11 @@ const Listing = ({ statsMutate }: Props) => {
   };
 
   const handleCampaignCancellation = async () => {
-    await request.post(`advertiser/campaign/${currentCampaign?.id}/cancel`);
+    await request(baseURL).post(
+      `advertiser/campaigns/${currentCampaign?.id}/cancel`,
+    );
     await sleep(1000);
     mutate();
-    statsMutate();
   };
 
   return (
@@ -122,24 +121,27 @@ const Listing = ({ statsMutate }: Props) => {
                 </thead>
                 <tbody className="divide-y dark:bg-black-600 divide-gray-200 dark:divide-black-200">
                   {loading &&
-                    [...Array(4)].map((_, i) => (
-                      <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    [...Array(2)].map((_, i) => (
+                      <tr
+                        className="hover:bg-blue-900/5 h-[57px] w-full"
+                        key={i}
+                      >
+                        <td className="w-[3.6%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="w-[6.5%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="w-[4%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm">
+                        <td className="w-[3%] px-5 py-4 whitespace-nowrap text-sm">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="w-[4%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="w-[20%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                           <Skeleton className="h-4" />
                         </td>
                       </tr>
@@ -257,16 +259,15 @@ const Listing = ({ statsMutate }: Props) => {
                 </tbody>
               </table>
             </div>
-            {data && data?.data?.length > 0 && (
-              <CampaignPagination
-                currentPage={data?.meta?.current_page}
-                firstPageUrl={data?.links?.first}
-                mutate={mutate}
-                nextPageUrl={data?.links?.next}
-                prevPageUrl={data?.links?.prev}
-                setUrl={setUrl}
-              />
-            )}
+            <CampaignPagination
+              currentPage={data?.meta?.current_page}
+              firstPageUrl={data?.links?.first}
+              mutate={mutate}
+              nextPageUrl={data?.links?.next}
+              prevPageUrl={data?.links?.prev}
+              setUrl={setUrl}
+              isLoading={loading}
+            />
           </div>
         </div>
       </div>

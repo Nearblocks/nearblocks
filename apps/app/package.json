@@ -49,6 +49,7 @@
     "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.1",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "near-api-js": "5.0.1",
     "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",

@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 
 import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -19,13 +20,14 @@ const LostPassword = () => {
   const router = useRouter();
 
   const [success, setSuccess] = useState(false);
+  const { userAuthURL: baseURL } = useConfig();
 
   const onLogin = () => router.push('/login');
   const onResend = () => router.push('/resend?type=RESET_PASSWORD');
 
   const onSubmit = async (values: FormikValues) => {
     try {
-      await request.post(`/forgot`, values);
+      await request(baseURL).post(`/forgot`, values);
       setSuccess(true);
     } catch (error: any) {
       const errors = error?.response?.data?.errors[0];

@@ -17,6 +17,7 @@ export const useConfig = () => {
     NEXT_PUBLIC_NETWORK_ID,
     NEXT_PUBLIC_TESTNET_URL,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+    NEXT_PUBLIC_USER_AUTH_URL,
     NEXT_PUBLIC_USER_API_URL,
   } = useEnvContext();
 
@@ -29,6 +30,9 @@ export const useConfig = () => {
     mainnet: { networkId: 'mainnet' },
     testnet: { networkId: 'testnet' },
   };
+
+  const userAuthURL =
+    NEXT_PUBLIC_USER_AUTH_URL || 'https://api.exploreblocks.io/api/';
 
   const userApiURL =
     NEXT_PUBLIC_USER_API_URL || 'https://api.exploreblocks.io/api/';
@@ -90,6 +94,7 @@ export const useConfig = () => {
     network,
     networkId,
     siteKey,
+    userAuthURL,
     userApiURL,
     verifierConfig,
   };

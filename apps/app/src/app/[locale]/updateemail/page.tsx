@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 
 import EmailUpdate from '@/components/app/EmailUpdate';
 import { request } from '@/hooks/app/useAuth';
+import { getUserDataFromToken } from '@/utils/app/libs';
+import { userAuthURL } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -16,34 +18,33 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-interface Props {
+type Props = {
   searchParams: Promise<{
     code?: string;
     email?: string;
   }>;
-}
+};
 
 export default async function UpdateEmail({ searchParams }: Props) {
+  const { code, email } = await searchParams;
+
   let status: number;
   let token: null | string = null;
   let role: null | string = null;
   let username: null | string = null;
 
-  const { code, email } = await searchParams;
-
   try {
-    const resp = await request.post(`/profile/update-email`, {
+    const resp = await request(userAuthURL).patch(`users/me/email`, {
       code: code,
       email: email,
     });
-    if (
-      resp?.data?.meta?.token &&
-      resp?.data?.data?.role &&
-      resp?.data?.data?.username
-    ) {
-      token = resp?.data?.meta?.token;
-      role = resp?.data?.data?.role[0].name;
-      username = resp?.data?.data?.username;
+    const respToken = resp?.data?.token;
+    token = respToken;
+
+    const userData: any = getUserDataFromToken(respToken);
+    if (userData) {
+      role = userData?.role || null;
+      username = userData?.username;
     }
     status = resp?.status;
   } catch (error: any) {

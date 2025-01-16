@@ -134,30 +134,30 @@ const Invoice = ({ role }: { role?: string }) => {
                 </thead>
                 <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                   {loading &&
-                    [...Array(5)].map((_, i) => (
+                    [...Array(7)].map((_, i) => (
                       <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-50 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[0.5%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-50 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[1.2%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[1%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[1.1%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[2%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[3.8%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[0.1%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        <td className="px-6 py-4 w-[2.5%] text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
                       </tr>
@@ -185,16 +185,16 @@ const Invoice = ({ role }: { role?: string }) => {
 
                   {invoices?.map((invoice: Invoice) => (
                     <tr className="hover:bg-blue-900/5" key={invoice.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
                         {invoice.number}
                         {role === 'publisher' && (
                           <Tooltip
-                            className={'left-1/2 max-w-[200px]'}
+                            className={'left-1/2 max-w-[120px]'}
                             position="top"
                             tooltip={invoice?.customer_email}
                           >
                             <div className="w-20">
-                              <p className="truncate text-ellipsis overflow-hidden">
+                              <p className="whitespace-nowrap truncate text-ellipsis overflow-hidden">
                                 <>{invoice?.customer_email}</>
                               </p>
                             </div>
@@ -243,19 +243,18 @@ const Invoice = ({ role }: { role?: string }) => {
               </table>
             </div>
           </div>
-          {invoices && invoices?.length > 0 && (
-            <Pagination
-              apiUrl={apiUrl}
-              dequeue={dequeue}
-              enqueue={enqueue}
-              isTopPagination={true}
-              mutate={mutate}
-              nextPageParams={nextPageParams}
-              setPreviousPageParam={setPreviousPageParam}
-              setUrl={setUrl}
-              size={size()}
-            />
-          )}
+          <Pagination
+            apiUrl={apiUrl}
+            dequeue={dequeue}
+            enqueue={enqueue}
+            isTopPagination={true}
+            mutate={mutate}
+            nextPageParams={nextPageParams}
+            setPreviousPageParam={setPreviousPageParam}
+            setUrl={setUrl}
+            size={size()}
+            isLoading={loading}
+          />
         </div>
       </UserLayout>
     </>

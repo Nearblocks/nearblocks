@@ -13,7 +13,7 @@ const Chart = ({ campaignId }: { campaignId?: string }) => {
   const [options, setOptions] = useState<any | null>(null);
   const { theme } = useTheme();
   const { data: chartData, loading: loadingChart } = useAuth(
-    campaignId ? `campaign/${campaignId}/chart` : '',
+    campaignId ? `campaigns/${campaignId}/chart` : '',
   );
 
   useEffect(() => {

@@ -1,7 +1,5 @@
 'use client';
-import get from 'lodash/get';
 import React from 'react';
-
 import Delete from '@/components/app/Dashboard/DeleteAccount';
 import UpdateEmail from '@/components/app/Dashboard/UpdateEmail';
 import UpdatePassword from '@/components/app/Dashboard/UpdatePassword';
@@ -10,8 +8,8 @@ import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 
 const Setting = ({ role }: { role?: string }) => {
-  const { data, loading, mutate } = useAuth('/profile');
-  const user = get(data, 'data') || null;
+  const { data: userData, loading, mutate } = useAuth('/users/me', {}, true);
+  const user = userData?.user || null;
 
   return (
     <>

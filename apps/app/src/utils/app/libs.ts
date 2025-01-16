@@ -1,6 +1,6 @@
 import Big from 'big.js';
 import get from 'lodash/get';
-
+import { jwtDecode } from 'jwt-decode';
 import { FieldType, GuessableTypeString } from '@/utils/types';
 import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
@@ -546,3 +546,13 @@ export function getFilteredQueryParams(
   );
   return Object.keys(filteredParams).length ? filteredParams : {};
 }
+
+export const getUserDataFromToken = (token: string) => {
+  try {
+    const decoded = jwtDecode(token);
+    return decoded;
+  } catch (error) {
+    console.error('Invalid token or decoding failed', error);
+    return null;
+  }
+};

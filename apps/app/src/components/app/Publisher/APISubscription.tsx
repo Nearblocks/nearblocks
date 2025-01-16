@@ -1,49 +1,24 @@
 'use client';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
-import React, { useEffect, useState } from 'react';
-
-import Pagination, {
-  paginationQueue,
-} from '@/components/app/Dashboard/Pagination';
+import React, { useState } from 'react';
 import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import SubscriptionStats from '@/components/app/Publisher/SubscriptionStats';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import useAuth from '@/hooks/app/useAuth';
 import { dollarFormat, localFormat } from '@/utils/app/libs';
-
 import Tooltip from '../common/Tooltip';
 import withAuth from '../stores/withAuth';
-
-interface QueueItem {
-  id: string;
-  value: string;
-}
+import CampaignPagination from '../Campaign/CampaignPagination';
 
 const APISubscription = ({ role }: { role?: string }) => {
-  const apiUrl = role === 'publisher' ? '/publisher/api-subscriptions?' : '';
+  const apiUrl = role === 'publisher' ? '/publisher/subscriptions/api?' : '';
   const [url, setUrl] = useState(apiUrl);
-  const [previousPageParam, setPreviousPageParam] = useState<QueueItem[]>([]);
-  const [nextPageParams, setNextPageParams] = useState<{}>();
-
-  const { dequeue, enqueue, size } = paginationQueue(
-    previousPageParam,
-    setPreviousPageParam,
-  );
 
   const { data, loading, mutate } = useAuth(url);
 
   const subscriptions = get(data, 'data') || null;
-
-  useEffect(() => {
-    if (subscriptions && subscriptions?.length > 0 && data?.has_more) {
-      setNextPageParams({
-        startingAfter: subscriptions[subscriptions?.length - 1]?.id,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subscriptions]);
 
   return (
     <>
@@ -115,30 +90,30 @@ const APISubscription = ({ role }: { role?: string }) => {
                 </thead>
                 <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                   {loading &&
-                    [...Array(5)].map((_, i) => (
-                      <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                    [...Array(2)].map((_, i) => (
+                      <tr className="hover:bg-blue-900/5 h-[100px]" key={i}>
+                        <td className="w-[5.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[8.3%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4 " />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[7.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[7%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[5.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
                       </tr>
@@ -178,44 +153,44 @@ const APISubscription = ({ role }: { role?: string }) => {
                           : 0;
                       return (
                         <tr className="hover:bg-blue-900/5" key={key.id}>
-                          <td className="px-6 py-4 text-xs text-black pt-6 dark:text-neargray-10 align-top max-w-52 text-ellipsis">
+                          <td className="px-6 py-4 text-xs text-black pt-6 dark:text-neargray-10 align-middle max-w-52 text-ellipsis">
                             <Tooltip
-                              className={'left-1/2 max-w-[200px]'}
+                              className={'left-25 mb-3 max-w-[200px]'}
                               position="top"
                               tooltip={key?.user_email}
                             >
-                              <span className="whitespace-nowrap overflow-hidden">
-                                {key?.user_email}
+                              <span className="whitespace-nowrap inline-block truncate max-w-[100px]">
+                                {key?.username}
                               </span>
                             </Tooltip>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-green-500 dark:text-green-250 align-top">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-green-500 dark:text-green-250 align-middle">
                             <div className="flex">
                               <p className="mr-2">{key?.campaign_plan_title}</p>
                             </div>
                           </td>
                           {key?.subscription_type === 'monthly' ? (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-top ">
+                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
                               <span>
                                 ${dollarFormat(key?.price / 100)}
                                 /mo
                               </span>
                             </td>
                           ) : (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-top">
+                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
                               <span>
                                 ${dollarFormat(key?.price / 100)}
                                 /yr
                               </span>
                             </td>
                           )}
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-top">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
                             {dayjs(key.start_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-top">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
                             {dayjs(key.end_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-top">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
                             {key.status}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap flex items-center text-xs text-gray-600 dark:text-neargray-10 align-top">
@@ -284,19 +259,15 @@ const APISubscription = ({ role }: { role?: string }) => {
               </table>
             </div>
           </div>
-          {subscriptions && subscriptions?.length > 0 && (
-            <Pagination
-              apiUrl={apiUrl}
-              dequeue={dequeue}
-              enqueue={enqueue}
-              isTopPagination={true}
-              mutate={mutate}
-              nextPageParams={nextPageParams}
-              setPreviousPageParam={setPreviousPageParam}
-              setUrl={setUrl}
-              size={size()}
-            />
-          )}
+          <CampaignPagination
+            nextPageUrl={data?.links?.next}
+            prevPageUrl={data?.links?.prev}
+            firstPageUrl={data?.links?.first}
+            currentPage={data?.meta?.current_page}
+            setUrl={setUrl}
+            mutate={mutate}
+            isLoading={loading}
+          />
         </div>
       </UserLayout>
     </>

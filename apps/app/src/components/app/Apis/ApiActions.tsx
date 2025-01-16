@@ -20,6 +20,7 @@ import FaCheckCircle from '../Icons/FaCheckCircle';
 import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const ApiActions = ({
   getContactDetails,
@@ -41,8 +42,9 @@ const ApiActions = ({
   const [description, setDescription] = useState('');
   const [currentItem, setCurrentItem] = useState<any>();
   const [token, _setToken] = useStorage('token');
-  const { data: userData } = useAuth(token ? '/profile' : '');
-  const currentPlan = userData?.currentPlan?.price_monthly ?? 0;
+  const { data: userData } = useAuth(token ? '/users/me' : '', {}, true);
+  const { userApiURL: baseURL } = useConfig();
+  const currentPlan = userData?.user?.plan?.price_monthly ?? 0;
 
   const router = useRouter();
 
@@ -56,24 +58,27 @@ const ApiActions = ({
   const subscribePlan = async () => {
     try {
       const stripePlanId = localStorage.getItem('stripe-plan-id');
-      const interval = localStorage.getItem('interval');
+      const interval =
+        localStorage.getItem('interval') === 'year' ? 'year' : 'month';
 
-      const res = await request.post(`advertiser/subscribe`, {
-        interval: interval === 'year' ? 'year' : 'month',
+      const res = await request(baseURL).post('advertiser/subscribe', {
+        interval,
         plan_id: stripePlanId,
       });
+
       localStorage.setItem('subscribe-called', 'true');
-      if (res?.data && res?.data['url ']) {
-        await router.push(res?.data['url ']);
+
+      const redirectUrl = res?.data['url '];
+      if (redirectUrl) {
+        router.push(redirectUrl);
         return;
       }
-      if (res?.data && res?.data['message'] === 'upgraded') {
+
+      const status = res?.data?.message;
+      if (status) {
         resetStripePlan();
-        router.push('/user/plan?status=upgraded');
-      }
-      if (res?.data && res?.data['message'] === 'downgraded') {
-        resetStripePlan();
-        router.push('/user/plan?status=downgraded');
+        router.push(`/user/plan?status=${status}`);
+        return;
       }
       resetStripePlan();
       router.push('/user/plan');
@@ -83,8 +88,7 @@ const ApiActions = ({
       if (statusCode === 422) {
         resetStripePlan();
         router.push('/user/plan?status=exists');
-      }
-      if (statusCode === 400) {
+      } else if (statusCode === 400) {
         resetStripePlan();
         router.push('/user/plan?status=invalid');
       }

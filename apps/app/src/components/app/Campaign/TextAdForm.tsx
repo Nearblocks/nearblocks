@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
-import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
 import { textCampaignValidation } from '@/utils/app/validationSchema';
 import { CampaignProps } from '@/utils/types';
@@ -15,6 +14,8 @@ import LoginCircle from '../Icons/LoginCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import PreviewAd from './PreviewAd';
 import StartForm from './StartForm';
+import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const TextAdForm = ({
   campaignData,
@@ -29,6 +30,7 @@ const TextAdForm = ({
   const [icon, setIcon] = useState<object>();
   const [iconPreview, setIconPreview] = useState<{ icon?: string }>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { userApiURL: baseURL } = useConfig();
 
   useEffect(() => {
     if (campaignData?.data?.subscription?.status === 'canceled') {
@@ -68,7 +70,7 @@ const TextAdForm = ({
     }
     setIsSubmitting(true);
     try {
-      await request.post(`/campaign/${campaignId}/text-ad`, formData);
+      await request(baseURL).post(`/campaigns/${campaignId}/text-ad`, formData);
       if (!toast.isActive('campaign-updated')) {
         toast.success('Campaign Information updated', {
           toastId: 'campaign-updated',

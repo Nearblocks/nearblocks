@@ -11,6 +11,7 @@ import Plan from '../../Icons/Plan';
 import Skeleton from '../../skeleton/common/Skeleton';
 import CampaignPagination from '../CampaignPagination';
 import ConfirmModal from './ConfirmModal';
+import Tooltip from '../../common/Tooltip';
 
 const CampaignListing = () => {
   const [currentCampaign, setCurrentCampaign] =
@@ -109,30 +110,30 @@ const CampaignListing = () => {
             </thead>
             <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
               {loading &&
-                [...Array(4)].map((_, i) => (
+                [...Array(3)].map((_, i) => (
                   <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[1%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[2%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <Skeleton className="h-4 w-16" />
+                    </td>
+                    <td className="w-[0.2%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[0.2%] px-5 py-4 whitespace-nowrap text-sm">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm">
+                    <td className="w-[0.2%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[0.1%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[2%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
-                      <Skeleton className="h-4" />
-                    </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[13.5%] px-5 py-4 whitespace-nowrap text-sm text-gray-600">
                       <Skeleton className="h-4" />
                     </td>
                   </tr>
@@ -164,11 +165,20 @@ const CampaignListing = () => {
               {data?.data?.map((item: currentCampaign, index: any) => (
                 <tr className="h-[57px] hover:bg-blue-900/5" key={index}>
                   <td className="px-5 py-4 whitespace-nowrap text-sm ">
-                    <span className="text-xs">
-                      {' '}
-                      {item?.title.charAt(0).toUpperCase() +
-                        item?.title.slice(1)}
-                    </span>
+                    <Tooltip
+                      className={'left-1/2 mb-3 max-w-[200px] ml-2'}
+                      position="top"
+                      tooltip={
+                        item?.title.charAt(0).toUpperCase() +
+                        item?.title.slice(1)
+                      }
+                    >
+                      <span className="text-xs inline-block truncate max-w-[80px]">
+                        {' '}
+                        {item?.title.charAt(0).toUpperCase() +
+                          item?.title.slice(1)}
+                      </span>
+                    </Tooltip>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-sm ">
                     <span className="text-xs">
@@ -180,7 +190,15 @@ const CampaignListing = () => {
                     </span>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-sm ">
-                    <span className="text-xs">{item?.user?.username}</span>
+                    <Tooltip
+                      className={'left-1/2 max-w-[200px]'}
+                      position="top"
+                      tooltip={item?.user?.email}
+                    >
+                      <span className="text-xs inline-block truncate max-w-[80px]">
+                        {item?.user?.username}
+                      </span>
+                    </Tooltip>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-sm ">
                     <span className="text-xs">
@@ -263,16 +281,15 @@ const CampaignListing = () => {
             </tbody>
           </table>
         </div>
-        {data && data?.data?.length > 0 && (
-          <CampaignPagination
-            currentPage={data?.meta?.current_page}
-            firstPageUrl={data?.links?.first}
-            mutate={mutate}
-            nextPageUrl={data?.links?.next}
-            prevPageUrl={data?.links?.prev}
-            setUrl={setUrl}
-          />
-        )}
+        <CampaignPagination
+          currentPage={data?.meta?.current_page}
+          firstPageUrl={data?.links?.first}
+          mutate={mutate}
+          nextPageUrl={data?.links?.next}
+          prevPageUrl={data?.links?.prev}
+          setUrl={setUrl}
+          isLoading={loading}
+        />
       </div>
     </>
   );

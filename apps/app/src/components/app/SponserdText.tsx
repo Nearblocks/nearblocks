@@ -1,17 +1,12 @@
-import { getRequest } from '@/utils/app/api';
-import { userApiURL } from '@/utils/app/config';
-
+import { userAuthURL } from '@/utils/app/config';
 import SponserdTextActions from './SponserdTextActions';
-
-const SponserdText = async () => {
+import { getRequest } from '@/utils/app/api';
+export default async function SponserdText() {
   const sponserdText = await getRequest(
-    `${userApiURL}approved-campaigns/text-ads`,
+    `${userAuthURL}campaigns/text-ads`,
     {},
     {},
     false,
   );
-
-  return <SponserdTextActions htmlContent={sponserdText} />;
-};
-
-export default SponserdText;
+  return <SponserdTextActions textAdInfo={sponserdText} />;
+}

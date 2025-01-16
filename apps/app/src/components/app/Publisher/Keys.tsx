@@ -1,21 +1,16 @@
 'use client';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-
-import Pagination, {
-  paginationQueue,
-} from '@/components/app/Dashboard/Pagination';
+import React, { useState } from 'react';
 import Plan from '@/components/app/Icons/Plan';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
-
 import Tooltip from '../common/Tooltip';
-import CopyIcon from '../Icons/CopyIcon';
+import CampaignPagination from '../Campaign/CampaignPagination';
+import { shortenAddress } from '@/utils/app/libs';
 
 interface ApiKey {
   created_at: string;
@@ -29,44 +24,11 @@ interface ApiKey {
   };
 }
 
-interface QueueItem {
-  id: string;
-  value: string;
-}
-
 const Keys = ({ role }: { role?: string }) => {
-  const apiUrl = role === 'publisher' ? '/publisher/list-all-keys?' : '';
+  const apiUrl = role === 'publisher' ? '/publisher/keys?' : '';
   const [url, setUrl] = useState(apiUrl);
-  const [previousPageParam, setPreviousPageParam] = useState<QueueItem[]>([]);
-
-  const [nextPageParams, setNextPageParams] = useState<{}>();
-
-  const { dequeue, enqueue, size } = paginationQueue(
-    previousPageParam,
-    setPreviousPageParam,
-  );
-
   const { data, loading, mutate } = useAuth(url);
-
   const keys = get(data, 'keys') || null;
-
-  useEffect(() => {
-    if (keys && keys?.data.length > 0 && data?.has_more) {
-      setNextPageParams({
-        startingAfter: keys[keys?.data.length - 1]?.id,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keys]);
-
-  const onCopy = async (key: ApiKey) => {
-    await navigator.clipboard.writeText(key?.token);
-    if (!toast.isActive('copy-key')) {
-      toast.success('Copied!', {
-        toastId: 'copy-key',
-      });
-    }
-  };
 
   return (
     <>
@@ -109,7 +71,7 @@ const Keys = ({ role }: { role?: string }) => {
                       className="px-6 py-4 text-left text-xs whitespace-nowrap font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
-                      Usage (Monthly)
+                      Current Usage (Monthly)
                     </th>
                     <th
                       className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
@@ -122,22 +84,25 @@ const Keys = ({ role }: { role?: string }) => {
                 <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                   {loading &&
                     [...Array(5)].map((_, i) => (
-                      <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                      <tr
+                        className="hover:bg-blue-900/5 h-[53px] w-full"
+                        key={i}
+                      >
+                        <td className="w-[5%] px-6 py-4 align-top text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[6.7%] px-6 py-4 align-top text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4 " />
-                          <Skeleton className="h-4 w-40 mt-2" />
+                        <td className="w-[6.3%] px-6 py-4 align-top text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                          <Skeleton className="h-3 w-40" />
+                          <Skeleton className="h-3 w-32 mt-2" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4" />
+                        <td className="w-[10%] px-6 py-4 align-top text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                          <Skeleton className="h-4 w-25" />
                         </td>
-                        <td className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4" />
+                        <td className="w-[4.5%] px-6 py-4  align-top ml-10 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                          <Skeleton className="h-4 w-10" />
                         </td>
                       </tr>
                     ))}
@@ -167,11 +132,11 @@ const Keys = ({ role }: { role?: string }) => {
                     <tr className="hover:bg-blue-900/5" key={key.id}>
                       <td className="px-6 py-4  text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
-                          className={'left-1/2 max-w-[200px] '}
+                          className={'left-1/2 mb-3 max-w-[200px] '}
                           position="top"
                           tooltip={key?.name}
                         >
-                          <span className="whitespace-nowrap overflow-hidden">
+                          <span className="whitespace-nowrap inline-block truncate max-w-[120px]">
                             {key?.name}
                           </span>
                         </Tooltip>
@@ -180,23 +145,16 @@ const Keys = ({ role }: { role?: string }) => {
                         <Tooltip
                           className={'left-1/2 max-w-[200px]'}
                           position="top"
-                          tooltip={key?.user?.username}
+                          tooltip={key?.user?.email}
                         >
-                          <span className="whitespace-nowrap overflow-hidden">
-                            {key?.user?.email}
+                          <span className="whitespace-nowrap inline-block truncate max-w-[120px]">
+                            {key?.user?.username}
                           </span>
                         </Tooltip>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-green-500 dark:text-green-250 align-top">
                         <div className="flex">
-                          <p className="mr-2">{key?.token}</p>
-                          <button
-                            className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full  p-1 w-5 h-5"
-                            onClick={() => onCopy(key)}
-                            type="button"
-                          >
-                            <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-3 w-3" />
-                          </button>
+                          <p className="mr-2">{shortenAddress(key?.token)}</p>
                         </div>
                         <p className="text-[10px] text-gray-600 dark:text-neargray-100">
                           Added on {dayjs(key.created_at).format('YYYY-MM-DD')}
@@ -224,19 +182,15 @@ const Keys = ({ role }: { role?: string }) => {
               </table>
             </div>
           </div>
-          {keys && keys?.data.length > 0 && (
-            <Pagination
-              apiUrl={apiUrl}
-              dequeue={dequeue}
-              enqueue={enqueue}
-              isTopPagination={true}
-              mutate={mutate}
-              nextPageParams={nextPageParams}
-              setPreviousPageParam={setPreviousPageParam}
-              setUrl={setUrl}
-              size={size()}
-            />
-          )}
+          <CampaignPagination
+            currentPage={keys?.current_page}
+            firstPageUrl={keys?.first_page_url}
+            mutate={mutate}
+            nextPageUrl={keys?.next_page_url}
+            prevPageUrl={keys?.prev_page_url}
+            setUrl={setUrl}
+            isLoading={loading}
+          />
         </div>
       </UserLayout>
     </>

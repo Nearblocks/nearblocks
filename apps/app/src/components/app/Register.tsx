@@ -15,6 +15,7 @@ import { catchErrors } from '@/utils/app/libs';
 
 export const Register = () => {
   const [verify, setverify] = useState(false);
+  const { userAuthURL: baseURL } = useConfig();
   const [showPasswords, setShowPasswords] = useState<{
     [key: string]: boolean;
   }>({
@@ -28,13 +29,13 @@ export const Register = () => {
     email: Yup.string()
       .email('Please enter a valid email')
       .required('Please enter email'),
-    email_confirmation: Yup.string()
+    confirm_email: Yup.string()
       .oneOf([Yup.ref('email')], 'Your email do not match')
       .required('Please enter  email confirmation'),
     password: Yup.string()
       .min(8, 'Password must be an 8 character')
       .required('Please enter  password'),
-    password_confirmation: Yup.string()
+    confirm_password: Yup.string()
       .oneOf([Yup.ref('password')], 'Your passwords do not match')
       .required('Please enter password confirmation'),
     terms_conditions: Yup.bool().oneOf(
@@ -61,7 +62,7 @@ export const Register = () => {
 
   const onSubmit = async (values: FormikValues) => {
     try {
-      await request.post(`/register`, values);
+      await request(baseURL).post(`/register`, values);
       setverify(true);
     } catch (error: any) {
       const errors = error?.response?.data?.error;
@@ -85,9 +86,9 @@ export const Register = () => {
   const formik = useFormik({
     initialValues: {
       email: '',
-      email_confirmation: '',
+      confirm_email: '',
       password: '',
-      password_confirmation: '',
+      confirm_password: '',
       terms_conditions: false,
       username: '',
     },
@@ -145,18 +146,18 @@ export const Register = () => {
                 <input
                   autoComplete="off"
                   className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
-                  name="email_confirmation"
+                  name="confirm_email"
                   onChange={formik.handleChange}
                   onPaste={(e) => {
                     e.preventDefault();
                     return false;
                   }}
-                  value={formik.values.email_confirmation}
+                  value={formik.values.confirm_email}
                 />
-                {formik.touched.email_confirmation &&
-                  formik.errors.email_confirmation && (
+                {formik.touched.confirm_email &&
+                  formik.errors.confirm_email && (
                     <small className="text-red-500">
-                      {formik.errors.email_confirmation}
+                      {formik.errors.confirm_email}
                     </small>
                   )}
               </div>
@@ -197,14 +198,14 @@ export const Register = () => {
                   <div className="relative w-full">
                     <input
                       className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
-                      name="password_confirmation"
+                      name="confirm_password"
                       onChange={formik.handleChange}
                       onPaste={(e) => {
                         e.preventDefault();
                         return false;
                       }}
                       type={showPasswords.password2 ? 'text' : 'password'}
-                      value={formik.values.password_confirmation}
+                      value={formik.values.confirm_password}
                     />
                     <button
                       className="absolute top-0 right-0 h-full px-3"
@@ -217,10 +218,10 @@ export const Register = () => {
                       )}
                     </button>
                   </div>
-                  {formik.touched.password_confirmation &&
-                    formik.errors.password_confirmation && (
+                  {formik.touched.confirm_password &&
+                    formik.errors.confirm_password && (
                       <small className="text-red-500">
-                        {formik.errors.password_confirmation}
+                        {formik.errors.confirm_password}
                       </small>
                     )}
                 </div>

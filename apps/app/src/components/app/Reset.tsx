@@ -11,12 +11,13 @@ import Visibility from '@/components/app/Icons/Visibility';
 import VisibilityOff from '@/components/app/Icons/VisibilityOff';
 import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, 'Password must be an 8 character')
     .required('Please enter  password'),
-  password_confirmation: Yup.string()
+  confirm_password: Yup.string()
     .oneOf([Yup.ref('password')], 'Your passwords do not match')
     .required('Please enter password confirmation'),
 });
@@ -28,6 +29,7 @@ interface Props {
 
 const Reset = ({ code, email }: Props) => {
   const router = useRouter();
+  const { userAuthURL: baseURL } = useConfig();
   const [showPasswords, setShowPasswords] = useState<{
     [key: string]: boolean;
   }>({
@@ -48,7 +50,7 @@ const Reset = ({ code, email }: Props) => {
 
   const onSubmit = async (values: FormikValues) => {
     try {
-      await request.post(`/reset`, values);
+      await request(baseURL).post(`/reset`, values);
       if (!toast.isActive('password-reset')) {
         toast.success('Password reset successfully', {
           toastId: 'password-reset',
@@ -81,7 +83,7 @@ const Reset = ({ code, email }: Props) => {
       code: code,
       email: email,
       password: '',
-      password_confirmation: '',
+      confirm_password: '',
     },
     onSubmit,
     validationSchema,
@@ -134,10 +136,10 @@ const Reset = ({ code, email }: Props) => {
                 <div className="relative w-full">
                   <input
                     className="border text-black-300 dark:text-white px-3 w-full h-12 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
-                    name="password_confirmation"
+                    name="confirm_password"
                     onChange={formik.handleChange}
                     type={showPasswords.password2 ? 'text' : 'password'}
-                    value={formik.values.password_confirmation}
+                    value={formik.values.confirm_password}
                   />
                   <button
                     className="absolute top-0 right-0 h-full px-3"
@@ -150,10 +152,10 @@ const Reset = ({ code, email }: Props) => {
                     )}
                   </button>
                 </div>
-                {formik.touched.password_confirmation &&
-                  formik.errors.password_confirmation && (
+                {formik.touched.confirm_password &&
+                  formik.errors.confirm_password && (
                     <small className="text-red-500">
-                      {formik.errors.password_confirmation}
+                      {formik.errors.confirm_password}
                     </small>
                   )}
               </div>

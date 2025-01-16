@@ -12,6 +12,7 @@ import LoadingCircular from '../common/LoadingCircular';
 import Skeleton from '../skeleton/common/Skeleton';
 import withAuth from '../stores/withAuth';
 import SwitchButton from '../SwitchButton';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface CampaignDetail {
   currentPlan?: currentCampaign;
@@ -27,9 +28,10 @@ const CampaignPlans = ({ userRole }: { userRole?: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams?.get('status');
-  const { data, mutate } = useAuth('/campaign/plans');
+  const { userApiURL: baseURL } = useConfig();
+  const { data, mutate } = useAuth('/campaigns/plans');
   const { data: userData, mutate: campaignMutate } = useAuth(
-    '/campaign/subscription-info',
+    '/campaigns/subscription-info',
     {
       revalidateOnMount: true,
     },
@@ -44,7 +46,7 @@ const CampaignPlans = ({ userRole }: { userRole?: string }) => {
     setIsSubmitting((prev) => ({ ...prev, [plan?.id]: true }));
 
     try {
-      const res = await request.post(`advertiser/subscribe`, {
+      const res = await request(baseURL).post(`advertiser/subscribe`, {
         interval: !interval ? 'month' : 'year',
         plan_id: plan?.id,
       });

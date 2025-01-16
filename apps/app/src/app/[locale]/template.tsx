@@ -12,12 +12,21 @@ export default async function Template({
   const role = (await cookies()).get('role')?.value;
   const user = (await cookies()).get('user')?.value;
   const token = (await cookies()).get('token')?.value;
-  const [stats, sync] = await Promise.all([
-    getRequest(`stats`),
-    getRequest(`sync/status`),
-  ]);
 
-  const syncTimestamp = sync?.status?.indexers?.base?.timestamp;
+  const getLatestStats = async () => {
+    'use server';
+    const statsDetails = await getRequest(`stats`);
+    return statsDetails?.stats?.[0];
+  };
+
+  const getSyncStatus = async () => {
+    'use server';
+    const sync = await getRequest('sync/status');
+    const syncTimestamp = sync?.status?.indexers?.base?.timestamp;
+    return syncTimestamp;
+  };
+
+  const stats = await getLatestStats();
 
   const handleFilterAndKeyword = async (
     keyword: string,
@@ -72,16 +81,18 @@ export default async function Template({
 
     return returnPath ? null : data;
   };
+
   return (
     <>
       <Header
         handleFilterAndKeyword={handleFilterAndKeyword}
         role={role}
         stats={stats}
-        sync={syncTimestamp}
         theme={theme}
         token={token}
         user={user}
+        getLatestStats={getLatestStats}
+        getSyncStatus={getSyncStatus}
       />
       {children}
     </>

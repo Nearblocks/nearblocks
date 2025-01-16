@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
 import { request } from '@/hooks/app/useAuth';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -19,11 +20,12 @@ interface Props {
 
 const Resend = ({ type }: Props) => {
   const router = useRouter();
+  const { userAuthURL: baseURL } = useConfig();
   const onLogin = () => router.push('/login');
   const onSubmit = async (values: FormikValues) => {
     try {
       const data = { ...values, type };
-      await request.post(`/resend`, data);
+      await request(baseURL).post(`/resend`, data);
       if (!toast.isActive('resent-email')) {
         toast.success('Email resent successfully', {
           toastId: 'resent-email',
@@ -31,7 +33,7 @@ const Resend = ({ type }: Props) => {
       }
       formik.resetForm();
     } catch (error: any) {
-      const message = error?.response?.data?.errors?.email[0];
+      const message = error?.response?.data?.errors[0]?.message;
       if (message) {
         if (!toast.isActive('resent-email-error')) {
           toast.error(message, {

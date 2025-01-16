@@ -16,13 +16,12 @@ const UserLogout = () => {
     Cookies.remove('token');
     Cookies.remove('role');
     Cookies.remove('user');
-    router?.push('/login');
-    router?.refresh();
+    router?.replace('/login');
   };
 
   return (
     <div
-      className="flex items-center text-center border-2 border-green hover:bg-green-400 bg-green-500 text-md pl-4 pr-6 py-1 rounded-md focus:outline-none font-semibold text-white dark:border-black-200 cursor-pointer"
+      className="flex items-center border-green border text-center hover:bg-green-400 bg-green-300 dark:bg-green-500 dark:hover:bg-green-400 text-md pl-2 pr-2 py-1 rounded-md focus:outline-none font-semibold text-white dark:border-black-200 cursor-pointer"
       onClick={onLogout}
     >
       <Logout className="h-6 w-5" />
