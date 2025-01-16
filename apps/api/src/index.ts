@@ -1,30 +1,50 @@
 /* eslint-disable perfectionist/sort-imports */
 import '#libs/tracing';
+
+import { createTerminus } from '@godaddy/terminus';
+
 import config from '#config';
 import logger from '#libs/logger';
-import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
-import redis from '#libs/redis';
-import sentry from '#libs/sentry';
 
 import app from './app.js';
+import redis from '#libs/redis';
+import sql from '#libs/postgres';
 
-app.listen(config.port, async () => {
+const server = app.listen(config.port, async () => {
   logger.info(`server listening on port ${config.port}`);
 });
 
-const onSignal = async (signal: number | string) => {
-  try {
-    await Promise.all([
-      redis.quit(),
-      ratelimiterRedisClient.quit(),
-      sentry.close(1000),
-    ]);
-  } catch (error) {
-    logger.error(error);
-  }
+const onSignal = async () => {
+  logger.info('server is starting cleanup');
 
-  process.kill(process.pid, signal);
+  try {
+    server.close();
+  } catch (error) {
+    logger.error('Error during cleanup:', error);
+  }
 };
 
-process.once('SIGINT', onSignal);
-process.once('SIGTERM', onSignal);
+const healthCheck = async () => {
+  try {
+    await sql`
+      SELECT
+        1
+    `;
+    await redis.client().ping();
+    return Promise.resolve(1);
+  } catch (error) {
+    return Promise.reject(new Error('Health check failed'));
+  }
+};
+
+const options = {
+  beforeShutdown: () => new Promise((resolve) => setTimeout(resolve, 10000)),
+  healthChecks: {
+    '/healthz': healthCheck,
+  },
+  onSignal,
+  signals: ['SIGTERM', 'SIGINT'],
+  useExit0: true,
+};
+
+createTerminus(server, options);
