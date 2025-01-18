@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@baselime/node-opentelemetry": "0.5.8",
+    "@godaddy/terminus": "4.12.1",
     "@opentelemetry/instrumentation-express": "0.47.0",
     "@opentelemetry/instrumentation-ioredis": "0.47.0",
     "@opentelemetry/instrumentation-pg": "0.50.0",
