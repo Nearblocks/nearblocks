@@ -249,6 +249,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                   }
                   selectedVerifier={selectedVerifier}
                   base64Code={contractData.base64Code}
+                  contractMetadata={contractData?.contractMetadata}
                 />
               )}
             </div>
