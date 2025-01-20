@@ -8,7 +8,7 @@ import {
 import config from '#config';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
-import { redisClient } from '#libs/redis';
+import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 
 const bearerVerify: VerifyFunction = async (token, done) => {
   if (config.apiAccessKey && token === config.apiAccessKey) {
@@ -16,7 +16,7 @@ const bearerVerify: VerifyFunction = async (token, done) => {
   }
 
   try {
-    const cachedUser = await redisClient.get(`api_key:${token}`);
+    const cachedUser = await ratelimiterRedisClient.get(`api_key:${token}`);
 
     if (cachedUser) {
       return done(null, JSON.parse(cachedUser));
@@ -36,7 +36,7 @@ const bearerVerify: VerifyFunction = async (token, done) => {
     const user = users?.[0];
 
     if (user) {
-      await redisClient.set(
+      await ratelimiterRedisClient.set(
         `api_key:${token}`,
         JSON.stringify(user),
         'EX',

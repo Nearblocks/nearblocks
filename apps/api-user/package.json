@@ -1,0 +1,61 @@
+{
+  "name": "api-user",
+  "version": "1.0.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/helmet": "^4.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.10.1",
+    "@types/nodemailer": "^6.4.17",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.11.10",
+    "@types/query-string": "^6.3.0",
+    "nb-redis": "*",
+    "nb-tsconfig": "*",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.723.0",
+    "@sentry/node": "7.18.0",
+    "@sentry/tracing": "7.18.0",
+    "bcrypt": "^5.1.1",
+    "bullmq": "^5.34.2",
+    "cors": "^2.8.5",
+    "csv-stringify": "^6.5.2",
+    "dayjs": "^1.11.13",
+    "envalid": "^8.0.0",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "lodash-es": "^4.17.21",
+    "near-api-js": "^5.0.1",
+    "nodemailer": "^6.9.16",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.13.1",
+    "pino": "^9.5.0",
+    "postgres": "3.4.5",
+    "query-string": "^9.1.1",
+    "uuid": "^11.0.3",
+    "zod": "3.23.8"
+  }
+}
