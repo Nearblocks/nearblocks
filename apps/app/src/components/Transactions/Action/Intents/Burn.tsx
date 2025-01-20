@@ -91,8 +91,8 @@ const Burn = ({ event, data, actionsLog }: Props) => {
   }, [actionsLog]);
 
   return (
-    <div className="flex flex-col break-all leading-7">
-      {data.map((item) => {
+    <div className="action flex flex-col break-all">
+      {data?.map((item) => {
         const { token_ids, amounts } = item;
 
         if (token_ids && amounts && token_ids?.length > 0) {
@@ -124,6 +124,20 @@ const Burn = ({ event, data, actionsLog }: Props) => {
                     <span className="pl-1">
                       {shortenText(address?.address)}
                     </span>
+                  </Link>
+                </div>
+              )}
+              {!address && (
+                <div className="flex items-center">
+                  <span className="font-bold text-gray text-sm sm:text-xs pl-1">
+                    To
+                  </span>
+                  <Link
+                    href={`/address/${item?.owner_id}`}
+                    className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-"
+                  >
+                    {networkIcon}
+                    <span className="pl-1">{shortenText(item?.owner_id)}</span>
                   </Link>
                 </div>
               )}

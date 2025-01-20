@@ -28,7 +28,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}
         <Link
           href={`/address/${props.receiver}`}
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
+          className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
         >
           {shortenAddress(props.receiver)}
         </Link>
@@ -58,7 +58,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}{' '}
         <Link
           href={`/address/${props.receiver}`}
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
+          className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
         >
           {shortenAddress(props.receiver)}
         </Link>
