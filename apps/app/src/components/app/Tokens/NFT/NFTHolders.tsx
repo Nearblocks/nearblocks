@@ -1,7 +1,5 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-
-import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
   holderPercentage,
@@ -16,6 +14,7 @@ import Table from '../../common/Table';
 import Tooltip from '../../common/Tooltip';
 import FaInbox from '../../Icons/FaInbox';
 import Skeleton from '../../skeleton/common/Skeleton';
+import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
 
 interface Props {
   count: number;
@@ -52,18 +51,18 @@ const NFTHolders = ({ count, error, holder, status, tab, tokens }: Props) => {
       cell: (row: HoldersPropsInfo) => (
         <span>
           <Tooltip
-            className={'left-1/2 max-w-[200px]'}
+            className={'ml-12 max-w-[200px]'}
             position="top"
             tooltip={row?.account}
           >
-            <span className="truncate max-w-[200px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
-              <Link
-                className="text-green-500 dark:text-green-250 font-semibold hover:no-undeline"
-                href={`/address/${row?.account}`}
-              >
-                {row?.account}
-              </Link>
-            </span>
+            <AddressOrTxnsLink
+              copy
+              className={
+                'truncate max-w-[200px] inline-block whitespace-nowrap'
+              }
+              currentAddress={row?.account}
+              noHover
+            />
           </Tooltip>
         </span>
       ),

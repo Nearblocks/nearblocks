@@ -27,7 +27,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   action: '',
@@ -158,7 +158,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                href={`/txns/${row?.transaction_hash}#execution#${row?.receipt_id}`}
+                href={`/txns/${row?.transaction_hash}?tab=execution#${row?.receipt_id}`}
               >
                 {row?.receipt_id}
               </Link>
@@ -181,12 +181,12 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             tooltip={row?.transaction_hash}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 className={
-                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap font-medium'
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
-                currentAddress={row?.transaction_hash}
+                txnHash={row?.transaction_hash}
               />
             </span>
           </Tooltip>
@@ -306,9 +306,11 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             tooltip={row.predecessor_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
-                className={'align-bottom whitespace-nowrap'}
+                className={
+                  'truncate max-w-[120px] align-bottom whitespace-nowrap'
+                }
                 currentAddress={row?.predecessor_account_id}
               />
             </span>
@@ -398,9 +400,11 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             tooltip={row.receiver_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
-                className={'align-bottom whitespace-nowrap'}
+                className={
+                  'truncate max-w-[120px] align-bottom whitespace-nowrap'
+                }
                 currentAddress={row?.receiver_account_id}
               />
             </span>

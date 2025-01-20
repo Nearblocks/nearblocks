@@ -20,7 +20,7 @@ import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const ListActions = ({
   countLoading,
@@ -158,7 +158,7 @@ const ListActions = ({
     {
       cell: (row: BlocksInfo) => (
         <span>
-          <AddressDisplay copy currentAddress={row?.author_account_id} />
+          <AddressOrTxnsLink copy currentAddress={row?.author_account_id} />
         </span>
       ),
       header: <span className="pl-1">{t('miner') || 'AUTHOR'}</span>,

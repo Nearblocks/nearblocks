@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
 
 import FaRight from '../../Icons/FaRight';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const CreateAccount = (props: ActionPropsInfo) => {
   const params = useParams();
@@ -22,7 +22,7 @@ const CreateAccount = (props: ActionPropsInfo) => {
       )}
       <span className="font-bold px-1 flex items-center">
         Create Account{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={props?.action?.to}
         />

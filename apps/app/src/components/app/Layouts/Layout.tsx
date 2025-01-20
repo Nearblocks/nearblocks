@@ -12,6 +12,7 @@ import { GTMID } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
+import { getRequest } from '@/utils/app/api';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 
 interface LayoutProps {
@@ -23,6 +24,79 @@ interface LayoutProps {
 const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
   const theme = (await cookies()).get('theme')?.value || 'light';
+  const token = (await cookies()).get('token')?.value;
+  const role = (await cookies()).get('role')?.value;
+  const user = (await cookies()).get('user')?.value;
+
+  const getLatestStats = async () => {
+    'use server';
+    const statsDetails = await getRequest(`stats`);
+    return statsDetails?.stats?.[0];
+  };
+
+  const getSyncStatus = async () => {
+    'use server';
+    const sync = await getRequest('sync/status');
+    const syncTimestamp = sync?.status?.indexers?.base?.timestamp;
+    return syncTimestamp;
+  };
+
+  const stats = await getLatestStats();
+  const sync = await getSyncStatus();
+
+  const handleFilterAndKeyword = async (
+    keyword: string,
+    filter: string,
+    returnPath: any,
+  ) => {
+    'use server';
+
+    if (keyword.includes('.')) {
+      keyword = keyword.toLowerCase();
+    }
+
+    const res = await getRequest(`search${filter}?keyword=${keyword}`);
+
+    const data = {
+      accounts: [],
+      blocks: [],
+      receipts: [],
+      txns: [],
+    };
+
+    if (res?.blocks?.length) {
+      if (returnPath) {
+        return { path: res.blocks[0].block_hash, type: 'block' };
+      }
+      data.blocks = res.blocks;
+    }
+
+    if (res?.txns?.length) {
+      if (returnPath) {
+        return { path: res.txns[0].transaction_hash, type: 'txn' };
+      }
+      data.txns = res.txns;
+    }
+
+    if (res?.receipts?.length) {
+      if (returnPath) {
+        return {
+          path: res.receipts[0].originated_from_transaction_hash,
+          type: 'txn',
+        };
+      }
+      data.receipts = res.receipts;
+    }
+
+    if (res?.accounts?.length) {
+      if (returnPath) {
+        return { path: res.accounts[0].account_id, type: 'address' };
+      }
+      data.accounts = res.accounts;
+    }
+
+    return returnPath ? null : data;
+  };
 
   return (
     <html
@@ -79,7 +153,19 @@ const Layout = async ({ children, locale }: LayoutProps) => {
               <ThemeProvider attribute="class" defaultTheme={theme}>
                 <ThemeInitializer initialTheme={theme} />
                 <ToastContainer />
-                <LayoutActions theme={theme}>{children}</LayoutActions>
+                <LayoutActions
+                  theme={theme}
+                  token={token}
+                  user={user}
+                  role={role}
+                  stats={stats}
+                  sync={sync}
+                  getLatestStats={getLatestStats}
+                  getSyncStatus={getSyncStatus}
+                  handleFilterAndKeyword={handleFilterAndKeyword}
+                >
+                  {children}
+                </LayoutActions>
               </ThemeProvider>
             </AddressHoverProvider>
           </NextIntlClientProvider>

@@ -5,7 +5,7 @@ import { ActionPropsInfo } from '@/utils/types';
 
 import Tooltip from '../../common/Tooltip';
 import FaRight from '../../Icons/FaRight';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const FunctionCall = (props: ActionPropsInfo) => {
   const params = useParams();
@@ -39,14 +39,14 @@ const FunctionCall = (props: ActionPropsInfo) => {
       </span>
       <span className="font-bold text-gray px-1 flex items-center">
         By{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={props.action.from}
         />
       </span>
       <span className="font-bold text-gray flex items-center">
         On{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={props.action.to}
         />

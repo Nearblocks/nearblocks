@@ -157,6 +157,7 @@ const Header = ({
   handleFilterAndKeyword,
   role,
   stats: initialStats,
+  sync: initialSync,
   theme: cookieTheme,
   token,
   user,
@@ -166,7 +167,8 @@ const Header = ({
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
   const [stats, setStats] = useState(initialStats);
-  const [sync, setSync] = useState<string | null>(null);
+  const [sync, setSync] = useState<string>(initialSync);
+
   const profile = [
     {
       id: 1,
@@ -187,6 +189,7 @@ const Header = ({
 
   const setLatestStats = useStatsStore((state) => state.setLatestStats);
   const setSyncStat = useStatsStore((state) => state.setSyncStatus);
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchSyncStats = async () => {
@@ -209,7 +212,7 @@ const Header = ({
       clearInterval(syncInterval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const fetchLatestStats = async () => {
@@ -223,7 +226,7 @@ const Header = ({
         console.error('Error fetching stats:', error);
       }
     };
-
+    fetchLatestStats();
     const statsInterval = setInterval(() => {
       fetchLatestStats();
     }, 60000);
@@ -232,12 +235,11 @@ const Header = ({
       clearInterval(statsInterval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
   const { networkId } = useConfig();
-  const pathname = usePathname();
   const router = useRouter();
   let { setTheme, theme } = useTheme();
 
