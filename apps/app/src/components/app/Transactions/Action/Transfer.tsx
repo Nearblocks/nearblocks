@@ -5,7 +5,7 @@ import { yoctoToNear } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
 
 import FaRight from '../../Icons/FaRight';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const Transfer = (props: ActionPropsInfo) => {
   const params = useParams();
@@ -29,14 +29,14 @@ const Transfer = (props: ActionPropsInfo) => {
       </span>
       <span className="font-bold text-gray px-1 flex items-center">
         From{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={props.action.from}
         />
       </span>
       <span className="font-bold text-gray flex items-center">
         To{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={props.action.to}
         />

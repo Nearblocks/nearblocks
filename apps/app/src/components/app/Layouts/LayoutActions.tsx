@@ -7,15 +7,41 @@ import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
 
 import { NearContext } from '../wallet/near-context';
+import Header from './Header';
 import Footer from './Footer';
+import { StatusInfo } from '@/utils/types';
 
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
   theme: string;
+  stats: StatusInfo;
+  sync: string;
+  handleFilterAndKeyword: (
+    keyword: string,
+    filter: string,
+    returnPath: any,
+  ) => any;
+  token?: string;
+  user?: string;
+  role?: string;
+  getLatestStats: () => Promise<StatusInfo>;
+  getSyncStatus: () => Promise<string>;
 }
 
-const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
+const LayoutActions = ({
+  children,
+  notice,
+  theme,
+  token,
+  user,
+  role,
+  stats,
+  sync,
+  handleFilterAndKeyword,
+  getLatestStats,
+  getSyncStatus,
+}: LayoutProps) => {
   const pathname = usePathname();
   const [signedAccountId, setSignedAccountId] = useState('');
   const wallet = useWallet();
@@ -38,6 +64,17 @@ const LayoutActions = ({ children, notice, theme }: LayoutProps) => {
       <NearContext.Provider value={{ signedAccountId, wallet }}>
         {notice}
         <Provider>
+          <Header
+            handleFilterAndKeyword={handleFilterAndKeyword}
+            stats={stats}
+            sync={sync}
+            theme={theme}
+            token={token}
+            user={user}
+            role={role}
+            getLatestStats={getLatestStats}
+            getSyncStatus={getSyncStatus}
+          />
           <main>{children}</main>
         </Provider>
         <Footer theme={theme} />

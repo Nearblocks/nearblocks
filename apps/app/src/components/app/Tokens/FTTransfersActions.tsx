@@ -22,7 +22,7 @@ import Tooltip from '../common/Tooltip';
 import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {
   data: {
@@ -91,14 +91,13 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
           position="top"
           tooltip={row?.transaction_hash}
         >
-          <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
-            <Link
-              className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
-              href={`/txns/${row?.transaction_hash}`}
-            >
-              {row?.transaction_hash}
-            </Link>
-          </span>
+          <AddressOrTxnsLink
+            copy
+            txnHash={row?.transaction_hash}
+            className={
+              'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+            }
+          />
         </Tooltip>
       ),
       header: <span>{t ? t('fts.hash') : 'HASH'}</span>,
@@ -139,7 +138,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -161,7 +160,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -210,7 +209,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -232,7 +231,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'

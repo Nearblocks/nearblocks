@@ -5,7 +5,7 @@ import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { DepositPropsInfo } from '@/utils/types';
 
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const Repay = (props: DepositPropsInfo) => {
   const params = useParams();
@@ -26,14 +26,14 @@ const Repay = (props: DepositPropsInfo) => {
       <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
       <span className="font-bold text-gray px-1 flex items-center">
         From{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           currentAddress={log?.account_id}
         />
       </span>
       <span className="font-bold text-gray px-1 flex items-center">
         On{' '}
-        <AddressDisplay
+        <AddressOrTxnsLink
           name="Burrow"
           currentAddress={'contract.main.burrow.near'}
           className="h-6 flex items-center ml-1"

@@ -28,7 +28,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import Near from '../Icons/Near';
 import SortIcon from '../Icons/SortIcon';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   chain: '',
@@ -188,9 +188,9 @@ const MultiChainTxns = ({
                   </div>
                 </div>
               )}
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
-                currentAddress={row?.transaction_hash}
+                txnHash={row?.transaction_hash}
                 className={
                   'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
                 }
@@ -222,7 +222,7 @@ const MultiChainTxns = ({
                 </div>
               )}
 
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 currentAddress={row?.account_id}
                 className={
@@ -341,7 +341,7 @@ const MultiChainTxns = ({
                   </div>
                 </div>
               )}
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 currentAddress={row?.derived_address}
                 href={handleChainSelect(

@@ -30,7 +30,7 @@ import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {
   error: boolean;
@@ -164,14 +164,13 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             position="top"
             tooltip={row?.transaction_hash}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom whitespace-nowrap text-green-500 dark:text-green-250">
-              <Link
-                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
-                href={`/txns/${row?.transaction_hash}`}
-              >
-                {row?.transaction_hash}
-              </Link>
-            </span>
+            <AddressOrTxnsLink
+              copy
+              txnHash={row?.transaction_hash}
+              className={
+                'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+              }
+            />
           </Tooltip>
         </span>
       ),
@@ -300,7 +299,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             tooltip={row?.signer_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 currentAddress={row?.signer_account_id}
                 className={
@@ -384,7 +383,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             tooltip={row?.receiver_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 currentAddress={row?.receiver_account_id}
                 className={

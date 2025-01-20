@@ -27,7 +27,7 @@ import Download from '../Icons/Download';
 import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   event: '',
@@ -142,14 +142,13 @@ const TokenTxnsActions = ({
             position="top"
             tooltip={row.transaction_hash}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
-              <Link
-                className="text-green-500 font-medium"
-                href={`/txns/${row.transaction_hash}`}
-              >
-                {row.transaction_hash}
-              </Link>
-            </span>
+            <AddressOrTxnsLink
+              copy
+              className={
+                'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+              }
+              txnHash={row.transaction_hash}
+            />
           </Tooltip>
         </span>
       ),
@@ -236,7 +235,7 @@ const TokenTxnsActions = ({
               tooltip={row?.affected_account_id}
             >
               <span>
-                <AddressDisplay
+                <AddressOrTxnsLink
                   copy
                   className={'inline-flex align-bottom whitespace-nowrap'}
                   currentAddress={row?.affected_account_id}
@@ -287,7 +286,7 @@ const TokenTxnsActions = ({
               tooltip={row.involved_account_id}
             >
               <span>
-                <AddressDisplay
+                <AddressOrTxnsLink
                   copy
                   className={'inline-flex align-bottom whitespace-nowrap'}
                   currentAddress={row?.involved_account_id}

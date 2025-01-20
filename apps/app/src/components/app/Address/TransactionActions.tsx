@@ -27,7 +27,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const initialForm = {
   action: '',
@@ -163,14 +163,13 @@ const TransactionActions = ({
             position="top"
             tooltip={row.transaction_hash}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap">
-              <Link
-                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                href={`/txns/${row.transaction_hash}`}
-              >
-                {row.transaction_hash}
-              </Link>
-            </span>
+            <AddressOrTxnsLink
+              copy
+              txnHash={row.transaction_hash}
+              className={
+                'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+              }
+            />
           </Tooltip>
         </span>
       ),
@@ -244,7 +243,7 @@ const TransactionActions = ({
             tooltip={row?.signer_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 className={'align-bottom whitespace-nowrap'}
                 currentAddress={row?.signer_account_id}
@@ -336,7 +335,7 @@ const TransactionActions = ({
             tooltip={row.receiver_account_id}
           >
             <span>
-              <AddressDisplay
+              <AddressOrTxnsLink
                 copy
                 className={'align-bottom whitespace-nowrap'}
                 currentAddress={row?.receiver_account_id}

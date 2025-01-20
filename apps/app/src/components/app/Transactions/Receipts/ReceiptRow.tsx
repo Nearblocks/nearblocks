@@ -15,6 +15,8 @@ import Question from '../../Icons/Question';
 import { Loader } from '../../skeleton/common/Skeleton';
 import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';
+import { CopyButton } from '../../common/CopyButton';
+import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
 
 interface Props {
   block: { height: string };
@@ -162,6 +164,11 @@ const ReceiptRow = (props: Props) => {
               >
                 {localFormat(block?.height)}
               </Link>
+              {block?.height && (
+                <span className="mx-0.5">
+                  <CopyButton textToCopy={block?.height} />
+                </span>
+              )}
             </div>
           ) : (
             ''
@@ -186,12 +193,10 @@ const ReceiptRow = (props: Props) => {
               </div>
             ) : receipt?.predecessor_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <Link
-                  className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
-                  href={`/address/${receipt?.predecessor_id}`}
-                >
-                  {receipt?.predecessor_id}
-                </Link>
+                <AddressOrTxnsLink
+                  copy
+                  currentAddress={receipt?.predecessor_id}
+                />
               </div>
             ) : (
               ''
@@ -215,12 +220,7 @@ const ReceiptRow = (props: Props) => {
               </div>
             ) : receipt?.receiver_id ? (
               <div className="w-full md:w-3/4 word-break">
-                <Link
-                  className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
-                  href={`/address/${receipt?.receiver_id}`}
-                >
-                  {receipt?.receiver_id}
-                </Link>
+                <AddressOrTxnsLink copy currentAddress={receipt?.receiver_id} />
               </div>
             ) : (
               ''

@@ -3,7 +3,6 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
-import { Link } from '@/i18n/routing';
 import {
   capitalizeWords,
   formatTimestampToString,
@@ -14,6 +13,7 @@ import {
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
 
 import Tooltip from '../common/Tooltip';
+import { AddressOrTxnsLink } from '../common/HoverContextProvider';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -120,18 +120,17 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip
-              className={'left-1/2 max-w-[200px] w-[150px]'}
+              className={'left-1/4 ml-2 max-w-[200px] w-[150px]'}
               position="top"
               tooltip={txn?.transaction_hash}
             >
-              <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 font-medium whitespace-nowrap">
-                <Link
-                  className="text-green-500 dark:text-green-250"
-                  href={`/txns/${txn?.transaction_hash}`}
-                >
-                  {txn?.transaction_hash && txn?.transaction_hash}
-                </Link>
-              </span>
+              <AddressOrTxnsLink
+                copy
+                txnHash={txn?.transaction_hash}
+                className={
+                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+                }
+              />
             </Tooltip>
           ) : (
             'Genesis'

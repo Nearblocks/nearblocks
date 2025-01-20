@@ -5,7 +5,7 @@ import FaRight from '@/components/app/Icons/FaRight';
 import { Link } from '@/i18n/routing';
 import { EventPropsInfo } from '@/utils/types';
 
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const Swap = (props: EventPropsInfo) => {
   const params = useParams();
@@ -34,7 +34,7 @@ const Swap = (props: EventPropsInfo) => {
       <TokenInfo amount={log[3]} contract={log[4].replace(/,$/, '')} />
       <span className="font-bold text-gray px-1 flex items-center">
         On
-        <AddressDisplay
+        <AddressOrTxnsLink
           name="Ref Finance"
           currentAddress={'v2.ref-finance.near'}
         />

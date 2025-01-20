@@ -52,7 +52,8 @@ import { Loader } from '../skeleton/common/Skeleton';
 import EventLogs from './Action';
 import Actions from './Actions';
 import NEPTokenTransactions from './NEPTokenTransactions';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { CopyButton } from '../common/CopyButton';
 
 interface Props {
   hash: string;
@@ -298,6 +299,11 @@ const Details = (props: Props) => {
                       ? localFormat(txn?.block?.block_height)
                       : txn?.block?.block_height ?? ''}
                   </Link>
+                  {txn?.block?.block_height && (
+                    <span className="mx-0.5">
+                      <CopyButton textToCopy={txn?.block?.block_height} />
+                    </span>
+                  )}
                 </div>
               ) : (
                 ''
@@ -449,7 +455,7 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-all">
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     currentAddress={txn?.signer_account_id}
                   />
@@ -474,7 +480,7 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-all">
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     currentAddress={txn?.receiver_account_id}
                   />
@@ -515,7 +521,7 @@ const Details = (props: Props) => {
                               <div className="font-semibold text-gray px-1 flex items-center">
                                 From
                                 {ft?.involved_account_id ? (
-                                  <AddressDisplay
+                                  <AddressOrTxnsLink
                                     className="h-6 flex items-center ml-1"
                                     currentAddress={ft?.involved_account_id}
                                   />
@@ -528,7 +534,7 @@ const Details = (props: Props) => {
                               <div className="font-semibold text-gray px-1 flex items-center">
                                 To
                                 {ft?.affected_account_id ? (
-                                  <AddressDisplay
+                                  <AddressOrTxnsLink
                                     className="h-6 flex items-center ml-1"
                                     currentAddress={ft?.affected_account_id}
                                   />
@@ -544,7 +550,7 @@ const Details = (props: Props) => {
                               <div className="font-semibold text-gray px-1 flex items-center">
                                 From
                                 {ft?.affected_account_id ? (
-                                  <AddressDisplay
+                                  <AddressOrTxnsLink
                                     className="h-6 flex items-center ml-1"
                                     currentAddress={ft?.affected_account_id}
                                   />
@@ -557,7 +563,7 @@ const Details = (props: Props) => {
                               <div className="font-semibold text-gray px-1 flex items-center">
                                 To
                                 {ft?.involved_account_id ? (
-                                  <AddressDisplay
+                                  <AddressOrTxnsLink
                                     className="h-6 flex items-center ml-1"
                                     currentAddress={ft?.involved_account_id}
                                   />
@@ -614,7 +620,7 @@ const Details = (props: Props) => {
                                       <div className="font-semibold text-gray px-1 flex items-center">
                                         From
                                         {nft?.involved_account_id ? (
-                                          <AddressDisplay
+                                          <AddressOrTxnsLink
                                             className="h-6 flex items-center ml-1"
                                             currentAddress={
                                               nft?.involved_account_id
@@ -629,7 +635,7 @@ const Details = (props: Props) => {
                                       <div className="font-semibold text-gray px-1 flex items-center">
                                         To
                                         {nft?.affected_account_id ? (
-                                          <AddressDisplay
+                                          <AddressOrTxnsLink
                                             className="h-6 flex items-center ml-1"
                                             currentAddress={
                                               nft?.affected_account_id
@@ -647,7 +653,7 @@ const Details = (props: Props) => {
                                       <div className="font-semibold text-gray px-1 flex items-center">
                                         From
                                         {nft?.affected_account_id ? (
-                                          <AddressDisplay
+                                          <AddressOrTxnsLink
                                             className="h-6 flex items-center ml-1"
                                             currentAddress={
                                               nft?.affected_account_id
@@ -662,7 +668,7 @@ const Details = (props: Props) => {
                                       <div className="font-semibold text-gray px-1 flex items-center">
                                         To
                                         {nft?.involved_account_id ? (
-                                          <AddressDisplay
+                                          <AddressOrTxnsLink
                                             className="h-6 flex items-center ml-1"
                                             currentAddress={
                                               nft?.involved_account_id

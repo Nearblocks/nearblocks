@@ -5,7 +5,7 @@ import { MtEventLogData, TransactionLog } from '@/utils/types';
 
 import TokenInfo from '../common/TokenInfo';
 import FaRight from '../Icons/FaRight';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface ParsedEventListProps {
   events: TransactionLog[];
@@ -32,7 +32,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.old_owner_id}
                           />
@@ -43,7 +43,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'owner_id' in data && data?.owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.owner_id}
                           />
@@ -57,7 +57,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'owner_id' in data && data?.owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.owner_id}
                           />
@@ -68,7 +68,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.old_owner_id}
                           />
@@ -82,7 +82,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         From{' '}
                         {'old_owner_id' in data && data?.old_owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.old_owner_id}
                           />
@@ -93,7 +93,7 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
                       <div className="font-semibold text-gray px-1 flex items-center">
                         To{' '}
                         {'new_owner_id' in data && data?.new_owner_id ? (
-                          <AddressDisplay
+                          <AddressOrTxnsLink
                             className="h-6 flex items-center ml-1"
                             currentAddress={data.new_owner_id}
                           />

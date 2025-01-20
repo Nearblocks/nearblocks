@@ -21,7 +21,7 @@ import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
 import { getFilteredQueryParams } from '@/utils/app/libs';
-import { AddressDisplay } from '@/components/app/common/HoverContextProvider';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface Props {
   count: number;
@@ -67,14 +67,13 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
             position="top"
             tooltip={row?.transaction_hash}
           >
-            <span className="truncate max-w-[120px] inline-block align-bottom text-green-500 dark:text-green-250 whitespace-nowrap">
-              <Link
-                className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
-                href={`/txns/${row?.transaction_hash}`}
-              >
-                {row?.transaction_hash}
-              </Link>
-            </span>
+            <AddressOrTxnsLink
+              copy
+              className={
+                'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+              }
+              txnHash={row?.transaction_hash}
+            />
           </Tooltip>
         </>
       ),
@@ -136,7 +135,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -158,7 +157,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -206,7 +205,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.involved_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
@@ -228,7 +227,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
                 tooltip={row?.affected_account_id}
               >
                 <span>
-                  <AddressDisplay
+                  <AddressOrTxnsLink
                     copy
                     className={
                       'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'

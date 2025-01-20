@@ -4,16 +4,13 @@ import {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
   type ReactNode,
 } from 'react';
-import CopyIcon from '@/components/app/Icons/CopyIcon';
 import Link from 'next/link';
 import { truncateString } from '@/utils/app/libs';
-
-import Clipboard from 'clipboard';
-import Tick from '@/components/app/Icons/Tick';
+import { CopyButton } from './CopyButton';
+import { usePathname } from '@/i18n/routing';
 
 type AddressHoverContextType = {
   hoveredAddress: string | null;
@@ -28,6 +25,12 @@ interface AddressHoverProviderProps {
 
 export function AddressHoverProvider({ children }: AddressHoverProviderProps) {
   const [hoveredAddress, setHoveredAddress] = useState<string | null>(null);
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setHoveredAddress(null);
+  }, [pathname]);
 
   const value = {
     hoveredAddress,
@@ -49,77 +52,67 @@ const useAddressHover = () => {
   return context;
 };
 
-interface AddressDisplayProps {
-  currentAddress: string;
+interface Props {
+  currentAddress?: string;
+  txnHash?: string;
   className?: string;
   href?: string;
   name?: string;
   copy?: boolean;
+  noHover?: boolean;
 }
 
-export function AddressDisplay({
-  href = '',
+export function AddressOrTxnsLink({
   currentAddress,
+  txnHash,
   className = '',
+  href = '',
   name = '',
   copy = false,
-}: AddressDisplayProps) {
+  noHover = false,
+}: Props) {
   const { hoveredAddress, setHoveredAddress } = useAddressHover();
-  const [isCopied, setIsCopied] = useState(false);
-
-  const copyButtonRef = useRef<HTMLButtonElement>(null);
 
   const isHovered = hoveredAddress === currentAddress;
+  const displayText = name
+    ? name
+    : txnHash
+    ? truncateString(txnHash, 17, '...')
+    : currentAddress && truncateString(currentAddress, 17, '...');
+  const linkHref = href
+    ? href
+    : txnHash
+    ? `/txns/${txnHash}`
+    : `/address/${currentAddress}`;
 
-  const handleMouseEnter = () => {
-    setHoveredAddress(currentAddress);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredAddress(null);
-  };
-  useEffect(() => {
-    if (!copyButtonRef.current) return;
-
-    const clipboard = new Clipboard(copyButtonRef.current, {
-      text: () => currentAddress,
-    });
-
-    clipboard.on('success', () => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500);
-    });
-
-    return () => {
-      clipboard.destroy();
-    };
-  }, [currentAddress]);
+  const textToCopy = txnHash ? txnHash : currentAddress || '';
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-1">
       <Link
-        href={href ? href : `/address/${currentAddress}`}
-        className={`text-green-500 dark:text-green-250 font-semibold transition-colors p-0.5 px-1 rounded-md 
-     ${className ? className : ''}
-     ${isHovered && 'bg-amber border-amber  border-dashed'}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        href={linkHref}
+        className={`
+          text-green-500 dark:text-green-250 
+          font-semibold
+          ${!txnHash && !noHover && 'p-0.5 px-1 border rounded-md'}
+          ${className}
+          ${
+            !txnHash && !noHover && isHovered
+              ? 'bg-[#FFC10740] border-[#FFC10740] dark:bg-black-200 dark:border-neargray-50 border-dashed cursor-pointer text-[#033F40]'
+              : 'border-transparent'
+          }
+        `}
+        onMouseEnter={() =>
+          !txnHash &&
+          !noHover &&
+          currentAddress &&
+          setHoveredAddress(currentAddress)
+        }
+        onMouseLeave={() => !txnHash && !noHover && setHoveredAddress(null)}
       >
-        {name ? name : truncateString(currentAddress, 17, '...')}
+        {displayText}
       </Link>
-      {copy && (
-        <button
-          ref={copyButtonRef}
-          className="dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1 w-5 h-5 group-hover:text-white"
-          type="button"
-        >
-          {isCopied ? (
-            <Tick className="fill-current text-green-500 h-4 w-4" />
-          ) : (
-            <CopyIcon className="fill-current -z-50 text-gray-500 dark:text-green-250 hover:text-green h-4 w-4" />
-          )}
-        </button>
-      )}
+      {copy && <CopyButton textToCopy={textToCopy} />}
     </div>
   );
 }

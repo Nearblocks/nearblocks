@@ -5,7 +5,7 @@ import HighchartsReact from 'highcharts-react-official';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
@@ -144,14 +144,7 @@ const Overview = ({
   const t = useTranslations();
   let { theme } = useTheme();
   const { networkId } = useConfig();
-  let [stats, setStats] = useState(initialStats);
-  const latestStats = useStatsStore((state) => state.latestStats);
-
-  useEffect(() => {
-    if (latestStats) {
-      setStats(latestStats);
-    }
-  }, [latestStats]);
+  const stats = useStatsStore((state) => state.latestStats) || initialStats;
 
   if (theme == undefined) {
     theme = cookieTheme;
