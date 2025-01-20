@@ -285,12 +285,12 @@ a {
 .mostly-customized-scrollbar::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #bbb; 
+  background-color:#f4f6f7; 
   border-radius: 12px;
 }
 
 .mostly-customized-scrollbar::-webkit-scrollbar-thumb {
-  background: gray;
+  background: #d1cfcf;
   border-radius: 12px;
 }
 

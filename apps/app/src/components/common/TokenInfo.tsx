@@ -66,7 +66,7 @@ const TokenInfo = (props: TokenInfoProps) => {
           <span>
             &nbsp;(
             {isShowText
-              ? `d${shortenTokenSymbol(meta?.symbol)}`
+              ? `i${shortenTokenSymbol(meta?.symbol)}`
               : shortenTokenSymbol(meta?.symbol)}
             )
           </span>

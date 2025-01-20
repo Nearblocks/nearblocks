@@ -9,7 +9,7 @@ const DeleteAccount = (props: ActionPropsInfo) => {
   const { hash } = router.query;
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all">
       {props?.action?.receiptId && hash ? (
         <Link
           href={`/txns/${hash}#execution#${props.action?.receiptId}`}
@@ -21,7 +21,7 @@ const DeleteAccount = (props: ActionPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}
 
-      <span className="font-bold px-1">
+      <span className="font-bold pl-1">
         Delete Account{' '}
         <Link
           href={`/address/${props.action.to}`}

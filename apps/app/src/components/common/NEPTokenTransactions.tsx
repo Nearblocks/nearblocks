@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { parseEventLogs } from '@/utils/near';
 import FaRight from '../Icons/FaRight';
@@ -12,11 +12,23 @@ interface ParsedEventListProps {
 }
 
 const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
-  let allTranferCount = 0;
+  const allTransferRef = useRef<HTMLDivElement>(null);
+  const [isActionScrollable, setIsActionScrollable] = useState(false);
+
+  useEffect(() => {
+    if (allTransferRef?.current) {
+      const height = allTransferRef?.current?.offsetHeight;
+      setIsActionScrollable(height >= 182);
+    }
+  }, [events]);
+
   return (
     <>
       <div className="mostly-customized-scrollbar">
-        <div className="max-h-[182px] break-words space-y-3">
+        <div
+          className="max-h-[182px] break-words space-y-2"
+          ref={allTransferRef}
+        >
           {events &&
             events?.map((event: any, index: number) => {
               const parsedEvent: any = parseEventLogs(event);
@@ -27,7 +39,6 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
                 const eventData = parsedEvent;
 
                 return eventData?.data?.flatMap((data: any, j: number) => {
-                  allTranferCount += 1;
                   const contracts = Array.isArray(data?.token_ids)
                     ? data?.token_ids.map(
                         (tokenId: string) => tokenId?.split(':')[1],
@@ -152,8 +163,8 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
             })}
         </div>
       </div>
-      {allTranferCount > 4 && (
-        <div className="flex text-xs mt-3 text-nearblue-600 dark:text-neargray-10">
+      {isActionScrollable && (
+        <div className="flex text-xs text-nearblue-600 dark:text-neargray-10">
           <ArrowDownDouble className="w-4 h-4 dark:invert" />
           Scroll for more
         </div>
@@ -163,7 +174,8 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
 };
 
 const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
-  let netTranferCount = 0;
+  const netTransferRef = useRef<HTMLDivElement>(null);
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const combinedTransactions = events
     ?.map((event: any) => {
@@ -267,12 +279,21 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
 
   const transactions = groupTransactions(combinedTransactions);
 
+  useEffect(() => {
+    if (netTransferRef?.current) {
+      const height = netTransferRef?.current?.offsetHeight;
+      setIsScrollable(height >= 180);
+    }
+  }, [transactions]);
+
   return (
     <>
       <div className="mostly-customized-scrollbar">
-        <div className="max-h-[180px] break-words space-y-3">
+        <div
+          className="max-h-[180px] break-words space-y-2"
+          ref={netTransferRef}
+        >
           {transactions?.map((item: any, tokenIndex: number) => {
-            netTranferCount += 1;
             return (
               <div
                 key={`${tokenIndex}`}
@@ -301,8 +322,8 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
           })}
         </div>
       </div>
-      {netTranferCount > 4 && (
-        <div className="flex text-xs mt-3 text-nearblue-600 dark:text-neargray-10">
+      {isScrollable && (
+        <div className="flex text-xs text-nearblue-600 dark:text-neargray-10">
           <ArrowDownDouble className="w-4 h-4 dark:invert" />
           Scroll for more
         </div>
