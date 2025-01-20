@@ -8,7 +8,6 @@ import dayjs from '#libs/dayjs';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
-import { redisClient } from '#libs/redis';
 import { SubscriptionStatus } from '#types/enums';
 import { Plan, User } from '#types/types';
 
@@ -67,7 +66,7 @@ const rateLimiter = catchAsync(
     let plans: Plan[] = [];
     let selectedPlan: Plan;
 
-    const cachedPlan = await redisClient.get(`user_plan:${id}`);
+    const cachedPlan = await ratelimiterRedisClient.get(`user_plan:${id}`);
 
     if (cachedPlan) {
       selectedPlan = JSON.parse(cachedPlan);
@@ -96,7 +95,7 @@ const rateLimiter = catchAsync(
         selectedPlan = plans?.[0];
 
         if (selectedPlan) {
-          await redisClient.set(
+          await ratelimiterRedisClient.set(
             `user_plan:${id}`,
             JSON.stringify(selectedPlan),
             'EX',
@@ -163,7 +162,12 @@ const useFreePlan = async (
 
   const plan = await getPlan(baseUrl, token);
 
-  await redisClient.set(`user_plan:${key}`, JSON.stringify(plan), 'EX', 86400);
+  await ratelimiterRedisClient.set(
+    `user_plan:${key}`,
+    JSON.stringify(plan),
+    'EX',
+    86400,
+  );
 
   const rateLimit = rateLimiterUnion(plan, baseUrl);
 
@@ -200,7 +204,7 @@ const getPlan = async (baseUrl: string, token: string) => {
 
 const getFreePlan = async () => {
   try {
-    const cachedFreePlan = await redisClient.get('free_plan');
+    const cachedFreePlan = await ratelimiterRedisClient.get('free_plan');
 
     if (cachedFreePlan) {
       return JSON.parse(cachedFreePlan);
@@ -218,7 +222,12 @@ const getFreePlan = async () => {
     const freePlan = plans?.[0];
 
     if (freePlan) {
-      await redisClient.set('free_plan', JSON.stringify(freePlan), 'EX', 86400);
+      await ratelimiterRedisClient.set(
+        'free_plan',
+        JSON.stringify(freePlan),
+        'EX',
+        86400,
+      );
     }
 
     return freePlan;
