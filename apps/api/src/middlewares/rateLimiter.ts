@@ -103,7 +103,9 @@ const rateLimiter = catchAsync(
           );
         }
       } catch (error) {
-        return next();
+        logger.error(error);
+
+        return await useFreePlan(req, res, next, req.ip!);
       }
     }
 
@@ -162,13 +164,16 @@ const useFreePlan = async (
 
   const plan = await getPlan(baseUrl, token);
 
-  await ratelimiterRedisClient.set(
-    `user_plan:${key}`,
-    JSON.stringify(plan),
-    'EX',
-    86400,
-  );
-
+  try {
+    await ratelimiterRedisClient.set(
+      `user_plan:${key}`,
+      JSON.stringify(plan),
+      'EX',
+      86400,
+    );
+  } catch (redisError) {
+    logger.error(redisError, 'Error caching user plan in Redis.');
+  }
   const rateLimit = rateLimiterUnion(plan, baseUrl);
 
   try {
@@ -209,6 +214,7 @@ const getFreePlan = async () => {
     if (cachedFreePlan) {
       return JSON.parse(cachedFreePlan);
     }
+    logger.info('Free plan not found in Redis cache, fetching from DB.');
 
     const plans = await userSql<Plan[]>`
       SELECT
@@ -222,17 +228,27 @@ const getFreePlan = async () => {
     const freePlan = plans?.[0];
 
     if (freePlan) {
-      await ratelimiterRedisClient.set(
-        'free_plan',
-        JSON.stringify(freePlan),
-        'EX',
-        86400,
-      );
-    }
+      try {
+        await ratelimiterRedisClient.set(
+          'free_plan',
+          JSON.stringify(freePlan),
+          'EX',
+          86400,
+        );
+      } catch (redisError) {
+        logger.error(redisError, 'Error caching free plan in Redis.');
+      }
 
-    return freePlan;
+      return freePlan;
+    }
+    logger.warn('No valid free plan found, returning null.');
+
+    return null;
   } catch (error) {
-    logger.error('Free plan not available, applying default rate limit.');
+    logger.error(
+      error,
+      'Free plan not available, applying default rate limit.',
+    );
 
     return null;
   }
