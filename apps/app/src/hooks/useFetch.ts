@@ -14,7 +14,7 @@ export const defaultOptions = {
   revalidateOnReconnect: false,
 };
 
-const request = axios.create({ baseURL });
+const request = axios.create({ baseURL, timeout: 5000 });
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
