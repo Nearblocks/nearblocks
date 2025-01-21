@@ -9,7 +9,7 @@ const Transfer = (props: ActionPropsInfo) => {
   const { hash } = router.query;
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all">
       {props?.action?.receiptId && hash ? (
         <Link
           href={`/txns/${hash}#execution#${props.action?.receiptId}`}
@@ -21,14 +21,14 @@ const Transfer = (props: ActionPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}
 
-      <span className="font-bold px-1">
-        Transfer{' '}
+      <span className="font-bold pl-1">
+        Transfer
         <span className="font-normal pl-1">
           {yoctoToNear(props.action.args.deposit, true)} Ⓝ
         </span>
       </span>
-      <span className="font-bold text-gray px-1">
-        From{' '}
+      <span className="font-bold text-gray pl-1">
+        From
         <Link
           href={`/address/${props.action.from}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -36,8 +36,8 @@ const Transfer = (props: ActionPropsInfo) => {
           {shortenAddress(props.action.from)}
         </Link>
       </span>
-      <span className="font-bold text-gray px-1">
-        To{' '}
+      <span className="font-bold text-gray pl-1">
+        To
         <Link
           href={`/address/${props.action.to}`}
           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"

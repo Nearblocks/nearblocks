@@ -307,7 +307,7 @@ const Details = (props: Props) => {
   useEffect(() => {
     if (actionColumnRef?.current) {
       const height = actionColumnRef?.current?.offsetHeight;
-      setIsScrollable(height >= 180);
+      setIsScrollable(height >= 160);
     }
   }, [filteredLogs, actions]);
 
@@ -501,7 +501,7 @@ const Details = (props: Props) => {
                 <div className="mostly-customized-scrollbar">
                   <div
                     ref={actionRef}
-                    className="max-h-[194px] break-words space-y-3 align-middle"
+                    className="max-h-[194px] break-words space-y-2 align-middle"
                   >
                     {updatedMainTxnsActions &&
                       updatedMainTxnsActions?.[0]?.logs?.map(
@@ -612,7 +612,7 @@ const Details = (props: Props) => {
           className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 mt-[-5px]"
         >
           <div className="flex items-start flex-wrap pl-4 sm:!pl-2">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7"></div>
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0"></div>
             {loading || (actions?.length === 0 && logs?.length === 0) ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-full max-w-xl" />
@@ -623,7 +623,7 @@ const Details = (props: Props) => {
                   <div
                     id="action-column"
                     ref={actionColumnRef}
-                    className="max-h-[180px] break-words space-y-2 text-xs"
+                    className="max-h-[160px] break-words space-y-1 text-xs"
                   >
                     {filteredLogs?.map((event: TransactionLog, i: number) => (
                       <EventLogs
@@ -638,7 +638,7 @@ const Details = (props: Props) => {
                   </div>
                 </div>
                 {isScrollable && (
-                  <div className="flex text-xs text-nearblue-600 dark:text-neargray-10">
+                  <div className="flex text-xs text-nearblue-600 dark:text-neargray-10 mt-1">
                     <ArrowDownDouble className="w-4 h-4 dark:invert" />
                     Scroll for more
                   </div>
@@ -668,18 +668,18 @@ const Details = (props: Props) => {
           ) : (
             <div className="relative w-full md:w-3/4">
               <div className="mostly-customized-scrollbar">
-                <div className="max-h-[180px] break-words space-y-3">
+                <div className="max-h-[180px] break-words space-y-2">
                   {fts &&
                     fts?.map((ft: any, i: number) => (
                       <div
-                        className="flex items-center flex-wrap break-all leading-7"
+                        className="flex items-center flex-wrap break-all"
                         key={i}
                       >
                         <FaRight className="inline-flex text-gray-400 text-xs" />
                         {ft?.cause === 'MINT' ? (
                           <>
-                            <div className="font-semibold text-gray px-1">
-                              From{' '}
+                            <div className="font-semibold text-gray pl-1">
+                              From
                               {ft?.involved_account_id ? (
                                 <Link
                                   className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -693,8 +693,8 @@ const Details = (props: Props) => {
                                 <span className="font-normal pl-1">system</span>
                               )}
                             </div>
-                            <div className="font-semibold text-gray px-1">
-                              To{' '}
+                            <div className="font-semibold text-gray pl-1">
+                              To
                               {ft?.affected_account_id ? (
                                 <Link
                                   className="text-green-500 dark:text-green-250 font-normal pl-1"
@@ -711,8 +711,8 @@ const Details = (props: Props) => {
                           </>
                         ) : (
                           <>
-                            <div className="font-semibold text-gray px-1">
-                              From{' '}
+                            <div className="font-semibold text-gray pl-1">
+                              From
                               {ft?.affected_account_id ? (
                                 <Link
                                   className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -726,8 +726,8 @@ const Details = (props: Props) => {
                                 <span className="font-normal pl-1">system</span>
                               )}
                             </div>
-                            <div className="font-semibold text-gray px-1">
-                              To{' '}
+                            <div className="font-semibold text-gray pl-1">
+                              To
                               {ft?.involved_account_id ? (
                                 <Link
                                   className="text-green-500 dark:text-green-250 font-normal pl-1"
@@ -743,8 +743,8 @@ const Details = (props: Props) => {
                             </div>
                           </>
                         )}
-                        <div className="font-semibold text-gray px-1">
-                          For{' '}
+                        <div className="font-semibold text-gray pl-1">
+                          For
                           <span className="pl-1 font-normal">
                             {ft?.delta_amount &&
                             ft?.ft_meta?.decimals &&
@@ -785,8 +785,8 @@ const Details = (props: Props) => {
                               <div className="sm:flex">
                                 {nft?.cause === 'MINT' ? (
                                   <>
-                                    <div className="font-semibold text-gray px-1">
-                                      From{' '}
+                                    <div className="font-semibold text-gray pl-1">
+                                      From
                                       {nft?.involved_account_id ? (
                                         <Link
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -802,8 +802,8 @@ const Details = (props: Props) => {
                                         </span>
                                       )}
                                     </div>
-                                    <div className="font-semibold text-gray px-1">
-                                      To{' '}
+                                    <div className="font-semibold text-gray pl-1">
+                                      To
                                       {nft?.affected_account_id ? (
                                         <Link
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -822,8 +822,8 @@ const Details = (props: Props) => {
                                   </>
                                 ) : (
                                   <>
-                                    <div className="font-semibold text-gray px-1">
-                                      From{' '}
+                                    <div className="font-semibold text-gray pl-1">
+                                      From
                                       {nft?.affected_account_id ? (
                                         <Link
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -839,8 +839,8 @@ const Details = (props: Props) => {
                                         </span>
                                       )}
                                     </div>
-                                    <div className="font-semibold text-gray px-1">
-                                      To{' '}
+                                    <div className="font-semibold text-gray pl-1">
+                                      To
                                       {nft?.involved_account_id ? (
                                         <Link
                                           className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline"
@@ -860,7 +860,7 @@ const Details = (props: Props) => {
                                 )}
                               </div>
                               <div className="sm:flex mt-1">
-                                <div className="text-gray px-1">
+                                <div className="text-gray pl-1">
                                   <span className="text-gray-400">For </span>
                                   <span className="pl-1 font-normal">
                                     NFT Token ID [
@@ -939,7 +939,7 @@ const Details = (props: Props) => {
                 </div>
               </Tooltip>
               NEP-245 Tokens Transferred
-              <div className="px-2 rounded-[1rem] bg-neargray-700 dark:bg-black-200 text-black-500 dark:text-neargray-10 ml-1 font-semibold">
+              <div className="px-[0.65em] py-[0.45em] rounded-[1rem] leading-[.50rem] bg-neargray-700 dark:bg-black-200 text-black-500 dark:text-neargray-10 ml-1 font-semibold items-center text-center justify-center">
                 {`${totalTokenIdsCount}`}
               </div>
             </div>

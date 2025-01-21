@@ -21,6 +21,11 @@ interface ParsedLog {
   networkType: string;
 }
 
+interface TransactionParties {
+  sender: string;
+  receiver: string;
+}
+
 interface Props {
   event: TransactionLog;
   data: DataItem[];
@@ -37,6 +42,9 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
     txnsHash: string;
   } | null>(null);
 
+  const [transactionParties, setTransactionParties] =
+    useState<TransactionParties | null>(null);
+
   const receiverId = data[0]?.owner_id;
   const token = data[0]?.token_ids[0]?.split(':')[1];
 
@@ -45,6 +53,17 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
   useEffect(() => {
     if (!parsedActionLogs || !receiverId) {
       return;
+    }
+
+    const relevantLog = parsedActionLogs?.find((log) => {
+      return log?.parsedArgs?.sender_id && log?.parsedArgs?.receiver_id;
+    });
+
+    if (relevantLog) {
+      setTransactionParties({
+        sender: relevantLog?.parsedArgs?.sender_id,
+        receiver: relevantLog?.parsedArgs?.receiver_id,
+      });
     }
 
     const extractedObjects: ParsedLog[] = parsedActionLogs
@@ -89,8 +108,7 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedActionLogs, receiverId]);
+  }, [parsedActionLogs, receiverId, tokenNetwork]);
 
   const renderTokenRow = (
     token: string,
@@ -111,12 +129,23 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
       ) : (
         <FaRight className="text-gray-400 text-xs" />
       )}
+
       <span className="font-semibold text-gray pl-1">Deposit</span>
       <TokenInfo
         contract={token?.split(':')[1]}
         amount={amount}
         isShowText={true}
       />
+      <div className="ml-1">
+        by
+        {transactionParties && (
+          <span className="text-green-500 dark:text-green-250 pl-1">
+            <Link href={`/address/${transactionParties.sender}`}>
+              {shortenText(transactionParties.sender)}
+            </Link>
+          </span>
+        )}
+      </div>
       <div className="flex items-center font-bold text-gray text-sm sm:text-xs pl-1">
         On
         <Link
