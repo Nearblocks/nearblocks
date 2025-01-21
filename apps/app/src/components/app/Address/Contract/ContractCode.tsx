@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Link } from '@/i18n/routing';
 import { verifierConfig } from '@/utils/app/config';
@@ -33,6 +33,19 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [selectedVerifier, setSelectedVerifier] = useState<string>(
     verifiers[0],
   );
+  const [ipfsUrl, setIpfsUrl] = useState('');
+
+  useEffect(() => {
+    const verifier = verifierConfig.find(
+      (config) => config.accountId === selectedVerifier,
+    );
+    const cid = verificationData[selectedVerifier]?.data?.cid;
+    if (verifier && cid) {
+      setIpfsUrl(verifier.ipfsUrl(cid));
+    } else {
+      setIpfsUrl('');
+    }
+  }, [selectedVerifier, verificationData]);
 
   const parseBuildEnvironment = (buildEnvironment: string) => {
     const [text] = buildEnvironment.split('@');
@@ -63,7 +76,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           contractData?.contractMetadata &&
           !error && (
             <div className="flex flex-wrap">
-              <div className="w-full lg:w-1/2">
+              <div className="w-full lg:w-1/2 pr-2">
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
@@ -170,8 +183,40 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 </div>
               </div>
 
-              <div className="w-full lg:w-1/2 pl-2">
-                <div className="flex flex-wrap p-4">
+              <div className="w-full lg:w-1/2">
+                <div className="flex items-start flex-wrap p-4">
+                  <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+                    <Tooltip
+                      className={'left-25 max-w-[200px] w-48'}
+                      position="top"
+                      tooltip={`View the contract's source code on IPFS`}
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip>
+                    IPFS
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    {!contractData?.contractMetadata ? (
+                      <Loader wrapperClassName="w-full" />
+                    ) : verificationData[selectedVerifier]?.data?.cid &&
+                      ipfsUrl ? (
+                      <Link
+                        href={ipfsUrl}
+                        className="text-green-500 dark:text-green-250 hover:no-underline break-words"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        {verificationData[selectedVerifier]?.data?.cid}
+                      </Link>
+                    ) : (
+                      'N/A'
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-25 max-w-[200px] w-48'}
@@ -219,7 +264,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                       <Loader wrapperClassName="w-full" />
                     ) : (
                       <textarea
-                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y "
+                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 flex-1 resize-y "
                         readOnly
                         rows={3}
                         value={

@@ -67,7 +67,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
   return statusLoading ? (
     <Loader wrapperClassName="w-full md:w-full my-4 " />
   ) : (
-    <div className="flex flex-wrap p-4 w-full">
+    <div className="flex flex-wrap pt-4 px-4 w-full">
       {verifiers?.length > 0 && (
         <div className="w-full flex items-center justify-between flex-wrap">
           {selectedVerifier ? (
