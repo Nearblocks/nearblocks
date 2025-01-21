@@ -400,7 +400,7 @@ export function shortenTokenSymbol(token: string) {
 }
 
 export function gasPercentage(gasUsed: string, gasAttached: string) {
-  if (!gasAttached) return 'N/A';
+  if (!gasAttached) return '0%';
   // @ts-ignore
   const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed(2);
   return `${formattedNumber}%`;

@@ -5,6 +5,7 @@ import { TransactionLog } from '@/utils/types';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import IntentsIcon from '@/components/Icons/IntentsIcon';
+import { shortenText } from '@/utils/libs';
 
 interface DataItem {
   old_owner_id: string;
@@ -37,6 +38,8 @@ const Transfer = ({ event, data }: Props) => {
       })),
   );
 
+  const signer = data[0]?.old_owner_id;
+
   const Loader = ({
     className = '',
     wrapperClassName = '',
@@ -50,8 +53,8 @@ const Transfer = ({ event, data }: Props) => {
   );
 
   return (
-    <div className="action flex flex-col space-y-3 break-all leading-7">
-      <div className="flex flex-wrap items-center text-sm sm:text-base mt-1">
+    <div className="action flex flex-col break-all">
+      <div className="flex flex-wrap items-center justify-start">
         {event?.receiptId && hash ? (
           <Link href={`/txns/${hash}#execution#${event?.receiptId}`}>
             <FaRight className="text-gray-400 text-xs cursor-pointer" />
@@ -59,7 +62,15 @@ const Transfer = ({ event, data }: Props) => {
         ) : (
           <FaRight className="text-gray-400 text-xs" />
         )}
-        <span className="font-semibold text-gray pl-1">Swap</span>
+        {signer && (
+          <Link
+            href={`/address/${signer}`}
+            className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-1"
+          >
+            {shortenText(signer)}
+          </Link>
+        )}
+        <span className="font-semibold text-gray pl-1"> swapped </span>
         {!tokens || tokens?.length === 0 ? (
           <Loader wrapperClassName="flex w-full max-w-xs" />
         ) : (

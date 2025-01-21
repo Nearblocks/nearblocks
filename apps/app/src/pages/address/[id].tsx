@@ -559,23 +559,25 @@ const Address = ({
               <Skeleton className="h-7" />
             </div>
           ) : (
-            <div className="flex md:flex-wrap w-full">
-              <div className="flex justify-between md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
-                <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 leading-8 px-2  dark:text-neargray-10">
-                  Near Account:&nbsp;
+            <div className="flex flex-wrap w-full">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center dark:text-neargray-10 border-b w-full mb-5 dark:border-black-200">
+                <h1 className="py-2 break-all text-xl text-gray-700 leading-8 px-2 dark:text-neargray-10">
+                  <span className="block sm:!inline">Near Account:&nbsp;</span>
                   {id && (
-                    <span className="text-green-500 dark:text-green-250">
+                    <span className="block sm:!inline text-green-500 dark:text-green-250">
                       @<span className="font-semibold">{id}</span>
                     </span>
                   )}
-                  <Buttons address={id as string} />
+                  <span className="block sm:!inline ml-0 sm:!ml-2">
+                    <Buttons address={id as string} />
+                  </span>
                 </h1>
-                <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+                <ul className="flex flex-wrap mt-1 md:!mt-0 items-center text-gray-500 text-xs ml-2 md:!ml-0">
                   <RpcMenu />
-                  <li className="ml-3 max-md:mb-2">
+                  <li className="ml-3 max-md:!mb-2">
                     <span className="group flex w-full relative h-full">
                       <a
-                        className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
+                        className={`md:!flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
                         href="#"
                       >
                         <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">

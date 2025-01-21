@@ -16,7 +16,6 @@ export const useNetworkIcons = ({
   network,
   className = 'w-4 h-4',
 }: NetworkIconsProps) => {
-  console.log({ network });
   switch (network) {
     case 'bitcoin':
       return <Bitcoin className={`${className} text-orange-400`} />;
