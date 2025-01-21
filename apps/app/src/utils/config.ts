@@ -63,7 +63,7 @@ export const verifierConfig =
             `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=${path}`,
           sourceCodeApiUrl: (cid: string, filePath: string) =>
             `https://api.sourcescan.dev/ipfs/${cid}/${filePath}`,
-
+          ipfsUrl: (cid: string) => `https://api.sourcescan.dev/ipfs/${cid}`,
           verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
         },
       ]
@@ -74,6 +74,7 @@ export const verifierConfig =
             `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=${path}`,
           sourceCodeApiUrl: (cid: string, filePath: string) =>
             `https://api.sourcescan.dev/ipfs/${cid}/${filePath}`,
+          ipfsUrl: (cid: string) => `https://api.sourcescan.dev/ipfs/${cid}`,
           verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
         },
       ];

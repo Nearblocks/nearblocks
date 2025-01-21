@@ -74,7 +74,7 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
                 </span>
               )}
               <button
-                className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 mr-2"
+                className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1 w-6 h-6 mr-1.5"
                 ref={copyButtonRef}
               >
                 <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-4 w-4" />
@@ -86,7 +86,7 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
             label={showFullCode ? 'Minimize' : 'Maximize'}
           >
             <button
-              className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7"
+              className="bg-green-500 dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1 w-6 h-6"
               onClick={toggleCodeView}
             >
               {showFullCode ? (

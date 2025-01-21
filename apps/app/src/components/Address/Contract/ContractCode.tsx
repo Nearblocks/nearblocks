@@ -1,7 +1,7 @@
 import Question from '@/components/Icons/Question';
 import { Tooltip } from '@reach/tooltip';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import VerifiedData from './VerifiedData';
 import VerificationStatus from './VerificationStatus';
 import { ContractData, VerificationData, VerifierData } from '@/utils/types';
@@ -30,6 +30,19 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [selectedVerifier, setSelectedVerifier] = useState<string>(
     verifiers[0],
   );
+  const [ipfsUrl, setIpfsUrl] = useState('');
+
+  useEffect(() => {
+    const verifier = verifierConfig.find(
+      (config) => config.accountId === selectedVerifier,
+    );
+    const cid = verificationData[selectedVerifier]?.data?.cid;
+    if (verifier && cid) {
+      setIpfsUrl(verifier.ipfsUrl(cid));
+    } else {
+      setIpfsUrl('');
+    }
+  }, [selectedVerifier, verificationData]);
 
   const parseBuildEnvironment = (buildEnvironment: string) => {
     const [text] = buildEnvironment.split('@');
@@ -60,7 +73,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           contractData?.contractMetadata &&
           !error && (
             <div className="flex flex-wrap">
-              <div className="w-full lg:w-1/2">
+              <div className="w-full lg:w-1/2 pr-2">
                 <div className="flex flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
@@ -164,8 +177,39 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 </div>
               </div>
 
-              <div className="w-full lg:w-1/2 pl-2">
-                <div className="flex flex-wrap p-4">
+              <div className="w-full lg:w-1/2">
+                <div className="flex items-start flex-wrap p-4">
+                  <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+                    <Tooltip
+                      label={`View the contract's source code on IPFS`}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white p-2 break-words"
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip>
+                    IPFS
+                  </div>
+                  <div className="w-full md:w-3/4 break-words">
+                    {!contractData?.contractMetadata ? (
+                      <Loader wrapperClassName="w-full" />
+                    ) : verificationData[selectedVerifier]?.data?.cid &&
+                      ipfsUrl ? (
+                      <Link
+                        href={ipfsUrl}
+                        className="text-green-500 dark:text-green-250 hover:no-underline break-words"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {verificationData[selectedVerifier]?.data?.cid}
+                      </Link>
+                    ) : (
+                      'N/A'
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-start flex-wrap p-4">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       label={'The environment in which the contract was built'}
@@ -221,7 +265,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                               )
                             : 'N/A'
                         }
-                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 pt-0 px-2 flex-1 resize-y "
+                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 flex-1 resize-y "
                       />
                     )}
                   </div>
