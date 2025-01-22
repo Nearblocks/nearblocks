@@ -173,11 +173,10 @@ const Header = ({
   const status = useMemo(() => {
     if (block?.block_timestamp) {
       const timestamp = nanoToMilli(block?.block_timestamp);
-
       const utcDate = Date.parse(new Date(timestamp).toISOString());
       const currentTime = Date.now();
 
-      if ((currentTime - utcDate) / (1000 * 60) > 10) {
+      if ((currentTime - utcDate) / (1000 * 60) > 2) {
         return false;
       }
     }
