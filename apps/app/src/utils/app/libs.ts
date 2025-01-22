@@ -556,3 +556,13 @@ export const getUserDataFromToken = (token: string) => {
     return null;
   }
 };
+
+export function isValidJson(value: string): boolean {
+  try {
+    const parsed = JSON.parse(value);
+
+    return parsed && typeof parsed === 'object';
+  } catch (e) {
+    return false;
+  }
+}

@@ -22,6 +22,7 @@ export default function AccountMoreInfo({
   id,
   nftTokenData,
   tokenData,
+  status,
 }: any) {
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
@@ -32,7 +33,7 @@ export default function AccountMoreInfo({
   useEffect(() => {
     const loadSchema = async () => {
       try {
-        const [code, keys, account]: any = await Promise.all([
+        const [code, keys]: any = await Promise.all([
           contractCode(id).catch((error: any) => {
             console.log(`Error fetching contract code for ${id}:`, error);
             return null;
@@ -41,10 +42,8 @@ export default function AccountMoreInfo({
             console.log(`Error fetching access keys for ${id}:`, error);
             return null;
           }),
-          viewAccount(id).catch(() => {
-            return null;
-          }),
         ]);
+
         if (code && code?.code_base64) {
           setContract({
             block_hash: code?.block_hash,
@@ -64,11 +63,7 @@ export default function AccountMoreInfo({
             public_key: string;
           }) => key.access_key.permission !== 'FullAccess',
         );
-        if (account) {
-          setAccountView(account);
-        } else {
-          setAccountView(null);
-        }
+
         setIsLocked(locked);
       } catch (error) {
         console.error('Error loading schema:', error);
@@ -78,7 +73,26 @@ export default function AccountMoreInfo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const accountInfo = accountData || accountView;
+  useEffect(() => {
+    const getAccountDetails = async () => {
+      const [account]: any = await Promise.all([
+        viewAccount(id).catch(() => {
+          return null;
+        }),
+      ]);
+
+      if (account) {
+        setAccountView(account);
+      } else {
+        setAccountView(null);
+      }
+    };
+    getAccountDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  const accountInfo = status ? accountData : accountView;
+  const stakedBalace = status ? accountData?.locked : accountView?.locked;
 
   let genesis =
     accountView !== null &&
@@ -92,8 +106,9 @@ export default function AccountMoreInfo({
       : false;
 
   const tokenTracker = tokenData?.name || nftTokenData?.name;
-  const storageUsed = accountInfo?.storage_usage ?? accountView?.storage_usage;
-
+  const storageUsed = status
+    ? accountData?.storage_usage
+    : accountView?.storage_usage;
   return (
     <div className="w-full">
       <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
@@ -105,19 +120,19 @@ export default function AccountMoreInfo({
             <div>
               <div className="flex-1 xl:flex-nowrap flex-wrap items-center pb-2">
                 <div className="mb-2 md:mb-0">
-                  Staked {t('balance') || 'Balance'}
+                  Staked {t('balance') || 'Balance'}:
                 </div>
                 <div className="flex whitespace-nowrap">
-                  {accountInfo?.locked
-                    ? yoctoToNear(accountInfo?.locked, true) + ' Ⓝ'
-                    : accountInfo?.locked ?? ''}
+                  {stakedBalace
+                    ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
+                    : stakedBalace ?? ''}
                 </div>
               </div>
             </div>
             <div className="pr-[1.4rem]">
               <div className="flex-1 xl:flex-nowrap flex-wrap items-center">
                 <div className="mb-2 md:mb-0 whitespace-nowrap">
-                  {t('storageUsed') || 'Storage used'}
+                  {t('storageUsed') || 'Storage used'}:
                 </div>
                 <div className="flex whitespace-nowrap">
                   {storageUsed ? weight(storageUsed) : storageUsed ?? ''}
@@ -132,7 +147,7 @@ export default function AccountMoreInfo({
                 {deploymentData?.receipt_predecessor_account_id && (
                   <div className="flex-1 pb-2">
                     <div className="mb-2 md:mb-0 whitespace-nowrap">
-                      Contract Creator
+                      Contract Creator:
                     </div>
                     <div className="flex lg:w-80 w-full pr-3 lg:whitespace-nowrap flex-wrap">
                       <span className="flex mr-1">
@@ -161,7 +176,7 @@ export default function AccountMoreInfo({
                   {contract && contract?.hash ? (
                     <div className="flex-1 md:w-full">
                       <div className="mb-2 whitespace-nowrap md:mb-0">
-                        Contract Locked
+                        Contract Locked:
                       </div>
                       <div className="w-full break-words">
                         {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
@@ -180,7 +195,7 @@ export default function AccountMoreInfo({
                 {tokenData?.name && (
                   <div className="flex-1 flex-nowrap">
                     <div className="flex md:w-1/4 mb-1 whitespace-nowrap">
-                      Token Tracker
+                      Token Tracker:
                     </div>
                     <div className="flex">
                       <span className="sm:flex flex-1 flex-nowrap lg:whitespace-nowrap w-full">
@@ -216,7 +231,7 @@ export default function AccountMoreInfo({
                 {nftTokenData?.name && (
                   <div className="flex-1 flex-nowrap">
                     <div className="flex md:w-1/4 mb-1 whitespace-nowrap">
-                      NFT Token Tracker
+                      NFT Token Tracker:
                     </div>
                     <div className="flex">
                       <span className="sm:flex flex-1 flex-nowrap lg:whitespace-nowrap w-full">
@@ -258,6 +273,7 @@ export default function AccountMoreInfo({
                   accountData?.deleted?.transaction_hash
                     ? 'Deleted At'
                     : 'Created At'}
+                  :
                 </div>
                 {accountView !== null &&
                 accountView?.block_hash === undefined &&
@@ -319,7 +335,7 @@ export default function AccountMoreInfo({
                 {contract && contract?.hash ? (
                   <div className="flex-1 md:w-full">
                     <div className="mb-2 whitespace-nowrap md:mb-0">
-                      Contract Locked
+                      Contract Locked:
                     </div>
                     <div className="w-full break-words">
                       {contract?.code_base64 && isLocked ? 'Yes' : 'No'}

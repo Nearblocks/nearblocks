@@ -347,6 +347,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                     hash={hash}
                     rpcTxn={rpcTxn}
                     txn={txn ? txn : rpcData}
+                    statsData={stats}
                   />
                 )}
                 {tab === 'tree' && (

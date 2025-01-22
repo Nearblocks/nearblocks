@@ -21,6 +21,7 @@ export default function AccountOverview({
   spamTokens,
   statsData,
   tokenData,
+  status,
 }: any) {
   const { ftBalanceOf, viewAccount } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
@@ -60,12 +61,11 @@ export default function AccountOverview({
 
   useEffect(() => {
     const fetchAccountData = async () => {
-      if (!accountData || accountData?.length === 0) {
+      if (!status) {
         try {
           const [account]: any = await Promise.all([
             viewAccount(id).catch(() => setRpcError(true)),
           ]);
-
           if (account) {
             setAccountView((prev) => {
               if (!prev || prev.account_id !== account?.account_id) {
@@ -84,10 +84,10 @@ export default function AccountOverview({
     };
 
     fetchAccountData();
-  }, [accountData, id, viewAccount, rpcUrl]);
+  }, [accountData, id, viewAccount, rpcUrl, status]);
 
   const accountInfo = accountData || accountView;
-  const balance = accountInfo?.amount ?? '';
+  const balance = status ? accountData?.amount : accountView?.amount;
   const nearPrice = statsData?.near_price ?? '';
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { space_mono } from '@/fonts/font';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
 import { Link } from '@/i18n/routing';
@@ -17,6 +16,8 @@ import ReceiptStatus from './ReceiptStatus';
 import TransactionActions from './TransactionActions';
 import { CopyButton } from '../../common/CopyButton';
 import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
+import FaMinimize from '../../Icons/FaMinimize';
+import FaExpand from '../../Icons/FaExpand';
 
 interface Props {
   block: { height: string };
@@ -39,6 +40,8 @@ const ReceiptRow = (props: Props) => {
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
   const rowRef = useRef<HTMLDivElement | null>(null);
   const { networkId } = useConfig();
+  const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -78,6 +81,44 @@ const ReceiptRow = (props: Props) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.receipt_id, pageHash]);
+
+  const logs =
+    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
+      ? receipt.outcome.logs.filter(Boolean)
+      : [];
+
+  const receiptLog =
+    viewMode === 'raw'
+      ? logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              try {
+                const parsed = JSON.parse(atob(log));
+                return JSON.stringify(parsed, null, 2);
+              } catch (error) {
+                return `${log}`;
+              }
+            }
+            return `${log}`;
+          })
+          .join('\n\n')
+      : logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              const match = log.match(/EVENT_JSON:({.*})/);
+              if (match) {
+                try {
+                  const parsed = JSON.parse(match[1]);
+                  return JSON.stringify(parsed, null, 2);
+                } catch (error) {
+                  return `${log}`;
+                }
+              }
+              return log;
+            }
+            return `${log}`;
+          })
+          .join('\n\n');
 
   return (
     <div
@@ -365,34 +406,47 @@ const ReceiptRow = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
               {receipt?.outcome?.logs?.length > 0 ? (
-                <textarea
-                  className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y ${space_mono.className}`}
-                  defaultValue={receipt.outcome.logs
-                    .map((log: any) => {
-                      if (typeof log === 'string') {
-                        const match = log.match(/EVENT_JSON:(\{.*\})/);
-                        if (match) {
-                          try {
-                            const parsed = JSON.parse(match[1]);
-                            return JSON.stringify(
-                              { EVENT_JSON: parsed },
-                              null,
-                              2,
-                            );
-                          } catch (error) {
-                            console.log('Error parsing JSON:', error, log);
-                            return `Invalid JSON log: ${log}`;
-                          }
-                        } else {
-                          return `${log}`;
-                        }
-                      }
-                      return `${log || ''}`;
-                    })
-                    .join('\n\n')}
-                  readOnly
-                  rows={10}
-                />
+                <div className="relative w-full pt-1">
+                  <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
+                    <button
+                      onClick={() => setViewMode('auto')}
+                      className={`px-3 py-1 rounded-l-lg text-sm ${
+                        viewMode === 'auto'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Auto
+                    </button>
+                    <button
+                      onClick={() => setViewMode('raw')}
+                      className={`px-3 py-1 rounded-r-lg text-sm ${
+                        viewMode === 'raw'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Raw
+                    </button>
+                    <button
+                      onClick={() => setIsExpanded((prev) => !prev)}
+                      className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+                    >
+                      {!isExpanded ? (
+                        <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                      ) : (
+                        <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <div
+                    className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto  ${
+                      !isExpanded ? 'h-[8rem]' : ''
+                    }`}
+                  >
+                    {receiptLog}
+                  </div>
+                </div>
               ) : (
                 <p>No Logs</p>
               )}

@@ -24,10 +24,15 @@ interface Props {
   hash: string;
   rpcTxn: RPCTransactionInfo;
   txn: TransactionInfo;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
 }
 
 const Execution = (props: Props) => {
-  const { hash, rpcTxn, txn } = props;
+  const { hash, rpcTxn, txn, statsData } = props;
 
   const [receipt, setReceipt] = useState<
     any | FailedToFindReceipt | NestedReceiptWithOutcome
@@ -151,6 +156,8 @@ const Execution = (props: Props) => {
                     expandAll={expandAll}
                     fellowOutgoingReceipts={[]}
                     receipt={receipt}
+                    statsData={statsData}
+                    rpcTxn={rpcTxn}
                   />
                 )}
               </div>

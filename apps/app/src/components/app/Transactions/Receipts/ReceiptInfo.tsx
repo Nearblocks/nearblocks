@@ -11,20 +11,34 @@ import {
   Action,
   FunctionCallActionView,
   ReceiptsPropsInfo,
+  RPCTransactionInfo,
 } from '@/utils/types';
 
 import Tooltip from '../../common/Tooltip';
 import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
 import Question from '../../Icons/Question';
+import FaMinimize from '../../Icons/FaMinimize';
+import FaExpand from '../../Icons/FaExpand';
+import { fiatValue, shortenAddress } from '@/utils/app/libs';
+import { networkId } from '@/utils/app/config';
 
 interface Props {
-  receipt: any | ReceiptsPropsInfo;
+  receipt: ReceiptsPropsInfo | any;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
+  rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
+  const [receiptKey, setReceiptKey] = useState<any>(null);
+  const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
+  const [isExpanded, setIsExpanded] = useState(false);
   const t = useTranslations();
   const onTab = (index: number) => {
     setHash(hashes[index]);
@@ -34,6 +48,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
 
   const [loading, setLoading] = useState(false);
   const { getBlockDetails } = useRpc();
+  const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   useEffect(() => {
     const index = hashes.indexOf(pageHash as string);
@@ -92,10 +107,10 @@ const ReceiptInfo = ({ receipt }: Props) => {
       statusInfo =
         prettyArgs && typeof prettyArgs === 'object' ? (
           <textarea
-            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
-            defaultValue={JSON.stringify(prettyArgs)}
             readOnly
             rows={4}
+            defaultValue={JSON.stringify(prettyArgs)}
+            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
           ></textarea>
         ) : (
           <div>
@@ -114,10 +129,10 @@ const ReceiptInfo = ({ receipt }: Props) => {
   } else if (receipt?.outcome?.status?.type === 'failure') {
     statusInfo = (
       <textarea
-        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
-        defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
         readOnly
         rows={4}
+        defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
+        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
       ></textarea>
     );
   } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
@@ -185,13 +200,69 @@ const ReceiptInfo = ({ receipt }: Props) => {
       status !== undefined) ||
     status === 'successReceiptId';
 
+  useEffect(() => {
+    if (rpcTxn && rpcTxn?.receipts?.length > 0) {
+      const receiptToFind: any = rpcTxn?.receipts?.find(
+        (item: any) => item?.receipt_id === receipt?.id,
+      );
+      if (receiptToFind) {
+        setReceiptKey(receiptToFind);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcTxn, receipt]);
+
+  const deposit =
+    Array.isArray(receipt?.actions) && receipt.actions.length > 0
+      ? receipt.actions[0]?.args?.deposit ?? 0
+      : 0;
+
+  const logs =
+    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
+      ? receipt.outcome.logs.filter(Boolean)
+      : [];
+
+  const receiptLog =
+    viewMode === 'raw'
+      ? logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              try {
+                const parsed = JSON.parse(atob(log));
+                return JSON.stringify(parsed, null, 2);
+              } catch (error) {
+                return `${log}`;
+              }
+            }
+            return `${log}`;
+          })
+          .join('\n\n')
+      : logs
+          .map((log: any) => {
+            if (typeof log === 'string') {
+              const match = log.match(/EVENT_JSON:({.*})/);
+              if (match) {
+                try {
+                  const parsed = JSON.parse(match[1]);
+                  return JSON.stringify(parsed, null, 2);
+                } catch (error) {
+                  return `${log}`;
+                }
+              }
+              return log;
+            }
+            return `${log}`;
+          })
+          .join('\n\n');
+
   return (
     <div className="flex flex-col">
-      <Tabs onSelect={(index) => onTab(index)} selectedIndex={tabIndex}>
+      <Tabs selectedIndex={tabIndex} onSelect={(index) => onTab(index)}>
         <TabList>
           {hashes &&
             hashes.map((hash, index) => (
               <Tab
+                key={index}
                 className={`text-nearblue-600 text-xs leading-4 ${
                   hash === 'output' ? 'ml-6' : 'ml-3'
                 } font-medium overflow-hidden inline-block cursor-pointer p-2 focus:outline-none ${
@@ -199,7 +270,6 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     ? 'rounded-lg bg-green-600 dark:bg-green-250 !text-white'
                     : 'hover:bg-neargray-800 bg-neargray-700 dark:text-neargray-10 dark:bg-black-200 rounded-lg hover:text-nearblue-600'
                 }`}
-                key={index}
                 value={hash}
               >
                 {hash === 'output' ? <h2>Output</h2> : <h2>Inspect</h2>}
@@ -225,13 +295,46 @@ const ReceiptInfo = ({ receipt }: Props) => {
               </h2>
               <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
                 {receipt?.outcome?.logs?.length > 0 ? (
-                  <div className="w-full  break-words  space-y-4">
-                    <textarea
-                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 resize-y"
-                      defaultValue={receipt?.outcome?.logs.join('\n')}
-                      readOnly
-                      rows={4}
-                    ></textarea>
+                  <div className="relative w-full">
+                    <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
+                      <button
+                        onClick={() => setViewMode('auto')}
+                        className={`px-3 py-1 rounded-l-lg text-sm ${
+                          viewMode === 'auto'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Auto
+                      </button>
+                      <button
+                        onClick={() => setViewMode('raw')}
+                        className={`px-3 py-1 rounded-r-lg text-sm ${
+                          viewMode === 'raw'
+                            ? 'bg-gray-500 text-white'
+                            : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                        }`}
+                      >
+                        Raw
+                      </button>
+                      <button
+                        onClick={() => setIsExpanded((prev) => !prev)}
+                        className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+                      >
+                        {!isExpanded ? (
+                          <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                        ) : (
+                          <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                    <div
+                      className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto ${
+                        !isExpanded ? 'h-[8rem]' : ''
+                      }`}
+                    >
+                      {receiptLog}
+                    </div>
                   </div>
                 ) : (
                   <div className="w-full  break-words p-5 font-medium space-y-4">
@@ -257,10 +360,12 @@ const ReceiptInfo = ({ receipt }: Props) => {
           </div>
         </TabPanel>
         <TabPanel
-          className={'w-fit focus:border-none focus:outline-none'}
+          className={
+            'w-full focus:border-none focus:outline-none overflow-hidden'
+          }
           value={hashes[1]}
         >
-          <div className="overflow-x-auto">
+          <div className="">
             <table className="my-4 mx-6 table-auto">
               <tbody>
                 <tr>
@@ -338,13 +443,38 @@ const ReceiptInfo = ({ receipt }: Props) => {
                     </Tooltip>
                     From
                   </td>
-                  <td className="py-2 pl-4">
-                    <Link
-                      className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
-                      href={`/address/${receipt?.predecessorId}`}
-                    >
-                      {receipt?.predecessorId}
-                    </Link>
+                  <td className="pl-4">
+                    <div className="flex items-center">
+                      <Link
+                        className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                        href={`/address/${receipt?.predecessorId}`}
+                      >
+                        {receipt?.predecessorId}
+                      </Link>
+                      {!loading &&
+                        receiptKey &&
+                        receiptKey?.receipt?.Action?.signer_public_key &&
+                        receiptKey?.receipt?.Action?.signer_id && (
+                          <Tooltip
+                            tooltip={'Access key used for this receipt'}
+                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                          >
+                            <span>
+                              &nbsp;(
+                              <Link
+                                href={`/address/${receiptKey?.receipt?.Action?.signer_id}?tab=accesskeys`}
+                                className="text-green-500 dark:text-green-250 hover:no-underline"
+                              >
+                                {shortenAddress(
+                                  receiptKey?.receipt?.Action
+                                    ?.signer_public_key,
+                                )}
+                              </Link>
+                              )
+                            </span>
+                          </Tooltip>
+                        )}
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -398,7 +528,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    <span className="whitespace-nowrap">Pre-charged Fee</span>
+                    Pre-charged Fee
                   </td>
                   <td className="py-2 pl-4">{`${
                     !loading &&
@@ -416,7 +546,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    <span className="whitespace-nowrap">Burnt Gas</span>
+                    Burnt Gas
                   </td>
                   <td className="text-xs py-2 pl-4">
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
@@ -439,7 +569,7 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         <Question className="w-4 h-4 fill-current mr-1" />
                       </div>
                     </Tooltip>
-                    <span className="whitespace-nowrap">Burnt Tokens</span>
+                    Burnt Tokens
                   </td>
                   <td className="text-xs py-2 pl-4">
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
@@ -472,6 +602,31 @@ const ReceiptInfo = ({ receipt }: Props) => {
                         true,
                       )}
                     Ⓝ
+                  </td>
+                </tr>
+                <tr>
+                  <td className="flex items-center py-2 pr-4">
+                    <Tooltip
+                      tooltip={'Deposit value attached with the receipt'}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    >
+                      <div>
+                        <Question className="w-4 h-4 fill-current mr-1" />
+                      </div>
+                    </Tooltip>
+                    Value
+                  </td>
+                  <td className="py-2 pl-4">
+                    {!loading && receipt && deposit
+                      ? yoctoToNear(deposit, true)
+                      : deposit ?? '0'}{' '}
+                    Ⓝ
+                    {currentPrice && networkId === 'mainnet'
+                      ? ` ($${fiatValue(
+                          yoctoToNear(deposit ?? 0, false),
+                          currentPrice,
+                        )})`
+                      : ''}
                   </td>
                 </tr>
               </tbody>

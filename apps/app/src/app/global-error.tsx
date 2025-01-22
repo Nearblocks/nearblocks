@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import '@/styles/globals.css';
+import '../../public/common.css';
 
 export const Content = ({ reset }: any) => {
   return (
@@ -39,11 +41,14 @@ export default function GlobalError({
   console.log(error);
 
   return (
-    <html>
-      <body>
-        <section className="flex flex-col items-center justify-center relative h-full">
-          <div className="errorContainer h-screen flex flex-col items-center justify-center">
-            <div className="px-3  errorContent absolute flex flex-col justify-between">
+    <html className="h-full">
+      <head>
+        <title>Error - Nearblocks</title>
+      </head>
+      <body className="h-full">
+        <section className="flex flex-col items-center justify-center relative h-full bg-white dark:bg-nearblack">
+          <div className="errorContainer h-screen flex flex-col items-center justify-center w-full">
+            <div className="px-3 errorContent absolute flex flex-col justify-between">
               <div className="text-center text-black dark:text-neargray-10 text-3xl pt-28 font-semibold">
                 Server Error
               </div>

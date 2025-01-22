@@ -25,6 +25,7 @@ export default async function Balance({ id }: { id: string }) {
     deploymentData,
     nftTokenData,
     multiChainAccountsData,
+    syncData,
   ] = await Promise.all([
     getRequest(`account/${id}?rpc=${rpcUrl}`, {}, options),
     getRequest('stats', {}, options),
@@ -33,7 +34,11 @@ export default async function Balance({ id }: { id: string }) {
     getRequest(`account/${id}/contract/deployments?rpc=${rpcUrl}`, {}, options),
     getRequest(`nfts/${id}`, {}, options),
     getRequest(`chain-abstraction/${id}/multi-chain-accounts`, {}, options),
+    getRequest(`sync/status`, {}, options),
   ]);
+
+  const balanceIndexerStatus =
+    syncData && syncData?.status?.indexers?.balance?.sync;
 
   const spamList: SpamToken = await fetch(
     `https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json`,
@@ -68,6 +73,7 @@ export default async function Balance({ id }: { id: string }) {
             spamTokens={spamList}
             statsData={statsData?.stats?.[0]}
             tokenData={tokenDetails?.contracts?.[0]}
+            status={balanceIndexerStatus}
           />
         </ErrorBoundary>
 
@@ -78,6 +84,7 @@ export default async function Balance({ id }: { id: string }) {
             id={id}
             nftTokenData={nftTokenData?.contracts?.[0]}
             tokenData={tokenDetails?.contracts?.[0]}
+            status={balanceIndexerStatus}
           />
         </ErrorBoundary>
 
