@@ -49,7 +49,7 @@
     "ethers": "^5.7.2",
     "lodash": "^4.17.21",
     "near-api-js": "5.0.0",
-    "nearblock-translations": "https://github.com/Nearblocks/translations.git#516d489658dea178226e90f1707935e970598c51",
+    "nearblock-translations": "https://github.com/Nearblocks/translations.git#7e2cc33bae10a2efc4fda38f79d6524bd12b9d54",
     "next": "14.2.5",
     "next-runtime-env": "1.x",
     "next-sitemap": "4.2.3",
