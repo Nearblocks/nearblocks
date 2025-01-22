@@ -79,9 +79,13 @@ export const onMessage = async (message: types.StreamerMessage) => {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
 
-    const start = performance.now();
+    let start = performance.now();
 
     await prepareCache(message);
+
+    const cache = performance.now() - start;
+    start = performance.now();
+
     await Promise.all([
       storeBlock(knex, message),
       storeChunks(knex, message),
@@ -94,7 +98,8 @@ export const onMessage = async (message: types.StreamerMessage) => {
 
     logger.info({
       block: message.block.header.height,
-      time: `${performance.now() - start} ms`,
+      cache: `${cache} ms`,
+      db: `${performance.now() - start} ms`,
     });
   } catch (error) {
     logger.error(
