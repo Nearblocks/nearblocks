@@ -15,6 +15,7 @@ import { NetworkId } from '@/utils/types';
 
 import ArrowDown from '../Icons/ArrowDown';
 import SearchIcon from '../Icons/SearchIcon';
+import { Spinner } from './Spinner';
 
 export const SearchToast = ({ networkId }: any) => {
   if (networkId === 'testnet') {
@@ -51,6 +52,7 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const containerRef: any = useRef<HTMLDivElement>(null);
 
   const isLocale = (value: null | string): any => {
@@ -78,20 +80,35 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
 
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
 
-  const redirect = (route: any) => {
-    switch (route?.type) {
-      case 'block':
-        return router.push(`/blocks/${route?.path}`);
-      case 'txn':
-        return router.push(`/txns/${route?.path}`);
-      case 'receipt':
-        return router.push(`/txns/${route?.path}`);
-      case 'address':
-        return router.push(`/address/${route?.path}`);
-      default:
+  const redirect = async (route: { type: string; path: string }) => {
+    const newPath =
+      route?.type === 'block'
+        ? `/blocks/${route?.path}`
+        : route?.type === 'txn' || route?.type === 'receipt'
+        ? `/txns/${route?.path}`
+        : route?.type === 'address'
+        ? `/address/${route?.path}`
+        : null;
+
+    if (newPath === pathname) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (newPath) {
+        return router.push(newPath);
+      } else {
         return toast.error(SearchToast(networkId as NetworkId));
+      }
+    } catch (error: any) {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [pathname]);
 
   const showResults =
     result?.blocks?.length > 0 ||
@@ -329,7 +346,11 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
         disabled={disabled}
         type="submit"
       >
-        <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
+        )}
       </button>
     </form>
   );
