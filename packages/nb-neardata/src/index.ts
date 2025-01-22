@@ -1,7 +1,5 @@
 import { Readable } from 'stream';
 
-import axios from 'axios';
-
 import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { retry } from 'nb-utils';
@@ -62,14 +60,21 @@ export const camelCaseKeys = <T>(obj: T): T => {
   return newObj as T;
 };
 
-const fetch = async (url: string, block: number): Promise<Message> => {
+const fetchBlock = async (url: string, block: number): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await axios.get(`${url}/v0/block/${block}`, {
-        timeout: 30000,
+      const response = await fetch(`${url}/v0/block/${block}`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(30000),
       });
 
-      return response.data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return data as Message;
     },
     { exponential: true, logger: retryLogger, retries },
   );
@@ -78,11 +83,18 @@ const fetch = async (url: string, block: number): Promise<Message> => {
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await axios.get(`${url}/v0/last_block/final`, {
-        timeout: 30000,
+      const response = await fetch(`${url}/v0/last_block/final`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(30000),
       });
 
-      return response.data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return data as Message;
     },
     { exponential: true, logger: retryLogger, retries },
   );
@@ -101,19 +113,19 @@ export const streamBlock = (config: BlockStreamConfig) => {
         // eslint-disable-next-line no-constant-condition
         whileLoop: while (true) {
           const block = this.block || start;
-          const promises: Promise<Message>[] = [];
-          const hasLast = !this.last || block - this.last > 1000;
-          const hasFinal = !this.final || this.final - block > limit + 1;
+          const hasLast = !this.last || block - this.last > 10;
 
-          if (hasLast && hasFinal) {
+          if (!this.final || hasLast) {
             this.final = (await fetchFinal(url)).block.header.height;
             this.last = block;
           }
 
-          const concurrency = hasFinal ? limit : 1;
+          const diff = this.final - block;
+          const concurrency = diff >= limit ? limit : diff > 0 ? diff : 1;
+          const promises: Promise<Message>[] = [];
 
           for (let i = 0; i < concurrency; i++) {
-            promises.push(fetch(url, block + i));
+            promises.push(fetchBlock(url, block + i));
           }
 
           const results = await Promise.all(promises);
