@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import { TransactionReceiptInfo } from '@/utils/types';
-
-import ArrowDown from '../../Icons/ArrowDown';
-import ReceiptInfo from './ReceiptInfo';
+import { useCallback, useEffect, useState } from 'react';
 import ReceiptKind from './ReceiptKind';
+import ReceiptInfo from './ReceiptInfo';
+import ArrowDown from '../../Icons/ArrowDown';
 
 const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const {
-    className,
-    convertionReceipt,
-    expandAll,
-    fellowOutgoingReceipts,
     receipt,
+    fellowOutgoingReceipts,
+    expandAll,
+    convertionReceipt,
+    className,
+    statsData,
+    rpcTxn,
   } = props;
 
   const [isTxTypeActive, setTxTypeActive] = useState(false);
@@ -55,28 +55,34 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
 
         {lastFellowOutgoingReceipt ? (
           <TransactionReceipt
-            className="pb-4 !mt-0 border-l ml-2.5"
-            convertionReceipt={false}
+            receipt={lastFellowOutgoingReceipt}
             expandAll={expandAll}
             fellowOutgoingReceipts={remainingFellowOutgoingReceipts}
-            receipt={lastFellowOutgoingReceipt}
+            convertionReceipt={false}
+            className="pb-4 !mt-0 border-l ml-2.5"
+            statsData={statsData}
+            rpcTxn={rpcTxn}
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
           {receipt?.actions?.map((action: any, index: number) => (
             <ReceiptKind
-              action={action}
-              isTxTypeActive={isTxTypeActive}
               key={`${action.kind}_${index}`}
+              action={action}
               onClick={switchActiveTxType}
-              receipt={receipt}
+              isTxTypeActive={isTxTypeActive}
               receiver={receipt.receiverId}
+              receipt={receipt}
             />
           ))}
         </div>
         {isTxTypeActive ? (
           <div className="border-l border-green-500 dark:border-green-250 ml-2.5">
-            <ReceiptInfo receipt={receipt} />
+            <ReceiptInfo
+              receipt={receipt}
+              statsData={statsData}
+              rpcTxn={rpcTxn}
+            />
           </div>
         ) : null}
         <div className="relative flex flex-row my-2.5">
@@ -91,11 +97,13 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
       </div>
       {lastNonRefundNestedReceipt ? (
         <TransactionReceipt
-          className="!pl-0 !border-transparent"
-          convertionReceipt={false}
+          receipt={lastNonRefundNestedReceipt}
           expandAll={expandAll}
           fellowOutgoingReceipts={nonRefundNestedReceipts}
-          receipt={lastNonRefundNestedReceipt}
+          className="!pl-0 !border-transparent"
+          convertionReceipt={false}
+          statsData={statsData}
+          rpcTxn={rpcTxn}
         />
       ) : null}
     </>

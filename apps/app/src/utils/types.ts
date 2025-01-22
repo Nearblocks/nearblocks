@@ -1500,11 +1500,17 @@ export type ParseOutcomeInfo = {
 };
 
 export type TransactionReceiptInfo = {
-  className: string;
-  convertionReceipt: any;
-  expandAll: any;
-  fellowOutgoingReceipts: any;
   receipt: any;
+  fellowOutgoingReceipts: any;
+  expandAll: any;
+  convertionReceipt: any;
+  className: string;
+  statsData: {
+    stats: Array<{
+      near_price: string;
+    }>;
+  };
+  rpcTxn: RPCTransactionInfo;
 };
 
 export type ReceiptKindInfo = {
