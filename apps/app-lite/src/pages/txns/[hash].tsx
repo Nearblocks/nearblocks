@@ -27,7 +27,7 @@ const Txn: PageLayout = () => {
         description={`Near Blockchain detailed info for transaction ${
           hash ?? ''
         }.`}
-        title={`Near Transaction ${hash ?? ''} | NearBlocks Lite`}
+        title={`Near Transaction ${hash ?? ''} | Near Validate`}
       />
       <div className="relative">
         <div className="absolute inset-0" ref={loader}>

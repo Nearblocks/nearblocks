@@ -25,7 +25,7 @@ const Block: PageLayout = () => {
     <>
       <Meta
         description={`Near Block Hash ${hash}. The block height, timestamp, block gas used, gas price, author of the block are detailed on Near.`}
-        title={`Near Block ${hash} | NearBlocks Lite`}
+        title={`Near Block ${hash} | Near Validate`}
       />
       <div className="relative">
         <div className="absolute inset-0" ref={loader}>
