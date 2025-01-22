@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 
 import ContactOptions from '@/components/app/Contact/ContactOptions';
 import { appUrl } from '@/utils/app/config';
+import Link from 'next/link';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -71,19 +72,19 @@ export default async function Contact(props: {
               <div className="my-4 flex flex-col gap-4">
                 {[
                   {
-                    description: `We do not process transactions and are therefore unable to expedite, cancel or replace them.`,
                     id: Math.random(),
-                    title: 'Pending Transaction',
+                    title: 'Refund Transaction',
+                    description: ` We do not process transactions and are therefore unable to revert, refund, expedite, cancel or replace them.`,
                   },
                   {
-                    description: `NearBlocks is an independent block explorer unrelated to other service providers (unless stated explicitly otherwise) and is therefore unable to provide a precise response for inquiries that are specific to other service providers.`,
                     id: Math.random(),
                     title: 'Near Protocol Block Explorer',
+                    description: `NearBlocks is an independent block explorer unrelated to other service providers (unless stated explicitly otherwise) and is therefore unable to provide a precise response for inquiries that are specific to other service providers.`,
                   },
                   {
-                    description: `Kindly reach out to your wallet service provider, exchanges or project/contract owner for further support as they are in a better position to assist you on the issues related to and from their platforms.`,
                     id: Math.random(),
                     title: 'Wallet / Exchange / Project related issues ',
+                    description: `Kindly reach out to your wallet service provider, exchanges or project/contract owner for further support as they are in a better position to assist you on the issues related to and from their platforms.`,
                   },
                 ].map((item, index) => (
                   <div key={item.id}>
@@ -97,6 +98,15 @@ export default async function Contact(props: {
                   </div>
                 ))}
               </div>
+              <p className="text-sm">
+                Near community support can be found here
+                <Link
+                  href={`https://dev.near.org/communities`}
+                  className="ml-1 font-semibold"
+                >
+                  https://dev.near.org/communities
+                </Link>
+              </p>
             </div>
             <ContactOptions />
           </div>
