@@ -9,10 +9,7 @@ import sentry from '#libs/sentry';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
-import { prepareCache } from '#services/cache';
 import { storeChunks } from '#services/chunk';
-import { storeExecutionOutcomes } from '#services/executionOutcome';
-import { storeReceipts } from '#services/receipt';
 import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
@@ -79,27 +76,19 @@ export const onMessage = async (message: types.StreamerMessage) => {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
 
-    let start = performance.now();
-
-    await prepareCache(message);
-
-    const cache = performance.now() - start;
-    start = performance.now();
+    const start = performance.now();
 
     await Promise.all([
       storeBlock(knex, message),
       storeChunks(knex, message),
       storeTransactions(knex, message),
-      storeReceipts(knex, message),
-      storeExecutionOutcomes(knex, message),
       storeAccounts(knex, message),
       storeAccessKeys(knex, message),
     ]);
 
     logger.info({
       block: message.block.header.height,
-      cache: `${cache} ms`,
-      db: `${performance.now() - start} ms`,
+      time: `${performance.now() - start} ms`,
     });
   } catch (error) {
     logger.error(
