@@ -28,14 +28,13 @@ export const getServerSideProps: GetServerSideProps<{
   signedAccountId: any;
 }> = async (context) => {
   const {
-    query: { qs },
+    query,
     req,
   }: {
     query: QueryParams;
     req: IncomingMessage;
   } = context;
-
-  const fetchUrl = `validators?${queryString.stringify(qs)}`;
+  const fetchUrl = `validators?${queryString.stringify(query)}`;
 
   try {
     const [dataResult] = await Promise.allSettled([fetcher(fetchUrl)]);
