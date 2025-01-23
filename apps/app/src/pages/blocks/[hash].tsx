@@ -107,7 +107,7 @@ const Block = ({
 
   const [rpcData, setRpcData] = useState<BlockData | null>(null);
   const [rpcError, setRpcError] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const balanceIndexerStatus =
     syncData && syncData?.status?.indexers?.balance?.sync;
