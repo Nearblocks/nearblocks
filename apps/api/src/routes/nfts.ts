@@ -474,11 +474,15 @@ const routes = (app: Router) => {
    *         examples:
    *           contract:
    *             value: example-contract-id
-   *       - in: query
+   *       - in: path
    *         name: token
+   *         required: true
    *         description: Token ID
    *         schema:
    *           type: string
+   *         examples:
+   *           token:
+   *             value: example-token-id
    *     responses:
    *       200:
    *         description: Success response
