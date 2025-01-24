@@ -558,6 +558,9 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
     <>
       {tab === 'receipts' ? (
         <>
+          <div className="w-full text-center bg-nearblue dark:bg-black-200 rounded-t-xl px-5 py-4 text-green dark:text-green-250 text-sm">
+            Receipts are out of sync. Receipts data will be delayed.
+          </div>
           {!count ? (
             <div className="pl-6 max-w-lg w-full py-5 ">
               <Skeleton className="h-4" />
