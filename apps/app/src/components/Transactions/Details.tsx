@@ -374,7 +374,7 @@ const Details = (props: Props) => {
               {txn?.outcomes?.status !== undefined && (
                 <TxnStatus
                   showLabel
-                  status={txn?.outcomes?.status}
+                  status={rpcTxn.status}
                   showReceipt={<FailedReceipts data={rpcTxn} />}
                 />
               )}
