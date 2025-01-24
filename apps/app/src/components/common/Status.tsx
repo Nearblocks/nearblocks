@@ -36,7 +36,7 @@ const getOptions = (status: boolean) => {
 };
 
 const TxnStatus = (props: Props) => {
-  const option = getOptions(props.status);
+  const option = getOptions(true);
   const Icon = option.icon;
 
   return (
