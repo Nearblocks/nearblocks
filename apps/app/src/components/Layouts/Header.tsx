@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { useTheme } from 'next-themes';
 import Collapse from '../Collapse';
@@ -10,7 +10,7 @@ import ArrowDown from '../Icons/ArrowDown';
 import ActiveLink from '../ActiveLink';
 import Skeleton from '@/components/skeleton/common/Skeleton';
 import { networkId } from '@/utils/config';
-import { dollarFormat, nanoToMilli } from '@/utils/libs';
+import { dollarFormat } from '@/utils/libs';
 import User from '../Icons/User';
 import { BlocksInfo, Stats } from '@/utils/types';
 import Search from '../common/Search';
@@ -145,7 +145,7 @@ interface Props {
 
 const Header = ({
   statsDetails,
-  latestBlocks,
+  // latestBlocks,
   signedAccountId: accountId,
 }: Props) => {
   /* eslint-disable @next/next/no-img-element */
@@ -157,7 +157,7 @@ const Header = ({
   const { signedAccountId, wallet } = useContext(NearContext);
   const [accountName, SetAccountName] = useState<undefined | string>(accountId);
   const stats: Stats | undefined = statsDetails?.stats?.[0];
-  const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
+  // const block: BlocksInfo | undefined = latestBlocks?.blocks?.[0];
 
   useEffect(() => {
     if (signedAccountId && signedAccountId?.length > 0) {
@@ -170,18 +170,19 @@ const Header = ({
     }
   }, [signedAccountId]);
 
-  const status = useMemo(() => {
-    if (block?.block_timestamp) {
-      const timestamp = nanoToMilli(block?.block_timestamp);
-      const utcDate = Date.parse(new Date(timestamp).toISOString());
-      const currentTime = Date.now();
+  // const status = useMemo(() => {
+  //   if (block?.block_timestamp) {
+  //     const timestamp = nanoToMilli(block?.block_timestamp);
+  //     const utcDate = Date.parse(new Date(timestamp).toISOString());
+  //     const currentTime = Date.now();
 
-      if ((currentTime - utcDate) / (1000 * 60) > 2) {
-        return false;
-      }
-    }
-    return true;
-  }, [block]);
+  //     if ((currentTime - utcDate) / (1000 * 60) > 2) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }, [block]);
+  const status = false;
 
   const showSearch = router.pathname !== '/';
   const userLoading = false;

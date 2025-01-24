@@ -17,7 +17,8 @@ interface Props {
 }
 
 const Receipt = (props: Props) => {
-  const { rpcTxn, txn, loading, statsData } = props;
+  // const { rpcTxn, txn, loading, statsData } = props;
+  const { rpcTxn, loading, statsData } = props;
 
   const [receipt, setReceipt] = useState(null);
 
@@ -89,8 +90,8 @@ const Receipt = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending = txn?.outcomes?.status === null;
-
+  // const txnsPending = txn?.outcomes?.status === null;
+  const txnsPending = false;
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
       {txnsPending ? (

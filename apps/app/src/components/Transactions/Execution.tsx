@@ -26,7 +26,8 @@ interface Props {
 }
 
 const Execution = (props: Props) => {
-  const { rpcTxn, txn, statsData } = props;
+  // const { rpcTxn, txn, statsData } = props;
+  const { rpcTxn, statsData } = props;
 
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
@@ -75,7 +76,8 @@ const Execution = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash]);
 
-  const txnsPending = txn?.outcomes?.status === null;
+  // const txnsPending = txn?.outcomes?.status === null;
+  const txnsPending = false;
 
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200  divide-solid divide-gray-200 divide-y">
