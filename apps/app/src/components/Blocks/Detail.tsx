@@ -204,16 +204,33 @@ const Details = (props: Props) => {
                                 '',
                           })}
                         </LinkWrapper>
-                        &nbsp;
+                        {/* &nbsp;
                         {t('blocks:block.transactions.2', {
                           receipts: block?.receipts_agg?.count
                             ? localFormat(
                                 block?.receipts_agg?.count?.toString(),
                               )
                             : block?.receipts_agg?.count?.toString() ?? '',
-                        })}
+                        })} */}
                       </>
                     ) : (
+                      // <>
+                      //   (
+                      //   <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                      //     {block?.transactions_agg?.count
+                      //       ? localFormat(
+                      //           block?.transactions_agg?.count.toString(),
+                      //         )
+                      //       : block?.transactions_agg?.count.toString() ??
+                      //         '' + ' transactions'}
+                      //   </LinkWrapper>
+                      //   ) + `and $
+                      //   {block?.receipts_agg?.count
+                      //     ? localFormat(block?.receipts_agg?.count.toString())
+                      //     : block?.receipts_agg?.count ?? ''}{' '}
+                      //   receipts`
+                      // </>
+
                       <>
                         (
                         <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
@@ -224,11 +241,7 @@ const Details = (props: Props) => {
                             : block?.transactions_agg?.count.toString() ??
                               '' + ' transactions'}
                         </LinkWrapper>
-                        ) + `and $
-                        {block?.receipts_agg?.count
-                          ? localFormat(block?.receipts_agg?.count.toString())
-                          : block?.receipts_agg?.count ?? ''}{' '}
-                        receipts`
+                        )
                       </>
                     )}
                   </div>
