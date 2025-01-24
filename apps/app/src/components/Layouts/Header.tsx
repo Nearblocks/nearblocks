@@ -171,11 +171,7 @@ const Header = ({
   }, [signedAccountId]);
 
   const status = useMemo(() => {
-    if (networkId === 'mainnet') {
-      return false;
-    }
-
-    if (networkId === 'testnet' && block?.block_timestamp) {
+    if (block?.block_timestamp) {
       const timestamp = nanoToMilli(block?.block_timestamp);
       const utcDate = Date.parse(new Date(timestamp).toISOString());
       const currentTime = Date.now();
