@@ -14,6 +14,7 @@ import FaInbox from '../Icons/FaInbox';
 import useTranslation from 'next-translate/useTranslation';
 import Table from '../common/Table';
 import TimeStamp from '../common/TimeStamp';
+import { networkId } from '@/utils/config';
 
 interface ListProps {
   data: {
@@ -127,21 +128,25 @@ const List = ({ data, totalCount, error }: ListProps) => {
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
-    // {
-    //   header: <span>{t ? t('blocks:block.receipt') : 'RECEIPT'}</span>,
-    //   key: 'count',
-    //   cell: (row: BlocksInfo) => (
-    //     <span>
-    //       {row?.receipts_agg?.count
-    //         ? localFormat(row?.receipts_agg?.count)
-    //         : row?.receipts_agg?.count ?? ''}
-    //     </span>
-    //   ),
-    //   tdClassName:
-    //     'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
-    //   thClassName:
-    //     'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
-    // },
+    ...(networkId === 'testnet'
+      ? [
+          {
+            header: <span>{t ? t('blocks:block.receipt') : 'RECEIPT'}</span>,
+            key: 'count',
+            cell: (row: BlocksInfo) => (
+              <span>
+                {row?.receipts_agg?.count
+                  ? localFormat(row?.receipts_agg?.count)
+                  : row?.receipts_agg?.count ?? ''}
+              </span>
+            ),
+            tdClassName:
+              'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+            thClassName:
+              'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
+          },
+        ]
+      : []),
     {
       header: <span className="pl-1">{t ? t('blocks:miner') : 'AUTHOR'}</span>,
       key: 'author_account_id',

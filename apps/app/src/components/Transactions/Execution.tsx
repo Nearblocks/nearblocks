@@ -14,6 +14,7 @@ import FaHourglassStart from '../Icons/FaHourglassStart';
 import Skeleton from '../skeleton/common/Skeleton';
 import TransactionReceipt from './Receipts/TransactionReceipt';
 import { isEmpty } from 'lodash';
+import { networkId } from '@/utils/config';
 
 interface Props {
   txn: TransactionInfo;
@@ -26,8 +27,7 @@ interface Props {
 }
 
 const Execution = (props: Props) => {
-  // const { rpcTxn, txn, statsData } = props;
-  const { rpcTxn, statsData } = props;
+  const { rpcTxn, txn, statsData } = props;
 
   const [receipt, setReceipt] = useState<
     NestedReceiptWithOutcome | FailedToFindReceipt | any
@@ -76,8 +76,8 @@ const Execution = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash]);
 
-  // const txnsPending = txn?.outcomes?.status === null;
-  const txnsPending = false;
+  const txnsPending =
+    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
 
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200  divide-solid divide-gray-200 divide-y">
