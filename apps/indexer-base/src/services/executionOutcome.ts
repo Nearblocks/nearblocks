@@ -2,10 +2,16 @@ import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
-import { retry } from 'nb-utils';
 
 import config from '#config';
 import { jsonStringify, mapExecutionStatus } from '#libs/utils';
+
+type OutcomeColumns = {
+  [K in keyof ExecutionOutcome]: ExecutionOutcome[K][];
+};
+type OutcomeReceiptColumns = {
+  [K in keyof ExecutionOutcomeReceipt]: ExecutionOutcomeReceipt[K][];
+};
 
 const batchSize = config.insertLimit;
 
@@ -34,14 +40,80 @@ export const storeExecutionOutcomes = async (
   if (outcomes.length) {
     for (let i = 0; i < outcomes.length; i += batchSize) {
       const batch = outcomes.slice(i, i + batchSize);
+      const columns: OutcomeColumns = {
+        executed_in_block_hash: [],
+        executed_in_block_timestamp: [],
+        executor_account_id: [],
+        gas_burnt: [],
+        index_in_chunk: [],
+        logs: [],
+        receipt_id: [],
+        shard_id: [],
+        status: [],
+        tokens_burnt: [],
+      };
+
+      batch.forEach((outcome) => {
+        columns.executed_in_block_hash.push(outcome.executed_in_block_hash);
+        columns.executed_in_block_timestamp.push(
+          outcome.executed_in_block_timestamp,
+        );
+        columns.executor_account_id.push(outcome.executor_account_id);
+        columns.gas_burnt.push(outcome.gas_burnt);
+        columns.index_in_chunk.push(outcome.index_in_chunk);
+        columns.logs.push(outcome.logs);
+        columns.receipt_id.push(outcome.receipt_id);
+        columns.shard_id.push(outcome.shard_id);
+        columns.status.push(outcome.status);
+        columns.tokens_burnt.push(outcome.tokens_burnt);
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('execution_outcomes')
-            .insert(batch)
-            .onConflict(['receipt_id'])
-            .ignore();
-        }),
+        knex.raw(
+          `
+            INSERT INTO
+              execution_outcomes (
+                executed_in_block_hash,
+                executed_in_block_timestamp,
+                executor_account_id,
+                gas_burnt,
+                index_in_chunk,
+                logs,
+                receipt_id,
+                shard_id,
+                status,
+                tokens_burnt
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                ?::TEXT[],
+                ?::BIGINT[],
+                ?::TEXT[],
+                ?::NUMERIC[],
+                ?::INTEGER[],
+                ?::JSONB[],
+                ?::TEXT[],
+                ?::NUMERIC[],
+                ?::execution_outcome_status[],
+                ?::NUMERIC[]
+              )
+            ON CONFLICT (receipt_id) DO NOTHING
+          `,
+          [
+            columns.executed_in_block_hash,
+            columns.executed_in_block_timestamp,
+            columns.executor_account_id,
+            columns.gas_burnt,
+            columns.index_in_chunk,
+            columns.logs,
+            columns.receipt_id,
+            columns.shard_id,
+            columns.status,
+            columns.tokens_burnt,
+          ],
+        ),
       );
     }
   }
@@ -49,18 +121,49 @@ export const storeExecutionOutcomes = async (
   if (outcomeReceipts.length) {
     for (let i = 0; i < outcomeReceipts.length; i += batchSize) {
       const batch = outcomeReceipts.slice(i, i + batchSize);
+      const columns: OutcomeReceiptColumns = {
+        executed_receipt_id: [],
+        index_in_execution_outcome: [],
+        produced_receipt_id: [],
+      };
+
+      batch.forEach((outcome) => {
+        columns.executed_receipt_id.push(outcome.executed_receipt_id);
+        columns.index_in_execution_outcome.push(
+          outcome.index_in_execution_outcome,
+        );
+        columns.produced_receipt_id.push(outcome.produced_receipt_id);
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('execution_outcome_receipts')
-            .insert(batch)
-            .onConflict([
-              'executed_receipt_id',
-              'index_in_execution_outcome',
-              'produced_receipt_id',
-            ])
-            .ignore();
-        }),
+        await knex.raw(
+          `
+            INSERT INTO
+              execution_outcome_receipts (
+                executed_receipt_id,
+                index_in_execution_outcome,
+                produced_receipt_id
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                ?::TEXT[],
+                ?::INTEGER[],
+                ?::TEXT[]
+              )
+              ON CONFLICT (
+                executed_receipt_id,
+                index_in_execution_outcome,
+                produced_receipt_id
+              ) DO NOTHING
+          `,
+          [
+            columns.executed_receipt_id,
+            columns.index_in_execution_outcome,
+            columns.produced_receipt_id,
+          ],
+        ),
       );
     }
   }

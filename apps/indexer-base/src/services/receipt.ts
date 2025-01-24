@@ -16,6 +16,19 @@ import { isDelegateAction } from '#libs/guards';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
+type ReceiptColumns = {
+  [K in keyof Receipt]: Receipt[K][];
+};
+type ActionReceiptColumns = {
+  [K in keyof ActionReceiptAction]: ActionReceiptAction[K][];
+};
+type ReceiptInputColumns = {
+  [K in keyof ActionReceiptInputData]: ActionReceiptInputData[K][];
+};
+type ReceiptOutputColumns = {
+  [K in keyof ActionReceiptOutputData]: ActionReceiptOutputData[K][];
+};
+
 const batchSize = config.insertLimit;
 
 export const storeReceipts = async (
@@ -56,14 +69,82 @@ export const storeReceipts = async (
   if (receiptData.length) {
     for (let i = 0; i < receiptData.length; i += batchSize) {
       const batch = receiptData.slice(i, i + batchSize);
+      const columns: ReceiptColumns = {
+        included_in_block_hash: [],
+        included_in_block_timestamp: [],
+        included_in_chunk_hash: [],
+        index_in_chunk: [],
+        originated_from_transaction_hash: [],
+        predecessor_account_id: [],
+        public_key: [],
+        receipt_id: [],
+        receipt_kind: [],
+        receiver_account_id: [],
+      };
+
+      batch.forEach((receipt) => {
+        columns.included_in_block_hash.push(receipt.included_in_block_hash),
+          columns.included_in_block_timestamp.push(
+            receipt.included_in_block_timestamp,
+          ),
+          columns.included_in_chunk_hash.push(receipt.included_in_chunk_hash),
+          columns.index_in_chunk.push(receipt.index_in_chunk),
+          columns.originated_from_transaction_hash.push(
+            receipt.originated_from_transaction_hash,
+          ),
+          columns.predecessor_account_id.push(receipt.predecessor_account_id),
+          columns.public_key.push(receipt.public_key),
+          columns.receipt_id.push(receipt.receipt_id),
+          columns.receipt_kind.push(receipt.receipt_kind),
+          columns.receiver_account_id.push(receipt.receiver_account_id);
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('receipts')
-            .insert(batch)
-            .onConflict(['receipt_id'])
-            .ignore();
-        }),
+        knex.raw(
+          `
+              INSERT INTO
+                receipts (
+                  included_in_block_hash,
+                  included_in_block_timestamp,
+                  included_in_chunk_hash,
+                  index_in_chunk,
+                  originated_from_transaction_hash,
+                  predecessor_account_id,
+                  public_key,
+                  receipt_id,
+                  receipt_kind,
+                  receiver_account_id
+                )
+              SELECT
+                *
+              FROM
+                UNNEST(
+                  ?::TEXT[],
+                  ?::BIGINT[],
+                  ?::TEXT[],
+                  ?::INTEGER[],
+                  ?::TEXT[],
+                  ?::TEXT[],
+                  ?::TEXT[],
+                  ?::TEXT[],
+                  ?::receipt_kind[],
+                  ?::TEXT[]
+                )
+              ON CONFLICT (receipt_id) DO NOTHING
+            `,
+          [
+            columns.included_in_block_hash,
+            columns.included_in_block_timestamp,
+            columns.included_in_chunk_hash,
+            columns.index_in_chunk,
+            columns.originated_from_transaction_hash,
+            columns.predecessor_account_id,
+            columns.public_key,
+            columns.receipt_id,
+            columns.receipt_kind,
+            columns.receiver_account_id,
+          ],
+        ),
       );
     }
   }
@@ -71,14 +152,74 @@ export const storeReceipts = async (
   if (receiptActionsData.length) {
     for (let i = 0; i < receiptActionsData.length; i += batchSize) {
       const batch = receiptActionsData.slice(i, i + batchSize);
+      const columns: ActionReceiptColumns = {
+        action_kind: [],
+        args: [],
+        index_in_action_receipt: [],
+        nep518_rlp_hash: [],
+        receipt_id: [],
+        receipt_included_in_block_timestamp: [],
+        receipt_predecessor_account_id: [],
+        receipt_receiver_account_id: [],
+      };
+
+      batch.forEach((receipt) => {
+        columns.action_kind.push(receipt.action_kind),
+          columns.args.push(receipt.args),
+          columns.index_in_action_receipt.push(receipt.index_in_action_receipt),
+          columns.nep518_rlp_hash.push(receipt.nep518_rlp_hash),
+          columns.receipt_id.push(receipt.receipt_id),
+          columns.receipt_included_in_block_timestamp.push(
+            receipt.receipt_included_in_block_timestamp,
+          ),
+          columns.receipt_predecessor_account_id.push(
+            receipt.receipt_predecessor_account_id,
+          ),
+          columns.receipt_receiver_account_id.push(
+            receipt.receipt_receiver_account_id,
+          );
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('action_receipt_actions')
-            .insert(batch)
-            .onConflict(['receipt_id', 'index_in_action_receipt'])
-            .ignore();
-        }),
+        knex.raw(
+          `
+              INSERT INTO
+                action_receipt_actions (
+                  action_kind,
+                  args,
+                  index_in_action_receipt,
+                  nep518_rlp_hash,
+                  receipt_id,
+                  receipt_included_in_block_timestamp,
+                  receipt_predecessor_account_id,
+                  receipt_receiver_account_id
+                )
+              SELECT
+                *
+              FROM
+                UNNEST(
+                  ?::action_kind[],
+                  ?::JSONB[],
+                  ?::INTEGER[],
+                  ?::TEXT[],
+                  ?::TEXT[],
+                  ?::BIGINT[],
+                  ?::TEXT[],
+                  ?::TEXT[]
+                )
+              ON CONFLICT (receipt_id, index_in_action_receipt) DO NOTHING
+            `,
+          [
+            columns.action_kind,
+            columns.args,
+            columns.index_in_action_receipt,
+            columns.nep518_rlp_hash,
+            columns.receipt_id,
+            columns.receipt_included_in_block_timestamp,
+            columns.receipt_predecessor_account_id,
+            columns.receipt_receiver_account_id,
+          ],
+        ),
       );
     }
   }
@@ -86,14 +227,35 @@ export const storeReceipts = async (
   if (receiptInputData.length) {
     for (let i = 0; i < receiptInputData.length; i += batchSize) {
       const batch = receiptInputData.slice(i, i + batchSize);
+      const columns: ReceiptInputColumns = {
+        input_data_id: [],
+        input_to_receipt_id: [],
+      };
+
+      batch.forEach((receipt) => {
+        columns.input_data_id.push(receipt.input_data_id);
+        columns.input_to_receipt_id.push(receipt.input_to_receipt_id);
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('action_receipt_input_data')
-            .insert(batch)
-            .onConflict(['input_data_id', 'input_to_receipt_id'])
-            .ignore();
-        }),
+        knex.raw(
+          `
+              INSERT INTO
+                action_receipt_input_data (
+                  input_data_id,
+                  input_to_receipt_id
+                )
+              SELECT
+                *
+              FROM
+                UNNEST(
+                  ?::TEXT[],
+                  ?::TEXT[]
+                )
+              ON CONFLICT (input_data_id, input_to_receipt_id) DO NOTHING
+            `,
+          [columns.input_data_id, columns.input_to_receipt_id],
+        ),
       );
     }
   }
@@ -101,14 +263,43 @@ export const storeReceipts = async (
   if (receiptOutputData.length) {
     for (let i = 0; i < receiptOutputData.length; i += batchSize) {
       const batch = receiptOutputData.slice(i, i + batchSize);
+      const columns: ReceiptOutputColumns = {
+        output_data_id: [],
+        output_from_receipt_id: [],
+        receiver_account_id: [],
+      };
+
+      batch.forEach((receipt) => {
+        columns.output_data_id.push(receipt.output_data_id);
+        columns.output_from_receipt_id.push(receipt.output_from_receipt_id);
+        columns.receiver_account_id.push(receipt.receiver_account_id);
+      });
 
       promises.push(
-        retry(async () => {
-          await knex('action_receipt_output_data')
-            .insert(batch)
-            .onConflict(['output_data_id', 'output_from_receipt_id'])
-            .ignore();
-        }),
+        knex.raw(
+          `
+              INSERT INTO
+                action_receipt_output_data (
+                  output_data_id,
+                  output_from_receipt_id,
+                  receiver_account_id
+                )
+              SELECT
+                *
+              FROM
+                UNNEST(
+                  ?::TEXT[],
+                  ?::TEXT[],
+                  ?::TEXT[]
+                )
+              ON CONFLICT (output_data_id, output_from_receipt_id) DO NOTHING
+            `,
+          [
+            columns.output_data_id,
+            columns.output_from_receipt_id,
+            columns.receiver_account_id,
+          ],
+        ),
       );
     }
   }
