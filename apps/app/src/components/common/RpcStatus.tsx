@@ -3,29 +3,35 @@ import FaHourglassStart from '../Icons/FaHourglassStart';
 import FaTimesCircle from '../Icons/FaTimesCircle';
 
 interface Props {
-  status: boolean;
+  status: 'SuccessValue' | 'Failure' | 'SuccessReceiptId' | 'Unknown';
   showLabel: boolean;
   showReceipt?: React.ReactNode;
 }
 
-const getOptions = (status: boolean) => {
+const getOptions = (status: Props['status']) => {
   switch (status) {
-    case null:
+    case 'Unknown':
       return {
         bg: 'bg-yellow-50 dark:bg-black',
         text: 'text-yellow-500',
         icon: FaHourglassStart,
         label: 'Pending',
       };
-    case false:
+    case 'Failure':
       return {
         bg: 'bg-red-50 dark:bg-black',
         text: 'text-red-500',
         icon: FaTimesCircle,
         label: 'Fail',
       };
-
-    default:
+    case 'SuccessValue':
+      return {
+        bg: 'bg-emerald-50 dark:bg-black',
+        text: 'text-emerald-500',
+        icon: FaCheckCircle,
+        label: 'Success',
+      };
+    case 'SuccessReceiptId':
       return {
         bg: 'bg-emerald-50 dark:bg-black',
         text: 'text-emerald-500',
@@ -35,23 +41,27 @@ const getOptions = (status: boolean) => {
   }
 };
 
-const TxnStatus = (props: Props) => {
-  const option = getOptions(props.status);
-  const Icon = option.icon;
+const RpcTxnStatus = (props: any) => {
+  if (!props.status) {
+    return null;
+  }
+
+  const statusType = Object.keys(props.status)[0] as Props['status'];
+  const option = getOptions(statusType);
+  const Icon = option?.icon;
 
   return (
     <div className="w-full md:w-3/4 break-words inline-flex items-center">
       <span
-        className={`inline-flex items-center text-xs rounded py-1 ${
-          option.bg
-        } ${option.text} ${props.showLabel ? ' px-2' : ' px-1'}`}
+        className={`inline-flex items-center text-xs rounded py-1 ${option?.bg} ${option?.text} ${
+          props.showLabel ? ' px-2' : ' px-1'
+        }`}
       >
         <Icon />
-        {props.showLabel && <span className="ml-2">{option.label}</span>}
+        {props.showLabel && <span className="ml-2">{option?.label}</span>}
       </span>
       {props.showReceipt ? props.showReceipt : null}
     </div>
   );
 };
-
-export default TxnStatus;
+export default RpcTxnStatus;

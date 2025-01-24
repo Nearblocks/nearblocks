@@ -36,7 +36,6 @@ import ArrowDown from '../Icons/ArrowDown';
 import ArrowUp from '../Icons/ArrowUp';
 import Question from '../Icons/Question';
 import useTranslation from 'next-translate/useTranslation';
-import TxnStatus from '../common/Status';
 import FaRight from '../Icons/FaRight';
 import { Tooltip } from '@reach/tooltip';
 import {
@@ -55,6 +54,7 @@ import { isEmpty } from 'lodash';
 import NEPTokenTransactions from '../common/NEPTokenTransactions';
 import Bolt from '../Icons/Bolt';
 import ArrowDownDouble from '../Icons/ArrowDownDouble';
+import RpcTxnStatus from '../common/RpcStatus';
 
 interface Props {
   loading: boolean;
@@ -372,7 +372,7 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words">
               {txn?.outcomes?.status !== undefined && (
-                <TxnStatus
+                <RpcTxnStatus
                   showLabel
                   status={rpcTxn.status}
                   showReceipt={<FailedReceipts data={rpcTxn} />}
