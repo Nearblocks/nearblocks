@@ -1,6 +1,6 @@
 'use client';
 
-import { useConfig } from '@/hooks/app/useConfig';
+// import { useConfig } from '@/hooks/app/useConfig';
 import { useEffect, useMemo, useState } from 'react';
 
 interface BannerData {
@@ -16,7 +16,7 @@ interface BannerActionsProps {
 }
 
 const Banner = ({ bannerInfo }: BannerActionsProps) => {
-  const { userAuthURL } = useConfig();
+  // const { userAuthURL } = useConfig();
   const [isTablet, setIsTablet] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -28,25 +28,26 @@ const Banner = ({ bannerInfo }: BannerActionsProps) => {
     };
     handleResize();
     window.addEventListener('resize', handleResize);
-
     return () => window.removeEventListener('resize', handleResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // API Call commented out
+  /*
   useEffect(() => {
     if (!bannerInfo) return;
     const impressionUrl = `${userAuthURL}campaigns/track/impression/${bannerInfo?.id}`;
-
     if (impressionUrl) {
       const img = new Image();
       img.src = impressionUrl;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bannerInfo]);
+  */
 
+  /*
   const createMarkup = useMemo(() => {
     if (!bannerInfo) return { __html: '' };
-
     return {
       __html: `
         <a href="${userAuthURL}campaigns/track/click/${bannerInfo?.id}" rel="nofollow" target="_blank">
@@ -74,7 +75,11 @@ const Banner = ({ bannerInfo }: BannerActionsProps) => {
       Ad
     </div>
   );
+  */
 
+  return null;
+  
+  /* Original return logic commented out
   return bannerInfo ? (
     isMobile ? (
       <div
@@ -106,5 +111,7 @@ const Banner = ({ bannerInfo }: BannerActionsProps) => {
       </div>
     )
   ) : null;
+  */
 };
+
 export default Banner;
