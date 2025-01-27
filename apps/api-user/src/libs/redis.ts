@@ -37,7 +37,7 @@ if (config.redisSentinelName) {
   }
 }
 
-const redis = new Redis(`user-api`, options);
+const redis = new Redis(`user-api:${config.network}`, options);
 
 export const redisClient = redis.client();
 

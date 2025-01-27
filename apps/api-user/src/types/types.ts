@@ -14,6 +14,7 @@ export type Config = {
   awsUrl: string;
   dbUrl: string;
   jwtSecret: string;
+  network: string;
   port: number;
   redisPassword: string;
   redisSentinelName: string;
