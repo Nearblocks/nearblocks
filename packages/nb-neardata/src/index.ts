@@ -115,9 +115,13 @@ export const streamBlock = (config: BlockStreamConfig) => {
           const block = this.block || start;
           const hasLast = !this.last || block - this.last > 10;
 
-          if (!this.final || hasLast) {
+          if (!this.final || hasLast || this.final < block) {
             this.final = (await fetchFinal(url)).block.header.height;
             this.last = block;
+          }
+
+          if (this.final < block) {
+            continue;
           }
 
           const diff = this.final - block;
