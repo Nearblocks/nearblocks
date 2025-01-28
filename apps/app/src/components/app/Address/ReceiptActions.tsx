@@ -28,6 +28,7 @@ import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const initialForm = {
   action: '',
@@ -54,6 +55,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
   const [showAge, setShowAge] = useState(true);
   const t = useTranslations();
   const errorMessage = t('noTxns') || ' No transactions found!';
+  const { networkId } = useConfig();
 
   const toggleShowAge = () => setShowAge((s) => !s);
   const currentParams = QueryString.parse(searchParams?.toString() || '');
@@ -537,6 +539,11 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
 
   return (
     <>
+      {networkId === 'mainnet' && txns && (
+        <div className="w-full text-center bg-nearblue dark:bg-black-200 rounded-t-xl px-5 py-4 text-green dark:text-green-250 text-sm">
+          Receipts are out of sync. Receipts data will be delayed.
+        </div>
+      )}
       <TableSummary
         filters={<Filters filters={modifiedFilter} onClear={onAllClear} />}
         linkToDowload={

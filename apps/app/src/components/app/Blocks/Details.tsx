@@ -226,34 +226,112 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
+                  <Skeleton className="flex w-full max-w-sm h-4" />
+                </div>
+              ) : (
+                <div className="w-full md:w-3/4 break-words">
+                  {block?.block_timestamp &&
+                    `${getTimeAgoString(
+                      nanoToMilli(block?.block_timestamp),
+                    )} (${convertToUTC(
+                      nanoToMilli(block?.block_timestamp),
+                      true,
+                    )}) +UTC`}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap p-4">
+              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                {t ? t('block.transactions.0') : 'Transactions'}
+              </div>
+              {isLoading ? (
+                <div className="w-full md:w-3/4">
                   <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 block?.transactions_agg?.count && (
                   <div className="w-full md:w-3/4 break-words">
-                    <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                      {t?.('block.transactions.1', {
-                        txns:
-                          localFormat(
-                            block?.transactions_agg?.count?.toString(),
-                          ) ||
-                          block?.transactions_agg?.count?.toString() ||
-                          'transactions',
-                      }) ||
-                        `${localFormat(
-                          block?.transactions_agg?.count?.toString(),
-                        )} transactions`}
-                    </LinkWrapper>
-                    &nbsp;
-                    {t?.('block.transactions.2', {
-                      receipts:
-                        localFormat(block?.receipts_agg?.count?.toString()) ||
-                        block?.receipts_agg?.count?.toString() ||
-                        'receipts',
-                    }) ||
-                      `and ${localFormat(
-                        block?.receipts_agg?.count?.toString(),
-                      )} receipts`}
+                    {t ? (
+                      <>
+                        {networkId === 'mainnet' ? (
+                          <LinkWrapper
+                            href={`/txns?block=${block?.block_hash}`}
+                          >
+                            {t('block.transactions.1', {
+                              txns: block?.transactions_agg?.count
+                                ? localFormat(
+                                    block?.transactions_agg?.count?.toString(),
+                                  )
+                                : block?.transactions_agg?.count?.toString() ??
+                                  '',
+                            })}
+                          </LinkWrapper>
+                        ) : (
+                          <>
+                            <LinkWrapper
+                              href={`/txns?block=${block?.block_hash}`}
+                            >
+                              {t('block.transactions.1', {
+                                txns: block?.transactions_agg?.count
+                                  ? localFormat(
+                                      block?.transactions_agg?.count?.toString(),
+                                    )
+                                  : block?.transactions_agg?.count?.toString() ??
+                                    '',
+                              })}
+                            </LinkWrapper>
+                            &nbsp;
+                            {t('block.transactions.2', {
+                              receipts: block?.receipts_agg?.count
+                                ? localFormat(
+                                    block?.receipts_agg?.count?.toString(),
+                                  )
+                                : block?.receipts_agg?.count?.toString() ?? '',
+                            })}{' '}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {networkId === 'mainnet' ? (
+                          <>
+                            (
+                            <LinkWrapper
+                              href={`/txns?block=${block?.block_hash}`}
+                            >
+                              {block?.transactions_agg?.count
+                                ? localFormat(
+                                    block?.transactions_agg?.count.toString(),
+                                  )
+                                : block?.transactions_agg?.count.toString() ??
+                                  '' + ' transactions'}
+                            </LinkWrapper>
+                            )
+                          </>
+                        ) : (
+                          <>
+                            (
+                            <LinkWrapper
+                              href={`/txns?block=${block?.block_hash}`}
+                            >
+                              {block?.transactions_agg?.count
+                                ? localFormat(
+                                    block?.transactions_agg?.count.toString(),
+                                  )
+                                : block?.transactions_agg?.count.toString() ??
+                                  '' + ' transactions'}
+                            </LinkWrapper>
+                            ) + `and $
+                            {block?.receipts_agg?.count
+                              ? localFormat(
+                                  block?.receipts_agg?.count.toString(),
+                                )
+                              : block?.receipts_agg?.count ?? ''}{' '}
+                            receipts`
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 )
               )}
