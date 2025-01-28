@@ -8,7 +8,7 @@ const Home: PageLayout = () => {
     <>
       <Meta
         description="Check real-time data on the NEAR blockchain"
-        title="Near RPC based Explorer | NearBlocks Lite"
+        title="Near RPC based Explorer | Near Validate"
       />
       <div className="relative container mx-auto">
         <div className="py-[58px] px-6 text-center">

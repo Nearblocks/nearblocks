@@ -27,7 +27,7 @@ const Address: PageLayout = () => {
     <>
       <Meta
         description={`Near Account ${id} page allows users to view account details and access keys.`}
-        title={`Near Account ${id} | NearBlocks Lite`}
+        title={`Near Account ${id} | Near Validate`}
       />
       <div className="relative">
         <div className="absolute inset-0" ref={loader}>
