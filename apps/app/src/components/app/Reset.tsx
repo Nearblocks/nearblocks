@@ -93,15 +93,15 @@ const Reset = ({ code, email }: Props) => {
       <div className="container-xxl mx-auto py-20">
         <div className="mx-auto px-5 align-middle max-w-[685px]">
           <form method="post" onSubmit={formik.handleSubmit}>
-            <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold">
+            <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
               Reset new Password
             </h1>
-            <p className="text-sm text-gray-600 dark:text-neargray-10 py-2 font-thin">
+            <p className="text-gray-600 dark:text-neargray-10 text-sm font-medium py-2">
               Fill out the form
             </p>
             <div className="py-2 flex">
               <div className="w-full mr-1">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Password
                 </p>
                 <div className="relative w-full">
@@ -130,7 +130,7 @@ const Reset = ({ code, email }: Props) => {
                 )}
               </div>
               <div className="w-full ml-2">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Confirm Password
                 </p>
                 <div className="relative w-full">
@@ -163,7 +163,7 @@ const Reset = ({ code, email }: Props) => {
 
             <div className="w-full text-right my-4 justify-between flex items-center">
               <a
-                className="underline text-xs text-gray-600 dark:text-neargray-10 cursor-pointer"
+                className="underline text-sm font-medium text-gray-600 dark:text-neargray-100 cursor-pointer"
                 onClick={onLogin}
               >
                 Back to sign in

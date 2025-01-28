@@ -1,10 +1,13 @@
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { redirect, RedirectType } from 'next/navigation';
 
 import Login from '@/components/app/Login';
 import { appUrl } from '@/utils/app/config';
+import { getUserDataFromToken } from '@/utils/app/libs';
+import { UserToken } from '@/utils/types';
+import { getCookie } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -49,13 +52,13 @@ interface Props {
 }
 
 export default async function LoginPage({ searchParams }: Props) {
-  const token = (await cookies()).get('token')?.value;
-  const role = (await cookies()).get('role')?.value;
-  const user = (await cookies()).get('user')?.value;
   const { id, interval } = await searchParams;
+  const token = await getCookie('token');
+  const userData: UserToken | null = getUserDataFromToken(token);
+  const user = userData?.username;
 
-  if (token && role && user && (!id || !interval)) {
-    redirect('/user/overview');
+  if (user && (!id || !interval)) {
+    redirect('/user/overview', RedirectType.replace);
   }
   const turnstileSiteAuth = async (tokens: string) => {
     'use server';

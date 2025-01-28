@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 
 import APISubscription from '@/components/app/Publisher/APISubscription';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -42,9 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function APISubscriptions() {
-  const userRole = (await cookies()).get('role')?.value;
-  if (userRole === 'advertiser') {
-    notFound();
-  }
-  return <APISubscription role={userRole} />;
+  const role = await getUserRole('advertiser');
+  return <APISubscription role={role} />;
 }

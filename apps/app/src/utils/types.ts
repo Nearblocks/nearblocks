@@ -1815,3 +1815,17 @@ export type Account = {
   storage_paid_at: number;
   storage_usage: number;
 };
+
+export type UserToken = {
+  exp: number;
+  iat: number;
+  role: string;
+  sub: string;
+  username: string;
+};
+
+export type BannerAdData = {
+  desktopImage: string;
+  id?: string;
+  mobileImage: string;
+};

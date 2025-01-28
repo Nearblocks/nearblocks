@@ -1,9 +1,12 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { redirect, RedirectType } from 'next/navigation';
 
 import Register from '@/components/app/Register';
 import { appUrl } from '@/utils/app/config';
+import { getUserDataFromToken } from '@/utils/app/libs';
+import { UserToken } from '@/utils/types';
+import { getCookie } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -41,11 +44,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RegisterPage() {
-  const token = (await cookies()).get('token')?.value;
-  const role = (await cookies()).get('role')?.value;
-  const user = (await cookies()).get('user')?.value;
-  if (token && role && user) {
-    redirect('/user/overview');
+  const token = await getCookie('token');
+  const userData: UserToken | null = getUserDataFromToken(token);
+  const user = userData?.username;
+  if (user) {
+    redirect('/user/overview', RedirectType.replace);
   }
   return <Register />;
 }

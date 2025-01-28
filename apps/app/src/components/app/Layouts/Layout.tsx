@@ -14,6 +14,7 @@ import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
 import { getRequest } from '@/utils/app/api';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
+import { getCookie } from '@/utils/app/actions';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,9 +25,7 @@ interface LayoutProps {
 const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
   const theme = (await cookies()).get('theme')?.value || 'light';
-  const token = (await cookies()).get('token')?.value;
-  const role = (await cookies()).get('role')?.value;
-  const user = (await cookies()).get('user')?.value;
+  const token = await getCookie('token');
 
   const getLatestStats = async () => {
     'use server';
@@ -156,8 +155,6 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                 <LayoutActions
                   theme={theme}
                   token={token}
-                  user={user}
-                  role={role}
                   stats={stats}
                   sync={sync}
                   getLatestStats={getLatestStats}

@@ -1,6 +1,4 @@
 import { FormikValues, useFormik } from 'formik';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
@@ -13,6 +11,7 @@ import UnlockCircle from '../Icons/UnlockCircle';
 import Visibility from '../Icons/Visibility';
 import VisibilityOff from '../Icons/VisibilityOff';
 import { useConfig } from '@/hooks/app/useConfig';
+import { signOut } from '@/utils/app/actions';
 
 const validationSchema = Yup.object().shape({
   old_password: Yup.string()
@@ -27,7 +26,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const UpdatePassword = () => {
-  const router = useRouter();
   const { userAuthURL: baseURL } = useConfig();
   const [showPasswords, setShowPasswords] = useState<{
     [key: string]: boolean;
@@ -45,14 +43,7 @@ const UpdatePassword = () => {
           toastId: 'password-changed',
         });
       }
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
-      Cookies.remove('token');
-      Cookies.remove('role');
-      Cookies.remove('user');
-      router?.push('/login');
-      router?.refresh();
+      signOut();
     } catch (error) {
       const message = catchErrors(error);
       if (!toast.isActive('password-changed-error')) {

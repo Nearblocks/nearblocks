@@ -472,20 +472,18 @@ const MultiChainTxns = ({
         <>
           <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
             {isTab && (
-              <div className="py-[0.32rem]">
-                <TableSummary
-                  filters={
-                    <Filters filters={modifiedFilter} onClear={onAllClear} />
-                  }
-                  text={
-                    txns &&
-                    !error &&
-                    `${`A total of${' '}
+              <TableSummary
+                filters={
+                  <Filters filters={modifiedFilter} onClear={onAllClear} />
+                }
+                text={
+                  txns &&
+                  !error &&
+                  `${`A total of${' '}
               ${count ? localFormat && localFormat(count.toString()) : 0}${' '}
               multichain transactions found`}`
-                  }
-                />
-              </div>
+                }
+              />
             )}
             <Table
               columns={columns}

@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { notFound } from 'next/navigation';
-
+import { headers } from 'next/headers';
 import Plan from '@/components/app/User/Plan';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -49,9 +48,6 @@ interface Props {
 
 export default async function CurrentPlan({ searchParams }: Props) {
   const { status } = await searchParams;
-  const userRole = (await cookies()).get('role')?.value;
-  if (userRole === 'publisher') {
-    notFound();
-  }
-  return <Plan role={userRole} status={status} />;
+  const role = await getUserRole('publisher');
+  return <Plan role={role} status={status} />;
 }

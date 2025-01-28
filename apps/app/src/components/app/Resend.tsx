@@ -58,17 +58,17 @@ const Resend = ({ type }: Props) => {
         <div className="mx-auto px-5 align-middle max-w-[685px]">
           <form method="post" onSubmit={formik.handleSubmit}>
             {type && type === 'RESET_PASSWORD' ? (
-              <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold">
+              <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
                 Resend Password Recovery{' '}
                 <span className="font-bold">Email</span>
               </h1>
             ) : (
-              <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold">
+              <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
                 Resend Confirmation <span className="font-bold">Email</span>
               </h1>
             )}
             <div className="py-2">
-              <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+              <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                 Email Address
               </p>
               <input
@@ -86,7 +86,7 @@ const Resend = ({ type }: Props) => {
 
             <div className="w-full text-right my-4 justify-between flex items-center">
               <a
-                className="underline text-xs text-gray-600 dark:text-neargray-10 cursor-pointer"
+                className="underline text-gray-600 text-sm  font-medium dark:text-neargray-100 cursor-pointer"
                 onClick={onLogin}
               >
                 Back to sign in

@@ -1,8 +1,9 @@
 import Big from 'big.js';
 import get from 'lodash/get';
-import { jwtDecode } from 'jwt-decode';
-import { FieldType, GuessableTypeString } from '@/utils/types';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
+import { FieldType, GuessableTypeString, UserToken } from '@/utils/types';
 import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
+import dayjs from './dayjs';
 
 const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
@@ -547,10 +548,15 @@ export function getFilteredQueryParams(
   return Object.keys(filteredParams).length ? filteredParams : {};
 }
 
-export const getUserDataFromToken = (token: string) => {
+export const getUserDataFromToken = (
+  token: string | undefined,
+): UserToken | null => {
   try {
-    const decoded = jwtDecode(token);
-    return decoded;
+    if (token) {
+      const decoded = jwtDecode<JwtPayload>(token);
+      return decoded as UserToken;
+    }
+    return null;
   } catch (error) {
     console.error('Invalid token or decoding failed', error);
     return null;
@@ -565,4 +571,13 @@ export function isValidJson(value: string): boolean {
   } catch (e) {
     return false;
   }
+}
+
+export function convertTimestampToTimes(nanoTimestamp: string) {
+  const milliTimestamp = nanoToMilli(nanoTimestamp);
+  const utcTime = dayjs
+    .utc(milliTimestamp)
+    .format('MMMM D, YYYY HH:mm:ss +UTC');
+  const localTime = dayjs(milliTimestamp).format('MMMM D, YYYY HH:mm:ss');
+  return { utcTime, localTime };
 }

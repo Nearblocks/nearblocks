@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 
 import CampaignEdit from '@/components/app/Campaign/CampaignEdit';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -50,7 +51,7 @@ export default async function EditCampaign({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<JSX.Element> {
-  const userRole = (await cookies()).get('role')?.value;
   const id = (await params).id;
-  return <CampaignEdit campaignId={id} userRole={userRole} />;
+  const role = await getUserRole();
+  return <CampaignEdit campaignId={id} userRole={role} />;
 }

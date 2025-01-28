@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 
 import Invoice from '@/components/app/User/Invoice';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -40,6 +41,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Invoices() {
-  const userRole = (await cookies()).get('role')?.value;
-  return <Invoice role={userRole} />;
+  const role = await getUserRole();
+  return <Invoice role={role} />;
 }

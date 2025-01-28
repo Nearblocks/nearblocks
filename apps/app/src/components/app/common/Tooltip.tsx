@@ -22,7 +22,7 @@ const Tooltip = ({
   return (
     <span className="relative group">
       <span
-        className={`absolute z-20 bg-black text-white text-xs break-words rounded-lg p-2 transition-all invisible opacity-0 group-hover:visible group-hover:opacity-80 ${tooltipPositionClasses[position]} ${className}`}
+        className={`absolute z-10 bg-black text-white text-xs break-words rounded-lg p-2 transition-all invisible opacity-0 group-hover:visible group-hover:opacity-80 ${tooltipPositionClasses[position]} ${className}`}
         style={{
           transitionDuration: '150ms',
         }}

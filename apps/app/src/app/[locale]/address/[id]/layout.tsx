@@ -4,7 +4,7 @@ import Buttons from '@/components/app/common/Button';
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
-import SponserdText from '@/components/app/SponserdText';
+/* import SponserdText from '@/components/app/SponserdText'; */
 import { appUrl, networkId } from '@/utils/app/config';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
@@ -100,11 +100,11 @@ export default async function AddressLayout(props: {
               </div>
             </div>
           </div>
-          <div className="container-xxl justify-left pl-2 pb-6 text-nearblue-600">
+          {/*  <div className="container-xxl justify-left pl-2 pb-6 dark:text-neargray-10 text-gray-700">
             <div className="min-h-[80px] md:min-h-[25px]">
               <SponserdText />
             </div>
-          </div>
+          </div> */}
         </div>
         {children}
       </div>

@@ -34,8 +34,6 @@ const LayoutActions = ({
   notice,
   theme,
   token,
-  user,
-  role,
   stats,
   sync,
   handleFilterAndKeyword,
@@ -70,8 +68,6 @@ const LayoutActions = ({
             sync={sync}
             theme={theme}
             token={token}
-            user={user}
-            role={role}
             getLatestStats={getLatestStats}
             getSyncStatus={getSyncStatus}
           />

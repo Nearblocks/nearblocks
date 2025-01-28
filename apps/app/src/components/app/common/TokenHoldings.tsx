@@ -76,16 +76,17 @@ const TokenHoldings = (props: Props) => {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="bg-white w-full -mt-1 !rounded-lg shadow border z-10 pb-2  dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
+        className="bg-white w-full -mt-1.5 !rounded-lg shadow border z-10 pb-1  dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
         roundedBottom={'lg'}
         roundedTop={'none'}
+        position="absolute"
       >
         <div className="dark:bg-black">
-          <PerfectScrollbar className="px-1">
+          <PerfectScrollbar>
             <div className="max-h-60 dark:bg-black">
               {props.ft?.tokens?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 py-2 mx-2 mt-2 rounded-lg">
+                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10 font-semibold pr-2 pl-1.5 py-2 mx-2 mt-1 rounded-lg">
                     Tokens{' '}
                     <span className="font-normal">
                       ({props.ft?.tokens?.length})
@@ -93,9 +94,12 @@ const TokenHoldings = (props: Props) => {
                   </div>
                   <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
                     {props.ft?.tokens?.map((token, index) => (
-                      <div className="dark:bg-black p-2" key={token?.contract}>
+                      <div
+                        className="dark:bg-black px-2 py-1"
+                        key={token?.contract}
+                      >
                         <Link
-                          className="flex justify-between items-center px-2 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
+                          className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
                           href={`/token/${token?.contract}?a=${props.id}`}
                         >
                           <div key={index}>
@@ -140,7 +144,7 @@ const TokenHoldings = (props: Props) => {
                                 )
                               </span>
                             </div>
-                            <div className="text-gray-400 flex items-center my-0.5 mx-2.5">
+                            <div className="text-gray-400 flex items-center my-0.5 mr-2.5 ml-1">
                               {token?.rpcAmount
                                 ? localFormat(token?.rpcAmount)
                                 : token?.rpcAmount ?? ''}
@@ -149,7 +153,7 @@ const TokenHoldings = (props: Props) => {
 
                           {!isTokenSpam(token?.contract) ? (
                             token?.ft_meta?.price && (
-                              <div className="text-right">
+                              <div className="text-right p-0.5">
                                 <div>
                                   {token?.amountUsd
                                     ? '$' + dollarFormat(token?.amountUsd)
@@ -164,7 +168,7 @@ const TokenHoldings = (props: Props) => {
                               </div>
                             )
                           ) : (
-                            <div className="text-gray-400">[Spam]</div>
+                            <div className="text-gray-400 p-0.5">[Spam]</div>
                           )}
                         </Link>
                       </div>
@@ -174,15 +178,18 @@ const TokenHoldings = (props: Props) => {
               )}
               {nfts?.length > 0 && (
                 <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 py-2 mx-2 mt-2 rounded-lg">
+                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 pr-2 pl-1 py-2 mx-2 mt-1 rounded-lg">
                     NFT Tokens
                     <span className="font-normal">({nfts?.length})</span>
                   </div>
                   <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
                     {nfts.map((nft) => (
-                      <div className="dark:bg-black p-2" key={nft?.contract}>
+                      <div
+                        className="dark:bg-black px-2 py-1"
+                        key={nft?.contract}
+                      >
                         <Link
-                          className="flex justify-between items-center px-2 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
+                          className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
                           href={`/nft-token/${nft?.contract}`}
                         >
                           <div>
@@ -215,14 +222,14 @@ const TokenHoldings = (props: Props) => {
                                 ({nft?.nft_meta?.symbol})
                               </span>
                             </div>
-                            <div className="text-gray-400 flex items-center my-0.5 mx-2.5">
+                            <div className="text-gray-400 flex items-center my-0.5 mr-2.5 ml-1.5">
                               {nft?.quantity
                                 ? localFormat(nft?.quantity)
                                 : nft?.quantity ?? ''}
                             </div>
                           </div>
                           {isTokenSpam(nft?.contract) && (
-                            <div className="text-gray-400">[Spam]</div>
+                            <div className="text-gray-400 p-0.5">[Spam]</div>
                           )}
                         </Link>
                       </div>

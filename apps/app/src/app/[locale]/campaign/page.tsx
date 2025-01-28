@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import CampaignPage from '@/components/app/Campaign/CampaignPage';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -41,6 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Campaign() {
-  const userRole = (await cookies()).get('role')?.value;
-  return <CampaignPage userRole={userRole} />;
+  const role = await getUserRole();
+  return <CampaignPage userRole={role} />;
 }

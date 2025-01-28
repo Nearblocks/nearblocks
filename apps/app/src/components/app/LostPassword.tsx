@@ -56,10 +56,10 @@ const LostPassword = () => {
         <div className="container-xxl mx-auto py-20">
           <div className="mx-auto px-5 align-middle max-w-[685px]">
             <form method="post" onSubmit={formik.handleSubmit}>
-              <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold">
+              <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
                 Forgot your password?
               </h1>
-              <p className="text-gray-600 dark:text-neargray-10 text-xs my-2">
+              <p className="text-gray-600 dark:text-neargray-10 text-sm font-medium my-2">
                 Enter your email address below and we&apos;ll get you back on
                 track.
               </p>
@@ -93,7 +93,7 @@ const LostPassword = () => {
               )}
 
               <div className="py-2">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-10">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Email Address
                 </p>
                 <input
@@ -111,7 +111,7 @@ const LostPassword = () => {
 
               <div className="w-full text-right my-4 justify-between flex items-center">
                 <a
-                  className="underline text-xs text-gray-600 dark:text-neargray-10 cursor-pointer"
+                  className="underline text-sm font-medium text-gray-600 dark:text-neargray-100 cursor-pointer"
                   onClick={onLogin}
                 >
                   Back to sign in
