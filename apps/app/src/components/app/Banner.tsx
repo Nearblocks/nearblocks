@@ -1,7 +1,6 @@
 'use client';
 
 // import { useConfig } from '@/hooks/app/useConfig';
-import { useEffect, useMemo, useState } from 'react';
 
 interface BannerData {
   desktopImage: string;
@@ -15,22 +14,22 @@ interface BannerActionsProps {
   bannerInfo: BannerData;
 }
 
-const Banner = ({ bannerInfo }: BannerActionsProps) => {
+const Banner = ({}: BannerActionsProps) => {
   // const { userAuthURL } = useConfig();
-  const [isTablet, setIsTablet] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // const [isTablet, setIsTablet] = useState(false);
+  // const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width <= 425);
-      setIsTablet(width > 425 && width <= 768);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     const width = window.innerWidth;
+  //     setIsMobile(width <= 425);
+  //     setIsTablet(width > 425 && width <= 768);
+  //   };
+  //   handleResize();
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   // API Call commented out
   /*
@@ -78,7 +77,7 @@ const Banner = ({ bannerInfo }: BannerActionsProps) => {
   */
 
   return null;
-  
+
   /* Original return logic commented out
   return bannerInfo ? (
     isMobile ? (

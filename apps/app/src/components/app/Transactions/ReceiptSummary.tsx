@@ -12,6 +12,7 @@ import FaInbox from '../Icons/FaInbox';
 import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
 import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   hash: string;
@@ -28,6 +29,7 @@ interface Props {
 
 const ReceiptSummary = (props: Props) => {
   const { hash, loading, price, rpcTxn, statsData, txn } = props;
+  const { networkId } = useConfig();
 
   const t = useTranslations();
   const [receipt, setReceipt] = useState<any>(null);
@@ -99,7 +101,9 @@ const ReceiptSummary = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending = txn?.outcomes?.status === null;
+  const txnsPending =
+    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
+
   return (
     <>
       {!txn ? (
