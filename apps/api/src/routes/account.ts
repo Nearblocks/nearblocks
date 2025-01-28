@@ -276,7 +276,12 @@ const routes = (app: Router) => {
    * @openapi
    * /v1/account/{account}/txns:
    *   get:
-   *     summary: Get account txns by pagination
+   *     summary: Get account txns by pagination (NOT RECOMMENDED)
+   *     description: |
+   *       **NOT RECOMMENDED**: This endpoint is no longer recommended for large accounts due to performance issue.
+   *       For large accounts, it is better to query txns and receipts separately:
+   *       - account/{account_id}/txns-only
+   *       - account/{account_id}/receipts
    *     tags:
    *       - Account
    *     parameters:
