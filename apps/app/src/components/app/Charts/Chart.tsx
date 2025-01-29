@@ -290,6 +290,20 @@ const Chart = (props: Props) => {
           type: 'x',
         },
       },
+      responsive: {
+        rules: [
+          {
+            condition: {
+              maxWidth: 500,
+            },
+            chartOptions: {
+              chart: {
+                height: chartTypes === 'txns' || 'addresses' ? 350 : 390,
+              },
+            },
+          },
+        ],
+      },
       credits: { enabled: false },
       plotOptions: {
         area: {
@@ -419,7 +433,7 @@ const Chart = (props: Props) => {
           >
             <div className="border-b dark:border-black-200 flex justify-between items-center">
               {chartData?.length > 0 ? (
-                <>
+                <div className="w-full flex flex-col sm:!flex-row sm:justify-between py-2 items-end sm:!py-0 sm:items-center">
                   <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
                     {chartInfo?.description}
                   </p>
@@ -443,7 +457,7 @@ const Chart = (props: Props) => {
                       {'Log View'}
                     </label>
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="py-5 mt-1 ml-4">
                   <Skeleton className="w-80 h-4" />

@@ -167,7 +167,7 @@ const TpsChart: React.FC<Props> = ({
         },
         chart: {
           backgroundColor: 'transparent',
-          height: 430,
+          height: 350,
           panKey: 'shift',
           zooming: {
             type: 'x',
@@ -248,7 +248,7 @@ const TpsChart: React.FC<Props> = ({
           >
             <div className="border-b dark:border-black-200 flex justify-between items-center">
               {chartTpsData?.length > 0 ? (
-                <>
+                <div className="w-full flex flex-col sm:!flex-row sm:justify-between py-2 items-end sm:!py-0 sm:items-center">
                   <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
                     Near Transactions per Second Chart shows the transactions
                     occuring per second on Near blockchain.
@@ -273,7 +273,7 @@ const TpsChart: React.FC<Props> = ({
                       {'Log View'}
                     </label>
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="py-5 mt-1 ml-4">
                   <Skeleton className="w-80 h-4" />
