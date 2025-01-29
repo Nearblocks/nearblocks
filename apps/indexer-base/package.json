@@ -23,11 +23,15 @@
     "ethers": "6.13.2",
     "lodash-es": "4.17.21",
     "near-lake-framework": "2.0.0",
+    "pg": "8.13.1",
+    "pg-copy-streams": "6.0.6",
     "stream-json": "1.8.0"
   },
   "devDependencies": {
     "@types/lodash-es": "~4.17",
     "@types/node": "~20.8",
+    "@types/pg": "~8.11.11",
+    "@types/pg-copy-streams": "~1.2.5",
     "@types/stream-json": "~1.7",
     "eslint-config-custom-node": "*",
     "nb-json": "*",
