@@ -2,17 +2,11 @@ import { Readable } from 'stream';
 
 import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
-import { retry } from 'nb-utils';
+import { retry, sleep } from 'nb-utils';
 
 import { Message } from './type.js';
 
 export * from './type.js';
-
-interface BlockReadable extends Readable {
-  block?: number;
-  final?: number;
-  last?: number;
-}
 
 export type BlockStreamConfig = {
   limit?: number;
@@ -69,7 +63,11 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        if (response.status === 404) {
+          await sleep(700);
+        }
+
+        throw new Error(`status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -83,13 +81,13 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/last_block/final`, {
+      const response = await fetch(`${url}/v0/last_block/optimistic`, {
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -102,64 +100,69 @@ const fetchFinal = async (url: string): Promise<Message> => {
 
 export const streamBlock = (config: BlockStreamConfig) => {
   const url = config.url ?? endpoint(config.network);
-  const start = config.start;
   const limit = config.limit ?? 10;
+  let isFetching = false;
+  let block = config.start;
+  const highWaterMark = limit * 2;
 
   const readable = new Readable({
-    highWaterMark: limit * 2 + 1,
+    highWaterMark,
     objectMode: true,
-    async read(this: BlockReadable) {
-      try {
-        // eslint-disable-next-line no-constant-condition
-        whileLoop: while (true) {
-          const block = this.block || start;
-          const hasLast = !this.last || block - this.last > 10;
+    read() {},
+  });
 
-          if (!this.final || hasLast || this.final < block) {
-            this.final = (await fetchFinal(url)).block.header.height;
-            this.last = block;
-          }
+  const fetchBlocks = async () => {
+    if (isFetching) return;
 
-          if (this.final < block) {
-            continue;
-          }
+    isFetching = true;
 
-          const diff = this.final - block;
-          const concurrency = diff >= limit ? limit : diff > 0 ? diff : 1;
-          const promises: Promise<Message>[] = [];
+    try {
+      const remaining = highWaterMark - readable.readableLength;
 
-          for (let i = 0; i < concurrency; i++) {
-            promises.push(fetchBlock(url, block + i));
-          }
+      if (block % 10 === 0 && remaining >= 5) {
+        const final = (await fetchFinal(url)).block.header.height;
 
-          const results = await Promise.all(promises);
+        const promises: Promise<Message>[] = [];
+        const concurrency = Math.min(limit, final - block, remaining);
 
-          for (const result of results) {
-            if (!result && concurrency === 1) {
-              this.block = block + 1;
-              continue whileLoop;
-            }
-
-            if (result) {
-              if (!this.push(camelCaseKeys(result))) {
-                this.pause();
-              }
-            }
-          }
-
-          this.block = block + concurrency;
-          break whileLoop;
+        for (let i = 0; i < concurrency; i++) {
+          promises.push(fetchBlock(url, block + i));
         }
-      } catch (error) {
-        this.emit('error', error);
-        this.push(null);
-      }
-    },
-  });
 
-  readable.on('drain', () => {
-    readable.resume();
-  });
+        const results = await Promise.all(promises);
+
+        for (const result of results) {
+          if (result && !readable.push(camelCaseKeys(result))) {
+            return;
+          }
+        }
+
+        block += concurrency;
+        return;
+      }
+
+      const result = await fetchBlock(url, block);
+
+      if (!result) {
+        block++;
+        return;
+      }
+
+      if (!readable.push(camelCaseKeys(result))) {
+        return;
+      }
+
+      block++;
+    } catch (error) {
+      readable.destroy(error as Error);
+    } finally {
+      isFetching = false;
+    }
+  };
+
+  const interval = setInterval(fetchBlocks, 500);
+
+  readable.on('close', () => clearInterval(interval));
 
   return readable;
 };
