@@ -1,6 +1,4 @@
 import { FormikHelpers, FormikValues, useFormik } from 'formik';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 import React from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
@@ -15,6 +13,7 @@ import EmailCircle from '../Icons/EmailCircle';
 import LoginCircle from '../Icons/LoginCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
+import { signOut } from '@/utils/app/actions';
 
 interface User {
   email?: string;
@@ -29,7 +28,6 @@ interface UpdateEmailProps {
 }
 
 const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
-  const router = useRouter();
   const { userAuthURL: baseURL } = useConfig();
 
   const validationSchema = user?.username
@@ -61,14 +59,7 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
             },
           );
         }
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
-        Cookies.remove('token');
-        Cookies.remove('role');
-        Cookies.remove('user');
-        router?.push('/login');
-        router?.refresh();
+        signOut();
       }
     } catch (error: any) {
       const errors = error?.response?.data?.error;

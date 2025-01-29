@@ -2,14 +2,15 @@ import { getTranslations } from 'next-intl/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getRequest } from '@/utils/app/api';
 import ErrorMessage from '../common/ErrorMessage';
-import { userAuthURL } from '@/utils/app/config';
+/* import { userAuthURL } from '@/utils/app/config'; */
 import Search from '../common/Search';
 import FaInbox from '../Icons/FaInbox';
-import SponserdText from '../SponserdText';
+/* import SponserdText from '../SponserdText'; */
 import HomeLatestBlocks from './LatestBlocks';
 import HomeLatestTxns from './LatestTxns';
 import HomeOverview from './Overview';
-import Banner from '../Banner';
+/* import Banner from '../Banner';
+import { BannerAdData } from '@/utils/types'; */
 
 export default async function Home({
   locale,
@@ -19,7 +20,12 @@ export default async function Home({
   theme: string;
 }) {
   const t = await getTranslations({ locale });
-  const bannerData = await getRequest(`${userAuthURL}campaigns`, {}, {}, false);
+  /*  const bannerData: BannerAdData = await getRequest(
+    `${userAuthURL}campaigns`,
+    {},
+    {},
+    false,
+  ); */
 
   const handleFilterAndKeyword = async (
     keyword: string,
@@ -76,7 +82,7 @@ export default async function Home({
   };
 
   const errorBoundaryFallback = (
-    <div className="h-96">
+    <div className="h-96 flex items-center">
       <ErrorMessage
         icons={<FaInbox />}
         message={''}
@@ -98,13 +104,13 @@ export default async function Home({
                 <Search handleFilterAndKeyword={handleFilterAndKeyword} />
               </div>
               <div className="text-white"></div>
-              <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
+              {/*  <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
                 <SponserdText />
-              </div>
+              </div> */}
             </div>
-            <div className="lg:!flex hidden w-2/5 justify-center">
+            {/*    <div className="lg:!flex hidden w-2/5 justify-center">
               <Banner bannerInfo={bannerData} />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -122,9 +128,9 @@ export default async function Home({
         <HomeOverview theme={theme} />
       </ErrorBoundary>
       <div className="py-2">
-        <div className="lg:!hidden block container mx-auto px-3 py-2">
+        {/*  <div className="lg:!hidden block container mx-auto px-3 py-2">
           <Banner bannerInfo={bannerData} />
-        </div>
+        </div> */}
       </div>
       <section>
         <div className="container-xxl mx-auto px-5 z-10">
@@ -134,7 +140,15 @@ export default async function Home({
                 <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-bold">
                   {t('homePage.latestBlocks')}
                 </h2>
-                <ErrorBoundary fallback={errorBoundaryFallback}>
+                <ErrorBoundary
+                  fallback={
+                    <div className="container-xxl mx-auto px-5">
+                      <div className="flex justify-center items-center px-5 md:py lg:px-0 dark:bg-black-600 bg-white">
+                        {errorBoundaryFallback}
+                      </div>
+                    </div>
+                  }
+                >
                   <HomeLatestBlocks />
                 </ErrorBoundary>
               </div>
@@ -144,7 +158,15 @@ export default async function Home({
                 <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-extrabold">
                   {t('homePage.latestTxns')}
                 </h2>
-                <ErrorBoundary fallback={errorBoundaryFallback}>
+                <ErrorBoundary
+                  fallback={
+                    <div className="container-xxl mx-auto px-5">
+                      <div className="flex justify-center items-center px-5 md:py lg:px-0 dark:bg-black-600 bg-white">
+                        {errorBoundaryFallback}
+                      </div>
+                    </div>
+                  }
+                >
                   <HomeLatestTxns />
                 </ErrorBoundary>
               </div>

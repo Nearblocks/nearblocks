@@ -102,14 +102,14 @@ export const Register = () => {
         <div className="mx-auto px-5 align-middle max-w-[685px]">
           {!verify ? (
             <form method="post" onSubmit={formik.handleSubmit}>
-              <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold">
+              <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
                 Register a new account
               </h1>
-              <p className="text-sm text-gray-600 dark:text-neargray-100 py-2 font-thin">
+              <p className="text-gray-600 text-sm  font-medium dark:text-white  py-2">
                 Fill out the form to get started.
               </p>
               <div className="py-2">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Username
                 </p>
                 <input
@@ -126,7 +126,7 @@ export const Register = () => {
                 )}
               </div>
               <div className="py-2">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Email Address
                 </p>
                 <input
@@ -140,7 +140,7 @@ export const Register = () => {
                 )}
               </div>
               <div className="py-2">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                   Confirm Email Address
                 </p>
                 <input
@@ -163,7 +163,7 @@ export const Register = () => {
               </div>
               <div className="py-2 flex">
                 <div className="w-full mr-1">
-                  <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                  <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                     Password
                   </p>
                   <div className="relative w-full">
@@ -192,7 +192,7 @@ export const Register = () => {
                   )}
                 </div>
                 <div className="w-full ml-2">
-                  <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+                  <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                     Confirm Password
                   </p>
                   <div className="relative w-full">
@@ -227,8 +227,8 @@ export const Register = () => {
                 </div>
               </div>
               <div className="py-2">
-                <p className="text-sm text-gray-600 dark:text-neargray-100">
-                  <span>
+                <p className="text-sm font-medium text-gray-600 dark:text-white flex">
+                  <span className="flex">
                     <input
                       checked={formik.values.terms_conditions}
                       className="mr-2"
@@ -241,9 +241,13 @@ export const Register = () => {
                       type="checkbox"
                     />
                   </span>
-                  I agree to the{' '}
+                  I agree to the
                   <span className="underline">
-                    <a href={`/terms-and-conditions`} target="_blank">
+                    <a
+                      className="ml-1"
+                      href={`/terms-and-conditions`}
+                      target="_blank"
+                    >
                       <span>Terms and Conditions</span>
                     </a>
                   </span>
@@ -270,8 +274,8 @@ export const Register = () => {
                 </button>
               </div>
               <div className="py-2">
-                <p className="text-gray-600 dark:text-neargray-100 text-sm my-1">
-                  <span className="font-thin">Already have an account?</span>{' '}
+                <p className="text-gray-600 text-sm  font-medium dark:text-white my-1">
+                  <span>Already have an account?</span>{' '}
                   <span className="text-green-500 dark:text-green-250 ">
                     <Link href="/login">
                       <span> Click to Sign In</span>
@@ -282,24 +286,24 @@ export const Register = () => {
             </form>
           ) : (
             <div>
-              <h1 className="text-3xl text-green-500 dark:text-green-250 py-4 font-semibold">
+              <h1 className="text-2xl text-green-500 dark:text-green-250 py-4 font-semibold">
                 Register a new account
               </h1>
               <div className="bg-neargreen/5 dark:bg-blue-900/[0.05] text-sm text-green-500 dark:text-green-250 rounded-md px-4 py-3">
                 Your account registration has been submitted and is pending
                 email verification
               </div>
-              <p className="text-sm dark:text-gray-300 my-6">
+              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
                 We have sent an email to {formik.values?.email} with a link to
                 activate your account. To complete the sign-up process, please
                 click on the confirmation link in the email.
               </p>
-              <p className="text-sm dark:text-gray-300 my-6">
+              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
                 If you do not receive a confirmation email, please check your
                 spam folder and ensure your spam filters allow emails from
                 contact@ {removeProtocol(appUrl)}.
               </p>
-              <p className="text-sm dark:text-gray-300 my-6">
+              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
                 If you dont get confirmation link, please{' '}
                 <a
                   className="text-green-500 dark:text-green-250 font-medium cursor-pointer"

@@ -28,9 +28,9 @@ const HomePageSkeleton = ({
                 <Search disabled />
               </div>
               <div className="text-white"></div>
-              <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]"></div>
+              {/*  <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]"></div> */}
             </div>
-            <div className="lg:!flex hidden w-2/5 justify-center"></div>
+            {/*   <div className="lg:!flex hidden w-2/5 justify-center"></div> */}
           </div>
         </div>
       </div>

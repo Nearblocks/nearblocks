@@ -8,5 +8,8 @@ export default async function SponserdText() {
     {},
     false,
   );
-  return <SponserdTextActions textAdInfo={sponserdText} />;
+  if (sponserdText && Object.keys(sponserdText).length > 0) {
+    return <SponserdTextActions textAdInfo={sponserdText} />;
+  }
+  return null;
 }

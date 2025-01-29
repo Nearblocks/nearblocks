@@ -8,9 +8,8 @@ import { toast } from 'react-toastify';
 
 import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import useAuth, { request } from '@/hooks/app/useAuth';
-import useStorage from '@/hooks/app/useStorage';
 import { docsUrl } from '@/utils/app/config';
-import { localFormat } from '@/utils/app/libs';
+import { getUserDataFromToken, localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
 import LoadingCircular from '../common/LoadingCircular';
@@ -21,6 +20,8 @@ import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
 import { useConfig } from '@/hooks/app/useConfig';
+import { getCookie, setCookie } from '@/utils/app/actions';
+import { UserToken } from '@/utils/types';
 
 const ApiActions = ({
   getContactDetails,
@@ -41,32 +42,25 @@ const ApiActions = ({
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const [currentItem, setCurrentItem] = useState<any>();
-  const [token, _setToken] = useStorage('token');
+  const token = Cookies.get('token');
   const { data: userData } = useAuth(token ? '/users/me' : '', {}, true);
   const { userApiURL: baseURL } = useConfig();
   const currentPlan = userData?.user?.plan?.price_monthly ?? 0;
 
   const router = useRouter();
 
-  const resetStripePlan = () => {
-    localStorage.removeItem('stripe-plan-id');
-    localStorage.removeItem('interval');
-    localStorage.removeItem('subscribe-called');
+  const resetStripePlan = async () => {
+    Cookies.remove('stripe-plan-id');
+    Cookies.remove('interval');
     return;
   };
 
-  const subscribePlan = async () => {
+  const subscribePlan = async (stripePlanId: string, interval: string) => {
     try {
-      const stripePlanId = localStorage.getItem('stripe-plan-id');
-      const interval =
-        localStorage.getItem('interval') === 'year' ? 'year' : 'month';
-
       const res = await request(baseURL).post('advertiser/subscribe', {
         interval,
         plan_id: stripePlanId,
       });
-
-      localStorage.setItem('subscribe-called', 'true');
 
       const redirectUrl = res?.data['url '];
       if (redirectUrl) {
@@ -138,22 +132,23 @@ const ApiActions = ({
   };
   const plans = get(planDetails, 'data') || null;
 
-  const roleCookie = Cookies.get('role');
-
   const onGetStarted = async (plan: any) => {
     if (plan) {
       if (token) {
         if (plan?.id) {
-          if (roleCookie === 'publisher') {
+          const userData: UserToken | null = getUserDataFromToken(token);
+          const role = userData?.role;
+          if (role === 'publisher') {
             toast.warning('Unauthorized Access!');
-          } else if (roleCookie === 'advertiser') {
-            localStorage.setItem('stripe-plan-id', plan?.id as string);
-            localStorage.setItem(
-              'interval',
-              !interval ? 'month' : ('year' as string),
-            );
-            localStorage.setItem('subscribe-called', '');
-            subscribePlan();
+          } else if (role === 'advertiser') {
+            setCookie('stripe-plan-id', plan?.id as string);
+            setCookie('interval', !interval ? 'month' : ('year' as string));
+            const stripePlanId = await getCookie('stripe-plan-id');
+            const planInterval =
+              (await getCookie('interval')) === 'year' ? 'year' : 'month';
+            if (stripePlanId && planInterval) {
+              subscribePlan(stripePlanId, planInterval);
+            }
           } else {
             toast.warning('please login to continue...');
           }
@@ -161,12 +156,8 @@ const ApiActions = ({
           router.replace('/user/overview');
         }
       } else {
-        localStorage.setItem('stripe-plan-id', plan?.id as string);
-        localStorage.setItem(
-          'interval',
-          !interval ? 'month' : ('year' as string),
-        );
-        localStorage.setItem('subscribe-called', '');
+        setCookie('stripe-plan-id', plan?.id as string);
+        setCookie('interval', !interval ? 'month' : ('year' as string));
         router.push(
           `/login?id=${plan?.id}&interval=${interval ? 'year' : 'month'}`,
         );

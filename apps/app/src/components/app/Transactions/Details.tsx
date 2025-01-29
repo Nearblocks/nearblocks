@@ -15,13 +15,12 @@ import {
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { parseEventLogs } from '@/utils/app/near';
+import dayjs from '../../../utils/app/dayjs';
 import {
   convertToMetricPrefix,
-  convertToUTC,
   dollarFormat,
   fiatValue,
   gasPercentage,
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
   shortenToken,
@@ -55,6 +54,7 @@ import NEPTokenTransactions from './NEPTokenTransactions';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '../common/CopyButton';
 import RpcTxnStatus from '../common/RpcStatus';
+import { convertTimestampToTimes } from '@/utils/app/libs';
 
 interface Props {
   hash: string;
@@ -81,7 +81,8 @@ const Details = (props: Props) => {
     txn,
   } = props;
   const [more, setMore] = useState(false);
-
+  const [utc, setUtc] = useState(true);
+  const { utcTime, localTime } = convertTimestampToTimes(txn.block_timestamp);
   const { networkId } = useConfig();
 
   const t = useTranslations();
@@ -341,12 +342,25 @@ const Details = (props: Props) => {
                   className="w-full md:w-3/4 break-words"
                   suppressHydrationWarning
                 >
-                  {`${getTimeAgoString(
-                    nanoToMilli(txn?.block_timestamp || '0'),
-                  )} (${convertToUTC(
-                    nanoToMilli(txn?.block_timestamp || '0'),
-                    true,
-                  )} +UTC)`}
+                  {txn?.block_timestamp && (
+                    <>
+                      <span className="mr-1">
+                        {dayjs().to(dayjs(nanoToMilli(txn.block_timestamp)))}
+                      </span>
+                      <Tooltip
+                        className={'left-1/2 whitespace-nowrap max-w-[200px]'}
+                        position="top"
+                        tooltip={utc ? 'Switch to local time' : 'Switch to UTC'}
+                      >
+                        <button
+                          onClick={() => setUtc((prevState) => !prevState)}
+                          className="relative"
+                        >
+                          {`(${utc ? utcTime : localTime})`}
+                        </button>
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
               ) : (
                 ''

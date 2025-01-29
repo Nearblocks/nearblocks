@@ -7,20 +7,21 @@ import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import {
+  convertTimestampToTimes,
   convertToMetricPrefix,
-  convertToUTC,
   dollarFormat,
   gasFee,
-  getTimeAgoString,
   localFormat,
   nanoToMilli,
 } from '@/utils/app/libs';
 import { gasPrice } from '@/utils/near';
 import { BlocksInfo } from '@/utils/types';
+import dayjs from '../../../utils/app/dayjs';
 
 import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
+import Tooltip from '../common/Tooltip';
 interface Props {
   data: any;
   hash?: any;
@@ -40,6 +41,7 @@ export default function Details(props: Props) {
   const { getBlockDetails } = useRpc();
   const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [utc, setUtc] = useState(true);
 
   useEffect(() => {
     const fetchBlockData = async () => {
@@ -108,6 +110,10 @@ export default function Details(props: Props) {
     Array.isArray(data?.blocks) && data?.blocks?.length === 0
       ? blockInfo?.blocks?.[0]
       : data?.blocks?.[0];
+
+  const { utcTime, localTime } = convertTimestampToTimes(
+    block?.block_timestamp,
+  );
 
   return (
     <>
@@ -210,33 +216,24 @@ export default function Details(props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {block?.block_timestamp &&
-                    `${getTimeAgoString(
-                      nanoToMilli(block?.block_timestamp),
-                    )} (${convertToUTC(
-                      nanoToMilli(block?.block_timestamp),
-                      true,
-                    )}) +UTC`}
-                </div>
-              )}
-            </div>
-            <div className="flex flex-wrap p-4">
-              <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                {t?.('block.transactions.0') || 'Transactions'}
-              </div>
-              {isLoading ? (
-                <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-sm h-4" />
-                </div>
-              ) : (
-                <div className="w-full md:w-3/4 break-words">
-                  {block?.block_timestamp &&
-                    `${getTimeAgoString(
-                      nanoToMilli(block?.block_timestamp),
-                    )} (${convertToUTC(
-                      nanoToMilli(block?.block_timestamp),
-                      true,
-                    )}) +UTC`}
+                  {block?.block_timestamp && (
+                    <>
+                      <span className="mr-1">
+                        {dayjs().to(dayjs(nanoToMilli(block?.block_timestamp)))}
+                      </span>
+                      <Tooltip
+                        className={'left-1/2 whitespace-nowrap max-w-[200px]'}
+                        position="top"
+                        tooltip={utc ? 'Switch to local time' : 'Switch to UTC'}
+                      >
+                        <button
+                          onClick={() => setUtc((prevState) => !prevState)}
+                        >
+                          {`(${utc ? utcTime : localTime})`}
+                        </button>
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
               )}
             </div>

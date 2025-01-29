@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import React from 'react';
 
 import CampaignChart from '@/components/app/Campaign/CampaignChart';
 import { appUrl } from '@/utils/app/config';
+import { getUserRole } from '@/utils/app/actions';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -48,7 +49,6 @@ interface Props {
 
 export default async function ChartPage({ searchParams }: Props) {
   const id = (await searchParams).id;
-  const userRole = (await cookies()).get('role')?.value;
-
-  return <CampaignChart campaignId={id} userRole={userRole} />;
+  const role = await getUserRole();
+  return <CampaignChart campaignId={id} userRole={role} />;
 }

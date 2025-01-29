@@ -3,13 +3,12 @@ import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link, routing, usePathname } from '@/i18n/routing';
 import { setCurrentTheme } from '@/utils/app/actions';
-import { nanoToMilli } from '@/utils/app/libs';
+import { getUserDataFromToken, nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
 import ActiveLink from '../ActiveLink';
@@ -19,6 +18,7 @@ import ArrowDown from '../Icons/ArrowDown';
 import Menu from '../Icons/Menu';
 import UserMenu from './UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
+import { UserToken } from '@/utils/types';
 
 const menus = [
   {
@@ -155,12 +155,10 @@ const languages = [
 
 const Header = ({
   handleFilterAndKeyword,
-  role,
   stats: initialStats,
   sync: initialSync,
+  token: tokenCookie,
   theme: cookieTheme,
-  token,
-  user,
   getLatestStats,
   getSyncStatus,
 }: any) => {
@@ -168,7 +166,21 @@ const Header = ({
   const [syncStatus, setSyncStatus] = useState(true);
   const [stats, setStats] = useState(initialStats);
   const [sync, setSync] = useState<string>(initialSync);
+  const [token, setToken] = useState<string | undefined>(tokenCookie);
 
+  useEffect(() => {
+    const check = () => {
+      const t = Cookies.get('token');
+      if (t !== token) setToken(t);
+    };
+    check();
+    const interval = setInterval(check, 500);
+    return () => clearInterval(interval);
+  }, [token]);
+
+  const userData: UserToken | null = getUserDataFromToken(token);
+  const role = userData?.role;
+  const user = userData?.username;
   const profile = [
     {
       id: 1,
@@ -240,7 +252,6 @@ const Header = ({
   const nearPrice = stats?.near_price ?? '';
   const t = useTranslations();
   const { networkId } = useConfig();
-  const router = useRouter();
   let { setTheme, theme } = useTheme();
 
   if (theme == undefined) {
@@ -262,19 +273,6 @@ const Header = ({
   }, [sync]);
 
   const showSearch = pathname !== '/';
-
-  const onSignOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    localStorage.removeItem('stripe-plan-id');
-    localStorage.removeItem('interval');
-    localStorage.removeItem('subscribe-called');
-    Cookies.remove('token');
-    Cookies.remove('role');
-    Cookies.remove('user');
-    router.push('/login');
-  };
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -384,13 +382,13 @@ const Header = ({
                         />
                       </div>
                     </a>
-                    <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
+                    <ul className="bg-white dark:bg-black-600 font-medium text-sm soft-shadow hidden min-w-full absolute top-full right-0 rounded-b-lg !border-t-2 !border-t-green-500 group-hover:block py-2 z-[99]">
                       <li>
                         <a
                           className={`block w-full hover:text-green-500 dark:text-green-250 hover:no-underline py-2 px-4 text-gray-500 ${
                             networkId === 'mainnet'
                               ? 'text-green-500 dark:text-green-250'
-                              : 'text-gray-500 dark:text-neargray-10'
+                              : 'text-black-600 dark:text-neargray-10'
                           }`}
                           href="https://nearblocks.io"
                         >
@@ -402,7 +400,7 @@ const Header = ({
                           className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline ${
                             networkId === 'testnet'
                               ? 'text-green-500 dark:text-green-250'
-                              : 'text-gray-500 dark:text-neargray-10'
+                              : 'text-black-600 dark:text-neargray-10'
                           }`}
                           href="https://testnet.nearblocks.io"
                         >
@@ -439,7 +437,7 @@ const Header = ({
 
       <header className="dark:bg-black-600 bg-white shadow-sm">
         <div className="container-xxl w-full mx-auto">
-          <div className="flex flex-wrap-reverse">
+          <div className="md:flex flex-wrap-reverse pt-1 md:pt-0">
             <div className="flex items-center justify-between w-full md:!w-auto px-3 ">
               <div className="mb-1 sm:!mb-0">
                 <Link
@@ -482,10 +480,10 @@ const Header = ({
                 </button>
               </div>
             </div>
-            <div className="flex flex-col flex-grow w-full md:!w-auto mb-2 md:mb-0">
+            <div className="flex flex-col flex-grow w-full md:!w-auto">
               <nav
                 className={`w-auto h-full md:flex md:w-auto text-sm py-0.5 order-1 md:order-2 flex-col md:!flex-row ${
-                  open ? 'flex ' : 'hidden'
+                  open ? 'flex' : 'hidden'
                 }`}
               >
                 <ul className="w-full  md:flex justify-end text-gray-500 dark:text-neargray-100 py-0 md:py-0">
@@ -661,15 +659,10 @@ const Header = ({
                     </span>
                   </li>
                   <li>
-                    <UserMenu
-                      onSignOut={onSignOut}
-                      profile={profile}
-                      token={token}
-                      user={user}
-                    />
+                    <UserMenu profile={profile} user={user} />
                   </li>
                 </ul>
-                <ul className="md:flex justify-end dark:text-neargray-10 text-black-600 pb-4 md:pb-0">
+                <ul className="md:flex justify-end dark:text-neargray-10 text-black-600 pb-2 md:pb-0">
                   <li>
                     <>
                       <Collapse
@@ -698,7 +691,12 @@ const Header = ({
                         <ul className="border-l-2 border-green-500 dark:text-green-250 md:hidden ml-4">
                           <li>
                             <a
-                              className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline font-medium text-xs text-black-600"
+                              className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline font-medium text-xs
+                                ${
+                                  networkId === 'mainnet'
+                                    ? 'text-green-500 dark:text-green-250'
+                                    : 'text-black-600 dark:text-neargray-10'
+                                }`}
                               href="https://nearblocks.io"
                             >
                               Mainnet
@@ -706,7 +704,12 @@ const Header = ({
                           </li>
                           <li>
                             <a
-                              className="block w-full hover:text-green-500 dark:hover:text-green-250 dark:text-neargray-10  py-2 px-4 hover:no-underline font-medium text-xs text-black-600"
+                              className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline font-medium text-xs
+                                ${
+                                  networkId === 'testnet'
+                                    ? 'text-green-500 dark:text-green-250'
+                                    : 'text-black-600 dark:text-neargray-10'
+                                }`}
                               href="https://testnet.nearblocks.io"
                             >
                               Testnet

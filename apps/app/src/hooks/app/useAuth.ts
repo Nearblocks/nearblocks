@@ -7,7 +7,7 @@ import RateLimitDialog from '@/components/app/RateLimitDialog';
 
 import { useSWR } from '../../utils/app/swrExport';
 import { useConfig } from './useConfig';
-import useStorage from './useStorage';
+import { getCookie, signOut } from '@/utils/app/actions';
 
 export const defaultOptions = {
   revalidateOnFocus: false,
@@ -33,16 +33,11 @@ const dynamicRequest = (baseUrl: string) => {
 
   // Request interceptor
   instance.interceptors.request.use(
-    (config) => {
-      let accessToken = null;
-
-      if (typeof window !== 'undefined') {
-        accessToken = localStorage.getItem('token');
-      }
+    async (config) => {
+      let accessToken = await getCookie('token');
       if (accessToken) {
-        config.headers.Authorization = `Bearer ${JSON.parse(accessToken)}`;
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
-
       return config;
     },
     (error) => Promise.reject(error),
@@ -61,12 +56,7 @@ const dynamicRequest = (baseUrl: string) => {
       }
 
       if (response?.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
-        Cookies.remove('token');
-        Cookies.remove('role');
-        Cookies.remove('user');
+        signOut();
       }
 
       if (!config || !config.attempt) return Promise.reject(error);
@@ -90,7 +80,7 @@ const dynamicRequest = (baseUrl: string) => {
 export const request = dynamicRequest;
 
 const useAuth = (url: string, options = {}, userInfo: boolean = false) => {
-  const [token] = useStorage('token');
+  const token = Cookies.get('token');
   const config = { ...defaultOptions, ...options };
   const { userApiURL, userAuthURL } = useConfig();
 

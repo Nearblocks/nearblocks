@@ -188,7 +188,7 @@ const Overview = ({
                     {t ? t('homePage.nearPrice') : 'NEAR PRICE'}
                   </p>
                   <Link
-                    className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex items-center"
+                    className="leading-6 text-nearblue-600 dark:text-neargray-10 hover:no-underline flex-wrap"
                     href="/charts/near-price"
                   >
                     {nearPrice ? '$' + dollarFormat(Number(nearPrice)) : ''}
@@ -270,7 +270,7 @@ const Overview = ({
                   <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                     {t ? t('homePage.transactions') : 'TRANSACTIONS'}
                   </p>
-                  <div className="flex flex-row">
+                  <div className="flex flex-wrap">
                     <p className="leading-6 text-nearblue-600 dark:text-neargray-10 mr-0.5">
                       {totalTxns ? currency(stats?.total_txns) : ''}
                     </p>
@@ -297,7 +297,7 @@ const Overview = ({
                 <p className="uppercase font-semibold text-nearblue-600 dark:text-neargray-10 text-sm">
                   {t ? t('homePage.gasPrice') : 'GAS PRICE'}
                 </p>
-                <p className="leading-6 text-nearblue-700">
+                <p className="leading-6 text-nearblue-700 flex-wrap">
                   {stats?.gas_price
                     ? gasPrice(stats?.gas_price)
                     : stats?.gas_price ?? ''}

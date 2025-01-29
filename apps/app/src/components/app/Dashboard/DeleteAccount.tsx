@@ -1,6 +1,4 @@
 import { FormikValues, useFormik } from 'formik';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
@@ -17,6 +15,7 @@ import { catchErrors } from '@/utils/app/libs';
 import Visibility from '../Icons/Visibility';
 import VisibilityOff from '../Icons/VisibilityOff';
 import { useConfig } from '@/hooks/app/useConfig';
+import { signOut } from '@/utils/app/actions';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -25,7 +24,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const Delete = () => {
-  const router = useRouter();
   const [confirm, setConfirm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -45,14 +43,7 @@ const Delete = () => {
       await request(baseURL).delete(`users/me`, {
         data: { password: values.password },
       });
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
-      Cookies.remove('token');
-      Cookies.remove('role');
-      Cookies.remove('user');
-      router.push('/login');
-      router?.refresh();
+      signOut();
     } catch (error) {
       const message = catchErrors(error);
       if (!toast.isActive('delete-user-error')) {

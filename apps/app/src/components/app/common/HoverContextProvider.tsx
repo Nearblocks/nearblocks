@@ -85,7 +85,7 @@ export function AddressOrTxnsLink({
     ? `/txns/${txnHash}`
     : `/address/${currentAddress}`;
 
-  const textToCopy = txnHash ? txnHash : currentAddress || '';
+  const textToCopy = txnHash ? txnHash : currentAddress;
 
   return (
     <div className="flex items-center gap-1">
@@ -112,7 +112,7 @@ export function AddressOrTxnsLink({
       >
         {displayText}
       </Link>
-      {copy && <CopyButton textToCopy={textToCopy} />}
+      {copy && textToCopy && <CopyButton textToCopy={textToCopy} />}
     </div>
   );
 }

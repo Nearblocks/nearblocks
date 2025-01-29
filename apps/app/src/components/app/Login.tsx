@@ -13,9 +13,10 @@ import Visibility from '@/components/app/Icons/Visibility';
 import VisibilityOff from '@/components/app/Icons/VisibilityOff';
 import { request } from '@/hooks/app/useAuth';
 import { useConfig } from '@/hooks/app/useConfig';
-import useStorage from '@/hooks/app/useStorage';
 import { Link } from '@/i18n/routing';
 import { catchErrors, getUserDataFromToken } from '@/utils/app/libs';
+import { getCookie, setCookie } from '@/utils/app/actions';
+import { UserToken } from '@/utils/types';
 
 interface Props {
   id?: string;
@@ -25,9 +26,6 @@ interface Props {
 
 const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   const router = useRouter();
-  const [, setToken] = useStorage('token');
-  const [, setRole] = useStorage('role');
-  const [, setUser] = useStorage('user');
   const [errorMsg, setErrorMsg] = useState('');
   const [status, setStatus] = useState<any>(null);
   const [tokens, setTokens] = useState<string>();
@@ -47,24 +45,16 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   });
 
   const resetStripePlan = () => {
-    localStorage.removeItem('stripe-plan-id');
-    localStorage.removeItem('interval');
-    localStorage.removeItem('subscribe-called');
+    Cookies.remove('stripe-plan-id');
+    Cookies.remove('interval');
     return;
   };
-
-  const subscribePlan = async () => {
+  const subscribePlan = async (stripePlanId: string, interval: string) => {
     try {
-      const stripePlanId = localStorage.getItem('stripe-plan-id');
-      const interval =
-        localStorage.getItem('interval') === 'year' ? 'year' : 'month';
-
       const res = await request(userApiURL).post('advertiser/subscribe', {
         interval,
         plan_id: stripePlanId,
       });
-
-      localStorage.setItem('subscribe-called', 'true');
 
       const redirectUrl = res?.data['url '];
 
@@ -95,26 +85,31 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   };
 
   useEffect(() => {
-    if (id) {
-      localStorage.setItem('stripe-plan-id', id as string);
-      localStorage.setItem('interval', interval as string);
-      localStorage.setItem('subscribe-called', '');
-    } else {
-      resetStripePlan();
-    }
+    const updateCookies = async () => {
+      if (id) {
+        setCookie('stripe-plan-id', id as string);
+        setCookie('interval', interval as string);
+      } else {
+        resetStripePlan();
+      }
+    };
+
+    updateCookies();
   }, [id, interval]);
 
   useEffect(() => {
     let hasRefreshed = false;
     const checkCookies = () => {
-      const u = Cookies.get('user');
+      const token = Cookies.get('token');
+      const userData: UserToken | null = getUserDataFromToken(token);
+      const u = userData?.username;
       if (u && !hasRefreshed) {
         hasRefreshed = true;
         router.refresh();
       }
     };
     checkCookies();
-    const intervalId = setInterval(checkCookies, 1000);
+    const intervalId = setInterval(checkCookies, 300);
     return () => clearInterval(intervalId);
   }, [router]);
 
@@ -135,22 +130,17 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
         const userData: any = getUserDataFromToken(respToken);
 
         if (userData) {
-          setToken(respToken);
-          setRole(userData?.role);
-          setUser(userData?.username);
-          Cookies.set('token', respToken, {
-            expires: 30,
-          });
-          Cookies.set('role', userData?.role, {
-            expires: 30,
-          });
-          Cookies.set('user', userData?.username, {
-            expires: 30,
-          });
-          if (id && interval) {
-            subscribePlan();
-          } else {
-            router.push('/user/overview');
+          setCookie('token', respToken);
+          const tokenCookie = await getCookie('token');
+          if (tokenCookie) {
+            const stripePlanId = await getCookie('stripe-plan-id');
+            const interval =
+              (await getCookie('interval')) === 'year' ? 'year' : 'month';
+            if (stripePlanId && interval) {
+              subscribePlan(stripePlanId, interval);
+            } else {
+              router.replace('/user/overview');
+            }
           }
         }
       } catch (error) {
@@ -193,12 +183,12 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
       <div className="container-xxl mx-auto py-20">
         <div className="mx-auto px-5 align-middle max-w-[685px]">
           <form method="post" onSubmit={formik.handleSubmit}>
-            <h1 className="text-3xl text-green-500 dark:text-green-250 py-2 font-semibold text-center">
+            <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold text-center">
               Welcome back
             </h1>
-            <span className="text-sm text-gray-400 py-2 font-thin text-center">
+            <span className="py-2 text-center">
               {/* Login to your account */}
-              <p className="text-gray-600 dark:text-white text-sm my-1 font-thin">
+              <p className="text-gray-600 text-sm  font-medium dark:text-white my-1">
                 Don&apos;t have an account?{' '}
                 <span className="text-green-500 dark:text-green-250">
                   <Link href="/register">
@@ -229,7 +219,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
             )}
 
             <div className="py-2">
-              <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+              <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
                 Username or Email
               </p>
               <input
@@ -254,12 +244,12 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
                 )}
             </div>
             <div className="py-2">
-              <div className="flex justify-between">
-                <p className="py-2 text-sm text-gray-600 dark:text-neargray-100">
+              <div className="flex justify-between items-center">
+                <p className="py-2 text-sm text-black-600 font-medium dark:text-neargray-100">
                   Password
                 </p>
                 <Link href="/lostpassword">
-                  <span className="py-2 text-xs text-gray-600 dark:text-white font-thin hover:text-green-500 dark:hover:text-green-250">
+                  <span className="py-2 text-sm font-medium text-gray-600 dark:text-white hover:text-green-500 dark:hover:text-green-250">
                     Forgot your password?
                   </span>
                 </Link>
@@ -296,8 +286,8 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
               )}
             </div>
             <div className="py-2">
-              <p className="text-sm text-gray-600 dark:text-white font-thin">
-                <span>
+              <p className="text-sm font-medium text-gray-600 dark:text-white flex">
+                <span className="flex">
                   <input
                     className="mr-2"
                     onChange={(e) =>

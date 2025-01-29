@@ -12,7 +12,7 @@ const ErrorMessage = ({ icons, message, mutedText, reset }: Props) => {
   const { resetBoundary } = useErrorBoundary();
 
   return (
-    <div className="text-center py-24">
+    <div className="text-center items-center py-24 text-nearblue-600 dark:text-neargray-10  text-sm font-normal">
       <div className="mb-4 flex justify-center">
         <span className="inline-block border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-500 rounded-full p-4">
           {icons}
