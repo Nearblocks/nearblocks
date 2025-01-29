@@ -10,15 +10,13 @@ import {
   isDeleteKeyAction,
   isTransferAction,
 } from '#libs/guards';
+import knex from '#libs/knex';
 import { publicKeyFromImplicitAccount } from '#libs/utils';
 
 type AccessKeyMap = Map<string, AccessKey>;
 type DeletedAccountMap = Map<string, { accountId: string; receiptId: string }>;
 
-export const storeGenesisAccessKeys = async (
-  knex: Knex,
-  accessKeys: AccessKey[],
-) => {
+export const storeGenesisAccessKeys = async (accessKeys: AccessKey[]) => {
   await retry(async () => {
     await knex('access_keys')
       .insert(accessKeys)
@@ -49,10 +47,7 @@ export const getGenesisAccessKeyData = (
   };
 };
 
-export const storeAccessKeys = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeAccessKeys = async (message: types.StreamerMessage) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccessKeys(

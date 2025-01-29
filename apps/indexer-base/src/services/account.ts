@@ -9,11 +9,12 @@ import {
   isDeleteAccountAction,
   isTransferAction,
 } from '#libs/guards';
+import knex from '#libs/knex';
 import { isEthImplicit, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
 
-export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
+export const storeGenesisAccounts = async (accounts: Account[]) => {
   await retry(async () => {
     await knex('accounts').insert(accounts).onConflict(['account_id']).ignore();
   });
@@ -30,10 +31,7 @@ export const getGenesisAccountData = (
   deleted_by_receipt_id: null,
 });
 
-export const storeAccounts = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeAccounts = async (message: types.StreamerMessage) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccounts(

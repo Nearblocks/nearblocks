@@ -1,10 +1,12 @@
 import { stream, types } from 'near-lake-framework';
+import { PoolClient } from 'pg';
 
 import { logger } from 'nb-logger';
 import { streamBlock } from 'nb-neardata';
+import { Block } from 'nb-types';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { pool } from '#libs/pg';
 import sentry from '#libs/sentry';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
@@ -29,7 +31,11 @@ if (config.s3Endpoint) {
 }
 
 export const syncData = async () => {
-  const block = await knex('blocks').orderBy('block_height', 'desc').first();
+  const pg = await pool.connect();
+  const resp = await pg.query<Block>(
+    `SELECT * FROM blocks ORDER BY block_height DESC LIMIT 1`,
+  );
+  const block = resp.rows[0];
 
   if (config.dataSource === DataSource.FAST_NEAR) {
     let startBlockHeight = config.startBlockHeight;
@@ -49,7 +55,7 @@ export const syncData = async () => {
     });
 
     for await (const message of stream) {
-      await onMessage(message);
+      await onMessage(pg, message);
     }
 
     stream.on('end', () => {
@@ -69,12 +75,15 @@ export const syncData = async () => {
     }
 
     for await (const message of stream(lakeConfig)) {
-      await onMessage(message);
+      await onMessage(pg, message);
     }
   }
 };
 
-export const onMessage = async (message: types.StreamerMessage) => {
+export const onMessage = async (
+  pg: PoolClient,
+  message: types.StreamerMessage,
+) => {
   try {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);
@@ -87,13 +96,13 @@ export const onMessage = async (message: types.StreamerMessage) => {
     start = performance.now();
 
     await Promise.all([
-      storeBlock(knex, message),
-      storeChunks(knex, message),
-      storeTransactions(knex, message),
-      storeReceipts(knex, message),
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
+      storeBlock(message),
+      storeChunks(message),
+      storeTransactions(pg, message),
+      storeReceipts(pg, message),
+      storeExecutionOutcomes(pg, message),
+      storeAccounts(message),
+      storeAccessKeys(message),
     ]);
 
     logger.info({

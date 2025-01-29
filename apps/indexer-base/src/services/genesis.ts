@@ -74,12 +74,12 @@ export const insertGenesisData = async (path: string) => {
 
   for await (const chunk of readable) {
     if (accounts.length === config.insertLimit) {
-      await storeGenesisAccounts(knex, accounts);
+      await storeGenesisAccounts(accounts);
       accounts = [];
     }
 
     if (accessKeys.length === config.insertLimit) {
-      await storeGenesisAccessKeys(knex, accessKeys);
+      await storeGenesisAccessKeys(accessKeys);
       accessKeys = [];
     }
 
@@ -106,8 +106,8 @@ export const insertGenesisData = async (path: string) => {
     }
   }
 
-  await storeGenesisAccounts(knex, accounts);
-  await storeGenesisAccessKeys(knex, accessKeys);
+  await storeGenesisAccounts(accounts);
+  await storeGenesisAccessKeys(accessKeys);
 
   logger.info(
     `inserted ${accountsCount} accounts and ${accessKeysCount} access keys...`,

@@ -1,6 +1,6 @@
 import { types } from 'near-lake-framework';
+import { PoolClient } from 'pg';
 
-import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 
 import config from '#config';
@@ -16,7 +16,7 @@ type OutcomeReceiptColumns = {
 const batchSize = config.insertLimit;
 
 export const storeExecutionOutcomes = async (
-  knex: Knex,
+  pg: PoolClient,
   message: types.StreamerMessage,
 ) => {
   let outcomes: ExecutionOutcome[] = [];
@@ -69,8 +69,9 @@ export const storeExecutionOutcomes = async (
       });
 
       promises.push(
-        knex.raw(
-          `
+        pg.query({
+          name: 'insert_execution_outcomes',
+          text: `
             INSERT INTO
               execution_outcomes (
                 executed_in_block_hash,
@@ -88,20 +89,20 @@ export const storeExecutionOutcomes = async (
               *
             FROM
               UNNEST(
-                ?::TEXT[],
-                ?::BIGINT[],
-                ?::TEXT[],
-                ?::NUMERIC[],
-                ?::INTEGER[],
-                ?::JSONB[],
-                ?::TEXT[],
-                ?::NUMERIC[],
-                ?::execution_outcome_status[],
-                ?::NUMERIC[]
+                $1::TEXT[],
+                $2::BIGINT[],
+                $3::TEXT[],
+                $4::NUMERIC[],
+                $5::INTEGER[],
+                $6::JSONB[],
+                $7::TEXT[],
+                $8::NUMERIC[],
+                $9::execution_outcome_status[],
+                $10::NUMERIC[]
               )
             ON CONFLICT (receipt_id) DO NOTHING
           `,
-          [
+          values: [
             columns.executed_in_block_hash,
             columns.executed_in_block_timestamp,
             columns.executor_account_id,
@@ -113,7 +114,7 @@ export const storeExecutionOutcomes = async (
             columns.status,
             columns.tokens_burnt,
           ],
-        ),
+        }),
       );
     }
   }
@@ -136,8 +137,9 @@ export const storeExecutionOutcomes = async (
       });
 
       promises.push(
-        await knex.raw(
-          `
+        pg.query({
+          name: 'insert_execution_outcome_receipts',
+          text: `
             INSERT INTO
               execution_outcome_receipts (
                 executed_receipt_id,
@@ -148,22 +150,22 @@ export const storeExecutionOutcomes = async (
               *
             FROM
               UNNEST(
-                ?::TEXT[],
-                ?::INTEGER[],
-                ?::TEXT[]
+                $1::TEXT[],
+                $2::INTEGER[],
+                $3::TEXT[]
               )
-              ON CONFLICT (
-                executed_receipt_id,
-                index_in_execution_outcome,
-                produced_receipt_id
-              ) DO NOTHING
+            ON CONFLICT (
+              executed_receipt_id,
+              index_in_execution_outcome,
+              produced_receipt_id
+            ) DO NOTHING
           `,
-          [
+          values: [
             columns.executed_receipt_id,
             columns.index_in_execution_outcome,
             columns.produced_receipt_id,
           ],
-        ),
+        }),
       );
     }
   }

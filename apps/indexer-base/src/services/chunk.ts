@@ -1,13 +1,11 @@
 import { types } from 'near-lake-framework';
 
-import { Knex } from 'nb-knex';
 import { Chunk } from 'nb-types';
 import { retry } from 'nb-utils';
 
-export const storeChunks = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+import knex from '#libs/knex';
+
+export const storeChunks = async (message: types.StreamerMessage) => {
   const data = message.shards.flatMap((shard) =>
     shard.chunk
       ? getChunkData(

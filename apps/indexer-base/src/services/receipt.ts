@@ -1,7 +1,7 @@
 import { difference, uniq } from 'lodash-es';
 import { types } from 'near-lake-framework';
+import { PoolClient } from 'pg';
 
-import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import {
   ActionReceiptAction,
@@ -32,7 +32,7 @@ type ReceiptOutputColumns = {
 const batchSize = config.insertLimit;
 
 export const storeReceipts = async (
-  knex: Knex,
+  pg: PoolClient,
   message: types.StreamerMessage,
 ) => {
   let receiptData: Receipt[] = [];
@@ -45,7 +45,7 @@ export const storeReceipts = async (
     chunks.map(async (chunk) => {
       if (chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
-          knex,
+          pg,
           chunk.header.chunkHash,
           message.block.header.hash,
           message.block.header.timestampNanosec,
@@ -100,39 +100,40 @@ export const storeReceipts = async (
       });
 
       promises.push(
-        knex.raw(
-          `
-              INSERT INTO
-                receipts (
-                  included_in_block_hash,
-                  included_in_block_timestamp,
-                  included_in_chunk_hash,
-                  index_in_chunk,
-                  originated_from_transaction_hash,
-                  predecessor_account_id,
-                  public_key,
-                  receipt_id,
-                  receipt_kind,
-                  receiver_account_id
-                )
-              SELECT
-                *
-              FROM
-                UNNEST(
-                  ?::TEXT[],
-                  ?::BIGINT[],
-                  ?::TEXT[],
-                  ?::INTEGER[],
-                  ?::TEXT[],
-                  ?::TEXT[],
-                  ?::TEXT[],
-                  ?::TEXT[],
-                  ?::receipt_kind[],
-                  ?::TEXT[]
-                )
-              ON CONFLICT (receipt_id) DO NOTHING
-            `,
-          [
+        pg.query({
+          name: 'insert_receipts',
+          text: `
+            INSERT INTO
+              receipts (
+                included_in_block_hash,
+                included_in_block_timestamp,
+                included_in_chunk_hash,
+                index_in_chunk,
+                originated_from_transaction_hash,
+                predecessor_account_id,
+                public_key,
+                receipt_id,
+                receipt_kind,
+                receiver_account_id
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                $1::TEXT[],
+                $2::BIGINT[],
+                $3::TEXT[],
+                $4::INTEGER[],
+                $5::TEXT[],
+                $6::TEXT[],
+                $7::TEXT[],
+                $8::TEXT[],
+                $9::receipt_kind[],
+                $10::TEXT[]
+              )
+            ON CONFLICT (receipt_id) DO NOTHING
+          `,
+          values: [
             columns.included_in_block_hash,
             columns.included_in_block_timestamp,
             columns.included_in_chunk_hash,
@@ -144,7 +145,7 @@ export const storeReceipts = async (
             columns.receipt_kind,
             columns.receiver_account_id,
           ],
-        ),
+        }),
       );
     }
   }
@@ -181,35 +182,36 @@ export const storeReceipts = async (
       });
 
       promises.push(
-        knex.raw(
-          `
-              INSERT INTO
-                action_receipt_actions (
-                  action_kind,
-                  args,
-                  index_in_action_receipt,
-                  nep518_rlp_hash,
-                  receipt_id,
-                  receipt_included_in_block_timestamp,
-                  receipt_predecessor_account_id,
-                  receipt_receiver_account_id
-                )
-              SELECT
-                *
-              FROM
-                UNNEST(
-                  ?::action_kind[],
-                  ?::JSONB[],
-                  ?::INTEGER[],
-                  ?::TEXT[],
-                  ?::TEXT[],
-                  ?::BIGINT[],
-                  ?::TEXT[],
-                  ?::TEXT[]
-                )
-              ON CONFLICT (receipt_id, index_in_action_receipt) DO NOTHING
-            `,
-          [
+        pg.query({
+          name: 'insert_action_receipt_actions',
+          text: `
+            INSERT INTO
+              action_receipt_actions (
+                action_kind,
+                args,
+                index_in_action_receipt,
+                nep518_rlp_hash,
+                receipt_id,
+                receipt_included_in_block_timestamp,
+                receipt_predecessor_account_id,
+                receipt_receiver_account_id
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                $1::action_kind[],
+                $2::JSONB[],
+                $3::INTEGER[],
+                $4::TEXT[],
+                $5::TEXT[],
+                $6::BIGINT[],
+                $7::TEXT[],
+                $8::TEXT[]
+              )
+            ON CONFLICT (receipt_id, index_in_action_receipt) DO NOTHING
+          `,
+          values: [
             columns.action_kind,
             columns.args,
             columns.index_in_action_receipt,
@@ -219,7 +221,7 @@ export const storeReceipts = async (
             columns.receipt_predecessor_account_id,
             columns.receipt_receiver_account_id,
           ],
-        ),
+        }),
       );
     }
   }
@@ -238,24 +240,25 @@ export const storeReceipts = async (
       });
 
       promises.push(
-        knex.raw(
-          `
-              INSERT INTO
-                action_receipt_input_data (
-                  input_data_id,
-                  input_to_receipt_id
-                )
-              SELECT
-                *
-              FROM
-                UNNEST(
-                  ?::TEXT[],
-                  ?::TEXT[]
-                )
-              ON CONFLICT (input_data_id, input_to_receipt_id) DO NOTHING
-            `,
-          [columns.input_data_id, columns.input_to_receipt_id],
-        ),
+        pg.query({
+          name: 'insert_action_receipt_input_data',
+          text: `
+            INSERT INTO
+              action_receipt_input_data (
+                input_data_id,
+                input_to_receipt_id
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                $1::TEXT[],
+                $2::TEXT[]
+              )
+            ON CONFLICT (input_data_id, input_to_receipt_id) DO NOTHING
+          `,
+          values: [columns.input_data_id, columns.input_to_receipt_id],
+        }),
       );
     }
   }
@@ -276,30 +279,31 @@ export const storeReceipts = async (
       });
 
       promises.push(
-        knex.raw(
-          `
-              INSERT INTO
-                action_receipt_output_data (
-                  output_data_id,
-                  output_from_receipt_id,
-                  receiver_account_id
-                )
-              SELECT
-                *
-              FROM
-                UNNEST(
-                  ?::TEXT[],
-                  ?::TEXT[],
-                  ?::TEXT[]
-                )
-              ON CONFLICT (output_data_id, output_from_receipt_id) DO NOTHING
-            `,
-          [
+        pg.query({
+          name: 'insert_action_receipt_output_data',
+          text: `
+            INSERT INTO
+              action_receipt_output_data (
+                output_data_id,
+                output_from_receipt_id,
+                receiver_account_id
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                $1::TEXT[],
+                $2::TEXT[],
+                $3::TEXT[]
+              )
+            ON CONFLICT (output_data_id, output_from_receipt_id) DO NOTHING
+          `,
+          values: [
             columns.output_data_id,
             columns.output_from_receipt_id,
             columns.receiver_account_id,
           ],
-        ),
+        }),
       );
     }
   }
@@ -308,7 +312,7 @@ export const storeReceipts = async (
 };
 
 const storeChunkReceipts = async (
-  knex: Knex,
+  pg: PoolClient,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
@@ -317,7 +321,7 @@ const storeChunkReceipts = async (
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
   );
-  const txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
+  const txnHashes = await getTxnHashes(pg, blockHash, receiptOrDataIds);
 
   const receiptData: Receipt[] = [];
   const receiptActionsData: ActionReceiptAction[] = [];
@@ -418,7 +422,11 @@ const storeChunkReceipts = async (
   };
 };
 
-const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
+const getTxnHashes = async (
+  pg: PoolClient,
+  blockHash: string,
+  ids: string[],
+) => {
   const receiptOrDataIds = uniq(ids);
   let txnHashes = await retry(async () => {
     return await fetchTxnHashesFromCache(receiptOrDataIds);
@@ -438,7 +446,7 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
   );
 
   txnHashes = await retry(async () => {
-    return await fetchTxnHashesFromDB(knex, receiptOrDataIds);
+    return await fetchTxnHashesFromDB(pg, receiptOrDataIds);
   });
 
   return txnHashes;
@@ -455,16 +463,24 @@ const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
   return txnHashes;
 };
 
-const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
+const fetchTxnHashesFromDB = async (
+  pg: PoolClient,
+  receiptOrDataIds: string[],
+) => {
   const txnHashes: Map<string, string> = new Map();
-  const receiptInputs = await knex('action_receipt_input_data')
-    .innerJoin(
-      'receipts',
-      'action_receipt_input_data.input_to_receipt_id',
-      'receipts.receipt_id',
-    )
-    .whereIn('input_data_id', receiptOrDataIds)
-    .select('input_data_id', 'originated_from_transaction_hash');
+  const { rows: receiptInputs } = await pg.query(
+    `
+      SELECT
+        action_receipt_input_data.input_data_id,
+        receipts.originated_from_transaction_hash
+      FROM
+        action_receipt_input_data
+        INNER JOIN receipts ON action_receipt_input_data.input_to_receipt_id = receipts.receipt_id
+      WHERE
+        action_receipt_input_data.input_data_id = ANY ($1)
+    `,
+    [receiptOrDataIds],
+  );
 
   receiptInputs.forEach((outputReceipt) => {
     txnHashes.set(
@@ -477,14 +493,19 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
     return txnHashes;
   }
 
-  const receiptOutputs = await knex('action_receipt_output_data')
-    .innerJoin(
-      'receipts',
-      'action_receipt_output_data.output_from_receipt_id',
-      'receipts.receipt_id',
-    )
-    .whereIn('output_data_id', receiptOrDataIds)
-    .select('output_data_id', 'originated_from_transaction_hash');
+  const { rows: receiptOutputs } = await pg.query(
+    `
+      SELECT
+        action_receipt_output_data.output_data_id,
+        receipts.originated_from_transaction_hash
+      FROM
+        action_receipt_output_data
+        INNER JOIN receipts ON action_receipt_output_data.output_from_receipt_id = receipts.receipt_id
+      WHERE
+        action_receipt_output_data.output_data_id = ANY ($1)
+    `,
+    [receiptOrDataIds],
+  );
 
   receiptOutputs.forEach((outputReceipt) => {
     txnHashes.set(
@@ -497,14 +518,19 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
     return txnHashes;
   }
 
-  const outcomeReceipts = await knex('execution_outcome_receipts')
-    .innerJoin(
-      'receipts',
-      'execution_outcome_receipts.executed_receipt_id',
-      'receipts.receipt_id',
-    )
-    .whereIn('produced_receipt_id', receiptOrDataIds)
-    .select('produced_receipt_id', 'originated_from_transaction_hash');
+  const { rows: outcomeReceipts } = await pg.query(
+    `
+      SELECT
+        execution_outcome_receipts.produced_receipt_id,
+        receipts.originated_from_transaction_hash
+      FROM
+        execution_outcome_receipts
+        INNER JOIN receipts ON execution_outcome_receipts.executed_receipt_id = receipts.receipt_id
+      WHERE
+        execution_outcome_receipts.produced_receipt_id = ANY ($1)
+    `,
+    [receiptOrDataIds],
+  );
 
   outcomeReceipts.forEach((outcomeReceipt) => {
     txnHashes.set(
@@ -517,9 +543,18 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
     return txnHashes;
   }
 
-  const transactions = await knex('transactions')
-    .whereIn('converted_into_receipt_id', receiptOrDataIds)
-    .select('converted_into_receipt_id', 'transaction_hash');
+  const { rows: transactions } = await pg.query(
+    `
+      SELECT
+        converted_into_receipt_id,
+        transaction_hash
+      FROM
+        transactions
+      WHERE
+        converted_into_receipt_id = ANY ($1)
+    `,
+    [receiptOrDataIds],
+  );
 
   transactions.forEach((transaction) => {
     txnHashes.set(

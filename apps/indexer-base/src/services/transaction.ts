@@ -1,6 +1,6 @@
 import { types } from 'near-lake-framework';
+import { PoolClient } from 'pg';
 
-import { Knex } from 'nb-knex';
 import { Transaction } from 'nb-types';
 
 import config from '#config';
@@ -13,7 +13,7 @@ type TransactionColumns = {
 const batchSize = config.insertLimit;
 
 export const storeTransactions = async (
-  knex: Knex,
+  pg: PoolClient,
   message: types.StreamerMessage,
 ) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
@@ -69,13 +69,42 @@ export const storeTransactions = async (
       });
 
       promises.push(
-        knex.raw(
-          `
-              INSERT INTO transactions (${Object.keys(columns).join(', ')})
-              SELECT * FROM UNNEST(?::BIGINT[], ?::TEXT[], ?::TEXT[], ?::TEXT[], ?::INTEGER[], ?::NUMERIC[], ?::NUMERIC[], ?::TEXT[], ?::TEXT[], ?::execution_outcome_status[], ?::TEXT[])
-              ON CONFLICT (transaction_hash) DO NOTHING
-            `,
-          [
+        pg.query({
+          name: 'insert_transactions',
+          text: `
+            INSERT INTO
+              transactions (
+                block_timestamp,
+                converted_into_receipt_id,
+                included_in_block_hash,
+                included_in_chunk_hash,
+                index_in_chunk,
+                receipt_conversion_gas_burnt,
+                receipt_conversion_tokens_burnt,
+                receiver_account_id,
+                signer_account_id,
+                status,
+                transaction_hash
+              )
+            SELECT
+              *
+            FROM
+              UNNEST(
+                $1::BIGINT[],
+                $2::TEXT[],
+                $3::TEXT[],
+                $4::TEXT[],
+                $5::INTEGER[],
+                $6::NUMERIC[],
+                $7::NUMERIC[],
+                $8::TEXT[],
+                $9::TEXT[],
+                $10::execution_outcome_status[],
+                $11::TEXT[]
+              )
+            ON CONFLICT (transaction_hash) DO NOTHING
+          `,
+          values: [
             columns.block_timestamp,
             columns.converted_into_receipt_id,
             columns.included_in_block_hash,
@@ -88,7 +117,7 @@ export const storeTransactions = async (
             columns.status,
             columns.transaction_hash,
           ],
-        ),
+        }),
       );
     }
 

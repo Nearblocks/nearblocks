@@ -1,13 +1,11 @@
 import { types } from 'near-lake-framework';
 
-import { Knex } from 'nb-knex';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 
-export const storeBlock = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+import knex from '#libs/knex';
+
+export const storeBlock = async (message: types.StreamerMessage) => {
   const data = getBlockData(message);
 
   await retry(async () => {
