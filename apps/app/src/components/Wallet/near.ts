@@ -121,7 +121,7 @@ export class Wallet {
     // Initialize the wallet selector
     this.selector = setupWalletSelector({
       modules: [
-        setupBitteWallet(),
+        setupBitteWallet() as any,
         setupCoin98Wallet(),
         setupEthereumWallets({
           wagmiConfig: wagmiAdapter.wagmiConfig as any,
