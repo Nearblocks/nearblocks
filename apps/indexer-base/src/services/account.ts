@@ -1,50 +1,74 @@
 import { types } from 'near-lake-framework';
 
-import { Knex } from 'nb-knex';
 import { Account } from 'nb-types';
-import { retry } from 'nb-utils';
 
 import {
   isCreateAccountAction,
   isDeleteAccountAction,
   isTransferAction,
 } from '#libs/guards';
-import knex from '#libs/knex';
+import { accountColumns, pgp } from '#libs/pgp';
 import { isEthImplicit, isNearImplicit } from '#libs/utils';
+import { PgpQuery } from '#types/types';
 
 type AccountMap = Map<string, Account>;
 
-export const storeGenesisAccounts = async (accounts: Account[]) => {
-  await retry(async () => {
-    await knex('accounts').insert(accounts).onConflict(['account_id']).ignore();
-  });
-};
-
-export const getGenesisAccountData = (
-  account: string,
-  blockHeight: number,
-): Account => ({
-  account_id: account,
-  created_by_block_height: blockHeight,
-  created_by_receipt_id: null,
-  deleted_by_block_height: null,
-  deleted_by_receipt_id: null,
-});
-
 export const storeAccounts = async (message: types.StreamerMessage) => {
+  let accounts: Account[] = [];
+  let accountsToUpdate: Account[] = [];
+
   await Promise.all(
     message.shards.map(async (shard) => {
-      await storeChunkAccounts(
-        knex,
+      const chunks = storeChunkAccounts(
         shard.receiptExecutionOutcomes,
         message.block.header,
       );
+
+      accounts = accounts.concat(chunks?.accounts ?? []);
+      accountsToUpdate = accountsToUpdate.concat(
+        chunks?.accountsToUpdate ?? [],
+      );
     }),
   );
+
+  const queries: PgpQuery[] = [];
+
+  if (accounts.length) {
+    queries.push(
+      pgp.helpers.insert(accounts, accountColumns) +
+        ' ON CONFLICT (account_id) DO NOTHING',
+    );
+  }
+
+  if (accountsToUpdate.length) {
+    queries.concat(
+      accountsToUpdate.map((account) => {
+        return {
+          query: `
+            UPDATE accounts
+            SET
+              deleted_by_receipt_id = $1,
+              deleted_by_block_height = $2
+            WHERE
+              account_id = $3
+              AND created_by_block_height < $4
+              AND deleted_by_block_height IS NULL
+          `,
+          values: [
+            account.deleted_by_receipt_id,
+            account.deleted_by_block_height,
+            account.account_id,
+            account.deleted_by_block_height,
+          ],
+        };
+      }),
+    );
+  }
+
+  return queries;
 };
 
-export const storeChunkAccounts = async (
-  knex: Knex,
+export const storeChunkAccounts = (
   outcomes: types.ExecutionOutcomeWithReceipt[],
   block: types.BlockHeader,
 ) => {
@@ -113,33 +137,10 @@ export const storeChunkAccounts = async (
     }
   }
 
-  if (accounts.size) {
-    await retry(async () => {
-      await knex('accounts')
-        .insert([...accounts.values()])
-        .onConflict(['account_id'])
-        .ignore();
-    });
-  }
-
-  if (accountsToUpdate.size) {
-    await Promise.all(
-      [...accountsToUpdate.values()].map(async (account) => {
-        await retry(async () => {
-          await knex('accounts')
-            .update('deleted_by_receipt_id', account.deleted_by_receipt_id)
-            .update('deleted_by_block_height', account.deleted_by_block_height)
-            .where('account_id', account.account_id)
-            .where(
-              'created_by_block_height',
-              '<',
-              account.deleted_by_block_height,
-            )
-            .whereNull('deleted_by_block_height');
-        });
-      }),
-    );
-  }
+  return {
+    accounts: [...accounts.values()],
+    accountsToUpdate: [...accountsToUpdate.values()],
+  };
 };
 
 const getAccountData = (

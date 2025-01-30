@@ -1,9 +1,8 @@
 import { types } from 'near-lake-framework';
 
 import { Chunk } from 'nb-types';
-import { retry } from 'nb-utils';
 
-import knex from '#libs/knex';
+import { chunkColumns, pgp } from '#libs/pgp';
 
 export const storeChunks = async (message: types.StreamerMessage) => {
   const data = message.shards.flatMap((shard) =>
@@ -17,10 +16,13 @@ export const storeChunks = async (message: types.StreamerMessage) => {
   );
 
   if (data.length) {
-    await retry(async () => {
-      await knex('chunks').insert(data).onConflict(['chunk_hash']).ignore();
-    });
+    return [
+      pgp.helpers.insert(data, chunkColumns) +
+        ' ON CONFLICT (chunk_hash) DO NOTHING',
+    ];
   }
+
+  return [];
 };
 
 const getChunkData = (

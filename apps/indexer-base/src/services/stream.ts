@@ -1,12 +1,11 @@
 import { stream, types } from 'near-lake-framework';
-import { PoolClient } from 'pg';
 
 import { logger } from 'nb-logger';
 import { streamBlock } from 'nb-neardata';
 import { Block } from 'nb-types';
 
 import config from '#config';
-import { pool } from '#libs/pg';
+import { pgp, pool } from '#libs/pgp';
 import sentry from '#libs/sentry';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
@@ -17,6 +16,7 @@ import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
+import { PgpClient, PgpQuery } from '#types/types';
 
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
@@ -31,11 +31,10 @@ if (config.s3Endpoint) {
 }
 
 export const syncData = async () => {
-  const pg = await pool.connect();
-  const resp = await pg.query<Block>(
+  const resp = await pool.query<Block[]>(
     `SELECT * FROM blocks ORDER BY block_height DESC LIMIT 1`,
   );
-  const block = resp.rows[0];
+  const block = resp[0];
 
   if (config.dataSource === DataSource.FAST_NEAR) {
     let startBlockHeight = config.startBlockHeight;
@@ -55,7 +54,7 @@ export const syncData = async () => {
     });
 
     for await (const message of stream) {
-      await onMessage(pg, message);
+      await onMessage(pool, message);
     }
 
     stream.on('end', () => {
@@ -75,13 +74,13 @@ export const syncData = async () => {
     }
 
     for await (const message of stream(lakeConfig)) {
-      await onMessage(pg, message);
+      await onMessage(pool, message);
     }
   }
 };
 
 export const onMessage = async (
-  pg: PoolClient,
+  pool: PgpClient,
   message: types.StreamerMessage,
 ) => {
   try {
@@ -95,15 +94,17 @@ export const onMessage = async (
     const cache = performance.now() - start;
     start = performance.now();
 
-    await Promise.all([
+    const queries: PgpQuery[][] = await Promise.all([
       storeBlock(message),
       storeChunks(message),
-      storeTransactions(pg, message),
-      storeReceipts(pg, message),
-      storeExecutionOutcomes(pg, message),
+      storeTransactions(message),
+      storeReceipts(pool, message),
+      storeExecutionOutcomes(message),
       storeAccounts(message),
       storeAccessKeys(message),
     ]);
+
+    await pool.none(pgp.helpers.concat(queries.flat()));
 
     logger.info({
       block: message.block.header.height,

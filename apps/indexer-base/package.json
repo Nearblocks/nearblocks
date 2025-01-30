@@ -25,6 +25,7 @@
     "near-lake-framework": "2.0.0",
     "pg": "8.13.1",
     "pg-copy-streams": "6.0.6",
+    "pg-promise": "11.10.2",
     "stream-json": "1.8.0"
   },
   "devDependencies": {

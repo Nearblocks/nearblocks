@@ -1,16 +1,16 @@
 import { types } from 'near-lake-framework';
 
 import { Block } from 'nb-types';
-import { retry } from 'nb-utils';
 
-import knex from '#libs/knex';
+import { blockColumns, pgp } from '#libs/pgp';
 
 export const storeBlock = async (message: types.StreamerMessage) => {
   const data = getBlockData(message);
 
-  await retry(async () => {
-    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
-  });
+  return [
+    pgp.helpers.insert(data, blockColumns) +
+      ' ON CONFLICT (block_hash) DO NOTHING',
+  ];
 };
 
 const getBlockData = (message: types.StreamerMessage): Block => {

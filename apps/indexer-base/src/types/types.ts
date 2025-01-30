@@ -1,4 +1,6 @@
 import { types } from 'near-lake-framework';
+import { IDatabase, IFormattingOptions } from 'pg-promise';
+import { IClient } from 'pg-promise/typescript/pg-subset.js';
 
 import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
@@ -69,3 +71,13 @@ export type AccessKeyPermission = {
 export type RlpJson = {
   tx_bytes_b64: string;
 };
+
+export type PgpClient = IDatabase<object, IClient>;
+
+export type PgpQuery =
+  | {
+      options?: IFormattingOptions;
+      query: string;
+      values?: unknown;
+    }
+  | string;

@@ -1,6 +1,5 @@
 import { difference, uniq } from 'lodash-es';
 import { types } from 'near-lake-framework';
-import { PoolClient } from 'pg';
 
 import { logger } from 'nb-logger';
 import {
@@ -11,28 +10,20 @@ import {
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import { isDelegateAction } from '#libs/guards';
+import {
+  pgp,
+  receiptActionsColumns,
+  receiptColumns,
+  receiptInputColumns,
+  receiptOutputColumns,
+} from '#libs/pgp';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
-
-type ReceiptColumns = {
-  [K in keyof Receipt]: Receipt[K][];
-};
-type ActionReceiptColumns = {
-  [K in keyof ActionReceiptAction]: ActionReceiptAction[K][];
-};
-type ReceiptInputColumns = {
-  [K in keyof ActionReceiptInputData]: ActionReceiptInputData[K][];
-};
-type ReceiptOutputColumns = {
-  [K in keyof ActionReceiptOutputData]: ActionReceiptOutputData[K][];
-};
-
-const batchSize = config.insertLimit;
+import { PgpClient } from '#types/types';
 
 export const storeReceipts = async (
-  pg: PoolClient,
+  pool: PgpClient,
   message: types.StreamerMessage,
 ) => {
   let receiptData: Receipt[] = [];
@@ -45,7 +36,7 @@ export const storeReceipts = async (
     chunks.map(async (chunk) => {
       if (chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
-          pg,
+          pool,
           chunk.header.chunkHash,
           message.block.header.hash,
           message.block.header.timestampNanosec,
@@ -64,255 +55,41 @@ export const storeReceipts = async (
     }),
   );
 
-  const promises = [];
+  const queries = [];
 
   if (receiptData.length) {
-    for (let i = 0; i < receiptData.length; i += batchSize) {
-      const batch = receiptData.slice(i, i + batchSize);
-      const columns: ReceiptColumns = {
-        included_in_block_hash: [],
-        included_in_block_timestamp: [],
-        included_in_chunk_hash: [],
-        index_in_chunk: [],
-        originated_from_transaction_hash: [],
-        predecessor_account_id: [],
-        public_key: [],
-        receipt_id: [],
-        receipt_kind: [],
-        receiver_account_id: [],
-      };
-
-      batch.forEach((receipt) => {
-        columns.included_in_block_hash.push(receipt.included_in_block_hash),
-          columns.included_in_block_timestamp.push(
-            receipt.included_in_block_timestamp,
-          ),
-          columns.included_in_chunk_hash.push(receipt.included_in_chunk_hash),
-          columns.index_in_chunk.push(receipt.index_in_chunk),
-          columns.originated_from_transaction_hash.push(
-            receipt.originated_from_transaction_hash,
-          ),
-          columns.predecessor_account_id.push(receipt.predecessor_account_id),
-          columns.public_key.push(receipt.public_key),
-          columns.receipt_id.push(receipt.receipt_id),
-          columns.receipt_kind.push(receipt.receipt_kind),
-          columns.receiver_account_id.push(receipt.receiver_account_id);
-      });
-
-      promises.push(
-        pg.query({
-          name: 'insert_receipts',
-          text: `
-            INSERT INTO
-              receipts (
-                included_in_block_hash,
-                included_in_block_timestamp,
-                included_in_chunk_hash,
-                index_in_chunk,
-                originated_from_transaction_hash,
-                predecessor_account_id,
-                public_key,
-                receipt_id,
-                receipt_kind,
-                receiver_account_id
-              )
-            SELECT
-              *
-            FROM
-              UNNEST(
-                $1::TEXT[],
-                $2::BIGINT[],
-                $3::TEXT[],
-                $4::INTEGER[],
-                $5::TEXT[],
-                $6::TEXT[],
-                $7::TEXT[],
-                $8::TEXT[],
-                $9::receipt_kind[],
-                $10::TEXT[]
-              )
-            ON CONFLICT (receipt_id) DO NOTHING
-          `,
-          values: [
-            columns.included_in_block_hash,
-            columns.included_in_block_timestamp,
-            columns.included_in_chunk_hash,
-            columns.index_in_chunk,
-            columns.originated_from_transaction_hash,
-            columns.predecessor_account_id,
-            columns.public_key,
-            columns.receipt_id,
-            columns.receipt_kind,
-            columns.receiver_account_id,
-          ],
-        }),
-      );
-    }
+    queries.push(
+      pgp.helpers.insert(receiptData, receiptColumns) +
+        ' ON CONFLICT (receipt_id) DO NOTHING',
+    );
   }
 
   if (receiptActionsData.length) {
-    for (let i = 0; i < receiptActionsData.length; i += batchSize) {
-      const batch = receiptActionsData.slice(i, i + batchSize);
-      const columns: ActionReceiptColumns = {
-        action_kind: [],
-        args: [],
-        index_in_action_receipt: [],
-        nep518_rlp_hash: [],
-        receipt_id: [],
-        receipt_included_in_block_timestamp: [],
-        receipt_predecessor_account_id: [],
-        receipt_receiver_account_id: [],
-      };
-
-      batch.forEach((receipt) => {
-        columns.action_kind.push(receipt.action_kind),
-          columns.args.push(receipt.args),
-          columns.index_in_action_receipt.push(receipt.index_in_action_receipt),
-          columns.nep518_rlp_hash.push(receipt.nep518_rlp_hash),
-          columns.receipt_id.push(receipt.receipt_id),
-          columns.receipt_included_in_block_timestamp.push(
-            receipt.receipt_included_in_block_timestamp,
-          ),
-          columns.receipt_predecessor_account_id.push(
-            receipt.receipt_predecessor_account_id,
-          ),
-          columns.receipt_receiver_account_id.push(
-            receipt.receipt_receiver_account_id,
-          );
-      });
-
-      promises.push(
-        pg.query({
-          name: 'insert_action_receipt_actions',
-          text: `
-            INSERT INTO
-              action_receipt_actions (
-                action_kind,
-                args,
-                index_in_action_receipt,
-                nep518_rlp_hash,
-                receipt_id,
-                receipt_included_in_block_timestamp,
-                receipt_predecessor_account_id,
-                receipt_receiver_account_id
-              )
-            SELECT
-              *
-            FROM
-              UNNEST(
-                $1::action_kind[],
-                $2::JSONB[],
-                $3::INTEGER[],
-                $4::TEXT[],
-                $5::TEXT[],
-                $6::BIGINT[],
-                $7::TEXT[],
-                $8::TEXT[]
-              )
-            ON CONFLICT (receipt_id, index_in_action_receipt) DO NOTHING
-          `,
-          values: [
-            columns.action_kind,
-            columns.args,
-            columns.index_in_action_receipt,
-            columns.nep518_rlp_hash,
-            columns.receipt_id,
-            columns.receipt_included_in_block_timestamp,
-            columns.receipt_predecessor_account_id,
-            columns.receipt_receiver_account_id,
-          ],
-        }),
-      );
-    }
+    queries.push(
+      pgp.helpers.insert(receiptActionsData, receiptActionsColumns) +
+        ' ON CONFLICT (receipt_id, index_in_action_receipt) DO NOTHING',
+    );
   }
 
   if (receiptInputData.length) {
-    for (let i = 0; i < receiptInputData.length; i += batchSize) {
-      const batch = receiptInputData.slice(i, i + batchSize);
-      const columns: ReceiptInputColumns = {
-        input_data_id: [],
-        input_to_receipt_id: [],
-      };
-
-      batch.forEach((receipt) => {
-        columns.input_data_id.push(receipt.input_data_id);
-        columns.input_to_receipt_id.push(receipt.input_to_receipt_id);
-      });
-
-      promises.push(
-        pg.query({
-          name: 'insert_action_receipt_input_data',
-          text: `
-            INSERT INTO
-              action_receipt_input_data (
-                input_data_id,
-                input_to_receipt_id
-              )
-            SELECT
-              *
-            FROM
-              UNNEST(
-                $1::TEXT[],
-                $2::TEXT[]
-              )
-            ON CONFLICT (input_data_id, input_to_receipt_id) DO NOTHING
-          `,
-          values: [columns.input_data_id, columns.input_to_receipt_id],
-        }),
-      );
-    }
+    queries.push(
+      pgp.helpers.insert(receiptInputData, receiptInputColumns) +
+        ' ON CONFLICT (input_data_id, input_to_receipt_id) DO NOTHING',
+    );
   }
 
   if (receiptOutputData.length) {
-    for (let i = 0; i < receiptOutputData.length; i += batchSize) {
-      const batch = receiptOutputData.slice(i, i + batchSize);
-      const columns: ReceiptOutputColumns = {
-        output_data_id: [],
-        output_from_receipt_id: [],
-        receiver_account_id: [],
-      };
-
-      batch.forEach((receipt) => {
-        columns.output_data_id.push(receipt.output_data_id);
-        columns.output_from_receipt_id.push(receipt.output_from_receipt_id);
-        columns.receiver_account_id.push(receipt.receiver_account_id);
-      });
-
-      promises.push(
-        pg.query({
-          name: 'insert_action_receipt_output_data',
-          text: `
-            INSERT INTO
-              action_receipt_output_data (
-                output_data_id,
-                output_from_receipt_id,
-                receiver_account_id
-              )
-            SELECT
-              *
-            FROM
-              UNNEST(
-                $1::TEXT[],
-                $2::TEXT[],
-                $3::TEXT[]
-              )
-            ON CONFLICT (output_data_id, output_from_receipt_id) DO NOTHING
-          `,
-          values: [
-            columns.output_data_id,
-            columns.output_from_receipt_id,
-            columns.receiver_account_id,
-          ],
-        }),
-      );
-    }
+    queries.push(
+      pgp.helpers.insert(receiptOutputData, receiptOutputColumns) +
+        ' ON CONFLICT (output_data_id, output_from_receipt_id) DO NOTHING',
+    );
   }
 
-  await Promise.all(promises);
+  return queries;
 };
 
 const storeChunkReceipts = async (
-  pg: PoolClient,
+  pool: PgpClient,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
@@ -321,7 +98,7 @@ const storeChunkReceipts = async (
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
   );
-  const txnHashes = await getTxnHashes(pg, blockHash, receiptOrDataIds);
+  const txnHashes = await getTxnHashes(pool, blockHash, receiptOrDataIds);
 
   const receiptData: Receipt[] = [];
   const receiptActionsData: ActionReceiptAction[] = [];
@@ -423,7 +200,7 @@ const storeChunkReceipts = async (
 };
 
 const getTxnHashes = async (
-  pg: PoolClient,
+  pool: PgpClient,
   blockHash: string,
   ids: string[],
 ) => {
@@ -446,7 +223,7 @@ const getTxnHashes = async (
   );
 
   txnHashes = await retry(async () => {
-    return await fetchTxnHashesFromDB(pg, receiptOrDataIds);
+    return await fetchTxnHashesFromDB(pool, receiptOrDataIds);
   });
 
   return txnHashes;
@@ -464,11 +241,11 @@ const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
 };
 
 const fetchTxnHashesFromDB = async (
-  pg: PoolClient,
+  pool: PgpClient,
   receiptOrDataIds: string[],
 ) => {
   const txnHashes: Map<string, string> = new Map();
-  const { rows: receiptInputs } = await pg.query(
+  const receiptInputs = await pool.any(
     `
       SELECT
         action_receipt_input_data.input_data_id,
@@ -477,7 +254,7 @@ const fetchTxnHashesFromDB = async (
         action_receipt_input_data
         INNER JOIN receipts ON action_receipt_input_data.input_to_receipt_id = receipts.receipt_id
       WHERE
-        action_receipt_input_data.input_data_id = ANY ($1)
+        action_receipt_input_data.input_data_id = ANY($1)
     `,
     [receiptOrDataIds],
   );
@@ -493,7 +270,7 @@ const fetchTxnHashesFromDB = async (
     return txnHashes;
   }
 
-  const { rows: receiptOutputs } = await pg.query(
+  const receiptOutputs = await pool.any(
     `
       SELECT
         action_receipt_output_data.output_data_id,
@@ -502,7 +279,7 @@ const fetchTxnHashesFromDB = async (
         action_receipt_output_data
         INNER JOIN receipts ON action_receipt_output_data.output_from_receipt_id = receipts.receipt_id
       WHERE
-        action_receipt_output_data.output_data_id = ANY ($1)
+        action_receipt_output_data.output_data_id = ANY($1)
     `,
     [receiptOrDataIds],
   );
@@ -518,7 +295,7 @@ const fetchTxnHashesFromDB = async (
     return txnHashes;
   }
 
-  const { rows: outcomeReceipts } = await pg.query(
+  const outcomeReceipts = await pool.any(
     `
       SELECT
         execution_outcome_receipts.produced_receipt_id,
@@ -527,7 +304,7 @@ const fetchTxnHashesFromDB = async (
         execution_outcome_receipts
         INNER JOIN receipts ON execution_outcome_receipts.executed_receipt_id = receipts.receipt_id
       WHERE
-        execution_outcome_receipts.produced_receipt_id = ANY ($1)
+        execution_outcome_receipts.produced_receipt_id = ANY($1)
     `,
     [receiptOrDataIds],
   );
@@ -543,7 +320,7 @@ const fetchTxnHashesFromDB = async (
     return txnHashes;
   }
 
-  const { rows: transactions } = await pg.query(
+  const transactions = await pool.any(
     `
       SELECT
         converted_into_receipt_id,
@@ -551,7 +328,7 @@ const fetchTxnHashesFromDB = async (
       FROM
         transactions
       WHERE
-        converted_into_receipt_id = ANY ($1)
+        converted_into_receipt_id = ANY($1)
     `,
     [receiptOrDataIds],
   );

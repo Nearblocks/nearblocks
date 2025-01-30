@@ -1,8 +1,6 @@
 import { types } from 'near-lake-framework';
 
-import { Knex } from 'nb-knex';
 import { AccessKey, AccessKeyPermissionKind } from 'nb-types';
-import { retry } from 'nb-utils';
 
 import {
   isAddKeyAction,
@@ -10,57 +8,97 @@ import {
   isDeleteKeyAction,
   isTransferAction,
 } from '#libs/guards';
-import knex from '#libs/knex';
+import { accessKeyColumns, pgp } from '#libs/pgp';
 import { publicKeyFromImplicitAccount } from '#libs/utils';
+import { PgpQuery } from '#types/types';
 
 type AccessKeyMap = Map<string, AccessKey>;
-type DeletedAccountMap = Map<string, { accountId: string; receiptId: string }>;
-
-export const storeGenesisAccessKeys = async (accessKeys: AccessKey[]) => {
-  await retry(async () => {
-    await knex('access_keys')
-      .insert(accessKeys)
-      .onConflict(['public_key', 'account_id'])
-      .ignore();
-  });
-};
-
-export const getGenesisAccessKeyData = (
-  account: string,
-  publicKey: string,
-  permission: string,
-  blockHeight: number,
-): AccessKey => {
-  const permissionKind =
-    permission === 'string'
-      ? AccessKeyPermissionKind.FULL_ACCESS
-      : AccessKeyPermissionKind.FUNCTION_CALL;
-
-  return {
-    account_id: account,
-    created_by_block_height: blockHeight,
-    created_by_receipt_id: null,
-    deleted_by_block_height: null,
-    deleted_by_receipt_id: null,
-    permission_kind: permissionKind,
-    public_key: publicKey,
-  };
-};
+type DeletedAccount = { accountId: string; receiptId: string };
+type DeletedAccountMap = Map<string, DeletedAccount>;
 
 export const storeAccessKeys = async (message: types.StreamerMessage) => {
+  let accessKeys: AccessKey[] = [];
+  let accessKeysToUpdate: AccessKey[] = [];
+  let deletedAccounts: DeletedAccount[] = [];
+
   await Promise.all(
     message.shards.map(async (shard) => {
-      await storeChunkAccessKeys(
-        knex,
+      const chunks = storeChunkAccessKeys(
         message.block.header,
         shard.receiptExecutionOutcomes,
       );
+
+      accessKeys = accessKeys.concat(chunks?.accessKeys ?? []);
+      accessKeysToUpdate = accessKeysToUpdate.concat(
+        chunks?.accessKeysToUpdate ?? [],
+      );
+      deletedAccounts = deletedAccounts.concat(chunks?.deletedAccounts ?? []);
     }),
   );
+
+  let queries: PgpQuery[] = [];
+
+  if (deletedAccounts.length) {
+    queries = queries.concat(
+      deletedAccounts.map((key) => {
+        return {
+          query: `
+            UPDATE access_keys
+            SET deleted_by_receipt_id = $1,
+                deleted_by_block_height = $2
+            WHERE account_id = $3
+              AND created_by_block_height < $4
+              AND deleted_by_block_height IS NULL;
+          `,
+          values: [
+            key.receiptId,
+            message.block.header.height,
+            key.accountId,
+            message.block.header.height,
+          ],
+        };
+      }),
+    );
+  }
+
+  if (accessKeys.length) {
+    queries.push(
+      pgp.helpers.insert(accessKeys, accessKeyColumns) +
+        ' ON CONFLICT (public_key, account_id) DO NOTHING',
+    );
+  }
+
+  if (accessKeysToUpdate.length) {
+    queries = queries.concat(
+      accessKeysToUpdate.map((key) => {
+        return {
+          query: `
+            UPDATE access_keys
+            SET
+              deleted_by_receipt_id = $1,
+              deleted_by_block_height = $2
+            WHERE
+              account_id = $3
+              AND public_key = $4
+              AND created_by_block_height < $5
+              AND deleted_by_block_height IS NULL;
+          `,
+          value: [
+            key.deleted_by_receipt_id,
+            key.deleted_by_block_height,
+            key.account_id,
+            key.public_key,
+            key.deleted_by_block_height,
+          ],
+        };
+      }),
+    );
+  }
+
+  return queries;
 };
 
-export const storeChunkAccessKeys = async (
-  knex: Knex,
+export const storeChunkAccessKeys = (
   block: types.BlockHeader,
   outcomes: types.ExecutionOutcomeWithReceipt[],
 ) => {
@@ -165,45 +203,11 @@ export const storeChunkAccessKeys = async (
     }
   }
 
-  if (deletedAccounts.size) {
-    await Promise.all(
-      [...deletedAccounts.values()].map(async (key) => {
-        await retry(async () => {
-          await knex('access_keys')
-            .update('deleted_by_receipt_id', key.receiptId)
-            .update('deleted_by_block_height', block.height)
-            .where('account_id', key.accountId)
-            .where('created_by_block_height', '<', block.height)
-            .whereNull('deleted_by_block_height');
-        });
-      }),
-    );
-  }
-
-  if (accessKeys.size) {
-    await retry(async () => {
-      await knex('access_keys')
-        .insert([...accessKeys.values()])
-        .onConflict(['public_key', 'account_id'])
-        .ignore();
-    });
-  }
-
-  if (accessKeysToUpdate.size) {
-    await Promise.all(
-      [...accessKeysToUpdate.values()].map(async (key) => {
-        await retry(async () => {
-          await knex('access_keys')
-            .update('deleted_by_receipt_id', key.deleted_by_receipt_id)
-            .update('deleted_by_block_height', key.deleted_by_block_height)
-            .where('account_id', key.account_id)
-            .where('public_key', key.public_key)
-            .where('created_by_block_height', '<', key.deleted_by_block_height)
-            .whereNull('deleted_by_block_height');
-        });
-      }),
-    );
-  }
+  return {
+    accessKeys: [...accessKeys.values()],
+    accessKeysToUpdate: [...accessKeysToUpdate.values()],
+    deletedAccounts: [...deletedAccounts.values()],
+  };
 };
 
 const getAccessKeyData = (
