@@ -31,8 +31,7 @@ const Ad: React.FC<IAd> = ({
       document.querySelector('#gm-ad-script');
     if (!script) {
       script = document.createElement('script');
-      script.src =
-        '/scripts/ad-unit-manager.react.js';
+      script.src = '/scripts/ad-unit-manager.react.js';
       script.id = 'gm-ad-script';
       document.head.appendChild(script);
     }
