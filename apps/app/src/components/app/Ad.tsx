@@ -32,7 +32,7 @@ const Ad: React.FC<IAd> = ({
     if (!script) {
       script = document.createElement('script');
       script.src =
-        'https://cdn.growthmate.xyz/scripts/ad-unit-manager.react.js';
+        '/scripts/ad-unit-manager.react.js';
       script.id = 'gm-ad-script';
       document.head.appendChild(script);
     }
