@@ -194,83 +194,41 @@ const Details = (props: Props) => {
                   <div className="w-full md:w-3/4 break-words">
                     {t ? (
                       <>
-                        {networkId === 'mainnet' ? (
-                          <LinkWrapper
-                            href={`/txns?block=${block?.block_hash}`}
-                          >
-                            {t('blocks:block.transactions.1', {
-                              txns: block?.transactions_agg?.count
-                                ? localFormat(
-                                    block?.transactions_agg?.count?.toString(),
-                                  )
-                                : block?.transactions_agg?.count?.toString() ??
-                                  '',
-                            })}
-                          </LinkWrapper>
-                        ) : (
-                          <>
-                            <LinkWrapper
-                              href={`/txns?block=${block?.block_hash}`}
-                            >
-                              {t('blocks:block.transactions.1', {
-                                txns: block?.transactions_agg?.count
-                                  ? localFormat(
-                                      block?.transactions_agg?.count?.toString(),
-                                    )
-                                  : block?.transactions_agg?.count?.toString() ??
-                                    '',
-                              })}
-                            </LinkWrapper>
-                            &nbsp;
-                            {t('blocks:block.transactions.2', {
-                              receipts: block?.receipts_agg?.count
-                                ? localFormat(
-                                    block?.receipts_agg?.count?.toString(),
-                                  )
-                                : block?.receipts_agg?.count?.toString() ?? '',
-                            })}{' '}
-                          </>
-                        )}
+                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                          {t('blocks:block.transactions.1', {
+                            txns: block?.transactions_agg?.count
+                              ? localFormat(
+                                  block?.transactions_agg?.count?.toString(),
+                                )
+                              : block?.transactions_agg?.count?.toString() ??
+                                '',
+                          })}
+                        </LinkWrapper>
+                        &nbsp;
+                        {t('blocks:block.transactions.2', {
+                          receipts: block?.receipts_agg?.count
+                            ? localFormat(
+                                block?.receipts_agg?.count?.toString(),
+                              )
+                            : block?.receipts_agg?.count?.toString() ?? '',
+                        })}{' '}
                       </>
                     ) : (
                       <>
-                        {networkId === 'mainnet' ? (
-                          <>
-                            (
-                            <LinkWrapper
-                              href={`/txns?block=${block?.block_hash}`}
-                            >
-                              {block?.transactions_agg?.count
-                                ? localFormat(
-                                    block?.transactions_agg?.count.toString(),
-                                  )
-                                : block?.transactions_agg?.count.toString() ??
-                                  '' + ' transactions'}
-                            </LinkWrapper>
-                            )
-                          </>
-                        ) : (
-                          <>
-                            (
-                            <LinkWrapper
-                              href={`/txns?block=${block?.block_hash}`}
-                            >
-                              {block?.transactions_agg?.count
-                                ? localFormat(
-                                    block?.transactions_agg?.count.toString(),
-                                  )
-                                : block?.transactions_agg?.count.toString() ??
-                                  '' + ' transactions'}
-                            </LinkWrapper>
-                            ) + `and $
-                            {block?.receipts_agg?.count
-                              ? localFormat(
-                                  block?.receipts_agg?.count.toString(),
-                                )
-                              : block?.receipts_agg?.count ?? ''}{' '}
-                            receipts`
-                          </>
-                        )}
+                        (
+                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                          {block?.transactions_agg?.count
+                            ? localFormat(
+                                block?.transactions_agg?.count.toString(),
+                              )
+                            : block?.transactions_agg?.count.toString() ??
+                              '' + ' transactions'}
+                        </LinkWrapper>
+                        ) + `and $
+                        {block?.receipts_agg?.count
+                          ? localFormat(block?.receipts_agg?.count.toString())
+                          : block?.receipts_agg?.count ?? ''}{' '}
+                        receipts`
                       </>
                     )}
                   </div>

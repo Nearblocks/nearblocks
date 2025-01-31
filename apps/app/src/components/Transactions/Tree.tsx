@@ -6,7 +6,6 @@ import FaHourglassStart from '../Icons/FaHourglassStart';
 import Skeleton from '../skeleton/common/Skeleton';
 import TreeReceipt from './TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
-import { networkId } from '@/utils/config';
 
 interface Props {
   txn: TransactionInfo;
@@ -87,8 +86,7 @@ const Tree = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
+  const txnsPending = txn?.outcomes?.status === null;
 
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200  divide-solid divide-gray-200 divide-y">

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import FaHourglassStart from '../Icons/FaHourglassStart';
 import ReceiptRow from './Receipts/ReceiptRow';
 import { isEmpty } from 'lodash';
-import { networkId } from '@/utils/config';
 
 interface Props {
   txn: TransactionInfo;
@@ -90,8 +89,7 @@ const Receipt = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
+  const txnsPending = txn?.outcomes?.status === null;
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
       {txnsPending ? (

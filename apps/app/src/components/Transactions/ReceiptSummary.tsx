@@ -8,7 +8,6 @@ import Skeleton from '../skeleton/common/Skeleton';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
-import { networkId } from '@/utils/config';
 
 interface Props {
   txn: TransactionInfo;
@@ -93,8 +92,7 @@ const ReceiptSummary = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
+  const txnsPending = txn?.outcomes?.status === null;
 
   return (
     <div className=" text-sm text-nearblue-600 dark:text-neargray-10 dark:divide-black-200 divide-solid divide-gray-200 divide-y">
