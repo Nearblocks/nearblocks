@@ -21,7 +21,6 @@ import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import { useConfig } from '@/hooks/app/useConfig';
 
 const ListActions = ({
   countLoading,
@@ -41,7 +40,6 @@ const ListActions = ({
   const count = totalCount?.blocks?.[0]?.count || 0;
   const cursor = data?.cursor;
   const toggleShowAge = () => setShowAge((s) => !s);
-  const { networkId } = useConfig();
   const columns: any = [
     {
       cell: (row: BlocksInfo) => (
@@ -142,25 +140,21 @@ const ListActions = ({
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
-    ...(networkId === 'testnet'
-      ? [
-          {
-            cell: (row: BlocksInfo) => (
-              <span>
-                {row?.receipts_agg?.count
-                  ? localFormat(row?.receipts_agg?.count)
-                  : row?.receipts_agg?.count ?? ''}
-              </span>
-            ),
-            header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
-            key: 'count',
-            tdClassName:
-              'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
-            thClassName:
-              'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
-          },
-        ]
-      : []),
+    {
+      cell: (row: BlocksInfo) => (
+        <span>
+          {row?.receipts_agg?.count
+            ? localFormat(row?.receipts_agg?.count)
+            : row?.receipts_agg?.count ?? ''}
+        </span>
+      ),
+      header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
+      key: 'count',
+      tdClassName:
+        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
+    },
     {
       cell: (row: BlocksInfo) => (
         <span>

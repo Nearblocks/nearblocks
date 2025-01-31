@@ -7,7 +7,6 @@ import ErrorMessage from '../common/ErrorMessage';
 import FaHourglassStart from '../Icons/FaHourglassStart';
 import FileSlash from '../Icons/FileSlash';
 import ReceiptRow from './Receipts/ReceiptRow';
-import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   block: { height: string };
@@ -24,10 +23,8 @@ interface Props {
 
 const Receipt = (props: Props) => {
   const { block, hash, receipt, statsData, txn } = props;
-  const { networkId } = useConfig();
 
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
+  const txnsPending = txn?.outcomes?.status === null;
 
   return (
     <>
