@@ -10,9 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
 
-  const metaTitle = 'All Latest Near Protocol Transactions | NearBlocks';
+  const metaTitle = 'Latest Near Protocol Transactions | NearBlocks';
   const metaDescription =
-    'All Latest Near Protocol transactions confirmed on Near Blockchain. The list consists of transactions from sending Near and the transactions details for each transaction.';
+    'Latest Near Protocol transactions confirmed on Near Blockchain. The list consists of transactions from sending Near and the transactions details for each transaction.';
 
   const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
     metaTitle,
