@@ -54,7 +54,6 @@ import { isEmpty } from 'lodash';
 import NEPTokenTransactions from '../common/NEPTokenTransactions';
 import Bolt from '../Icons/Bolt';
 import ArrowDownDouble from '../Icons/ArrowDownDouble';
-import RpcTxnStatus from '../common/RpcStatus';
 import TxnStatus from '../common/Status';
 
 interface Props {
@@ -68,7 +67,6 @@ interface Props {
 
 const Details = (props: Props) => {
   const { loading, txn, rpcTxn, statsData, price, isContract = false } = props;
-
   const [more, setMore] = useState(false);
   const { t } = useTranslation();
   const actionColumnRef = useRef<HTMLDivElement>(null);
@@ -373,21 +371,11 @@ const Details = (props: Props) => {
           ) : (
             <div className="w-full md:w-3/4 break-words">
               {txn?.outcomes?.status !== undefined && (
-                <>
-                  {networkId === 'mainnet' ? (
-                    <RpcTxnStatus
-                      showLabel
-                      status={rpcTxn.status}
-                      showReceipt={<FailedReceipts data={rpcTxn} />}
-                    />
-                  ) : (
-                    <TxnStatus
-                      showLabel
-                      status={txn?.outcomes?.status}
-                      showReceipt={<FailedReceipts data={rpcTxn} />}
-                    />
-                  )}
-                </>
+                <TxnStatus
+                  showLabel
+                  status={txn?.outcomes?.status}
+                  showReceipt={<FailedReceipts data={rpcTxn} />}
+                />
               )}
               {errorMessage && (
                 <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded text-left px-2 py-1">
