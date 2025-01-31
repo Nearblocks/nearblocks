@@ -83,7 +83,7 @@ export const storeAccessKeys = async (message: types.StreamerMessage) => {
               AND created_by_block_height < $5
               AND deleted_by_block_height IS NULL;
           `,
-          value: [
+          values: [
             key.deleted_by_receipt_id,
             key.deleted_by_block_height,
             key.account_id,
