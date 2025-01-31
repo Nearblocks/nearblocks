@@ -38,7 +38,7 @@ import {
   TransactionLog,
 } from '@/utils/types';
 
-import { Ad } from '../Ad';
+import DynamicAd from '../DynamicAd';
 import ErrorMessage from '../common/ErrorMessage';
 import TxnStatus from '../common/Status';
 import TokenImage, { NFTImage } from '../common/TokenImage';
@@ -432,7 +432,7 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 hidden md:!block overflow-x-hidden">
+          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 overflow-x-hidden">
             <div className="flex flex-wrap px-4 py-2">
               <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
@@ -445,19 +445,15 @@ const Details = (props: Props) => {
                 </Tooltip>
                 Sponsored:
               </div>
-              {!txn?.signer_account_id ? (
-                <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-full max-w-xl" />
-                </div>
-              ) : (
-                <div className="w-full md:w-3/4 break-all overflow-auto h-[90px]">
-                  <Ad
-                    className="!max-w-[720px] h-[90px] bg-no-repeat "
-                    format="Leaderboard"
-                    unitId="IbT2RAk1Cdc36JPkKEfCJQ=="
-                  />
-                </div>
-              )}
+              <div className="w-full md:w-3/4 break-all overflow-auto">
+                <DynamicAd
+                  className="!max-w-[720px] !max-h-[100px] rounded-lg"
+                  breakpoint={1024}
+                  desktopUnitId="IbT2RAk1Cdc36JPkKEfCJQ=="
+                  mobileUnitId="uLZF93wBs/ew1TZnm64OxQ=="
+                  network="Near"
+                />
+              </div>
             </div>
           </div>
 

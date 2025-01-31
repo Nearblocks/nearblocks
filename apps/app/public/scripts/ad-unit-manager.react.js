@@ -1,133 +1,196 @@
-var q = {},
-  L,
-  K = document.createElement('link');
-K.href = 'https://cdn.growthmate.xyz/scripts/ad-unit.css';
-K.type = 'text/css';
-K.rel = 'stylesheet';
-document.head.appendChild(K);
-L = new IntersectionObserver(
-  (j) =>
-    j.forEach((z) => {
-      const B = z.target.attributes.getNamedItem('data-gm-id').nodeValue;
-      if (z.isIntersecting) q[B].timeout = setTimeout(() => S(B), 1000);
-      else clearTimeout(q[B].timeout);
+// Growthmate Ad Unit Manager v0.3.2
+
+const LOCAL = false;
+
+const MIN_ONSCREEN_TIME = 1000;
+const MIN_ONSCREEN_PERCENTAGE = 50;
+const DEBOUNCE_TIME = 1000;
+
+const API_BASE_URL = LOCAL
+  ? 'http://localhost:3000'
+  : 'https://api.growthmate.xyz';
+const CDN_BASE_URL = LOCAL
+  ? 'http://localhost:8080'
+  : 'https://cdn.growthmate.xyz/scripts';
+
+const state = {};
+
+let intersectionObserver;
+
+const stylesheet = document.createElement('link');
+stylesheet.href = `${CDN_BASE_URL}/v0.3.2/ad-unit.css`;
+stylesheet.type = 'text/css';
+stylesheet.rel = 'stylesheet';
+
+document.head.appendChild(stylesheet);
+
+intersectionObserver = new IntersectionObserver(
+  (entries) =>
+    entries.forEach((e) => {
+      const id = e.target.attributes.getNamedItem('data-gm-id').nodeValue;
+      if (e.isIntersecting)
+        state[id]['timeout'] = setTimeout(
+          () => registerImpression(id),
+          MIN_ONSCREEN_TIME,
+        );
+      else clearTimeout(state[id]['timeout']);
     }),
-  { threshold: 0.5 },
+  { threshold: MIN_ONSCREEN_PERCENTAGE / 100 },
 );
-window.growthmate = {
-  register: (j) => {
-    const z = document.querySelectorAll(`a[data-gm-id="${j}"]`);
-    if (z.length > 1) {
+
+window['growthmate'] = {
+  register: (id) => {
+    const units = document.querySelectorAll(`a[data-gm-id="${id}"]`);
+
+    if (units.length > 1) {
       console.error('Ad unit ids must be unique');
       return;
     }
-    if (!L) {
+
+    if (!intersectionObserver) {
       console.error('Missing intersection observer');
       return;
     }
-    const B = z[0];
+
+    const unit = units[0];
+
+    state[id] ??= {};
+
     if (
-      ((q[j] ??= {}),
-      q[j].unit != null &&
-        q[j].creation_time != null &&
-        Date.now() - q[j].creation_time <= 1000)
+      state[id]['unit'] != undefined &&
+      state[id]['creation_time'] != undefined &&
+      Date.now() - state[id]['creation_time'] <= DEBOUNCE_TIME
     ) {
-      B.replaceWith(q[j].unit);
+      unit.replaceWith(state[id]['unit']);
       return;
-    } else if (q[j].status != 'loading')
-      (q[j].status = 'loading'),
-        (q[j].unit = B),
-        R(j)
-          .then(() => {
-            q[j].status = 'success';
-          })
-          .catch((D) => {
-            console.error('Error requesting advertisment', D),
-              B.setAttribute('data-gm-is-error', !0);
-            return;
-          });
-    else return;
-    L.observe(B),
-      (B.onclick = (D) => {
-        const G = D.target.attributes.getNamedItem('data-gm-id').nodeValue;
-        return T(G), !0;
-      });
+    } else if (state[id]['status'] != 'loading') {
+      state[id]['status'] = 'loading';
+      state[id]['unit'] = unit;
+      serve(id)
+        .then(() => {
+          state[id]['status'] = 'success';
+          intersectionObserver.observe(unit);
+        })
+        .catch((err) => {
+          console.error('Error requesting advertisment', err);
+          unit.setAttribute('data-gm-is-error', true);
+          return;
+        });
+    } else {
+      return;
+    }
+
+    unit.onclick = (e) => {
+      const id = e.target.attributes.getNamedItem('data-gm-id').nodeValue;
+      registerClick(id);
+      return true;
+    };
   },
-  unregister: (j) => {
-    delete q[j];
+
+  unregister: (id) => {
+    delete state[id];
   },
 };
-var M = async (j) => {
-    const z =
-      q[j]?.unit.attributes.getNamedItem('data-gm-account-id')?.nodeValue;
-    if (z) return z;
-    if (window.selector && window.selector.isSignedIn())
-      return (await (await window.selector.wallet()).getAccounts())[0]
-        .accountId;
-    return null;
-  },
-  P = async (j) => {
-    const z = q[j]?.unit.attributes.getNamedItem('data-gm-network')?.nodeValue;
-    if (z) return z;
-    return null;
-  },
-  Q = async (j) => {
-    const z = q[j]?.unit.attributes.getNamedItem('data-gm-format')?.nodeValue;
-    if (z) return z;
-    return null;
-  },
-  R = async (j) => {
-    const [z, B, D] = await Promise.all([M(j), P(j), Q(j)]),
-      J = await (
-        await fetch('https://api.growthmate.xyz/public/v0/rec', {
-          body: JSON.stringify({
-            account_id: z,
-            ad_unit_id: j,
-            hint_media_type: D,
-            network: B,
-            referrer: window.location.href,
-          }),
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-        })
-      ).json(),
-      E = q[j].unit;
-    E.setAttribute('data-gm-is-backup', J.is_backup),
-      E.setAttribute('href', J.link),
-      E.setAttribute('target', '_blank'),
-      E.setAttribute('rel', 'noopener'),
-      (E.style.backgroundImage = `url(${J.media_url})`),
-      (E.style.backgroundSize = 'contain'),
-      (q[j] = {
-        ...q[j],
-        creation_time: Date.now(),
-        rec_id: J.rec_id,
-        unit: E,
-      });
-  },
-  S = async (j) => {
-    const z = q[j]?.rec_id,
-      B = q[j]?.ipr_id;
-    if (z == null || !!B) return;
-    const G = await (
-      await fetch('https://api.growthmate.xyz/public/v0/ipr', {
-        body: JSON.stringify({ rec_id: z }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-    ).json();
-    q[j].ipr_id = G.ipr_id;
-  },
-  T = async (j) => {
-    const z = q[j]?.rec_id,
-      B = q[j]?.clk_id;
-    if (z == null || !!B) return;
-    const G = await (
-      await fetch('https://api.growthmate.xyz/public/v0/clk', {
-        body: JSON.stringify({ rec_id: z }),
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-    ).json();
-    q[j].clk_id = G.clk_id;
+
+const getAccountId = async (id) => {
+  const accountIdAttribute =
+    state[id]?.['unit'].attributes.getNamedItem(
+      'data-gm-account-id',
+    )?.nodeValue;
+  if (accountIdAttribute) return accountIdAttribute;
+
+  if (window.selector && window.selector.isSignedIn()) {
+    return (await (await window.selector.wallet()).getAccounts())[0].accountId;
+  }
+
+  return null;
+};
+
+const getNetwork = async (id) => {
+  const networkAttribute =
+    state[id]?.['unit'].attributes.getNamedItem('data-gm-network')?.nodeValue;
+  if (networkAttribute) return networkAttribute;
+
+  return null;
+};
+
+const getFormatHint = async (id) => {
+  const formatAttribute =
+    state[id]?.['unit'].attributes.getNamedItem('data-gm-format')?.nodeValue;
+  if (formatAttribute) return formatAttribute;
+
+  return null;
+};
+
+const serve = async (id) => {
+  const [accountId, network, formatHint] = await Promise.all([
+    getAccountId(id),
+    getNetwork(id),
+    getFormatHint(id),
+  ]);
+
+  const request = await fetch(`${API_BASE_URL}/public/v0/rec`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      account_id: accountId,
+      network: network,
+      hint_media_type: formatHint,
+      ad_unit_id: id,
+      referrer: window.location.href,
+    }),
+  });
+
+  const response = await request.json();
+
+  const unit = state[id]['unit'];
+
+  if (!!response.is_backup)
+    unit.setAttribute('data-gm-is-backup', response.is_backup);
+  unit.setAttribute('href', response.link);
+  unit.setAttribute('target', '_blank');
+  unit.setAttribute('rel', 'noopener');
+  unit.style.backgroundImage = `url(${response.media_url})`;
+  unit.style.backgroundSize = 'contain';
+  // unit.style.width = `${response.unit_width}px`;
+  // unit.style.height = `${response.unit_height}px`;
+
+  state[id] = {
+    ...state[id],
+    rec_id: response.rec_id,
+    creation_time: Date.now(),
+    unit,
   };
+};
+
+const registerImpression = async (id) => {
+  const rec_id = state[id]?.['rec_id'];
+  const ipr_id = state[id]?.['ipr_id'];
+  if (rec_id == undefined || !!ipr_id) return;
+
+  const request = await fetch(`${API_BASE_URL}/public/v0/ipr`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rec_id }),
+  });
+
+  const response = await request.json();
+
+  state[id]['ipr_id'] = response.ipr_id;
+};
+
+const registerClick = async (id) => {
+  const rec_id = state[id]?.['rec_id'];
+  const clk_id = state[id]?.['clk_id'];
+  if (rec_id == undefined || !!clk_id) return;
+
+  const request = await fetch(`${API_BASE_URL}/public/v0/clk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rec_id }),
+  });
+
+  const response = await request.json();
+
+  state[id]['clk_id'] = response.clk_id;
+};
