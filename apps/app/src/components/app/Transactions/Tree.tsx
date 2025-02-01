@@ -11,7 +11,6 @@ import FileSlash from '../Icons/FileSlash';
 import Skeleton, { Loader } from '../skeleton/common/Skeleton';
 import TreeReceipt from './TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
-import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   hash: string;
@@ -21,7 +20,6 @@ interface Props {
 
 const Tree = (props: Props) => {
   const { hash, rpcTxn, txn } = props;
-  const { networkId } = useConfig();
 
   const [receipt, setReceipt] = useState<any>(null);
   const [show, setShow] = useState<any>(null);
@@ -94,9 +92,7 @@ const Tree = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
-
+  const txnsPending = txn?.outcomes?.status === null;
   return (
     <>
       {!txn ? (

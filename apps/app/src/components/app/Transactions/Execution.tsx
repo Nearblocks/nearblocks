@@ -19,7 +19,6 @@ import FaHourglassStart from '../Icons/FaHourglassStart';
 import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
 import TransactionReceipt from './Receipts/TransactionReceipt';
-import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   hash: string;
@@ -34,7 +33,6 @@ interface Props {
 
 const Execution = (props: Props) => {
   const { hash, rpcTxn, txn, statsData } = props;
-  const { networkId } = useConfig();
 
   const [receipt, setReceipt] = useState<
     any | FailedToFindReceipt | NestedReceiptWithOutcome
@@ -82,9 +80,7 @@ const Execution = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash]);
-  const txnsPending =
-    networkId === 'testnet' ? txn?.outcomes?.status === null : false;
-
+  const txnsPending = txn?.outcomes?.status === null;
   return (
     <>
       {!txn ? (
